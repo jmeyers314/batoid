@@ -2,8 +2,8 @@ all: jtrace.so libjtrace.dylib
 
 
 
-jtrace.so: libjtrace.dylib pyjtrace.o pyvec3.o pyray.o pyintersection.o pysurface.o pyparaboloid.o
-	g++ -o jtrace.so -fvisibility=hidden -bundle pyjtrace.o pyvec3.o pyray.o pyintersection.o pysurface.o pyparaboloid.o -L/Users/josh/src/lsstsw3/miniconda/lib -L/Users/josh/src/jtrace/ -lpython3.5m -ljtrace
+jtrace.so: libjtrace.dylib pyjtrace.o pyvec3.o pyray.o pyintersection.o pysurface.o pyparaboloid.o pyasphere.o
+	g++ -o jtrace.so -fvisibility=hidden -bundle pyjtrace.o pyvec3.o pyray.o pyintersection.o pysurface.o pyparaboloid.o pyasphere.o -L/Users/josh/src/lsstsw3/miniconda/lib -L/Users/josh/src/jtrace/ -lpython3.5m -ljtrace
 
 
 
@@ -25,10 +25,13 @@ pysurface.o: pysrc/surface.cpp include/surface.h
 pyparaboloid.o: pysrc/paraboloid.cpp include/paraboloid.h
 	g++ -o pyparaboloid.o -c -std=c++11 -fvisibility=hidden -Iinclude/ -I/Users/josh/src/lsstsw3/miniconda/include/python3.5m/ pysrc/paraboloid.cpp
 
+pyasphere.o: pysrc/asphere.cpp include/asphere.h
+	g++ -o pyasphere.o -c -std=c++11 -fvisibility=hidden -Iinclude/ -I/Users/josh/src/lsstsw3/miniconda/include/python3.5m/ pysrc/asphere.cpp
 
 
-libjtrace.dylib: intersection.o ray.o utils.o jtrace.o paraboloid.o
-	g++ -o libjtrace.dylib -dynamiclib ray.o utils.o jtrace.o intersection.o paraboloid.o
+
+libjtrace.dylib: intersection.o ray.o utils.o jtrace.o paraboloid.o asphere.o
+	g++ -o libjtrace.dylib -dynamiclib ray.o utils.o jtrace.o intersection.o paraboloid.o asphere.o
 
 jtrace.o: src/jtrace.cpp include/jtrace.h
 	g++ -o jtrace.o -c -std=c++11 -I include/ src/jtrace.cpp
@@ -44,3 +47,6 @@ intersection.o: src/intersection.cpp include/intersection.h
 
 paraboloid.o: src/paraboloid.cpp include/paraboloid.h
 	g++ -o paraboloid.o -c -std=c++11 -I include/ src/paraboloid.cpp
+
+asphere.o: src/asphere.cpp include/asphere.h
+	g++ -o asphere.o -c -std=c++11 -I include/ src/asphere.cpp

@@ -3,6 +3,7 @@
 
 #include "jtrace.h"
 #include "surface.h"
+#include "solve.h"
 
 namespace jtrace {
 
@@ -12,6 +13,10 @@ namespace jtrace {
         virtual double operator()(double, double) const;
         virtual Vec3 normal(double, double) const;
         virtual Intersection intersect(const Ray&) const;
+        double getR() const {return R;}
+        double getKappa() const {return kappa;}
+        const std::vector<double>& getAlpha() const {return alpha;}
+        double getB() const {return B;}
 
         std::string repr() const;
 

@@ -10,8 +10,9 @@ namespace jtrace {
             .def(py::init<double,double>())
             .def_property_readonly("A", &Paraboloid::getA)
             .def_property_readonly("B", &Paraboloid::getB)
-            .def("intersect", &Paraboloid::intersect)
             .def("__call__", &Paraboloid::operator())
+            .def("normal", &Paraboloid::normal)
+            .def("intersect", &Paraboloid::intersect)
             .def("__repr__", &Paraboloid::repr);
     }
 }

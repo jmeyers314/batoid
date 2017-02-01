@@ -10,6 +10,7 @@ namespace jtrace {
     void pyExportIntersection(py::module &);
     void pyExportSurface(py::module &);
     void pyExportParaboloid(py::module &);
+    void pyExportAsphere(py::module &);
 
     PYBIND11_PLUGIN(jtrace) {
         py::module m("jtrace", "ray tracer");
@@ -19,6 +20,7 @@ namespace jtrace {
         pyExportIntersection(m);
         pyExportSurface(m);
         pyExportParaboloid(m);
+        pyExportAsphere(m);
 
         return m.ptr();
     }

@@ -21,3 +21,11 @@ import jtrace
 ray = jtrace.Ray(jtrace.Vec3(0,0.5,0), jtrace.Vec3(0,0,1))
 para = jtrace.Paraboloid(1, 1)
 print(para.intersect(ray))
+
+asphere = jtrace.Asphere(1.0, -1.0, [0.0, 0.001], 0.0)
+print(asphere)
+print(asphere.alpha)
+isec = asphere.intersect(ray)
+print(isec)
+print(asphere(isec.point.x, isec.point.y))
+print(ray(isec.t))

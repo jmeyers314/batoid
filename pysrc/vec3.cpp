@@ -12,6 +12,9 @@ namespace jtrace {
             .def("MagnitudeSquared", &Vec3::MagnitudeSquared)
             .def("Magnitude", &Vec3::Magnitude)
             .def("UnitVec3", &Vec3::UnitVec3)
-            .def("__repr__", &Vec3::repr);
+            .def("__repr__", &Vec3::repr)
+            .def_readonly("x", &Vec3::x)
+            .def_readonly("y", &Vec3::y)
+            .def_readonly("z", &Vec3::z);
     }
 }
