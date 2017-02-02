@@ -2,7 +2,6 @@
 #include "intersection.h"
 
 namespace py = pybind11;
-using namespace pybind11::literals;
 
 namespace jtrace {
     void pyExportIntersection(py::module &m) {

@@ -2,7 +2,6 @@
 #include "vec3.h"
 
 namespace py = pybind11;
-using namespace pybind11::literals;
 
 namespace jtrace {
     void pyExportVec3(py::module &m) {

@@ -1,7 +1,10 @@
 #ifndef __jem_intersection__h
 #define __jem_intersection__h
 
+#include <string>
+#include <sstream>
 #include "vec3.h"
+#include "surface.h"
 
 namespace jtrace {
     class Surface;

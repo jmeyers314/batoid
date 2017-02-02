@@ -3,7 +3,6 @@
 #include "asphere.h"
 
 namespace py = pybind11;
-using namespace pybind11::literals;
 
 namespace jtrace {
     void pyExportAsphere(py::module &m) {

@@ -1,4 +1,5 @@
 #include "asphere.h"
+#include "solve.h"
 #include "paraboloid.h"
 
 namespace jtrace {

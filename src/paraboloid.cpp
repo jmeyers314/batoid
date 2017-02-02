@@ -1,5 +1,4 @@
 #include "paraboloid.h"
-#include "utils.h"
 
 namespace jtrace {
 

@@ -28,6 +28,8 @@
 
 #include <cmath>
 #include <limits>
+#include <stdexcept>
+#include <sstream>
 
 namespace jtrace {
 

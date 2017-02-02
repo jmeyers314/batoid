@@ -1,9 +1,8 @@
 #ifndef __jem_asphere__h
 #define __jem_asphere__h
 
+#include<vector>
 #include "jtrace.h"
-#include "surface.h"
-#include "solve.h"
 
 namespace jtrace {
 

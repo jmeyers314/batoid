@@ -1,6 +1,8 @@
 #ifndef __jem_ray__h
 #define __jem_ray__h
 
+#include <sstream>
+#include <string>
 #include "vec3.h"
 
 namespace jtrace {
@@ -12,11 +14,7 @@ namespace jtrace {
         double t0; // reference time
         Vec3 operator()(double t) const {return p0+v*(t-t0);}
 
-        std::string repr() const {
-            std::ostringstream oss(" ");
-            oss << "Ray(" << p0 << ", " << v << ", " << t0 << ")";
-            return oss.str();
-        }
+        std::string repr() const;
     };
 
     inline std::ostream& operator<<(std::ostream& os, const Ray &r);

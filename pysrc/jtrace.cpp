@@ -2,7 +2,6 @@
 #include "jtrace.h"
 
 namespace py = pybind11;
-using namespace pybind11::literals;
 
 namespace jtrace {
     void pyExportVec3(py::module &);
@@ -11,6 +10,7 @@ namespace jtrace {
     void pyExportSurface(py::module &);
     void pyExportParaboloid(py::module &);
     void pyExportAsphere(py::module &);
+    void pyExportPlane(py::module &);
 
     PYBIND11_PLUGIN(jtrace) {
         py::module m("jtrace", "ray tracer");
@@ -21,6 +21,7 @@ namespace jtrace {
         pyExportSurface(m);
         pyExportParaboloid(m);
         pyExportAsphere(m);
+        pyExportPlane(m);
 
         return m.ptr();
     }

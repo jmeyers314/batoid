@@ -2,7 +2,6 @@
 #include "paraboloid.h"
 
 namespace py = pybind11;
-using namespace pybind11::literals;
 
 namespace jtrace {
     void pyExportParaboloid(py::module &m) {
