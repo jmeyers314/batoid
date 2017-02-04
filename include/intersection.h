@@ -9,11 +9,12 @@
 namespace jtrace {
     class Surface;
     struct Intersection {
-        Intersection(double _t, Vec3 _point, Vec3 _surfaceNormal, const Surface* _surface);
+        Intersection(const double _t, const Vec3 _point,
+                     const Vec3 _surfaceNormal, const Surface* _surface);
 
-        double t;
-        Vec3 point;
-        Vec3 surfaceNormal;
+        const double t;
+        const Vec3 point;
+        const Vec3 surfaceNormal;
         const Surface* surface; // Pointer to surface that was intersected.
 
         std::string repr() const;
