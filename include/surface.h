@@ -6,7 +6,7 @@
 #include "intersection.h"
 
 namespace jtrace {
-    class Intersection;
+    struct Intersection;
     class Surface {
     public:
         virtual double operator()(double, double) const = 0;
