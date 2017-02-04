@@ -1,7 +1,5 @@
 import sys
 import os
-d = os.path.dirname(__file__)
-sys.path.append(os.path.join(d, '../'))
 
 import jtrace
 # para = jtrace.Paraboloid(0.0, 0.0)
