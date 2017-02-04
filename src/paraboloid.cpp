@@ -38,6 +38,8 @@ namespace jtrace {
             if (r1 < 0) {
                 if (r2 < 0) {
                     throw NoFutureIntersectionError("");
+                } else {
+                    t = r2;
                 }
             } else {
                 if (r2 < 0) {
