@@ -17,6 +17,14 @@ namespace jtrace {
         const Vec3 surfaceNormal;
         const Surface* surface; // Pointer to surface that was intersected.
 
+        double getX0() const { return point.x; }
+        double getY0() const { return point.y; }
+        double getZ0() const { return point.z; }
+
+        double getNx() const { return surfaceNormal.x; }
+        double getNy() const { return surfaceNormal.y; }
+        double getNz() const { return surfaceNormal.z; }
+
         Ray reflectedRay(const Ray &) const;
         std::string repr() const;
     };
