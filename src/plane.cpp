@@ -5,6 +5,7 @@ namespace jtrace {
 
     Intersection Plane::intersect(const Ray &r) const {
         double t = (B - r.p0.z)/r.v.z;
+        t += r.t0;
         Vec3 point = r(t);
         Vec3 surfaceNormal = normal(point.x, point.y);
         return Intersection(t, point, surfaceNormal, this);

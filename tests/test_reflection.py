@@ -5,6 +5,60 @@ def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
     return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
 
 
+def test_plane_reflection_plane():
+    import random
+    plane = jtrace.Plane(10)
+    for i in range(100):
+        x = random.gauss(0, 1)
+        y = random.gauss(0, 1)
+        vx = random.gauss(0, 1e-1)
+        vy = random.gauss(0, 1e-1)
+        ray = jtrace.Ray(x, y, 0, vx, vy, 1, 0)
+        isec = plane.intersect(ray)
+        rray = isec.reflectedRay(ray)
+
+        # ray.v, surfaceNormal, and rray.v should all be in the same plane, and
+        # hence (ray.v x surfaceNormal) . rray.v should have zero magnitude.
+        # magnitude zero.
+        assert isclose(
+            jtrace.DotProduct(
+                jtrace.CrossProduct(ray.v, isec.surfaceNormal),
+                rray.v),
+            0.0, rel_tol=0, abs_tol=1e-15)
+
+
+def test_plane_reflection_reversal():
+    import random
+    plane = jtrace.Plane(10)
+    for i in range(100):
+        x = random.gauss(0, 1)
+        y = random.gauss(0, 1)
+        vx = random.gauss(0, 1e-1)
+        vy = random.gauss(0, 1e-1)
+        ray = jtrace.Ray(jtrace.Vec3(x, y, 0),
+                         jtrace.Vec3(vx, vy, 1).UnitVec3(),
+                         0)
+        isec = plane.intersect(ray)
+        rray = isec.reflectedRay(ray)
+
+        # Invert the reflected ray, and see that it ends back at the starting
+        # point
+
+        # Keep going a bit before turning around though
+        turn_around = rray(rray.t0+0.1)
+        return_ray = jtrace.Ray(turn_around, -rray.v, -(rray.t0+0.1))
+        risec = plane.intersect(return_ray)
+        assert isclose(isec.point.x, risec.point.x, rel_tol=0, abs_tol=1e-11)
+        assert isclose(isec.point.y, risec.point.y, rel_tol=0, abs_tol=1e-11)
+        assert isclose(isec.point.z, risec.point.z, rel_tol=0, abs_tol=1e-11)
+        # Reflect and propagate back to t=0.
+        cray = risec.reflectedRay(return_ray)
+        cray = cray(0)
+        assert isclose(cray.x, x, rel_tol=0, abs_tol=1e-10)
+        assert isclose(cray.y, y, rel_tol=0, abs_tol=1e-10)
+        assert isclose(cray.z, 0, rel_tol=0, abs_tol=1e-10)
+
+
 def test_paraboloid_reflection_plane():
     import random
     para = jtrace.Paraboloid(-0.1, 10)
@@ -82,6 +136,8 @@ def test_paraboloid_reflection_to_focus():
 
 
 if __name__ == '__main__':
+    test_plane_reflection_plane()
+    test_plane_reflection_reversal()
     test_paraboloid_reflection_plane()
     test_paraboloid_reflection_reversal()
     test_paraboloid_reflection_to_focus()
