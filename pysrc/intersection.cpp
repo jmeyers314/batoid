@@ -11,6 +11,7 @@ namespace jtrace {
             .def("__repr__", &Intersection::repr)
             .def_readonly("t", &Intersection::t)
             .def_readonly("point", &Intersection::point)
-            .def_readonly("surfaceNormal", &Intersection::surfaceNormal);
+            .def_readonly("surfaceNormal", &Intersection::surfaceNormal)
+            .def("reflectedRay", &Intersection::reflectedRay);
     }
 }

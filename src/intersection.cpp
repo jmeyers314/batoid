@@ -6,6 +6,11 @@ namespace jtrace {
                                const Vec3 _surfaceNormal, const Surface* _surface) :
         t(_t), point(_point), surfaceNormal(_surfaceNormal), surface(_surface) {}
 
+    Ray Intersection::reflectedRay(const Ray &r) const {
+        double c1 = DotProduct(r.v, surfaceNormal);
+        return Ray(point, r.v + 2*c1*surfaceNormal, t);
+    }
+
     std::string Intersection::repr() const {
         std::ostringstream oss(" ");
         oss << "Intersection(" << t << ", " << point << ", " << surfaceNormal << ")";
