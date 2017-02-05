@@ -66,13 +66,13 @@ def test_intersect():
             isec = asphere.intersect(r)
             assert isclose(isec.point.x, x)
             assert isclose(isec.point.y, y)
-            assert isclose(isec.point.z, asphere(x, y), abs_tol=1e-9)
+            assert isclose(isec.point.z, asphere(x, y), rel_tol=0, abs_tol=1e-9)
 
             # We can also check just for mutual consistency of the asphere,
             # ray and intersection.
 
-            vx = random.gauss(0.0, 0.001)
-            vy = random.gauss(0.0, 0.001)
+            vx = random.gauss(0.0, 0.01)
+            vy = random.gauss(0.0, 0.01)
             vz = 1.0
             v = jtrace.Vec3(vx, vy, vz).UnitVec3()
             r = jtrace.Ray(jtrace.Vec3(x, y, -10), v, 0)
@@ -82,7 +82,7 @@ def test_intersect():
             assert isclose(p1.x, p2.x)
             assert isclose(p1.y, p2.y)
             assert isclose(p1.z, p2.z)
-            assert isclose(asphere(p1.x, p2.y), p1.z, abs_tol=1e-9)
+            assert isclose(asphere(p1.x, p2.y), p1.z, rel_tol=0, abs_tol=1e-9)
 
 if __name__ == '__main__':
     test_properties()

@@ -43,13 +43,13 @@ def test_intersect():
             isec = para.intersect(r)
             assert isclose(isec.point.x, x)
             assert isclose(isec.point.y, y)
-            assert isclose(isec.point.z, para(x, y))
+            assert isclose(isec.point.z, para(x, y), rel_tol=0, abs_tol=1e-9)
 
             # We can also check just for mutual consistency of the paraboloid,
             # ray and intersection.
 
-            vx = random.gauss(0.0, 0.001)
-            vy = random.gauss(0.0, 0.001)
+            vx = random.gauss(0.0, 0.1)
+            vy = random.gauss(0.0, 0.1)
             vz = 1.0
             v = jtrace.Vec3(vx, vy, vz).UnitVec3()
             r = jtrace.Ray(jtrace.Vec3(x, y, -10), v, 0)
@@ -59,7 +59,7 @@ def test_intersect():
             assert isclose(p1.x, p2.x)
             assert isclose(p1.y, p2.y)
             assert isclose(p1.z, p2.z)
-            assert isclose(para(p1.x, p2.y), p1.z, abs_tol=1e-6)
+            assert isclose(para(p1.x, p2.y), p1.z, rel_tol=0, abs_tol=1e-6)
 
 
 if __name__ == '__main__':
