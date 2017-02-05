@@ -13,7 +13,9 @@ def test_plane_reflection_plane():
         y = random.gauss(0, 1)
         vx = random.gauss(0, 1e-1)
         vy = random.gauss(0, 1e-1)
-        ray = jtrace.Ray(x, y, 0, vx, vy, 1, 0)
+        ray = jtrace.Ray(jtrace.Vec3(x, y, 0),
+                         jtrace.Vec3(vx, vy, 1).UnitVec3(),
+                         0)
         isec = plane.intersect(ray)
         rray = isec.reflectedRay(ray)
 
@@ -25,6 +27,12 @@ def test_plane_reflection_plane():
                 jtrace.CrossProduct(ray.v, isec.surfaceNormal),
                 rray.v),
             0.0, rel_tol=0, abs_tol=1e-15)
+
+        # Actually, reflection off a plane is pretty straigtforward to test
+        # directly.
+        assert isclose(ray.v.x, rray.v.x)
+        assert isclose(ray.v.y, rray.v.y)
+        assert isclose(ray.v.z, -rray.v.z)
 
 
 def test_plane_reflection_reversal():

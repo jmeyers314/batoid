@@ -20,10 +20,12 @@ def test_call():
         # Test both ways of constructing a Ray
         r1 = jtrace.Ray(x, y, z, vx, vy, vz, t0)
         r2 = jtrace.Ray(jtrace.Vec3(x, y, z), jtrace.Vec3(vx, vy, vz), t0)
+        # Ray normalizes the "velocity" vector to a unit vector.
+        v = jtrace.Vec3(vx, vy, vz).UnitVec3()
         for r in [r1, r2]:
-            assert isclose(r(t).x, x+vx*(t-t0))
-            assert isclose(r(t).y, y+vy*(t-t0))
-            assert isclose(r(t).z, z+vz*(t-t0))
+            assert isclose(r(t).x, x+v.x*(t-t0))
+            assert isclose(r(t).y, y+v.y*(t-t0))
+            assert isclose(r(t).z, z+v.z*(t-t0))
 
 
 def test_properties():
@@ -39,11 +41,12 @@ def test_properties():
 
         r1 = jtrace.Ray(x, y, z, vx, vy, vz, t0)
         r2 = jtrace.Ray(jtrace.Vec3(x, y, z), jtrace.Vec3(vx, vy, vz), t0)
+        v = jtrace.Vec3(vx, vy, vz).UnitVec3()
         for r in [r1, r2]:
             assert r.p0.x == x
             assert r.p0.y == y
             assert r.p0.z == z
-            assert r.v.x == vx
-            assert r.v.y == vy
-            assert r.v.z == vz
+            assert r.v.x == v.x
+            assert r.v.y == v.y
+            assert r.v.z == v.z
             assert r.t0 == t0
