@@ -43,6 +43,20 @@ namespace jtrace {
             return *this;
         }
 
+        Vec3& operator-=(const Vec3& other) {
+            x -= other.x;
+            y -= other.y;
+            z -= other.z;
+            return *this;
+        }
+
+        Vec3& operator/=(const double factor) {
+            x /= factor;
+            y /= factor;
+            z /= factor;
+            return *this;
+        }
+
         std::string repr() const {
             std::ostringstream oss(" ");
             oss << "Vec3(" << x << ", " << y << ", " << z << ")";
@@ -87,6 +101,14 @@ namespace jtrace {
 
     inline Vec3 operator/(const Vec3& v, double s) {
         return Vec3(v.x/s, v.y/s, v.z/s);
+    }
+
+    inline bool operator==(const Vec3& a, const Vec3& b) {
+        return a.x == b.x && a.y == b.y && a.z == b.z;
+    }
+
+    inline bool operator!=(const Vec3& a, const Vec3& b) {
+        return a.x != b.x || a.y != b.y || a.z != b.z;
     }
 }
 
