@@ -3,7 +3,7 @@
 
 namespace jtrace {
 
-    constexpr double TOLERANCE = 1.0e-8;
+    constexpr double TOLERANCE = 1.0e-9;
 
     inline bool IsZero(double x) { return (fabs(x) < TOLERANCE); }
 

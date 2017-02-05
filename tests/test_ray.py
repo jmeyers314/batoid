@@ -1,7 +1,9 @@
 import jtrace
 
+
 def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
     return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
+
 
 def test_call():
     import random
@@ -22,6 +24,7 @@ def test_call():
             assert isclose(r(t).x, x+vx*(t-t0))
             assert isclose(r(t).y, y+vy*(t-t0))
             assert isclose(r(t).z, z+vz*(t-t0))
+
 
 def test_properties():
     import random
