@@ -26,7 +26,8 @@ namespace jtrace {
             .def(py::self / float())
             .def(py::self /= float())
             .def(py::self == py::self)
-            .def(py::self != py::self);
+            .def(py::self != py::self)
+            .def(-py::self);
         m.def("DotProduct", &DotProduct);
         m.def("CrossProduct", &CrossProduct);
     }

@@ -8,7 +8,7 @@ namespace jtrace {
 
     Ray Intersection::reflectedRay(const Ray &r) const {
         double c1 = DotProduct(r.v, surfaceNormal);
-        return Ray(point, r.v + 2*c1*surfaceNormal, t);
+        return Ray(point, (r.v - 2*c1*surfaceNormal).UnitVec3(), t);
     }
 
     std::string Intersection::repr() const {

@@ -50,6 +50,7 @@ namespace jtrace {
             }
         }
 
+        t += ray.t0;
         Vec3 point = ray(t);
         Vec3 surfaceNormal = normal(point.x, point.y);
         return Intersection(t, point, surfaceNormal, this);
