@@ -53,7 +53,7 @@ def test_intersect():
         R = random.gauss(25.0, 0.2)
         kappa = random.uniform(-1.0, -0.9)
         nalpha = random.randint(0, 4)
-        alpha = [random.gauss(0, 1e-2) for i in range(nalpha)]
+        alpha = [random.gauss(0, 1e-6) for i in range(nalpha)]
         B = random.gauss(0, 1.1)
         asphere = jtrace.Asphere(R, kappa, alpha, B)
         for j in range(10):
@@ -62,11 +62,11 @@ def test_intersect():
 
             # If we shoot rays straight up, then it's easy to predict the
             # intersection points.
-            r = jtrace.Ray(x, y, -1000, 0, 0, 1, 0)
+            r = jtrace.Ray(x, y, -10, 0, 0, 1, 0)
             isec = asphere.intersect(r)
             assert isclose(isec.point.x, x)
             assert isclose(isec.point.y, y)
-            # assert isclose(isec.point.z, asphere(x, y), abs_tol=1e-3)
+            assert isclose(isec.point.z, asphere(x, y), abs_tol=1e-9)
 
             # We can also check just for mutual consistency of the asphere,
             # ray and intersection.
@@ -75,15 +75,16 @@ def test_intersect():
             vy = random.gauss(0.0, 0.001)
             vz = 1.0
             v = jtrace.Vec3(vx, vy, vz).UnitVec3()
-            r = jtrace.Ray(jtrace.Vec3(x, y, -1000), v, 0)
+            r = jtrace.Ray(jtrace.Vec3(x, y, -10), v, 0)
             isec = asphere.intersect(r)
             p1 = r(isec.t)
             p2 = isec.point
             assert isclose(p1.x, p2.x)
             assert isclose(p1.y, p2.y)
             assert isclose(p1.z, p2.z)
-            # assert isclose(asphere(p1.x, p2.y), p1.z, abs_tol=1e-3)
+            assert isclose(asphere(p1.x, p2.y), p1.z, abs_tol=1e-9)
 
 if __name__ == '__main__':
     test_properties()
     test_call()
+    test_intersect()

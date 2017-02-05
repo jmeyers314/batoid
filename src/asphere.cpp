@@ -30,7 +30,8 @@ namespace jtrace {
         AsphereResidual(const Asphere &_a, const Ray &_r) : a(_a), r(_r) {}
         double operator()(double t) const {
             Vec3 p = r(t);
-            return a(p.x, p.y) - p.z;
+            double resid = a(p.x, p.y) - p.z;
+            return resid;
         }
     private:
         const Asphere &a;
@@ -42,28 +43,12 @@ namespace jtrace {
         double A = 1./(2*R);
         Paraboloid para(A, B);
         Intersection isec = para.intersect(r);
-        double zpara = isec.point.z;
-        double zasphere = (*this)(isec.point.x, isec.point.y);
-        Solve<AsphereResidual> solve(AsphereResidual(*this, r), isec.t, isec.t+1e-3);
-
-        double t;
-        if (zpara > zasphere) {
-            if (r.v.z < 0) {
-                solve.bracketUpper();
-                t = solve.root();
-            } else {
-                solve.bracketLower();
-                t = solve.root();
-            }
-        } else {
-            if (r.v.z < 0) {
-                solve.bracketLower();
-                t = solve.root();
-            } else {
-                solve.bracketUpper();
-                t = solve.root();
-            }
-        }
+        AsphereResidual resid(*this, r);
+        Solve<AsphereResidual> solve(resid, isec.t, isec.t+1e-2);
+        solve.setMethod(Method::Brent);
+        solve.setXTolerance(1e-9);
+        solve.bracket();
+        double t = solve.root();
 
         Vec3 point = r(t);
         Vec3 surfaceNormal = normal(point.x, point.y);
