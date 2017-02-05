@@ -45,7 +45,7 @@ def test_intersect():
             assert isclose(isec.point.y, y)
             assert isclose(isec.point.z, para(x, y))
 
-            # We can also check just for mutual consistency the paraboloid,
+            # We can also check just for mutual consistency of the paraboloid,
             # ray and intersection.
 
             vx = random.gauss(0.0, 0.001)

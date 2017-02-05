@@ -8,7 +8,7 @@ def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
 def test_plane_reflection_plane():
     import random
     plane = jtrace.Plane(10)
-    for i in range(100):
+    for i in range(1000):
         x = random.gauss(0, 1)
         y = random.gauss(0, 1)
         vx = random.gauss(0, 1e-1)
@@ -30,7 +30,7 @@ def test_plane_reflection_plane():
 def test_plane_reflection_reversal():
     import random
     plane = jtrace.Plane(10)
-    for i in range(100):
+    for i in range(1000):
         x = random.gauss(0, 1)
         y = random.gauss(0, 1)
         vx = random.gauss(0, 1e-1)
@@ -48,9 +48,9 @@ def test_plane_reflection_reversal():
         turn_around = rray(rray.t0+0.1)
         return_ray = jtrace.Ray(turn_around, -rray.v, -(rray.t0+0.1))
         risec = plane.intersect(return_ray)
-        assert isclose(isec.point.x, risec.point.x, rel_tol=0, abs_tol=1e-11)
-        assert isclose(isec.point.y, risec.point.y, rel_tol=0, abs_tol=1e-11)
-        assert isclose(isec.point.z, risec.point.z, rel_tol=0, abs_tol=1e-11)
+        assert isclose(isec.point.x, risec.point.x, rel_tol=0, abs_tol=1e-10)
+        assert isclose(isec.point.y, risec.point.y, rel_tol=0, abs_tol=1e-10)
+        assert isclose(isec.point.z, risec.point.z, rel_tol=0, abs_tol=1e-10)
         # Reflect and propagate back to t=0.
         cray = risec.reflectedRay(return_ray)
         cray = cray(0)
@@ -62,7 +62,7 @@ def test_plane_reflection_reversal():
 def test_paraboloid_reflection_plane():
     import random
     para = jtrace.Paraboloid(-0.1, 10)
-    for i in range(100):
+    for i in range(1000):
         x = random.gauss(0, 1)
         y = random.gauss(0, 1)
         vx = random.gauss(0, 1e-1)
@@ -84,7 +84,7 @@ def test_paraboloid_reflection_plane():
 def test_paraboloid_reflection_reversal():
     import random
     para = jtrace.Paraboloid(-0.1, 10)
-    for i in range(100):
+    for i in range(1000):
         x = random.gauss(0, 1)
         y = random.gauss(0, 1)
         vx = random.gauss(0, 1e-1)
@@ -103,9 +103,9 @@ def test_paraboloid_reflection_reversal():
         return_ray = jtrace.Ray(turn_around, -rray.v, -(rray.t0+0.1))
         risec = para.intersect(return_ray)
         # First check that we intersected at the same point
-        assert isclose(isec.point.x, risec.point.x, rel_tol=0, abs_tol=1e-11)
-        assert isclose(isec.point.y, risec.point.y, rel_tol=0, abs_tol=1e-11)
-        assert isclose(isec.point.z, risec.point.z, rel_tol=0, abs_tol=1e-11)
+        assert isclose(isec.point.x, risec.point.x, rel_tol=0, abs_tol=1e-10)
+        assert isclose(isec.point.y, risec.point.y, rel_tol=0, abs_tol=1e-10)
+        assert isclose(isec.point.z, risec.point.z, rel_tol=0, abs_tol=1e-10)
         # Reflect and propagate back to t=0.
         cray = risec.reflectedRay(return_ray)
         cray = cray(0)
