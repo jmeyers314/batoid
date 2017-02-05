@@ -30,7 +30,7 @@ def test_call():
 def test_intersect():
     import random
     for i in range(100):
-        A = random.gauss(0.2, 0.1)
+        A = random.gauss(0.05, 0.01)
         B = random.gauss(0.4, 0.2)
         para = jtrace.Paraboloid(A, B)
         for j in range(10):
@@ -52,11 +52,17 @@ def test_intersect():
             vy = random.gauss(0.0, 0.001)
             vz = 1.0
             v = jtrace.Vec3(vx, vy, vz).UnitVec3()
-            r = jtrace.Ray(jtrace.Vec3(x, y, -1000), v, 0)
+            r = jtrace.Ray(jtrace.Vec3(x, y, -10), v, 0)
             isec = para.intersect(r)
             p1 = r(isec.t)
             p2 = isec.point
             assert isclose(p1.x, p2.x)
             assert isclose(p1.y, p2.y)
             assert isclose(p1.z, p2.z)
-            assert isclose(para(p1.x, p2.y), p1.z, abs_tol=1e-3)
+            assert isclose(para(p1.x, p2.y), p1.z, abs_tol=1e-6)
+
+
+if __name__ == '__main__':
+    test_properties()
+    test_call()
+    test_intersect()
