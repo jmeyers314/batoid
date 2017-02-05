@@ -12,6 +12,10 @@ namespace jtrace {
         return oss.str();
     }
 
+    Vec3 Ray::operator()(const double t) const {
+        return p0+v*(t-t0);
+    }
+
     inline std::ostream& operator<<(std::ostream& os, const Ray &r) {
         return os << r.repr();
     }
