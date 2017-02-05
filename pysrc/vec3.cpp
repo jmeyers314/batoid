@@ -15,5 +15,7 @@ namespace jtrace {
             .def_readonly("x", &Vec3::x)
             .def_readonly("y", &Vec3::y)
             .def_readonly("z", &Vec3::z);
+        m.def("DotProduct", &DotProduct);
+        m.def("CrossProduct", &CrossProduct);
     }
 }

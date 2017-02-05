@@ -114,6 +114,8 @@ setup(
     long_description='',
     ext_modules=ext_modules,
     install_requires=['pybind11>=1.7'],
+    setup_requires=['pytest-runner'],
+    tests_require=['pytest'],
     cmdclass={'build_ext': BuildExt},
     zip_safe=False,
 )
