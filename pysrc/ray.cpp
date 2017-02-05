@@ -16,6 +16,12 @@ namespace jtrace {
             .def_readonly("p0", &Ray::p0)
             .def_readonly("v", &Ray::v)
             .def_readonly("t0", &Ray::t0)
+            .def_property_readonly("x0", &Ray::getX0)
+            .def_property_readonly("y0", &Ray::getY0)
+            .def_property_readonly("z0", &Ray::getZ0)
+            .def_property_readonly("vx", &Ray::getVx)
+            .def_property_readonly("vy", &Ray::getVy)
+            .def_property_readonly("vz", &Ray::getVz)
             .def("__call__", &Ray::operator())
             .def("__repr__", &Ray::repr);
     }

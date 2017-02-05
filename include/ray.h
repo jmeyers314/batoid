@@ -13,6 +13,12 @@ namespace jtrace {
         Vec3 v;  // "velocity" Vec3
         double t0; // reference time
         Vec3 operator()(double t) const;
+        double getX0() const { return p0.x; }
+        double getY0() const { return p0.y; }
+        double getZ0() const { return p0.z; }
+        double getVx() const { return v.x; }
+        double getVy() const { return v.y; }
+        double getVz() const { return v.z; }
 
         std::string repr() const;
     };
