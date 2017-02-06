@@ -27,6 +27,11 @@ namespace jtrace {
         const char * const message;
     };
 
+    class NotImplemented : public std::logic_error {
+    public:
+        NotImplemented(std::string s="") : std::logic_error(s) {}
+    };
+
 }
 
 #endif

@@ -12,6 +12,7 @@ namespace jtrace {
         virtual double operator()(double, double) const = 0;
         virtual Vec3 normal(double, double) const = 0;
         virtual Intersection intersect(const Ray&) const = 0;
+        virtual std::string repr() const = 0;
     };
 
 }
