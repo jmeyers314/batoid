@@ -8,7 +8,7 @@ namespace jtrace {
         t += r.t0;
         Vec3 point = r(t);
         Vec3 surfaceNormal = normal(point.x, point.y);
-        return Intersection(t, point, surfaceNormal, this);
+        return Intersection(t, point, surfaceNormal);
     }
 
     std::string Plane::repr() const {

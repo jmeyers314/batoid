@@ -23,7 +23,7 @@ namespace jtrace {
         Ray rr {r.p0-dr, r.v, r.t0};
         Intersection isec = transformee->intersect(rr);
         // Now transform intersection back into transformed coord sys.
-        return Intersection(isec.t, isec.point+dr, isec.surfaceNormal, this);
+        return Intersection(isec.t, isec.point+dr, isec.surfaceNormal);
     }
 
     std::string Transformation::repr() const {
