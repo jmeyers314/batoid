@@ -21,6 +21,11 @@ def test_properties():
         assert transformed.dx == dx
         assert transformed.dy == dy
         assert transformed.dz == dz
+        # Try other way to effect a shift.
+        transformed2 = asphere.shift(dx, dy, dz)
+        assert transformed2.dx == dx
+        assert transformed2.dy == dy
+        assert transformed2.dz == dz
 
 
 def test_intersect():
@@ -35,7 +40,7 @@ def test_intersect():
         dx = random.gauss(0, 1)
         dy = random.gauss(0, 1)
         dz = random.gauss(0, 1)
-        transformed = jtrace.Transformation(asphere, dx, dy, dz)
+        transformed = asphere.shift(dx, dy, dz)
 
         for j in range(10):
             x = random.gauss(0.0, 1.0)

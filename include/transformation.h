@@ -2,8 +2,10 @@
 #define __jem_transformation__h
 
 #include "jtrace.h"
-namespace jtrace {
 
+namespace jtrace {
+    struct Intersection;
+    class Surface;
     class Transformation : public Surface {
     public:
         Transformation(const Surface*, double dx, double dy, double dz);

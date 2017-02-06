@@ -7,12 +7,14 @@
 
 namespace jtrace {
     struct Intersection;
+    class Transformation;
     class Surface {
     public:
         virtual double operator()(double, double) const = 0;
         virtual Vec3 normal(double, double) const = 0;
         virtual Intersection intersect(const Ray&) const = 0;
         virtual std::string repr() const = 0;
+        Transformation shift(double dx, double dy, double dz) const;
     };
 
 }

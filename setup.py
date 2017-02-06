@@ -28,6 +28,7 @@ ext_modules = [
          'src/asphere.cpp',
          'src/paraboloid.cpp',
          'src/transformation.cpp',
+         'src/surface.cpp',
          'src/intersection.cpp',
          'src/ray.cpp',
          'src/utils.cpp',
