@@ -40,7 +40,10 @@ def test_intersect():
         dx = random.gauss(0, 1)
         dy = random.gauss(0, 1)
         dz = random.gauss(0, 1)
-        transformed = asphere.shift(dx, dy, dz)
+        # transformed = asphere.shift(dx, dy, dz).rotX(0.1)
+        shifted = asphere.shift(dx, dy, dz)
+        transformed = shifted.rotX(0.1)
+        print(transformed)
 
         for j in range(10):
             x = random.gauss(0.0, 1.0)

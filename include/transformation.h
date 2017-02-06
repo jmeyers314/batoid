@@ -3,6 +3,7 @@
 
 #include "jtrace.h"
 #include <array>
+#include <memory>
 
 namespace jtrace {
     struct Intersection;
@@ -16,9 +17,11 @@ namespace jtrace {
         virtual Vec3 normal(double, double) const;
         virtual Intersection intersect(const Ray&) const;
         std::string repr() const;
+        Vec3 getDr() const { return dr; }
         double getDx() const { return dr.x; }
         double getDy() const { return dr.y; }
         double getDz() const { return dr.z; }
+        std::array<std::array<double, 3>, 3> getR() const { return rot3; }
     private:
         const Surface* transformee;
         const Vec3 dr;

@@ -28,7 +28,6 @@ namespace jtrace {
 
     std::string Transformation::repr() const {
         std::ostringstream oss(" ");
-        // oss << "Transformation(" << transformee << ", " << dr << ")";
         oss << "Transformation(" << transformee->repr() << ", " << dr << ")";
         return oss.str();
     }
