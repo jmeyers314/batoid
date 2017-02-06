@@ -10,9 +10,9 @@ namespace jtrace {
     class Surface;
     class Transformation : public Surface {
     public:
-        Transformation(const Surface*, double dx, double dy, double dz);
-        Transformation(const Surface*, const Vec3& dr);
-        Transformation(const Surface*, std::array<std::array<double, 3>, 3> r3);
+        Transformation(std::shared_ptr<const Surface>, double dx, double dy, double dz);
+        Transformation(std::shared_ptr<const Surface>, const Vec3& dr);
+        Transformation(std::shared_ptr<const Surface>, std::array<std::array<double, 3>, 3> r3);
         virtual double operator()(double, double) const;
         virtual Vec3 normal(double, double) const;
         virtual Intersection intersect(const Ray&) const;
@@ -23,7 +23,7 @@ namespace jtrace {
         double getDz() const { return dr.z; }
         std::array<std::array<double, 3>, 3> getR() const { return rot3; }
     private:
-        const Surface* transformee;
+        std::shared_ptr<const Surface> transformee;
         const Vec3 dr;
         const std::array<std::array<double, 3>, 3> rot3;
     };

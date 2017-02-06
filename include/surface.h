@@ -8,7 +8,7 @@
 namespace jtrace {
     struct Intersection;
     class Transformation;
-    class Surface {
+    class Surface : public std::enable_shared_from_this<Surface> {
     public:
         virtual double operator()(double, double) const = 0;
         virtual Vec3 normal(double, double) const = 0;
