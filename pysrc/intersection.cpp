@@ -17,6 +17,7 @@ namespace jtrace {
             .def_property_readonly("ny", &Intersection::getNy)
             .def_property_readonly("nz", &Intersection::getNz)
             .def("__repr__", &Intersection::repr)
-            .def("reflectedRay", &Intersection::reflectedRay);
+            .def("reflectedRay", &Intersection::reflectedRay)
+            .def("refractedRay", &Intersection::refractedRay);
     }
 }

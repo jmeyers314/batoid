@@ -24,6 +24,7 @@ namespace jtrace {
         double getNz() const { return surfaceNormal.z; }
 
         Ray reflectedRay(const Ray &) const;
+        Ray refractedRay(const Ray &, double n1, double n2) const;
         std::string repr() const;
     };
 
