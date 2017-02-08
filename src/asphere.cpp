@@ -1,6 +1,6 @@
 #include "asphere.h"
 #include "solve.h"
-#include "paraboloid.h"
+#include "quadric.h"
 
 namespace jtrace {
     Asphere::Asphere(double _R, double _kappa, std::vector<double> _alpha, double _B) :
@@ -39,10 +39,10 @@ namespace jtrace {
     };
 
     Intersection Asphere::intersect(const Ray &r) const {
-        // Solve the paraboloid problem analytically to get a good starting point.
-        double A = 1./(2*R);
-        Paraboloid para(A, B);
-        Intersection isec = para.intersect(r);
+        // Solve the quadric problem analytically to get a good starting point.
+        Quadric quad(R, kappa, B);
+        Intersection isec = quad.intersect(r);
+
         AsphereResidual resid(*this, r);
         Solve<AsphereResidual> solve(resid, isec.t, isec.t+1e-2);
         solve.setMethod(Method::Brent);
