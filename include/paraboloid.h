@@ -17,7 +17,7 @@ namespace jtrace {
         std::string repr() const;
 
     private:
-        double A, B;
+        const double A, B;
     };
 
     inline std::ostream& operator<<(std::ostream& os, const Paraboloid &p);

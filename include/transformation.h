@@ -23,7 +23,7 @@ namespace jtrace {
         double getDz() const { return dr.z; }
         std::array<std::array<double, 3>, 3> getR() const { return rot3; }
     private:
-        std::shared_ptr<const Surface> transformee;
+        const std::shared_ptr<const Surface> transformee;
         const Vec3 dr;
         const std::array<std::array<double, 3>, 3> rot3;
     };

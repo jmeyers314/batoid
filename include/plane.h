@@ -16,7 +16,7 @@ namespace jtrace {
         std::string repr() const;
 
     private:
-        double B;
+        const double B;
     };
 
     inline std::ostream& operator<<(std::ostream& os, const Plane &p);

@@ -1,7 +1,7 @@
 #ifndef __jem_asphere__h
 #define __jem_asphere__h
 
-#include<vector>
+#include <vector>
 #include "jtrace.h"
 
 namespace jtrace {
@@ -20,9 +20,9 @@ namespace jtrace {
         std::string repr() const;
 
     private:
-        double R, kappa;
-        std::vector<double> alpha;
-        double B;
+        const double R, kappa;
+        const std::vector<double> alpha;
+        const double B;
 
         double dzdr(double r) const;
     };

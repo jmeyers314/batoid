@@ -18,7 +18,7 @@ namespace jtrace {
         std::string repr() const;
 
     private:
-        double R, kappa, B;
+        const double R, kappa, B;
 
         double dzdr(double r) const;
     };
