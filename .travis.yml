@@ -13,7 +13,8 @@ matrix:
           packages: [g++-4.8, cmake]
 before_install:
   - |
-    if [ -n "$CPP"]; then export CPP=-std=c++$CPP; fi
+    export CPP=-std=c++$CPP
+    export CXX=g++-$GCC CC=gcc-$GCC
   - |
     pip install --user --upgrade pip virtualenv
     virtualenv -p python venv
