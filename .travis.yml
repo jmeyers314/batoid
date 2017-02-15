@@ -19,6 +19,7 @@ before_install:
     pip install --user --upgrade pip virtualenv
     virtualenv -p python venv
     source venv/bin/activate
+    pip install -r requirements.txt
 install:
   - |
     python setup.py install
