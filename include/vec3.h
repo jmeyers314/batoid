@@ -4,6 +4,7 @@
 #include <cmath>
 #include <string>
 #include <sstream>
+#include <array>
 
 namespace jtrace {
 
@@ -110,6 +111,12 @@ namespace jtrace {
     inline bool operator!=(const Vec3& a, const Vec3& b) {
         return a.x != b.x || a.y != b.y || a.z != b.z;
     }
+
+    struct Mat3 {
+        std::array<double,9> data;
+
+        Mat3() : data({{0,0,0,0,0,0,0,0,0}}) {}
+    };
 }
 
 #endif

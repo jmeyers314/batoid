@@ -30,5 +30,18 @@ namespace jtrace {
             .def(-py::self);
         m.def("DotProduct", &DotProduct);
         m.def("CrossProduct", &CrossProduct);
+
+        py::class_<Mat3>(m, "Mat3", py::buffer_protocol())
+            .def(py::init<>())
+            .def_buffer([](Mat3 &mm) -> py::buffer_info {
+                return py::buffer_info(
+                    mm.data.data(),
+                    sizeof(double),
+                    py::format_descriptor<double>::format(),
+                    2,
+                    {3, 3},
+                    {sizeof(double) * 3, sizeof(double)}
+                );
+            });
     }
 }
