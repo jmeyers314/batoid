@@ -4,6 +4,7 @@ from test_helpers import isclose
 
 def test_plane_refraction_plane():
     import random
+    random.seed(5)
     plane = jtrace.Plane(10)
     for i in range(1000):
         x = random.gauss(0, 1)
@@ -37,6 +38,7 @@ def test_plane_refraction_plane():
 
 def test_plane_refraction_reversal():
     import random
+    random.seed(57)
     plane = jtrace.Plane(10)
     for i in range(1000):
         x = random.gauss(0, 1)
@@ -71,6 +73,7 @@ def test_plane_refraction_reversal():
 
 def test_paraboloid_refraction_plane():
     import random
+    random.seed(577)
     para = jtrace.Paraboloid(-0.1, 10)
     for i in range(1000):
         x = random.gauss(0, 1)
@@ -101,6 +104,7 @@ def test_paraboloid_refraction_plane():
 
 def test_paraboloid_refraction_reversal():
     import random
+    random.seed(5772)
     para = jtrace.Paraboloid(-0.1, 10)
     for i in range(1000):
         x = random.gauss(0, 1)
@@ -136,6 +140,7 @@ def test_paraboloid_refraction_reversal():
 
 def test_asphere_refraction_plane():
     import random
+    random.seed(57721)
     asphere = jtrace.Asphere(25.0, -0.97, [1e-3, 1e-5], 0.1)
     for i in range(1000):
         x = random.gauss(0, 1)
@@ -166,6 +171,7 @@ def test_asphere_refraction_plane():
 
 def test_asphere_refraction_reversal():
     import random
+    random.seed(577215)
     asphere = jtrace.Asphere(23.0, -0.97, [1e-5, 1e-6], 0.1)
     for i in range(1000):
         x = random.gauss(0, 1)

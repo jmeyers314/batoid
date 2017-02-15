@@ -4,6 +4,7 @@ from test_helpers import isclose
 
 def test_properties():
     import random
+    random.seed(5)
     for i in range(100):
         R = random.gauss(0.7, 0.8)
         kappa = random.uniform(0.9, 1.0)
@@ -25,6 +26,7 @@ def quadric(R, kappa, B):
 
 def test_call():
     import random
+    random.seed(57)
     for i in range(100):
         R = random.gauss(25.0, 0.2)
         kappa = random.uniform(-1.0, -0.9)
@@ -37,6 +39,7 @@ def test_call():
 
 def test_intersect():
     import random
+    random.seed(577)
     for i in range(100):
         R = random.gauss(25.0, 0.2)
         kappa = random.uniform(-1.0, 1)

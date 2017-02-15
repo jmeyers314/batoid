@@ -4,6 +4,7 @@ from test_helpers import isclose
 
 def test_call():
     import random
+    random.seed(5)
     for i in range(100):
         x = random.gauss(0.1, 2.3)
         y = random.gauss(2.1, 4.3)
@@ -27,6 +28,7 @@ def test_call():
 
 def test_properties():
     import random
+    random.seed(57)
     for i in range(100):
         x = random.gauss(0.1, 2.3)
         y = random.gauss(2.1, 4.3)
@@ -47,3 +49,8 @@ def test_properties():
             assert r.vy == v.y
             assert r.vz == v.z
             assert r.t0 == t0
+
+
+if __name__ == '__main__':
+    test_call()
+    test_properties()

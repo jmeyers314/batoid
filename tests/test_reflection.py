@@ -4,6 +4,7 @@ from test_helpers import isclose
 
 def test_plane_reflection_plane():
     import random
+    random.seed(5)
     plane = jtrace.Plane(10)
     for i in range(1000):
         x = random.gauss(0, 1)
@@ -34,6 +35,7 @@ def test_plane_reflection_plane():
 
 def test_plane_reflection_reversal():
     import random
+    random.seed(57)
     plane = jtrace.Plane(10)
     for i in range(1000):
         x = random.gauss(0, 1)
@@ -66,6 +68,7 @@ def test_plane_reflection_reversal():
 
 def test_paraboloid_reflection_plane():
     import random
+    random.seed(577)
     para = jtrace.Paraboloid(-0.1, 10)
     for i in range(1000):
         x = random.gauss(0, 1)
@@ -88,6 +91,7 @@ def test_paraboloid_reflection_plane():
 
 def test_paraboloid_reflection_reversal():
     import random
+    random.seed(5772)
     para = jtrace.Paraboloid(-0.1, 10)
     for i in range(1000):
         x = random.gauss(0, 1)
@@ -121,6 +125,7 @@ def test_paraboloid_reflection_reversal():
 
 def test_paraboloid_reflection_to_focus():
     import random
+    random.seed(57721)
     for i in range(100):
         A = random.gauss(0, 1)
         para = jtrace.Paraboloid(A, 0)  # z = A(x^2 + y^2)
@@ -142,6 +147,7 @@ def test_paraboloid_reflection_to_focus():
 
 def test_asphere_reflection_plane():
     import random
+    random.seed(577215)
     asphere = jtrace.Asphere(25.0, -0.97, [1e-3, 1e-5], 0.1)
     for i in range(1000):
         x = random.gauss(0, 1)
@@ -164,6 +170,7 @@ def test_asphere_reflection_plane():
 
 def test_asphere_reflection_reversal():
     import random
+    random.seed(5772156)
     asphere = jtrace.Asphere(23.0, -0.97, [1e-5, 1e-6], 0.1)
     for i in range(1000):
         x = random.gauss(0, 1)

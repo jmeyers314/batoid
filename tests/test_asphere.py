@@ -4,6 +4,7 @@ from test_helpers import isclose
 
 def test_properties():
     import random
+    random.seed(5)
     for i in range(100):
         R = random.gauss(0.7, 0.8)
         kappa = random.uniform(0.9, 1.0)
@@ -31,6 +32,7 @@ def aspher(R, kappa, alpha, B):
 
 def test_call():
     import random
+    random.seed(57)
     for i in range(100):
         R = random.gauss(25.0, 0.2)
         kappa = random.uniform(-1.0, -0.9)
@@ -46,12 +48,13 @@ def test_call():
 
 def test_intersect():
     import random
+    random.seed(577)
     for i in range(100):
         R = random.gauss(25.0, 0.2)
         kappa = random.uniform(-1.0, -0.9)
         nalpha = random.randint(0, 4)
-        alpha = [random.gauss(0, 1e-6) for i in range(nalpha)]
-        B = random.gauss(0, 1.1)
+        alpha = [random.gauss(0, 1e-10) for i in range(nalpha)]
+        B = random.gauss(0, 0.5)
         asphere = jtrace.Asphere(R, kappa, alpha, B)
         for j in range(10):
             x = random.gauss(0.0, 1.0)

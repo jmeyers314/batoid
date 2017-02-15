@@ -4,6 +4,7 @@ from test_helpers import isclose
 
 def test_properties():
     import random
+    random.seed(5)
     for i in range(100):
         A = random.gauss(0.7, 0.8)
         B = random.gauss(0.8, 1.2)
@@ -14,6 +15,7 @@ def test_properties():
 
 def test_call():
     import random
+    random.seed(57)
     for i in range(100):
         A = random.gauss(0.2, 0.3)
         B = random.gauss(0.4, 0.2)
@@ -26,6 +28,7 @@ def test_call():
 
 def test_intersect():
     import random
+    random.seed(577)
     for i in range(100):
         A = random.gauss(0.05, 0.01)
         B = random.gauss(0.4, 0.2)

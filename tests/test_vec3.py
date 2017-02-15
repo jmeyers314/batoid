@@ -5,6 +5,7 @@ from test_helpers import isclose
 
 def test_DotProduct():
     import random
+    random.seed(5)
     for i in range(100):
         x1 = random.gauss(mu=0.1, sigma=0.3)
         y1 = random.gauss(mu=-0.3, sigma=1.1)
@@ -25,6 +26,7 @@ def test_DotProduct():
 
 def test_CrossProduct():
     import random
+    random.seed(57)
     for i in range(100):
         x1 = random.gauss(mu=0.1, sigma=0.3)
         y1 = random.gauss(mu=-0.3, sigma=1.1)
@@ -64,6 +66,7 @@ def test_CrossProduct():
 
 def test_Magnitude():
     import random
+    random.seed(577)
     for i in range(100):
         x = random.gauss(mu=0.1, sigma=0.3)
         y = random.gauss(mu=-0.3, sigma=1.1)
@@ -77,6 +80,7 @@ def test_Magnitude():
 
 def test_add():
     import random
+    random.seed(5772)
     for i in range(100):
         x1 = random.gauss(mu=0.1, sigma=0.3)
         y1 = random.gauss(mu=-0.3, sigma=1.1)
@@ -102,6 +106,7 @@ def test_add():
 
 def test_sub():
     import random
+    random.seed(57721)
     for i in range(100):
         x1 = random.gauss(mu=0.1, sigma=0.3)
         y1 = random.gauss(mu=-0.3, sigma=1.1)
@@ -127,6 +132,7 @@ def test_sub():
 
 def test_mul():
     import random
+    random.seed(577215)
     for i in range(100):
         x1 = random.gauss(mu=0.1, sigma=0.3)
         y1 = random.gauss(mu=-0.3, sigma=1.1)
@@ -148,6 +154,7 @@ def test_mul():
 
 def test_div():
     import random
+    random.seed(5772156)
     for i in range(100):
         x1 = random.gauss(mu=0.1, sigma=0.3)
         y1 = random.gauss(mu=-0.3, sigma=1.1)
@@ -169,6 +176,7 @@ def test_div():
 
 def test_eq():
     import random
+    random.seed(57721566)
     for i in range(100):
         x1 = random.gauss(mu=0.1, sigma=0.3)
         y1 = random.gauss(mu=-0.3, sigma=1.1)
@@ -182,6 +190,7 @@ def test_eq():
 
 def test_ne():
     import random
+    random.seed(577215664)
     for i in range(100):
         x1 = random.gauss(mu=0.1, sigma=0.3)
         y1 = random.gauss(mu=-0.3, sigma=1.1)
@@ -195,3 +204,15 @@ def test_ne():
         assert vec1 != vec2
         assert vec1 != vec3
         assert vec1 != vec4
+
+
+if __name__ == '__main__':
+    test_DotProduct()
+    test_CrossProduct()
+    test_Magnitude()
+    test_add()
+    test_sub()
+    test_mul()
+    test_div()
+    test_eq()
+    test_ne()
