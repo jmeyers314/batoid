@@ -23,6 +23,13 @@ def test_properties():
         assert transformed2.dx == dx
         assert transformed2.dy == dy
         assert transformed2.dz == dz
+        # and a third way
+        dr = jtrace.Vec3(dx, dy, dz)
+        transformed3 = asphere.shift(dr)
+        assert transformed3.dx == dx
+        assert transformed3.dy == dy
+        assert transformed3.dz == dz
+        assert transformed3.dr == dr
 
 
 def test_intersect():

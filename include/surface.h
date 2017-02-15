@@ -15,6 +15,7 @@ namespace jtrace {
         virtual Intersection intersect(const Ray&) const = 0;
         virtual std::string repr() const = 0;
         Transformation shift(double dx, double dy, double dz) const;
+        Transformation shift(const Vec3&) const;
         Transformation rotX(double theta) const;
         Transformation rotY(double theta) const;
         Transformation rotZ(double theta) const;
