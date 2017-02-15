@@ -7,4 +7,6 @@ python:
 install:
   - "pip install -r requirements.txt"
   - "python setup.py install"
+compiler:
+  - clang
 script: pytest
