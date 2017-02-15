@@ -20,6 +20,10 @@ before_install:
     virtualenv -p python venv
     source venv/bin/activate
     pip install -r requirements.txt
+cache:
+  directories:
+    - $HOME/.cache/pip
+    - $HOME/Library/Caches/pip
 install:
   - |
     python setup.py install
