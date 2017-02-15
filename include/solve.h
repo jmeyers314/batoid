@@ -234,7 +234,7 @@ namespace jtrace {
 
             T delta = uBound-lBound;
             for (int j=1; j<maxSteps; j++) {
-                if (fupper*flower < 0.0) return;
+                if (fupper*flower <= 0.0) return;
                 if (std::abs(flower) < std::abs(fupper)) {
                     uBound = lBound;
                     fupper = flower;
