@@ -4,6 +4,7 @@
 #include "vec3.h"
 #include "ray.h"
 #include "intersection.h"
+#include <memory>
 
 namespace jtrace {
     struct Intersection;
