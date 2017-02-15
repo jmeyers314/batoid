@@ -2,10 +2,10 @@
 
 namespace jtrace {
     Transformation::Transformation(std::shared_ptr<const Surface> s, double dx, double dy, double dz) :
-        transformee(s), dr(Vec3(dx, dy, dz)), rot3{ident_rot3} {}
+        transformee(s), dr(Vec3(dx, dy, dz)), rot3(ident_rot3) {}
 
     Transformation::Transformation(std::shared_ptr<const Surface> s, const Vec3& _dr) :
-        transformee(s), dr(_dr), rot3{ident_rot3} {}
+        transformee(s), dr(_dr), rot3(ident_rot3) {}
 
     Transformation::Transformation(std::shared_ptr<const Surface> s, std::array<std::array<double, 3>, 3> r) :
         transformee(s), dr(), rot3(r) {}
