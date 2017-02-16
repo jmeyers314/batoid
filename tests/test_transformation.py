@@ -119,9 +119,6 @@ def test_rotate():
             nx = isecp.nx
             ny = isecp.ny * ctp - isecp.nz * stp
             nz = isecp.ny * stp + isecp.nz * ctp
-            # print()
-            # print(isec)
-            # print(isecp)
             assert not isclose(isecp.y0, isec.y0)
             assert not isclose(isecp.z0, isec.z0)
             assert not isclose(isecp.ny, isec.ny)
@@ -133,6 +130,54 @@ def test_rotate():
             assert isclose(ny, isec.ny)
             assert isclose(nz, isec.nz)
             assert isclose(isec.t, isecp.t)
+
+            # And now repeat for RotY
+            theta = random.gauss(0, 0.1)
+            st, ct = math.sin(theta), math.cos(theta)
+            rotated = asphere.rotY(theta)
+            xp = x * ct + z * st
+            yp = y
+            zp = -x * st + z * ct
+            vxp = vx * ct + vz * st
+            vyp = vy
+            vzp = -vx * st + vz * ct
+            rp = jtrace.Ray(xp, yp, zp, vxp, vyp, vzp, 0)
+            isecp = rotated.intersect(rp)
+
+            # Now rotate intersection point and normal back to original frame.
+            thetap = -theta
+            stp, ctp = math.sin(thetap), math.cos(thetap)
+            px = isecp.x0 * ctp + isecp.z0 * stp
+            py = isecp.y0
+            pz = -isecp.x0 * stp + isecp.z0 * ctp
+            nx = isecp.nx * ctp + isecp.nz * stp
+            ny = isecp.ny
+            nz = -isecp.nx * stp + isecp.nz * ctp
+            assert not isclose(isecp.x0, isec.x0)
+            assert not isclose(isecp.z0, isec.z0)
+            assert not isclose(isecp.nx, isec.nx)
+            assert not isclose(isecp.nz, isec.nz)
+            assert isclose(px, isec.x0)
+            assert isclose(py, isec.y0)
+            assert isclose(pz, isec.z0)
+            assert isclose(nx, isec.nx)
+            assert isclose(ny, isec.ny)
+            assert isclose(nz, isec.nz)
+            assert isclose(isec.t, isecp.t)
+
+            # And now repeat for RotZ, which as the optic axis, shouldn't actually
+            # change any of the intersection points.
+            theta = random.gauss(0, 0.1)
+            st, ct = math.sin(theta), math.cos(theta)
+            rotated = asphere.rotZ(theta)
+            isecz = rotated.intersect(r)
+            assert isclose(isecz.x0, isec.x0)
+            assert isclose(isecz.y0, isec.y0)
+            assert isclose(isecz.z0, isec.z0)
+            assert isclose(isecz.nx, isec.nx)
+            assert isclose(isecz.ny, isec.ny)
+            assert isclose(isecz.nz, isec.nz)
+            assert isclose(isecz.t, isec.t)
 
 
 if __name__ == '__main__':
