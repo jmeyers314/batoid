@@ -12,7 +12,7 @@ namespace jtrace {
     public:
         Transformation(std::shared_ptr<const Surface>, double dx, double dy, double dz);
         Transformation(std::shared_ptr<const Surface>, const Vec3& dr);
-        Transformation(std::shared_ptr<const Surface>, std::array<std::array<double, 3>, 3> r3);
+        Transformation(std::shared_ptr<const Surface>, const Rot3& r3);
         virtual double operator()(double, double) const;
         virtual Vec3 normal(double, double) const;
         virtual Intersection intersect(const Ray&) const;
@@ -21,16 +21,18 @@ namespace jtrace {
         double getDx() const { return dr.x; }
         double getDy() const { return dr.y; }
         double getDz() const { return dr.z; }
-        std::array<std::array<double, 3>, 3> getR() const { return rot3; }
+        Rot3 getR() const { return rot; }
     private:
         const std::shared_ptr<const Surface> transformee;
         const Vec3 dr;
-        const std::array<std::array<double, 3>, 3> rot3;
+        const Rot3 rot;
     };
 
     inline std::ostream& operator<<(std::ostream& os, const Transformation& t);
 
-    constexpr std::array<std::array<double, 3>, 3> ident_rot3 {{{{1,0,0}},{{0,1,0}},{{0,0,1}}}};
+    const Rot3 ident_rot {{1,0,0,
+                           0,1,0,
+                           0,0,1}};
 }
 
 #endif

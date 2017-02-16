@@ -33,7 +33,7 @@ def test_properties():
         assert transformed3.dr == dr
 
 
-def test_intersect():
+def test_shift():
     import random
     random.seed(57)
     for i in range(100):
@@ -46,8 +46,7 @@ def test_intersect():
         dx = random.gauss(0, 1)
         dy = random.gauss(0, 1)
         dz = random.gauss(0, 1)
-        transformed = asphere.shift(dx, dy, dz).rotX(0.1)
-        print(transformed)
+        transformed = asphere.shift(dx, dy, dz)
 
         for j in range(10):
             x = random.gauss(0.0, 1.0)
@@ -63,7 +62,6 @@ def test_intersect():
 
             # We can also check just for mutual consistency of the asphere,
             # ray and intersection.
-
             vx = random.gauss(0.0, 0.01)
             vy = random.gauss(0.0, 0.01)
             vz = 1.0
@@ -78,6 +76,66 @@ def test_intersect():
             assert isclose(asphere(p1.x-dx, p2.y-dy)+dz, p1.z, rel_tol=0, abs_tol=1e-9)
 
 
+def test_rotate():
+    import random
+    import math
+    random.seed(577)
+    for i in range(100):
+        R = random.gauss(25.0, 0.2)
+        kappa = random.uniform(-2.0, 2.0)
+        nalpha = random.randint(0, 4)
+        alpha = [random.gauss(0, 1e-10) for i in range(nalpha)]
+        B = random.gauss(0, 1.1)
+        asphere = jtrace.Asphere(R, kappa, alpha, B)
+        # We're going to rain down some photons, rotate the camera and rotate the position/vectors
+        # of the photons, and see if we get the same spot pattern.
+        for j in range(10):
+            x = random.gauss(0, 1.0)
+            y = random.gauss(0, 1.0)
+            z = 10
+            vx = vy = 0
+            vz = -1
+            r = jtrace.Ray(x, y, z, vx, vy, vz, 0)
+            isec = asphere.intersect(r)
+
+            theta = random.gauss(0, 0.1)
+            st, ct = math.sin(theta), math.cos(theta)
+            rotated = asphere.rotX(theta)
+            xp = x
+            yp = y * ct - z * st
+            zp = y * st + z * ct
+            vxp = vx
+            vyp = vy * ct - vz * st
+            vzp = vy * st + vz * ct
+            rp = jtrace.Ray(xp, yp, zp, vxp, vyp, vzp, 0)
+            isecp = rotated.intersect(rp)
+
+            # Now rotate intersection point and normal back to original frame.
+            thetap = -theta
+            stp, ctp = math.sin(thetap), math.cos(thetap)
+            px = isecp.x0
+            py = isecp.y0 * ctp - isecp.z0 * stp
+            pz = isecp.y0 * stp + isecp.z0 * ctp
+            nx = isecp.nx
+            ny = isecp.ny * ctp - isecp.nz * stp
+            nz = isecp.ny * stp + isecp.nz * ctp
+            # print()
+            # print(isec)
+            # print(isecp)
+            assert not isclose(isecp.y0, isec.y0)
+            assert not isclose(isecp.z0, isec.z0)
+            assert not isclose(isecp.ny, isec.ny)
+            assert not isclose(isecp.nz, isec.nz)
+            assert isclose(px, isec.x0)
+            assert isclose(py, isec.y0)
+            assert isclose(pz, isec.z0)
+            assert isclose(nx, isec.nx)
+            assert isclose(ny, isec.ny)
+            assert isclose(nz, isec.nz)
+            assert isclose(isec.t, isecp.t)
+
+
 if __name__ == '__main__':
     test_properties()
-    test_intersect()
+    test_shift()
+    test_rotate()

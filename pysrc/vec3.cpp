@@ -1,5 +1,6 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/operators.h>
+#include <pybind11/stl.h>
 #include "vec3.h"
 
 namespace py = pybind11;
@@ -28,20 +29,30 @@ namespace jtrace {
             .def(py::self == py::self)
             .def(py::self != py::self)
             .def(-py::self);
-        m.def("DotProduct", &DotProduct);
-        m.def("CrossProduct", &CrossProduct);
 
-        py::class_<Mat3>(m, "Mat3", py::buffer_protocol())
-            .def(py::init<>())
-            .def_buffer([](Mat3 &mm) -> py::buffer_info {
+        py::class_<Rot3>(m, "Rot3", py::buffer_protocol())
+            .def_buffer([](Rot3 &r) -> py::buffer_info {
                 return py::buffer_info(
-                    mm.data.data(),
+                    r.data.data(),
                     sizeof(double),
                     py::format_descriptor<double>::format(),
                     2,
                     {3, 3},
                     {sizeof(double) * 3, sizeof(double)}
                 );
-            });
+            })
+            .def(py::init<>())
+            .def(py::init<std::array<double,9>>())
+            .def("__repr__", &Rot3::repr)
+            .def(py::self * float())
+            .def(py::self *= float())
+            .def(py::self / float())
+            .def(py::self /= float())
+            .def("determinant", &Rot3::determinant);
+
+        m.def("DotProduct", &DotProduct);
+        m.def("CrossProduct", &CrossProduct);
+        m.def("RotVec", &RotVec);
+        m.def("UnRotVec", &UnRotVec);
     }
 }

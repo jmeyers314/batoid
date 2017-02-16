@@ -2,13 +2,13 @@
 
 namespace jtrace {
     Transformation::Transformation(std::shared_ptr<const Surface> s, double dx, double dy, double dz) :
-        transformee(s), dr(Vec3(dx, dy, dz)), rot3(ident_rot3) {}
+        transformee(s), dr(Vec3(dx, dy, dz)), rot(ident_rot) {}
 
     Transformation::Transformation(std::shared_ptr<const Surface> s, const Vec3& _dr) :
-        transformee(s), dr(_dr), rot3(ident_rot3) {}
+        transformee(s), dr(_dr), rot(ident_rot) {}
 
-    Transformation::Transformation(std::shared_ptr<const Surface> s, std::array<std::array<double, 3>, 3> r) :
-        transformee(s), dr(), rot3(r) {}
+    Transformation::Transformation(std::shared_ptr<const Surface> s, const Rot3& r) :
+        transformee(s), dr(), rot(r) {}
 
     double Transformation::operator()(double x, double y) const {
         throw NotImplemented("Transformation::operator() not implemented");
@@ -20,10 +20,10 @@ namespace jtrace {
 
     Intersection Transformation::intersect(const Ray &r) const {
         // Need to transform the coord sys of r into the coord sys of the transformee.
-        Ray rr {r.p0-dr, r.v, r.t0};
+        Ray rr {RotVec(rot, r.p0-dr), RotVec(rot, r.v), r.t0};
         Intersection isec = transformee->intersect(rr);
         // Now transform intersection back into transformed coord sys.
-        return Intersection(isec.t, isec.point+dr, isec.surfaceNormal);
+        return Intersection(isec.t, UnRotVec(rot, isec.point)+dr, UnRotVec(rot, isec.surfaceNormal));
     }
 
     std::string Transformation::repr() const {

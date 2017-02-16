@@ -206,6 +206,54 @@ def test_ne():
         assert vec1 != vec4
 
 
+def testRotVec():
+    import random
+    import math
+    random.seed(5772156649)
+    for i in range(1000):
+        x1 = random.gauss(mu=0.1, sigma=0.3)
+        y1 = random.gauss(mu=-0.3, sigma=1.1)
+        z1 = random.gauss(mu=10.34, sigma=13.0)
+
+        # Check identity rotation
+        ident = jtrace.Rot3()
+        vec1 = jtrace.Vec3(x1, y1, z1)
+        vec2 = jtrace.RotVec(ident, vec1)
+        vec3 = jtrace.UnRotVec(ident, vec1)
+        assert vec1 == vec2
+        assert vec1 == vec3
+        assert ident.determinant() == 1.0
+
+        # Check random rotation
+        th1 = random.uniform(0, 2*math.pi)
+        th2 = random.uniform(0, 2*math.pi)
+        th3 = random.uniform(0, 2*math.pi)
+        sth1, cth1 = math.sin(th1), math.cos(th1)
+        sth2, cth2 = math.sin(th2), math.cos(th2)
+        sth3, cth3 = math.sin(th3), math.cos(th3)
+        R1 = jtrace.Rot3([1, 0, 0, 0, cth1, -sth1, 0, sth1, cth1])
+        R2 = jtrace.Rot3([cth2, 0, sth2, 0, 1, 0, -sth2, 0, cth2])
+        R3 = jtrace.Rot3([cth3, -sth3, 0, sth3, cth3, 0, 0, 0, 1])
+        vec2 = jtrace.RotVec(R1, jtrace.RotVec(R2, jtrace.RotVec(R3, vec1)))
+
+        assert isclose(vec1.Magnitude(), vec2.Magnitude())
+        # Unrotate...
+        vec3 = jtrace.UnRotVec(R3, jtrace.UnRotVec(R2, jtrace.UnRotVec(R1, vec2)))
+        assert isclose(vec1.x, vec3.x)
+        assert isclose(vec1.y, vec3.y)
+        assert isclose(vec1.z, vec3.z)
+
+
+def test_determinant():
+    import random
+    random.seed(57721566490)
+    import numpy as np
+
+    for i in range(1000):
+        R = jtrace.Rot3([random.gauss(0,1) for i in range(9)])
+        assert isclose(np.linalg.det(R), R.determinant())
+
+
 if __name__ == '__main__':
     test_DotProduct()
     test_CrossProduct()
@@ -216,3 +264,5 @@ if __name__ == '__main__':
     test_div()
     test_eq()
     test_ne()
+    testRotVec()
+    test_determinant()
