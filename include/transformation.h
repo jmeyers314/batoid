@@ -30,9 +30,9 @@ namespace jtrace {
 
     inline std::ostream& operator<<(std::ostream& os, const Transformation& t);
 
-    const Rot3 ident_rot {{1,0,0,
-                           0,1,0,
-                           0,0,1}};
+    const Rot3 ident_rot {{{1,0,0,
+                            0,1,0,
+                            0,0,1}}};
 }
 
 #endif
