@@ -18,21 +18,18 @@ matrix:
           sources: [ubuntu-toolchain-r-test, kubuntu-backports, deadsnakes]
           packages: [g++-4.8, cmake, python3.5-dev]
 before_install:
-  - |
-    export CPP=-std=c++$CPP
-    export CXX=g++-$GCC CC=gcc-$GCC
-  - |
-    pip install --user --upgrade pip virtualenv
-    virtualenv -p python venv
-    source venv/bin/activate
-    pip install -r requirements.txt
-    pip install numpy pytest
+  - export CPP=-std=c++$CPP
+  - export CXX=g++-$GCC CC=gcc-$GCC
+  - pip install --user --upgrade pip virtualenv
+  - virtualenv -p python$PYTHON venv
+  - source venv/bin/activate
+  - pip install -r requirements.txt
+  - pip install numpy pytest
 cache:
   directories:
     - $HOME/.cache/pip
     - $HOME/Library/Caches/pip
 install:
-  - |
-    python setup.py install
+  python setup.py install
 script:
-    pytest tests/test_*.py
+  pytest tests/test_*.py
