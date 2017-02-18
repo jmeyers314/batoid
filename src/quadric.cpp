@@ -7,9 +7,12 @@ namespace jtrace {
 
     double Quadric::operator()(double x, double y) const {
         double r2 = x*x + y*y;
-        double den = R*(1.+std::sqrt(1.-(1.+kappa)*r2/R/R));
-        return r2/den + B;
-
+        double result = B;
+        if (R != 0) {
+            double den = R*(1.+std::sqrt(1.-(1.+kappa)*r2/R/R));
+            result += r2/den;
+        }
+        return result;
         // Following also works, except leads to divide by 0 when kappa=-1
         // return R/(1+kappa)*(1-std::sqrt(1-(1+kappa)*r2/R/R))+B;
     }

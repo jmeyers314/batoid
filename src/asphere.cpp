@@ -8,8 +8,11 @@ namespace jtrace {
 
     double Asphere::operator()(double x, double y) const {
         double r2 = x*x + y*y;
-        double den = R*(1.+std::sqrt(1.-(1.+kappa)*r2/R/R));
-        double result = r2/den + B;
+        double result = B;
+        if (R != 0) {
+            double den = R*(1.+std::sqrt(1.-(1.+kappa)*r2/R/R));
+            result += r2/den;
+        }
         double rr = r2;
         for (const auto &a : alpha) {
             rr *= r2;
