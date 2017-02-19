@@ -1,5 +1,4 @@
-https://travis-ci.org/jmeyers314/jtrace
-
+[//]: # ( @mainpage )
 [![Build Status](https://travis-ci.org/jmeyers314/jtrace.svg?branch=master)](https://travis-ci.org/jmeyers314/jtrace)
 
 jtrace
