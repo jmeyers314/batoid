@@ -23,8 +23,8 @@
 // Template to find the zero of an equation
 // Currently uses bisection method, no solution caching.
 
-#ifndef __jem_solve__h
-#define __jem_solve__h
+#ifndef jtrace_solve_h
+#define jtrace_solve_h
 
 #include <cmath>
 #include <limits>

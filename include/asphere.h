@@ -1,5 +1,5 @@
-#ifndef __jem_asphere__h
-#define __jem_asphere__h
+#ifndef jtrace_asphere_h
+#define jtrace_asphere_h
 
 #include <vector>
 #include "jtrace.h"

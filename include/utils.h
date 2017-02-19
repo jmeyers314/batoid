@@ -1,5 +1,5 @@
-#ifndef __jem_utils__h
-#define __jem_utils__h
+#ifndef jtrace_utils_h
+#define jtrace_utils_h
 
 namespace jtrace {
 

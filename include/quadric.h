@@ -1,5 +1,5 @@
-#ifndef __jem_quadric__h
-#define __jem_quadric__h
+#ifndef jtrace_quadric_h
+#define jtrace_quadric_h
 
 #include "jtrace.h"
 

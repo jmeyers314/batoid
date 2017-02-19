@@ -1,5 +1,5 @@
-#ifndef __jem_paraboloid__h
-#define __jem_paraboloid__h
+#ifndef jtrace_paraboloid_h
+#define jtrace_paraboloid_h
 
 #include "jtrace.h"
 

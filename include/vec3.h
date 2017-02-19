@@ -1,5 +1,5 @@
-#ifndef __jem_vec3__h
-#define __jem_vec3__h
+#ifndef jtrace_vec3_h
+#define jtrace_vec3_h
 
 #include <cmath>
 #include <string>

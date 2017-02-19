@@ -1,5 +1,5 @@
-#ifndef __jem_ray__h
-#define __jem_ray__h
+#ifndef jtrace_ray_h
+#define jtrace_ray_h
 
 #include <sstream>
 #include <string>

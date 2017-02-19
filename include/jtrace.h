@@ -1,5 +1,5 @@
-#ifndef __jem_jtrace__h
-#define __jem_jtrace__h
+#ifndef jtrace_jtrace_h
+#define jtrace_jtrace_h
 
 #include "vec3.h"
 #include "ray.h"

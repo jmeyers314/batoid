@@ -1,5 +1,5 @@
-#ifndef __jem_surface__h
-#define __jem_surface__h
+#ifndef jtrace_surface_h
+#define jtrace_surface_h
 
 #include "vec3.h"
 #include "ray.h"

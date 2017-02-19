@@ -1,5 +1,5 @@
-#ifndef __jem_plane_h
-#define __jem_plane_h
+#ifndef jtrace_plane_h
+#define jtrace_plane_h
 
 #include "jtrace.h"
 

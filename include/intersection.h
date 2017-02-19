@@ -1,5 +1,5 @@
-#ifndef __jem_intersection__h
-#define __jem_intersection__h
+#ifndef jtrace_intersection_h
+#define jtrace_intersection_h
 
 #include <string>
 #include <sstream>

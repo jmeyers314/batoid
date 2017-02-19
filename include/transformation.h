@@ -1,5 +1,5 @@
-#ifndef __jem_transformation__h
-#define __jem_transformation__h
+#ifndef jtrace_transformation_h
+#define jtrace_transformation_h
 
 #include "jtrace.h"
 #include <array>
