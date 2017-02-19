@@ -5,7 +5,7 @@
 namespace py = pybind11;
 
 namespace jtrace {
-    void pyExportIntersection(py::module &m) {
+    void pyExportIntersection(py::module& m) {
         py::class_<Intersection, std::shared_ptr<Intersection>>(m, "Intersection")
             .def_readonly("t", &Intersection::t)
             .def_readonly("point", &Intersection::point)

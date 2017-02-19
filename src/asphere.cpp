@@ -14,7 +14,7 @@ namespace jtrace {
             result += r2/den;
         }
         double rr = r2;
-        for (const auto &a : alpha) {
+        for (const auto& a : alpha) {
             rr *= r2;
             result += rr*a;
         }
@@ -30,18 +30,18 @@ namespace jtrace {
 
     class AsphereResidual {
     public:
-        AsphereResidual(const Asphere &_a, const Ray &_r) : a(_a), r(_r) {}
+        AsphereResidual(const Asphere& _a, const Ray& _r) : a(_a), r(_r) {}
         double operator()(double t) const {
             Vec3 p = r(t);
             double resid = a(p.x, p.y) - p.z;
             return resid;
         }
     private:
-        const Asphere &a;
-        const Ray &r;
+        const Asphere& a;
+        const Ray& r;
     };
 
-    Intersection Asphere::intersect(const Ray &r) const {
+    Intersection Asphere::intersect(const Ray& r) const {
         // Solve the quadric problem analytically to get a good starting point.
         Quadric quad(R, kappa, B);
         Intersection isec = quad.intersect(r);
@@ -61,7 +61,7 @@ namespace jtrace {
     std::string Asphere::repr() const {
         std::ostringstream oss(" ");
         oss << "Asphere(" << R << ", " << kappa << ", [";
-        for (const auto &a : alpha) {
+        for (const auto& a : alpha) {
             oss << a << ", ";
         }
         oss << "], " << B << ")";
@@ -72,7 +72,7 @@ namespace jtrace {
         double result = r/(R*std::sqrt(1-r*r*(1+kappa)/R/R));
         double rrr = r*r*r;
         int twoi=0;
-        for (const auto &a : alpha) {
+        for (const auto& a : alpha) {
             result += (4+twoi)*a*rrr;
             rrr *= r*r;
             twoi += 2;
@@ -80,7 +80,7 @@ namespace jtrace {
         return result;
     }
 
-    inline std::ostream& operator<<(std::ostream& os, const Asphere &a) {
+    inline std::ostream& operator<<(std::ostream& os, const Asphere& a) {
         return os << a.repr();
     }
 

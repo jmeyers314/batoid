@@ -6,12 +6,12 @@ namespace jtrace {
     Intersection::Intersection(const double _t, const Vec3 _point, const Vec3 _surfaceNormal) :
         t(_t), point(_point), surfaceNormal(_surfaceNormal.UnitVec3()) {}
 
-    Ray Intersection::reflectedRay(const Ray &r) const {
+    Ray Intersection::reflectedRay(const Ray& r) const {
         double c1 = DotProduct(r.v, surfaceNormal);
         return Ray(point, (r.v - 2*c1*surfaceNormal).UnitVec3(), t);
     }
 
-    Ray Intersection::refractedRay(const Ray &r, double n1, double n2) const {
+    Ray Intersection::refractedRay(const Ray& r, double n1, double n2) const {
         double alpha = DotProduct(r.v, surfaceNormal);
         double a = 1.;
         double b = 2*alpha;

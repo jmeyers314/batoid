@@ -20,7 +20,7 @@ namespace jtrace {
         const double A, B;
     };
 
-    inline std::ostream& operator<<(std::ostream& os, const Paraboloid &p);
+    inline std::ostream& operator<<(std::ostream& os, const Paraboloid& p);
 
 }
 #endif

@@ -23,12 +23,12 @@ namespace jtrace {
         double getNy() const { return surfaceNormal.y; }
         double getNz() const { return surfaceNormal.z; }
 
-        Ray reflectedRay(const Ray &) const;
-        Ray refractedRay(const Ray &, double n1, double n2) const;
+        Ray reflectedRay(const Ray&) const;
+        Ray refractedRay(const Ray&, double n1, double n2) const;
         std::string repr() const;
     };
 
-    inline std::ostream& operator<<(std::ostream& os, const Intersection &i) {
+    inline std::ostream& operator<<(std::ostream& os, const Intersection& i) {
         return os << i.repr();
     }
 }

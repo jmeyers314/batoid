@@ -23,7 +23,7 @@ namespace jtrace {
         double dzdr(double r) const;
     };
 
-    inline std::ostream& operator<<(std::ostream& os, const Quadric &a);
+    inline std::ostream& operator<<(std::ostream& os, const Quadric& q);
 
 }
 #endif

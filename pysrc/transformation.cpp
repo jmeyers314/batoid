@@ -6,7 +6,7 @@
 namespace py = pybind11;
 
 namespace jtrace {
-    void pyExportTransformation(py::module &m) {
+    void pyExportTransformation(py::module& m) {
         py::class_<Transformation, std::shared_ptr<Transformation>, Surface>(m, "Transformation")
             .def(py::init<std::shared_ptr<Surface>,double,double,double>())
             .def("intersect", &Transformation::intersect)

@@ -27,7 +27,7 @@ namespace jtrace {
         double dzdr(double r) const;
     };
 
-    inline std::ostream& operator<<(std::ostream& os, const Asphere &a);
+    inline std::ostream& operator<<(std::ostream& os, const Asphere& a);
 
 }
 #endif

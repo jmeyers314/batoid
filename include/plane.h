@@ -19,6 +19,6 @@ namespace jtrace {
         const double B;
     };
 
-    inline std::ostream& operator<<(std::ostream& os, const Plane &p);
+    inline std::ostream& operator<<(std::ostream& os, const Plane& p);
 }
 #endif

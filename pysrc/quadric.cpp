@@ -5,7 +5,7 @@
 namespace py = pybind11;
 
 namespace jtrace {
-    void pyExportQuadric(py::module &m) {
+    void pyExportQuadric(py::module& m) {
         py::class_<Quadric, std::shared_ptr<Quadric>, Surface>(m, "Quadric")
             .def(py::init<double,double,double>())
             .def_property_readonly("R", &Quadric::getR)

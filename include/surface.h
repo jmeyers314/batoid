@@ -21,6 +21,5 @@ namespace jtrace {
         Transformation rotY(double theta) const;
         Transformation rotZ(double theta) const;
     };
-
 }
 #endif

@@ -65,30 +65,30 @@ namespace jtrace {
         }
     };
 
-    inline std::ostream& operator<<(std::ostream& os, const Vec3 &v) {
+    inline std::ostream& operator<<(std::ostream& os, const Vec3& v) {
         return os << v.repr();
     }
 
-    inline Vec3 operator+(const Vec3 &a, const Vec3 &b) {
+    inline Vec3 operator+(const Vec3& a, const Vec3& b) {
         return Vec3(a.x+b.x, a.y+b.y, a.z+b.z);
     }
 
-    inline Vec3 operator-(const Vec3 &a, const Vec3 &b) {
+    inline Vec3 operator-(const Vec3& a, const Vec3& b) {
         return Vec3(a.x-b.x, a.y-b.y, a.z-b.z);
     }
 
-    inline Vec3 operator-(const Vec3 &a) {
+    inline Vec3 operator-(const Vec3& a) {
         return Vec3(-a.x, -a.y, -a.z);
     }
 
-    inline Vec3 CrossProduct(const Vec3 &a, const Vec3 &b) {
+    inline Vec3 CrossProduct(const Vec3& a, const Vec3& b) {
         return Vec3(
             (a.y * b.z) - (a.z * b.y),
             (a.z * b.x) - (a.x * b.z),
             (a.x * b.y) - (a.y * b.x));
     }
 
-    inline double DotProduct(const Vec3 &a, const Vec3 &b) {
+    inline double DotProduct(const Vec3& a, const Vec3& b) {
         return a.x*b.x + a.y*b.y + a.z*b.z;
     }
 

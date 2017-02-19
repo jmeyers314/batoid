@@ -18,7 +18,7 @@ namespace jtrace {
         throw NotImplemented("Transformation::normal() not implemented");
     }
 
-    Intersection Transformation::intersect(const Ray &r) const {
+    Intersection Transformation::intersect(const Ray& r) const {
         // Need to transform the coord sys of r into the coord sys of the transformee.
         Ray rr {RotVec(rot, r.p0-dr), RotVec(rot, r.v), r.t0};
         Intersection isec = transformee->intersect(rr);
@@ -32,7 +32,7 @@ namespace jtrace {
         return oss.str();
     }
 
-    inline std::ostream& operator<<(std::ostream& os, const Transformation &t) {
+    inline std::ostream& operator<<(std::ostream& os, const Transformation& t) {
         return os << t.repr();
     }
 }

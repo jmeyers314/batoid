@@ -6,7 +6,7 @@ namespace jtrace {
         return Transformation(shared_from_this(), dx, dy, dz);
     }
 
-    Transformation Surface::shift(const Vec3 &dr) const {
+    Transformation Surface::shift(const Vec3& dr) const {
         return Transformation(shared_from_this(), dr.x, dr.y, dr.z);
     }
 

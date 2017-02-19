@@ -3,7 +3,7 @@
 namespace jtrace {
     Plane::Plane(double _B) : B(_B) {}
 
-    Intersection Plane::intersect(const Ray &r) const {
+    Intersection Plane::intersect(const Ray& r) const {
         double t = (B - r.p0.z)/r.v.z;
         t += r.t0;
         Vec3 point = r(t);
@@ -17,7 +17,7 @@ namespace jtrace {
         return oss.str();
     }
 
-    inline std::ostream& operator<<(std::ostream& os, const Plane &p) {
+    inline std::ostream& operator<<(std::ostream& os, const Plane& p) {
         return os << p.repr();
     }
 }

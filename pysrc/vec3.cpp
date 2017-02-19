@@ -7,7 +7,7 @@ namespace py = pybind11;
 using namespace pybind11::literals;
 
 namespace jtrace {
-    void pyExportVec3(py::module &m) {
+    void pyExportVec3(py::module& m) {
         py::class_<Vec3>(m, "Vec3")
             .def(py::init<double,double,double>(), "init", "x"_a, "y"_a, "z"_a)
             .def(py::init<>())
@@ -31,7 +31,7 @@ namespace jtrace {
             .def(-py::self);
 
         py::class_<Rot3>(m, "Rot3", py::buffer_protocol())
-            .def_buffer([](Rot3 &r) -> py::buffer_info {
+            .def_buffer([](Rot3& r) -> py::buffer_info {
                 return py::buffer_info(
                     r.data.data(),
                     sizeof(double),

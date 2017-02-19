@@ -6,7 +6,7 @@
 namespace py = pybind11;
 
 namespace jtrace {
-    void pyExportAsphere(py::module &m) {
+    void pyExportAsphere(py::module& m) {
         py::class_<Asphere, std::shared_ptr<Asphere>, Surface>(m, "Asphere")
             .def(py::init<double,double,std::vector<double>,double>())
             .def_property_readonly("R", &Asphere::getR)

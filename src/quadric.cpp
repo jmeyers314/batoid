@@ -82,8 +82,8 @@ namespace jtrace {
         return r/(R*std::sqrt(1-r*r*(1+kappa)/R/R));
     }
 
-    inline std::ostream& operator<<(std::ostream& os, const Quadric &a) {
-        return os << a.repr();
+    inline std::ostream& operator<<(std::ostream& os, const Quadric& q) {
+        return os << q.repr();
     }
 
 }

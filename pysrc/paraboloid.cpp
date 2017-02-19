@@ -5,7 +5,7 @@
 namespace py = pybind11;
 
 namespace jtrace {
-    void pyExportParaboloid(py::module &m) {
+    void pyExportParaboloid(py::module& m) {
         py::class_<Paraboloid, std::shared_ptr<Paraboloid>, Surface>(m, "Paraboloid")
             .def(py::init<double,double>())
             .def_property_readonly("A", &Paraboloid::getA)

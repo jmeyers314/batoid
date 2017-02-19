@@ -5,7 +5,7 @@ namespace py = pybind11;
 using namespace pybind11::literals;
 
 namespace jtrace {
-    void pyExportRay(py::module &m) {
+    void pyExportRay(py::module& m) {
         py::class_<Ray>(m, "Ray")
             .def(py::init<double,double,double,double,double,double,double>(),
                  "init",

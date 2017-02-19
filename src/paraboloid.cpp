@@ -56,7 +56,7 @@ namespace jtrace {
         return Intersection(t, point, surfaceNormal);
     }
 
-    inline std::ostream& operator<<(std::ostream& os, const Paraboloid &p) {
+    inline std::ostream& operator<<(std::ostream& os, const Paraboloid& p) {
         return os << p.repr();
     }
 
