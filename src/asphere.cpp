@@ -49,7 +49,7 @@ namespace jtrace {
         AsphereResidual resid(*this, r);
         Solve<AsphereResidual> solve(resid, isec.t, isec.t+1e-2);
         solve.setMethod(Method::Brent);
-        solve.setXTolerance(1e-9);
+        solve.setXTolerance(1e-12);
         solve.bracket();
         double t = solve.root();
 
