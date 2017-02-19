@@ -17,6 +17,8 @@ namespace jtrace {
 
         Vec3(double _x, double _y, double _z) : x(_x), y(_y), z(_z) {}
 
+        Vec3(std::array<double,3> a) : x(a[0]), y(a[1]), z(a[2]) {}
+
         const double MagnitudeSquared() const {
             return (x*x)+(y*y)+(z*z);
         }

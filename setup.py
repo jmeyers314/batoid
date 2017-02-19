@@ -2,6 +2,7 @@ from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 import sys
 import setuptools
+import glob
 
 __version__ = '0.0.1'
 
@@ -20,30 +21,15 @@ class get_pybind_include(object):
         import pybind11
         return pybind11.get_include(self.user)
 
+sources = glob.glob("src/*.cpp")
+sources += glob.glob("pysrc/*.cpp")
+headers = glob.glob("include/*.h")
 
 ext_modules = [
     Extension(
-        'jtrace',
-        ['src/plane.cpp',
-         'src/asphere.cpp',
-         'src/quadric.cpp',
-         'src/paraboloid.cpp',
-         'src/transformation.cpp',
-         'src/surface.cpp',
-         'src/intersection.cpp',
-         'src/ray.cpp',
-         'src/utils.cpp',
-         'src/jtrace.cpp',
-         'pysrc/plane.cpp',
-         'pysrc/asphere.cpp',
-         'pysrc/quadric.cpp',
-         'pysrc/paraboloid.cpp',
-         'pysrc/transformation.cpp',
-         'pysrc/surface.cpp',
-         'pysrc/intersection.cpp',
-         'pysrc/ray.cpp',
-         'pysrc/vec3.cpp',
-         'pysrc/jtrace.cpp'],
+        'jtrace._jtrace',
+        sources,
+        depends=headers,
         include_dirs=[
             # Path to pybind11 headers
             'include/',
@@ -138,6 +124,8 @@ setup(
     url='https://github.com/jmeyers314/jtrace',
     description="Josh's raytracer",
     long_description='',
+    packages=['jtrace'],
+    package_data={'jtrace' : headers },
     ext_modules=ext_modules,
     install_requires=['pybind11>=1.7'],
     setup_requires=['pytest-runner'],

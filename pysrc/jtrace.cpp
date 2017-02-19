@@ -14,8 +14,8 @@ namespace jtrace {
     void pyExportPlane(py::module&);
     void pyExportTransformation(py::module&);
 
-    PYBIND11_PLUGIN(jtrace) {
-        py::module m("jtrace", "ray tracer");
+    PYBIND11_PLUGIN(_jtrace) {
+        py::module m("_jtrace", "ray tracer");
 
         pyExportVec3(m);
         pyExportRay(m);
