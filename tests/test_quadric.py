@@ -7,7 +7,7 @@ def test_properties():
     random.seed(5)
     for i in range(100):
         R = random.gauss(0.7, 0.8)
-        kappa = random.uniform(0.9, 1.0)
+        kappa = random.uniform(-2.0, 1.0)
         B = random.gauss(0, 1.1)
         quad = jtrace.Quadric(R, kappa, B)
         assert quad.R == R
@@ -29,10 +29,10 @@ def test_call():
     random.seed(57)
     for i in range(100):
         R = random.gauss(25.0, 0.2)
-        kappa = random.uniform(-1.0, -0.9)
+        kappa = random.uniform(-2.0, 1.0)
         B = random.gauss(0, 1.1)
         quad = jtrace.Quadric(R, kappa, B)
-        for j in range(10):
+        for j in range(100):
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
             assert isclose(quad(x, y), quadric(R, kappa, B)(x, y))
@@ -42,10 +42,10 @@ def test_intersect():
     random.seed(577)
     for i in range(100):
         R = random.gauss(25.0, 0.2)
-        kappa = random.uniform(-1.0, 1)
+        kappa = random.uniform(-2.0, 1.0)
         B = 0
         quad = jtrace.Quadric(R, kappa, B)
-        for j in range(10):
+        for j in range(100):
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
 

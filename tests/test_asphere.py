@@ -7,7 +7,7 @@ def test_properties():
     random.seed(5)
     for i in range(100):
         R = random.gauss(0.7, 0.8)
-        kappa = random.uniform(0.9, 1.0)
+        kappa = random.uniform(-2.0, 1.0)
         nalpha = random.randint(0, 4)
         alpha = [random.gauss(0, 1e-10) for i in range(nalpha)]
         B = random.gauss(0, 1.1)
@@ -18,7 +18,7 @@ def test_properties():
         assert asphere.B == B
 
 
-def aspher(R, kappa, alpha, B):
+def py_asphere(R, kappa, alpha, B):
     def f(x, y):
         import math
         r2 = x*x + y*y
@@ -35,15 +35,15 @@ def test_call():
     random.seed(57)
     for i in range(100):
         R = random.gauss(25.0, 0.2)
-        kappa = random.uniform(-1.0, -0.9)
+        kappa = random.uniform(-2.0, 1.0)
         nalpha = random.randint(0, 4)
         alpha = [random.gauss(0, 1e-10) for i in range(nalpha)]
         B = random.gauss(0, 1.1)
         asphere = jtrace.Asphere(R, kappa, alpha, B)
-        for j in range(10):
+        for j in range(100):
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
-            assert isclose(asphere(x, y), aspher(R, kappa, alpha, B)(x, y))
+            assert isclose(asphere(x, y), py_asphere(R, kappa, alpha, B)(x, y))
 
 
 def test_intersect():
@@ -51,12 +51,12 @@ def test_intersect():
     random.seed(577)
     for i in range(100):
         R = random.gauss(25.0, 0.2)
-        kappa = random.uniform(-1.0, -0.9)
+        kappa = random.uniform(-2.0, 1.0)
         nalpha = random.randint(0, 4)
         alpha = [random.gauss(0, 1e-10) for i in range(nalpha)]
         B = random.gauss(0, 0.5)
         asphere = jtrace.Asphere(R, kappa, alpha, B)
-        for j in range(10):
+        for j in range(100):
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
 
@@ -84,7 +84,37 @@ def test_intersect():
             assert isclose(p1.z, p2.z)
             assert isclose(asphere(p1.x, p2.y), p1.z, rel_tol=0, abs_tol=1e-9)
 
+
+def py_poly(alpha):
+    def f(x, y):
+        r2 = x*x + y*y
+        result = 0
+        for i, a in enumerate(alpha):
+            result += r2**(i+2) * a
+        return result
+    return f
+
+
+def test_quad_plus_poly():
+    import random
+    random.seed(5772)
+    for i in range(100):
+        R = random.gauss(25.0, 0.2)
+        kappa = random.uniform(-2.0, 1.0)
+        nalpha = random.randint(0, 4)
+        alpha = [random.gauss(0, 1e-10) for i in range(nalpha)]
+        B = random.gauss(0, 1.1)
+        asphere = jtrace.Asphere(R, kappa, alpha, B)
+        quad = jtrace.Quadric(R, kappa, B)
+        poly = py_poly(alpha)
+        for j in range(100):
+            x = random.gauss(0.0, 1.0)
+            y = random.gauss(0.0, 1.0)
+            assert isclose(asphere(x, y), quad(x, y)+poly(x, y))
+
+
 if __name__ == '__main__':
     test_properties()
     test_call()
     test_intersect()
+    test_quad_plus_poly()
