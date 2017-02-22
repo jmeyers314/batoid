@@ -8,16 +8,41 @@ using namespace pybind11::literals;
 
 namespace jtrace {
     void pyExportVec3(py::module& m) {
-        py::class_<Vec3>(m, "Vec3")
+        py::class_<Vec3>(m, "Vec3", R"pbdoc(
+          Simple python 3-vector
+
+          Parameters
+          ----------
+          x
+            x-coordinate
+          y
+            y-coordinate
+          z
+            z-coordinate
+
+          Notes
+          -----
+          `x`, `y`, and `z` may also all be left blank, in which case the 0-vector is returned.
+
+          Examples
+          --------
+          >>> v = jtrace.Vec3(1, 2, 3.4)
+          >>> print(v)
+          Vec3(1, 2, 3.4)
+
+          >>> v2 = jtrace.Vec3()
+          >>> print(v2)
+          Vec3(0, 0, 0)
+        )pbdoc")
             .def(py::init<double,double,double>(), "init", "x"_a, "y"_a, "z"_a)
             .def(py::init<>())
-            .def("MagnitudeSquared", &Vec3::MagnitudeSquared)
-            .def("Magnitude", &Vec3::Magnitude)
-            .def("UnitVec3", &Vec3::UnitVec3)
+            .def("MagnitudeSquared", &Vec3::MagnitudeSquared, "Return square of vector magnitude.")
+            .def("Magnitude", &Vec3::Magnitude, "Return vector magnitude.")
+            .def("UnitVec3", &Vec3::UnitVec3, "Return unit vector pointing in same direction.")
             .def("__repr__", &Vec3::repr)
-            .def_readonly("x", &Vec3::x)
-            .def_readonly("y", &Vec3::y)
-            .def_readonly("z", &Vec3::z)
+            .def_readonly("x", &Vec3::x, "x-coordinate of vector")
+            .def_readonly("y", &Vec3::y, "y-coordinate of vector")
+            .def_readonly("z", &Vec3::z, "z-coordinate of vector")
             .def(py::self + py::self)
             .def(py::self += py::self)
             .def(py::self - py::self)
@@ -50,8 +75,77 @@ namespace jtrace {
             .def(py::self /= float())
             .def("determinant", &Rot3::determinant);
 
-        m.def("DotProduct", &DotProduct);
-        m.def("CrossProduct", &CrossProduct);
+        m.def("DotProduct", &DotProduct, R"pbdoc(
+          Compute the dot-product of two Vec3 objects.
+
+          Parameters
+          ----------
+          v1 : Vec3
+            First vector
+          v2 : Vec3
+            Second vector
+
+          Returns
+          -------
+          float
+            The dot product.
+
+          Notes
+          -----
+          The dot product is defined as the component-wise sum of products of two vectors.  It is
+          useful for computing the magnitude of a vector, or the angle between two vectors as
+
+          .. math::
+            v1 \dot v2 = \cos(\theta)
+
+          where :math:`\theta` is the angle in between the two vectors.
+
+          Examples
+          --------
+          >>> v1 = jtrace.Vec3(0, 1, 0)
+          >>> v2 = jtrace.Vec3(0, 0, 1)
+          >>> print(jtrace.DotProduct(v1, v2))
+          0.0
+          >>> v1 = jtrace.Vec3(0, 1, 2)
+          >>> v2 = jtrace.Vec3(1, 2, 3)
+          >>> assert jtrace.DotProduct(v1, v2) == v1.x*v2.x + v1.y*v2.y + v1.z*v2.z
+
+        )pbdoc");
+        m.def("CrossProduct", &CrossProduct, R"pbdoc(
+          Compute the cross-product of two Vec3 objects.
+
+          Parameters
+          ----------
+          v1 : Vec3
+            First vector
+          v2 : Vec3
+            Second vector
+
+          Returns
+          -------
+          Vec3
+            The vector cross-product v1 x v2.
+
+          Notes
+          -----
+          The vector cross-product is useful for computing a vector that is perpendicular to both
+          `v1` and `v2`.  The magnitude of the cross-product is equal to
+
+          .. math::
+            |v1 \cross v2| = |v1|  |v2| \sin(\theta)
+
+          where :math:`\theta` is the angle in between `v1` and `v2`.  jtrace Vec3 objects obey the
+          right-hand-rule, where Vec3(1, 0, 0) x Vec3(0, 1, 0) = Vec3(0, 0, 1), and cyclic
+          permutations thereof.
+
+          Examples
+          --------
+          >>> v1 = jtrace.Vec3(0, 1, 2)
+          >>> v2 = jtrace.Vec3(1, 2, 3)
+          >>> jtrace.CrossProduct(v1, v2)
+          Vec3(-1, 2, -1)
+
+        )pbdoc");
         m.def("RotVec", &RotVec);
         m.def("UnRotVec", &UnRotVec);
     }
