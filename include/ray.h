@@ -24,7 +24,9 @@ namespace jtrace {
         std::string repr() const;
     };
 
-    inline std::ostream& operator<<(std::ostream& os, const Ray& r);
+    inline std::ostream& operator<<(std::ostream& os, const Ray& r) {
+        return os << r.repr();
+    }
 }
 
 #endif

@@ -16,7 +16,6 @@ namespace jtrace {
 
     PYBIND11_PLUGIN(_jtrace) {
         py::module m("_jtrace", "ray tracer");
-
         pyExportVec3(m);
         pyExportRay(m);
         pyExportIntersection(m);

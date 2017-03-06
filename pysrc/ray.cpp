@@ -1,6 +1,9 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/stl_bind.h>
 #include "ray.h"
+
+PYBIND11_MAKE_OPAQUE(std::vector<jtrace::Ray>);
 
 namespace py = pybind11;
 using namespace pybind11::literals;
@@ -26,5 +29,6 @@ namespace jtrace {
             .def_property_readonly("vz", &Ray::getVz)
             .def("__call__", &Ray::operator())
             .def("__repr__", &Ray::repr);
+        py::bind_vector<std::vector<jtrace::Ray>>(m, "RayVector");
     }
 }

@@ -1,7 +1,11 @@
 #include <memory>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/stl_bind.h>
 #include "asphere.h"
+
+PYBIND11_MAKE_OPAQUE(std::vector<jtrace::Ray>);
+PYBIND11_MAKE_OPAQUE(std::vector<jtrace::Intersection>);
 
 namespace py = pybind11;
 
@@ -16,7 +20,7 @@ namespace jtrace {
             .def("__call__", &Asphere::operator())
             .def("normal", &Asphere::normal)
             .def("intersect", (Intersection (Asphere::*)(const Ray&) const) &Asphere::intersect)
-            .def("intersect", (std::vector<Intersection> (Asphere::*)(const std::vector<Ray>&) const) &Asphere::intersect)
+            .def("intersect", (std::vector<jtrace::Intersection> (Asphere::*)(const std::vector<jtrace::Ray>&) const) &Asphere::intersect)
             .def("__repr__", &Asphere::repr);
     }
 }

@@ -1,7 +1,10 @@
 #include <memory>
 #include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <pybind11/stl_bind.h>
 #include "quadric.h"
+
+PYBIND11_MAKE_OPAQUE(std::vector<jtrace::Ray>);
+PYBIND11_MAKE_OPAQUE(std::vector<jtrace::Intersection>);
 
 namespace py = pybind11;
 
@@ -15,7 +18,7 @@ namespace jtrace {
             .def("__call__", &Quadric::operator())
             .def("normal", &Quadric::normal)
             .def("intersect", (Intersection (Quadric::*)(const Ray&) const) &Quadric::intersect)
-            .def("intersect", (std::vector<Intersection> (Quadric::*)(const std::vector<Ray>&) const) &Quadric::intersect)
+            .def("intersect", (std::vector<jtrace::Intersection> (Quadric::*)(const std::vector<jtrace::Ray>&) const) &Quadric::intersect)
             .def("__repr__", &Quadric::repr);
     }
 }

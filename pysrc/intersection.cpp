@@ -1,7 +1,10 @@
 #include <memory>
 #include <pybind11/pybind11.h>
+#include <pybind11/stl_bind.h>
 #include <pybind11/operators.h>
 #include "intersection.h"
+
+PYBIND11_MAKE_OPAQUE(std::vector<jtrace::Intersection>);
 
 namespace py = pybind11;
 
@@ -21,5 +24,6 @@ namespace jtrace {
             .def("reflectedRay", &Intersection::reflectedRay)
             .def("refractedRay", &Intersection::refractedRay)
             .def(py::self == py::self);
+        py::bind_vector<std::vector<jtrace::Intersection>>(m, "IntersectionVector");
     }
 }

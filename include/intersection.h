@@ -11,9 +11,9 @@ namespace jtrace {
     struct Intersection {
         Intersection(const double _t, const Vec3 _point, const Vec3 _surfaceNormal);
 
-        const double t;
-        const Vec3 point;
-        const Vec3 surfaceNormal;
+        double t;
+        Vec3 point;
+        Vec3 surfaceNormal;
 
         double getX0() const { return point.x; }
         double getY0() const { return point.y; }
