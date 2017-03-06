@@ -74,7 +74,32 @@ def test_intersect():
             assert isclose(quad(p2.x, p2.y), p1.z, rel_tol=0, abs_tol=1e-9)
 
 
+def test_intersect_vectorized():
+    import random
+    random.seed(5772)
+    rays = [jtrace.Ray([random.gauss(0.0, 0.1),
+                        random.gauss(0.0, 0.1),
+                        random.gauss(10.0, 0.1)],
+                       [random.gauss(0.0, 0.1),
+                        random.gauss(0.0, 0.1),
+                        random.gauss(-1.0, 0.1)],
+                       random.gauss(0.0, 0.1))
+            for i in range(1000)]
+    rays = jtrace.RayVector(rays)
+
+    for i in range(100):
+        R = random.gauss(25.0, 0.2)
+        kappa = random.uniform(-2.0, 1.0)
+        B = random.gauss(0.0, 0.1)
+        quad = jtrace.Quadric(R, kappa, B)
+        intersections = quad.intersect(rays)
+        intersections2 = [quad.intersect(ray) for ray in rays]
+        intersections2 = jtrace.IntersectionVector(intersections2)
+        assert intersections == intersections2
+
+
 if __name__ == '__main__':
     test_properties()
     test_call()
     test_intersect()
+    test_intersect_vectorized()

@@ -62,7 +62,30 @@ def test_intersect():
             assert isclose(para(p1.x, p2.y), p1.z, rel_tol=0, abs_tol=1e-6)
 
 
+def test_intersect_vectorized():
+    import random
+    random.seed(5772)
+    rays = [jtrace.Ray([random.gauss(0.0, 0.1),
+                        random.gauss(0.0, 0.1),
+                        random.gauss(10.0, 0.1)],
+                       [random.gauss(0.0, 0.1),
+                        random.gauss(0.0, 0.1),
+                        random.gauss(-1.0, 0.1)],
+                       random.gauss(0.0, 0.1))
+            for i in range(1000)]
+    rays = jtrace.RayVector(rays)
+
+    for i in range(100):
+        A = random.gauss(0.05, 0.01)
+        B = random.gauss(0.4, 0.2)
+        para = jtrace.Paraboloid(A, B)
+        intersections = para.intersect(rays)
+        intersections2 = [para.intersect(ray) for ray in rays]
+        intersections2 = jtrace.IntersectionVector(intersections2)
+        assert intersections == intersections2
+
 if __name__ == '__main__':
     test_properties()
     test_call()
     test_intersect()
+    test_intersect_vectorized()

@@ -46,7 +46,7 @@ def test_shift():
         dx = random.gauss(0, 1)
         dy = random.gauss(0, 1)
         dz = random.gauss(0, 1)
-        transformed = asphere.shift(dx, dy, dz)
+        shifted = asphere.shift(dx, dy, dz)
 
         for j in range(10):
             x = random.gauss(0.0, 1.0)
@@ -55,7 +55,7 @@ def test_shift():
             # If we shoot rays straight up, then it's easy to predict the
             # intersection points.
             r = jtrace.Ray(x, y, -10, 0, 0, 1, 0)
-            isec = transformed.intersect(r)
+            isec = shifted.intersect(r)
             assert isclose(isec.point.x, x)
             assert isclose(isec.point.y, y)
             assert isclose(isec.point.z, asphere(x-dx, y-dy)+dz, rel_tol=0, abs_tol=1e-9)
@@ -67,7 +67,7 @@ def test_shift():
             vz = 1.0
             v = jtrace.Vec3(vx, vy, vz).UnitVec3()
             r = jtrace.Ray(jtrace.Vec3(x, y, -10), v, 0)
-            isec = transformed.intersect(r)
+            isec = shifted.intersect(r)
             p1 = r(isec.t)
             p2 = isec.point
             assert isclose(p1.x, p2.x)
@@ -76,10 +76,40 @@ def test_shift():
             assert isclose(asphere(p1.x-dx, p2.y-dy)+dz, p1.z, rel_tol=0, abs_tol=1e-9)
 
 
+def test_shift_vectorized():
+    import random
+    random.seed(577)
+    rays = [jtrace.Ray([random.gauss(0.0, 0.1),
+                        random.gauss(0.0, 0.1),
+                        random.gauss(10.0, 0.1)],
+                       [random.gauss(0.0, 0.1),
+                        random.gauss(0.0, 0.1),
+                        random.gauss(-1.0, 0.1)],
+                       random.gauss(0.0, 0.1))
+            for i in range(1000)]
+    rays = jtrace.RayVector(rays)
+
+    for i in range(100):
+        R = random.gauss(25.0, 0.2)
+        kappa = random.uniform(-1.0, -0.9)
+        nalpha = random.randint(0, 4)
+        alpha = [random.gauss(0, 1e-10) for i in range(nalpha)]
+        B = random.gauss(0, 1.1)
+        asphere = jtrace.Asphere(R, kappa, alpha, B)
+        dx = random.gauss(0, 1)
+        dy = random.gauss(0, 1)
+        dz = random.gauss(0, 1)
+        shifted = asphere.shift(dx, dy, dz)
+        intersections = shifted.intersect(rays)
+        intersections2 = [shifted.intersect(ray) for ray in rays]
+        intersections2 = jtrace.IntersectionVector(intersections2)
+        assert intersections == intersections2
+
+
 def test_rotate():
     import random
     import math
-    random.seed(577)
+    random.seed(5772)
     for i in range(100):
         R = random.gauss(25.0, 0.2)
         kappa = random.uniform(-2.0, 2.0)
@@ -180,7 +210,41 @@ def test_rotate():
             assert isclose(isecz.t, isec.t)
 
 
+def test_rotate_vectorized():
+    import random
+    import math
+    random.seed(57721)
+    rays = [jtrace.Ray([random.gauss(0.0, 0.1),
+                        random.gauss(0.0, 0.1),
+                        random.gauss(10.0, 0.1)],
+                       [random.gauss(0.0, 0.1),
+                        random.gauss(0.0, 0.1),
+                        random.gauss(-1.0, 0.1)],
+                       random.gauss(0.0, 0.1))
+            for i in range(1000)]
+    rays = jtrace.RayVector(rays)
+
+    for i in range(100):
+        R = random.gauss(25.0, 0.2)
+        kappa = random.uniform(-2.0, 2.0)
+        nalpha = random.randint(0, 4)
+        alpha = [random.gauss(0, 1e-10) for i in range(nalpha)]
+        B = random.gauss(0, 1.1)
+        asphere = jtrace.Asphere(R, kappa, alpha, B)
+        theta = random.gauss(0, 0.1)
+        st, ct = math.sin(theta), math.cos(theta)
+        rotated = asphere.rotX(theta)
+        phi = random.gauss(0, 0.1)
+        rotated = rotated.rotY(phi)
+        intersections = rotated.intersect(rays)
+        intersections2 = [rotated.intersect(ray) for ray in rays]
+        intersections2 = jtrace.IntersectionVector(intersections2)
+        assert intersections == intersections2
+
+
 if __name__ == '__main__':
     test_properties()
     test_shift()
+    test_shift_vectorized()
     test_rotate()
+    test_rotate_vectorized()
