@@ -6,6 +6,9 @@ namespace jtrace {
 
     Ray::Ray(Vec3 _p0, Vec3 _v, double t) : p0(_p0), v(_v.UnitVec3()), t0(t) {}
 
+    Ray::Ray(std::array<double,3> _p0, std::array<double,3> _v, double t) :
+        p0(Vec3(_p0)), v(Vec3(_v).UnitVec3()), t0(t) {}
+
     std::string Ray::repr() const {
         std::ostringstream oss(" ");
         oss << "Ray(" << p0 << ", " << v << ", " << t0 << ")";

@@ -1,4 +1,5 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 #include "ray.h"
 
 namespace py = pybind11;
@@ -13,6 +14,7 @@ namespace jtrace {
             .def(py::init<Vec3,Vec3,double>(),
                  "init",
                  "p0"_a, "v"_a, "t"_a=0.0)
+            .def(py::init<std::array<double,3>,std::array<double,3>,double>())
             .def_readonly("p0", &Ray::p0)
             .def_readonly("v", &Ray::v)
             .def_readonly("t0", &Ray::t0)
