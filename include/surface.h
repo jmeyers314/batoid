@@ -5,6 +5,7 @@
 #include "ray.h"
 #include "intersection.h"
 #include <memory>
+#include <vector>
 
 namespace jtrace {
     struct Intersection;
@@ -14,6 +15,7 @@ namespace jtrace {
         virtual double operator()(double, double) const = 0;
         virtual Vec3 normal(double, double) const = 0;
         virtual Intersection intersect(const Ray&) const = 0;
+        std::vector<Intersection> intersect(const std::vector<Ray>&) const;
         virtual std::string repr() const = 0;
         Transformation shift(double dx, double dy, double dz) const;
         Transformation shift(const Vec3&) const;

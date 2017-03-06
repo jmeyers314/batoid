@@ -10,6 +10,7 @@ namespace jtrace {
         Paraboloid(double _A, double _B);
         virtual double operator()(double, double) const;
         virtual Vec3 normal(double, double) const;
+        using Surface::intersect;
         virtual Intersection intersect(const Ray&) const;
         double getA() const {return A;}
         double getB() const {return B;}

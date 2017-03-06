@@ -8,6 +8,7 @@ namespace py = pybind11;
 namespace jtrace {
     void pyExportSurface(py::module& m) {
         py::class_<Surface, std::shared_ptr<Surface>>(m, "Surface")
+            .def("intersect", (std::vector<Intersection> (Surface::*)(const std::vector<Ray>&) const) &Surface::intersect)
             .def("shift", (Transformation (Surface::*)(double,double,double) const) &Surface::shift)
             .def("shift", (Transformation (Surface::*)(const Vec3&) const) &Surface::shift)
             .def("rotX", &Surface::rotX)

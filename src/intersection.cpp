@@ -2,7 +2,6 @@
 #include "utils.h"
 
 namespace jtrace {
-
     Intersection::Intersection(const double _t, const Vec3 _point, const Vec3 _surfaceNormal) :
         t(_t), point(_point), surfaceNormal(_surfaceNormal.UnitVec3()) {}
 

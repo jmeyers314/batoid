@@ -11,6 +11,7 @@ namespace jtrace {
         Asphere(double _R, double _kappa, std::vector<double> _alpha, double _B);
         virtual double operator()(double, double) const;
         virtual Vec3 normal(double, double) const;
+        using Surface::intersect;
         virtual Intersection intersect(const Ray&) const;
         double getR() const {return R;}
         double getKappa() const {return kappa;}

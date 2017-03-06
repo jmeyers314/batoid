@@ -1,5 +1,6 @@
 #include <memory>
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 #include "plane.h"
 
 namespace py = pybind11;
@@ -11,7 +12,8 @@ namespace jtrace {
             .def_property_readonly("B", &Plane::getB)
             .def("__call__", &Plane::operator())
             .def("normal", &Plane::normal)
-            .def("intersect", &Plane::intersect)
+            .def("intersect", (Intersection (Plane::*)(const Ray&) const) &Plane::intersect)
+            .def("intersect", (std::vector<Intersection> (Plane::*)(const std::vector<Ray>&) const) &Plane::intersect)
             .def("__repr__", &Plane::repr);
     }
 }

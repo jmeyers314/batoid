@@ -24,7 +24,7 @@ namespace jtrace {
         double ct = std::cos(theta);
         Rot3 r{{{ct, 0, -st,
                   0, 1,   0,
-                 st, 0, ct}}};
+                 st, 0,  ct}}};
         return Transformation(shared_from_this(), r);
     }
 
@@ -35,6 +35,15 @@ namespace jtrace {
                  -st, ct, 0,
                    0,  0, 1}}};
         return Transformation(shared_from_this(), r);
+    }
+
+    std::vector<Intersection> Surface::intersect(const std::vector<Ray>& rays) const {
+        auto result = std::vector<Intersection>();
+        result.reserve(rays.size());
+        for (const auto& ray : rays) {
+            result.push_back(intersect(ray));
+        }
+        return result;
     }
 
 }

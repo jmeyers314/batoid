@@ -1,5 +1,6 @@
 #include <memory>
 #include <pybind11/pybind11.h>
+#include <pybind11/operators.h>
 #include "intersection.h"
 
 namespace py = pybind11;
@@ -18,6 +19,7 @@ namespace jtrace {
             .def_property_readonly("nz", &Intersection::getNz)
             .def("__repr__", &Intersection::repr)
             .def("reflectedRay", &Intersection::reflectedRay)
-            .def("refractedRay", &Intersection::refractedRay);
+            .def("refractedRay", &Intersection::refractedRay)
+            .def(py::self == py::self);
     }
 }

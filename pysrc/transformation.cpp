@@ -9,7 +9,8 @@ namespace jtrace {
     void pyExportTransformation(py::module& m) {
         py::class_<Transformation, std::shared_ptr<Transformation>, Surface>(m, "Transformation")
             .def(py::init<std::shared_ptr<Surface>,double,double,double>())
-            .def("intersect", &Transformation::intersect)
+            .def("intersect", (Intersection (Transformation::*)(const Ray&) const) &Transformation::intersect)
+            .def("intersect", (std::vector<Intersection> (Transformation::*)(const std::vector<Ray>&) const) &Transformation::intersect)
             .def("__repr__", &Transformation::repr)
             .def_property_readonly("dr", &Transformation::getDr)
             .def_property_readonly("dx", &Transformation::getDx)

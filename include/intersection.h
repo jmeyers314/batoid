@@ -31,6 +31,10 @@ namespace jtrace {
     inline std::ostream& operator<<(std::ostream& os, const Intersection& i) {
         return os << i.repr();
     }
+
+    inline bool operator==(const Intersection& i1, const Intersection& i2) {
+        return i1.t == i2.t && i1.point == i2.point && i1.surfaceNormal == i2.surfaceNormal;
+    }
 }
 
 #endif
