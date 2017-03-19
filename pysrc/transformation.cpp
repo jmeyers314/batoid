@@ -1,7 +1,8 @@
+#include "transformation.h"
 #include <memory>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl_bind.h>
-#include "transformation.h"
+#include <pybind11/stl.h>
 
 PYBIND11_MAKE_OPAQUE(std::vector<jtrace::Ray>);
 PYBIND11_MAKE_OPAQUE(std::vector<jtrace::Intersection>);
