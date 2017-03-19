@@ -1,5 +1,5 @@
-#include <iostream>
 #include "quadric.h"
+#include <iostream>
 
 namespace jtrace {
     Quadric::Quadric(double _R, double _kappa, double _B) :
