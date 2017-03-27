@@ -20,7 +20,7 @@ namespace jtrace {
 
     Intersection Transformation::intersect(const Ray& r) const {
         // Need to transform the coord sys of r into the coord sys of the transformee.
-        Ray rr {RotVec(rot, r.p0-dr), RotVec(rot, r.v), r.t0};
+        Ray rr {RotVec(rot, r.p0-dr), RotVec(rot, r.v), r.t0, r.wavelength, r.isVignetted};
         Intersection isec = transformee->intersect(rr);
         // Now transform intersection back into transformed coord sys.
         return Intersection(isec.t, UnRotVec(rot, isec.point)+dr, UnRotVec(rot, isec.surfaceNormal));

@@ -7,7 +7,7 @@ namespace jtrace {
 
     Ray Intersection::reflectedRay(const Ray& r) const {
         double c1 = DotProduct(r.v, surfaceNormal);
-        return Ray(point, (r.v - 2*c1*surfaceNormal).UnitVec3(), t);
+        return Ray(point, (r.v - 2*c1*surfaceNormal).UnitVec3(), t, r.wavelength, r.isVignetted);
     }
 
     Ray Intersection::refractedRay(const Ray& r, double n1, double n2) const {
@@ -20,9 +20,9 @@ namespace jtrace {
         Vec3 f1(r.v+k1*surfaceNormal);
         Vec3 f2(r.v+k2*surfaceNormal);
         if (DotProduct(f1, r.v) > DotProduct(f2, r.v))
-            return Ray(point, f1, t);
+            return Ray(point, f1, t, r.wavelength, r.isVignetted);
         else
-            return Ray(point, f2, t);
+            return Ray(point, f2, t, r.wavelength, r.isVignetted);
     }
 
     std::string Intersection::repr() const {

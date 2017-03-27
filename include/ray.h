@@ -7,12 +7,18 @@
 
 namespace jtrace {
     struct Ray {
-        Ray(double x0, double y0, double z0, double vx, double vy, double vz, double t);
-        Ray(Vec3 _p0, Vec3 _v, double t);
-        Ray(std::array<double,3> _p0, std::array<double,3> _v, double t);
+        Ray(double x0, double y0, double z0, double vx, double vy, double vz,
+            double t, double w, bool isVignetted);
+        Ray(Vec3 _p0, Vec3 _v, double t, double w, bool isVignetted);
+        Ray(std::array<double,3> _p0, std::array<double,3> _v,
+            double t, double w, bool isVignetted);
+
         Vec3 p0; // reference position
         Vec3 v;  // "velocity" Vec3
         double t0; // reference time
+        double wavelength; // in vacuum, in nanometers
+        bool isVignetted;
+
         Vec3 operator()(double t) const;
         double getX0() const { return p0.x; }
         double getY0() const { return p0.y; }
