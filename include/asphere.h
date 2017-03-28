@@ -2,7 +2,11 @@
 #define jtrace_asphere_h
 
 #include <vector>
-#include "jtrace.h"
+#include <sstream>
+#include "surface.h"
+#include "intersection.h"
+#include "ray.h"
+#include "vec3.h"
 
 namespace jtrace {
 

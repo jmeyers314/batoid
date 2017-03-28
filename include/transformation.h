@@ -1,9 +1,13 @@
 #ifndef jtrace_transformation_h
 #define jtrace_transformation_h
 
-#include "jtrace.h"
 #include <array>
 #include <memory>
+#include <sstream>
+#include "surface.h"
+#include "intersection.h"
+#include "ray.h"
+#include "vec3.h"
 
 namespace jtrace {
     struct Intersection;

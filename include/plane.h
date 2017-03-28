@@ -1,7 +1,11 @@
 #ifndef jtrace_plane_h
 #define jtrace_plane_h
 
-#include "jtrace.h"
+#include <sstream>
+#include "surface.h"
+#include "intersection.h"
+#include "ray.h"
+#include "vec3.h"
 
 namespace jtrace {
 

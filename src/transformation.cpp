@@ -1,4 +1,5 @@
 #include "transformation.h"
+#include "except.h"
 
 namespace jtrace {
     Transformation::Transformation(std::shared_ptr<const Surface> s, double dx, double dy, double dz) :

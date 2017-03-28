@@ -1,11 +1,11 @@
 #ifndef jtrace_surface_h
 #define jtrace_surface_h
 
+#include <vector>
+#include <memory>
 #include "vec3.h"
 #include "ray.h"
 #include "intersection.h"
-#include <memory>
-#include <vector>
 
 namespace jtrace {
     struct Intersection;

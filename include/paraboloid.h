@@ -1,7 +1,11 @@
 #ifndef jtrace_paraboloid_h
 #define jtrace_paraboloid_h
 
-#include "jtrace.h"
+#include <sstream>
+#include "surface.h"
+#include "intersection.h"
+#include "ray.h"
+#include "vec3.h"
 
 namespace jtrace {
 

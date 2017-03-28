@@ -1,6 +1,6 @@
 #include "asphere.h"
-#include "solve.h"
 #include "quadric.h"
+#include "solve.h"
 
 namespace jtrace {
     Asphere::Asphere(double _R, double _kappa, std::vector<double> _alpha, double _B) :
