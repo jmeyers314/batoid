@@ -4,10 +4,9 @@
 #include <string>
 #include <sstream>
 #include "vec3.h"
-#include "surface.h"
+#include "ray.h"
 
 namespace jtrace {
-    class Surface;
     struct Intersection {
         Intersection(const double _t, const Vec3 _point, const Vec3 _surfaceNormal);
 
