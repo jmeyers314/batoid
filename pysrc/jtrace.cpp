@@ -13,6 +13,7 @@ namespace jtrace {
     void pyExportQuadric(py::module&);
     void pyExportPlane(py::module&);
     void pyExportTransformation(py::module&);
+    void pyExportTable(py::module&);
 
     PYBIND11_PLUGIN(_jtrace) {
         py::module m("_jtrace", "ray tracer");
@@ -25,6 +26,7 @@ namespace jtrace {
         pyExportQuadric(m);
         pyExportPlane(m);
         pyExportTransformation(m);
+        pyExportTable(m);
 
         return m.ptr();
     }
