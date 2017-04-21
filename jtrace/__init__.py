@@ -4,5 +4,6 @@ from ._jtrace import Ray, Intersection, RayVector, IntersectionVector
 from ._jtrace import Surface, Plane, Paraboloid, Quadric, Asphere
 from ._jtrace import Transformation
 from ._jtrace import Table
+from ._jtrace import Medium, ConstMedium, TableMedium
 from .telescope import Telescope
 from .rays import parallelRays
