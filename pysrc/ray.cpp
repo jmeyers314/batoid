@@ -2,6 +2,8 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
+#include <pybind11/operators.h>
+
 
 PYBIND11_MAKE_OPAQUE(std::vector<jtrace::Ray>);
 
@@ -33,7 +35,9 @@ namespace jtrace {
             .def_property_readonly("vy", &Ray::getVy)
             .def_property_readonly("vz", &Ray::getVz)
             .def("__call__", &Ray::operator())
-            .def("__repr__", &Ray::repr);
+            .def("__repr__", &Ray::repr)
+            .def(py::self == py::self)
+            .def(py::self != py::self);
         py::bind_vector<std::vector<jtrace::Ray>>(m, "RayVector");
     }
 }

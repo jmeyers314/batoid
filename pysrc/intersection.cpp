@@ -22,7 +22,8 @@ namespace jtrace {
             .def_property_readonly("nz", &Intersection::getNz)
             .def("__repr__", &Intersection::repr)
             .def("reflectedRay", &Intersection::reflectedRay)
-            .def("refractedRay", &Intersection::refractedRay)
+            .def("refractedRay", (Ray (Intersection::*)(const Ray&, double, double) const) &Intersection::refractedRay)
+            .def("refractedRay", (Ray (Intersection::*)(const Ray&, const Medium&, const Medium&) const) &Intersection::refractedRay)
             .def(py::self == py::self);
         py::bind_vector<std::vector<jtrace::Intersection>>(m, "IntersectionVector");
     }

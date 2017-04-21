@@ -1,6 +1,10 @@
+import os
+import numpy as np
 import jtrace
 from test_helpers import isclose
 
+
+datadir = os.path.join(os.path.dirname(__file__), 'data', 'media')
 
 def test_plane_refraction_plane():
     import random
@@ -205,6 +209,57 @@ def test_asphere_refraction_reversal():
         assert isclose(cpoint.z, 0, rel_tol=0, abs_tol=1e-9)
 
 
+def test_const_medium_refraction():
+    import random
+    random.seed(5772156)
+
+    asphere = jtrace.Asphere(25.0, -0.97, [1e-3, 1e-5], 0.1)
+    for i in range(10000):
+        x = random.gauss(0, 1)
+        y = random.gauss(0, 1)
+        vx = random.gauss(0, 1e-1)
+        vy = random.gauss(0, 1e-1)
+        ray = jtrace.Ray(x, y, 0, vx, vy, 1, 0)
+        isec = asphere.intersect(ray)
+        n1 = 1.7
+        n2 = 1.2
+        m1 = jtrace.ConstMedium(n1)
+        m2 = jtrace.ConstMedium(n2)
+        rray1 = isec.refractedRay(ray, n1, n2)
+        rray2 = isec.refractedRay(ray, m1, m2)
+
+        assert rray1 == rray2
+
+
+def test_table_medium_refraction():
+    import random
+    random.seed(57721566)
+
+    filename = os.path.join(datadir, "silica_dispersion.txt")
+    wave, n = np.genfromtxt(filename).T
+    table = jtrace.Table(wave, n, jtrace.Table.Interpolant.linear)
+    silica = jtrace.TableMedium(table)
+    air = jtrace.ConstMedium(1.000277)
+
+    asphere = jtrace.Asphere(25.0, -0.97, [1e-3, 1e-5], 0.1)
+    for i in range(10000):
+        x = random.gauss(0, 1)
+        y = random.gauss(0, 1)
+        vx = random.gauss(0, 1e-1)
+        vy = random.gauss(0, 1e-1)
+        wavelength = random.uniform(0.3, 1.2)
+        ray = jtrace.Ray(x, y, 0, vx, vy, 1, 0, wavelength)
+        isec = asphere.intersect(ray)
+
+        n1 = silica.getN(wavelength)
+        n2 = air.getN(wavelength)
+
+        rray1 = isec.refractedRay(ray, silica, air)
+        rray2 = isec.refractedRay(ray, n1, n2)
+
+        assert rray1 == rray2
+
+
 if __name__ == '__main__':
     test_plane_refraction_plane()
     test_plane_refraction_reversal()
@@ -212,3 +267,5 @@ if __name__ == '__main__':
     test_paraboloid_refraction_reversal()
     test_asphere_refraction_plane()
     test_asphere_refraction_reversal()
+    test_const_medium_refraction()
+    test_table_medium_refraction()

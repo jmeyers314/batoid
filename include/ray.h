@@ -20,6 +20,8 @@ namespace jtrace {
         bool isVignetted;
 
         Vec3 operator()(double t) const;
+        bool operator==(const Ray&) const;
+        bool operator!=(const Ray&) const;
         double getX0() const { return p0.x; }
         double getY0() const { return p0.y; }
         double getZ0() const { return p0.z; }

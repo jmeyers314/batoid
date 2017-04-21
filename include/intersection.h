@@ -5,6 +5,7 @@
 #include <sstream>
 #include "vec3.h"
 #include "ray.h"
+#include "medium.h"
 
 namespace jtrace {
     struct Intersection {
@@ -24,6 +25,7 @@ namespace jtrace {
 
         Ray reflectedRay(const Ray&) const;
         Ray refractedRay(const Ray&, double n1, double n2) const;
+        Ray refractedRay(const Ray&, const Medium& m1, const Medium& m2) const;
         std::string repr() const;
     };
 

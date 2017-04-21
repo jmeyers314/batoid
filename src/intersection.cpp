@@ -25,6 +25,12 @@ namespace jtrace {
             return Ray(point, f2, t, r.wavelength, r.isVignetted);
     }
 
+    Ray Intersection::refractedRay(const Ray& r, const Medium& m1, const Medium& m2) const {
+        double n1 = m1.getN(r.wavelength);
+        double n2 = m2.getN(r.wavelength);
+        return refractedRay(r, n1, n2);
+    }
+
     std::string Intersection::repr() const {
         std::ostringstream oss(" ");
         oss << "Intersection(" << t << ", " << point << ", " << surfaceNormal << ")";

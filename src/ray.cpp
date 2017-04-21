@@ -27,4 +27,16 @@ namespace jtrace {
         return p0+v*(t-t0);
     }
 
+    bool Ray::operator==(const Ray& other) const {
+        return (p0 == other.p0) &&
+               (v == other.v) &&
+               (t0 == other.t0) &&
+               (wavelength == other.wavelength) &&
+               (isVignetted == other.isVignetted);
+    }
+
+    bool Ray::operator!=(const Ray& other) const {
+        return !(*this == other);
+    }
+
 }
