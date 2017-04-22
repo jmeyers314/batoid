@@ -12,7 +12,7 @@ def test_telescope():
                                theta_x=1.0*np.pi/180, theta_y=0.1*np.pi/180)
     for i in range(6):
         telescope = jtrace.Telescope(os.path.join(datadir, "optics_{}.txt".format(i)))
-        isecs = telescope.traceMany(rays)
+        telescope.traceMany(rays)
 
 
 if __name__ == '__main__':

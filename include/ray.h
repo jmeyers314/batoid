@@ -14,8 +14,8 @@ namespace jtrace {
             double t, double w, bool isVignetted);
 
         Vec3 p0; // reference position
-        Vec3 v;  // "velocity" Vec3
-        double t0; // reference time
+        Vec3 v;  // "velocity" Vec3, really v/c
+        double t0; // reference time, really c*t0
         double wavelength; // in vacuum, in nanometers
         bool isVignetted;
 

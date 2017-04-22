@@ -20,7 +20,7 @@ namespace jtrace {
         Vec3(std::array<double,3> a) : x(a[0]), y(a[1]), z(a[2]) {}
 
         const double MagnitudeSquared() const {
-            return (x*x)+(y*y)+(z*z);
+            return x*x + y*y + z*z;
         }
 
         const double Magnitude() const {
