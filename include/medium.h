@@ -25,6 +25,23 @@ namespace jtrace {
     private:
         const std::shared_ptr<Table<double,double>> table;
     };
+
+    class SellmeierMedium : public Medium {
+    public:
+        SellmeierMedium(double B1, double B2, double B3, double C1, double C2, double C3);
+        double getN(double wavelength) const override;
+    private:
+        const double B1, B2, B3, C1, C2, C3;
+    };
+
+    class Air: public Medium {
+    public:
+        Air(double pressure=69.328, double temperature=293.15, double H2O_pressure=1.067);
+        double getN(double wavelength) const override;
+    private:
+        const double P, T, W;
+    };
+
 }
 
 #endif
