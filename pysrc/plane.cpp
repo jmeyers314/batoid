@@ -7,11 +7,12 @@ PYBIND11_MAKE_OPAQUE(std::vector<jtrace::Ray>);
 PYBIND11_MAKE_OPAQUE(std::vector<jtrace::Intersection>);
 
 namespace py = pybind11;
+using namespace pybind11::literals;
 
 namespace jtrace {
     void pyExportPlane(py::module& m) {
         py::class_<Plane, std::shared_ptr<Plane>, Surface>(m, "Plane")
-            .def(py::init<double>())
+            .def(py::init<double>(), "init", "B"_a)
             .def_property_readonly("B", &Plane::getB)
             .def("__call__", &Plane::operator())
             .def("normal", &Plane::normal)
