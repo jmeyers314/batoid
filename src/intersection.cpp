@@ -12,6 +12,16 @@ namespace jtrace {
         return Ray(point, (nv - 2*c1*surfaceNormal).UnitVec3()/n, t, r.wavelength, r.isVignetted);
     }
 
+    // Reflect lots of rays at single intersection
+    std::vector<Ray> Intersection::reflectedRay(const std::vector<Ray>& rays) const {
+        auto result = std::vector<Ray>();
+        result.reserve(rays.size());
+        for (const auto& ray : rays) {
+            result.push_back(reflectedRay(ray));
+        }
+        return result;
+    }
+
     Ray Intersection::refractedRay(const Ray& r, double n1, double n2) const {
         //assert n1 == 1./r.Magnitude()
         Vec3 nv = r.v * n1;
@@ -29,15 +39,62 @@ namespace jtrace {
             return Ray(point, f2/n2, t, r.wavelength, r.isVignetted);
     }
 
+    std::vector<Ray> Intersection::refractedRay(const std::vector<Ray>& rays, double n1, double n2) const {
+        auto result = std::vector<Ray>();
+        result.reserve(rays.size());
+        for (const auto& ray : rays) {
+            result.push_back(refractedRay(ray, n1, n2));
+        }
+        return result;
+    }
+
     Ray Intersection::refractedRay(const Ray& r, const Medium& m1, const Medium& m2) const {
         double n1 = m1.getN(r.wavelength);
         double n2 = m2.getN(r.wavelength);
         return refractedRay(r, n1, n2);
     }
 
+    std::vector<Ray> Intersection::refractedRay(const std::vector<Ray>& rays, const Medium& m1, const Medium& m2) const {
+        auto result = std::vector<Ray>();
+        result.reserve(rays.size());
+        for (const auto& ray : rays) {
+            result.push_back(refractedRay(ray, m1, m2));
+        }
+        return result;
+    }
+
     std::string Intersection::repr() const {
         std::ostringstream oss(" ");
         oss << "Intersection(" << t << ", " << point << ", " << surfaceNormal << ")";
         return oss.str();
+    }
+
+    // Reflect lots of rays at lots of different intersections
+    std::vector<Ray> reflectMany(const std::vector<Intersection>& isecs, const std::vector<Ray>& rays) {
+        auto result = std::vector<Ray>();
+        result.reserve(isecs.size());
+        for (unsigned i=0; i<isecs.size(); i++) {
+            result.push_back(isecs[i].reflectedRay(rays[i]));
+        }
+        return result;
+    }
+
+    // Refract lots of rays at lots of different intersections
+    std::vector<Ray> refractMany(const std::vector<Intersection>& isecs, const std::vector<Ray>& rays, double n1, double n2) {
+        auto result = std::vector<Ray>();
+        result.reserve(isecs.size());
+        for (unsigned i=0; i<isecs.size(); i++) {
+            result.push_back(isecs[i].refractedRay(rays[i], n1, n2));
+        }
+        return result;
+    }
+
+    std::vector<Ray> refractMany(const std::vector<Intersection>& isecs, const std::vector<Ray>& rays, const Medium& m1, const Medium& m2) {
+        auto result = std::vector<Ray>();
+        result.reserve(isecs.size());
+        for (unsigned i=0; i<isecs.size(); i++) {
+            result.push_back(isecs[i].refractedRay(rays[i], m1, m2));
+        }
+        return result;
     }
 }

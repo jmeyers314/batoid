@@ -21,10 +21,16 @@ namespace jtrace {
             .def_property_readonly("ny", &Intersection::getNy)
             .def_property_readonly("nz", &Intersection::getNz)
             .def("__repr__", &Intersection::repr)
-            .def("reflectedRay", &Intersection::reflectedRay)
+            .def("reflectedRay", (Ray (Intersection::*)(const Ray&) const) &Intersection::reflectedRay)
+            .def("reflectedRay", (std::vector<jtrace::Ray> (Intersection::*)(const std::vector<jtrace::Ray>&) const) &Intersection::reflectedRay)
             .def("refractedRay", (Ray (Intersection::*)(const Ray&, double, double) const) &Intersection::refractedRay)
+            .def("refractedRay", (std::vector<jtrace::Ray> (Intersection::*)(const std::vector<jtrace::Ray>&, double, double) const) &Intersection::refractedRay)
             .def("refractedRay", (Ray (Intersection::*)(const Ray&, const Medium&, const Medium&) const) &Intersection::refractedRay)
+            .def("refractedRay", (std::vector<jtrace::Ray> (Intersection::*)(const std::vector<jtrace::Ray>&, const Medium&, const Medium&) const) &Intersection::refractedRay)
             .def(py::self == py::self);
         py::bind_vector<std::vector<jtrace::Intersection>>(m, "IntersectionVector");
+        m.def("reflectMany", &reflectMany);
+        m.def("refractMany", (std::vector<jtrace::Ray>(*)(const std::vector<Intersection>&, const std::vector<Ray>&, double, double)) &refractMany);
+        m.def("refractMany", (std::vector<jtrace::Ray>(*)(const std::vector<Intersection>&, const std::vector<Ray>&, const Medium&, const Medium&)) &refractMany);
     }
 }

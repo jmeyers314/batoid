@@ -52,4 +52,15 @@ class Telescope(object):
         return isec
 
     def traceMany(self, rays):
-        return jtrace.IntersectionVector([self.trace(r) for r in rays])
+        rs = rays
+        for optic in self.optics:
+            isecs = optic['surface'].intersect(rs)
+            if optic['typ'] == 'mirror':
+                rs = jtrace._jtrace.reflectMany(isecs, rs)
+            elif optic['typ'] in ['lens', 'filter']:
+                rs = jtrace._jtrace.refractMany(isecs, rs, optic['n0'], optic['n1'])
+            elif optic['typ'] == 'det':
+                pass
+            else:
+                raise ValueError("Unknown optic type: {}".format(optic['typ']))
+        return isecs
