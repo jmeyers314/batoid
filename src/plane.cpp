@@ -1,14 +1,18 @@
 #include "plane.h"
+#include <cmath>
 
 namespace jtrace {
-    Plane::Plane(double _B) : B(_B) {}
+    Plane::Plane(double _B, double _Rin, double _Rout) :
+        B(_B), Rin(_Rin), Rout(_Rout) {}
 
     Intersection Plane::intersect(const Ray& r) const {
         double t = (B - r.p0.z)/r.v.z;
         t += r.t0;
         Vec3 point = r(t);
         Vec3 surfaceNormal = normal(point.x, point.y);
-        return Intersection(t, point, surfaceNormal);
+        double rho = std::hypot(point.x, point.y);
+        bool isVignetted = rho < Rin || rho > Rout;
+        return Intersection(t, point, surfaceNormal, isVignetted);
     }
 
     std::string Plane::repr() const {

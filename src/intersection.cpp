@@ -2,14 +2,14 @@
 #include "utils.h"
 
 namespace jtrace {
-    Intersection::Intersection(const double _t, const Vec3 _point, const Vec3 _surfaceNormal) :
-        t(_t), point(_point), surfaceNormal(_surfaceNormal.UnitVec3()) {}
+    Intersection::Intersection(const double _t, const Vec3 _point, const Vec3 _surfaceNormal, bool _isVignetted) :
+        t(_t), point(_point), surfaceNormal(_surfaceNormal.UnitVec3()), isVignetted(_isVignetted) {}
 
     Ray Intersection::reflectedRay(const Ray& r) const {
         double n = 1.0 / r.v.Magnitude();
         Vec3 nv = r.v * n;
         double c1 = DotProduct(nv, surfaceNormal);
-        return Ray(point, (nv - 2*c1*surfaceNormal).UnitVec3()/n, t, r.wavelength, r.isVignetted);
+        return Ray(point, (nv - 2*c1*surfaceNormal).UnitVec3()/n, t, r.wavelength, r.isVignetted || isVignetted);
     }
 
     // Reflect lots of rays at single intersection
@@ -34,9 +34,9 @@ namespace jtrace {
         Vec3 f1 = (nv+k1*surfaceNormal).UnitVec3();
         Vec3 f2 = (nv+k2*surfaceNormal).UnitVec3();
         if (DotProduct(f1, nv) > DotProduct(f2, nv))
-            return Ray(point, f1/n2, t, r.wavelength, r.isVignetted);
+            return Ray(point, f1/n2, t, r.wavelength, r.isVignetted || isVignetted);
         else
-            return Ray(point, f2/n2, t, r.wavelength, r.isVignetted);
+            return Ray(point, f2/n2, t, r.wavelength, r.isVignetted || isVignetted);
     }
 
     std::vector<Ray> Intersection::refractedRay(const std::vector<Ray>& rays, double n1, double n2) const {
@@ -65,7 +65,7 @@ namespace jtrace {
 
     std::string Intersection::repr() const {
         std::ostringstream oss(" ");
-        oss << "Intersection(" << t << ", " << point << ", " << surfaceNormal << ")";
+        oss << "Intersection(" << t << ", " << point << ", " << surfaceNormal << ", " << isVignetted << ")";
         return oss.str();
     }
 

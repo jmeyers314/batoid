@@ -3,8 +3,8 @@
 #include "except.h"
 
 namespace jtrace {
-    Quadric::Quadric(double _R, double _kappa, double _B) :
-        R(_R), kappa(_kappa), B(_B) {}
+    Quadric::Quadric(double _R, double _kappa, double _B, double _Rin, double _Rout) :
+        R(_R), kappa(_kappa), B(_B), Rin(_Rin), Rout(_Rout) {}
 
     double Quadric::operator()(double x, double y) const {
         double r2 = x*x + y*y;
@@ -70,7 +70,9 @@ namespace jtrace {
         t += r.t0;
         Vec3 point = r(t);
         Vec3 surfaceNormal = normal(point.x, point.y);
-        return Intersection(t, point, surfaceNormal);
+        double rho = std::hypot(point.x, point.y);
+        bool isVignetted = rho < Rin || rho > Rout;
+        return Intersection(t, point, surfaceNormal, isVignetted);
     }
 
     std::string Quadric::repr() const {

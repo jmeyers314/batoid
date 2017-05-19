@@ -1,10 +1,12 @@
 #include "paraboloid.h"
 #include "utils.h"
 #include "except.h"
+#include <cmath>
 
 namespace jtrace {
 
-    Paraboloid::Paraboloid(double _A, double _B) : A(_A), B(_B) {}
+    Paraboloid::Paraboloid(double _A, double _B, double _Rin, double _Rout) :
+        A(_A), B(_B), Rin(_Rin), Rout(_Rout) {}
 
     std::string Paraboloid::repr() const {
         std::ostringstream oss(" ");
@@ -55,7 +57,9 @@ namespace jtrace {
         t += ray.t0;
         Vec3 point = ray(t);
         Vec3 surfaceNormal = normal(point.x, point.y);
-        return Intersection(t, point, surfaceNormal);
+        double rho = std::hypot(point.x, point.y);
+        bool isVignetted = rho < Rin || rho > Rout;
+        return Intersection(t, point, surfaceNormal, isVignetted);
     }
 
     inline std::ostream& operator<<(std::ostream& os, const Paraboloid& p) {

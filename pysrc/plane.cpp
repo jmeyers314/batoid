@@ -1,5 +1,6 @@
 #include "plane.h"
 #include <memory>
+#include <limits>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl_bind.h>
 
@@ -12,7 +13,9 @@ using namespace pybind11::literals;
 namespace jtrace {
     void pyExportPlane(py::module& m) {
         py::class_<Plane, std::shared_ptr<Plane>, Surface>(m, "Plane")
-            .def(py::init<double>(), "init", "B"_a)
+            .def(py::init<double,double,double>(), "init",
+                 "B"_a,
+                 "Rin"_a=0.0, "Rout"_a=std::numeric_limits<double>::infinity())
             .def_property_readonly("B", &Plane::getB)
             .def("__call__", &Plane::operator())
             .def("normal", &Plane::normal)

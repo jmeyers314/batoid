@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <sstream>
+#include <limits>
 #include "surface.h"
 #include "intersection.h"
 #include "ray.h"
@@ -12,7 +13,8 @@ namespace jtrace {
 
     class Asphere : public Surface {
     public:
-        Asphere(double _R, double _kappa, std::vector<double> _alpha, double _B);
+        Asphere(double _R, double _kappa, std::vector<double> _alpha, double _B,
+                double _Rin=0.0, double _Rout=std::numeric_limits<double>::infinity());
         virtual double operator()(double, double) const;
         virtual Vec3 normal(double, double) const;
         using Surface::intersect;
@@ -28,6 +30,7 @@ namespace jtrace {
         const double R, kappa;
         const std::vector<double> alpha;
         const double B;
+        const double Rin, Rout;  // Inner and outer radii for vignetting
 
         double dzdr(double r) const;
     };

@@ -2,6 +2,7 @@
 #define jtrace_quadric_h
 
 #include <sstream>
+#include <limits>
 #include "surface.h"
 #include "intersection.h"
 #include "ray.h"
@@ -11,7 +12,8 @@ namespace jtrace {
 
     class Quadric : public Surface {
     public:
-        Quadric(double _R, double _kappa, double _B);
+        Quadric(double _R, double _kappa, double _B,
+                double _Rin=0.0, double _Rout=std::numeric_limits<double>::infinity());
         virtual double operator()(double, double) const;
         virtual Vec3 normal(double, double) const;
         using Surface::intersect;
@@ -24,6 +26,7 @@ namespace jtrace {
 
     private:
         const double R, kappa, B;
+        const double Rin, Rout;
 
         double dzdr(double r) const;
     };

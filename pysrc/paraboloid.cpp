@@ -1,5 +1,6 @@
 #include "paraboloid.h"
 #include <memory>
+#include <limits>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl_bind.h>
 
@@ -12,7 +13,9 @@ using namespace pybind11::literals;
 namespace jtrace {
     void pyExportParaboloid(py::module& m) {
         py::class_<Paraboloid, std::shared_ptr<Paraboloid>, Surface>(m, "Paraboloid")
-            .def(py::init<double,double>(), "init", "A"_a, "B"_a)
+            .def(py::init<double,double,double,double>(), "init",
+                 "A"_a, "B"_a,
+                 "Rin"_a=0.0, "Rout"_a=std::numeric_limits<double>::infinity())
             .def_property_readonly("A", &Paraboloid::getA)
             .def_property_readonly("B", &Paraboloid::getB)
             .def("__call__", &Paraboloid::operator())

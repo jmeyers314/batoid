@@ -24,7 +24,7 @@ namespace jtrace {
         Ray rr {RotVec(rot, r.p0-dr), RotVec(rot, r.v), r.t0, r.wavelength, r.isVignetted};
         Intersection isec = transformee->intersect(rr);
         // Now transform intersection back into transformed coord sys.
-        return Intersection(isec.t, UnRotVec(rot, isec.point)+dr, UnRotVec(rot, isec.surfaceNormal));
+        return Intersection(isec.t, UnRotVec(rot, isec.point)+dr, UnRotVec(rot, isec.surfaceNormal), isec.isVignetted);
     }
 
     std::string Transformation::repr() const {

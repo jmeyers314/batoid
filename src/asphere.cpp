@@ -1,10 +1,12 @@
 #include "asphere.h"
 #include "quadric.h"
 #include "solve.h"
+#include <cmath>
 
 namespace jtrace {
-    Asphere::Asphere(double _R, double _kappa, std::vector<double> _alpha, double _B) :
-        R(_R), kappa(_kappa), alpha(_alpha), B(_B) {}
+    Asphere::Asphere(double _R, double _kappa, std::vector<double> _alpha, double _B,
+                     double _Rin, double _Rout) :
+        R(_R), kappa(_kappa), alpha(_alpha), B(_B), Rin(_Rin), Rout(_Rout) {}
 
     double Asphere::operator()(double x, double y) const {
         double r2 = x*x + y*y;
@@ -55,7 +57,9 @@ namespace jtrace {
 
         Vec3 point = r(t);
         Vec3 surfaceNormal = normal(point.x, point.y);
-        return Intersection(t, point, surfaceNormal);
+        double rho = std::hypot(point.x, point.y);
+        bool isVignetted = rho < Rin || rho > Rout;
+        return Intersection(t, point, surfaceNormal, isVignetted);
     }
 
     std::string Asphere::repr() const {
