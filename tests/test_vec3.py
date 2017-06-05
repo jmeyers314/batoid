@@ -1,8 +1,9 @@
 import math
 import jtrace
-from test_helpers import isclose
+from test_helpers import isclose, timer
 
 
+@timer
 def test_DotProduct():
     import random
     random.seed(5)
@@ -24,6 +25,7 @@ def test_DotProduct():
                        vec1.x*vec2.x + vec1.y*vec2.y + vec1.z*vec2.z)
 
 
+@timer
 def test_CrossProduct():
     import random
     random.seed(57)
@@ -64,6 +66,7 @@ def test_CrossProduct():
                 vec2.Magnitude() * vec3.Magnitude())
 
 
+@timer
 def test_Magnitude():
     import random
     random.seed(577)
@@ -78,6 +81,7 @@ def test_Magnitude():
         assert isclose(vec.UnitVec3().Magnitude(), 1.0)
 
 
+@timer
 def test_add():
     import random
     random.seed(5772)
@@ -104,6 +108,7 @@ def test_add():
         assert isclose(z1+z2, vec1.z)
 
 
+@timer
 def test_sub():
     import random
     random.seed(57721)
@@ -130,6 +135,7 @@ def test_sub():
         assert isclose(z1-z2, vec1.z)
 
 
+@timer
 def test_mul():
     import random
     random.seed(577215)
@@ -152,6 +158,7 @@ def test_mul():
         assert isclose(z1*m, vec1.z, rel_tol=1e-7)
 
 
+@timer
 def test_div():
     import random
     random.seed(5772156)
@@ -174,6 +181,7 @@ def test_div():
         assert isclose(z1/m, vec1.z, rel_tol=1e-7)
 
 
+@timer
 def test_eq():
     import random
     random.seed(57721566)
@@ -188,6 +196,7 @@ def test_eq():
         assert vec1 == vec2
 
 
+@timer
 def test_ne():
     import random
     random.seed(577215664)
@@ -206,6 +215,7 @@ def test_ne():
         assert vec1 != vec4
 
 
+@timer
 def testRotVec():
     import random
     import math
@@ -244,6 +254,7 @@ def testRotVec():
         assert isclose(vec1.z, vec3.z)
 
 
+@timer
 def test_determinant():
     import random
     random.seed(57721566490)

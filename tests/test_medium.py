@@ -1,10 +1,10 @@
 import os
 import jtrace
 import numpy as np
-from test_helpers import isclose
+from test_helpers import isclose, timer
 
-datadir = os.path.join(os.path.dirname(__file__), 'data', 'media')
 
+@timer
 def test_const_medium():
     import random
     random.seed(5)
@@ -12,15 +12,17 @@ def test_const_medium():
     n = 1.4
     const_medium = jtrace.ConstMedium(n)
     for i in range(100):
-        w = random.uniform(500.0, 1000.0)
+        w = random.uniform(0.5, 1.0)
         assert const_medium.getN(w) == n
 
+
+@timer
 def test_table_medium():
     import random
     random.seed(57)
 
     # File from phosim
-    filename = os.path.join(datadir, "silica_dispersion.txt")
+    filename = os.path.join(jtrace.datadir, "media", "silica_dispersion.txt")
     wave, n = np.genfromtxt(filename).T
     table = jtrace.Table(wave, n, jtrace.Table.Interpolant.linear)
     table_medium = jtrace.TableMedium(table)
@@ -28,13 +30,15 @@ def test_table_medium():
         w = random.uniform(0.3, 1.2)
         assert table_medium.getN(w) == table(w)
 
+
+@timer
 def test_silica_sellmeier_table():
     import random
     import time
     random.seed(577)
 
     # File from phosim
-    filename = os.path.join(datadir, "silica_dispersion.txt")
+    filename = os.path.join(jtrace.datadir, "media", "silica_dispersion.txt")
     wave, n = np.genfromtxt(filename).T
     table = jtrace.Table(wave, n, jtrace.Table.Interpolant.linear)
     table_silica = jtrace.TableMedium(table)
@@ -63,6 +67,7 @@ def test_silica_sellmeier_table():
     np.testing.assert_allclose(table_n, sellmeier_n, atol=1e-6, rtol=0)
 
 
+@timer
 def test_air():
     # Just spot check some comparisons with GalSim.
     ws = [0.3, 0.5, 0.7, 0.9, 1.1]

@@ -1,7 +1,8 @@
 import jtrace
-from test_helpers import isclose
+from test_helpers import isclose, timer
 
 
+@timer
 def test_properties():
     import random
     random.seed(5)
@@ -33,6 +34,7 @@ def test_properties():
         assert transformed3.dr == dr
 
 
+@timer
 def test_shift():
     import random
     random.seed(57)
@@ -76,6 +78,7 @@ def test_shift():
             assert isclose(asphere(p1.x-dx, p2.y-dy)+dz, p1.z, rel_tol=0, abs_tol=1e-9)
 
 
+@timer
 def test_shift_vectorized():
     import random
     random.seed(577)
@@ -106,6 +109,7 @@ def test_shift_vectorized():
         assert intersections == intersections2
 
 
+@timer
 def test_rotate():
     import random
     import math
@@ -210,6 +214,7 @@ def test_rotate():
             assert isclose(isecz.t, isec.t)
 
 
+@timer
 def test_rotate_vectorized():
     import random
     import math

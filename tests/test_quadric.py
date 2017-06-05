@@ -1,7 +1,8 @@
 import jtrace
-from test_helpers import isclose
+from test_helpers import isclose, timer
 
 
+@timer
 def test_properties():
     import random
     random.seed(5)
@@ -24,6 +25,7 @@ def quadric(R, kappa, B):
     return f
 
 
+@timer
 def test_call():
     import random
     random.seed(57)
@@ -37,6 +39,8 @@ def test_call():
             y = random.gauss(0.0, 1.0)
             assert isclose(quad(x, y), quadric(R, kappa, B)(x, y))
 
+
+@timer
 def test_intersect():
     import random
     random.seed(577)
@@ -74,6 +78,7 @@ def test_intersect():
             assert isclose(quad(p2.x, p2.y), p1.z, rel_tol=0, abs_tol=1e-9)
 
 
+@timer
 def test_intersect_vectorized():
     import random
     random.seed(5772)

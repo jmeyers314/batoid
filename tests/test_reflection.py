@@ -1,7 +1,8 @@
 import jtrace
-from test_helpers import isclose
+from test_helpers import isclose, timer
 
 
+@timer
 def test_plane_reflection_plane():
     import random
     random.seed(5)
@@ -33,6 +34,7 @@ def test_plane_reflection_plane():
         assert isclose(ray.v.z, -rray.v.z)
 
 
+@timer
 def test_plane_reflection_reversal():
     import random
     random.seed(57)
@@ -66,6 +68,7 @@ def test_plane_reflection_reversal():
         assert isclose(cray.z, 0, rel_tol=0, abs_tol=1e-10)
 
 
+@timer
 def test_paraboloid_reflection_plane():
     import random
     random.seed(577)
@@ -89,6 +92,7 @@ def test_paraboloid_reflection_plane():
             0.0, rel_tol=0, abs_tol=1e-15)
 
 
+@timer
 def test_paraboloid_reflection_reversal():
     import random
     random.seed(5772)
@@ -123,6 +127,7 @@ def test_paraboloid_reflection_reversal():
         assert isclose(cray.z, 0, rel_tol=0, abs_tol=1e-10)
 
 
+@timer
 def test_paraboloid_reflection_to_focus():
     import random
     random.seed(57721)
@@ -145,6 +150,7 @@ def test_paraboloid_reflection_to_focus():
             assert isclose(focus.z, 1.0/(4*A), abs_tol=1e-12)
 
 
+@timer
 def test_asphere_reflection_plane():
     import random
     random.seed(577215)
@@ -168,6 +174,7 @@ def test_asphere_reflection_plane():
             0.0, rel_tol=0, abs_tol=1e-15)
 
 
+@timer
 def test_asphere_reflection_reversal():
     import random
     random.seed(5772156)

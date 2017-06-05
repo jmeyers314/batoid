@@ -1,7 +1,8 @@
 import jtrace
-from test_helpers import isclose
+from test_helpers import isclose, timer
 
 
+@timer
 def test_properties():
     import random
     random.seed(5)
@@ -30,6 +31,7 @@ def py_asphere(R, kappa, alpha, B):
     return f
 
 
+@timer
 def test_call():
     import random
     random.seed(57)
@@ -46,6 +48,7 @@ def test_call():
             assert isclose(asphere(x, y), py_asphere(R, kappa, alpha, B)(x, y))
 
 
+@timer
 def test_intersect():
     import random
     random.seed(577)
@@ -85,6 +88,7 @@ def test_intersect():
             assert isclose(asphere(p1.x, p2.y), p1.z, rel_tol=0, abs_tol=1e-9)
 
 
+@timer
 def test_intersect_vectorized():
     import random
     random.seed(5772)
@@ -121,6 +125,7 @@ def py_poly(alpha):
     return f
 
 
+@timer
 def test_quad_plus_poly():
     import random
     random.seed(5772)

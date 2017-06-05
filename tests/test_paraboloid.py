@@ -1,7 +1,8 @@
 import jtrace
-from test_helpers import isclose
+from test_helpers import isclose, timer
 
 
+@timer
 def test_properties():
     import random
     random.seed(5)
@@ -13,6 +14,7 @@ def test_properties():
         assert para.B == B
 
 
+@timer
 def test_call():
     import random
     random.seed(57)
@@ -26,6 +28,7 @@ def test_call():
             assert isclose(para(x, y), A*(x*x + y*y)+B)
 
 
+@timer
 def test_intersect():
     import random
     random.seed(577)
@@ -62,6 +65,7 @@ def test_intersect():
             assert isclose(para(p1.x, p2.y), p1.z, rel_tol=0, abs_tol=1e-6)
 
 
+@timer
 def test_intersect_vectorized():
     import random
     random.seed(5772)
@@ -83,6 +87,7 @@ def test_intersect_vectorized():
         intersections2 = [para.intersect(ray) for ray in rays]
         intersections2 = jtrace.IntersectionVector(intersections2)
         assert intersections == intersections2
+
 
 if __name__ == '__main__':
     test_properties()

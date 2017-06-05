@@ -1,6 +1,9 @@
 import numpy as np
 import jtrace
+from test_helpers import timer
 
+
+@timer
 def test_table():
     import random
     random.seed(5)

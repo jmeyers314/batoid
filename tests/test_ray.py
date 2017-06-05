@@ -1,7 +1,8 @@
 import jtrace
-from test_helpers import isclose
+from test_helpers import isclose, timer
 
 
+@timer
 def test_call():
     import random
     random.seed(5)
@@ -25,6 +26,7 @@ def test_call():
         assert r1 == r2
 
 
+@timer
 def test_properties():
     import random
     random.seed(57)

@@ -1,0 +1,199 @@
+name: HSC
+medium: air
+surfaces:
+- quadric:
+    name: PM
+    type: mirror
+    zvertex: 0.0
+    thickness: 0.0
+    inner: 0.0
+    outer: 4.1
+    medium: air
+    R: 30.0
+    conic: -1.00835
+- quadric:
+    name: G1
+    type: lens
+    zvertex: 13.4564
+    thickness: 13.4564
+    inner: 0.0
+    outer: 0.41
+    medium: silica
+    R: 0.76
+    conic: 0.0
+- asphere:
+    name: G1E
+    type: lens
+    zvertex: 13.55358
+    thickness: 0.09718
+    inner: 0.0
+    outer: 0.40220143728
+    medium: air
+    R: 1.3755
+    conic: 0.0
+    coef: [0.14974887830730002, 0.07579068214673, 0.7705293869522001, -10.26626319251,
+      70.78826218129001, -255.96006178059997, 376.1551480577999]
+- asphere:
+    name: G2
+    type: lens
+    zvertex: 13.92643
+    thickness: 0.37285
+    inner: 0.0
+    outer: 0.3075181146466
+    medium: bsl7y
+    R: -3.53
+    conic: 0.0
+    coef: [-0.06914718060975, -0.603728126364, 15.326231734619999, -361.8110894954,
+      4741.677881169, -32173.090716919996, 88598.78091629999]
+- quadric:
+    name: G2E
+    type: lens
+    zvertex: 13.97243
+    thickness: 0.046
+    inner: 0.0
+    outer: 0.2865165285897
+    medium: air
+    R: 0.6562498974113357
+    conic: 0.0
+- plane:
+    name: ADC1
+    type: lens
+    zvertex: 14.290429999999999
+    thickness: 0.318
+    inner: 0.0
+    outer: 0.282794660157
+    medium: bsl7y
+- quadric:
+    name: ADC1E
+    type: lens
+    zvertex: 14.330429999999998
+    thickness: 0.04
+    inner: 0.0
+    outer: 0.2820282677958
+    medium: air
+    R: 1.058
+    conic: 0.0
+- quadric:
+    name: ADC2
+    type: lens
+    zvertex: 14.333429999999998
+    thickness: 0.003
+    inner: 0.0
+    outer: 0.2825217682803
+    medium: pbl1y
+    R: 1.04
+    conic: 0.0
+- plane:
+    name: ADC2E
+    type: lens
+    zvertex: 14.415429999999999
+    thickness: 0.082
+    inner: 0.0
+    outer: 0.2818065578377
+    medium: air
+- asphere:
+    name: G3
+    type: lens
+    zvertex: 14.689729999999999
+    thickness: 0.2743
+    inner: 0.0
+    outer: 0.2758409560694
+    medium: pbl1y
+    R: -0.840000170144847
+    conic: 0.0
+    coef: [-2.768476102307, 48.556420092589995, -717.6113272765999, 10763.702614520002,
+      -118744.32178099999, 798382.1197395, -2393556.961408]
+- quadric:
+    name: G3E
+    type: lens
+    zvertex: 14.729729999999998
+    thickness: 0.04
+    inner: 0.0
+    outer: 0.2838358237172
+    medium: air
+    R: 9.8
+    conic: 0.0
+- asphere:
+    name: G4
+    type: lens
+    zvertex: 14.819729999999998
+    thickness: 0.09
+    inner: 0.0
+    outer: 0.314
+    medium: bsl7y
+    R: 0.48
+    conic: 0.0
+    coef: [4.355533915492, -36.358679149130005, 595.1267151922, -7658.839741989, 71941.20343205,
+      -394282.0924898, 954342.843455]
+- quadric:
+    name: G4E
+    type: lens
+    zvertex: 14.921729999999998
+    thickness: 0.102
+    inner: 0.0
+    outer: 0.314
+    medium: air
+    R: 4.021759021137413
+    conic: 0.0
+- quadric:
+    name: G5
+    type: lens
+    zvertex: 15.021929999999998
+    thickness: 0.1002
+    inner: 0.0
+    outer: 0.314
+    medium: silica
+    R: 4.176748363640779
+    conic: 0.0
+- asphere:
+    name: G5E
+    type: lens
+    zvertex: 15.109929999999997
+    thickness: 0.088
+    inner: 0.0
+    outer: 0.308
+    medium: air
+    R: -1.2728222984309576
+    conic: 0.0
+    coef: [1.064687616564, -3.377750239208, 110.26471335, -2282.368582236, 27430.39658171,
+      -175577.1152898, 482194.9608578]
+- plane:
+    name: F
+    type: filter
+    zvertex: 15.199971256451507
+    thickness: 0.09004125645151
+    inner: 0.0
+    outer: 0.2695068874933
+    medium: silica
+- plane:
+    name: FE
+    type: filter
+    zvertex: 15.214971256451507
+    thickness: 0.015
+    inner: 0.0
+    outer: 0.2668394944827
+    medium: air
+- plane:
+    name: W
+    type: lens
+    zvertex: 15.247471256451508
+    thickness: 0.0325
+    inner: 0.0
+    outer: 0.2582205358629
+    medium: silica
+- plane:
+    name: WE
+    type: lens
+    zvertex: 15.284471256451509
+    thickness: 0.037
+    inner: 0.0
+    outer: 0.2516409664366
+    medium: air
+- plane:
+    name: D
+    type: det
+    zvertex: 15.29947125645151
+    thickness: 0.015
+    inner: 0.0
+    outer: 0.2476837392465
+    medium: air

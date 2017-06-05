@@ -1,0 +1,124 @@
+name: LSST
+config: y
+init_medium: air
+surfaces:
+  M1:
+    sagtype: asphere
+    surftype: mirror
+    zvertex: 0.0
+    thickness: 0.0
+    inner: 2.558
+    outer: 4.18
+    medium: air
+    R: 19.835
+    conic: -1.215
+    coef: [-0.0, -1.381e-09]
+  M2:
+    sagtype: asphere
+    surftype: mirror
+    zvertex: 6.1562006
+    thickness: 6.1562006
+    inner: 0.9
+    outer: 1.71
+    medium: air
+    R: 6.788
+    conic: -0.222
+    coef: [-0.0, 1.274e-05, 9.68e-07]
+  M3:
+    sagtype: asphere
+    surftype: mirror
+    zvertex: -0.23380000000000045
+    thickness: -6.3900006000000005
+    inner: 0.55
+    outer: 2.508
+    medium: air
+    R: 8.3445
+    conic: 0.155
+    coef: [-0.0, 4.5000000000000003e-07, 8.149999999999999e-09]
+  L1:
+    sagtype: quadric
+    surftype: lens
+    zvertex: 3.396128110561967
+    thickness: 3.6299281105619676
+    inner: 0.0
+    outer: 0.775
+    medium: silica
+    R: 2.824
+    conic: 0.0
+  L1E:
+    sagtype: quadric
+    surftype: lens
+    zvertex: 3.478358110561967
+    thickness: 0.08223
+    inner: 0.0
+    outer: 0.775
+    medium: air
+    R: 5.021
+    conic: 0.0
+  L2:
+    sagtype: plane
+    surftype: lens
+    zvertex: 3.891000130561967
+    thickness: 0.41264202
+    inner: 0.0
+    outer: 0.551
+    medium: silica
+  L2E:
+    sagtype: asphere
+    surftype: lens
+    zvertex: 3.921000130561967
+    thickness: 0.03
+    inner: 0.0
+    outer: 0.551
+    medium: air
+    R: 2.529
+    conic: -1.57
+    coef: [-0.0, -0.0016560000000000001]
+  F:
+    sagtype: quadric
+    surftype: filter
+    zvertex: 4.270580130561967
+    thickness: 0.34958
+    inner: 0.0
+    outer: 0.375
+    medium: silica
+    R: 5.632
+    conic: 0.0
+  FE:
+    sagtype: quadric
+    surftype: filter
+    zvertex: 4.284180130561968
+    thickness: 0.0136
+    inner: 0.0
+    outer: 0.375
+    medium: air
+    R: 5.64
+    conic: 0.0
+  L3:
+    sagtype: quadric
+    surftype: lens
+    zvertex: 4.339580130561967
+    thickness: 0.0554
+    inner: 0.0
+    outer: 0.361
+    medium: silica
+    R: 3.169
+    conic: -0.962
+  L3E:
+    sagtype: quadric
+    surftype: lens
+    zvertex: 4.399580130561967
+    thickness: 0.06
+    inner: 0.0
+    outer: 0.361
+    medium: air
+    R: -13.36
+    conic: 0.0
+  D:
+    sagtype: plane
+    surftype: det
+    zvertex: 4.428080130561967
+    thickness: 0.0285
+    inner: 0.0
+    outer: 0.4
+    medium: air

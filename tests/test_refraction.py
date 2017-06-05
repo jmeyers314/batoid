@@ -1,11 +1,10 @@
 import os
 import numpy as np
 import jtrace
-from test_helpers import isclose
+from test_helpers import isclose, timer
 
 
-datadir = os.path.join(os.path.dirname(__file__), 'data', 'media')
-
+@timer
 def test_plane_refraction_plane():
     import random
     random.seed(5)
@@ -39,6 +38,7 @@ def test_plane_refraction_plane():
             rel_tol=0, abs_tol=1e-15)
 
 
+@timer
 def test_plane_refraction_reversal():
     import random
     random.seed(57)
@@ -76,6 +76,7 @@ def test_plane_refraction_reversal():
         assert isclose(cpoint.z, 0, rel_tol=0, abs_tol=1e-10)
 
 
+@timer
 def test_paraboloid_refraction_plane():
     import random
     random.seed(577)
@@ -109,6 +110,7 @@ def test_paraboloid_refraction_plane():
             rel_tol=0, abs_tol=1e-15)
 
 
+@timer
 def test_paraboloid_refraction_reversal():
     import random
     random.seed(5772)
@@ -147,6 +149,7 @@ def test_paraboloid_refraction_reversal():
         assert isclose(cpoint.z, 0, rel_tol=0, abs_tol=1e-10)
 
 
+@timer
 def test_asphere_refraction_plane():
     import random
     random.seed(57721)
@@ -180,6 +183,7 @@ def test_asphere_refraction_plane():
             rel_tol=0, abs_tol=1e-15)
 
 
+@timer
 def test_asphere_refraction_reversal():
     import random
     random.seed(577215)
@@ -218,6 +222,7 @@ def test_asphere_refraction_reversal():
         assert isclose(cpoint.z, 0, rel_tol=0, abs_tol=1e-9)
 
 
+@timer
 def test_const_medium_refraction():
     import random
     random.seed(5772156)
@@ -240,11 +245,12 @@ def test_const_medium_refraction():
         assert rray1 == rray2
 
 
+@timer
 def test_table_medium_refraction():
     import random
     random.seed(57721566)
 
-    filename = os.path.join(datadir, "silica_dispersion.txt")
+    filename = os.path.join(jtrace.datadir, "media", "silica_dispersion.txt")
     wave, n = np.genfromtxt(filename).T
     table = jtrace.Table(wave, n, jtrace.Table.Interpolant.linear)
     silica = jtrace.TableMedium(table)

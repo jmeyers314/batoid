@@ -2,7 +2,7 @@ from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 import sys
 import setuptools
-import glob
+from glob import glob
 
 __version__ = '0.0.1'
 
@@ -21,9 +21,9 @@ class get_pybind_include(object):
         import pybind11
         return pybind11.get_include(self.user)
 
-sources = glob.glob("src/*.cpp")
-sources += glob.glob("pysrc/*.cpp")
-headers = glob.glob("include/*.h")
+sources = glob("src/*.cpp")
+sources += glob("pysrc/*.cpp")
+headers = glob("include/*.h")
 
 ext_modules = [
     Extension(
@@ -115,7 +115,6 @@ def parallelCCompile(self, sources, output_dir=None, macros=None, include_dirs=N
 import distutils.ccompiler
 distutils.ccompiler.CCompiler.compile=parallelCCompile
 
-
 setup(
     name='jtrace',
     version=__version__,
@@ -125,11 +124,13 @@ setup(
     description="Josh's raytracer",
     long_description='',
     packages=['jtrace'],
-    package_data={'jtrace' : headers },
+    package_dir={'jtrace' : 'jtrace'},
+    package_data={'jtrace' : ['data/**/*']},
     ext_modules=ext_modules,
     install_requires=['pybind11>=1.7'],
     setup_requires=['pytest-runner'],
     tests_require=['pytest'],
     cmdclass={'build_ext': BuildExt},
     zip_safe=False,
+    include_package_data=True
 )
