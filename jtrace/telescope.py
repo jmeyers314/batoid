@@ -4,10 +4,40 @@ import jtrace
 from .yaml import ordered_load
 
 
-silica = jtrace.SellmeierMedium(
-    0.6961663, 0.4079426, 0.8974794,
-    0.0684043**2, 0.1162414**2, 9.896161**2)
 
+def media_catalog(media_str):
+    # This works for LSST, together with jtrace.Air()
+    silica = jtrace.SellmeierMedium(
+        0.6961663, 0.4079426, 0.8974794,
+        0.0684043**2, 0.1162414**2, 9.896161**2)
+
+    # For HSC, we interpolate between values in pdf description
+    w = [0.4, 0.6, 0.75, 0.9, 1.1]
+    silica_n = [1.47009272, 1.45801158, 1.45421013, 1.45172729, 1.44917721]
+    bsl7y_n = [1.53123287, 1.51671428, 1.51225242, 1.50939738, 1.50653251]
+    pbl1y_n = [1.57046066, 1.54784671, 1.54157395, 1.53789058, 1.53457169]
+
+    hsc_silica = jtrace.TableMedium(
+        jtrace.Table(w, silica_n, jtrace.Table.Interpolant.linear))
+    hsc_bsl7y = jtrace.TableMedium(
+        jtrace.Table(w, bsl7y_n, jtrace.Table.Interpolant.linear))
+    hsc_pbl1y = jtrace.TableMedium(
+        jtrace.Table(w, pbl1y_n, jtrace.Table.Interpolant.linear))
+
+    if media_str == 'air':
+        return jtrace.Air()
+    elif media_str == 'silica':
+        return silica
+    elif media_str == 'hsc_air':
+        return jtrace.ConstMedium(1.0)
+    elif media_str == 'hsc_silica':
+        return hsc_silica
+    elif media_str == 'hsc_bsl7y':
+        return hsc_bsl7y
+    elif media_str == 'hsc_pbl1y':
+        return hsc_pbl1y
+    else:
+        raise RuntimeError("Unknown medium {}".format(media_str))
 
 class Telescope(object):
     @classmethod
@@ -16,17 +46,11 @@ class Telescope(object):
         with open(infn, 'r') as infile:
             data = ordered_load(infile)
             # First, parse the optics
-            m0 = data.pop('init_medium', "air")
-            if m0 == 'air':
-                m0 = jtrace.Air()
+            m0 = media_catalog(data.pop('init_medium'))
             surfaces = data.pop('surfaces')
             out.surfaces = OrderedDict()
             for name, sdata in surfaces.items():
-                m1 = sdata.pop('medium', 'air')
-                if m1 == 'air':
-                    m1 = jtrace.Air()
-                elif m1 == 'silica':
-                    m1 = silica
+                m1 = media_catalog(sdata.pop('medium'))
                 sdict = dict(
                     name=name,
                     outer=sdata['outer'],
@@ -56,7 +80,7 @@ class Telescope(object):
                         Rin=sdata['inner'],
                         Rout=sdata['outer'])
                 else:
-                    raise RuntimeError("Unknown surface type {}".format(scls))
+                    raise RuntimeError("Unknown surface type {}".format(sagtype))
                 out.surfaces[name] = sdict
                 m0 = m1
             # Then update any other params in file

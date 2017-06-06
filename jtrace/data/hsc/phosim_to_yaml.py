@@ -6,8 +6,8 @@ from jtrace.yaml import ordered_dump
 
 def translate(infn, outfn):
     out = OrderedDict(name="HSC")
-    out['medium'] = "air"
-    surfaces = []
+    out['init_medium'] = "hsc_air"
+    surfaces = OrderedDict()
     z = 0.0
     with open(infn, 'r') as infile:
         thickness = 0.0
@@ -21,31 +21,35 @@ def translate(infn, outfn):
              coating, medium) = line.split()
             z += float(dz)/1000
             thickness += float(dz)/1000
-            data = OrderedDict(name=name)
-            data['type'] = typ
+            data = OrderedDict()
+            data['sagtype'] = '' # Want it first, but will fill it in later
+            data['surftype'] = typ
             data['zvertex'] = z
             data['thickness'] = thickness
             data['inner'] = float(inner)/1000
             data['outer'] = float(outer)/1000
             data['medium'] = medium
             if float(R) == 0.0:
-                surface = OrderedDict(plane=data)
+                data['sagtype'] = "plane"
+                surfaces[name] = data
             else:
                 data['R'] = float(R)/1000
                 data['conic'] = float(kappa)
-                coef = [-float(np.double(a4)*10**((4-1)*3)),
-                        -float(np.double(a6)*10**((6-1)*3)),
-                        -float(np.double(a8)*10**((8-1)*3)),
-                        -float(np.double(a10)*10**((10-1)*3)),
-                        -float(np.double(a12)*10**((12-1)*3)),
-                        -float(np.double(a14)*10**((14-1)*3)),
-                        -float(np.double(a16)*10**((16-1)*3))]
-                if all(c == 0.0 for c in coef):
-                    surface = OrderedDict(quadric=data)
+                coef = [float(np.double(a4)*10**((4-1)*3)),
+                        float(np.double(a6)*10**((6-1)*3)),
+                        float(np.double(a8)*10**((8-1)*3)),
+                        float(np.double(a10)*10**((10-1)*3)),
+                        float(np.double(a12)*10**((12-1)*3)),
+                        float(np.double(a14)*10**((14-1)*3)),
+                        float(np.double(a16)*10**((16-1)*3))]
+                coef = np.trim_zeros(coef, 'b')
+                if len(coef) == 0:
+                    data['sagtype'] = "quadric"
+                    surfaces[name] = data
                 else:
+                    data['sagtype'] = "asphere"
                     data['coef'] = coef
-                    surface = OrderedDict(asphere=data)
-            surfaces.append(surface)
+                    surfaces[name] = data
             thickness = 0.0
     out['surfaces'] = surfaces
     with open(outfn, 'w') as outfile:
