@@ -6,6 +6,8 @@ namespace jtrace {
         B(_B), Rin(_Rin), Rout(_Rout) {}
 
     Intersection Plane::intersect(const Ray& r) const {
+        if (r.failed)
+            return Intersection(true);
         double t = (B - r.p0.z)/r.v.z;
         t += r.t0;
         Vec3 point = r(t);

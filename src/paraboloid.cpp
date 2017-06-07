@@ -24,6 +24,8 @@ namespace jtrace {
     }
 
     Intersection Paraboloid::intersect(const Ray& ray) const {
+        if (ray.failed)
+            return Intersection(true);
         double a = A*(ray.v.x*ray.v.x + ray.v.y*ray.v.y);
         double b = 2*A*(ray.p0.x*ray.v.x + ray.p0.y*ray.v.y) - ray.v.z;
         double c = A*(ray.p0.x*ray.p0.x + ray.p0.y*ray.p0.y) + B - ray.p0.z;
@@ -32,16 +34,19 @@ namespace jtrace {
 
         double t;
         if (n == 0) {
-            throw NoIntersectionError("");
+            // throw NoIntersectionError("");
+            return Intersection(true);
         } else if (n == 1) {
             if (r1 < 0) {
-                throw NoFutureIntersectionError("");
+                // throw NoFutureIntersectionError("");
+                return Intersection(true);
             }
             t = r1;
         } else {
             if (r1 < 0) {
                 if (r2 < 0) {
-                    throw NoFutureIntersectionError("");
+                    // throw NoFutureIntersectionError("");
+                    return Intersection(true);
                 } else {
                     t = r2;
                 }

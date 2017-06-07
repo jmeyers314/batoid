@@ -9,12 +9,14 @@
 
 namespace jtrace {
     struct Intersection {
-        Intersection(const double _t, const Vec3 _point, const Vec3 _surfaceNormal, bool _isVignetted=false);
+        Intersection(const double _t, const Vec3 _point, const Vec3 _surfaceNormal, const bool _isVignetted=false);
+        Intersection(const bool failed);
 
         double t;
         Vec3 point;
         Vec3 surfaceNormal;
         bool isVignetted;
+        bool failed;
 
         double getX0() const { return point.x; }
         double getY0() const { return point.y; }
@@ -23,6 +25,9 @@ namespace jtrace {
         double getNx() const { return surfaceNormal.x; }
         double getNy() const { return surfaceNormal.y; }
         double getNz() const { return surfaceNormal.z; }
+
+        void setFail() { failed=true; }
+        void clearFail() { failed=false; }
 
         Ray reflectedRay(const Ray&) const;
         std::vector<Ray> reflectedRay(const std::vector<Ray>&) const;

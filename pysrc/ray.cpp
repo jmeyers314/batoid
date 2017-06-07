@@ -28,6 +28,7 @@ namespace jtrace {
             .def_readonly("t0", &Ray::t0)
             .def_readonly("wavelength", &Ray::wavelength)
             .def_readonly("isVignetted", &Ray::isVignetted)
+            .def_readonly("failed", &Ray::failed)
             .def_property_readonly("x0", &Ray::getX0)
             .def_property_readonly("y0", &Ray::getY0)
             .def_property_readonly("z0", &Ray::getZ0)

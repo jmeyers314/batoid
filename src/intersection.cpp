@@ -3,9 +3,15 @@
 
 namespace jtrace {
     Intersection::Intersection(const double _t, const Vec3 _point, const Vec3 _surfaceNormal, bool _isVignetted) :
-        t(_t), point(_point), surfaceNormal(_surfaceNormal.UnitVec3()), isVignetted(_isVignetted) {}
+        t(_t), point(_point), surfaceNormal(_surfaceNormal.UnitVec3()), isVignetted(_isVignetted), failed(false) {}
+
+    // failed state constructor.  Doesn't actually matter if failed arg is true or false
+    Intersection::Intersection(bool failed) :
+        t(0.0), point(Vec3()), surfaceNormal(Vec3()), isVignetted(true), failed(true) {}
 
     Ray Intersection::reflectedRay(const Ray& r) const {
+        if (failed || r.failed)
+            return Ray(true);
         double n = 1.0 / r.v.Magnitude();
         Vec3 nv = r.v * n;
         double c1 = DotProduct(nv, surfaceNormal);
@@ -16,6 +22,10 @@ namespace jtrace {
     std::vector<Ray> Intersection::reflectedRay(const std::vector<Ray>& rays) const {
         auto result = std::vector<Ray>();
         result.reserve(rays.size());
+        if (failed) {
+            result.assign(rays.size(), Ray(true));
+            return result;
+        }
         for (const auto& ray : rays) {
             result.push_back(reflectedRay(ray));
         }
@@ -23,6 +33,8 @@ namespace jtrace {
     }
 
     Ray Intersection::refractedRay(const Ray& r, double n1, double n2) const {
+        if (failed || r.failed)
+            return Ray(true);
         //assert n1 == 1./r.Magnitude()
         Vec3 nv = r.v * n1;
         double alpha = DotProduct(nv, surfaceNormal);
@@ -42,6 +54,10 @@ namespace jtrace {
     std::vector<Ray> Intersection::refractedRay(const std::vector<Ray>& rays, double n1, double n2) const {
         auto result = std::vector<Ray>();
         result.reserve(rays.size());
+        if (failed) {
+            result.assign(rays.size(), Ray(true));
+            return result;
+        }
         for (const auto& ray : rays) {
             result.push_back(refractedRay(ray, n1, n2));
         }
@@ -49,6 +65,8 @@ namespace jtrace {
     }
 
     Ray Intersection::refractedRay(const Ray& r, const Medium& m1, const Medium& m2) const {
+        if (failed || r.failed)
+            return Ray(true);
         double n1 = m1.getN(r.wavelength);
         double n2 = m2.getN(r.wavelength);
         return refractedRay(r, n1, n2);
@@ -57,6 +75,10 @@ namespace jtrace {
     std::vector<Ray> Intersection::refractedRay(const std::vector<Ray>& rays, const Medium& m1, const Medium& m2) const {
         auto result = std::vector<Ray>();
         result.reserve(rays.size());
+        if (failed) {
+            result.assign(rays.size(), Ray(true));
+            return result;
+        }
         for (const auto& ray : rays) {
             result.push_back(refractedRay(ray, m1, m2));
         }

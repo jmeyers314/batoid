@@ -44,16 +44,25 @@ namespace jtrace {
     };
 
     Intersection Asphere::intersect(const Ray& r) const {
+        if (r.failed)
+            return Intersection(true);
         // Solve the quadric problem analytically to get a good starting point.
         Quadric quad(R, kappa, B);
         Intersection isec = quad.intersect(r);
+        if (isec.failed)
+            return isec;
 
         AsphereResidual resid(*this, r);
         Solve<AsphereResidual> solve(resid, isec.t, isec.t+1e-2);
         solve.setMethod(Method::Brent);
         solve.setXTolerance(1e-12);
-        solve.bracket();
-        double t = solve.root();
+        double t;
+        try {
+            solve.bracket();
+            t = solve.root();
+        } catch (const SolveError&) {
+            return Intersection(true);
+        }
 
         Vec3 point = r(t);
         Vec3 surfaceNormal = normal(point.x, point.y);

@@ -26,6 +26,8 @@ namespace jtrace {
     }
 
     Intersection Quadric::intersect(const Ray &r) const {
+        if (r.failed)
+            return Intersection(true);
         double vr2 = r.v.x*r.v.x + r.v.y*r.v.y;
         double vz2 = r.v.z*r.v.z;
         double vrr0 = r.v.x*r.p0.x + r.v.y*r.p0.y;
@@ -45,16 +47,19 @@ namespace jtrace {
 
         double t;
         if (n == 0) {
-            throw NoIntersectionError("");
+            // throw NoIntersectionError("");
+            return Intersection(true);
         } else if (n == 1) {
             if (r1 < 0) {
-                throw NoFutureIntersectionError("");
+                // throw NoFutureIntersectionError("");
+                return Intersection(true);
             }
             t = r1;
         } else {
             if (r1 < 0) {
                 if (r2 < 0) {
-                    throw NoFutureIntersectionError("");
+                    // throw NoFutureIntersectionError("");
+                    return Intersection(true);
                 } else {
                     t = r2;
                 }
