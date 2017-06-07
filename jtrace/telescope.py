@@ -1,8 +1,7 @@
 from collections import OrderedDict
 import numbers
 import jtrace
-from .yaml import ordered_load
-
+from .utils import ordered_load
 
 
 def media_catalog(media_str):

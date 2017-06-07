@@ -24,7 +24,7 @@ before_install:
   - virtualenv -p python$PYTHON venv
   - source venv/bin/activate
   - pip install -r requirements.txt
-  - pip install numpy pytest
+  - pip install pytest
 cache:
   directories:
     - $HOME/.cache/pip
