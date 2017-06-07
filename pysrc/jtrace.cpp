@@ -11,6 +11,7 @@ namespace jtrace {
     void pyExportParaboloid(py::module&);
     void pyExportAsphere(py::module&);
     void pyExportQuadric(py::module&);
+    void pyExportSphere(py::module&);
     void pyExportPlane(py::module&);
     void pyExportTransformation(py::module&);
     void pyExportTable(py::module&);
@@ -25,6 +26,7 @@ namespace jtrace {
         pyExportParaboloid(m);
         pyExportAsphere(m);
         pyExportQuadric(m);
+        pyExportSphere(m);
         pyExportPlane(m);
         pyExportTransformation(m);
         pyExportTable(m);

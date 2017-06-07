@@ -12,7 +12,7 @@ surfaces:
     R: 30.0
     conic: -1.00835
   G1:
-    sagtype: quadric
+    sagtype: sphere
     surftype: lens
     zvertex: 13.4564
     thickness: 13.4564
@@ -20,7 +20,6 @@ surfaces:
     outer: 0.41
     medium: hsc_silica
     R: 0.76
-    conic: 0.0
   G1E:
     sagtype: asphere
     surftype: lens
@@ -46,7 +45,7 @@ surfaces:
     coef: [0.06914718060975, 0.603728126364, -15.326231734619999, 361.8110894954,
       -4741.677881169, 32173.090716919996, -88598.78091629999]
   G2E:
-    sagtype: quadric
+    sagtype: sphere
     surftype: lens
     zvertex: 13.97243
     thickness: 0.046
@@ -54,7 +53,6 @@ surfaces:
     outer: 0.2865165285897
     medium: hsc_air
     R: 0.6562498974113357
-    conic: 0.0
   ADC1:
     sagtype: plane
     surftype: lens
@@ -64,7 +62,7 @@ surfaces:
     outer: 0.282794660157
     medium: hsc_bsl7y
   ADC1E:
-    sagtype: quadric
+    sagtype: sphere
     surftype: lens
     zvertex: 14.330429999999998
     thickness: 0.04
@@ -72,9 +70,8 @@ surfaces:
     outer: 0.2820282677958
     medium: hsc_air
     R: 1.058
-    conic: 0.0
   ADC2:
-    sagtype: quadric
+    sagtype: sphere
     surftype: lens
     zvertex: 14.333429999999998
     thickness: 0.003
@@ -82,7 +79,6 @@ surfaces:
     outer: 0.2825217682803
     medium: hsc_pbl1y
     R: 1.04
-    conic: 0.0
   ADC2E:
     sagtype: plane
     surftype: lens
@@ -104,7 +100,7 @@ surfaces:
     coef: [2.768476102307, -48.556420092589995, 717.6113272765999, -10763.702614520002,
       118744.32178099999, -798382.1197395, 2393556.961408]
   G3E:
-    sagtype: quadric
+    sagtype: sphere
     surftype: lens
     zvertex: 14.729729999999998
     thickness: 0.04
@@ -112,7 +108,6 @@ surfaces:
     outer: 0.2838358237172
     medium: hsc_air
     R: 9.8
-    conic: 0.0
   G4:
     sagtype: asphere
     surftype: lens
@@ -126,7 +121,7 @@ surfaces:
     coef: [-4.355533915492, 36.358679149130005, -595.1267151922, 7658.839741989, -71941.20343205,
       394282.0924898, -954342.843455]
   G4E:
-    sagtype: quadric
+    sagtype: sphere
     surftype: lens
     zvertex: 14.921729999999998
     thickness: 0.102
@@ -134,9 +129,8 @@ surfaces:
     outer: 0.314
     medium: hsc_air
     R: 4.021759021137413
-    conic: 0.0
   G5:
-    sagtype: quadric
+    sagtype: sphere
     surftype: lens
     zvertex: 15.021929999999998
     thickness: 0.1002
@@ -144,7 +138,6 @@ surfaces:
     outer: 0.314
     medium: hsc_silica
     R: 4.176748363640779
-    conic: 0.0
   G5E:
     sagtype: asphere
     surftype: lens

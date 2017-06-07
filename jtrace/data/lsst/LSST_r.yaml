@@ -36,7 +36,7 @@ surfaces:
     conic: 0.155
     coef: [-0.0, 4.5000000000000003e-07, 8.149999999999999e-09]
   L1:
-    sagtype: quadric
+    sagtype: sphere
     surftype: lens
     zvertex: 3.3974725882045593
     thickness: 3.63127258820456
@@ -44,9 +44,8 @@ surfaces:
     outer: 0.775
     medium: silica
     R: 2.824
-    conic: 0.0
   L1E:
-    sagtype: quadric
+    sagtype: sphere
     surftype: lens
     zvertex: 3.4797025882045594
     thickness: 0.08223
@@ -54,7 +53,6 @@ surfaces:
     outer: 0.775
     medium: air
     R: 5.021
-    conic: 0.0
   L2:
     sagtype: plane
     surftype: lens
@@ -75,7 +73,7 @@ surfaces:
     conic: -1.57
     coef: [-0.0, -0.0016560000000000001]
   F:
-    sagtype: quadric
+    sagtype: sphere
     surftype: filter
     zvertex: 4.271924608204559
     thickness: 0.34958
@@ -83,9 +81,8 @@ surfaces:
     outer: 0.375
     medium: silica
     R: 5.632
-    conic: 0.0
   FE:
-    sagtype: quadric
+    sagtype: sphere
     surftype: filter
     zvertex: 4.289824608204559
     thickness: 0.0179
@@ -93,7 +90,6 @@ surfaces:
     outer: 0.375
     medium: air
     R: 5.606
-    conic: 0.0
   L3:
     sagtype: quadric
     surftype: lens
@@ -105,7 +101,7 @@ surfaces:
     R: 3.169
     conic: -0.962
   L3E:
-    sagtype: quadric
+    sagtype: sphere
     surftype: lens
     zvertex: 4.4009246082045586
     thickness: 0.06
@@ -113,7 +109,6 @@ surfaces:
     outer: 0.361
     medium: air
     R: -13.36
-    conic: 0.0
   D:
     sagtype: plane
     surftype: det

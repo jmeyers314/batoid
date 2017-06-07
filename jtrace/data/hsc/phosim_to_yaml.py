@@ -34,7 +34,6 @@ def translate(infn, outfn):
                 surfaces[name] = data
             else:
                 data['R'] = float(R)/1000
-                data['conic'] = float(kappa)
                 coef = [float(np.double(a4)*10**((4-1)*3)),
                         float(np.double(a6)*10**((6-1)*3)),
                         float(np.double(a8)*10**((8-1)*3)),
@@ -44,10 +43,16 @@ def translate(infn, outfn):
                         float(np.double(a16)*10**((16-1)*3))]
                 coef = np.trim_zeros(coef, 'b')
                 if len(coef) == 0:
-                    data['sagtype'] = "quadric"
-                    surfaces[name] = data
+                    if float(kappa) == 0.0:
+                        data['sagtype'] = "sphere"
+                        surfaces[name] = data
+                    else:
+                        data['sagtype'] = "quadric"
+                        data['conic'] = float(kappa)
+                        surfaces[name] = data
                 else:
                     data['sagtype'] = "asphere"
+                    data['conic'] = float(kappa)
                     data['coef'] = coef
                     surfaces[name] = data
             thickness = 0.0

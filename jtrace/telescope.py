@@ -63,6 +63,12 @@ class Telescope(object):
                         sdata['zvertex'],
                         Rin=sdata['inner'],
                         Rout=sdata['outer'])
+                elif sagtype == 'sphere':
+                    sdict['surface'] = jtrace.Sphere(
+                        sdata['R'],
+                        sdata['zvertex'],
+                        Rin=sdata['inner'],
+                        Rout=sdata['outer'])
                 elif sagtype == 'quadric':
                     sdict['surface'] = jtrace.Quadric(
                         sdata['R'],
