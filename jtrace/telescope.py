@@ -92,13 +92,11 @@ class Telescope(object):
             out.__dict__.update(data)
         return out
 
-    def trace(self, r, ax=None, **kwargs):
+    def trace(self, r):
         if isinstance(r, jtrace.Ray):
             ray = r
             for name, surface in self.surfaces.items():
                 isec = surface['surface'].intersect(ray)
-                if ax is not None:
-                    ax.plot([ray.x0, isec.x0], [ray.z0, isec.z0], **kwargs)
                 if surface['type'] == 'mirror':
                     ray = isec.reflectedRay(ray)
                 elif surface['type'] in ['lens', 'filter']:
@@ -121,6 +119,41 @@ class Telescope(object):
                 else:
                     raise ValueError("Unknown optic type: {}".format(surface['type']))
             return rays, isecs
+
+    def traceFull(self, r):
+        out = []
+        if isinstance(r, jtrace.Ray):
+            ray = r
+            for name, surface in self.surfaces.items():
+                isec = surface['surface'].intersect(ray)
+                data = {'name':name, 'isec': isec, 'inray':ray}
+                if surface['type'] == 'mirror':
+                    ray = isec.reflectedRay(ray)
+                elif surface['type'] in ['lens', 'filter']:
+                    ray = isec.refractedRay(ray, surface['m0'], surface['m1'])
+                elif surface['type'] == 'det':
+                    pass
+                else:
+                    raise ValueError("Unknown optic type: {}".format(surface['type']))
+                data['outray'] = ray
+                out.append(data)
+            return out
+        else:
+            rays = r
+            for name, surface in self.surfaces.items():
+                isecs = surface['surface'].intersect(rays)
+                data = {'name':name, 'isecs': isecs, 'inrays':rays}
+                if surface['type'] == 'mirror':
+                    rays = jtrace._jtrace.reflectMany(isecs, rays)
+                elif surface['type'] in ['lens', 'filter']:
+                    rays = jtrace._jtrace.refractMany(isecs, rays, surface['m0'], surface['m1'])
+                elif surface['type'] == 'det':
+                    pass
+                else:
+                    raise ValueError("Unknown optic type: {}".format(surface['type']))
+                data['outrays'] = rays
+                out.append(data)
+            return out
 
     def clone(self):
         cls = self.__class__
