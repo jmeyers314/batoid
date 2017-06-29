@@ -1,4 +1,5 @@
 #include "ray.h"
+#include <cmath>
 
 namespace jtrace {
     Ray::Ray(double x0, double y0, double z0, double vx, double vy, double vz, double t=0.0,
@@ -40,6 +41,32 @@ namespace jtrace {
 
     bool Ray::operator!=(const Ray& other) const {
         return !(*this == other);
+    }
+
+    double Ray::phase(const Vec3& r, double t) const {
+        return DotProduct(k(), r-p0) - (t-t0)*omega();
+    }
+
+    std::complex<double> Ray::amplitude(const Vec3& r, double t) const {
+        return std::exp(std::complex<double>(0, 1)*phase(r, t));
+    }
+
+    std::vector<double> phaseMany(const std::vector<Ray>& rays, const Vec3& r, double t) {
+        auto result = std::vector<double>();
+        result.reserve(rays.size());
+        for (const auto& ray : rays) {
+            result.push_back(ray.phase(r, t));
+        }
+        return result;
+    }
+
+    std::vector<std::complex<double>> amplitudeMany(const std::vector<Ray>& rays, const Vec3& r, double t) {
+        auto result = std::vector<std::complex<double>>();
+        result.reserve(rays.size());
+        for (const auto& ray : rays) {
+            result.push_back(ray.amplitude(r, t));
+        }
+        return result;
     }
 
 }
