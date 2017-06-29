@@ -26,7 +26,7 @@ namespace jtrace {
         return oss.str();
     }
 
-    Vec3 Ray::operator()(const double t) const {
+    Vec3 Ray::positionAtTime(const double t) const {
         return p0+v*(t-t0);
     }
 

@@ -54,7 +54,7 @@ def test_plane_reflection_reversal():
         # point
 
         # Keep going a bit before turning around though
-        turn_around = rray(rray.t0+0.1)
+        turn_around = rray.positionAtTime(rray.t0+0.1)
         return_ray = jtrace.Ray(turn_around, -rray.v, -(rray.t0+0.1))
         risec = plane.intersect(return_ray)
         assert isclose(isec.point.x, risec.point.x, rel_tol=0, abs_tol=1e-10)
@@ -62,7 +62,7 @@ def test_plane_reflection_reversal():
         assert isclose(isec.point.z, risec.point.z, rel_tol=0, abs_tol=1e-10)
         # Reflect and propagate back to t=0.
         cray = risec.reflectedRay(return_ray)
-        cray = cray(0)
+        cray = cray.positionAtTime(0)
         assert isclose(cray.x, x, rel_tol=0, abs_tol=1e-10)
         assert isclose(cray.y, y, rel_tol=0, abs_tol=1e-10)
         assert isclose(cray.z, 0, rel_tol=0, abs_tol=1e-10)
@@ -112,7 +112,7 @@ def test_paraboloid_reflection_reversal():
         # point
 
         # Keep going a bit before turning around though
-        turn_around = rray(rray.t0+0.1)
+        turn_around = rray.positionAtTime(rray.t0+0.1)
         return_ray = jtrace.Ray(turn_around, -rray.v, -(rray.t0+0.1))
         risec = para.intersect(return_ray)
         # First check that we intersected at the same point
@@ -121,7 +121,7 @@ def test_paraboloid_reflection_reversal():
         assert isclose(isec.point.z, risec.point.z, rel_tol=0, abs_tol=1e-10)
         # Reflect and propagate back to t=0.
         cray = risec.reflectedRay(return_ray)
-        cray = cray(0)
+        cray = cray.positionAtTime(0)
         assert isclose(cray.x, x, rel_tol=0, abs_tol=1e-10)
         assert isclose(cray.y, y, rel_tol=0, abs_tol=1e-10)
         assert isclose(cray.z, 0, rel_tol=0, abs_tol=1e-10)
@@ -144,7 +144,7 @@ def test_paraboloid_reflection_to_focus():
             # Solve the x equation: 0 = rray.p0.x + rray.v.x*(t-t0) for t:
             # t = t0 - p0.x/vx
             t = rray.t0 - rray.p0.x/rray.v.x
-            focus = rray(t)
+            focus = rray.positionAtTime(t)
             assert isclose(focus.x, 0, abs_tol=1e-12)
             assert isclose(focus.y, 0, abs_tol=1e-12)
             assert isclose(focus.z, 1.0/(4*A), abs_tol=1e-12)
@@ -194,7 +194,7 @@ def test_asphere_reflection_reversal():
         # point
 
         # Keep going a bit before turning around though
-        turn_around = rray(rray.t0+0.1)
+        turn_around = rray.positionAtTime(rray.t0+0.1)
         return_ray = jtrace.Ray(turn_around, -rray.v, -(rray.t0+0.1))
         risec = asphere.intersect(return_ray)
         # First check that we intersected at the same point
@@ -203,7 +203,7 @@ def test_asphere_reflection_reversal():
         assert isclose(isec.point.z, risec.point.z, rel_tol=0, abs_tol=1e-9)
         # Reflect and propagate back to t=0.
         cray = risec.reflectedRay(return_ray)
-        cray = cray(0)
+        cray = cray.positionAtTime(0)
         assert isclose(cray.x, x, rel_tol=0, abs_tol=1e-9)
         assert isclose(cray.y, y, rel_tol=0, abs_tol=1e-9)
         assert isclose(cray.z, 0, rel_tol=0, abs_tol=1e-9)

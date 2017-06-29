@@ -18,7 +18,7 @@ namespace jtrace {
                  "Rin"_a=0.0, "Rout"_a=std::numeric_limits<double>::infinity())
             .def_property_readonly("A", &Paraboloid::getA)
             .def_property_readonly("B", &Paraboloid::getB)
-            .def("__call__", &Paraboloid::operator())
+            .def("sag", &Paraboloid::sag)
             .def("normal", &Paraboloid::normal)
             .def("intersect", (Intersection (Paraboloid::*)(const Ray&) const) &Paraboloid::intersect)
             .def("intersect", (std::vector<jtrace::Intersection> (Paraboloid::*)(const std::vector<jtrace::Ray>&) const) &Paraboloid::intersect)

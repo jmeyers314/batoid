@@ -21,7 +21,7 @@ namespace jtrace {
         bool isVignetted;
         bool failed;
 
-        Vec3 operator()(double t) const;
+        Vec3 positionAtTime(double t) const;
         bool operator==(const Ray&) const;
         bool operator!=(const Ray&) const;
         double getX0() const { return p0.x; }

@@ -14,7 +14,7 @@ namespace jtrace {
     public:
         Plane(double _B,
               double _Rin=0.0, double _Rout=std::numeric_limits<double>::infinity());
-        virtual double operator()(double, double) const {return B;}
+        virtual double sag(double, double) const {return B;}
         virtual Vec3 normal(double, double) const {return Vec3(0,0,1);}
         using Surface::intersect;
         virtual Intersection intersect(const Ray&) const;

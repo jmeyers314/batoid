@@ -20,9 +20,9 @@ def test_call():
         r1 = jtrace.Ray(x, y, z, vx, vy, vz, t0)
         r2 = jtrace.Ray(jtrace.Vec3(x, y, z), jtrace.Vec3(vx, vy, vz), t0)
         for r in [r1, r2]:
-            assert isclose(r(t).x, x+vx*(t-t0))
-            assert isclose(r(t).y, y+vy*(t-t0))
-            assert isclose(r(t).z, z+vz*(t-t0))
+            assert isclose(r.positionAtTime(t).x, x+vx*(t-t0))
+            assert isclose(r.positionAtTime(t).y, y+vy*(t-t0))
+            assert isclose(r.positionAtTime(t).z, z+vz*(t-t0))
         assert r1 == r2
 
 

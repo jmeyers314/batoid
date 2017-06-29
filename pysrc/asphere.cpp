@@ -21,7 +21,7 @@ namespace jtrace {
             .def_property_readonly("kappa", &Asphere::getKappa)
             .def_property_readonly("alpha", &Asphere::getAlpha)
             .def_property_readonly("B", &Asphere::getB)
-            .def("__call__", &Asphere::operator())
+            .def("sag", &Asphere::sag)
             .def("normal", &Asphere::normal)
             .def("intersect", (Intersection (Asphere::*)(const Ray&) const) &Asphere::intersect)
             .def("intersect", (std::vector<jtrace::Intersection> (Asphere::*)(const std::vector<jtrace::Ray>&) const) &Asphere::intersect)

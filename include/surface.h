@@ -12,7 +12,7 @@ namespace jtrace {
     class Transformation;
     class Surface : public std::enable_shared_from_this<Surface> {
     public:
-        virtual double operator()(double, double) const = 0;
+        virtual double sag(double, double) const = 0;
         virtual Vec3 normal(double, double) const = 0;
         virtual Intersection intersect(const Ray&) const = 0;
         std::vector<Intersection> intersect(const std::vector<Ray>&) const;

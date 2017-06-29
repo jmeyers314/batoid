@@ -61,7 +61,7 @@ def test_plane_refraction_reversal():
         # point
 
         # Keep going a bit before turning around though
-        turn_around = rray(rray.t0+0.1)
+        turn_around = rray.positionAtTime(rray.t0+0.1)
         return_ray = jtrace.Ray(turn_around, -rray.v, -(rray.t0+0.1))
         risec = plane.intersect(return_ray)
         assert isclose(isec.point.x, risec.point.x, rel_tol=0, abs_tol=1e-10)
@@ -70,7 +70,7 @@ def test_plane_refraction_reversal():
         # Refract and propagate back to t=0.
         cray = risec.refractedRay(return_ray, n2, n1)
         assert isclose(cray.v.Magnitude(), 1./n1, rel_tol=1e-15)
-        cpoint = cray(0)
+        cpoint = cray.positionAtTime(0)
         assert isclose(cpoint.x, x, rel_tol=0, abs_tol=1e-10)
         assert isclose(cpoint.y, y, rel_tol=0, abs_tol=1e-10)
         assert isclose(cpoint.z, 0, rel_tol=0, abs_tol=1e-10)
@@ -133,7 +133,7 @@ def test_paraboloid_refraction_reversal():
         # point
 
         # Keep going a bit before turning around though
-        turn_around = rray(rray.t0+0.1)
+        turn_around = rray.positionAtTime(rray.t0+0.1)
         return_ray = jtrace.Ray(turn_around, -rray.v, -(rray.t0+0.1))
         risec = para.intersect(return_ray)
         # First check that we intersected at the same point
@@ -143,7 +143,7 @@ def test_paraboloid_refraction_reversal():
         # Refract and propagate back to t=0.
         cray = risec.refractedRay(return_ray, n2, n1)
         assert isclose(cray.v.Magnitude(), 1./n1, rel_tol=1e-15)
-        cpoint = cray(0)
+        cpoint = cray.positionAtTime(0)
         assert isclose(cpoint.x, x, rel_tol=0, abs_tol=1e-10)
         assert isclose(cpoint.y, y, rel_tol=0, abs_tol=1e-10)
         assert isclose(cpoint.z, 0, rel_tol=0, abs_tol=1e-10)
@@ -206,7 +206,7 @@ def test_asphere_refraction_reversal():
         # point
 
         # Keep going a bit before turning around though
-        turn_around = rray(rray.t0+0.1)
+        turn_around = rray.positionAtTime(rray.t0+0.1)
         return_ray = jtrace.Ray(turn_around, -rray.v, -(rray.t0+0.1))
         risec = asphere.intersect(return_ray)
         # First check that we intersected at the same point
@@ -216,7 +216,7 @@ def test_asphere_refraction_reversal():
         # Refract and propagate back to t=0.
         cray = risec.refractedRay(return_ray, n2, n1)
         assert isclose(cray.v.Magnitude(), 1./n1, rel_tol=1e-15)
-        cpoint = cray(0)
+        cpoint = cray.positionAtTime(0)
         assert isclose(cpoint.x, x, rel_tol=0, abs_tol=1e-9)
         assert isclose(cpoint.y, y, rel_tol=0, abs_tol=1e-9)
         assert isclose(cpoint.z, 0, rel_tol=0, abs_tol=1e-9)

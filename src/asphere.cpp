@@ -8,7 +8,7 @@ namespace jtrace {
                      double _Rin, double _Rout) :
         R(_R), kappa(_kappa), alpha(_alpha), B(_B), Rin(_Rin), Rout(_Rout) {}
 
-    double Asphere::operator()(double x, double y) const {
+    double Asphere::sag(double x, double y) const {
         double r2 = x*x + y*y;
         double result = B;
         if (R != 0) {
@@ -34,8 +34,8 @@ namespace jtrace {
     public:
         AsphereResidual(const Asphere& _a, const Ray& _r) : a(_a), r(_r) {}
         double operator()(double t) const {
-            Vec3 p = r(t);
-            double resid = a(p.x, p.y) - p.z;
+            Vec3 p = r.positionAtTime(t);
+            double resid = a.sag(p.x, p.y) - p.z;
             return resid;
         }
     private:
@@ -64,7 +64,7 @@ namespace jtrace {
             return Intersection(true);
         }
 
-        Vec3 point = r(t);
+        Vec3 point = r.positionAtTime(t);
         Vec3 surfaceNormal = normal(point.x, point.y);
         double rho = std::hypot(point.x, point.y);
         bool isVignetted = rho < Rin || rho > Rout;

@@ -35,7 +35,7 @@ namespace jtrace {
             .def_property_readonly("vx", &Ray::getVx)
             .def_property_readonly("vy", &Ray::getVy)
             .def_property_readonly("vz", &Ray::getVz)
-            .def("__call__", &Ray::operator())
+            .def("positionAtTime", &Ray::positionAtTime)
             .def("__repr__", &Ray::repr)
             .def(py::self == py::self)
             .def(py::self != py::self);

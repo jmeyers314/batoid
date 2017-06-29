@@ -37,6 +37,6 @@ def parallelRays(z, outer, inner=0, theta_x=0, theta_y=0, nradii=50, naz=64,
             v = jtrace.Vec3(-np.tan(theta_x), -np.tan(theta_y), -1)
             v *= 1./(n*v.Magnitude())
             r0 = jtrace.Ray(p0, v, t=z*n)
-            p1 = r0(0)
+            p1 = r0.positionAtTime(0)
             rays.append(jtrace.Ray(p1, v, t=0, w=wavelength))
     return rays

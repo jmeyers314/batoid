@@ -60,7 +60,7 @@ def test_shift():
             isec = shifted.intersect(r)
             assert isclose(isec.point.x, x)
             assert isclose(isec.point.y, y)
-            assert isclose(isec.point.z, asphere(x-dx, y-dy)+dz, rel_tol=0, abs_tol=1e-9)
+            assert isclose(isec.point.z, asphere.sag(x-dx, y-dy)+dz, rel_tol=0, abs_tol=1e-9)
 
             # We can also check just for mutual consistency of the asphere,
             # ray and intersection.
@@ -70,12 +70,12 @@ def test_shift():
             v = jtrace.Vec3(vx, vy, vz).UnitVec3()
             r = jtrace.Ray(jtrace.Vec3(x, y, -10), v, 0)
             isec = shifted.intersect(r)
-            p1 = r(isec.t)
+            p1 = r.positionAtTime(isec.t)
             p2 = isec.point
             assert isclose(p1.x, p2.x)
             assert isclose(p1.y, p2.y)
             assert isclose(p1.z, p2.z)
-            assert isclose(asphere(p1.x-dx, p2.y-dy)+dz, p1.z, rel_tol=0, abs_tol=1e-9)
+            assert isclose(asphere.sag(p1.x-dx, p2.y-dy)+dz, p1.z, rel_tol=0, abs_tol=1e-9)
 
 
 @timer

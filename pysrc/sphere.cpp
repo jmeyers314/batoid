@@ -18,7 +18,7 @@ namespace jtrace {
                  "Rin"_a=0.0, "Rout"_a=std::numeric_limits<double>::infinity())
             .def_property_readonly("R", &Sphere::getR)
             .def_property_readonly("B", &Sphere::getB)
-            .def("__call__", &Sphere::operator())
+            .def("sag", &Sphere::sag)
             .def("normal", &Sphere::normal)
             .def("intersect", (Intersection (Sphere::*)(const Ray&) const) &Sphere::intersect)
             .def("intersect", (std::vector<jtrace::Intersection> (Sphere::*)(const std::vector<jtrace::Ray>&) const) &Sphere::intersect)

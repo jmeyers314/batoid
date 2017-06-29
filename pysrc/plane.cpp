@@ -17,7 +17,7 @@ namespace jtrace {
                  "B"_a,
                  "Rin"_a=0.0, "Rout"_a=std::numeric_limits<double>::infinity())
             .def_property_readonly("B", &Plane::getB)
-            .def("__call__", &Plane::operator())
+            .def("sag", &Plane::sag)
             .def("normal", &Plane::normal)
             .def("intersect", (Intersection (Plane::*)(const Ray&) const) &Plane::intersect)
             .def("intersect", (std::vector<jtrace::Intersection> (Plane::*)(const std::vector<jtrace::Ray>&) const) &Plane::intersect)

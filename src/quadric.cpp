@@ -6,7 +6,7 @@ namespace jtrace {
     Quadric::Quadric(double _R, double _kappa, double _B, double _Rin, double _Rout) :
         R(_R), kappa(_kappa), B(_B), Rin(_Rin), Rout(_Rout) {}
 
-    double Quadric::operator()(double x, double y) const {
+    double Quadric::sag(double x, double y) const {
         double r2 = x*x + y*y;
         double result = B;
         if (R != 0) {
@@ -73,7 +73,7 @@ namespace jtrace {
         }
 
         t += r.t0;
-        Vec3 point = r(t);
+        Vec3 point = r.positionAtTime(t);
         Vec3 surfaceNormal = normal(point.x, point.y);
         double rho = std::hypot(point.x, point.y);
         bool isVignetted = rho < Rin || rho > Rout;

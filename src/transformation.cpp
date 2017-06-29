@@ -11,7 +11,7 @@ namespace jtrace {
     Transformation::Transformation(std::shared_ptr<const Surface> s, const Rot3& r) :
         transformee(s), dr(), rot(r) {}
 
-    double Transformation::operator()(double x, double y) const {
+    double Transformation::sag(double x, double y) const {
         throw NotImplemented("Transformation::operator() not implemented");
     }
 

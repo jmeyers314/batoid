@@ -45,7 +45,7 @@ def test_call():
         for j in range(100):
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
-            assert isclose(asphere(x, y), py_asphere(R, kappa, alpha, B)(x, y))
+            assert isclose(asphere.sag(x, y), py_asphere(R, kappa, alpha, B)(x, y))
 
 
 @timer
@@ -69,7 +69,7 @@ def test_intersect():
             isec = asphere.intersect(r)
             assert isclose(isec.point.x, x)
             assert isclose(isec.point.y, y)
-            assert isclose(isec.point.z, asphere(x, y), rel_tol=0, abs_tol=1e-9)
+            assert isclose(isec.point.z, asphere.sag(x, y), rel_tol=0, abs_tol=1e-9)
 
             # We can also check just for mutual consistency of the asphere,
             # ray and intersection.
@@ -80,12 +80,12 @@ def test_intersect():
             v = jtrace.Vec3(vx, vy, vz).UnitVec3()
             r = jtrace.Ray(jtrace.Vec3(x, y, -10), v, 0)
             isec = asphere.intersect(r)
-            p1 = r(isec.t)
+            p1 = r.positionAtTime(isec.t)
             p2 = isec.point
             assert isclose(p1.x, p2.x)
             assert isclose(p1.y, p2.y)
             assert isclose(p1.z, p2.z)
-            assert isclose(asphere(p1.x, p2.y), p1.z, rel_tol=0, abs_tol=1e-9)
+            assert isclose(asphere.sag(p1.x, p2.y), p1.z, rel_tol=0, abs_tol=1e-9)
 
 
 @timer
@@ -141,7 +141,7 @@ def test_quad_plus_poly():
         for j in range(100):
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
-            assert isclose(asphere(x, y), quad(x, y)+poly(x, y))
+            assert isclose(asphere.sag(x, y), quad.sag(x, y)+poly(x, y))
 
 
 if __name__ == '__main__':

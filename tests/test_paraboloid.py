@@ -25,7 +25,7 @@ def test_call():
         for j in range(10):
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
-            assert isclose(para(x, y), A*(x*x + y*y)+B)
+            assert isclose(para.sag(x, y), A*(x*x + y*y)+B)
 
 
 @timer
@@ -46,7 +46,7 @@ def test_intersect():
             isec = para.intersect(r)
             assert isclose(isec.point.x, x)
             assert isclose(isec.point.y, y)
-            assert isclose(isec.point.z, para(x, y), rel_tol=0, abs_tol=1e-9)
+            assert isclose(isec.point.z, para.sag(x, y), rel_tol=0, abs_tol=1e-9)
 
             # We can also check just for mutual consistency of the paraboloid,
             # ray and intersection.
@@ -57,12 +57,12 @@ def test_intersect():
             v = jtrace.Vec3(vx, vy, vz).UnitVec3()
             r = jtrace.Ray(jtrace.Vec3(x, y, -10), v, 0)
             isec = para.intersect(r)
-            p1 = r(isec.t)
+            p1 = r.positionAtTime(isec.t)
             p2 = isec.point
             assert isclose(p1.x, p2.x)
             assert isclose(p1.y, p2.y)
             assert isclose(p1.z, p2.z)
-            assert isclose(para(p1.x, p2.y), p1.z, rel_tol=0, abs_tol=1e-6)
+            assert isclose(para.sag(p1.x, p2.y), p1.z, rel_tol=0, abs_tol=1e-6)
 
 
 @timer

@@ -17,7 +17,7 @@ namespace jtrace {
         Transformation(std::shared_ptr<const Surface>, double dx, double dy, double dz);
         Transformation(std::shared_ptr<const Surface>, const Vec3& dr);
         Transformation(std::shared_ptr<const Surface>, const Rot3& r3);
-        virtual double operator()(double, double) const;
+        virtual double sag(double, double) const;
         virtual Vec3 normal(double, double) const;
         using Surface::intersect;
         virtual Intersection intersect(const Ray&) const;

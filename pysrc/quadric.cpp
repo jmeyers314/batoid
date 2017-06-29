@@ -19,7 +19,7 @@ namespace jtrace {
             .def_property_readonly("R", &Quadric::getR)
             .def_property_readonly("kappa", &Quadric::getKappa)
             .def_property_readonly("B", &Quadric::getB)
-            .def("__call__", &Quadric::operator())
+            .def("sag", &Quadric::sag)
             .def("normal", &Quadric::normal)
             .def("intersect", (Intersection (Quadric::*)(const Ray&) const) &Quadric::intersect)
             .def("intersect", (std::vector<jtrace::Intersection> (Quadric::*)(const std::vector<jtrace::Ray>&) const) &Quadric::intersect)

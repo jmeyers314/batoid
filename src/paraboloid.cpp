@@ -14,7 +14,7 @@ namespace jtrace {
         return oss.str();
     }
 
-    double Paraboloid::operator()(double x, double y) const {
+    double Paraboloid::sag(double x, double y) const {
         double r2 = x*x + y*y;
         return A*r2 + B;
     }
@@ -60,7 +60,7 @@ namespace jtrace {
         }
 
         t += ray.t0;
-        Vec3 point = ray(t);
+        Vec3 point = ray.positionAtTime(t);
         Vec3 surfaceNormal = normal(point.x, point.y);
         double rho = std::hypot(point.x, point.y);
         bool isVignetted = rho < Rin || rho > Rout;
