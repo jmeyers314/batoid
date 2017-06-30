@@ -1,3 +1,4 @@
+import numpy as np
 from collections import OrderedDict
 import numbers
 import jtrace
@@ -12,6 +13,7 @@ def media_catalog(media_str):
 
     # For HSC, we interpolate between values in pdf description
     w = [0.4, 0.6, 0.75, 0.9, 1.1]
+    w = np.array(w)*1e-6
     silica_n = [1.47009272, 1.45801158, 1.45421013, 1.45172729, 1.44917721]
     bsl7y_n = [1.53123287, 1.51671428, 1.51225242, 1.50939738, 1.50653251]
     pbl1y_n = [1.57046066, 1.54784671, 1.54157395, 1.53789058, 1.53457169]

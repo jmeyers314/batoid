@@ -20,7 +20,7 @@ namespace jtrace {
         Vec3 p0; // reference position
         Vec3 v;  // "velocity" Vec3, really v/c
         double t0; // reference time, really c*t0
-        double wavelength; // in vacuum, in nanometers
+        double wavelength; // in vacuum, in meters
         bool isVignetted;
         bool failed;
 
@@ -39,8 +39,8 @@ namespace jtrace {
 
         std::string repr() const;
 
-        Vec3 k() const { return 2 * PI * v / (wavelength * 1e-9) / v.Magnitude() / v.Magnitude(); }
-        double omega() const { return 2 * PI / (wavelength * 1e-9); }
+        Vec3 k() const { return 2 * PI * v / wavelength / v.Magnitude() / v.Magnitude(); }
+        double omega() const { return 2 * PI / wavelength; }
         double phase(const Vec3& r, double t) const;
         std::complex<double> amplitude(const Vec3& r, double t) const;
     };

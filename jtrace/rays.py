@@ -2,7 +2,7 @@ import numpy as np
 import jtrace
 
 def parallelRays(z, outer, inner=0, theta_x=0, theta_y=0, nradii=50, naz=64,
-                 wavelength=0.5, medium=jtrace.ConstMedium(1.0)):
+                 wavelength=500e-9, medium=jtrace.ConstMedium(1.0)):
     """Create a RayVector of parallel Rays aimed toward the origin.
 
     Parameters
@@ -22,7 +22,7 @@ def parallelRays(z, outer, inner=0, theta_x=0, theta_y=0, nradii=50, naz=64,
     naz : int
         Number of azimuthal rays to use on the outer ring. [default: 64]
     wavelength : float
-        Wavelength of rays in microns. [default: 0.5]
+        Wavelength of rays in meters. [default: 500e-9]
     medium : jtrace.Medium
         Medium rays are in. [default: jtrace.ConstMedium(1.0)]
     """

@@ -21,7 +21,8 @@ namespace jtrace {
         B1(_B1), B2(_B2), B3(_B3), C1(_C1), C2(_C2), C3(_C3) {}
 
     double SellmeierMedium::getN(double wavelength) const {
-        double x = wavelength*wavelength;
+        // Sellmeier coefficients assume wavelength is in microns, so we have to multiply (1e6)**2
+        double x = wavelength*wavelength*1e12;
         return std::sqrt(1.0 + B1*x/(x-C1) + B2*x/(x-C2) + B3*x/(x-C3));
     }
 
@@ -42,7 +43,7 @@ namespace jtrace {
 
     double Air::getN(double wavelength) const {
         // inverse wavenumber squared in micron^-2
-        double sigma_squared = 1.0 / (wavelength*wavelength);
+        double sigma_squared = 1e-12 / (wavelength*wavelength);
         double n_minus_one = (64.328 + (29498.1 / (146.0 - sigma_squared))
                               + (255.4 / (41.0 - sigma_squared))) * 1.e-6;
         n_minus_one *= P * (1.0 + (1.049 - 0.0157 * T) * 1.e-6 * P) / (720.883 * (1.0 + 0.003661 * T));

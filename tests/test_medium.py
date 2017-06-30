@@ -24,10 +24,11 @@ def test_table_medium():
     # File from phosim
     filename = os.path.join(jtrace.datadir, "media", "silica_dispersion.txt")
     wave, n = np.genfromtxt(filename).T
+    wave *= 1e-6    # microns -> meters
     table = jtrace.Table(wave, n, jtrace.Table.Interpolant.linear)
     table_medium = jtrace.TableMedium(table)
     for i in range(100):
-        w = random.uniform(0.3, 1.2)
+        w = random.uniform(0.3e-6, 1.2e-6)
         assert table_medium.getN(w) == table(w)
 
 
@@ -40,6 +41,7 @@ def test_silica_sellmeier_table():
     # File from phosim
     filename = os.path.join(jtrace.datadir, "media", "silica_dispersion.txt")
     wave, n = np.genfromtxt(filename).T
+    wave *= 1e-6    # microns -> meters
     table = jtrace.Table(wave, n, jtrace.Table.Interpolant.linear)
     table_silica = jtrace.TableMedium(table)
 
@@ -52,7 +54,7 @@ def test_silica_sellmeier_table():
     # Making this a timing test too for fun
     ws = []
     for i in range(100000):
-        ws.append(random.uniform(0.3, 1.2))
+        ws.append(random.uniform(0.3e-6, 1.2e-6))
     table_n = []
     sellmeier_n = []
     t0 = time.time()
@@ -74,7 +76,7 @@ def test_air():
     gsn = [ 1.00019563,  1.00018713,  1.00018498,  1.00018412,  1.00018369]
     air = jtrace.Air()
     for w, n in zip(ws, gsn):
-        assert isclose(n, air.getN(w), abs_tol=1e-8, rel_tol=0)
+        assert isclose(n, air.getN(w*1e-6), abs_tol=1e-8, rel_tol=0)
 
 
 if __name__ == '__main__':
