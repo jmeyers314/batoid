@@ -2,6 +2,12 @@
 #include "utils.h"
 
 namespace jtrace {
+    Intersection::Intersection(double _t, double x0, double y0,
+                               double z0, double nx, double ny, double nz,
+                               bool _isVignetted) :
+        t(_t), point(Vec3(x0, y0, z0)), surfaceNormal(Vec3(nx, ny, nz).UnitVec3()),
+        isVignetted(_isVignetted), failed(false) {}
+
     Intersection::Intersection(const double _t, const Vec3 _point, const Vec3 _surfaceNormal, bool _isVignetted) :
         t(_t), point(_point), surfaceNormal(_surfaceNormal.UnitVec3()), isVignetted(_isVignetted), failed(false) {}
 

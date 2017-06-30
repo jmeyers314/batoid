@@ -9,6 +9,8 @@
 
 namespace jtrace {
     struct Intersection {
+        Intersection(double _t, double x0, double y0, double z0, double nx, double ny, double nz,
+                     bool isVignetted);
         Intersection(const double _t, const Vec3 _point, const Vec3 _surfaceNormal, const bool _isVignetted=false);
         Intersection(const bool failed);
 
