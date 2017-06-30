@@ -4,6 +4,7 @@
 #include <pybind11/stl_bind.h>
 #include <pybind11/operators.h>
 #include <pybind11/complex.h>
+#include <pybind11/numpy.h>
 
 
 PYBIND11_MAKE_OPAQUE(std::vector<jtrace::Ray>);
@@ -46,6 +47,158 @@ namespace jtrace {
             .def("amplitude", &Ray::amplitude);
         m.def("amplitudeMany", &amplitudeMany);
         m.def("phaseMany", &phaseMany);
-        py::bind_vector<std::vector<jtrace::Ray>>(m, "RayVector");
+
+        auto RV = py::bind_vector<std::vector<jtrace::Ray>>(m, "RayVector");
+        // This feels a little hacky, but seems to work.
+        RV.def_property_readonly(
+            "x",
+            [](std::vector<jtrace::Ray>& rv) {
+                return py::array_t<double>(
+                    py::buffer_info(
+                        &rv[0].p0.x,
+                        sizeof(double),
+                        py::format_descriptor<double>::format(),
+                        1,
+                        {rv.size()},
+                        {sizeof(jtrace::Ray)}
+                    )
+                );
+            }
+        )
+        .def_property_readonly(
+            "y",
+            [](std::vector<jtrace::Ray>& rv) {
+                return py::array_t<double>(
+                    py::buffer_info(
+                        &rv[0].p0.y,
+                        sizeof(double),
+                        py::format_descriptor<double>::format(),
+                        1,
+                        {rv.size()},
+                        {sizeof(jtrace::Ray)}
+                    )
+                );
+            }
+        )
+        .def_property_readonly(
+            "z",
+            [](std::vector<jtrace::Ray>& rv) {
+                return py::array_t<double>(
+                    py::buffer_info(
+                        &rv[0].p0.z,
+                        sizeof(double),
+                        py::format_descriptor<double>::format(),
+                        1,
+                        {rv.size()},
+                        {sizeof(jtrace::Ray)}
+                    )
+                );
+            }
+        )
+        .def_property_readonly(
+            "vx",
+            [](std::vector<jtrace::Ray>& rv) {
+                return py::array_t<double>(
+                    py::buffer_info(
+                        &rv[0].v.x,
+                        sizeof(double),
+                        py::format_descriptor<double>::format(),
+                        1,
+                        {rv.size()},
+                        {sizeof(jtrace::Ray)}
+                    )
+                );
+            }
+        )
+        .def_property_readonly(
+            "vy",
+            [](std::vector<jtrace::Ray>& rv) {
+                return py::array_t<double>(
+                    py::buffer_info(
+                        &rv[0].v.y,
+                        sizeof(double),
+                        py::format_descriptor<double>::format(),
+                        1,
+                        {rv.size()},
+                        {sizeof(jtrace::Ray)}
+                    )
+                );
+            }
+        )
+        .def_property_readonly(
+            "vz",
+            [](std::vector<jtrace::Ray>& rv) {
+                return py::array_t<double>(
+                    py::buffer_info(
+                        &rv[0].v.z,
+                        sizeof(double),
+                        py::format_descriptor<double>::format(),
+                        1,
+                        {rv.size()},
+                        {sizeof(jtrace::Ray)}
+                    )
+                );
+            }
+        )
+        .def_property_readonly(
+            "t0",
+            [](std::vector<jtrace::Ray>& rv) {
+                return py::array_t<double>(
+                    py::buffer_info(
+                        &rv[0].t0,
+                        sizeof(double),
+                        py::format_descriptor<double>::format(),
+                        1,
+                        {rv.size()},
+                        {sizeof(jtrace::Ray)}
+                    )
+                );
+            }
+        )
+        .def_property_readonly(
+            "wavelength",
+            [](std::vector<jtrace::Ray>& rv) {
+                return py::array_t<double>(
+                    py::buffer_info(
+                        &rv[0].wavelength,
+                        sizeof(double),
+                        py::format_descriptor<double>::format(),
+                        1,
+                        {rv.size()},
+                        {sizeof(jtrace::Ray)}
+                    )
+                );
+            }
+        )
+        .def_property_readonly(
+            "isVignetted",
+            [](std::vector<jtrace::Ray>& rv) {
+                return py::array_t<bool>(
+                    py::buffer_info(
+                        &rv[0].isVignetted,
+                        sizeof(bool),
+                        py::format_descriptor<bool>::format(),
+                        1,
+                        {rv.size()},
+                        {sizeof(jtrace::Ray)}
+                    )
+                );
+            }
+        )
+        .def_property_readonly(
+            "failed",
+            [](std::vector<jtrace::Ray>& rv) {
+                return py::array_t<bool>(
+                    py::buffer_info(
+                        &rv[0].failed,
+                        sizeof(bool),
+                        py::format_descriptor<bool>::format(),
+                        1,
+                        {rv.size()},
+                        {sizeof(jtrace::Ray)}
+                    )
+                );
+            }
+        );
     }
 }

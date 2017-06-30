@@ -119,7 +119,41 @@ def test_phase():
                                rel_tol=0, abs_tol=1e-9)
 
 
+@timer
+def test_RayVector():
+    import random
+    import numpy as np
+    random.seed(5772)
+    rayList = []
+    for i in range(1000):
+        rayList.append(
+            jtrace.Ray(
+                random.gauss(0.0, 1.0),
+                random.gauss(0.0, 1.0),
+                random.gauss(0.0, 1.0),
+                random.gauss(0.0, 1.0),
+                random.gauss(0.0, 1.0),
+                random.gauss(0.0, 1.0),
+                random.gauss(0.0, 1.0),
+                random.gauss(0.0, 1.0),
+                True if random.gauss(0.0, 1.0) < 0.0 else False
+            )
+        )
+    rayVector = jtrace.RayVector(rayList)
+    np.testing.assert_equal(rayVector.x, np.array([r.x0 for r in rayVector]))
+    np.testing.assert_equal(rayVector.y, np.array([r.y0 for r in rayVector]))
+    np.testing.assert_equal(rayVector.z, np.array([r.z0 for r in rayVector]))
+    np.testing.assert_equal(rayVector.vx, np.array([r.vx for r in rayVector]))
+    np.testing.assert_equal(rayVector.vy, np.array([r.vy for r in rayVector]))
+    np.testing.assert_equal(rayVector.vz, np.array([r.vz for r in rayVector]))
+    np.testing.assert_equal(rayVector.t0, np.array([r.t0 for r in rayVector]))
+    np.testing.assert_equal(rayVector.wavelength, np.array([r.wavelength for r in rayVector]))
+    np.testing.assert_equal(rayVector.isVignetted, np.array([r.isVignetted for r in rayVector]))
+    np.testing.assert_equal(rayVector.failed, np.array([r.failed for r in rayVector]))
+
+
 if __name__ == '__main__':
     test_call()
     test_properties()
     test_phase()
+    test_RayVector()
