@@ -40,9 +40,10 @@ namespace jtrace {
     std::vector<Intersection> Surface::intersect(const std::vector<Ray>& rays) const {
         auto result = std::vector<Intersection>();
         result.reserve(rays.size());
-        for (const auto& ray : rays) {
-            result.push_back(intersect(ray));
-        }
+        std::transform(rays.cbegin(), rays.cend(), std::back_inserter(result),
+            [this](const Ray& ray)
+            { return intersect(ray); }
+        );
         return result;
     }
 

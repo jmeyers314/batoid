@@ -54,18 +54,22 @@ namespace jtrace {
     std::vector<double> phaseMany(const std::vector<Ray>& rays, const Vec3& r, double t) {
         auto result = std::vector<double>();
         result.reserve(rays.size());
-        for (const auto& ray : rays) {
-            result.push_back(ray.phase(r, t));
-        }
+        std::transform(
+            rays.cbegin(), rays.cend(), std::back_inserter(result),
+            [=](const Ray& ray)
+                { return ray.phase(r, t); }
+        );
         return result;
     }
 
     std::vector<std::complex<double>> amplitudeMany(const std::vector<Ray>& rays, const Vec3& r, double t) {
         auto result = std::vector<std::complex<double>>();
         result.reserve(rays.size());
-        for (const auto& ray : rays) {
-            result.push_back(ray.amplitude(r, t));
-        }
+        std::transform(
+            rays.cbegin(), rays.cend(), std::back_inserter(result),
+            [=](const Ray& ray)
+                { return ray.amplitude(r, t); }
+        );
         return result;
     }
 

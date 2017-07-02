@@ -16,6 +16,7 @@ namespace jtrace {
         Ray(std::array<double,3> _p0, std::array<double,3> _v,
             double t, double w, bool isVignetted);
         Ray(bool failed);
+        Ray() = default;
 
         Vec3 p0; // reference position
         Vec3 v;  // "velocity" Vec3, really v/c

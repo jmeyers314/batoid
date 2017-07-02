@@ -32,9 +32,10 @@ namespace jtrace {
             result.assign(rays.size(), Ray(true));
             return result;
         }
-        for (const auto& ray : rays) {
-            result.push_back(reflectedRay(ray));
-        }
+        std::transform(rays.cbegin(), rays.cend(), std::back_inserter(result),
+            [this](const Ray& ray)
+                { return reflectedRay(ray); }
+        );
         return result;
     }
 
@@ -64,9 +65,10 @@ namespace jtrace {
             result.assign(rays.size(), Ray(true));
             return result;
         }
-        for (const auto& ray : rays) {
-            result.push_back(refractedRay(ray, n1, n2));
-        }
+        std::transform(rays.cbegin(), rays.cend(), std::back_inserter(result),
+            [this,n1,n2](const Ray& ray)
+                { return refractedRay(ray, n1, n2); }
+        );
         return result;
     }
 
@@ -85,9 +87,10 @@ namespace jtrace {
             result.assign(rays.size(), Ray(true));
             return result;
         }
-        for (const auto& ray : rays) {
-            result.push_back(refractedRay(ray, m1, m2));
-        }
+        std::transform(rays.cbegin(), rays.cend(), std::back_inserter(result),
+            [this,&m1,&m2](const Ray& ray)
+                { return refractedRay(ray, m1, m2); }
+        );
         return result;
     }
 
@@ -101,9 +104,11 @@ namespace jtrace {
     std::vector<Ray> reflectMany(const std::vector<Intersection>& isecs, const std::vector<Ray>& rays) {
         auto result = std::vector<Ray>();
         result.reserve(isecs.size());
-        for (unsigned i=0; i<isecs.size(); i++) {
-            result.push_back(isecs[i].reflectedRay(rays[i]));
-        }
+        std::transform(
+            isecs.cbegin(), isecs.cend(), rays.cbegin(), std::back_inserter(result),
+            [](const Intersection& isec, const Ray& ray)
+                { return isec.reflectedRay(ray); }
+            );
         return result;
     }
 
@@ -111,18 +116,22 @@ namespace jtrace {
     std::vector<Ray> refractMany(const std::vector<Intersection>& isecs, const std::vector<Ray>& rays, double n1, double n2) {
         auto result = std::vector<Ray>();
         result.reserve(isecs.size());
-        for (unsigned i=0; i<isecs.size(); i++) {
-            result.push_back(isecs[i].refractedRay(rays[i], n1, n2));
-        }
+        std::transform(
+            isecs.cbegin(), isecs.cend(), rays.cbegin(), std::back_inserter(result),
+            [=](const Intersection& isec, const Ray& ray)
+                { return isec.refractedRay(ray, n1, n2); }
+        );
         return result;
     }
 
     std::vector<Ray> refractMany(const std::vector<Intersection>& isecs, const std::vector<Ray>& rays, const Medium& m1, const Medium& m2) {
         auto result = std::vector<Ray>();
         result.reserve(isecs.size());
-        for (unsigned i=0; i<isecs.size(); i++) {
-            result.push_back(isecs[i].refractedRay(rays[i], m1, m2));
-        }
+        std::transform(
+            isecs.cbegin(), isecs.cend(), rays.cbegin(), std::back_inserter(result),
+            [&](const Intersection& isec, const Ray& ray)
+                { return isec.refractedRay(ray, m1, m2); }
+        );
         return result;
     }
 }
