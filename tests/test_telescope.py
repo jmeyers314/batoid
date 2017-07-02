@@ -7,10 +7,15 @@ import time
 
 @timer
 def test_telescope():
+    if __name__ == '__main__':
+        naz = 1024
+    else:
+        naz = 64
     rays = jtrace.parallelRays(z=20, outer=4.18, inner=2.558,
                                theta_x=1.0*np.pi/180, theta_y=0.1*np.pi/180,
-                               nradii=50, naz=64, medium=jtrace.Air())
-    print("Tracing {} rays.".format(len(rays)*6))
+                               nradii=50, naz=naz, medium=jtrace.Air())
+    nrays = len(rays)*len("ugrizy")
+    print("Tracing {} rays.".format(nrays))
     t_fast = 0.0
     t_slow = 0.0
     for f in "ugrizy":
@@ -28,7 +33,10 @@ def test_telescope():
         t_fast += t1 - t0
         t_slow += t2 - t1
     print("Fast trace: {:5.3f} s".format(t_fast))
+    print("            {} rays per second".format(int(nrays/t_fast)))
     print("Slow trace: {:5.3f} s".format(t_slow))
+    print("            {} rays per second".format(int(nrays/t_slow)))
+
 
 if __name__ == '__main__':
     test_telescope()
