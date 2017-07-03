@@ -1,5 +1,6 @@
 #include "surface.h"
 #include "transformation.h"
+#include "utils.h"
 
 namespace jtrace {
     Transformation Surface::shift(double dx, double dy, double dz) const {
@@ -38,13 +39,12 @@ namespace jtrace {
     }
 
     std::vector<Intersection> Surface::intersect(const std::vector<Ray>& rays) const {
-        auto result = std::vector<Intersection>();
-        result.reserve(rays.size());
-        std::transform(rays.cbegin(), rays.cend(), std::back_inserter(result),
+        auto result = std::vector<Intersection>(rays.size());
+        parallelTransform(rays.cbegin(), rays.cend(), result.begin(),
             [this](const Ray& ray)
-            { return intersect(ray); }
+            { return intersect(ray); },
+            2000
         );
         return result;
     }
-
 }

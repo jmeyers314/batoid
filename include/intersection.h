@@ -13,6 +13,7 @@ namespace jtrace {
                      bool isVignetted);
         Intersection(const double _t, const Vec3 _point, const Vec3 _surfaceNormal, const bool _isVignetted=false);
         Intersection(const bool failed);
+        Intersection() = default;
 
         double t;
         Vec3 point;

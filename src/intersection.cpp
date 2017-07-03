@@ -102,35 +102,35 @@ namespace jtrace {
 
     // Reflect lots of rays at lots of different intersections
     std::vector<Ray> reflectMany(const std::vector<Intersection>& isecs, const std::vector<Ray>& rays) {
-        auto result = std::vector<Ray>();
-        result.reserve(isecs.size());
-        std::transform(
-            isecs.cbegin(), isecs.cend(), rays.cbegin(), std::back_inserter(result),
+        auto result = std::vector<Ray>(isecs.size());
+        parallelTransform(
+            isecs.cbegin(), isecs.cend(), rays.cbegin(), result.begin(),
             [](const Intersection& isec, const Ray& ray)
-                { return isec.reflectedRay(ray); }
-            );
+                { return isec.reflectedRay(ray); },
+            2000
+        );
         return result;
     }
 
     // Refract lots of rays at lots of different intersections
     std::vector<Ray> refractMany(const std::vector<Intersection>& isecs, const std::vector<Ray>& rays, double n1, double n2) {
-        auto result = std::vector<Ray>();
-        result.reserve(isecs.size());
-        std::transform(
-            isecs.cbegin(), isecs.cend(), rays.cbegin(), std::back_inserter(result),
+        auto result = std::vector<Ray>(isecs.size());
+        parallelTransform(
+            isecs.cbegin(), isecs.cend(), rays.cbegin(), result.begin(),
             [=](const Intersection& isec, const Ray& ray)
-                { return isec.refractedRay(ray, n1, n2); }
+                { return isec.refractedRay(ray, n1, n2); },
+            2000
         );
         return result;
     }
 
     std::vector<Ray> refractMany(const std::vector<Intersection>& isecs, const std::vector<Ray>& rays, const Medium& m1, const Medium& m2) {
-        auto result = std::vector<Ray>();
-        result.reserve(isecs.size());
-        std::transform(
-            isecs.cbegin(), isecs.cend(), rays.cbegin(), std::back_inserter(result),
+        auto result = std::vector<Ray>(isecs.size());
+        parallelTransform(
+            isecs.cbegin(), isecs.cend(), rays.cbegin(), result.begin(),
             [&](const Intersection& isec, const Ray& ray)
-                { return isec.refractedRay(ray, m1, m2); }
+                { return isec.refractedRay(ray, m1, m2); },
+            2000
         );
         return result;
     }

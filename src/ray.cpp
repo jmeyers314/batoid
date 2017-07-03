@@ -1,5 +1,6 @@
 #include "ray.h"
 #include <cmath>
+#include <algorithm>
 
 namespace jtrace {
     Ray::Ray(double x0, double y0, double z0, double vx, double vy, double vz, double t=0.0,
