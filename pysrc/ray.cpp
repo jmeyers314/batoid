@@ -14,6 +14,7 @@ using namespace pybind11::literals;
 
 namespace jtrace {
     void pyExportRay(py::module& m) {
+        PYBIND11_NUMPY_DTYPE(Ray, p0, v, t0, wavelength, isVignetted, failed);
         py::class_<Ray>(m, "Ray")
             .def(py::init<double,double,double,double,double,double,double,double,bool>(),
                  "init",
@@ -48,7 +49,7 @@ namespace jtrace {
         m.def("amplitudeMany", &amplitudeMany);
         m.def("phaseMany", &phaseMany);
 
-        auto RV = py::bind_vector<std::vector<jtrace::Ray>>(m, "RayVector");
+        auto RV = py::bind_vector<std::vector<jtrace::Ray>>(m, "RayVector", py::buffer_protocol());
         // This feels a little hacky, but seems to work.
         RV.def_property_readonly(
             "x",

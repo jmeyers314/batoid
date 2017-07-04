@@ -2,12 +2,14 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/operators.h>
 #include <pybind11/stl.h>
+#include <pybind11/numpy.h>
 
 namespace py = pybind11;
 using namespace pybind11::literals;
 
 namespace jtrace {
     void pyExportVec3(py::module& m) {
+        PYBIND11_NUMPY_DTYPE(Vec3, x, y, z);
         py::class_<Vec3>(m, "Vec3", R"pbdoc(
           Simple python 3-vector
 

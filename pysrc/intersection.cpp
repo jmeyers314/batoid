@@ -13,6 +13,7 @@ using namespace pybind11::literals;
 
 namespace jtrace {
     void pyExportIntersection(py::module& m) {
+        PYBIND11_NUMPY_DTYPE(Intersection, t, point, surfaceNormal, isVignetted, failed);
         py::class_<Intersection, std::shared_ptr<Intersection>>(m, "Intersection")
             .def(py::init<double,double,double,double,double,double,double,bool>(),
                  "init",
@@ -39,7 +40,7 @@ namespace jtrace {
         m.def("reflectMany", &reflectMany);
         m.def("refractMany", (std::vector<jtrace::Ray>(*)(const std::vector<Intersection>&, const std::vector<Ray>&, double, double)) &refractMany);
         m.def("refractMany", (std::vector<jtrace::Ray>(*)(const std::vector<Intersection>&, const std::vector<Ray>&, const Medium&, const Medium&)) &refractMany);
-        auto IV = py::bind_vector<std::vector<jtrace::Intersection>>(m, "IntersectionVector");
+        auto IV = py::bind_vector<std::vector<jtrace::Intersection>>(m, "IntersectionVector", py::buffer_protocol());
         IV.def_property_readonly(
             "t",
             [](std::vector<jtrace::Intersection>& isecs) {
