@@ -45,9 +45,11 @@ namespace jtrace {
             .def(py::self == py::self)
             .def(py::self != py::self)
             .def("phase", &Ray::phase)
-            .def("amplitude", &Ray::amplitude);
+            .def("amplitude", &Ray::amplitude)
+            .def("propagatedToTime", &Ray::propagatedToTime);
         m.def("amplitudeMany", &amplitudeMany);
         m.def("phaseMany", &phaseMany);
+        m.def("propagatedToTimesMany", &propagatedToTimesMany);
 
         auto RV = py::bind_vector<std::vector<jtrace::Ray>>(m, "RayVector", py::buffer_protocol());
         // This feels a little hacky, but seems to work.

@@ -1,4 +1,5 @@
 #include "ray.h"
+#include "utils.h"
 #include <cmath>
 #include <algorithm>
 
@@ -32,6 +33,10 @@ namespace jtrace {
         return p0+v*(t-t0);
     }
 
+    Ray Ray::propagatedToTime(const double t) const {
+        return Ray(positionAtTime(t), v, t, wavelength, isVignetted);
+    }
+
     bool Ray::operator==(const Ray& other) const {
         return (p0 == other.p0) &&
                (v == other.v) &&
@@ -53,25 +58,32 @@ namespace jtrace {
     }
 
     std::vector<double> phaseMany(const std::vector<Ray>& rays, const Vec3& r, double t) {
-        auto result = std::vector<double>();
-        result.reserve(rays.size());
-        std::transform(
-            rays.cbegin(), rays.cend(), std::back_inserter(result),
+        auto result = std::vector<double>(rays.size());
+        parallelTransform(rays.cbegin(), rays.cend(), result.begin(),
             [=](const Ray& ray)
-                { return ray.phase(r, t); }
+                { return ray.phase(r, t); },
+            2000
         );
         return result;
     }
 
     std::vector<std::complex<double>> amplitudeMany(const std::vector<Ray>& rays, const Vec3& r, double t) {
-        auto result = std::vector<std::complex<double>>();
-        result.reserve(rays.size());
-        std::transform(
-            rays.cbegin(), rays.cend(), std::back_inserter(result),
+        auto result = std::vector<std::complex<double>>(rays.size());
+        parallelTransform(rays.cbegin(), rays.cend(), result.begin(),
             [=](const Ray& ray)
-                { return ray.amplitude(r, t); }
+                { return ray.amplitude(r, t); },
+            2000
         );
         return result;
     }
 
+    std::vector<Ray> propagatedToTimesMany(const std::vector<Ray>& rays, const std::vector<double>& ts) {
+        auto result = std::vector<Ray>(rays.size());
+        parallelTransform(rays.cbegin(), rays.cend(), ts.cbegin(), result.begin(),
+            [](const Ray& ray, double t)
+                { return ray.propagatedToTime(t); },
+            2000
+        );
+        return result;
+    }
 }

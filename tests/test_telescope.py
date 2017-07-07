@@ -22,14 +22,11 @@ def test_telescope():
         fn = os.path.join(jtrace.datadir, "lsst", "LSST_{}.yaml".format(f))
         telescope = jtrace.Telescope.makeFromYAML(fn)
         t0 = time.time()
-        rays_fast, isecs_fast = telescope.trace(rays)
+        rays_fast = telescope.trace(rays)
         t1 = time.time()
-        rays_slow, isecs_slow = zip(*[telescope.trace(r) for r in rays])
-        rays_slow = jtrace.RayVector(rays_slow)
-        isecs_slow = jtrace.IntersectionVector(isecs_slow)
+        rays_slow = jtrace.RayVector([telescope.trace(r) for r in rays])
         t2 = time.time()
         assert rays_fast == rays_slow
-        assert isecs_fast == isecs_slow
         t_fast += t1 - t0
         t_slow += t2 - t1
     print("Fast trace: {:5.3f} s".format(t_fast))
