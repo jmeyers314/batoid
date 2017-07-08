@@ -98,8 +98,8 @@ namespace jtrace {
 
           Notes
           -----
-          The dot product is defined as the component-wise sum of products of two vectors.  It is
-          useful for computing the magnitude of a vector, or the angle between two vectors as
+          The dot product is defined as the sum of the component-wise products of two vectors.  It
+          is useful for computing the magnitude of a vector, or the angle between two vectors as
 
           .. math::
             v1 \dot v2 = \cos(\theta)
@@ -117,6 +117,7 @@ namespace jtrace {
           >>> assert jtrace.DotProduct(v1, v2) == v1.x*v2.x + v1.y*v2.y + v1.z*v2.z
 
         )pbdoc");
+
         m.def("CrossProduct", &CrossProduct, R"pbdoc(
           Compute the cross-product of two Vec3 objects.
 
