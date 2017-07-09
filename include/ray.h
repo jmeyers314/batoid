@@ -29,12 +29,6 @@ namespace jtrace {
         Ray propagatedToTime(double t) const;
         bool operator==(const Ray&) const;
         bool operator!=(const Ray&) const;
-        double getX0() const { return p0.x; }
-        double getY0() const { return p0.y; }
-        double getZ0() const { return p0.z; }
-        double getVx() const { return v.x; }
-        double getVy() const { return v.y; }
-        double getVz() const { return v.z; }
 
         void setFail() { failed=true; }
         void clearFail() { failed=false; }

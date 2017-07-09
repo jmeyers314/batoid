@@ -21,14 +21,6 @@ namespace jtrace {
         bool isVignetted;
         bool failed;
 
-        double getX0() const { return point.x; }
-        double getY0() const { return point.y; }
-        double getZ0() const { return point.z; }
-
-        double getNx() const { return surfaceNormal.x; }
-        double getNy() const { return surfaceNormal.y; }
-        double getNz() const { return surfaceNormal.z; }
-
         void setFail() { failed=true; }
         void clearFail() { failed=false; }
 
