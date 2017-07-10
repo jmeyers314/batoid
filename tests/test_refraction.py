@@ -80,7 +80,7 @@ def test_plane_refraction_reversal():
 def test_paraboloid_refraction_plane():
     import random
     random.seed(577)
-    para = jtrace.Paraboloid(-0.1, 10)
+    para = jtrace.Paraboloid(-20.0, 10)
     n1 = 1.11
     n2 = 1.32
     for i in range(1000):
@@ -114,7 +114,7 @@ def test_paraboloid_refraction_plane():
 def test_paraboloid_refraction_reversal():
     import random
     random.seed(5772)
-    para = jtrace.Paraboloid(-0.1, 10)
+    para = jtrace.Paraboloid(-20.0, 10)
     n1 = 1.43
     n2 = 1.34
     for i in range(1000):

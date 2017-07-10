@@ -96,7 +96,7 @@ def test_paraboloid_reflection_plane():
 def test_paraboloid_reflection_reversal():
     import random
     random.seed(5772)
-    para = jtrace.Paraboloid(-0.1, 10)
+    para = jtrace.Paraboloid(-5.0, 10)
     for i in range(1000):
         x = random.gauss(0, 1)
         y = random.gauss(0, 1)
@@ -132,22 +132,22 @@ def test_paraboloid_reflection_to_focus():
     import random
     random.seed(57721)
     for i in range(100):
-        A = random.gauss(0, 1)
-        para = jtrace.Paraboloid(A, 0)  # z = A(x^2 + y^2)
+        R = random.gauss(0, 3.0)
+        para = jtrace.Paraboloid(R, 0)
         for j in range(100):
             x = random.gauss(0, 1)
             y = random.gauss(0, 1)
             ray = jtrace.Ray(x,y,-1000, 0,0,1, 0)
             isec = para.intersect(ray)
             rray = isec.reflectedRay(ray)
-            # Now see if rray goes through (0,0,1/(4*A))
+            # Now see if rray goes through (0,0,R/2)
             # Solve the x equation: 0 = rray.p0.x + rray.v.x*(t-t0) for t:
             # t = t0 - p0.x/vx
             t = rray.t0 - rray.p0.x/rray.v.x
             focus = rray.positionAtTime(t)
             assert isclose(focus.x, 0, abs_tol=1e-12)
             assert isclose(focus.y, 0, abs_tol=1e-12)
-            assert isclose(focus.z, 1.0/(4*A), abs_tol=1e-12)
+            assert isclose(focus.z, R/2.0, abs_tol=1e-12)
 
 
 @timer

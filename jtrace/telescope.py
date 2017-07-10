@@ -71,6 +71,12 @@ class Telescope(object):
                         sdata['zvertex'],
                         Rin=sdata['inner'],
                         Rout=sdata['outer'])
+                elif sagtype == 'paraboloid':
+                    sdict['surface']=jtrace.Paraboloid(
+                        sdata['R'],
+                        sdata['zvertex'],
+                        Rin=sdata['inner'],
+                        Rout=sdata['outer'])
                 elif sagtype == 'quadric':
                     sdict['surface'] = jtrace.Quadric(
                         sdata['R'],

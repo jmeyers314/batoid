@@ -7,10 +7,10 @@ def test_properties():
     import random
     random.seed(5)
     for i in range(100):
-        A = random.gauss(0.7, 0.8)
+        R = random.gauss(0.7, 0.8)
         B = random.gauss(0.8, 1.2)
-        para = jtrace.Paraboloid(A, B)
-        assert para.A == A
+        para = jtrace.Paraboloid(R, B)
+        assert para.R == R
         assert para.B == B
 
 
@@ -19,13 +19,13 @@ def test_call():
     import random
     random.seed(57)
     for i in range(100):
-        A = random.gauss(0.2, 0.3)
+        R = random.gauss(0.2, 0.3)
         B = random.gauss(0.4, 0.2)
-        para = jtrace.Paraboloid(A, B)
+        para = jtrace.Paraboloid(R, B)
         for j in range(10):
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
-            assert isclose(para.sag(x, y), A*(x*x + y*y)+B)
+            assert isclose(para.sag(x, y), (x*x + y*y)/2/R+B)
 
 
 @timer
@@ -33,9 +33,9 @@ def test_intersect():
     import random
     random.seed(577)
     for i in range(100):
-        A = random.gauss(0.05, 0.01)
+        R = random.gauss(10.0, 0.1)
         B = random.gauss(0.4, 0.2)
-        para = jtrace.Paraboloid(A, B)
+        para = jtrace.Paraboloid(R, B)
         for j in range(10):
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
@@ -58,7 +58,7 @@ def test_intersect():
             r = jtrace.Ray(jtrace.Vec3(x, y, -10), v, 0)
             isec = para.intersect(r)
             p1 = r.positionAtTime(isec.t)
-            p2 = isec.point
+            p2 = isec.point            
             assert isclose(p1.x, p2.x)
             assert isclose(p1.y, p2.y)
             assert isclose(p1.z, p2.z)
@@ -80,9 +80,9 @@ def test_intersect_vectorized():
     rays = jtrace.RayVector(rays)
 
     for i in range(100):
-        A = random.gauss(0.05, 0.01)
+        R = random.gauss(0.05, 0.01)
         B = random.gauss(0.4, 0.2)
-        para = jtrace.Paraboloid(A, B)
+        para = jtrace.Paraboloid(R, B)
         intersections = para.intersect(rays)
         intersections2 = [para.intersect(ray) for ray in rays]
         intersections2 = jtrace.IntersectionVector(intersections2)

@@ -12,19 +12,19 @@ namespace jtrace {
 
     class Paraboloid : public Surface {
     public:
-        Paraboloid(double _A, double _B,
+        Paraboloid(double _R, double _B,
                    double _Rin=0.0, double _Rout=std::numeric_limits<double>::infinity());
         virtual double sag(double, double) const;
         virtual Vec3 normal(double, double) const;
         using Surface::intersect;
         virtual Intersection intersect(const Ray&) const;
-        double getA() const {return A;}
+        double getR() const {return R;}
         double getB() const {return B;}
 
         std::string repr() const;
 
     private:
-        const double A, B;
+        const double R, B;
         const double Rin, Rout;
     };
 

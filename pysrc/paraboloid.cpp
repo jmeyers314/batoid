@@ -14,9 +14,9 @@ namespace jtrace {
     void pyExportParaboloid(py::module& m) {
         py::class_<Paraboloid, std::shared_ptr<Paraboloid>, Surface>(m, "Paraboloid")
             .def(py::init<double,double,double,double>(), "init",
-                 "A"_a, "B"_a,
+                 "R"_a, "B"_a,
                  "Rin"_a=0.0, "Rout"_a=std::numeric_limits<double>::infinity())
-            .def_property_readonly("A", &Paraboloid::getA)
+            .def_property_readonly("R", &Paraboloid::getR)
             .def_property_readonly("B", &Paraboloid::getB)
             .def("sag", &Paraboloid::sag)
             .def("normal", &Paraboloid::normal)
