@@ -10,15 +10,16 @@ matrix:
       addons:
         apt:
           sources: [ubuntu-toolchain-r-test, kubuntu-backports]
-          packages: [g++-4.8, cmake]
+          packages: [g++-4.8, cmake, lcov]
     - os: linux
       env: PYTHON=3.5 CPP=11 GCC=4.8
       addons:
         apt:
           sources: [ubuntu-toolchain-r-test, kubuntu-backports, deadsnakes]
-          packages: [g++-4.8, cmake, python3.5-dev]
+          packages: [g++-4.8, cmake, python3.5-dev, lcov]
 before_install:
   - export CPP=-std=c++$CPP
+  - export CFLAGS=-coverage
   - export CXX=g++-$GCC CC=gcc-$GCC
   - pip install --user --upgrade pip virtualenv
   - virtualenv -p python$PYTHON venv
@@ -33,3 +34,10 @@ install:
   python setup.py install
 script:
   pytest tests/test_*.py
+after_success:
+  - "ls -rtlha build/*/src/*.gc*"
+  - cp build/*/src/*.gc* src/
+#  - cp build/*/pysrc/*.gc* pysrc/
+  - gcov-4.8 -o src/ src/*.cpp
+# - gcov-4.8 -o src/ src/*.cpp -o pysrc/ pysrc/*.cpp
+  - bash <(curl -s https://codecov.io/bash)
