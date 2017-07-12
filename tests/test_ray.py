@@ -150,6 +150,10 @@ def test_RayVector():
     np.testing.assert_equal(rayVector.wavelength, np.array([r.wavelength for r in rayVector]))
     np.testing.assert_equal(rayVector.isVignetted, np.array([r.isVignetted for r in rayVector]))
     np.testing.assert_equal(rayVector.failed, np.array([r.failed for r in rayVector]))
+    np.testing.assert_equal(jtrace._jtrace.phaseMany(rayVector, jtrace.Vec3(1, 2, 3), 4.0),
+                            np.array([r.phase(jtrace.Vec3(1, 2, 3), 4.0) for r in rayVector]))
+    np.testing.assert_equal(jtrace._jtrace.amplitudeMany(rayVector, jtrace.Vec3(1, 2, 3), 4.0),
+                            np.array([r.amplitude(jtrace.Vec3(1, 2, 3), 4.0) for r in rayVector]))
 
 
 if __name__ == '__main__':
