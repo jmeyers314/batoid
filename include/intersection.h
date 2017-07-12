@@ -25,12 +25,8 @@ namespace jtrace {
         void clearFail() { failed=false; }
 
         Ray reflectedRay(const Ray&) const;
-        std::vector<Ray> reflectedRay(const std::vector<Ray>&) const;
-
         Ray refractedRay(const Ray&, double n1, double n2) const;
-        std::vector<Ray> refractedRay(const std::vector<Ray>&, double n1, double n2) const;
         Ray refractedRay(const Ray&, const Medium& m1, const Medium& m2) const;
-        std::vector<Ray> refractedRay(const std::vector<Ray>&, const Medium& m1, const Medium& m2) const;
         std::string repr() const;
     };
 

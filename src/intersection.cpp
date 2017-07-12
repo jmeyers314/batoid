@@ -24,21 +24,6 @@ namespace jtrace {
         return Ray(point, (nv - 2*c1*surfaceNormal).UnitVec3()/n, t, r.wavelength, r.isVignetted || isVignetted);
     }
 
-    // Reflect lots of rays at single intersection
-    std::vector<Ray> Intersection::reflectedRay(const std::vector<Ray>& rays) const {
-        auto result = std::vector<Ray>();
-        result.reserve(rays.size());
-        if (failed) {
-            result.assign(rays.size(), Ray(true));
-            return result;
-        }
-        std::transform(rays.cbegin(), rays.cend(), std::back_inserter(result),
-            [this](const Ray& ray)
-                { return reflectedRay(ray); }
-        );
-        return result;
-    }
-
     Ray Intersection::refractedRay(const Ray& r, double n1, double n2) const {
         if (failed || r.failed)
             return Ray(true);
@@ -58,40 +43,12 @@ namespace jtrace {
             return Ray(point, f2/n2, t, r.wavelength, r.isVignetted || isVignetted);
     }
 
-    std::vector<Ray> Intersection::refractedRay(const std::vector<Ray>& rays, double n1, double n2) const {
-        auto result = std::vector<Ray>();
-        result.reserve(rays.size());
-        if (failed) {
-            result.assign(rays.size(), Ray(true));
-            return result;
-        }
-        std::transform(rays.cbegin(), rays.cend(), std::back_inserter(result),
-            [this,n1,n2](const Ray& ray)
-                { return refractedRay(ray, n1, n2); }
-        );
-        return result;
-    }
-
     Ray Intersection::refractedRay(const Ray& r, const Medium& m1, const Medium& m2) const {
         if (failed || r.failed)
             return Ray(true);
         double n1 = m1.getN(r.wavelength);
         double n2 = m2.getN(r.wavelength);
         return refractedRay(r, n1, n2);
-    }
-
-    std::vector<Ray> Intersection::refractedRay(const std::vector<Ray>& rays, const Medium& m1, const Medium& m2) const {
-        auto result = std::vector<Ray>();
-        result.reserve(rays.size());
-        if (failed) {
-            result.assign(rays.size(), Ray(true));
-            return result;
-        }
-        std::transform(rays.cbegin(), rays.cend(), std::back_inserter(result),
-            [this,&m1,&m2](const Ray& ray)
-                { return refractedRay(ray, m1, m2); }
-        );
-        return result;
     }
 
     std::string Intersection::repr() const {
