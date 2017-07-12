@@ -15,7 +15,7 @@ def test_properties():
 
 
 @timer
-def test_call():
+def test_sag():
     import random
     random.seed(57)
     for i in range(100):
@@ -58,7 +58,7 @@ def test_intersect():
             r = jtrace.Ray(jtrace.Vec3(x, y, -10), v, 0)
             isec = para.intersect(r)
             p1 = r.positionAtTime(isec.t)
-            p2 = isec.point            
+            p2 = isec.point
             assert isclose(p1.x, p2.x)
             assert isclose(p1.y, p2.y)
             assert isclose(p1.z, p2.z)
@@ -91,6 +91,6 @@ def test_intersect_vectorized():
 
 if __name__ == '__main__':
     test_properties()
-    test_call()
+    test_sag()
     test_intersect()
     test_intersect_vectorized()

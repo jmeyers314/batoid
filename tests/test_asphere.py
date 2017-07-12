@@ -32,7 +32,7 @@ def py_asphere(R, kappa, alpha, B):
 
 
 @timer
-def test_call():
+def test_sag():
     import random
     random.seed(57)
     for i in range(100):
@@ -146,7 +146,7 @@ def test_quad_plus_poly():
 
 if __name__ == '__main__':
     test_properties()
-    test_call()
+    test_sag()
     test_intersect()
     test_intersect_vectorized()
     test_quad_plus_poly()
