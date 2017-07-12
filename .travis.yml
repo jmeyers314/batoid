@@ -25,15 +25,15 @@ before_install:
   - virtualenv -p python$PYTHON venv
   - source venv/bin/activate
   - pip install -r requirements.txt
-  - pip install pytest
+  - pip install pytest-cov
 cache:
   directories:
     - $HOME/.cache/pip
     - $HOME/Library/Caches/pip
 install:
-  python setup.py install
+  python setup.py develop
 script:
-  pytest tests/test_*.py
+  pytest --cov=jtrace --cov-report=xml
 after_success:
   - "ls -rtlha build/*/src/*.gc*"
   - cp build/*/src/*.gc* src/
