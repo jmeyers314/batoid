@@ -189,7 +189,47 @@ def test_hsc_psf():
             plt.show()
 
 
+@timer
+def test_decam_psf():
+    # Just testing that doesn't crash for the moment
+    fn = os.path.join(jtrace.datadir, "decam", "DECam.yaml")
+    telescope = jtrace.Telescope.makeFromYAML(fn)
+
+    if __name__ == '__main__':
+        thetas = [0.0, 1800.0, 3960.0] # arcsec
+    else:
+        thetas = [3960.0]
+    for theta in thetas:
+        print(theta/3600.0)
+        rays = jtrace.parallelRays(10, 4.1, 0.75, theta_y=theta/206265, nradii=30, naz=200,
+                                   wavelength=760e-9, medium=jtrace.Air())
+        traced_rays = telescope.trace(rays)
+        traced_rays = jtrace.RayVector([r for r in traced_rays if not r.isVignetted])
+
+        nx = 64
+        xs = np.linspace(-27.1e-6, 27.1e-6, nx)
+        ys = np.linspace(-27.1e-6, 27.1e-6, nx)
+        xs += np.mean(traced_rays.x)
+        ys += np.mean(traced_rays.y)
+        xs, ys = np.meshgrid(xs, ys)
+
+        psf = telescope.huygensPSF(xs=xs, ys=ys, rays=rays)
+
+        if __name__ == '__main__':
+            import matplotlib.pyplot as plt
+            fig = plt.figure(figsize=(12, 8))
+            ax = fig.add_subplot(111)
+            ax.imshow(psf, extent=np.r_[xs.min(), xs.max(), ys.min(), ys.max()]*1e6)
+            ax.scatter(traced_rays.x*1e6, traced_rays.y*1e6, s=1, c='r')
+            ax.set_xlim(xs.min()*1e6, xs.max()*1e6)
+            ax.set_ylim(ys.min()*1e6, ys.max()*1e6)
+
+            fig.tight_layout()
+            plt.show()
+
+
 if __name__ == '__main__':
     test_huygens_psf()
     test_lsst_psf()
     test_hsc_psf()
+    test_decam_psf()
