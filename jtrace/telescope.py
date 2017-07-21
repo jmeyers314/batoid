@@ -40,7 +40,13 @@ def media_catalog(media_str):
     else:
         raise RuntimeError("Unknown medium {}".format(media_str))
 
+
 class Telescope(object):
+    def __init__(self, surfaceList):
+        self.surfaces = OrderedDict()
+        for surface in surfaceList:
+            self.surfaces[surface['name']] = surface
+
     @classmethod
     def makeFromYAML(cls, infn):
         out = cls.__new__(cls)
@@ -162,6 +168,34 @@ class Telescope(object):
                 data['outrays'] = rays
                 out.append(data)
             return out
+
+    def huygensPSF(self, xs, ys, zs=None, rays=None, wavelength=None, theta_x=0, theta_y=0, nradii=5, naz=50):
+        surfaceList = list(self.surfaces.values())
+        if rays is None:
+            # Generate some rays based on the first optic.
+            s0 = surfaceList[0]
+            rays = jtrace.parallelRays(
+                z=10, outer=s0['outer'], inner=s0['inner'],
+                theta_x=theta_x, theta_y=theta_y,
+                nradii=nradii, naz=naz,
+                wavelength=wavelength, medium=s0['m0']
+            )
+        rays = self.trace(rays)
+        rays = jtrace.RayVector([r for r in rays if not r.isVignetted])
+        if zs is None:
+            zs = np.empty(xs.shape, dtype=np.float64)
+            zs.fill(surfaceList[-1]['surface'].B)
+        points = np.concatenate([aux[..., None] for aux in (xs, ys, zs)], axis=-1)
+        time = rays[0].t0  # Doesn't actually matter, but use something close to intercept time
+        amplitudes = np.empty(xs.shape, dtype=np.complex128)
+        for (i, j) in np.ndindex(xs.shape):
+            amplitudes[i, j] = np.sum(jtrace._jtrace.amplitudeMany(
+                rays,
+                jtrace.Vec3(*points[i, j]),
+                time
+            )
+        )
+        return np.abs(amplitudes)**2
 
     def clone(self):
         cls = self.__class__

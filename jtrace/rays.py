@@ -28,7 +28,17 @@ def parallelRays(z, outer, inner=0, theta_x=0, theta_y=0, nradii=50, naz=64,
     """
     radii = np.linspace(inner, outer, nradii)
     rays = jtrace.RayVector()
-    n = medium.getN(wavelength)
+    try:
+        n = medium.getN(wavelength)
+    except AttributeError:
+        n = medium
+
+    # Make a centered ray that can be used to define initial plane wave.
+    r0 = jtrace.Ray(jtrace.Vec3(0, 0, 0),
+                    jtrace.Vec3(-np.tan(theta_x), -np.tan(theta_y), -1),
+                    t=z*n)
+    p00 = r0.positionAtTime(0)
+    start_plane = jtrace.Plane(p00.z).rotX(-theta_y).rotY(theta_x)
 
     for r in radii:
         phis = np.linspace(0, 2*np.pi, int(naz*r/outer), endpoint=False)
@@ -37,6 +47,6 @@ def parallelRays(z, outer, inner=0, theta_x=0, theta_y=0, nradii=50, naz=64,
             v = jtrace.Vec3(-np.tan(theta_x), -np.tan(theta_y), -1)
             v *= 1./(n*v.Magnitude())
             r0 = jtrace.Ray(p0, v, t=z*n)
-            p1 = r0.positionAtTime(0)
-            rays.append(jtrace.Ray(p1, v, t=0, w=wavelength))
+            isec = start_plane.intersect(r0)
+            rays.append(jtrace.Ray(isec.point, r0.v, t=0, w=wavelength))
     return rays
