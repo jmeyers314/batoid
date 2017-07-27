@@ -197,6 +197,54 @@ class Telescope(object):
         )
         return np.abs(amplitudes)**2
 
+    def exit_pupil_z(self, wavelength, theta=10./206265):
+        # Trace a parabasal ray, i.e., a ray that goes through the center of the entrance pupil at a
+        # small angle, and see where it intersects the optic axis again.  We're assuming here both
+        # that the entrance pupil is coincident with the first surface (which is reasonable for most
+        # telescopes), and that the optics are centered.
+        point = jtrace.Vec3(0, 0, 0)
+        th = 10./206265
+        v = jtrace.Vec3(0.0, np.sin(theta), -np.cos(theta))
+        m0 = list(self.surfaces.values())[0]['m0']
+        v /= m0.getN(wavelength)
+        r = jtrace.Ray(point, v, t=0, w=wavelength)
+        # rewind a bit so we can find an intersection
+        r = r.propagatedToTime(-1)
+        r = self.trace(r)
+        t = -r.y0/r.vy + r.t0
+        XP = r.positionAtTime(t).z
+        return XP
+
+    def _reference_sphere(self, point, wavelength, theta=10./206265):
+        XP = self.exit_pupil_z(wavelength, theta)
+        ref_sphere_radius = XP - point.z
+        return (jtrace.Sphere(-ref_sphere_radius, point.z+ref_sphere_radius)
+                .shift(point.x, point.y, 0.0))
+
+    def wavefront(self, theta_x, theta_y, wavelength, rays=None, nx=32):
+        if rays is None:
+            EP_size = list(self.surfaces.values())[0]['outer']
+            m0 = list(self.surfaces.values())[0]['m0']
+            rays = jtrace.rayGrid(
+                    10, 2*EP_size,
+                    theta_x=theta_x, theta_y=theta_y,
+                    wavelength=wavelength, medium=m0, nx=nx)
+        outrays = self.trace(rays)
+        w = np.logical_not(outrays.isVignetted)
+        point = jtrace.Vec3(np.mean(outrays.x[w]), np.mean(outrays.y[w]), np.mean(outrays.z[w]))
+        ref_sphere = self._reference_sphere(point, wavelength)
+        isecs = ref_sphere.intersect(outrays)
+        wf = (isecs.t-np.mean(isecs.t[w]))/wavelength
+        wf = np.ma.masked_array(wf, mask=outrays.isVignetted)
+        return wf
+
+    def fftPSF(self, theta_x, theta_y, wavelength, nx=32):
+        wf = self.wavefront(theta_x, theta_y, wavelength, nx=nx).reshape(nx, nx)
+        expwf = np.zeros((2*nx, 2*nx), dtype=np.complex128)
+        expwf[nx//2:-nx//2, nx//2:-nx//2][~wf.mask] = np.exp(2j*np.pi*wf[~wf.mask])
+        psf = np.abs(np.fft.fftshift(np.fft.fft2(np.fft.fftshift(expwf))))**2
+        return psf
+
     def clone(self):
         cls = self.__class__
         out = cls.__new__(cls)
