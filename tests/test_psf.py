@@ -86,25 +86,34 @@ def test_huygens_psf():
 
         if __name__ == '__main__':
             import matplotlib.pyplot as plt
-            fig = plt.figure(figsize=(15, 8))
+            fig = plt.figure(figsize=(15, 4))
             ax1 = fig.add_subplot(131)
-            ax1.imshow(np.log10(arr), extent=[-size/2, size/2, -size/2, size/2], vmin=-7, vmax=-1)
+            im1 = ax1.imshow(np.log10(arr), extent=[-size/2, size/2, -size/2, size/2], vmin=-7, vmax=-1)
+            plt.colorbar(im1, ax=ax1)
             ax1.set_title('GalSim')
+            ax1.set_xlabel("arcsec")
+            ax1.set_ylabel("arcsec")
 
             xs *= 1e6 # m -> micron
             ys *= 1e6
             rayx = traced_rays.x*1e6
             rayy = traced_rays.y*1e6
             ax2 = fig.add_subplot(132)
-            ax2.imshow(np.log10(psf), extent=[xs.min(), xs.max(), ys.min(), ys.max()], vmin=-7, vmax=-1)
+            im2 = ax2.imshow(np.log10(psf), extent=[xs.min(), xs.max(), ys.min(), ys.max()], vmin=-7, vmax=-1)
+            plt.colorbar(im2, ax=ax2)
             ax2.scatter(rayx, rayy, s=1, c='r')
             ax2.set_xlim(xs.min(), xs.max())
             ax2.set_ylim(ys.min(), ys.max())
             ax2.set_title('jtrace')
+            ax2.set_xlabel("$\mu m$")
+            ax2.set_ylabel("$\mu m$")
 
             ax3 = fig.add_subplot(133)
-            ax3.imshow((psf-arr)/arr, vmin=-0.1, vmax=0.1)
+            im3 = ax3.imshow((psf-arr)/arr, vmin=-0.1, vmax=0.1)
+            plt.colorbar(im3, ax=ax3)
             ax3.set_title('resid')
+            ax3.set_xlabel("$\mu m$")
+            ax3.set_ylabel("$\mu m$")
 
             fig.tight_layout()
 
@@ -145,6 +154,9 @@ def test_lsst_psf():
             ax.scatter(traced_rays.x*1e6, traced_rays.y*1e6, s=1, c='r')
             ax.set_xlim(xs.min()*1e6, xs.max()*1e6)
             ax.set_ylim(ys.min()*1e6, ys.max()*1e6)
+            ax.set_title("LSST PSF field={:5.2f}".format(theta/3600.0))
+            ax.set_xlabel("$\mu m$")
+            ax.set_ylabel("$\mu m$")
 
             fig.tight_layout()
             plt.show()
@@ -184,6 +196,9 @@ def test_hsc_psf():
             ax.scatter(traced_rays.x*1e6, traced_rays.y*1e6, s=1, c='r')
             ax.set_xlim(xs.min()*1e6, xs.max()*1e6)
             ax.set_ylim(ys.min()*1e6, ys.max()*1e6)
+            ax.set_title("HSC PSF field={:5.2f}".format(theta/3600.0))
+            ax.set_xlabel("$\mu m$")
+            ax.set_ylabel("$\mu m$")
 
             fig.tight_layout()
             plt.show()
@@ -223,6 +238,9 @@ def test_decam_psf():
             ax.scatter(traced_rays.x*1e6, traced_rays.y*1e6, s=1, c='r')
             ax.set_xlim(xs.min()*1e6, xs.max()*1e6)
             ax.set_ylim(ys.min()*1e6, ys.max()*1e6)
+            ax.set_title("DECam PSF field={:5.2f}".format(theta/3600.0))
+            ax.set_xlabel("$\mu m$")
+            ax.set_ylabel("$\mu m$")
 
             fig.tight_layout()
             plt.show()
