@@ -1,5 +1,5 @@
-#ifndef jtrace_quadric_h
-#define jtrace_quadric_h
+#ifndef batoid_quadric_h
+#define batoid_quadric_h
 
 #include <sstream>
 #include <limits>
@@ -8,7 +8,7 @@
 #include "ray.h"
 #include "vec3.h"
 
-namespace jtrace {
+namespace batoid {
 
     class Quadric : public Surface {
     public:

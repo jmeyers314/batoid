@@ -1,13 +1,13 @@
 import numpy as np
 from collections import OrderedDict
 import numbers
-import jtrace
+import batoid
 from .utils import ordered_load
 
 
 def media_catalog(media_str):
-    # This works for LSST, together with jtrace.Air()
-    silica = jtrace.SellmeierMedium(
+    # This works for LSST, together with batoid.Air()
+    silica = batoid.SellmeierMedium(
         0.6961663, 0.4079426, 0.8974794,
         0.0684043**2, 0.1162414**2, 9.896161**2)
 
@@ -18,19 +18,19 @@ def media_catalog(media_str):
     bsl7y_n = [1.53123287, 1.51671428, 1.51225242, 1.50939738, 1.50653251]
     pbl1y_n = [1.57046066, 1.54784671, 1.54157395, 1.53789058, 1.53457169]
 
-    hsc_silica = jtrace.TableMedium(
-        jtrace.Table(w, silica_n, jtrace.Table.Interpolant.linear))
-    hsc_bsl7y = jtrace.TableMedium(
-        jtrace.Table(w, bsl7y_n, jtrace.Table.Interpolant.linear))
-    hsc_pbl1y = jtrace.TableMedium(
-        jtrace.Table(w, pbl1y_n, jtrace.Table.Interpolant.linear))
+    hsc_silica = batoid.TableMedium(
+        batoid.Table(w, silica_n, batoid.Table.Interpolant.linear))
+    hsc_bsl7y = batoid.TableMedium(
+        batoid.Table(w, bsl7y_n, batoid.Table.Interpolant.linear))
+    hsc_pbl1y = batoid.TableMedium(
+        batoid.Table(w, pbl1y_n, batoid.Table.Interpolant.linear))
 
     if media_str == 'air':
-        return jtrace.Air()
+        return batoid.Air()
     elif media_str == 'silica':
         return silica
     elif media_str == 'hsc_air':
-        return jtrace.ConstMedium(1.0)
+        return batoid.ConstMedium(1.0)
     elif media_str == 'hsc_silica':
         return hsc_silica
     elif media_str == 'hsc_bsl7y':
@@ -67,31 +67,31 @@ class Telescope(object):
                     m1=m1)
                 sagtype = sdata['sagtype']
                 if sagtype == 'plane':
-                    sdict['surface'] = jtrace.Plane(
+                    sdict['surface'] = batoid.Plane(
                         sdata['zvertex'],
                         Rin=sdata['inner'],
                         Rout=sdata['outer'])
                 elif sagtype == 'sphere':
-                    sdict['surface'] = jtrace.Sphere(
+                    sdict['surface'] = batoid.Sphere(
                         sdata['R'],
                         sdata['zvertex'],
                         Rin=sdata['inner'],
                         Rout=sdata['outer'])
                 elif sagtype == 'paraboloid':
-                    sdict['surface']=jtrace.Paraboloid(
+                    sdict['surface']=batoid.Paraboloid(
                         sdata['R'],
                         sdata['zvertex'],
                         Rin=sdata['inner'],
                         Rout=sdata['outer'])
                 elif sagtype == 'quadric':
-                    sdict['surface'] = jtrace.Quadric(
+                    sdict['surface'] = batoid.Quadric(
                         sdata['R'],
                         sdata['conic'],
                         sdata['zvertex'],
                         Rin=sdata['inner'],
                         Rout=sdata['outer'])
                 elif sagtype == 'asphere':
-                    sdict['surface']=jtrace.Asphere(
+                    sdict['surface']=batoid.Asphere(
                         sdata['R'],
                         sdata['conic'],
                         sdata['coef'],
@@ -107,7 +107,7 @@ class Telescope(object):
         return out
 
     def trace(self, r):
-        if isinstance(r, jtrace.Ray):
+        if isinstance(r, batoid.Ray):
             ray = r
             for name, surface in self.surfaces.items():
                 isec = surface['surface'].intersect(ray)
@@ -120,23 +120,23 @@ class Telescope(object):
                 else:
                     raise ValueError("Unknown optic type: {}".format(surface['type']))
             return ray
-        elif isinstance(r, jtrace.RayVector):
+        elif isinstance(r, batoid.RayVector):
             rays = r
             for name, surface in self.surfaces.items():
                 isecs = surface['surface'].intersect(rays)
                 if surface['type'] == 'mirror':
-                    rays = jtrace._jtrace.reflectMany(isecs, rays)
+                    rays = batoid._batoid.reflectMany(isecs, rays)
                 elif surface['type'] in ['lens', 'filter']:
-                    rays = jtrace._jtrace.refractMany(isecs, rays, surface['m0'], surface['m1'])
+                    rays = batoid._batoid.refractMany(isecs, rays, surface['m0'], surface['m1'])
                 elif surface['type'] == 'det':
-                    rays = jtrace._jtrace.propagatedToTimesMany(rays, isecs.t)
+                    rays = batoid._batoid.propagatedToTimesMany(rays, isecs.t)
                 else:
                     raise ValueError("Unknown optic type: {}".format(surface['type']))
             return rays
 
     def traceFull(self, r):
         out = []
-        if isinstance(r, jtrace.Ray):
+        if isinstance(r, batoid.Ray):
             ray = r
             for name, surface in self.surfaces.items():
                 isec = surface['surface'].intersect(ray)
@@ -158,11 +158,11 @@ class Telescope(object):
                 isecs = surface['surface'].intersect(rays)
                 data = {'name':name, 'inrays':rays}
                 if surface['type'] == 'mirror':
-                    rays = jtrace._jtrace.reflectMany(isecs, rays)
+                    rays = batoid._batoid.reflectMany(isecs, rays)
                 elif surface['type'] in ['lens', 'filter']:
-                    rays = jtrace._jtrace.refractMany(isecs, rays, surface['m0'], surface['m1'])
+                    rays = batoid._batoid.refractMany(isecs, rays, surface['m0'], surface['m1'])
                 elif surface['type'] == 'det':
-                    rays = jtrace._jtrace.propagatedToTimesMany(rays, isecs.t)
+                    rays = batoid._batoid.propagatedToTimesMany(rays, isecs.t)
                 else:
                     raise ValueError("Unknown optic type: {}".format(surface['type']))
                 data['outrays'] = rays
@@ -174,14 +174,14 @@ class Telescope(object):
         if rays is None:
             # Generate some rays based on the first optic.
             s0 = surfaceList[0]
-            rays = jtrace.parallelRays(
+            rays = batoid.parallelRays(
                 z=10, outer=s0['outer'], inner=s0['inner'],
                 theta_x=theta_x, theta_y=theta_y,
                 nradii=nradii, naz=naz,
                 wavelength=wavelength, medium=s0['m0']
             )
         rays = self.trace(rays)
-        rays = jtrace.RayVector([r for r in rays if not r.isVignetted])
+        rays = batoid.RayVector([r for r in rays if not r.isVignetted])
         if zs is None:
             zs = np.empty(xs.shape, dtype=np.float64)
             zs.fill(surfaceList[-1]['surface'].B)
@@ -189,9 +189,9 @@ class Telescope(object):
         time = rays[0].t0  # Doesn't actually matter, but use something close to intercept time
         amplitudes = np.empty(xs.shape, dtype=np.complex128)
         for (i, j) in np.ndindex(xs.shape):
-            amplitudes[i, j] = np.sum(jtrace._jtrace.amplitudeMany(
+            amplitudes[i, j] = np.sum(batoid._batoid.amplitudeMany(
                 rays,
-                jtrace.Vec3(*points[i, j]),
+                batoid.Vec3(*points[i, j]),
                 time
             )
         )
@@ -202,11 +202,11 @@ class Telescope(object):
         # small angle, and see where it intersects the optic axis again.  We're assuming here both
         # that the entrance pupil is coincident with the first surface (which is reasonable for most
         # telescopes), and that the optics are centered.
-        point = jtrace.Vec3(0, 0, 0)
-        v = jtrace.Vec3(0.0, np.sin(theta), -np.cos(theta))
+        point = batoid.Vec3(0, 0, 0)
+        v = batoid.Vec3(0.0, np.sin(theta), -np.cos(theta))
         m0 = list(self.surfaces.values())[0]['m0']
         v /= m0.getN(wavelength)
-        r = jtrace.Ray(point, v, t=0, w=wavelength)
+        r = batoid.Ray(point, v, t=0, w=wavelength)
         # rewind a bit so we can find an intersection
         r = r.propagatedToTime(-1)
         r = self.trace(r)
@@ -217,20 +217,20 @@ class Telescope(object):
     def _reference_sphere(self, point, wavelength, theta=10./206265):
         XP = self.exit_pupil_z(wavelength, theta)
         ref_sphere_radius = XP - point.z
-        return (jtrace.Sphere(-ref_sphere_radius, point.z+ref_sphere_radius)
+        return (batoid.Sphere(-ref_sphere_radius, point.z+ref_sphere_radius)
                 .shift(point.x, point.y, 0.0))
 
     def wavefront(self, theta_x, theta_y, wavelength, rays=None, nx=32):
         if rays is None:
             EP_size = list(self.surfaces.values())[0]['outer']
             m0 = list(self.surfaces.values())[0]['m0']
-            rays = jtrace.rayGrid(
+            rays = batoid.rayGrid(
                     10, 2*EP_size,
                     theta_x=theta_x, theta_y=theta_y,
                     wavelength=wavelength, medium=m0, nx=nx)
         outrays = self.trace(rays)
         w = np.logical_not(outrays.isVignetted)
-        point = jtrace.Vec3(np.mean(outrays.x[w]), np.mean(outrays.y[w]), np.mean(outrays.z[w]))
+        point = batoid.Vec3(np.mean(outrays.x[w]), np.mean(outrays.y[w]), np.mean(outrays.z[w]))
         ref_sphere = self._reference_sphere(point, wavelength)
         isecs = ref_sphere.intersect(outrays)
         wf = (isecs.t-np.mean(isecs.t[w]))/wavelength

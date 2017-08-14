@@ -33,7 +33,7 @@ cache:
 install:
   python setup.py develop
 script:
-  pytest --cov=jtrace --cov-report=xml
+  pytest --cov=batoid --cov-report=xml
 after_success:
   - "ls -rtlha build/*/src/*.gc*"
   - cp build/*/src/*.gc* src/

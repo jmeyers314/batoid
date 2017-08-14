@@ -1,7 +1,7 @@
 #include "transformation.h"
 #include "except.h"
 
-namespace jtrace {
+namespace batoid {
     Transformation::Transformation(std::shared_ptr<const Surface> s, double dx, double dy, double dz) :
         transformee(s), dr(Vec3(dx, dy, dz)), rot(ident_rot) {}
 

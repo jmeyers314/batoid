@@ -2,7 +2,7 @@
 #include "transformation.h"
 #include "utils.h"
 
-namespace jtrace {
+namespace batoid {
     Transformation Surface::shift(double dx, double dy, double dz) const {
         return Transformation(shared_from_this(), dx, dy, dz);
     }

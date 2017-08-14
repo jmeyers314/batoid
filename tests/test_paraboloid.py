@@ -1,4 +1,4 @@
-import jtrace
+import batoid
 from test_helpers import isclose, timer
 
 
@@ -9,7 +9,7 @@ def test_properties():
     for i in range(100):
         R = random.gauss(0.7, 0.8)
         B = random.gauss(0.8, 1.2)
-        para = jtrace.Paraboloid(R, B)
+        para = batoid.Paraboloid(R, B)
         assert para.R == R
         assert para.B == B
 
@@ -21,7 +21,7 @@ def test_sag():
     for i in range(100):
         R = random.gauss(0.2, 0.3)
         B = random.gauss(0.4, 0.2)
-        para = jtrace.Paraboloid(R, B)
+        para = batoid.Paraboloid(R, B)
         for j in range(10):
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
@@ -35,14 +35,14 @@ def test_intersect():
     for i in range(100):
         R = random.gauss(10.0, 0.1)
         B = random.gauss(0.4, 0.2)
-        para = jtrace.Paraboloid(R, B)
+        para = batoid.Paraboloid(R, B)
         for j in range(10):
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
 
             # If we shoot rays straight up, then it's easy to predict the
             # intersection points.
-            r = jtrace.Ray(x, y, -1000, 0, 0, 1, 0)
+            r = batoid.Ray(x, y, -1000, 0, 0, 1, 0)
             isec = para.intersect(r)
             assert isclose(isec.point.x, x)
             assert isclose(isec.point.y, y)
@@ -54,8 +54,8 @@ def test_intersect():
             vx = random.gauss(0.0, 0.1)
             vy = random.gauss(0.0, 0.1)
             vz = 1.0
-            v = jtrace.Vec3(vx, vy, vz).UnitVec3()
-            r = jtrace.Ray(jtrace.Vec3(x, y, -10), v, 0)
+            v = batoid.Vec3(vx, vy, vz).UnitVec3()
+            r = batoid.Ray(batoid.Vec3(x, y, -10), v, 0)
             isec = para.intersect(r)
             p1 = r.positionAtTime(isec.t)
             p2 = isec.point
@@ -69,7 +69,7 @@ def test_intersect():
 def test_intersect_vectorized():
     import random
     random.seed(5772)
-    rays = [jtrace.Ray([random.gauss(0.0, 0.1),
+    rays = [batoid.Ray([random.gauss(0.0, 0.1),
                         random.gauss(0.0, 0.1),
                         random.gauss(10.0, 0.1)],
                        [random.gauss(0.0, 0.1),
@@ -77,15 +77,15 @@ def test_intersect_vectorized():
                         random.gauss(-1.0, 0.1)],
                        random.gauss(0.0, 0.1))
             for i in range(1000)]
-    rays = jtrace.RayVector(rays)
+    rays = batoid.RayVector(rays)
 
     for i in range(100):
         R = random.gauss(0.05, 0.01)
         B = random.gauss(0.4, 0.2)
-        para = jtrace.Paraboloid(R, B)
+        para = batoid.Paraboloid(R, B)
         intersections = para.intersect(rays)
         intersections2 = [para.intersect(ray) for ray in rays]
-        intersections2 = jtrace.IntersectionVector(intersections2)
+        intersections2 = batoid.IntersectionVector(intersections2)
         assert intersections == intersections2
 
 

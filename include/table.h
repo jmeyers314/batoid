@@ -21,8 +21,8 @@
  */
 
 
-#ifndef jtrace_table_h
-#define jtrace_table_h
+#ifndef batoid_table_h
+#define batoid_table_h
 
 #include <vector>
 #include <algorithm>
@@ -32,7 +32,7 @@
 #include <iostream>
 #include <functional>
 
-namespace jtrace {
+namespace batoid {
 
     // All code between the @cond and @endcond is excluded from Doxygen documentation
     //! @cond

@@ -1,5 +1,5 @@
-#ifndef jtrace_surface_h
-#define jtrace_surface_h
+#ifndef batoid_surface_h
+#define batoid_surface_h
 
 #include <vector>
 #include <memory>
@@ -7,7 +7,7 @@
 #include "ray.h"
 #include "intersection.h"
 
-namespace jtrace {
+namespace batoid {
     struct Intersection;
     class Transformation;
     class Surface : public std::enable_shared_from_this<Surface> {

@@ -1,5 +1,5 @@
-#ifndef jtrace_transformation_h
-#define jtrace_transformation_h
+#ifndef batoid_transformation_h
+#define batoid_transformation_h
 
 #include <array>
 #include <memory>
@@ -9,7 +9,7 @@
 #include "ray.h"
 #include "vec3.h"
 
-namespace jtrace {
+namespace batoid {
     struct Intersection;
     class Surface;
     class Transformation : public Surface {

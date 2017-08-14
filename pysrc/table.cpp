@@ -4,7 +4,7 @@
 
 namespace py = pybind11;
 
-namespace jtrace {
+namespace batoid {
     void pyExportTable(py::module& m) {
         using TableDD = Table<double, double>;
         auto table = py::class_<TableDD, std::shared_ptr<TableDD>>(m, "Table")

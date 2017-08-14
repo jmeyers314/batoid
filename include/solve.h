@@ -23,15 +23,15 @@
 // Template to find the zero of an equation
 // Currently uses bisection method, no solution caching.
 
-#ifndef jtrace_solve_h
-#define jtrace_solve_h
+#ifndef batoid_solve_h
+#define batoid_solve_h
 
 #include <cmath>
 #include <limits>
 #include <stdexcept>
 #include <sstream>
 
-namespace jtrace {
+namespace batoid {
 
     // A nice way to throw exceptions that take a string argument and have that string
     // include double or int information as well.

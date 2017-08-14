@@ -1,8 +1,8 @@
 [//]: # ( @mainpage )
-[![Build Status](https://travis-ci.org/jmeyers314/jtrace.svg?branch=master)](https://travis-ci.org/jmeyers314/jtrace)
-[![codecov](https://codecov.io/gh/jmeyers314/jtrace/branch/master/graph/badge.svg)](https://codecov.io/gh/jmeyers314/jtrace)
+[![Build Status](https://travis-ci.org/jmeyers314/batoid.svg?branch=master)](https://travis-ci.org/jmeyers314/batoid)
+[![codecov](https://codecov.io/gh/jmeyers314/batoid/branch/master/graph/badge.svg)](https://codecov.io/gh/jmeyers314/batoid)
 
-jtrace
+batoid
 ======
 
-Josh's raytracer
+A c++ backed python optical raytracer.

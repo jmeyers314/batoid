@@ -4,13 +4,13 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl_bind.h>
 
-PYBIND11_MAKE_OPAQUE(std::vector<jtrace::Ray>);
-PYBIND11_MAKE_OPAQUE(std::vector<jtrace::Intersection>);
+PYBIND11_MAKE_OPAQUE(std::vector<batoid::Ray>);
+PYBIND11_MAKE_OPAQUE(std::vector<batoid::Intersection>);
 
 namespace py = pybind11;
 using namespace pybind11::literals;
 
-namespace jtrace {
+namespace batoid {
     void pyExportQuadric(py::module& m) {
         py::class_<Quadric, std::shared_ptr<Quadric>, Surface>(m, "Quadric")
             .def(py::init<double,double,double,double,double>(), "init",
@@ -22,7 +22,7 @@ namespace jtrace {
             .def("sag", &Quadric::sag)
             .def("normal", &Quadric::normal)
             .def("intersect", (Intersection (Quadric::*)(const Ray&) const) &Quadric::intersect)
-            .def("intersect", (std::vector<jtrace::Intersection> (Quadric::*)(const std::vector<jtrace::Ray>&) const) &Quadric::intersect)
+            .def("intersect", (std::vector<batoid::Intersection> (Quadric::*)(const std::vector<batoid::Ray>&) const) &Quadric::intersect)
             .def("__repr__", &Quadric::repr);
     }
 }

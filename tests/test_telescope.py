@@ -1,4 +1,4 @@
-import jtrace
+import batoid
 import numpy as np
 import os
 from test_helpers import timer
@@ -11,20 +11,20 @@ def test_telescope():
         naz = 1024
     else:
         naz = 64
-    rays = jtrace.parallelRays(z=20, outer=4.18, inner=2.558,
+    rays = batoid.parallelRays(z=20, outer=4.18, inner=2.558,
                                theta_x=1.0*np.pi/180, theta_y=0.1*np.pi/180,
-                               nradii=50, naz=naz, medium=jtrace.Air())
+                               nradii=50, naz=naz, medium=batoid.Air())
     nrays = len(rays)*len("ugrizy")
     print("Tracing {} rays.".format(nrays))
     t_fast = 0.0
     t_slow = 0.0
     for f in "ugrizy":
-        fn = os.path.join(jtrace.datadir, "lsst", "LSST_{}.yaml".format(f))
-        telescope = jtrace.Telescope.makeFromYAML(fn)
+        fn = os.path.join(batoid.datadir, "lsst", "LSST_{}.yaml".format(f))
+        telescope = batoid.Telescope.makeFromYAML(fn)
         t0 = time.time()
         rays_fast = telescope.trace(rays)
         t1 = time.time()
-        rays_slow = jtrace.RayVector([telescope.trace(r) for r in rays])
+        rays_slow = batoid.RayVector([telescope.trace(r) for r in rays])
         t2 = time.time()
         assert rays_fast == rays_slow
         t_fast += t1 - t0

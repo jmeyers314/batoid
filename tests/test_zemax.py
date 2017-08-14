@@ -1,13 +1,13 @@
 # Compare ray by ray tracing to Zemax
 import os
 import numpy as np
-import jtrace
+import batoid
 
 directory = os.path.dirname(__file__)
 
 def test_HSC_trace():
-    telescope = jtrace.Telescope.makeFromYAML(os.path.join(jtrace.datadir, "hsc", "HSC.yaml"))
-    # Zemax has a number of virtual surfaces that we don't trace in jtrace.  This list picks out
+    telescope = batoid.Telescope.makeFromYAML(os.path.join(batoid.datadir, "hsc", "HSC.yaml"))
+    # Zemax has a number of virtual surfaces that we don't trace in batoid.  This list picks out
     # the "real" surfaces.
     HSC_surfaces = [3, 6, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 24, 25, 28, 29, 31]
 
@@ -16,7 +16,7 @@ def test_HSC_trace():
         with open(filename) as f:
             arr = np.loadtxt(f, skiprows=22, usecols=list(range(0, 12)))
         arr0 = arr[0]
-        ray = jtrace.Ray(arr0[1]/1000, arr0[2]/1000, 16.0, arr0[4], arr0[5], -arr0[6], t=0, w=750e-9)
+        ray = batoid.Ray(arr0[1]/1000, arr0[2]/1000, 16.0, arr0[4], arr0[5], -arr0[6], t=0, w=750e-9)
         tf = telescope.traceFull(ray)
         for i in range(len(tf)):
             s = tf[i]['outray']

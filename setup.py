@@ -27,7 +27,7 @@ headers = glob("include/*.h")
 
 ext_modules = [
     Extension(
-        'jtrace._jtrace',
+        'batoid._batoid',
         sources,
         depends=headers,
         include_dirs=[
@@ -116,16 +116,16 @@ import distutils.ccompiler
 distutils.ccompiler.CCompiler.compile=parallelCCompile
 
 setup(
-    name='jtrace',
+    name='batoid',
     version=__version__,
     author='Josh Meyers',
     author_email='jmeyers314@gmail.com',
-    url='https://github.com/jmeyers314/jtrace',
-    description="Josh's raytracer",
+    url='https://github.com/jmeyers314/batoid',
+    description="Optics raytracer",
     long_description='',
-    packages=['jtrace'],
-    package_dir={'jtrace' : 'jtrace'},
-    package_data={'jtrace' : ['data/**/*']},
+    packages=['batoid'],
+    package_dir={'batoid' : 'batoid'},
+    package_data={'batoid' : ['data/**/*']},
     ext_modules=ext_modules,
     install_requires=['pybind11>=1.7'],
     setup_requires=['pytest-runner'],

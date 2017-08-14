@@ -2,7 +2,7 @@
 #include "utils.h"
 #include "except.h"
 
-namespace jtrace {
+namespace batoid {
     Sphere::Sphere(double _R, double _B, double _Rin, double _Rout) :
         R(_R), B(_B), Rin(_Rin), Rout(_Rout) {}
 

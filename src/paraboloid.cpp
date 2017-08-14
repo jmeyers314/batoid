@@ -3,7 +3,7 @@
 #include "except.h"
 #include <cmath>
 
-namespace jtrace {
+namespace batoid {
 
     Paraboloid::Paraboloid(double _R, double _B, double _Rin, double _Rout) :
         R(_R), B(_B), Rin(_Rin), Rout(_Rout) {}

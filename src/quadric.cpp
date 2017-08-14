@@ -2,7 +2,7 @@
 #include "utils.h"
 #include "except.h"
 
-namespace jtrace {
+namespace batoid {
     Quadric::Quadric(double _R, double _kappa, double _B, double _Rin, double _Rout) :
         R(_R), kappa(_kappa), B(_B), Rin(_Rin), Rout(_Rout) {}
 

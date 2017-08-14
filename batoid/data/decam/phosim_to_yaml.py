@@ -1,12 +1,11 @@
 import re
 from collections import OrderedDict
 import numpy as np
-from jtrace.utils import ordered_dump
+from batoid.utils import ordered_dump
 
 
-def translate(infn, outfn, f):
-    out = OrderedDict(name="LSST")
-    out['config'] = f
+def translate(infn, outfn):
+    out = OrderedDict(name="DECam")
     out['init_medium'] = "air"
     surfaces = OrderedDict()
     z = 0.0
@@ -61,5 +60,4 @@ def translate(infn, outfn, f):
 
 
 if __name__ == '__main__':
-    for i, f in zip(range(6), 'ugrizy'):
-        translate("optics_{}.txt".format(i), "LSST_{}.yaml".format(f), f)
+    translate("optics.txt", "DECam.yaml")

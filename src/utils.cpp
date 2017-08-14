@@ -2,7 +2,7 @@
 #include <cmath>
 #include <utility>
 
-namespace jtrace {
+namespace batoid {
 
     constexpr double TOLERANCE = 1.0e-15;
 

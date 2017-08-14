@@ -1,5 +1,5 @@
-#ifndef jtrace_intersection_h
-#define jtrace_intersection_h
+#ifndef batoid_intersection_h
+#define batoid_intersection_h
 
 #include <string>
 #include <sstream>
@@ -7,7 +7,7 @@
 #include "ray.h"
 #include "medium.h"
 
-namespace jtrace {
+namespace batoid {
     struct Intersection {
         Intersection(double _t, double x0, double y0, double z0, double nx, double ny, double nz,
                      bool isVignetted);

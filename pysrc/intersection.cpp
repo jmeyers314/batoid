@@ -6,12 +6,12 @@
 #include <pybind11/numpy.h>
 
 
-PYBIND11_MAKE_OPAQUE(std::vector<jtrace::Intersection>);
+PYBIND11_MAKE_OPAQUE(std::vector<batoid::Intersection>);
 
 namespace py = pybind11;
 using namespace pybind11::literals;
 
-namespace jtrace {
+namespace batoid {
     void pyExportIntersection(py::module& m) {
         PYBIND11_NUMPY_DTYPE(Intersection, t, point, surfaceNormal, isVignetted, failed);
         py::class_<Intersection, std::shared_ptr<Intersection>>(m, "Intersection")
@@ -35,12 +35,12 @@ namespace jtrace {
             .def("refractedRay", (Ray (Intersection::*)(const Ray&, const Medium&, const Medium&) const) &Intersection::refractedRay)
             .def(py::self == py::self);
         m.def("reflectMany", &reflectMany);
-        m.def("refractMany", (std::vector<jtrace::Ray>(*)(const std::vector<Intersection>&, const std::vector<Ray>&, double, double)) &refractMany);
-        m.def("refractMany", (std::vector<jtrace::Ray>(*)(const std::vector<Intersection>&, const std::vector<Ray>&, const Medium&, const Medium&)) &refractMany);
-        auto IV = py::bind_vector<std::vector<jtrace::Intersection>>(m, "IntersectionVector", py::buffer_protocol());
+        m.def("refractMany", (std::vector<batoid::Ray>(*)(const std::vector<Intersection>&, const std::vector<Ray>&, double, double)) &refractMany);
+        m.def("refractMany", (std::vector<batoid::Ray>(*)(const std::vector<Intersection>&, const std::vector<Ray>&, const Medium&, const Medium&)) &refractMany);
+        auto IV = py::bind_vector<std::vector<batoid::Intersection>>(m, "IntersectionVector", py::buffer_protocol());
         IV.def_property_readonly(
             "t",
-            [](std::vector<jtrace::Intersection>& isecs) {
+            [](std::vector<batoid::Intersection>& isecs) {
                 return py::array_t<double>(
                     py::buffer_info(
                         &isecs[0].t,
@@ -48,14 +48,14 @@ namespace jtrace {
                         py::format_descriptor<double>::format(),
                         1,
                         {isecs.size()},
-                        {sizeof(jtrace::Intersection)}
+                        {sizeof(batoid::Intersection)}
                     )
                 );
             }
         )
         .def_property_readonly(
             "x",
-            [](std::vector<jtrace::Intersection>& isecs) {
+            [](std::vector<batoid::Intersection>& isecs) {
                 return py::array_t<double>(
                     py::buffer_info(
                         &isecs[0].point.x,
@@ -63,14 +63,14 @@ namespace jtrace {
                         py::format_descriptor<double>::format(),
                         1,
                         {isecs.size()},
-                        {sizeof(jtrace::Intersection)}
+                        {sizeof(batoid::Intersection)}
                     )
                 );
             }
         )
         .def_property_readonly(
             "y",
-            [](std::vector<jtrace::Intersection>& isecs) {
+            [](std::vector<batoid::Intersection>& isecs) {
                 return py::array_t<double>(
                     py::buffer_info(
                         &isecs[0].point.y,
@@ -78,14 +78,14 @@ namespace jtrace {
                         py::format_descriptor<double>::format(),
                         1,
                         {isecs.size()},
-                        {sizeof(jtrace::Intersection)}
+                        {sizeof(batoid::Intersection)}
                     )
                 );
             }
         )
         .def_property_readonly(
             "z",
-            [](std::vector<jtrace::Intersection>& isecs) {
+            [](std::vector<batoid::Intersection>& isecs) {
                 return py::array_t<double>(
                     py::buffer_info(
                         &isecs[0].point.z,
@@ -93,14 +93,14 @@ namespace jtrace {
                         py::format_descriptor<double>::format(),
                         1,
                         {isecs.size()},
-                        {sizeof(jtrace::Intersection)}
+                        {sizeof(batoid::Intersection)}
                     )
                 );
             }
         )
         .def_property_readonly(
             "nx",
-            [](std::vector<jtrace::Intersection>& isecs) {
+            [](std::vector<batoid::Intersection>& isecs) {
                 return py::array_t<double>(
                     py::buffer_info(
                         &isecs[0].surfaceNormal.x,
@@ -108,14 +108,14 @@ namespace jtrace {
                         py::format_descriptor<double>::format(),
                         1,
                         {isecs.size()},
-                        {sizeof(jtrace::Intersection)}
+                        {sizeof(batoid::Intersection)}
                     )
                 );
             }
         )
         .def_property_readonly(
             "ny",
-            [](std::vector<jtrace::Intersection>& isecs) {
+            [](std::vector<batoid::Intersection>& isecs) {
                 return py::array_t<double>(
                     py::buffer_info(
                         &isecs[0].surfaceNormal.y,
@@ -123,14 +123,14 @@ namespace jtrace {
                         py::format_descriptor<double>::format(),
                         1,
                         {isecs.size()},
-                        {sizeof(jtrace::Intersection)}
+                        {sizeof(batoid::Intersection)}
                     )
                 );
             }
         )
         .def_property_readonly(
             "nz",
-            [](std::vector<jtrace::Intersection>& isecs) {
+            [](std::vector<batoid::Intersection>& isecs) {
                 return py::array_t<double>(
                     py::buffer_info(
                         &isecs[0].surfaceNormal.z,
@@ -138,14 +138,14 @@ namespace jtrace {
                         py::format_descriptor<double>::format(),
                         1,
                         {isecs.size()},
-                        {sizeof(jtrace::Intersection)}
+                        {sizeof(batoid::Intersection)}
                     )
                 );
             }
         )
         .def_property_readonly(
             "isVignetted",
-            [](std::vector<jtrace::Intersection>& isecs) {
+            [](std::vector<batoid::Intersection>& isecs) {
                 return py::array_t<bool>(
                     py::buffer_info(
                         &isecs[0].isVignetted,
@@ -153,14 +153,14 @@ namespace jtrace {
                         py::format_descriptor<bool>::format(),
                         1,
                         {isecs.size()},
-                        {sizeof(jtrace::Intersection)}
+                        {sizeof(batoid::Intersection)}
                     )
                 );
             }
         )
         .def_property_readonly(
             "failed",
-            [](std::vector<jtrace::Intersection>& isecs) {
+            [](std::vector<batoid::Intersection>& isecs) {
                 return py::array_t<bool>(
                     py::buffer_info(
                         &isecs[0].failed,
@@ -168,7 +168,7 @@ namespace jtrace {
                         py::format_descriptor<bool>::format(),
                         1,
                         {isecs.size()},
-                        {sizeof(jtrace::Intersection)}
+                        {sizeof(batoid::Intersection)}
                     )
                 );
             }

@@ -5,13 +5,13 @@
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 
-PYBIND11_MAKE_OPAQUE(std::vector<jtrace::Ray>);
-PYBIND11_MAKE_OPAQUE(std::vector<jtrace::Intersection>);
+PYBIND11_MAKE_OPAQUE(std::vector<batoid::Ray>);
+PYBIND11_MAKE_OPAQUE(std::vector<batoid::Intersection>);
 
 namespace py = pybind11;
 using namespace pybind11::literals;
 
-namespace jtrace {
+namespace batoid {
     void pyExportAsphere(py::module& m) {
         py::class_<Asphere, std::shared_ptr<Asphere>, Surface>(m, "Asphere")
             .def(py::init<double,double,std::vector<double>,double,double,double>(), "init",
@@ -24,7 +24,7 @@ namespace jtrace {
             .def("sag", &Asphere::sag)
             .def("normal", &Asphere::normal)
             .def("intersect", (Intersection (Asphere::*)(const Ray&) const) &Asphere::intersect)
-            .def("intersect", (std::vector<jtrace::Intersection> (Asphere::*)(const std::vector<jtrace::Ray>&) const) &Asphere::intersect)
+            .def("intersect", (std::vector<batoid::Intersection> (Asphere::*)(const std::vector<batoid::Ray>&) const) &Asphere::intersect)
             .def("__repr__", &Asphere::repr);
     }
 }

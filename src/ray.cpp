@@ -3,7 +3,7 @@
 #include <cmath>
 #include <algorithm>
 
-namespace jtrace {
+namespace batoid {
     Ray::Ray(double x0, double y0, double z0, double vx, double vy, double vz, double t=0.0,
              double w=0.0, bool isV=false) :
         p0(Vec3(x0, y0, z0)), v(Vec3(vx, vy, vz)), t0(t),

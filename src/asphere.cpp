@@ -3,7 +3,7 @@
 #include "solve.h"
 #include <cmath>
 
-namespace jtrace {
+namespace batoid {
     Asphere::Asphere(double _R, double _kappa, std::vector<double> _alpha, double _B,
                      double _Rin, double _Rout) :
         R(_R), kappa(_kappa), alpha(_alpha), B(_B), Rin(_Rin), Rout(_Rout) {}

@@ -1,12 +1,12 @@
-#ifndef jtrace_vec3_h
-#define jtrace_vec3_h
+#ifndef batoid_vec3_h
+#define batoid_vec3_h
 
 #include <cmath>
 #include <string>
 #include <sstream>
 #include <array>
 
-namespace jtrace {
+namespace batoid {
 
     struct Vec3 {
         double x;

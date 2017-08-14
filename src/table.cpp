@@ -26,7 +26,7 @@
 
 #include <iostream>
 
-namespace jtrace {
+namespace batoid {
 
     // ArgVec
 

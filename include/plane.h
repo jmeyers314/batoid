@@ -1,5 +1,5 @@
-#ifndef jtrace_plane_h
-#define jtrace_plane_h
+#ifndef batoid_plane_h
+#define batoid_plane_h
 
 #include <sstream>
 #include <limits>
@@ -8,7 +8,7 @@
 #include "ray.h"
 #include "vec3.h"
 
-namespace jtrace {
+namespace batoid {
 
     class Plane : public Surface {
     public:

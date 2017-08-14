@@ -1,5 +1,5 @@
 import math
-import jtrace
+import batoid
 from test_helpers import isclose, timer
 
 
@@ -16,12 +16,12 @@ def test_DotProduct():
         y2 = random.gauss(mu=-0.5, sigma=1.21)
         z2 = random.gauss(mu=1.34, sigma=3.01)
 
-        vec1 = jtrace.Vec3(x1, y1, z1)
-        vec2 = jtrace.Vec3(x2, y2, z2)
+        vec1 = batoid.Vec3(x1, y1, z1)
+        vec2 = batoid.Vec3(x2, y2, z2)
 
-        assert isclose(jtrace.DotProduct(vec1, vec2),
+        assert isclose(batoid.DotProduct(vec1, vec2),
                        x1*x2 + y1*y2 + z1*z2)
-        assert isclose(jtrace.DotProduct(vec1, vec2),
+        assert isclose(batoid.DotProduct(vec1, vec2),
                        vec1.x*vec2.x + vec1.y*vec2.y + vec1.z*vec2.z)
 
 
@@ -38,31 +38,31 @@ def test_CrossProduct():
         y2 = random.gauss(mu=-0.5, sigma=1.21)
         z2 = random.gauss(mu=1.34, sigma=3.01)
 
-        vec1 = jtrace.Vec3(x1, y1, z1)
-        vec2 = jtrace.Vec3(x2, y2, z2)
+        vec1 = batoid.Vec3(x1, y1, z1)
+        vec2 = batoid.Vec3(x2, y2, z2)
 
         # Cross product is orthogonal to input vectors
         assert isclose(
-                jtrace.DotProduct(jtrace.CrossProduct(vec1, vec2), vec1),
+                batoid.DotProduct(batoid.CrossProduct(vec1, vec2), vec1),
                 0.0,
                 abs_tol=1e-12)
         assert isclose(
-                jtrace.DotProduct(jtrace.CrossProduct(vec1, vec2), vec2),
+                batoid.DotProduct(batoid.CrossProduct(vec1, vec2), vec2),
                 0.0,
                 abs_tol=1e-12)
 
         # Auto cross product is "zero"
         assert isclose(
-                jtrace.CrossProduct(vec1, vec1).Magnitude(), 0.0,
+                batoid.CrossProduct(vec1, vec1).Magnitude(), 0.0,
                 abs_tol=1e-12)
 
         # Magnitude of cross product of orthogonal vectors is product of magnitudes
-        vec3 = jtrace.CrossProduct(vec1, vec2)
+        vec3 = batoid.CrossProduct(vec1, vec2)
         assert isclose(
-                jtrace.CrossProduct(vec1, vec3).Magnitude(),
+                batoid.CrossProduct(vec1, vec3).Magnitude(),
                 vec1.Magnitude() * vec3.Magnitude())
         assert isclose(
-                jtrace.CrossProduct(vec2, vec3).Magnitude(),
+                batoid.CrossProduct(vec2, vec3).Magnitude(),
                 vec2.Magnitude() * vec3.Magnitude())
 
 
@@ -75,7 +75,7 @@ def test_Magnitude():
         y = random.gauss(mu=-0.3, sigma=1.1)
         z = random.gauss(mu=10.34, sigma=13.0)
 
-        vec = jtrace.Vec3(x, y, z)
+        vec = batoid.Vec3(x, y, z)
         assert isclose(vec.Magnitude(), math.sqrt(x*x + y*y + z*z))
         assert isclose(vec.MagnitudeSquared(), x*x + y*y + z*z)
         assert isclose(vec.UnitVec3().Magnitude(), 1.0)
@@ -94,8 +94,8 @@ def test_add():
         y2 = random.gauss(mu=-0.5, sigma=1.21)
         z2 = random.gauss(mu=1.34, sigma=3.01)
 
-        vec1 = jtrace.Vec3(x1, y1, z1)
-        vec2 = jtrace.Vec3(x2, y2, z2)
+        vec1 = batoid.Vec3(x1, y1, z1)
+        vec2 = batoid.Vec3(x2, y2, z2)
 
         vec3 = vec1 + vec2
         assert isclose(vec1.x+vec2.x, vec3.x)
@@ -121,8 +121,8 @@ def test_sub():
         y2 = random.gauss(mu=-0.5, sigma=1.21)
         z2 = random.gauss(mu=1.34, sigma=3.01)
 
-        vec1 = jtrace.Vec3(x1, y1, z1)
-        vec2 = jtrace.Vec3(x2, y2, z2)
+        vec1 = batoid.Vec3(x1, y1, z1)
+        vec2 = batoid.Vec3(x2, y2, z2)
 
         vec3 = vec1 - vec2
         assert isclose(vec1.x-vec2.x, vec3.x)
@@ -146,7 +146,7 @@ def test_mul():
 
         m = random.gauss(mu=2.3, sigma=0.31)
 
-        vec1 = jtrace.Vec3(x1, y1, z1)
+        vec1 = batoid.Vec3(x1, y1, z1)
         vec2 = vec1 * m
         assert isclose(vec1.x*m, vec2.x, rel_tol=1e-7)
         assert isclose(vec1.y*m, vec2.y, rel_tol=1e-7)
@@ -169,7 +169,7 @@ def test_div():
 
         m = random.gauss(mu=2.3, sigma=0.31)
 
-        vec1 = jtrace.Vec3(x1, y1, z1)
+        vec1 = batoid.Vec3(x1, y1, z1)
         vec2 = vec1/m
         assert isclose(vec1.x/m, vec2.x, rel_tol=1e-7)
         assert isclose(vec1.y/m, vec2.y, rel_tol=1e-7)
@@ -190,8 +190,8 @@ def test_eq():
         y1 = random.gauss(mu=-0.3, sigma=1.1)
         z1 = random.gauss(mu=10.34, sigma=13.0)
 
-        vec1 = jtrace.Vec3(x1, y1, z1)
-        vec2 = jtrace.Vec3(x1, y1, z1)
+        vec1 = batoid.Vec3(x1, y1, z1)
+        vec2 = batoid.Vec3(x1, y1, z1)
 
         assert vec1 == vec2
 
@@ -205,10 +205,10 @@ def test_ne():
         y1 = random.gauss(mu=-0.3, sigma=1.1)
         z1 = random.gauss(mu=10.34, sigma=13.0)
 
-        vec1 = jtrace.Vec3(x1, y1, z1)
-        vec2 = jtrace.Vec3(x1+1e-12, y1, z1)
-        vec3 = jtrace.Vec3(x1, y1+1e-12, z1)
-        vec4 = jtrace.Vec3(x1, y1, z1+1e-12)
+        vec1 = batoid.Vec3(x1, y1, z1)
+        vec2 = batoid.Vec3(x1+1e-12, y1, z1)
+        vec3 = batoid.Vec3(x1, y1+1e-12, z1)
+        vec4 = batoid.Vec3(x1, y1, z1+1e-12)
 
         assert vec1 != vec2
         assert vec1 != vec3
@@ -226,10 +226,10 @@ def testRotVec():
         z1 = random.gauss(mu=10.34, sigma=13.0)
 
         # Check identity rotation
-        ident = jtrace.Rot3()
-        vec1 = jtrace.Vec3(x1, y1, z1)
-        vec2 = jtrace.RotVec(ident, vec1)
-        vec3 = jtrace.UnRotVec(ident, vec1)
+        ident = batoid.Rot3()
+        vec1 = batoid.Vec3(x1, y1, z1)
+        vec2 = batoid.RotVec(ident, vec1)
+        vec3 = batoid.UnRotVec(ident, vec1)
         assert vec1 == vec2
         assert vec1 == vec3
         assert ident.determinant() == 1.0
@@ -241,14 +241,14 @@ def testRotVec():
         sth1, cth1 = math.sin(th1), math.cos(th1)
         sth2, cth2 = math.sin(th2), math.cos(th2)
         sth3, cth3 = math.sin(th3), math.cos(th3)
-        R1 = jtrace.Rot3([1, 0, 0, 0, cth1, -sth1, 0, sth1, cth1])
-        R2 = jtrace.Rot3([cth2, 0, sth2, 0, 1, 0, -sth2, 0, cth2])
-        R3 = jtrace.Rot3([cth3, -sth3, 0, sth3, cth3, 0, 0, 0, 1])
-        vec2 = jtrace.RotVec(R1, jtrace.RotVec(R2, jtrace.RotVec(R3, vec1)))
+        R1 = batoid.Rot3([1, 0, 0, 0, cth1, -sth1, 0, sth1, cth1])
+        R2 = batoid.Rot3([cth2, 0, sth2, 0, 1, 0, -sth2, 0, cth2])
+        R3 = batoid.Rot3([cth3, -sth3, 0, sth3, cth3, 0, 0, 0, 1])
+        vec2 = batoid.RotVec(R1, batoid.RotVec(R2, batoid.RotVec(R3, vec1)))
 
         assert isclose(vec1.Magnitude(), vec2.Magnitude())
         # Unrotate...
-        vec3 = jtrace.UnRotVec(R3, jtrace.UnRotVec(R2, jtrace.UnRotVec(R1, vec2)))
+        vec3 = batoid.UnRotVec(R3, batoid.UnRotVec(R2, batoid.UnRotVec(R1, vec2)))
         assert isclose(vec1.x, vec3.x)
         assert isclose(vec1.y, vec3.y)
         assert isclose(vec1.z, vec3.z)
@@ -261,7 +261,7 @@ def test_determinant():
     import numpy as np
 
     for i in range(1000):
-        R = jtrace.Rot3([random.gauss(0,1) for i in range(9)])
+        R = batoid.Rot3([random.gauss(0,1) for i in range(9)])
         assert isclose(np.linalg.det(R), R.determinant())
 
 

@@ -1,7 +1,7 @@
 #include "plane.h"
 #include <cmath>
 
-namespace jtrace {
+namespace batoid {
     Plane::Plane(double _B, double _Rin, double _Rout) :
         B(_B), Rin(_Rin), Rout(_Rout) {}
 

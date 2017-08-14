@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# jtrace documentation build configuration file, created by
+# batoid documentation build configuration file, created by
 # sphinx-quickstart on Wed Feb 22 00:56:14 2017.
 #
 # This file is execfile()d with the current directory set to its
@@ -51,7 +51,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'jtrace'
+project = 'batoid'
 copyright = '2017, Josh Meyers'
 author = 'Josh Meyers'
 
@@ -105,7 +105,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'jtracedoc'
+htmlhelp_basename = 'batoiddoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -132,7 +132,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'jtrace.tex', 'jtrace Documentation',
+    (master_doc, 'batoid.tex', 'batoid Documentation',
      'Josh Meyers', 'manual'),
 ]
 
@@ -142,7 +142,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'jtrace', 'jtrace Documentation',
+    (master_doc, 'batoid', 'batoid Documentation',
      [author], 1)
 ]
 
@@ -153,7 +153,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'jtrace', 'jtrace Documentation',
-     author, 'jtrace', 'One line description of project.',
+    (master_doc, 'batoid', 'batoid Documentation',
+     author, 'batoid', 'One line description of project.',
      'Miscellaneous'),
 ]

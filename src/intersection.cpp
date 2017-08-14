@@ -1,7 +1,7 @@
 #include "intersection.h"
 #include "utils.h"
 
-namespace jtrace {
+namespace batoid {
     Intersection::Intersection(double _t, double x0, double y0,
                                double z0, double nx, double ny, double nz,
                                bool _isVignetted) :

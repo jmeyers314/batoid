@@ -1,5 +1,5 @@
-#ifndef jtrace_sphere_h
-#define jtrace_sphere_h
+#ifndef batoid_sphere_h
+#define batoid_sphere_h
 
 #include <sstream>
 #include <limits>
@@ -8,7 +8,7 @@
 #include "ray.h"
 #include "vec3.h"
 
-namespace jtrace {
+namespace batoid {
 
     class Sphere : public Surface {
     public:

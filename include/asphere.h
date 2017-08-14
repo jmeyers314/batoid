@@ -1,5 +1,5 @@
-#ifndef jtrace_asphere_h
-#define jtrace_asphere_h
+#ifndef batoid_asphere_h
+#define batoid_asphere_h
 
 #include <vector>
 #include <sstream>
@@ -9,7 +9,7 @@
 #include "ray.h"
 #include "vec3.h"
 
-namespace jtrace {
+namespace batoid {
 
     class Asphere : public Surface {
     public:

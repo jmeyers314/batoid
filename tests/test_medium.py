@@ -1,5 +1,5 @@
 import os
-import jtrace
+import batoid
 import numpy as np
 from test_helpers import isclose, timer
 
@@ -10,7 +10,7 @@ def test_const_medium():
     random.seed(5)
 
     n = 1.4
-    const_medium = jtrace.ConstMedium(n)
+    const_medium = batoid.ConstMedium(n)
     for i in range(100):
         w = random.uniform(0.5, 1.0)
         assert const_medium.getN(w) == n
@@ -22,11 +22,11 @@ def test_table_medium():
     random.seed(57)
 
     # File from phosim
-    filename = os.path.join(jtrace.datadir, "media", "silica_dispersion.txt")
+    filename = os.path.join(batoid.datadir, "media", "silica_dispersion.txt")
     wave, n = np.genfromtxt(filename).T
     wave *= 1e-6    # microns -> meters
-    table = jtrace.Table(wave, n, jtrace.Table.Interpolant.linear)
-    table_medium = jtrace.TableMedium(table)
+    table = batoid.Table(wave, n, batoid.Table.Interpolant.linear)
+    table_medium = batoid.TableMedium(table)
     for i in range(100):
         w = random.uniform(0.3e-6, 1.2e-6)
         assert table_medium.getN(w) == table(w)
@@ -39,15 +39,15 @@ def test_silica_sellmeier_table():
     random.seed(577)
 
     # File from phosim
-    filename = os.path.join(jtrace.datadir, "media", "silica_dispersion.txt")
+    filename = os.path.join(batoid.datadir, "media", "silica_dispersion.txt")
     wave, n = np.genfromtxt(filename).T
     wave *= 1e-6    # microns -> meters
-    table = jtrace.Table(wave, n, jtrace.Table.Interpolant.linear)
-    table_silica = jtrace.TableMedium(table)
+    table = batoid.Table(wave, n, batoid.Table.Interpolant.linear)
+    table_silica = batoid.TableMedium(table)
 
     # Coefficients from
     # https://refractiveindex.info/?shelf=main&book=SiO2&page=Malitson
-    sellmeier_silica = jtrace.SellmeierMedium(
+    sellmeier_silica = batoid.SellmeierMedium(
             0.6961663, 0.4079426, 0.8974794,
             0.0684043**2, 0.1162414**2, 9.896161**2)
 
@@ -74,7 +74,7 @@ def test_air():
     # Just spot check some comparisons with GalSim.
     ws = [0.3, 0.5, 0.7, 0.9, 1.1]
     gsn = [ 1.00019563,  1.00018713,  1.00018498,  1.00018412,  1.00018369]
-    air = jtrace.Air()
+    air = batoid.Air()
     for w, n in zip(ws, gsn):
         assert isclose(n, air.getN(w*1e-6), abs_tol=1e-8, rel_tol=0)
 

@@ -1,11 +1,11 @@
-#ifndef jtrace_utils_h
-#define jtrace_utils_h
+#ifndef batoid_utils_h
+#define batoid_utils_h
 
 #include <iterator>
 #include <future>
 #include <algorithm>
 
-namespace jtrace {
+namespace batoid {
 
     int solveQuadratic(double a, double b, double c, double& r1, double& r2);
 

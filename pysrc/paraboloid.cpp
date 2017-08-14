@@ -4,13 +4,13 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl_bind.h>
 
-PYBIND11_MAKE_OPAQUE(std::vector<jtrace::Ray>);
-PYBIND11_MAKE_OPAQUE(std::vector<jtrace::Intersection>);
+PYBIND11_MAKE_OPAQUE(std::vector<batoid::Ray>);
+PYBIND11_MAKE_OPAQUE(std::vector<batoid::Intersection>);
 
 namespace py = pybind11;
 using namespace pybind11::literals;
 
-namespace jtrace {
+namespace batoid {
     void pyExportParaboloid(py::module& m) {
         py::class_<Paraboloid, std::shared_ptr<Paraboloid>, Surface>(m, "Paraboloid")
             .def(py::init<double,double,double,double>(), "init",
@@ -21,7 +21,7 @@ namespace jtrace {
             .def("sag", &Paraboloid::sag)
             .def("normal", &Paraboloid::normal)
             .def("intersect", (Intersection (Paraboloid::*)(const Ray&) const) &Paraboloid::intersect)
-            .def("intersect", (std::vector<jtrace::Intersection> (Paraboloid::*)(const std::vector<jtrace::Ray>&) const) &Paraboloid::intersect)
+            .def("intersect", (std::vector<batoid::Intersection> (Paraboloid::*)(const std::vector<batoid::Ray>&) const) &Paraboloid::intersect)
             .def("__repr__", &Paraboloid::repr);
     }
 }

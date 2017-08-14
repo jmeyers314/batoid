@@ -1,5 +1,5 @@
-#ifndef jtrace_ray_h
-#define jtrace_ray_h
+#ifndef batoid_ray_h
+#define batoid_ray_h
 
 #include <sstream>
 #include <string>
@@ -7,7 +7,7 @@
 #include <vector>
 #include "vec3.h"
 
-namespace jtrace {
+namespace batoid {
     const double PI = 3.14159265358979323846;
     struct Ray {
         Ray(double x0, double y0, double z0, double vx, double vy, double vz,

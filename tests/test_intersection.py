@@ -1,5 +1,5 @@
-import jtrace
-from test_helpers import isclose, timer
+import batoid
+from test_helpers import timer
 
 
 @timer
@@ -10,7 +10,7 @@ def test_intersectionVector():
     intersectionList = []
     for i in range(1000):
         intersectionList.append(
-            jtrace.Intersection(
+            batoid.Intersection(
                 random.gauss(0.0, 1.0),
                 random.gauss(0.0, 1.0),
                 random.gauss(0.0, 1.0),
@@ -20,7 +20,7 @@ def test_intersectionVector():
                 random.gauss(0.0, 1.0),
             )
         )
-    isecs = jtrace.IntersectionVector(intersectionList)
+    isecs = batoid.IntersectionVector(intersectionList)
     np.testing.assert_equal(isecs.t, np.array([isec.t for isec in isecs]))
     np.testing.assert_equal(isecs.x, np.array([isec.point.x for isec in isecs]))
     np.testing.assert_equal(isecs.y, np.array([isec.point.y for isec in isecs]))

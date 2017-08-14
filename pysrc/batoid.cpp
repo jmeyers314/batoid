@@ -1,9 +1,9 @@
-#include "jtrace.h"
+#include "batoid.h"
 #include <pybind11/pybind11.h>
 
 namespace py = pybind11;
 
-namespace jtrace {
+namespace batoid {
     void pyExportVec3(py::module&);
     void pyExportRay(py::module&);
     void pyExportIntersection(py::module&);
@@ -17,8 +17,8 @@ namespace jtrace {
     void pyExportTable(py::module&);
     void pyExportMedium(py::module&);
 
-    PYBIND11_PLUGIN(_jtrace) {
-        py::module m("_jtrace", "ray tracer");
+    PYBIND11_PLUGIN(_batoid) {
+        py::module m("_batoid", "ray tracer");
         pyExportVec3(m);
         pyExportRay(m);
         pyExportIntersection(m);

@@ -1,5 +1,5 @@
-#ifndef jtrace_paraboloid_h
-#define jtrace_paraboloid_h
+#ifndef batoid_paraboloid_h
+#define batoid_paraboloid_h
 
 #include <sstream>
 #include <limits>
@@ -8,7 +8,7 @@
 #include "ray.h"
 #include "vec3.h"
 
-namespace jtrace {
+namespace batoid {
 
     class Paraboloid : public Surface {
     public:

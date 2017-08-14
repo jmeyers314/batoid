@@ -1,2 +1,0 @@
-.. automodule:: jtrace
-  :members:

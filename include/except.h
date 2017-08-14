@@ -1,7 +1,7 @@
-#ifndef jtrace_except_h
-#define jtrace_except_h
+#ifndef batoid_except_h
+#define batoid_except_h
 
-namespace jtrace {
+namespace batoid {
 
     class NoIntersectionError
     {

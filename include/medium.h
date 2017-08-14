@@ -1,10 +1,10 @@
-#ifndef jtrace_medium_h
-#define jtrace_medium_h
+#ifndef batoid_medium_h
+#define batoid_medium_h
 
 #include "table.h"
 #include <memory>
 
-namespace jtrace {
+namespace batoid {
     class Medium {
     public:
         virtual double getN(double wavelength) const = 0;

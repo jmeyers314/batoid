@@ -1,7 +1,7 @@
 #include "medium.h"
 #include <cmath>
 
-namespace jtrace {
+namespace batoid {
     ConstMedium::ConstMedium(double _n) : n(_n) {}
 
     double ConstMedium::getN(double wavelength) const {

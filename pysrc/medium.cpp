@@ -6,7 +6,7 @@
 namespace py = pybind11;
 using namespace pybind11::literals;
 
-namespace jtrace {
+namespace batoid {
     void pyExportMedium(py::module& m) {
         py::class_<Medium, std::shared_ptr<Medium>>(m, "Medium")
             .def("getN", &Medium::getN);

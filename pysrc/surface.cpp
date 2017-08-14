@@ -4,15 +4,15 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl_bind.h>
 
-PYBIND11_MAKE_OPAQUE(std::vector<jtrace::Ray>);
-PYBIND11_MAKE_OPAQUE(std::vector<jtrace::Intersection>);
+PYBIND11_MAKE_OPAQUE(std::vector<batoid::Ray>);
+PYBIND11_MAKE_OPAQUE(std::vector<batoid::Intersection>);
 
 namespace py = pybind11;
 
-namespace jtrace {
+namespace batoid {
     void pyExportSurface(py::module& m) {
         py::class_<Surface, std::shared_ptr<Surface>>(m, "Surface")
-            .def("intersect", (std::vector<jtrace::Intersection> (Surface::*)(const std::vector<jtrace::Ray>&) const) &Surface::intersect)
+            .def("intersect", (std::vector<batoid::Intersection> (Surface::*)(const std::vector<batoid::Ray>&) const) &Surface::intersect)
             .def("shift", (Transformation (Surface::*)(double,double,double) const) &Surface::shift)
             .def("shift", (Transformation (Surface::*)(const Vec3&) const) &Surface::shift)
             .def("rotX", &Surface::rotX)

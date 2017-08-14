@@ -7,7 +7,7 @@
 namespace py = pybind11;
 using namespace pybind11::literals;
 
-namespace jtrace {
+namespace batoid {
     void pyExportVec3(py::module& m) {
         PYBIND11_NUMPY_DTYPE(Vec3, x, y, z);
         py::class_<Vec3>(m, "Vec3", R"pbdoc(
@@ -28,11 +28,11 @@ namespace jtrace {
 
           Examples
           --------
-          >>> v = jtrace.Vec3(1, 2, 3.4)
+          >>> v = batoid.Vec3(1, 2, 3.4)
           >>> print(v)
           Vec3(1, 2, 3.4)
 
-          >>> v2 = jtrace.Vec3()
+          >>> v2 = batoid.Vec3()
           >>> print(v2)
           Vec3(0, 0, 0)
         )pbdoc")
@@ -105,13 +105,13 @@ namespace jtrace {
 
           Examples
           --------
-          >>> v1 = jtrace.Vec3(0, 1, 0)
-          >>> v2 = jtrace.Vec3(0, 0, 1)
-          >>> print(jtrace.DotProduct(v1, v2))
+          >>> v1 = batoid.Vec3(0, 1, 0)
+          >>> v2 = batoid.Vec3(0, 0, 1)
+          >>> print(batoid.DotProduct(v1, v2))
           0.0
-          >>> v1 = jtrace.Vec3(0, 1, 2)
-          >>> v2 = jtrace.Vec3(1, 2, 3)
-          >>> assert jtrace.DotProduct(v1, v2) == v1.x*v2.x + v1.y*v2.y + v1.z*v2.z
+          >>> v1 = batoid.Vec3(0, 1, 2)
+          >>> v2 = batoid.Vec3(1, 2, 3)
+          >>> assert batoid.DotProduct(v1, v2) == v1.x*v2.x + v1.y*v2.y + v1.z*v2.z
 
         )pbdoc");
 
@@ -138,15 +138,15 @@ namespace jtrace {
           .. math::
             |v1 \cross v2| = |v1|  |v2| \sin(\theta)
 
-          where :math:`\theta` is the angle in between `v1` and `v2`.  jtrace Vec3 objects obey the
+          where :math:`\theta` is the angle in between `v1` and `v2`.  batoid Vec3 objects obey the
           right-hand-rule, where Vec3(1, 0, 0) x Vec3(0, 1, 0) = Vec3(0, 0, 1), and cyclic
           permutations thereof.
 
           Examples
           --------
-          >>> v1 = jtrace.Vec3(0, 1, 2)
-          >>> v2 = jtrace.Vec3(1, 2, 3)
-          >>> jtrace.CrossProduct(v1, v2)
+          >>> v1 = batoid.Vec3(0, 1, 2)
+          >>> v2 = batoid.Vec3(1, 2, 3)
+          >>> batoid.CrossProduct(v1, v2)
           Vec3(-1, 2, -1)
 
         )pbdoc");

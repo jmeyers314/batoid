@@ -1,7 +1,7 @@
 import re
 from collections import OrderedDict
 import numpy as np
-from jtrace.utils import ordered_dump
+from batoid.utils import ordered_dump
 
 
 def translate(infn, outfn):

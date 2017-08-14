@@ -1,4 +1,4 @@
-import jtrace
+import batoid
 from test_helpers import isclose, timer
 
 
@@ -12,11 +12,11 @@ def test_properties():
         nalpha = random.randint(0, 4)
         alpha = [random.gauss(0, 1e-10) for i in range(nalpha)]
         B = random.gauss(0, 1.1)
-        asphere = jtrace.Asphere(R, kappa, alpha, B)
+        asphere = batoid.Asphere(R, kappa, alpha, B)
         dx = random.gauss(0, 1)
         dy = random.gauss(0, 1)
         dz = random.gauss(0, 1)
-        transformed = jtrace.Transformation(asphere, dx, dy, dz)
+        transformed = batoid.Transformation(asphere, dx, dy, dz)
         assert transformed.dx == dx
         assert transformed.dy == dy
         assert transformed.dz == dz
@@ -26,7 +26,7 @@ def test_properties():
         assert transformed2.dy == dy
         assert transformed2.dz == dz
         # and a third way
-        dr = jtrace.Vec3(dx, dy, dz)
+        dr = batoid.Vec3(dx, dy, dz)
         transformed3 = asphere.shift(dr)
         assert transformed3.dx == dx
         assert transformed3.dy == dy
@@ -44,7 +44,7 @@ def test_shift():
         nalpha = random.randint(0, 4)
         alpha = [random.gauss(0, 1e-10) for i in range(nalpha)]
         B = random.gauss(0, 1.1)
-        asphere = jtrace.Asphere(R, kappa, alpha, B)
+        asphere = batoid.Asphere(R, kappa, alpha, B)
         dx = random.gauss(0, 1)
         dy = random.gauss(0, 1)
         dz = random.gauss(0, 1)
@@ -56,7 +56,7 @@ def test_shift():
 
             # If we shoot rays straight up, then it's easy to predict the
             # intersection points.
-            r = jtrace.Ray(x, y, -10, 0, 0, 1, 0)
+            r = batoid.Ray(x, y, -10, 0, 0, 1, 0)
             isec = shifted.intersect(r)
             assert isclose(isec.point.x, x)
             assert isclose(isec.point.y, y)
@@ -67,8 +67,8 @@ def test_shift():
             vx = random.gauss(0.0, 0.01)
             vy = random.gauss(0.0, 0.01)
             vz = 1.0
-            v = jtrace.Vec3(vx, vy, vz).UnitVec3()
-            r = jtrace.Ray(jtrace.Vec3(x, y, -10), v, 0)
+            v = batoid.Vec3(vx, vy, vz).UnitVec3()
+            r = batoid.Ray(batoid.Vec3(x, y, -10), v, 0)
             isec = shifted.intersect(r)
             p1 = r.positionAtTime(isec.t)
             p2 = isec.point
@@ -82,7 +82,7 @@ def test_shift():
 def test_shift_vectorized():
     import random
     random.seed(577)
-    rays = [jtrace.Ray([random.gauss(0.0, 0.1),
+    rays = [batoid.Ray([random.gauss(0.0, 0.1),
                         random.gauss(0.0, 0.1),
                         random.gauss(10.0, 0.1)],
                        [random.gauss(0.0, 0.1),
@@ -90,7 +90,7 @@ def test_shift_vectorized():
                         random.gauss(-1.0, 0.1)],
                        random.gauss(0.0, 0.1))
             for i in range(1000)]
-    rays = jtrace.RayVector(rays)
+    rays = batoid.RayVector(rays)
 
     for i in range(100):
         R = random.gauss(25.0, 0.2)
@@ -98,14 +98,14 @@ def test_shift_vectorized():
         nalpha = random.randint(0, 4)
         alpha = [random.gauss(0, 1e-10) for i in range(nalpha)]
         B = random.gauss(0, 1.1)
-        asphere = jtrace.Asphere(R, kappa, alpha, B)
+        asphere = batoid.Asphere(R, kappa, alpha, B)
         dx = random.gauss(0, 1)
         dy = random.gauss(0, 1)
         dz = random.gauss(0, 1)
         shifted = asphere.shift(dx, dy, dz)
         intersections = shifted.intersect(rays)
         intersections2 = [shifted.intersect(ray) for ray in rays]
-        intersections2 = jtrace.IntersectionVector(intersections2)
+        intersections2 = batoid.IntersectionVector(intersections2)
         assert intersections == intersections2
 
 
@@ -120,7 +120,7 @@ def test_rotate():
         nalpha = random.randint(0, 4)
         alpha = [random.gauss(0, 1e-10) for i in range(nalpha)]
         B = random.gauss(0, 1.1)
-        asphere = jtrace.Asphere(R, kappa, alpha, B)
+        asphere = batoid.Asphere(R, kappa, alpha, B)
         # We're going to rain down some photons, rotate the camera and rotate the position/vectors
         # of the photons, and see if we get the same spot pattern.
         for j in range(10):
@@ -129,7 +129,7 @@ def test_rotate():
             z = 10
             vx = vy = 0
             vz = -1
-            r = jtrace.Ray(x, y, z, vx, vy, vz, 0)
+            r = batoid.Ray(x, y, z, vx, vy, vz, 0)
             isec = asphere.intersect(r)
 
             theta = random.gauss(0, 0.1)
@@ -141,7 +141,7 @@ def test_rotate():
             vxp = vx
             vyp = vy * ct - vz * st
             vzp = vy * st + vz * ct
-            rp = jtrace.Ray(xp, yp, zp, vxp, vyp, vzp, 0)
+            rp = batoid.Ray(xp, yp, zp, vxp, vyp, vzp, 0)
             isecp = rotated.intersect(rp)
 
             # Now rotate intersection point and normal back to original frame.
@@ -175,7 +175,7 @@ def test_rotate():
             vxp = vx * ct + vz * st
             vyp = vy
             vzp = -vx * st + vz * ct
-            rp = jtrace.Ray(xp, yp, zp, vxp, vyp, vzp, 0)
+            rp = batoid.Ray(xp, yp, zp, vxp, vyp, vzp, 0)
             isecp = rotated.intersect(rp)
 
             # Now rotate intersection point and normal back to original frame.
@@ -219,7 +219,7 @@ def test_rotate_vectorized():
     import random
     import math
     random.seed(57721)
-    rays = [jtrace.Ray([random.gauss(0.0, 0.1),
+    rays = [batoid.Ray([random.gauss(0.0, 0.1),
                         random.gauss(0.0, 0.1),
                         random.gauss(10.0, 0.1)],
                        [random.gauss(0.0, 0.1),
@@ -227,7 +227,7 @@ def test_rotate_vectorized():
                         random.gauss(-1.0, 0.1)],
                        random.gauss(0.0, 0.1))
             for i in range(1000)]
-    rays = jtrace.RayVector(rays)
+    rays = batoid.RayVector(rays)
 
     for i in range(100):
         R = random.gauss(25.0, 0.2)
@@ -235,15 +235,14 @@ def test_rotate_vectorized():
         nalpha = random.randint(0, 4)
         alpha = [random.gauss(0, 1e-10) for i in range(nalpha)]
         B = random.gauss(0, 1.1)
-        asphere = jtrace.Asphere(R, kappa, alpha, B)
+        asphere = batoid.Asphere(R, kappa, alpha, B)
         theta = random.gauss(0, 0.1)
-        st, ct = math.sin(theta), math.cos(theta)
         rotated = asphere.rotX(theta)
         phi = random.gauss(0, 0.1)
         rotated = rotated.rotY(phi)
         intersections = rotated.intersect(rays)
         intersections2 = [rotated.intersect(ray) for ray in rays]
-        intersections2 = jtrace.IntersectionVector(intersections2)
+        intersections2 = batoid.IntersectionVector(intersections2)
         assert intersections == intersections2
 
 

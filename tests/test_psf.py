@@ -1,6 +1,6 @@
 import os
 import numpy as np
-import jtrace
+import batoid
 from test_helpers import timer, isclose
 
 
@@ -27,7 +27,7 @@ def test_huygens_psf():
                 type='mirror',
                 m0=1.0,
                 m1=1.0,
-                surface=jtrace.Paraboloid(R, 0.0, Rin=obscuration*diam/2, Rout=diam/2)
+                surface=batoid.Paraboloid(R, 0.0, Rin=obscuration*diam/2, Rout=diam/2)
             ),
             dict(
                 name='Det',
@@ -36,10 +36,10 @@ def test_huygens_psf():
                 type='det',
                 m0=1.0,
                 m1=1.0,
-                surface=jtrace.Plane(focalLength, Rout=0.01)
+                surface=batoid.Plane(focalLength, Rout=0.01)
             )
         ]
-        telescope = jtrace.Telescope(surfaces)
+        telescope = batoid.Telescope(surfaces)
 
         airy_size = 1.22*500e-9/diam * 206265
         print()
@@ -52,9 +52,9 @@ def test_huygens_psf():
         arr = im.array/im.array.sum()
         gs_mom = galsim.hsm.FindAdaptiveMom(im)
 
-        rays = jtrace.parallelRays(10, 0.15, 0.0, nradii=20, naz=100, wavelength=500e-9)
+        rays = batoid.parallelRays(10, 0.15, 0.0, nradii=20, naz=100, wavelength=500e-9)
         traced_rays = telescope.trace(rays)
-        traced_rays = jtrace.RayVector([r for r in traced_rays if not r.isVignetted])
+        traced_rays = batoid.RayVector([r for r in traced_rays if not r.isVignetted])
 
         xs = np.linspace(-size/2, size/2, npix) # arcsec
         xs /= (206265/focalLength) # meters
@@ -69,13 +69,13 @@ def test_huygens_psf():
         jt_mom = galsim.hsm.FindAdaptiveMom(psfim)
 
         print("GalSim shape: ", gs_mom.observed_shape)
-        print("jtrace shape: ", jt_mom.observed_shape)
+        print("batoid shape: ", jt_mom.observed_shape)
         print("GalSim centroid:  ", gs_mom.moments_centroid)
-        print("jtrace centroid:  ", jt_mom.moments_centroid)
+        print("batoid centroid:  ", jt_mom.moments_centroid)
         print("GalSim size: ", gs_mom.moments_sigma)
-        print("jtrace size: ", jt_mom.moments_sigma)
+        print("batoid size: ", jt_mom.moments_sigma)
         print("GalSim rho4: ", gs_mom.moments_rho4)
-        print("jtrace rho4: ", jt_mom.moments_rho4)
+        print("batoid rho4: ", jt_mom.moments_rho4)
 
         assert isclose(gs_mom.observed_shape.g1, jt_mom.observed_shape.g1, abs_tol=3e-3, rel_tol=0.0)
         assert isclose(gs_mom.observed_shape.g2, jt_mom.observed_shape.g2, abs_tol=3e-3, rel_tol=0.0)
@@ -104,7 +104,7 @@ def test_huygens_psf():
             ax2.scatter(rayx, rayy, s=1, c='r')
             ax2.set_xlim(xs.min(), xs.max())
             ax2.set_ylim(ys.min(), ys.max())
-            ax2.set_title('jtrace')
+            ax2.set_title('batoid')
             ax2.set_xlabel("$\mu m$")
             ax2.set_ylabel("$\mu m$")
 
@@ -123,8 +123,8 @@ def test_huygens_psf():
 @timer
 def test_lsst_psf():
     # Just testing that doesn't crash for the moment
-    fn = os.path.join(jtrace.datadir, "lsst", "LSST_r.yaml")
-    telescope = jtrace.Telescope.makeFromYAML(fn)
+    fn = os.path.join(batoid.datadir, "lsst", "LSST_r.yaml")
+    telescope = batoid.Telescope.makeFromYAML(fn)
 
     if __name__ == '__main__':
         thetas = [0.0, 1200.0, 3600.0, 6300.0] # arcsec
@@ -132,10 +132,10 @@ def test_lsst_psf():
         thetas = [6300.0]
     for theta in thetas:
         print(theta/3600.0)
-        rays = jtrace.parallelRays(10, 4.2, 2.55, theta_x=theta/206265, nradii=10, naz=100,
-                                   wavelength=620e-9, medium=jtrace.Air())
+        rays = batoid.parallelRays(10, 4.2, 2.55, theta_x=theta/206265, nradii=10, naz=100,
+                                   wavelength=620e-9, medium=batoid.Air())
         traced_rays = telescope.trace(rays)
-        traced_rays = jtrace.RayVector([r for r in traced_rays if not r.isVignetted])
+        traced_rays = batoid.RayVector([r for r in traced_rays if not r.isVignetted])
 
         nx = 64
         xs = np.linspace(-10e-6, 10e-6, nx) # 2 pixels wide
@@ -165,8 +165,8 @@ def test_lsst_psf():
 @timer
 def test_hsc_psf():
     # Just testing that doesn't crash for the moment
-    fn = os.path.join(jtrace.datadir, "hsc", "HSC.yaml")
-    telescope = jtrace.Telescope.makeFromYAML(fn)
+    fn = os.path.join(batoid.datadir, "hsc", "HSC.yaml")
+    telescope = batoid.Telescope.makeFromYAML(fn)
 
     if __name__ == '__main__':
         thetas = [0.0, 1350.0, 2700.0] # arcsec
@@ -174,10 +174,10 @@ def test_hsc_psf():
         thetas = [2700.0]
     for theta in thetas:
         print(theta/3600.0)
-        rays = jtrace.parallelRays(10, 4.1, 0.75, theta_y=theta/206265, nradii=10, naz=100,
+        rays = batoid.parallelRays(10, 4.1, 0.75, theta_y=theta/206265, nradii=10, naz=100,
                                    wavelength=760e-9)
         traced_rays = telescope.trace(rays)
-        traced_rays = jtrace.RayVector([r for r in traced_rays if not r.isVignetted])
+        traced_rays = batoid.RayVector([r for r in traced_rays if not r.isVignetted])
 
         nx = 64
         xs = np.linspace(-27.1e-6, 27.1e-6, nx) # 2 pixels wide
@@ -207,8 +207,8 @@ def test_hsc_psf():
 @timer
 def test_decam_psf():
     # Just testing that doesn't crash for the moment
-    fn = os.path.join(jtrace.datadir, "decam", "DECam.yaml")
-    telescope = jtrace.Telescope.makeFromYAML(fn)
+    fn = os.path.join(batoid.datadir, "decam", "DECam.yaml")
+    telescope = batoid.Telescope.makeFromYAML(fn)
 
     if __name__ == '__main__':
         thetas = [0.0, 1800.0, 3960.0] # arcsec
@@ -216,10 +216,10 @@ def test_decam_psf():
         thetas = [3960.0]
     for theta in thetas:
         print(theta/3600.0)
-        rays = jtrace.parallelRays(10, 4.1, 0.75, theta_y=theta/206265, nradii=30, naz=200,
-                                   wavelength=760e-9, medium=jtrace.Air())
+        rays = batoid.parallelRays(10, 4.1, 0.75, theta_y=theta/206265, nradii=30, naz=200,
+                                   wavelength=760e-9, medium=batoid.Air())
         traced_rays = telescope.trace(rays)
-        traced_rays = jtrace.RayVector([r for r in traced_rays if not r.isVignetted])
+        traced_rays = batoid.RayVector([r for r in traced_rays if not r.isVignetted])
 
         nx = 64
         xs = np.linspace(-27.1e-6, 27.1e-6, nx)
