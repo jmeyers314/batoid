@@ -203,7 +203,6 @@ class Telescope(object):
         # that the entrance pupil is coincident with the first surface (which is reasonable for most
         # telescopes), and that the optics are centered.
         point = jtrace.Vec3(0, 0, 0)
-        th = 10./206265
         v = jtrace.Vec3(0.0, np.sin(theta), -np.cos(theta))
         m0 = list(self.surfaces.values())[0]['m0']
         v /= m0.getN(wavelength)
@@ -238,12 +237,17 @@ class Telescope(object):
         wf = np.ma.masked_array(wf, mask=outrays.isVignetted)
         return wf
 
-    def fftPSF(self, theta_x, theta_y, wavelength, nx=32):
+    def fftPSF(self, theta_x, theta_y, wavelength, nx=32, pad_factor=2):
+        L = list(self.surfaces.values())[0]['outer']*2*pad_factor
+        im_dtheta = wavelength / L
         wf = self.wavefront(theta_x, theta_y, wavelength, nx=nx).reshape(nx, nx)
-        expwf = np.zeros((2*nx, 2*nx), dtype=np.complex128)
-        expwf[nx//2:-nx//2, nx//2:-nx//2][~wf.mask] = np.exp(2j*np.pi*wf[~wf.mask])
+        pad_size = nx*pad_factor
+        expwf = np.zeros((pad_size, pad_size), dtype=np.complex128)
+        start = pad_size//2-nx//2
+        stop = pad_size//2+nx//2
+        expwf[start:stop, start:stop][~wf.mask] = np.exp(2j*np.pi*wf[~wf.mask])
         psf = np.abs(np.fft.fftshift(np.fft.fft2(np.fft.fftshift(expwf))))**2
-        return psf
+        return im_dtheta, psf
 
     def clone(self):
         cls = self.__class__
