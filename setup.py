@@ -127,7 +127,7 @@ setup(
     package_dir={'batoid' : 'batoid'},
     package_data={'batoid' : ['data/**/*']},
     ext_modules=ext_modules,
-    install_requires=['pybind11>=1.7'],
+    install_requires=['pybind11>=1.7', 'numpy', 'pyyaml', 'future'],
     setup_requires=['pytest-runner'],
     tests_require=['pytest'],
     cmdclass={'build_ext': BuildExt},
