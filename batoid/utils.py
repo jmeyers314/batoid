@@ -2,6 +2,8 @@
 
 import yaml
 from collections import OrderedDict
+from past.builtins import basestring
+from numbers import Integral
 
 def ordered_load(stream, Loader=yaml.Loader, object_pairs_hook=OrderedDict):
     class OrderedLoader(Loader):
@@ -31,3 +33,34 @@ def ordered_dump(data, stream=None, Dumper=yaml.Dumper, **kwds):
 
 # # usage:
 # ordered_dump(data, Dumper=yaml.SafeDumper)
+
+
+class ListDict(OrderedDict):
+    # Like an ordered dict, but you can access items by number instead of just by key.  So it's
+    # a sequence and a mapping.
+    def __init__(self, *args, **kwargs):
+        OrderedDict.__init__(self, *args, **kwargs)
+        if any(isinstance(k, Integral) for k in self):
+            raise ValueError
+
+    def _getKeyFromIndex(self, idx):
+        return list(self.keys())[idx]
+
+    def __setitem__(self, key, value):
+        # If key is Integral, access that item in order.  Cannot create a new item using Integral
+        # key.  If key is not Integral though, can modify or create as needed.
+        if isinstance(key, Integral):
+            if key >= len(self):
+                raise KeyError
+            key = self._getKeyFromIndex(key)
+        OrderedDict.__setitem__(self, key, value)
+
+    def __getitem__(self, key):
+        if isinstance(key, Integral):
+            key = self._getKeyFromIndex(key)
+        return OrderedDict.__getitem__(self, key)
+
+    def __delitem__(self, key):
+        if isinstance(key, Integral):
+            key = self._getKeyFromIndex(key)
+        OrderedDict.__delitem__(self, key)

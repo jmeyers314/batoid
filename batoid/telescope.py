@@ -2,7 +2,7 @@ import numpy as np
 from collections import OrderedDict
 import numbers
 import batoid
-from .utils import ordered_load
+from .utils import ordered_load, ListDict
 
 
 def media_catalog(media_str):
@@ -43,7 +43,7 @@ def media_catalog(media_str):
 
 class Telescope(object):
     def __init__(self, surfaceList):
-        self.surfaces = OrderedDict()
+        self.surfaces = ListDict()
         for surface in surfaceList:
             self.surfaces[surface['name']] = surface
 
@@ -55,7 +55,7 @@ class Telescope(object):
             # First, parse the optics
             m0 = media_catalog(data.pop('init_medium'))
             surfaces = data.pop('surfaces')
-            out.surfaces = OrderedDict()
+            out.surfaces = ListDict()
             for name, sdata in surfaces.items():
                 m1 = media_catalog(sdata.pop('medium'))
                 sdict = dict(
@@ -170,10 +170,9 @@ class Telescope(object):
             return out
 
     def huygensPSF(self, xs, ys, zs=None, rays=None, wavelength=None, theta_x=0, theta_y=0, nradii=5, naz=50):
-        surfaceList = list(self.surfaces.values())
         if rays is None:
             # Generate some rays based on the first optic.
-            s0 = surfaceList[0]
+            s0 = self.surfaces[0]
             rays = batoid.parallelRays(
                 z=10, outer=s0['outer'], inner=s0['inner'],
                 theta_x=theta_x, theta_y=theta_y,
@@ -184,7 +183,7 @@ class Telescope(object):
         rays = batoid.RayVector([r for r in rays if not r.isVignetted])
         if zs is None:
             zs = np.empty(xs.shape, dtype=np.float64)
-            zs.fill(surfaceList[-1]['surface'].B)
+            zs.fill(self.surfaces[-1]['surface'].B)
         points = np.concatenate([aux[..., None] for aux in (xs, ys, zs)], axis=-1)
         time = rays[0].t0  # Doesn't actually matter, but use something close to intercept time
         amplitudes = np.empty(xs.shape, dtype=np.complex128)
@@ -204,7 +203,7 @@ class Telescope(object):
         # telescopes), and that the optics are centered.
         point = batoid.Vec3(0, 0, 0)
         v = batoid.Vec3(0.0, np.sin(theta), -np.cos(theta))
-        m0 = list(self.surfaces.values())[0]['m0']
+        m0 = self.surfaces[0]['m0']
         v /= m0.getN(wavelength)
         r = batoid.Ray(point, v, t=0, w=wavelength)
         # rewind a bit so we can find an intersection
@@ -222,8 +221,8 @@ class Telescope(object):
 
     def wavefront(self, theta_x, theta_y, wavelength, rays=None, nx=32):
         if rays is None:
-            EP_size = list(self.surfaces.values())[0]['outer']
-            m0 = list(self.surfaces.values())[0]['m0']
+            EP_size = self.surfaces[0]['outer']
+            m0 = self.surfaces[0]['m0']
             rays = batoid.rayGrid(
                     10, 2*EP_size,
                     theta_x=theta_x, theta_y=theta_y,
@@ -238,7 +237,7 @@ class Telescope(object):
         return wf
 
     def fftPSF(self, theta_x, theta_y, wavelength, nx=32, pad_factor=2):
-        L = list(self.surfaces.values())[0]['outer']*2*pad_factor
+        L = self.surfaces[0]['outer']*2*pad_factor
         im_dtheta = wavelength / L
         wf = self.wavefront(theta_x, theta_y, wavelength, nx=nx).reshape(nx, nx)
         pad_size = nx*pad_factor
@@ -258,45 +257,29 @@ class Telescope(object):
 
     def withShift(self, surfaceId, dx, dy, dz):
         out = self.clone()
-        if isinstance(surfaceId, numbers.Integral):
-            container = out.surfaces.values()
-        else:
-            container = out.surfaces
-        sdict = container[surfaceId].copy()
+        sdict = out.surfaces[surfaceId].copy()
         surf = sdict['surface']
         sdict['surface'] = surf.shift(dx, dy, dz)
-        container[surfaceId] = sdict
+        out.surfaces[surfaceId] = sdict
         return out
 
     def withRotX(self, surfaceId, theta):
         out = self.clone()
-        if isinstance(surfaceId, numbers.Integral):
-            container = out.surfaces.values()
-        else:
-            container = out.surfaces
-        sorig = container[surfaceId]
+        sorig = out.surfaces[surfaceId]
         snew = sorig.rotX(theta)
-        container[surfaceId] = snew
+        out.surfaces[surfaceId] = snew
         return out
 
     def withRotY(self, surfaceId, theta):
         out = self.clone()
-        if isinstance(surfaceId, numbers.Integral):
-            container = out.surfaces.values()
-        else:
-            container = out.surfaces
-        sorig = container[surfaceId]
+        sorig = out.surfaces[surfaceId]
         snew = sorig.rotY(theta)
-        container[surfaceId] = snew
+        out.surfaces[surfaceId] = snew
         return out
 
     def withRotZ(self, surfaceId, theta):
         out = self.clone()
-        if isinstance(surfaceId, numbers.Integral):
-            container = out.surfaces.values()
-        else:
-            container = out.surfaces
-        sorig = container[surfaceId]
+        sorig = out.surfaces[surfaceId]
         snew = sorig.rotZ(theta)
-        container[surfaceId] = snew
+        out.surfaces[surfaceId] = snew
         return out
