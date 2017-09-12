@@ -1,6 +1,4 @@
 import numpy as np
-from collections import OrderedDict
-import numbers
 import batoid
 from .utils import ordered_load, ListDict
 
@@ -42,10 +40,11 @@ def media_catalog(media_str):
 
 
 class Telescope(object):
-    def __init__(self, surfaceList):
+    def __init__(self, surfaceList, **kwargs):
         self.surfaces = ListDict()
         for surface in surfaceList:
             self.surfaces[surface['name']] = surface
+        self.__dict__.update(kwargs)
 
     @classmethod
     def makeFromYAML(cls, infn):

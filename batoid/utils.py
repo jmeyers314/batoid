@@ -56,8 +56,9 @@ class ListDict(OrderedDict):
         OrderedDict.__setitem__(self, key, value)
 
     def __getitem__(self, key):
-        if isinstance(key, Integral):
-            key = self._getKeyFromIndex(key)
+        if isinstance(key, (Integral, slice)):
+            # Should really probably return a new ListDict on slice access, but this works for now.
+            return list(self.values())[key]
         return OrderedDict.__getitem__(self, key)
 
     def __delitem__(self, key):
