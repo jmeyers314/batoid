@@ -18,8 +18,13 @@ class get_pybind_include(object):
         self.user = user
 
     def __str__(self):
-        import pybind11
-        return pybind11.get_include(self.user)
+        # Deal with LSST Stack...
+        import os
+        if 'PYBIND11_DIR' in os.environ:
+            return os.environ['PYBIND11_DIR']+'/include'
+        else:
+            import pybind11
+            return pybind11.get_include(self.user)
 
 sources = glob("src/*.cpp")
 sources += glob("pysrc/*.cpp")
