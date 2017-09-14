@@ -114,7 +114,7 @@ namespace batoid {
         return a.x != b.x || a.y != b.y || a.z != b.z;
     }
 
-
+    // Should really be some sanity checks here that this is really a rotation matrix...
     struct Rot3 {
         std::array<double,9> data;
 
@@ -133,18 +133,6 @@ namespace batoid {
                  - data[2]*data[4]*data[6];
         }
 
-        Rot3& operator*=(const double factor) {
-            for (auto& d : data)
-                d *= factor;
-            return *this;
-        }
-
-        Rot3& operator/=(const double factor) {
-            for (auto& d : data)
-                d /= factor;
-            return *this;
-        }
-
         std::string repr() const {
             std::ostringstream oss("\n");
             oss << "Rot3([" << data[0] << ", " << data[1] << ", " << data[2] << ",\n"
@@ -156,27 +144,6 @@ namespace batoid {
 
     inline std::ostream& operator<<(std::ostream& os, const Rot3& r) {
         return os << r.repr();
-    }
-
-    inline Rot3 operator*(double s, const Rot3& v) {
-        std::array<double,9> data = v.data;
-        for (auto& d : data)
-            d *= s;
-        return Rot3(data);
-    }
-
-    inline Rot3 operator*(const Rot3& v, double s) {
-        std::array<double,9> data = v.data;
-        for (auto& d : data)
-            d *= s;
-        return Rot3(data);
-    }
-
-    inline Rot3 operator/(const Rot3& v, double s) {
-        std::array<double,9> data = v.data;
-        for (auto& d : data)
-            d /= s;
-        return Rot3(data);
     }
 
     inline Vec3 RotVec(const Rot3& r, const Vec3& v) {

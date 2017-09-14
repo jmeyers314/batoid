@@ -72,10 +72,6 @@ namespace batoid {
             .def(py::init<>())
             .def(py::init<std::array<double,9>>())
             .def("__repr__", &Rot3::repr)
-            .def(py::self * double())
-            .def(py::self *= double())
-            .def(py::self / double())
-            .def(py::self /= double())
             .def("determinant", &Rot3::determinant);
 
         m.def("DotProduct", &DotProduct, R"pbdoc(
