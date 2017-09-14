@@ -19,8 +19,12 @@ namespace batoid {
     void pyExportMedium(py::module&);
     void pyExportObscuration(py::module&);
 
+#if (PYBIND11_VERSION_MAJOR >= 2) & (PYBIND11_VERSION_MINOR >= 2)
+    PYBIND11_MODULE(_batoid, m) {
+#else
     PYBIND11_PLUGIN(_batoid) {
         py::module m("_batoid", "ray tracer");
+#endif
         pyExportVec3(m);
         pyExportVec2(m);
         pyExportRay(m);
@@ -35,7 +39,8 @@ namespace batoid {
         pyExportTable(m);
         pyExportMedium(m);
         pyExportObscuration(m);
-
+#if !((PYBIND11_VERSION_MAJOR >= 2) & (PYBIND11_VERSION_MINOR >= 2))
         return m.ptr();
+#endif
     }
 }
