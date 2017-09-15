@@ -11,6 +11,38 @@ surfaces:
     medium: hsc_air
     R: 30.0
     conic: -1.00835
+    obscuration:
+        type: ObscUnion
+        items:
+          -
+            type: ObscCircle
+            x: 0.0
+            y: 0.0
+            radius: 0.9471
+          -
+            type: ObscRay
+            x: 0.43
+            y: 0.43
+            width: 0.22
+            theta: 1.688606
+          -
+            type: ObscRay
+            x: 0.43
+            y: 0.43
+            width: 0.22
+            theta: -0.117810
+          -
+            type: ObscRay
+            x: -0.43
+            y: -0.43
+            width: 0.22
+            theta: 3.023783
+          -
+            type: ObscRay
+            x: -0.43
+            y: -0.43
+            width: 0.22
+            theta: 4.830199
   G1:
     sagtype: sphere
     surftype: lens

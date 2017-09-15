@@ -4,6 +4,7 @@
 #include <pybind11/stl.h>
 
 namespace py = pybind11;
+using namespace pybind11::literals;
 
 namespace batoid {
     void pyExportObscuration(py::module& m) {
@@ -11,21 +12,23 @@ namespace batoid {
             .def("contains", &Obscuration::contains);
 
         py::class_<ObscCircle, std::shared_ptr<ObscCircle>, Obscuration>(m, "ObscCircle")
-            .def(py::init<double,double,double>());
+            .def(py::init<double,double,double>(), "init", "x"_a, "y"_a, "radius"_a);
 
         py::class_<ObscRectangle, std::shared_ptr<ObscRectangle>, Obscuration>(m, "ObscRectangle")
-            .def(py::init<double,double,double,double,double>());
+            .def(py::init<double,double,double,double,double>(), "init",
+                 "x"_a, "y"_a, "width"_a, "height"_a, "theta"_a);
 
         py::class_<ObscRay, std::shared_ptr<ObscRay>, Obscuration>(m, "ObscRay")
-            .def(py::init<double,double,double,double>());
+            .def(py::init<double,double,double,double>(), "init",
+                 "x"_a, "y"_a, "width"_a, "theta"_a);
 
         py::class_<ObscUnion, std::shared_ptr<ObscUnion>, Obscuration>(m, "ObscUnion")
-            .def(py::init<std::vector<std::shared_ptr<Obscuration>>>());
+            .def(py::init<std::vector<std::shared_ptr<Obscuration>>>(), "init", "items"_a);
 
         py::class_<ObscIntersection, std::shared_ptr<ObscIntersection>, Obscuration>(m, "ObscIntersection")
-            .def(py::init<std::vector<std::shared_ptr<Obscuration>>>());
+            .def(py::init<std::vector<std::shared_ptr<Obscuration>>>(), "init", "items"_a);
 
         py::class_<ObscNegation, std::shared_ptr<ObscNegation>, Obscuration>(m, "ObscNegation")
-            .def(py::init<std::shared_ptr<Obscuration>>());
+            .def(py::init<std::shared_ptr<Obscuration>>(), "init", "original"_a);
     }
 }

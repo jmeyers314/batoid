@@ -1,6 +1,7 @@
 import numpy as np
 import batoid
 from .utils import ordered_load, ListDict
+from .parse import parse_obscuration
 
 
 def media_catalog(media_str):
@@ -99,6 +100,8 @@ class Telescope(object):
                         Rout=sdata['outer'])
                 else:
                     raise RuntimeError("Unknown surface type {}".format(sagtype))
+                if 'obscuration' in sdata:
+                    sdict['obscuration'] = parse_obscuration(sdata['obscuration'])
                 out.surfaces[name] = sdict
                 m0 = m1
             # Then update any other params in file
