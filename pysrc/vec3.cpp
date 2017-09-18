@@ -71,6 +71,7 @@ namespace batoid {
             })
             .def(py::init<>())
             .def(py::init<std::array<double,9>>())
+            .def(py::self * py::self)
             .def("__repr__", &Rot3::repr)
             .def("determinant", &Rot3::determinant);
 
