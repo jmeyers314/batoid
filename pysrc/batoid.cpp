@@ -19,6 +19,7 @@ namespace batoid {
     void pyExportMedium(py::module&);
     void pyExportObscuration(py::module&);
     void pyExportXForm(py::module&);
+    void pyExportCoordSys(py::module&);
 
 #if (PYBIND11_VERSION_MAJOR >= 2) & (PYBIND11_VERSION_MINOR >= 2)
     PYBIND11_MODULE(_batoid, m) {
@@ -41,6 +42,7 @@ namespace batoid {
         pyExportMedium(m);
         pyExportObscuration(m);
         pyExportXForm(m);
+        pyExportCoordSys(m);
 #if !((PYBIND11_VERSION_MAJOR >= 2) & (PYBIND11_VERSION_MINOR >= 2))
         return m.ptr();
 #endif
