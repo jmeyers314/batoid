@@ -1,4 +1,5 @@
 import batoid
+import numpy as np
 import math
 from test_helpers import isclose, timer
 
@@ -24,9 +25,21 @@ def test_sag():
         B = random.gauss(0.4, 0.2)
         sphere = batoid.Sphere(R, B)
         for j in range(10):
-            x = random.gauss(0.0, 1.0)
-            y = random.gauss(0.0, 1.0)
-            assert isclose(sphere.sag(x, y), R*(1-math.sqrt(1.0-(x*x + y*y)/R/R))+B)
+            x = random.uniform(-0.7*R, 0.7*R)
+            y = random.uniform(-0.7*R, 0.7*R)
+            result = sphere.sag(x, y)
+            assert isclose(result, R*(1-math.sqrt(1.0-(x*x + y*y)/R/R))+B)
+            # Check that it returned a scalar float and not an array
+            assert isinstance(result, float)
+        # Check vectorization
+        x = np.random.uniform(-0.7*R, 0.7*R, size=(10, 10))
+        y = np.random.uniform(-0.7*R, 0.7*R, size=(10, 10))
+        np.testing.assert_allclose(sphere.sag(x, y), R*(1-np.sqrt(1.0-(x*x + y*y)/R/R))+B)
+        # Make sure non-unit stride arrays also work
+        np.testing.assert_allclose(
+            sphere.sag(x[::5,::2], y[::5,::2]),
+            (R*(1-np.sqrt(1.0-(x*x + y*y)/R/R))+B)[::5, ::2]
+        )
 
 
 @timer

@@ -4,6 +4,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
+#include <pybind11/numpy.h>
 
 PYBIND11_MAKE_OPAQUE(std::vector<batoid::Ray>);
 PYBIND11_MAKE_OPAQUE(std::vector<batoid::Intersection>);
@@ -21,7 +22,7 @@ namespace batoid {
             .def_property_readonly("kappa", &Asphere::getKappa)
             .def_property_readonly("alpha", &Asphere::getAlpha)
             .def_property_readonly("B", &Asphere::getB)
-            .def("sag", &Asphere::sag)
+            .def("sag", py::vectorize(&Asphere::sag))
             .def("normal", &Asphere::normal)
             .def("intersect", (Intersection (Asphere::*)(const Ray&) const) &Asphere::intersect)
             .def("intersect", (std::vector<batoid::Intersection> (Asphere::*)(const std::vector<batoid::Ray>&) const) &Asphere::intersect)

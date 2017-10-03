@@ -3,6 +3,7 @@
 #include <limits>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl_bind.h>
+#include <pybind11/numpy.h>
 
 PYBIND11_MAKE_OPAQUE(std::vector<batoid::Ray>);
 PYBIND11_MAKE_OPAQUE(std::vector<batoid::Intersection>);
@@ -18,7 +19,7 @@ namespace batoid {
                  "Rin"_a=0.0, "Rout"_a=std::numeric_limits<double>::infinity())
             .def_property_readonly("R", &Sphere::getR)
             .def_property_readonly("B", &Sphere::getB)
-            .def("sag", &Sphere::sag)
+            .def("sag", py::vectorize(&Sphere::sag))
             .def("normal", &Sphere::normal)
             .def("intersect", (Intersection (Sphere::*)(const Ray&) const) &Sphere::intersect)
             .def("intersect", (std::vector<batoid::Intersection> (Sphere::*)(const std::vector<batoid::Ray>&) const) &Sphere::intersect)

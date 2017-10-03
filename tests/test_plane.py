@@ -1,4 +1,5 @@
 import batoid
+import numpy as np
 from test_helpers import isclose, timer
 
 
@@ -22,7 +23,16 @@ def test_sag():
         for j in range(10):
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
-            assert isclose(plane.sag(x, y), B)
+            result = plane.sag(x, y)
+            assert isclose(result, B)
+            # Check that it returned a scalar float and not an array
+            assert isinstance(result, float)
+        # Check vectorization
+        x = np.random.normal(0.0, 1.0, size=(10, 10))
+        y = np.random.normal(0.0, 1.0, size=(10, 10))
+        np.testing.assert_allclose(plane.sag(x, y), B)
+        # Make sure non-unit stride arrays also work
+        np.testing.assert_allclose(plane.sag(x[::5,::2], y[::5,::2]), B)
 
 
 @timer

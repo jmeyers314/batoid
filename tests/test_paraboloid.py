@@ -1,4 +1,5 @@
 import batoid
+import numpy as np
 from test_helpers import isclose, timer
 
 
@@ -25,7 +26,16 @@ def test_sag():
         for j in range(10):
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
-            assert isclose(para.sag(x, y), (x*x + y*y)/2/R+B)
+            result = para.sag(x, y)
+            assert isclose(result, (x*x + y*y)/2/R+B)
+            # Check that it returned a scalar float and not an array
+            assert isinstance(result, float)
+        # Check vectorization
+        x = np.random.normal(0.0, 1.0, size=(10, 10))
+        y = np.random.normal(0.0, 1.0, size=(10, 10))
+        np.testing.assert_allclose(para.sag(x, y), (x*x + y*y)/2/R+B)
+        # Make sure non-unit stride arrays also work
+        np.testing.assert_allclose(para.sag(x[::5,::2], y[::5,::2]), ((x*x + y*y)/2/R+B)[::5,::2])
 
 
 @timer

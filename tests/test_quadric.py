@@ -1,4 +1,5 @@
 import batoid
+import numpy as np
 from test_helpers import isclose, timer
 
 
@@ -18,9 +19,8 @@ def test_properties():
 
 def quadric(R, kappa, B):
     def f(x, y):
-        import math
         r2 = x*x + y*y
-        den = R*(1+math.sqrt(1-(1+kappa)*r2/R/R))
+        den = R*(1+np.sqrt(1-(1+kappa)*r2/R/R))
         return r2/den + B
     return f
 
@@ -37,7 +37,19 @@ def test_sag():
         for j in range(100):
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
-            assert isclose(quad.sag(x, y), quadric(R, kappa, B)(x, y))
+            result = quad.sag(x, y)
+            assert isclose(result, quadric(R, kappa, B)(x, y))
+            # Check that it returned a scalar float and not an array
+            assert isinstance(result, float)
+        # Check vectorization
+        x = np.random.normal(0.0, 1.0, size=(10, 10))
+        y = np.random.normal(0.0, 1.0, size=(10, 10))
+        np.testing.assert_allclose(quad.sag(x, y), quadric(R, kappa, B)(x, y))
+        # Make sure non-unit stride arrays also work
+        np.testing.assert_allclose(
+            quad.sag(x[::5,::2], y[::5,::2]),
+            quadric(R, kappa, B)(x, y)[::5,::2]
+        )
 
 
 @timer
