@@ -65,8 +65,6 @@ namespace batoid {
 
         Vec3 applyForward(const Vec3& r) const;
         Vec3 applyReverse(const Vec3& r) const;
-        std::vector<Vec3> applyForward(const std::vector<Vec3>& rs) const;
-        std::vector<Vec3> applyReverse(const std::vector<Vec3>& rs) const;
 
         Ray applyForward(const Ray& r) const;
         Ray applyReverse(const Ray& r) const;

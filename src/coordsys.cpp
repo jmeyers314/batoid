@@ -104,24 +104,6 @@ namespace batoid {
         return RotVec(rotation, r)+dr;
     }
 
-    std::vector<Vec3> CoordTransform::applyForward(const std::vector<Vec3>& rs) const {
-        std::vector<Vec3> result(rs.size());
-        parallelTransform(rs.cbegin(), rs.cend(), result.begin(),
-            [this](const Vec3& r) { return applyForward(r); },
-            2000
-        );
-        return result;
-    }
-
-    std::vector<Vec3> CoordTransform::applyReverse(const std::vector<Vec3>& rs) const {
-        std::vector<Vec3> result(rs.size());
-        parallelTransform(rs.cbegin(), rs.cend(), result.begin(),
-            [this](const Vec3& r) { return applyReverse(r); },
-            2000
-        );
-        return result;
-    }
-
     Ray CoordTransform::applyForward(const Ray& r) const {
         return Ray(
             UnRotVec(rotation, r.p0-dr),
