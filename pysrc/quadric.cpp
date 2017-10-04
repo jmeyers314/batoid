@@ -20,6 +20,8 @@ namespace batoid {
             .def_property_readonly("R", &Quadric::getR)
             .def_property_readonly("kappa", &Quadric::getKappa)
             .def_property_readonly("B", &Quadric::getB)
+            .def_property_readonly("Rin", &Quadric::getRin)
+            .def_property_readonly("Rout", &Quadric::getRout)
             .def("sag", py::vectorize(&Quadric::sag))
             .def("normal", &Quadric::normal)
             .def("intersect", (Intersection (Quadric::*)(const Ray&) const) &Quadric::intersect)

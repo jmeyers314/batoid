@@ -23,6 +23,8 @@ namespace batoid {
         double getKappa() const {return kappa;}
         const std::vector<double>& getAlpha() const {return alpha;}
         double getB() const {return B;}
+        double getRin() const {return Rin;}
+        double getRout() const {return Rout;}
 
         std::string repr() const;
 

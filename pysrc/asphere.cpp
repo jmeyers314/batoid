@@ -22,6 +22,8 @@ namespace batoid {
             .def_property_readonly("kappa", &Asphere::getKappa)
             .def_property_readonly("alpha", &Asphere::getAlpha)
             .def_property_readonly("B", &Asphere::getB)
+            .def_property_readonly("Rin", &Asphere::getRin)
+            .def_property_readonly("Rout", &Asphere::getRout)
             .def("sag", py::vectorize(&Asphere::sag))
             .def("normal", &Asphere::normal)
             .def("intersect", (Intersection (Asphere::*)(const Ray&) const) &Asphere::intersect)

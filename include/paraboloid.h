@@ -20,6 +20,8 @@ namespace batoid {
         virtual Intersection intersect(const Ray&) const;
         double getR() const {return R;}
         double getB() const {return B;}
+        double getRin() const {return Rin;}
+        double getRout() const {return Rout;}
 
         std::string repr() const;
 

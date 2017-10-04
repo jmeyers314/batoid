@@ -19,6 +19,8 @@ namespace batoid {
                  "Rin"_a=0.0, "Rout"_a=std::numeric_limits<double>::infinity())
             .def_property_readonly("R", &Sphere::getR)
             .def_property_readonly("B", &Sphere::getB)
+            .def_property_readonly("Rin", &Sphere::getRin)
+            .def_property_readonly("Rout", &Sphere::getRout)
             .def("sag", py::vectorize(&Sphere::sag))
             .def("normal", &Sphere::normal)
             .def("intersect", (Intersection (Sphere::*)(const Ray&) const) &Sphere::intersect)

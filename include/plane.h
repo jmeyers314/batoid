@@ -19,6 +19,8 @@ namespace batoid {
         using Surface::intersect;
         virtual Intersection intersect(const Ray&) const;
         double getB() const {return B;}
+        double getRin() const {return Rin;}
+        double getRout() const {return Rout;}
 
         std::string repr() const;
 

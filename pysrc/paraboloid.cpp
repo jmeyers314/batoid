@@ -19,6 +19,8 @@ namespace batoid {
                  "Rin"_a=0.0, "Rout"_a=std::numeric_limits<double>::infinity())
             .def_property_readonly("R", &Paraboloid::getR)
             .def_property_readonly("B", &Paraboloid::getB)
+            .def_property_readonly("Rin", &Paraboloid::getRin)
+            .def_property_readonly("Rout", &Paraboloid::getRout)
             .def("sag", py::vectorize(&Paraboloid::sag))
             .def("normal", &Paraboloid::normal)
             .def("intersect", (Intersection (Paraboloid::*)(const Ray&) const) &Paraboloid::intersect)
