@@ -1,6 +1,8 @@
 #include "batoid.h"
 #include <pybind11/pybind11.h>
 
+PYBIND11_MAKE_OPAQUE(std::vector<batoid::Ray>);
+
 namespace py = pybind11;
 
 namespace batoid {
@@ -45,6 +47,15 @@ namespace batoid {
         pyExportXForm(m);
         pyExportCoordSys(m);
         pyExportCoordTransform(m);
+
+        m.def("reflect", (Ray (*)(const Ray&, const Surface&)) &reflect)
+         .def("reflect", (std::vector<Ray> (*)(const std::vector<Ray>&, const Surface&)) &reflect)
+         .def("refract", (Ray (*)(const Ray&, const Surface&, const double, const double)) &refract)
+         .def("refract", (std::vector<Ray> (*)(const std::vector<Ray>&, const Surface&, const double, const double)) &refract)
+         .def("refract", (Ray (*)(const Ray&, const Surface&, const Medium&, const Medium&)) &refract)
+         .def("refract", (std::vector<Ray> (*)(const std::vector<Ray>&, const Surface&, const Medium&, const Medium&)) &refract);
+
+
 #if !((PYBIND11_VERSION_MAJOR >= 2) & (PYBIND11_VERSION_MINOR >= 2))
         return m.ptr();
 #endif
