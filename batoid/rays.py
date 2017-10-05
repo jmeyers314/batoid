@@ -26,7 +26,7 @@ def parallelRays(z, outer, inner=0, theta_x=0, theta_y=0, nradii=50, naz=64,
     medium : batoid.Medium
         Medium rays are in. [default: batoid.ConstMedium(1.0)]
     """
-    radii = np.linspace(inner, outer, nradii)
+    radii = np.linspace(outer, inner, nradii)
     rays = batoid.RayVector()
     try:
         n = medium.getN(wavelength)
@@ -41,7 +41,7 @@ def parallelRays(z, outer, inner=0, theta_x=0, theta_y=0, nradii=50, naz=64,
     start_plane = batoid.Plane(p00.z).rotX(-theta_y).rotY(theta_x)
 
     for r in radii:
-        phis = np.linspace(0, 2*np.pi, int(naz*r/outer), endpoint=False)
+        phis = np.linspace(0, 2*np.pi, int(np.ceil(naz*r/outer)), endpoint=False)
         for phi in phis:
             p0 = batoid.Vec3(r*np.cos(phi), r*np.sin(phi), 0)
             v = batoid.Vec3(-np.tan(theta_x), -np.tan(theta_y), -1)
