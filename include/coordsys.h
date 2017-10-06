@@ -48,7 +48,7 @@ namespace batoid {
 
         std::string repr() const {
             std::ostringstream oss(" ");
-            oss << "CoordSys(" << origin << ',' << rotation << ")";
+            oss << "CoordSys(" << origin << ", " << rotation << ')';
             return oss.str();
         }
 

@@ -141,9 +141,9 @@ namespace batoid {
 
         std::string repr() const {
             std::ostringstream oss("\n");
-            oss << "Rot3([" << data[0] << ", " << data[1] << ", " << data[2] << ",\n"
-                << "      " << data[3] << ", " << data[4] << ", " << data[5] << ",\n"
-                << "      " << data[6] << ", " << data[7] << ", " << data[8] << "])\n";
+            oss << "Rot3([" << data[0] << ", " << data[1] << ", " << data[2] << ", "
+                            << data[3] << ", " << data[4] << ", " << data[5] << ", "
+                            << data[6] << ", " << data[7] << ", " << data[8] << "])";
             return oss.str();
         }
     };
