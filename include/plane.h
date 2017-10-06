@@ -18,6 +18,7 @@ namespace batoid {
         virtual Vec3 normal(double, double) const {return Vec3(0,0,1);}
         using Surface::intersect;
         virtual Intersection intersect(const Ray&) const;
+        virtual Ray intercept(const Ray&) const;
         double getB() const {return B;}
         double getRin() const {return Rin;}
         double getRout() const {return Rout;}

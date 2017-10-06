@@ -15,8 +15,8 @@ namespace batoid {
             .def(py::init<Rot3,Vec3>())
             .def("forward", (Ray (XForm::*)(const Ray&) const) &XForm::to)
             .def("reverse", (Ray (XForm::*)(const Ray&) const) &XForm::from)
-            .def("forward", (std::vector<batoid::Ray> (XForm::*)(const std::vector<batoid::Ray>&) const) &XForm::to)
-            .def("reverse", (std::vector<batoid::Ray> (XForm::*)(const std::vector<batoid::Ray>&) const) &XForm::from)
+            .def("forward", (std::vector<Ray> (XForm::*)(const std::vector<Ray>&) const) &XForm::to)
+            .def("reverse", (std::vector<Ray> (XForm::*)(const std::vector<Ray>&) const) &XForm::from)
             .def("inverse", &XForm::inverse)
             .def(py::self * py::self);
     }

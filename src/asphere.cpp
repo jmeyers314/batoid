@@ -43,6 +43,31 @@ namespace batoid {
         const Ray& r;
     };
 
+    Ray Asphere::intercept(const Ray& r) const {
+        if (r.failed)
+            return Ray(true);
+        // Solve the quadric problem analytically to get a good starting point.
+        Quadric quad(R, kappa, B);
+        Ray rquad = quad.intercept(r);
+        if (rquad.failed)
+            return Ray(true);
+
+        AsphereResidual resid(*this, r);
+        Solve<AsphereResidual> solve(resid, rquad.t0, rquad.t0+1e-2);
+        solve.setMethod(Method::Brent);
+        solve.setXTolerance(1e-12);
+        double t;
+        try {
+            solve.bracket();
+            t = solve.root();
+        } catch (const SolveError&) {
+            return Ray(true);
+        }
+
+        Vec3 point = r.positionAtTime(t);
+        return Ray(point, r.v, t, r.wavelength, r.isVignetted);
+    }
+
     Intersection Asphere::intersect(const Ray& r) const {
         if (r.failed)
             return Intersection(true);

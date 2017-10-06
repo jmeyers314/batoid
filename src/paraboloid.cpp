@@ -26,6 +26,48 @@ namespace batoid {
         return Vec3(-x/R, -y/R, 1).UnitVec3();
     }
 
+    Ray Paraboloid::intercept(const Ray& r) const {
+        if (r.failed)
+            return Ray(true);
+        double a = (r.v.x*r.v.x + r.v.y*r.v.y)/2/R;
+        double b = (r.p0.x*r.v.x + r.p0.y*r.v.y)/R - r.v.z;
+        double c = (r.p0.x*r.p0.x + r.p0.y*r.p0.y)/2/R + B - r.p0.z;
+        double r1, r2;
+        int n = solveQuadratic(a, b, c, r1, r2);
+
+        double t;
+        if (n == 0) {
+            // throw NoIntersectionError("");
+            return Ray(true);
+        } else if (n == 1) {
+            if (r1 < 0) {
+                // throw NoFutureIntersectionError("");
+                return Ray(true);
+            }
+            t = r1;
+        } else {
+            if (r1 < 0) {
+                if (r2 < 0) {
+                    // throw NoFutureIntersectionError("");
+                    return Ray(true);
+                } else {
+                    t = r2;
+                }
+            } else {
+                if (r2 < 0) {
+                    t = r1;
+                } else {
+                    t = std::min(r1, r2);
+                }
+            }
+        }
+
+        t += r.t0;
+        Vec3 point = r.positionAtTime(t);
+        return Ray(point, r.v, t, r.wavelength, r.isVignetted);
+    }
+
+
     Intersection Paraboloid::intersect(const Ray& ray) const {
         if (ray.failed)
             return Intersection(true);

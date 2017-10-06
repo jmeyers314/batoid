@@ -16,6 +16,7 @@ namespace batoid {
                 double _Rin=0.0, double _Rout=std::numeric_limits<double>::infinity());
         virtual double sag(double, double) const;
         virtual Vec3 normal(double, double) const;
+        Ray intercept(const Ray&) const;
         using Surface::intersect;
         virtual Intersection intersect(const Ray&) const;
         double getR() const {return R;}

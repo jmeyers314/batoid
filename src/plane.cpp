@@ -5,6 +5,15 @@ namespace batoid {
     Plane::Plane(double _B, double _Rin, double _Rout) :
         B(_B), Rin(_Rin), Rout(_Rout) {}
 
+    Ray Plane::intercept(const Ray& r) const {
+        if (r.failed)
+            return Ray(true);
+        double t = (B - r.p0.z)/r.v.z;
+        t += r.t0;
+        Vec3 point = r.positionAtTime(t);
+        return Ray(point, r.v, t, r.wavelength, r.isVignetted);
+    }
+
     Intersection Plane::intersect(const Ray& r) const {
         if (r.failed)
             return Intersection(true);

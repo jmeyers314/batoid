@@ -47,4 +47,14 @@ namespace batoid {
         );
         return result;
     }
+
+    std::vector<Ray> Surface::intercept(const std::vector<Ray>& rays) const {
+        auto result = std::vector<Ray>(rays.size());
+        parallelTransform(rays.cbegin(), rays.cend(), result.begin(),
+            [this](const Ray& ray)
+            { return intercept(ray); },
+            2000
+        );
+        return result;
+    }
 }

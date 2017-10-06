@@ -51,11 +51,11 @@ namespace batoid {
         m.def("phaseMany", &phaseMany);
         m.def("propagatedToTimesMany", &propagatedToTimesMany);
 
-        auto RV = py::bind_vector<std::vector<batoid::Ray>>(m, "RayVector", py::buffer_protocol());
+        auto RV = py::bind_vector<std::vector<Ray>>(m, "RayVector", py::buffer_protocol());
         // This feels a little hacky, but seems to work.
         RV.def_property_readonly(
             "x",
-            [](std::vector<batoid::Ray>& rv) {
+            [](std::vector<Ray>& rv) {
                 return py::array_t<double>(
                     py::buffer_info(
                         &rv[0].p0.x,
@@ -63,14 +63,14 @@ namespace batoid {
                         py::format_descriptor<double>::format(),
                         1,
                         {rv.size()},
-                        {sizeof(batoid::Ray)}
+                        {sizeof(Ray)}
                     )
                 );
             }
         )
         .def_property_readonly(
             "y",
-            [](std::vector<batoid::Ray>& rv) {
+            [](std::vector<Ray>& rv) {
                 return py::array_t<double>(
                     py::buffer_info(
                         &rv[0].p0.y,
@@ -78,14 +78,14 @@ namespace batoid {
                         py::format_descriptor<double>::format(),
                         1,
                         {rv.size()},
-                        {sizeof(batoid::Ray)}
+                        {sizeof(Ray)}
                     )
                 );
             }
         )
         .def_property_readonly(
             "z",
-            [](std::vector<batoid::Ray>& rv) {
+            [](std::vector<Ray>& rv) {
                 return py::array_t<double>(
                     py::buffer_info(
                         &rv[0].p0.z,
@@ -93,14 +93,14 @@ namespace batoid {
                         py::format_descriptor<double>::format(),
                         1,
                         {rv.size()},
-                        {sizeof(batoid::Ray)}
+                        {sizeof(Ray)}
                     )
                 );
             }
         )
         .def_property_readonly(
             "vx",
-            [](std::vector<batoid::Ray>& rv) {
+            [](std::vector<Ray>& rv) {
                 return py::array_t<double>(
                     py::buffer_info(
                         &rv[0].v.x,
@@ -108,14 +108,14 @@ namespace batoid {
                         py::format_descriptor<double>::format(),
                         1,
                         {rv.size()},
-                        {sizeof(batoid::Ray)}
+                        {sizeof(Ray)}
                     )
                 );
             }
         )
         .def_property_readonly(
             "vy",
-            [](std::vector<batoid::Ray>& rv) {
+            [](std::vector<Ray>& rv) {
                 return py::array_t<double>(
                     py::buffer_info(
                         &rv[0].v.y,
@@ -123,14 +123,14 @@ namespace batoid {
                         py::format_descriptor<double>::format(),
                         1,
                         {rv.size()},
-                        {sizeof(batoid::Ray)}
+                        {sizeof(Ray)}
                     )
                 );
             }
         )
         .def_property_readonly(
             "vz",
-            [](std::vector<batoid::Ray>& rv) {
+            [](std::vector<Ray>& rv) {
                 return py::array_t<double>(
                     py::buffer_info(
                         &rv[0].v.z,
@@ -138,14 +138,14 @@ namespace batoid {
                         py::format_descriptor<double>::format(),
                         1,
                         {rv.size()},
-                        {sizeof(batoid::Ray)}
+                        {sizeof(Ray)}
                     )
                 );
             }
         )
         .def_property_readonly(
             "t0",
-            [](std::vector<batoid::Ray>& rv) {
+            [](std::vector<Ray>& rv) {
                 return py::array_t<double>(
                     py::buffer_info(
                         &rv[0].t0,
@@ -153,14 +153,14 @@ namespace batoid {
                         py::format_descriptor<double>::format(),
                         1,
                         {rv.size()},
-                        {sizeof(batoid::Ray)}
+                        {sizeof(Ray)}
                     )
                 );
             }
         )
         .def_property_readonly(
             "wavelength",
-            [](std::vector<batoid::Ray>& rv) {
+            [](std::vector<Ray>& rv) {
                 return py::array_t<double>(
                     py::buffer_info(
                         &rv[0].wavelength,
@@ -168,14 +168,14 @@ namespace batoid {
                         py::format_descriptor<double>::format(),
                         1,
                         {rv.size()},
-                        {sizeof(batoid::Ray)}
+                        {sizeof(Ray)}
                     )
                 );
             }
         )
         .def_property_readonly(
             "isVignetted",
-            [](std::vector<batoid::Ray>& rv) {
+            [](std::vector<Ray>& rv) {
                 return py::array_t<bool>(
                     py::buffer_info(
                         &rv[0].isVignetted,
@@ -183,14 +183,14 @@ namespace batoid {
                         py::format_descriptor<bool>::format(),
                         1,
                         {rv.size()},
-                        {sizeof(batoid::Ray)}
+                        {sizeof(Ray)}
                     )
                 );
             }
         )
         .def_property_readonly(
             "failed",
-            [](std::vector<batoid::Ray>& rv) {
+            [](std::vector<Ray>& rv) {
                 return py::array_t<bool>(
                     py::buffer_info(
                         &rv[0].failed,
@@ -198,7 +198,7 @@ namespace batoid {
                         py::format_descriptor<bool>::format(),
                         1,
                         {rv.size()},
-                        {sizeof(batoid::Ray)}
+                        {sizeof(Ray)}
                     )
                 );
             }

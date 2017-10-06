@@ -26,8 +26,9 @@ namespace batoid {
             .def_property_readonly("Rout", &Asphere::getRout)
             .def("sag", py::vectorize(&Asphere::sag))
             .def("normal", &Asphere::normal)
+            .def("intercept", &Asphere::intercept)
             .def("intersect", (Intersection (Asphere::*)(const Ray&) const) &Asphere::intersect)
-            .def("intersect", (std::vector<batoid::Intersection> (Asphere::*)(const std::vector<batoid::Ray>&) const) &Asphere::intersect)
+            .def("intersect", (std::vector<Intersection> (Asphere::*)(const std::vector<Ray>&) const) &Asphere::intersect)
             .def("__repr__", &Asphere::repr);
     }
 }

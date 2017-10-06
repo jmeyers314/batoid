@@ -35,12 +35,12 @@ namespace batoid {
             .def("refractedRay", (Ray (Intersection::*)(const Ray&, const Medium&, const Medium&) const) &Intersection::refractedRay)
             .def(py::self == py::self);
         m.def("reflectMany", &reflectMany);
-        m.def("refractMany", (std::vector<batoid::Ray>(*)(const std::vector<Intersection>&, const std::vector<Ray>&, double, double)) &refractMany);
-        m.def("refractMany", (std::vector<batoid::Ray>(*)(const std::vector<Intersection>&, const std::vector<Ray>&, const Medium&, const Medium&)) &refractMany);
-        auto IV = py::bind_vector<std::vector<batoid::Intersection>>(m, "IntersectionVector", py::buffer_protocol());
+        m.def("refractMany", (std::vector<Ray>(*)(const std::vector<Intersection>&, const std::vector<Ray>&, double, double)) &refractMany);
+        m.def("refractMany", (std::vector<Ray>(*)(const std::vector<Intersection>&, const std::vector<Ray>&, const Medium&, const Medium&)) &refractMany);
+        auto IV = py::bind_vector<std::vector<Intersection>>(m, "IntersectionVector", py::buffer_protocol());
         IV.def_property_readonly(
             "t",
-            [](std::vector<batoid::Intersection>& isecs) {
+            [](std::vector<Intersection>& isecs) {
                 return py::array_t<double>(
                     py::buffer_info(
                         &isecs[0].t,
@@ -48,14 +48,14 @@ namespace batoid {
                         py::format_descriptor<double>::format(),
                         1,
                         {isecs.size()},
-                        {sizeof(batoid::Intersection)}
+                        {sizeof(Intersection)}
                     )
                 );
             }
         )
         .def_property_readonly(
             "x",
-            [](std::vector<batoid::Intersection>& isecs) {
+            [](std::vector<Intersection>& isecs) {
                 return py::array_t<double>(
                     py::buffer_info(
                         &isecs[0].point.x,
@@ -63,14 +63,14 @@ namespace batoid {
                         py::format_descriptor<double>::format(),
                         1,
                         {isecs.size()},
-                        {sizeof(batoid::Intersection)}
+                        {sizeof(Intersection)}
                     )
                 );
             }
         )
         .def_property_readonly(
             "y",
-            [](std::vector<batoid::Intersection>& isecs) {
+            [](std::vector<Intersection>& isecs) {
                 return py::array_t<double>(
                     py::buffer_info(
                         &isecs[0].point.y,
@@ -78,14 +78,14 @@ namespace batoid {
                         py::format_descriptor<double>::format(),
                         1,
                         {isecs.size()},
-                        {sizeof(batoid::Intersection)}
+                        {sizeof(Intersection)}
                     )
                 );
             }
         )
         .def_property_readonly(
             "z",
-            [](std::vector<batoid::Intersection>& isecs) {
+            [](std::vector<Intersection>& isecs) {
                 return py::array_t<double>(
                     py::buffer_info(
                         &isecs[0].point.z,
@@ -93,14 +93,14 @@ namespace batoid {
                         py::format_descriptor<double>::format(),
                         1,
                         {isecs.size()},
-                        {sizeof(batoid::Intersection)}
+                        {sizeof(Intersection)}
                     )
                 );
             }
         )
         .def_property_readonly(
             "nx",
-            [](std::vector<batoid::Intersection>& isecs) {
+            [](std::vector<Intersection>& isecs) {
                 return py::array_t<double>(
                     py::buffer_info(
                         &isecs[0].surfaceNormal.x,
@@ -108,14 +108,14 @@ namespace batoid {
                         py::format_descriptor<double>::format(),
                         1,
                         {isecs.size()},
-                        {sizeof(batoid::Intersection)}
+                        {sizeof(Intersection)}
                     )
                 );
             }
         )
         .def_property_readonly(
             "ny",
-            [](std::vector<batoid::Intersection>& isecs) {
+            [](std::vector<Intersection>& isecs) {
                 return py::array_t<double>(
                     py::buffer_info(
                         &isecs[0].surfaceNormal.y,
@@ -123,14 +123,14 @@ namespace batoid {
                         py::format_descriptor<double>::format(),
                         1,
                         {isecs.size()},
-                        {sizeof(batoid::Intersection)}
+                        {sizeof(Intersection)}
                     )
                 );
             }
         )
         .def_property_readonly(
             "nz",
-            [](std::vector<batoid::Intersection>& isecs) {
+            [](std::vector<Intersection>& isecs) {
                 return py::array_t<double>(
                     py::buffer_info(
                         &isecs[0].surfaceNormal.z,
@@ -138,14 +138,14 @@ namespace batoid {
                         py::format_descriptor<double>::format(),
                         1,
                         {isecs.size()},
-                        {sizeof(batoid::Intersection)}
+                        {sizeof(Intersection)}
                     )
                 );
             }
         )
         .def_property_readonly(
             "isVignetted",
-            [](std::vector<batoid::Intersection>& isecs) {
+            [](std::vector<Intersection>& isecs) {
                 return py::array_t<bool>(
                     py::buffer_info(
                         &isecs[0].isVignetted,
@@ -153,14 +153,14 @@ namespace batoid {
                         py::format_descriptor<bool>::format(),
                         1,
                         {isecs.size()},
-                        {sizeof(batoid::Intersection)}
+                        {sizeof(Intersection)}
                     )
                 );
             }
         )
         .def_property_readonly(
             "failed",
-            [](std::vector<batoid::Intersection>& isecs) {
+            [](std::vector<Intersection>& isecs) {
                 return py::array_t<bool>(
                     py::buffer_info(
                         &isecs[0].failed,
@@ -168,7 +168,7 @@ namespace batoid {
                         py::format_descriptor<bool>::format(),
                         1,
                         {isecs.size()},
-                        {sizeof(batoid::Intersection)}
+                        {sizeof(Intersection)}
                     )
                 );
             }

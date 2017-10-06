@@ -22,8 +22,9 @@ namespace batoid {
             .def_property_readonly("Rout", &Plane::getRout)
             .def("sag", py::vectorize(&Plane::sag))
             .def("normal", &Plane::normal)
+            .def("intercept", &Plane::intercept)
             .def("intersect", (Intersection (Plane::*)(const Ray&) const) &Plane::intersect)
-            .def("intersect", (std::vector<batoid::Intersection> (Plane::*)(const std::vector<batoid::Ray>&) const) &Plane::intersect)
+            .def("intersect", (std::vector<Intersection> (Plane::*)(const std::vector<Ray>&) const) &Plane::intersect)
             .def("__repr__", &Plane::repr);
     }
 }

@@ -24,8 +24,9 @@ namespace batoid {
             .def_property_readonly("Rout", &Quadric::getRout)
             .def("sag", py::vectorize(&Quadric::sag))
             .def("normal", &Quadric::normal)
+            .def("intercept", &Quadric::intercept)
             .def("intersect", (Intersection (Quadric::*)(const Ray&) const) &Quadric::intersect)
-            .def("intersect", (std::vector<batoid::Intersection> (Quadric::*)(const std::vector<batoid::Ray>&) const) &Quadric::intersect)
+            .def("intersect", (std::vector<Intersection> (Quadric::*)(const std::vector<Ray>&) const) &Quadric::intersect)
             .def("__repr__", &Quadric::repr);
     }
 }

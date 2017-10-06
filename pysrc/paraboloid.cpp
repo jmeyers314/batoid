@@ -23,8 +23,9 @@ namespace batoid {
             .def_property_readonly("Rout", &Paraboloid::getRout)
             .def("sag", py::vectorize(&Paraboloid::sag))
             .def("normal", &Paraboloid::normal)
+            .def("intercept", &Paraboloid::intercept)
             .def("intersect", (Intersection (Paraboloid::*)(const Ray&) const) &Paraboloid::intersect)
-            .def("intersect", (std::vector<batoid::Intersection> (Paraboloid::*)(const std::vector<batoid::Ray>&) const) &Paraboloid::intersect)
+            .def("intersect", (std::vector<Intersection> (Paraboloid::*)(const std::vector<Ray>&) const) &Paraboloid::intersect)
             .def("__repr__", &Paraboloid::repr);
     }
 }
