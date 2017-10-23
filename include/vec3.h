@@ -123,6 +123,29 @@ namespace batoid {
                         0,1,0,
                         0,0,1}}) {}
         Rot3(std::array<double,9> d) : data(d) {}
+        Rot3(double thx, double thy, double thz) {
+            double cx = cos(thx), sx = sin(thx);
+            double cy = cos(thy), sy = sin(thy);
+            double cz = cos(thz), sz = sin(thz);
+            data = {{cy*cz,
+                     -cy*sz,
+                     sy,
+                     cx*sz + sx*sy*cz,
+                     cx*cz - sx*sy*sz,
+                     -sx*cy,
+                     sx*sz-cx*sy*cz,
+                     sx*cz+cx*sy*sz,
+                     cx*cy}};
+        }
+
+        Rot3(std::array<double,3> euler) : Rot3(euler[0], euler[1], euler[2]) {}
+
+        std::array<double,3> getEuler() const {
+            return {{atan2(-data[5], data[8]),
+                     asin(data[2]),
+                     atan2(-data[1], data[0])}};
+        }
+
 
         inline double determinant() const {
             return data[0]*data[4]*data[8]
@@ -178,6 +201,15 @@ namespace batoid {
                       a.data[6]*b.data[2] + a.data[7]*b.data[5] + a.data[8]*b.data[8]
         }}};
     }
+
+    inline bool operator==(const Rot3& a, const Rot3& b) {
+        return a.data == b.data;
+    }
+
+    inline bool operator!=(const Rot3& a, const Rot3& b) {
+        return a.data != b.data;
+    }
+
 }
 
 #endif

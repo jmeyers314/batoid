@@ -71,9 +71,14 @@ namespace batoid {
             })
             .def(py::init<>())
             .def(py::init<std::array<double,9>>())
+            .def(py::init<std::array<double,3>>())
+            .def(py::init<double,double,double>())
             .def(py::self * py::self)
+            .def(py::self == py::self)
+            .def(py::self != py::self)
             .def("__repr__", &Rot3::repr)
-            .def("determinant", &Rot3::determinant);
+            .def("determinant", &Rot3::determinant)
+            .def_property_readonly("euler", &Rot3::getEuler);
 
         m.def("DotProduct", &DotProduct, R"pbdoc(
           Compute the dot-product of two Vec3 objects.

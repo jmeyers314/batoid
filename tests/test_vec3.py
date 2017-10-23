@@ -265,6 +265,33 @@ def test_determinant():
         assert isclose(np.linalg.det(R), R.determinant())
 
 
+@timer
+def test_euler():
+    import math
+    import random
+    random.seed(57721566490)
+    for i in range(1000):
+        thx = random.uniform(0, 2*math.pi)
+        thy = random.uniform(0, 2*math.pi)
+        thz = random.uniform(0, 2*math.pi)
+        # test 3 double ctor is same as list of 3 doubles ctor
+        R = batoid.Rot3(thx, thy, thz)
+        R2 = batoid.Rot3([thx, thy, thz])
+        assert R == R2
+
+        # Make sure != works
+        R3 = batoid.Rot3(thx+0.1, thy, thz)
+        assert R != R3
+
+        # Check ctor against rotating one at a time.
+        R4 = batoid.RotX(thx)*batoid.RotY(thy)*batoid.RotZ(thz)
+        assert R == R4
+
+        # Check round trip of .euler property
+        R5 = batoid.Rot3(R.euler)
+        assert all([isclose(r1, r5, rel_tol=0, abs_tol=1e-15) for r1, r5 in zip(R.euler, R5.euler)])
+
+
 if __name__ == '__main__':
     test_DotProduct()
     test_CrossProduct()
@@ -277,3 +304,4 @@ if __name__ == '__main__':
     test_ne()
     testRotVec()
     test_determinant()
+    test_euler()
