@@ -54,7 +54,7 @@ namespace batoid {
         double *ptrZOut = (double *)  bufZOut.ptr;
 
         auto v = Vec3();
-        for (size_t idx = 0; idx < bufX.size; idx++) {
+        for (ssize_t idx = 0; idx < bufX.size; idx++) {
             v = ct.applyForward(Vec3(ptrX[idx], ptrY[idx], ptrZ[idx]));
             ptrXOut[idx] = v.x;
             ptrYOut[idx] = v.y;
