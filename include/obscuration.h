@@ -13,53 +13,53 @@ namespace batoid {
 
     class ObscCircle : public Obscuration {
     public:
-        ObscCircle(double x0, double y0, double radius);
-        bool contains(double, double) const override;
+        ObscCircle(double radius, double x0=0.0, double y0=0.0);
+        bool contains(double x, double y) const override;
     private:
-        const double x0, y0, radius;
+        const double _radius, _x0, _y0;
     };
 
     class ObscRectangle : public Obscuration {
     public:
-        ObscRectangle(double x0, double y0, double width, double height, double theta);
-        bool contains(double, double) const override;
+        ObscRectangle(double width, double height, double x0=0.0, double y0=0.0, double theta=0.0);
+        bool contains(double x, double y) const override;
     private:
-        const double x0, y0, width, height, theta;
-        Vec2 A, B, C, AB, BC;
-        double ABAB, BCBC;
+        const double _width, _height, _x0, _y0, _theta;
+        Vec2 _A, _B, _C, _AB, _BC;
+        double _ABAB, _BCBC;
     };
 
     class ObscRay : public Obscuration {
     public:
-        ObscRay(double x0, double y0, double width, double theta);
-        bool contains(double, double) const override;
+        ObscRay(double width, double theta, double x0=0.0, double y0=0.0);
+        bool contains(double x, double y) const override;
     private:
-        const double x0, y0, width, theta;
-        const ObscRectangle rect;
+        const double _width, _theta, _x0, _y0;
+        const ObscRectangle _rect;
     };
 
     class ObscUnion : public Obscuration {
     public:
-        ObscUnion(const std::vector<std::shared_ptr<Obscuration>> _obscVec);
-        bool contains(double, double) const override;
+        ObscUnion(const std::vector<std::shared_ptr<Obscuration>> obscVec);
+        bool contains(double x, double y) const override;
     private:
-        const std::vector<std::shared_ptr<Obscuration>> obscVec;
+        const std::vector<std::shared_ptr<Obscuration>> _obscVec;
     };
 
     class ObscIntersection : public Obscuration {
     public:
-        ObscIntersection(const std::vector<std::shared_ptr<Obscuration>> _obscVec);
-        bool contains(double, double) const override;
+        ObscIntersection(const std::vector<std::shared_ptr<Obscuration>> obscVec);
+        bool contains(double x, double y) const override;
     private:
-        const std::vector<std::shared_ptr<Obscuration>> obscVec;
+        const std::vector<std::shared_ptr<Obscuration>> _obscVec;
     };
 
     class ObscNegation : public Obscuration {
     public:
-        ObscNegation(const std::shared_ptr<Obscuration> _original);
-        bool contains(double, double) const override;
+        ObscNegation(const std::shared_ptr<Obscuration> original);
+        bool contains(double x, double y) const override;
     private:
-        const std::shared_ptr<Obscuration> original;
+        const std::shared_ptr<Obscuration> _original;
     };
 }
 

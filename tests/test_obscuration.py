@@ -1,33 +1,36 @@
 import batoid
 import numpy as np
+from test_helpers import timer
 
 
+@timer
 def test_ObscCircle():
     import random
     random.seed(5)
 
-    for i in range(10):
+    for i in range(100):
         cx = random.gauss(0.0, 1.0)
         cy = random.gauss(0.0, 1.0)
         r = random.uniform(0.5, 1.5)
 
-        obsc = batoid._batoid.ObscCircle(cx, cy, r)
+        obsc = batoid._batoid.ObscCircle(r, cx, cy)
         for i in range(100):
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
             assert obsc.contains(x, y) == (np.hypot(x-cx, y-cy) <= r)
 
 
+@timer
 def test_ObscNegation():
     import random
     random.seed(57)
 
-    for i in range(10):
+    for i in range(100):
         cx = random.gauss(0.0, 1.0)
         cy = random.gauss(0.0, 1.0)
         r = random.uniform(0.5, 1.5)
 
-        obsc = batoid._batoid.ObscCircle(cx, cy, r)
+        obsc = batoid._batoid.ObscCircle(r, cx, cy)
         obsc = batoid._batoid.ObscNegation(obsc)
         for i in range(100):
             x = random.gauss(0.0, 1.0)
@@ -42,17 +45,18 @@ def test_ObscNegation():
             assert obsc.contains(x, y) == (np.hypot(x-cx, y-cy) > r)
 
 
+@timer
 def test_ObscRectangle():
     import random
     random.seed(577)
 
-    for i in range(10):
+    for i in range(100):
         cx = random.gauss(0.0, 1.0)
         cy = random.gauss(0.0, 1.0)
         w = random.uniform(0.5, 2.5)
         h = random.uniform(0.5, 2.5)
 
-        obsc = batoid._batoid.ObscRectangle(cx, cy, w, h, 0.0)
+        obsc = batoid._batoid.ObscRectangle(w, h, cx, cy, 0.0)
 
         for i in range(100):
             x = random.gauss(0.0, 2.0)
@@ -60,7 +64,7 @@ def test_ObscRectangle():
             assert obsc.contains(x, y) == (x > cx-w/2 and x < cx+w/2 and y > cy-h/2 and y < cy+h/2)
 
         th = random.uniform(0.0, np.pi/2)
-        obsc = batoid._batoid.ObscRectangle(cx, cy, w, h, th)
+        obsc = batoid._batoid.ObscRectangle(w, h, cx, cy, th)
         for i in range(100):
             x = random.gauss(0.0, 2.0)
             y = random.gauss(0.0, 2.0)
@@ -69,22 +73,23 @@ def test_ObscRectangle():
             assert obsc.contains(x, y) == (xp > cx-w/2 and xp < cx+w/2 and yp > cy-h/2 and yp < cy+h/2)
 
 
+@timer
 def test_ObscCompound():
     import random
     random.seed(5772)
 
-    for i in range(10):
+    for i in range(100):
         rx = random.gauss(0.0, 1.0)
         ry = random.gauss(0.0, 1.0)
         w = random.uniform(0.5, 2.5)
         h = random.uniform(0.5, 2.5)
         th = random.uniform(0.0, np.pi)
-        rect = batoid._batoid.ObscRectangle(rx, ry, w, h, th)
+        rect = batoid._batoid.ObscRectangle(w, h, rx, ry, th)
 
         cx = random.gauss(0.0, 1.0)
         cy = random.gauss(0.0, 1.0)
         r = random.uniform(0.5, 1.5)
-        circ = batoid._batoid.ObscCircle(cx, cy, r)
+        circ = batoid._batoid.ObscCircle(r, cx, cy)
 
         union = batoid._batoid.ObscUnion([rect, circ])
         intersection = batoid._batoid.ObscIntersection([rect, circ])
