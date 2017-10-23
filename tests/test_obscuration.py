@@ -33,6 +33,13 @@ def test_ObscNegation():
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
             assert obsc.contains(x, y) == (np.hypot(x-cx, y-cy) > r)
+        # also test config parsing of "ClearCircle"
+        config = {'type':'ClearCircle', 'x':cx, 'y':cy, 'radius':r}
+        obsc = batoid.parse.parse_obscuration(config)
+        for i in range(100):
+            x = random.gauss(0.0, 1.0)
+            y = random.gauss(0.0, 1.0)
+            assert obsc.contains(x, y) == (np.hypot(x-cx, y-cy) > r)
 
 
 def test_ObscRectangle():
