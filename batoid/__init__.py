@@ -8,6 +8,7 @@ from ._batoid import Medium, ConstMedium, TableMedium, SellmeierMedium, Air
 from .telescope import Telescope
 from .rays import parallelRays, rayGrid
 from .coordsys import RotX, RotY, RotZ
+from . import optic
 
 import os
 datadir = os.path.join(os.path.dirname(__file__), "data")
