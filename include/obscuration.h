@@ -15,7 +15,6 @@ namespace batoid {
     public:
         ObscCircle(double radius, double x0=0.0, double y0=0.0);
         bool contains(double x, double y) const override;
-    private:
         const double _radius, _x0, _y0;
     };
 
@@ -23,8 +22,8 @@ namespace batoid {
     public:
         ObscRectangle(double width, double height, double x0=0.0, double y0=0.0, double theta=0.0);
         bool contains(double x, double y) const override;
-    private:
         const double _width, _height, _x0, _y0, _theta;
+    private:
         Vec2 _A, _B, _C, _AB, _BC;
         double _ABAB, _BCBC;
     };
@@ -33,8 +32,8 @@ namespace batoid {
     public:
         ObscRay(double width, double theta, double x0=0.0, double y0=0.0);
         bool contains(double x, double y) const override;
-    private:
         const double _width, _theta, _x0, _y0;
+    private:
         const ObscRectangle _rect;
     };
 
@@ -42,7 +41,6 @@ namespace batoid {
     public:
         ObscUnion(const std::vector<std::shared_ptr<Obscuration>> obscVec);
         bool contains(double x, double y) const override;
-    private:
         const std::vector<std::shared_ptr<Obscuration>> _obscVec;
     };
 
@@ -50,7 +48,6 @@ namespace batoid {
     public:
         ObscIntersection(const std::vector<std::shared_ptr<Obscuration>> obscVec);
         bool contains(double x, double y) const override;
-    private:
         const std::vector<std::shared_ptr<Obscuration>> _obscVec;
     };
 
@@ -58,7 +55,6 @@ namespace batoid {
     public:
         ObscNegation(const std::shared_ptr<Obscuration> original);
         bool contains(double x, double y) const override;
-    private:
         const std::shared_ptr<Obscuration> _original;
     };
 }
