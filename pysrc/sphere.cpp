@@ -25,7 +25,8 @@ namespace batoid {
             .def("normal", &Sphere::normal)
             .def("intercept", &Sphere::intercept)
             .def("intersect", (Intersection (Sphere::*)(const Ray&) const) &Sphere::intersect)
-            .def("intersect", (std::vector<Intersection> (Sphere::*)(const std::vector<Ray>&) const) &Sphere::intersect)
+            .def("intercept", (std::vector<Ray> (Sphere::*)(const std::vector<Ray>&) const) &Surface::intercept)
+            .def("intersect", (std::vector<Intersection> (Sphere::*)(const std::vector<Ray>&) const) &Surface::intersect)
             .def("__repr__", &Sphere::repr);
     }
 }

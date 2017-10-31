@@ -25,7 +25,8 @@ namespace batoid {
             .def("normal", &Paraboloid::normal)
             .def("intercept", &Paraboloid::intercept)
             .def("intersect", (Intersection (Paraboloid::*)(const Ray&) const) &Paraboloid::intersect)
-            .def("intersect", (std::vector<Intersection> (Paraboloid::*)(const std::vector<Ray>&) const) &Paraboloid::intersect)
+            .def("intercept", (std::vector<Ray> (Paraboloid::*)(const std::vector<Ray>&) const) &Surface::intercept)
+            .def("intersect", (std::vector<Intersection> (Paraboloid::*)(const std::vector<Ray>&) const) &Surface::intersect)
             .def("__repr__", &Paraboloid::repr);
     }
 }
