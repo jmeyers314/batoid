@@ -23,6 +23,7 @@ namespace batoid {
     }
 
     Vec3 Paraboloid::normal(double x, double y) const {
+        if (R == 0.0) return Vec3(0,0,1);
         return Vec3(-x/R, -y/R, 1).UnitVec3();
     }
 

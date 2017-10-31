@@ -20,6 +20,7 @@ namespace batoid {
 
     Vec3 Quadric::normal(double x, double y) const {
         double r = std::sqrt(x*x + y*y);
+        if (r == 0.0) return Vec3(0,0,1);
         double dzdr1 = dzdr(r);
         Vec3 n{-dzdr1*x/r, -dzdr1*y/r, 1};
         return n.UnitVec3();
