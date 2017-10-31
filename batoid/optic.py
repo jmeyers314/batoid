@@ -137,10 +137,28 @@ class Lens(CompoundOptic):
         self.medium = medium
 
 class Detector(Interface):
-    pass
+    def trace(self, r, inCoordSys=batoid._batoid.CoordSys(), outCoordSys=None):
+        transform = batoid._batoid.CoordTransform(inCoordSys, self.coordSys)
+        r = transform.applyForward(r)
+        r = self.surface.intercept(r)
+        # r = self.obscuration.obscure(r)
+        if outCoordSys is None:
+            return r, self.coordSys
+        else:
+            transform = batoid._batoid.CoordTransform(self.coordSys, outCoordSys)
+            return transform.applyForward(r), outCoordSys
 
 class Baffle(Interface):
-    pass
+    def trace(self, r, inCoordSys=batoid._batoid.CoordSys(), outCoordSys=None):
+        transform = batoid._batoid.CoordTransform(inCoordSys, self.coordSys)
+        r = transform.applyForward(r)
+        r = self.surface.intercept(r)
+        # r = self.obscuration.obscure(r)
+        if outCoordSys is None:
+            return r, self.coordSys
+        else:
+            transform = batoid._batoid.CoordTransform(self.coordSys, outCoordSys)
+            return transform.applyForward(r), outCoordSys
 
 class Phantom(Interface):
     pass

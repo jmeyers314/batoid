@@ -61,8 +61,8 @@ def parse_optic(config,
     name = config.pop('name', "")
     if 'coordSys' in config:
         coordSys = parse_coordSys(config.pop('coordSys'), coordSys)
-    inMedium = config.pop('inMedium', inMedium)
-    outMedium = config.pop('outMedium', outMedium)
+    inMedium = parse_medium(config.pop('inMedium', inMedium))
+    outMedium = parse_medium(config.pop('outMedium', outMedium))
     if outMedium is None:
         outMedium = inMedium
 
@@ -98,7 +98,7 @@ def parse_optic(config,
             coordSys=coordSys, obscuration=obscuration,
             inMedium=inMedium, outMedium=outMedium)
     elif typ == 'Lens':
-        medium = config.pop('medium')
+        medium = parse_medium(config.pop('medium'))
         itemsConfig = config.pop('items')
         items = [
             parse_optic(itemsConfig[0], coordSys=coordSys, inMedium=inMedium, outMedium=medium),
@@ -116,3 +116,48 @@ def parse_optic(config,
         return batoid.optic.CompoundOptic(items, name=name, coordSys=coordSys)
     else:
         raise ValueError("Unknown optic type")
+
+
+def parse_medium(value):
+    from numbers import Real
+    if isinstance(value, batoid.Medium):
+        return value
+    elif isinstance(value, Real):
+        return batoid.ConstMedium(value)
+    elif isinstance(value, str):
+        if value == 'air':
+            return batoid.Air()
+        elif value == 'silica':
+            return batoid.SellmeierMedium(
+                0.6961663, 0.4079426, 0.8974794,
+                0.0684043**2, 0.1162414**2, 9.896161**2)
+        elif value == 'hsc_air':
+            return batoid.ConstMedium(1.0)
+        w = [0.4, 0.6, 0.75, 0.9, 1.1]
+        w = [w_*1e-6 for w_ in w]
+        if value == 'hsc_silica':
+            return batoid.TableMedium(
+                batoid.Table(
+                    w,
+                    [1.47009272, 1.45801158, 1.45421013, 1.45172729, 1.44917721],
+                    batoid.Table.Interpolant.linear
+                )
+            )
+        elif value == 'hsc_bsl7y':
+            return batoid.TableMedium(
+                batoid.Table(
+                    w,
+                    [1.53123287, 1.51671428, 1.51225242, 1.50939738, 1.50653251],
+                    batoid.Table.Interpolant.linear
+                )
+            )
+        elif value == 'hsc_pbl1y':
+            return batoid.TableMedium(
+                batoid.Table(
+                    w,
+                    [1.57046066, 1.54784671, 1.54157395, 1.53789058, 1.53457169],
+                    batoid.Table.Interpolant.linear
+                )
+            )
+        else:
+            raise RuntimeError("Unknown medium {}".format(value))
