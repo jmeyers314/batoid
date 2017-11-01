@@ -1,8 +1,34 @@
-#include "vec2.h"
 #include "obscuration.h"
+#include "vec2.h"
+#include "ray.h"
+#include "utils.h"
 #include <cmath>
 
 namespace batoid {
+    Ray Obscuration::obscure(const Ray& ray) const {
+        if (ray.failed) return Ray(true);
+        if (contains(ray.p0.x, ray.p0.y))
+            return Ray(ray.p0, ray.v, ray.t0, ray.wavelength, true);
+        else
+            return Ray(ray.p0, ray.v, ray.t0, ray.wavelength, ray.isVignetted);
+    }
+
+    std::vector<Ray> Obscuration::obscure(const std::vector<Ray>& rays) const {
+        auto result = std::vector<Ray>(rays.size());
+        parallelTransform(rays.cbegin(), rays.cend(), result.begin(),
+            [this](const Ray& ray)
+            {
+                if (ray.failed) return Ray(true);
+                if (contains(ray.p0.x, ray.p0.y))
+                    return Ray(ray.p0, ray.v, ray.t0, ray.wavelength, true);
+                else
+                    return Ray(ray.p0, ray.v, ray.t0, ray.wavelength, ray.isVignetted);
+            },
+            2000
+        );
+        return result;
+    }
+
     ObscCircle::ObscCircle(double radius, double x0, double y0) :
         _radius(radius), _x0(x0), _y0(y0) {}
 

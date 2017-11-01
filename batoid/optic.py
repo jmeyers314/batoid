@@ -91,7 +91,7 @@ class RefractiveInterface(Interface):
         transform = batoid._batoid.CoordTransform(inCoordSys, self.coordSys)
         r = transform.applyForward(r)
         r = self.surface.intercept(r)
-        # r = self.obscuration.obscure(r)
+        r = self.obscuration.obscure(r)
         r = batoid._batoid.refract(r, self.surface, self.inMedium, self.outMedium)
         if outCoordSys is None:
             return r, self.coordSys
@@ -104,7 +104,7 @@ class Mirror(Interface):
         transform = batoid._batoid.CoordTransform(inCoordSys, self.coordSys)
         r = transform.applyForward(r)
         r = self.surface.intercept(r)
-        # r = self.obscuration.obscure(r)
+        r = self.obscuration.obscure(r)
         r = batoid._batoid.reflect(r, self.surface)
         if outCoordSys is None:
             return r, self.coordSys
@@ -141,7 +141,7 @@ class Detector(Interface):
         transform = batoid._batoid.CoordTransform(inCoordSys, self.coordSys)
         r = transform.applyForward(r)
         r = self.surface.intercept(r)
-        # r = self.obscuration.obscure(r)
+        r = self.obscuration.obscure(r)
         if outCoordSys is None:
             return r, self.coordSys
         else:
@@ -153,7 +153,7 @@ class Baffle(Interface):
         transform = batoid._batoid.CoordTransform(inCoordSys, self.coordSys)
         r = transform.applyForward(r)
         r = self.surface.intercept(r)
-        # r = self.obscuration.obscure(r)
+        r = self.obscuration.obscure(r)
         if outCoordSys is None:
             return r, self.coordSys
         else:

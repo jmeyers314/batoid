@@ -2,13 +2,19 @@
 #define batoid_obscuration_h
 
 #include "vec2.h"
+#include "ray.h"
 #include <vector>
 #include <memory>
+#include <pybind11/stl_bind.h>
+
+PYBIND11_MAKE_OPAQUE(std::vector<batoid::Ray>);
 
 namespace batoid {
     class Obscuration {
     public:
         virtual bool contains(double x, double y) const = 0;
+        Ray obscure(const Ray&) const;
+        std::vector<Ray> obscure(const std::vector<Ray>&) const;
     };
 
     class ObscCircle : public Obscuration {

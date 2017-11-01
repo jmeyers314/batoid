@@ -9,7 +9,9 @@ using namespace pybind11::literals;
 namespace batoid {
     void pyExportObscuration(py::module& m) {
         py::class_<Obscuration, std::shared_ptr<Obscuration>>(m, "Obscuration")
-            .def("contains", &Obscuration::contains);
+            .def("contains", &Obscuration::contains)
+            .def("obscure", (Ray (Obscuration::*)(const Ray&) const) &Obscuration::obscure)
+            .def("obscure", (std::vector<Ray> (Obscuration::*)(const std::vector<Ray>&) const) &Obscuration::obscure);
 
         py::class_<ObscCircle, std::shared_ptr<ObscCircle>, Obscuration>(m, "ObscCircle")
             .def(py::init<double,double,double>(), "init", "radius"_a, "x"_a=0.0, "y"_a=0.0)
