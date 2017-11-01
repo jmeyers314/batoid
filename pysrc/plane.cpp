@@ -19,13 +19,6 @@ namespace batoid {
                  "Rin"_a=0.0, "Rout"_a=std::numeric_limits<double>::infinity())
             .def_property_readonly("B", &Plane::getB)
             .def_property_readonly("Rin", &Plane::getRin)
-            .def_property_readonly("Rout", &Plane::getRout)
-            .def("sag", py::vectorize(&Plane::sag))
-            .def("normal", &Plane::normal)
-            .def("intercept", (Ray (Plane::*)(const Ray&) const) &Plane::intercept)
-            .def("intersect", (Intersection (Plane::*)(const Ray&) const) &Plane::intersect)
-            .def("intercept", (std::vector<Ray> (Plane::*)(const std::vector<Ray>&) const) &Surface::intercept)
-            .def("intersect", (std::vector<Intersection> (Plane::*)(const std::vector<Ray>&) const) &Surface::intersect)
-            .def("__repr__", &Plane::repr);
+            .def_property_readonly("Rout", &Plane::getRout);
     }
 }

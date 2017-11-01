@@ -20,13 +20,6 @@ namespace batoid {
             .def_property_readonly("R", &Sphere::getR)
             .def_property_readonly("B", &Sphere::getB)
             .def_property_readonly("Rin", &Sphere::getRin)
-            .def_property_readonly("Rout", &Sphere::getRout)
-            .def("sag", py::vectorize(&Sphere::sag))
-            .def("normal", &Sphere::normal)
-            .def("intercept", &Sphere::intercept)
-            .def("intersect", (Intersection (Sphere::*)(const Ray&) const) &Sphere::intersect)
-            .def("intercept", (std::vector<Ray> (Sphere::*)(const std::vector<Ray>&) const) &Surface::intercept)
-            .def("intersect", (std::vector<Intersection> (Sphere::*)(const std::vector<Ray>&) const) &Surface::intersect)
-            .def("__repr__", &Sphere::repr);
+            .def_property_readonly("Rout", &Sphere::getRout);
     }
 }
