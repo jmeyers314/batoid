@@ -53,6 +53,54 @@ namespace batoid {
             handle.wait();
         }
     }
+
+    template<typename It, typename UnaryOperation>
+    void parallel_for_each(
+        It first, It last, UnaryOperation unary_op,
+        typename std::iterator_traits<It>::difference_type chunksize)
+    {
+        auto len = last - first;
+        if (len < chunksize) {
+            std::for_each(first, last, unary_op);
+        } else {
+            It mid = first + len/2;
+            auto handle = std::async(std::launch::async,
+                                     parallel_for_each<It, UnaryOperation>,
+                                     mid, last, unary_op, chunksize);
+            parallelTransform(first, mid, unary_op, chunksize);
+            handle.wait();
+        }
+    }
+
+    // A binary operator version of for_each
+    template<typename It1, typename It2, typename BinaryOperation>
+    BinaryOperation for_each(
+        It1 first1, It1 last1, It2 first2, BinaryOperation binary_op)
+    {
+        for(; first1 != last1; ++first1, ++first2) {
+            binary_op(*first1, *first2);
+        }
+        return binary_op;
+    }
+
+    template<typename It1, typename It2, typename BinaryOperation>
+    void parallel_for_each(
+        It1 first1, It1 last1, It2 first2, BinaryOperation binary_op,
+        typename std::iterator_traits<It1>::difference_type chunksize)
+    {
+        auto len = last1 - first1;
+        if (len < chunksize) {
+            for_each(first1, last1, first2, binary_op);
+        } else {
+            It1 mid1 = first1 + len/2;
+            It2 mid2 = first2 + len/2;
+            auto handle = std::async(std::launch::async,
+                                     parallel_for_each<It1, It2, BinaryOperation>,
+                                     mid1, last1, mid2, binary_op, chunksize);
+            parallel_for_each(first1, mid1, first2, binary_op, chunksize);
+            handle.wait();
+        }
+    }
 }
 
 #endif

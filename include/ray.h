@@ -27,6 +27,7 @@ namespace batoid {
 
         Vec3 positionAtTime(double t) const;
         Ray propagatedToTime(double t) const;
+        void propagateInPlace(double t);
         bool operator==(const Ray&) const;
         bool operator!=(const Ray&) const;
 
@@ -48,7 +49,7 @@ namespace batoid {
     std::vector<double> phaseMany(const std::vector<Ray>&, const Vec3& r, double t);
     std::vector<std::complex<double>> amplitudeMany(const std::vector<Ray>&, const Vec3& r, double t);
     std::vector<Ray> propagatedToTimesMany(const std::vector<Ray>&, const std::vector<double>& t);
-
+    void propagateInPlaceMany(std::vector<Ray>&, const std::vector<double>& t);
 }
 
 #endif

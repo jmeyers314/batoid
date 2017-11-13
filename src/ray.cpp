@@ -37,6 +37,11 @@ namespace batoid {
         return Ray(positionAtTime(t), v, t, wavelength, isVignetted);
     }
 
+    void Ray::propagateInPlace(const double t) {
+        p0 += v*(t-t0);
+        t0 = t;
+    }
+
     bool Ray::operator==(const Ray& other) const {
         return (p0 == other.p0) &&
                (v == other.v) &&
@@ -85,5 +90,13 @@ namespace batoid {
             2000
         );
         return result;
+    }
+
+    void propagateInPlaceMany(std::vector<Ray>& rays, const std::vector<double>& ts) {
+        parallel_for_each(rays.begin(), rays.end(), ts.begin(),
+            [](Ray& ray, double t)
+                { ray.propagateInPlace(t); },
+            2000
+        );
     }
 }

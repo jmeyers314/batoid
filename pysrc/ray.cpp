@@ -46,10 +46,12 @@ namespace batoid {
             .def(py::self != py::self)
             .def("phase", &Ray::phase)
             .def("amplitude", &Ray::amplitude)
-            .def("propagatedToTime", &Ray::propagatedToTime);
+            .def("propagatedToTime", &Ray::propagatedToTime)
+            .def("propagateInPlace", &Ray::propagateInPlace);
         m.def("amplitudeMany", &amplitudeMany);
         m.def("phaseMany", &phaseMany);
         m.def("propagatedToTimesMany", &propagatedToTimesMany);
+        m.def("propagateInPlaceMany", &propagateInPlaceMany);
 
         auto RV = py::bind_vector<std::vector<Ray>>(m, "RayVector", py::buffer_protocol());
         // This feels a little hacky, but seems to work.
