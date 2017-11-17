@@ -25,9 +25,9 @@ namespace batoid {
         return CoordSys(RotVec(_rotation, origin), _rotation*rotation);
     }
 
-    CoordSys CoordSys::rotateGlobal(const Rot3& _rotation, const Vec3& rotCenter, std::shared_ptr<CoordSys> coordSys) const {
-        CoordTransform toGlobal(coordSys, std::make_shared<CoordSys>(CoordSys()));
-        Vec3 globalRotCenter = toGlobal.applyForward(rotCenter);
+    CoordSys CoordSys::rotateGlobal(const Rot3& _rotation, const Vec3& rotCenter, const CoordSys& coordSys) const {
+        auto toGlobal = getTransform(coordSys, CoordSys());
+        Vec3 globalRotCenter = toGlobal->applyForward(rotCenter);
         return CoordSys(
             RotVec(_rotation, origin-globalRotCenter)+globalRotCenter,
             _rotation*rotation
@@ -41,9 +41,9 @@ namespace batoid {
         );
     }
 
-    CoordSys CoordSys::rotateLocal(const Rot3& _rotation, const Vec3& rotCenter, std::shared_ptr<CoordSys> coordSys) const {
-        CoordTransform toGlobal(coordSys, std::make_shared<CoordSys>(CoordSys()));
-        Vec3 globalRotCenter = toGlobal.applyForward(rotCenter);
+    CoordSys CoordSys::rotateLocal(const Rot3& _rotation, const Vec3& rotCenter, const CoordSys& coordSys) const {
+        auto toGlobal = getTransform(coordSys, CoordSys());
+        Vec3 globalRotCenter = toGlobal->applyForward(rotCenter);
         std::cout << "globalRotCenter = " << globalRotCenter << '\n';
         std::cout << "origin = " << origin << '\n';
         return CoordSys(
@@ -68,6 +68,25 @@ namespace batoid {
         return os << cs.repr();
     }
 
+    std::vector<Ray> BaseCoordTransform::applyForward(const std::vector<Ray>& rs) const {
+        std::vector<Ray> result(rs.size());
+        parallelTransform(rs.cbegin(), rs.cend(), result.begin(),
+            [this](const Ray& r) { return applyForward(r); },
+            2000
+        );
+        return result;
+    }
+
+    std::vector<Ray> BaseCoordTransform::applyReverse(const std::vector<Ray>& rs) const {
+        std::vector<Ray> result(rs.size());
+        parallelTransform(rs.cbegin(), rs.cend(), result.begin(),
+            [this](const Ray& r) { return applyReverse(r); },
+            2000
+        );
+        return result;
+    }
+
+
     // x is global
     // y is destination, with corresponding R and dr
     // z is source, with corresponding S and ds
@@ -82,59 +101,22 @@ namespace batoid {
     //   = Rinv S (z + Sinv ds - Sinv dr)
     //   = (Sinv R)^-1 (z - (Sinv dr - Sinv ds))
     //   = (Sinv R)^-1 (z - Sinv (dr - ds))
-    //
-    CoordTransform::CoordTransform(
-        std::shared_ptr<const CoordSys> _source,
-        std::shared_ptr<const CoordSys> _destination) :
-        source(_source),
-        destination(_destination),
-        rotation(source->rotation.inverse()*destination->rotation),
-        dr(UnRotVec(source->rotation, destination->origin - source->origin))
-        {}
 
-    // We actively shift and rotate the coordinate system axes,
-    // This looks like y = R x + dr
-    // For a passive transformation of a fixed vector from one coord sys to another
-    // though, we want the opposite transformation: y = R^-1 (x - dr)
-    Vec3 CoordTransform::applyForward(const Vec3& r) const {
-        return UnRotVec(rotation, r-dr);
-    }
-
-    Vec3 CoordTransform::applyReverse(const Vec3& r) const {
-        return RotVec(rotation, r)+dr;
-    }
-
-    Ray CoordTransform::applyForward(const Ray& r) const {
-        return Ray(
-            UnRotVec(rotation, r.p0-dr),
-            UnRotVec(rotation, r.v),
-            r.t0, r.wavelength, r.isVignetted
-        );
-    }
-
-    Ray CoordTransform::applyReverse(const Ray& r) const {
-        return Ray(
-            RotVec(rotation, r.p0) + dr,
-            RotVec(rotation, r.v),
-            r.t0, r.wavelength, r.isVignetted
-        );
-    }
-
-    std::vector<Ray> CoordTransform::applyForward(const std::vector<Ray>& rs) const {
-        std::vector<Ray> result(rs.size());
-        parallelTransform(rs.cbegin(), rs.cend(), result.begin(),
-            [this](const Ray& r) { return applyForward(r); },
-            2000
-        );
-        return result;
-    }
-
-    std::vector<Ray> CoordTransform::applyReverse(const std::vector<Ray>& rs) const {
-        std::vector<Ray> result(rs.size());
-        parallelTransform(rs.cbegin(), rs.cend(), result.begin(),
-            [this](const Ray& r) { return applyReverse(r); },
-            2000
-        );
-        return result;
+    std::unique_ptr<BaseCoordTransform> getTransform(const CoordSys& source, const CoordSys& destination) {
+        Rot3 rot = source.rotation.inverse()*destination.rotation;
+        Vec3 dr = UnRotVec(source.rotation, destination.origin - source.origin);
+        if (rot == Rot3()) {
+            if (dr == Vec3()) {
+                return std::unique_ptr<BaseCoordTransform>(new IdentityTransform());
+            } else {
+                return std::unique_ptr<BaseCoordTransform>(new ShiftTransform(dr));
+            }
+        } else {
+            if (dr == Vec3()) {
+                return std::unique_ptr<BaseCoordTransform>(new RotTransform(rot));
+            } else {
+                return std::unique_ptr<BaseCoordTransform>(new CoordTransform(dr, rot));
+            }
+        }
     }
 }

@@ -32,14 +32,14 @@ namespace batoid {
 
         // Rotate wrt the global axes, around the given center of rotation, which is expressed
         // in the given coordinate system.
-        CoordSys rotateGlobal(const Rot3& rotation, const Vec3& rotOrigin, std::shared_ptr<CoordSys> coordSys) const;
+        CoordSys rotateGlobal(const Rot3& rotation, const Vec3& rotOrigin, const CoordSys& coordSys) const;
 
         // Rotate wrt the local axes, around the local origin
         CoordSys rotateLocal(const Rot3& rotation) const;
 
         // Rotate wrt the local axes, around the given center of rotation, which is expressed
         // in the given coordinate system.
-        CoordSys rotateLocal(const Rot3& rotation, const Vec3& rotOrigin, std::shared_ptr<CoordSys> coordSys) const;
+        CoordSys rotateLocal(const Rot3& rotation, const Vec3& rotOrigin, const CoordSys& coordSys) const;
 
         // Get local unit vectors in global coordinates.
         Vec3 getX() const;
@@ -60,22 +60,100 @@ namespace batoid {
 
     std::ostream& operator<<(std::ostream &os, const CoordSys& cs);
 
-    struct CoordTransform {
-        CoordTransform(std::shared_ptr<const CoordSys> source, std::shared_ptr<const CoordSys> destination);
+    class BaseCoordTransform {
+    public:
+        virtual Vec3 applyForward(const Vec3& r) const = 0;
+        virtual Vec3 applyReverse(const Vec3& r) const = 0;
 
-        Vec3 applyForward(const Vec3& r) const;
-        Vec3 applyReverse(const Vec3& r) const;
-
-        Ray applyForward(const Ray& r) const;
-        Ray applyReverse(const Ray& r) const;
+        virtual Ray applyForward(const Ray& r) const = 0;
+        virtual Ray applyReverse(const Ray& r) const = 0;
         std::vector<Ray> applyForward(const std::vector<Ray>& r) const;
         std::vector<Ray> applyReverse(const std::vector<Ray>& r) const;
 
-        const std::shared_ptr<const CoordSys> source;
-        const std::shared_ptr<const CoordSys> destination;
-        const Rot3 rotation;
-        const Vec3 dr;
+        virtual Rot3 getRot() const = 0;
+        virtual Vec3 getDr() const = 0;
     };
+
+    class IdentityTransform : public BaseCoordTransform {
+    public:
+        IdentityTransform() = default;
+        virtual Vec3 applyForward(const Vec3& r) const override { return r; }
+        virtual Vec3 applyReverse(const Vec3& r) const override { return r; }
+
+        virtual Ray applyForward(const Ray& r) const override { return r; }
+        virtual Ray applyReverse(const Ray& r) const override { return r; }
+
+        virtual Rot3 getRot() const override { return Rot3(); }
+        virtual Vec3 getDr() const override { return Vec3(); }
+    };
+
+    class ShiftTransform : public BaseCoordTransform {
+    public:
+        ShiftTransform(Vec3 dr) : _dr(dr) {}
+        virtual Vec3 applyForward(const Vec3& r) const override { return r-_dr; }
+        virtual Vec3 applyReverse(const Vec3& r) const override { return r+_dr; }
+
+        virtual Ray applyForward(const Ray& r) const override
+            { return Ray(r.p0-_dr, r.v, r.t0, r.wavelength, r.isVignetted); }
+        virtual Ray applyReverse(const Ray& r) const override
+            { return Ray(r.p0+_dr, r.v, r.t0, r.wavelength, r.isVignetted); }
+
+        virtual Rot3 getRot() const override { return Rot3(); }
+        virtual Vec3 getDr() const override { return _dr; }
+    private:
+        const Vec3 _dr;
+    };
+
+    class RotTransform : public BaseCoordTransform {
+    public:
+        RotTransform(Rot3 rot) : _rot(rot) {}
+        virtual Vec3 applyForward(const Vec3& r) const override { return UnRotVec(_rot, r); }
+        virtual Vec3 applyReverse(const Vec3& r) const override { return RotVec(_rot, r); }
+
+        virtual Ray applyForward(const Ray& r) const override {
+            return Ray(UnRotVec(_rot, r.p0), UnRotVec(_rot, r.v),
+                       r.t0, r.wavelength, r.isVignetted);
+        }
+        virtual Ray applyReverse(const Ray& r) const override {
+            return Ray(RotVec(_rot, r.p0), RotVec(_rot, r.v),
+                       r.t0, r.wavelength, r.isVignetted);
+        }
+
+        virtual Rot3 getRot() const override { return _rot; }
+        virtual Vec3 getDr() const override { return Vec3(); }
+    private:
+        const Rot3 _rot;
+    };
+
+    class CoordTransform : public BaseCoordTransform {
+    public:
+        CoordTransform(Vec3 dr, Rot3 rot) : _dr(dr), _rot(rot) {}
+
+        // We actively shift and rotate the coordinate system axes,
+        // This looks like y = R x + dr
+        // For a passive transformation of a fixed vector from one coord sys to another
+        // though, we want the opposite transformation: y = R^-1 (x - dr)
+        virtual Vec3 applyForward(const Vec3& r) const override { return UnRotVec(_rot, r-_dr); }
+        virtual Vec3 applyReverse(const Vec3& r) const override { return RotVec(_rot, r)+_dr; }
+
+        virtual Ray applyForward(const Ray& r) const override {
+            return Ray(UnRotVec(_rot, r.p0-_dr), UnRotVec(_rot, r.v),
+                    r.t0, r.wavelength, r.isVignetted);
+        }
+        virtual Ray applyReverse(const Ray& r) const override {
+            return Ray(RotVec(_rot, r.p0) + _dr, RotVec(_rot, r.v),
+                r.t0, r.wavelength, r.isVignetted);
+        }
+
+        virtual Rot3 getRot() const override { return _rot; }
+        virtual Vec3 getDr() const override { return _dr; }
+    private:
+        const Vec3 _dr;
+        const Rot3 _rot;
+    };
+
+    std::unique_ptr<BaseCoordTransform> getTransform(const CoordSys& source, const CoordSys& destination);
+
 }
 
 #endif

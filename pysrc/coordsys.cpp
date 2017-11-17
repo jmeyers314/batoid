@@ -22,13 +22,13 @@ namespace batoid {
             .def("shiftGlobal", &CoordSys::shiftGlobal)
             .def("shiftLocal", &CoordSys::shiftLocal)
             .def("rotateGlobal", (CoordSys (CoordSys::*) (const Rot3&) const) &CoordSys::rotateGlobal)
-            .def("rotateGlobal", (CoordSys (CoordSys::*) (const Rot3&, const Vec3&, std::shared_ptr<CoordSys>) const) &CoordSys::rotateGlobal)
+            .def("rotateGlobal", (CoordSys (CoordSys::*) (const Rot3&, const Vec3&, const CoordSys&) const) &CoordSys::rotateGlobal)
             .def("rotateLocal", (CoordSys (CoordSys::*) (const Rot3&) const) &CoordSys::rotateLocal)
-            .def("rotateLocal", (CoordSys (CoordSys::*) (const Rot3&, const Vec3&, std::shared_ptr<CoordSys>) const) &CoordSys::rotateLocal);
+            .def("rotateLocal", (CoordSys (CoordSys::*) (const Rot3&, const Vec3&, const CoordSys&) const) &CoordSys::rotateLocal);
     }
 
     std::tuple<py::array_t<double>, py::array_t<double>, py::array_t<double>>
-    numpyApplyForward(const CoordTransform& ct,
+    numpyApplyForward(const BaseCoordTransform& ct,
                       py::array_t<double> xs,
                       py::array_t<double> ys,
                       py::array_t<double> zs) {
@@ -64,18 +64,31 @@ namespace batoid {
     }
 
     void pyExportCoordTransform(py::module& m) {
-        py::class_<CoordTransform, std::shared_ptr<CoordTransform>>(m, "CoordTransform")
-            .def(py::init<std::shared_ptr<CoordSys>,std::shared_ptr<CoordSys>>())
-            .def("applyForward", (Vec3 (CoordTransform::*)(const Vec3&) const) &CoordTransform::applyForward)
-            .def("applyReverse", (Vec3 (CoordTransform::*)(const Vec3&) const) &CoordTransform::applyReverse)
-            .def("applyForward", [](const CoordTransform& ct, py::array_t<double> xs, py::array_t<double> ys, py::array_t<double> zs){
+        // py::class_<CoordTransform, std::shared_ptr<CoordTransform>>(m, "CoordTransform")
+        //     .def(py::init<std::shared_ptr<CoordSys>,std::shared_ptr<CoordSys>>())
+        //     .def("applyForward", (Vec3 (CoordTransform::*)(const Vec3&) const) &CoordTransform::applyForward)
+        //     .def("applyReverse", (Vec3 (CoordTransform::*)(const Vec3&) const) &CoordTransform::applyReverse)
+        //     .def("applyForward", [](const CoordTransform& ct, py::array_t<double> xs, py::array_t<double> ys, py::array_t<double> zs){
+        //         return numpyApplyForward(ct, xs, ys, zs);
+        //     })
+        //     .def("applyForward", (Ray (CoordTransform::*)(const Ray&) const) &CoordTransform::applyForward)
+        //     .def("applyReverse", (Ray (CoordTransform::*)(const Ray&) const) &CoordTransform::applyReverse)
+        //     .def("applyForward", (std::vector<Ray> (CoordTransform::*)(const std::vector<Ray>&) const) &CoordTransform::applyForward)
+        //     .def("applyReverse", (std::vector<Ray> (CoordTransform::*)(const std::vector<Ray>&) const) &CoordTransform::applyReverse)
+        //     .def_readonly("source", &CoordTransform::source)
+        //     .def_readonly("destination", &CoordTransform::destination);
+
+        py::class_<BaseCoordTransform, std::shared_ptr<BaseCoordTransform>>(m, "CoordTransform")
+            .def(py::init(&getTransform))
+            .def("applyForward", (Vec3 (BaseCoordTransform::*)(const Vec3&) const) &BaseCoordTransform::applyForward)
+            .def("applyReverse", (Vec3 (BaseCoordTransform::*)(const Vec3&) const) &BaseCoordTransform::applyReverse)
+            .def("applyForward", [](const BaseCoordTransform& ct, py::array_t<double> xs, py::array_t<double> ys, py::array_t<double> zs){
                 return numpyApplyForward(ct, xs, ys, zs);
             })
-            .def("applyForward", (Ray (CoordTransform::*)(const Ray&) const) &CoordTransform::applyForward)
-            .def("applyReverse", (Ray (CoordTransform::*)(const Ray&) const) &CoordTransform::applyReverse)
-            .def("applyForward", (std::vector<Ray> (CoordTransform::*)(const std::vector<Ray>&) const) &CoordTransform::applyForward)
-            .def("applyReverse", (std::vector<Ray> (CoordTransform::*)(const std::vector<Ray>&) const) &CoordTransform::applyReverse)
-            .def_readonly("source", &CoordTransform::source)
-            .def_readonly("destination", &CoordTransform::destination);
+            .def("applyForward", (Ray (BaseCoordTransform::*)(const Ray&) const) &BaseCoordTransform::applyForward)
+            .def("applyReverse", (Ray (BaseCoordTransform::*)(const Ray&) const) &BaseCoordTransform::applyReverse)
+            .def("applyForward", (std::vector<Ray> (BaseCoordTransform::*)(const std::vector<Ray>&) const) &BaseCoordTransform::applyForward)
+            .def("applyReverse", (std::vector<Ray> (BaseCoordTransform::*)(const std::vector<Ray>&) const) &BaseCoordTransform::applyReverse)
+            ;
     }
 }
