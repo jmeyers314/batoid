@@ -9,23 +9,21 @@ def test_properties():
     random.seed(5)
     for i in range(100):
         R = random.gauss(0.7, 0.8)
-        kappa = random.uniform(-2.0, 1.0)
-        nalpha = random.randint(0, 4)
-        alpha = [random.gauss(0, 1e-10) for i in range(nalpha)]
-        B = random.gauss(0, 1.1)
-        asphere = batoid.Asphere(R, kappa, alpha, B)
+        conic = random.uniform(-2.0, 1.0)
+        ncoef = random.randint(0, 4)
+        coefs = [random.gauss(0, 1e-10) for i in range(ncoef)]
+        asphere = batoid.Asphere(R, conic, coefs)
         assert asphere.R == R
-        assert asphere.kappa == kappa
-        assert asphere.alpha == alpha
-        assert asphere.B == B
+        assert asphere.conic == conic
+        assert asphere.coefs == coefs
 
 
-def py_asphere(R, kappa, alpha, B):
+def py_asphere(R, conic, coefs):
     def f(x, y):
         r2 = x*x + y*y
-        den = R*(1+np.sqrt(1-(1+kappa)*r2/R/R))
-        result = r2/den + B
-        for i, a in enumerate(alpha):
+        den = R*(1+np.sqrt(1-(1+conic)*r2/R/R))
+        result = r2/den
+        for i, a in enumerate(coefs):
             result += r2**(i+2) * a
         return result
     return f
@@ -37,16 +35,15 @@ def test_sag():
     random.seed(57)
     for i in range(100):
         R = random.gauss(25.0, 0.2)
-        kappa = random.uniform(-2.0, 1.0)
-        nalpha = random.randint(0, 4)
-        alpha = [random.gauss(0, 1e-10) for i in range(nalpha)]
-        B = random.gauss(0, 1.1)
-        asphere = batoid.Asphere(R, kappa, alpha, B)
+        conic = random.uniform(-2.0, 1.0)
+        ncoefs = random.randint(0, 4)
+        coefs = [random.gauss(0, 1e-10) for i in range(ncoefs)]
+        asphere = batoid.Asphere(R, conic, coefs)
         for j in range(100):
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
             result = asphere.sag(x, y)
-            assert isclose(result, py_asphere(R, kappa, alpha, B)(x, y))
+            assert isclose(result, py_asphere(R, conic, coefs)(x, y))
             # Check that it returned a scalar float and not an array
             assert isinstance(result, float)
         # Check vectorization
@@ -55,7 +52,7 @@ def test_sag():
         # Make sure non-unit stride arrays also work
         np.testing.assert_allclose(
             asphere.sag(x[::5,::2], y[::5,::2]),
-            py_asphere(R, kappa, alpha, B)(x, y)[::5,::2]
+            py_asphere(R, conic, coefs)(x, y)[::5,::2]
         )
 
 
@@ -65,11 +62,10 @@ def test_intersect():
     random.seed(577)
     for i in range(100):
         R = random.gauss(25.0, 0.2)
-        kappa = random.uniform(-2.0, 1.0)
-        nalpha = random.randint(0, 4)
-        alpha = [random.gauss(0, 1e-10) for i in range(nalpha)]
-        B = random.gauss(0, 0.5)
-        asphere = batoid.Asphere(R, kappa, alpha, B)
+        conic = random.uniform(-2.0, 1.0)
+        ncoefs = random.randint(0, 4)
+        coefs = [random.gauss(0, 1e-10) for i in range(ncoefs)]
+        asphere = batoid.Asphere(R, conic, coefs)
         for j in range(100):
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
@@ -115,22 +111,21 @@ def test_intersect_vectorized():
 
     for i in range(100):
         R = random.gauss(25.0, 0.2)
-        kappa = random.uniform(-2.0, 1.0)
-        nalpha = random.randint(0, 4)
-        alpha = [random.gauss(0, 1e-10) for i in range(nalpha)]
-        B = random.gauss(0, 0.5)
-        asphere = batoid.Asphere(R, kappa, alpha, B)
+        conic = random.uniform(-2.0, 1.0)
+        ncoefs = random.randint(0, 4)
+        coefs = [random.gauss(0, 1e-10) for i in range(ncoefs)]
+        asphere = batoid.Asphere(R, conic, coefs)
         intersections = asphere.intersect(rays)
         intersections2 = [asphere.intersect(ray) for ray in rays]
         intersections2 = batoid.IntersectionVector(intersections2)
         assert intersections == intersections2
 
 
-def py_poly(alpha):
+def py_poly(coefs):
     def f(x, y):
         r2 = x*x + y*y
         result = 0
-        for i, a in enumerate(alpha):
+        for i, a in enumerate(coefs):
             result += r2**(i+2) * a
         return result
     return f
@@ -142,13 +137,12 @@ def test_quad_plus_poly():
     random.seed(5772)
     for i in range(100):
         R = random.gauss(25.0, 0.2)
-        kappa = random.uniform(-2.0, 1.0)
-        nalpha = random.randint(0, 4)
-        alpha = [random.gauss(0, 1e-10) for i in range(nalpha)]
-        B = random.gauss(0, 1.1)
-        asphere = batoid.Asphere(R, kappa, alpha, B)
-        quad = batoid.Quadric(R, kappa, B)
-        poly = py_poly(alpha)
+        conic = random.uniform(-2.0, 1.0)
+        ncoefs = random.randint(0, 4)
+        coefs = [random.gauss(0, 1e-10) for i in range(ncoefs)]
+        asphere = batoid.Asphere(R, conic, coefs)
+        quad = batoid.Quadric(R, conic)
+        poly = py_poly(coefs)
         for j in range(100):
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)

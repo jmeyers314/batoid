@@ -3,24 +3,19 @@
 #include "except.h"
 
 namespace batoid {
-    Sphere::Sphere(double _R, double _B, double _Rin, double _Rout) :
-        R(_R), B(_B), Rin(_Rin), Rout(_Rout) {}
+    Sphere::Sphere(double R) : _R(R) {}
 
     double Sphere::sag(double x, double y) const {
-        double r2 = x*x + y*y;
-        double result = B;
-        if (R != 0) {
-            result += R*(1-std::sqrt(1-r2/R/R));
-        }
-        return result;
+        if (_R != 0)
+            return _R*(1-std::sqrt(1-(x*x + y*y)/_R/_R));
+        return 0.0;
     }
 
     Vec3 Sphere::normal(double x, double y) const {
         double r = std::sqrt(x*x + y*y);
         if (r == 0) return Vec3(0,0,1);
         double dzdr1 = dzdr(r);
-        Vec3 n{-dzdr1*x/r, -dzdr1*y/r, 1};
-        return n.UnitVec3();
+        return Vec3(-dzdr1*x/r, -dzdr1*y/r, 1).UnitVec3();
     }
 
     Ray Sphere::intercept(const Ray& r) const {
@@ -30,33 +25,29 @@ namespace batoid {
         double vz2 = r.v.z*r.v.z;
         double vrr0 = r.v.x*r.p0.x + r.v.y*r.p0.y;
         double r02 = r.p0.x*r.p0.x + r.p0.y*r.p0.y;
-        double z0term = (r.p0.z-B-R);
+        double z0term = (r.p0.z-_R);
 
         // Quadratic equation coefficients
         double a = vz2 + vr2;
         double b = 2*r.v.z*z0term + 2*vrr0;
-        double c = z0term*z0term - R*R + r02;
+        double c = z0term*z0term - _R*_R + r02;
 
         double r1, r2;
         int n = solveQuadratic(a, b, c, r1, r2);
 
         // Should probably check the solutions here since we obtained the quadratic
         // formula above by squaring both sides of an equation.
-
         double t;
         if (n == 0) {
-            // throw NoIntersectionError("");
             return Ray(true);
         } else if (n == 1) {
             if (r1 < 0) {
-                // throw NoFutureIntersectionError("");
                 return Ray(true);
             }
             t = r1;
         } else {
             if (r1 < 0) {
                 if (r2 < 0) {
-                    // throw NoFutureIntersectionError("");
                     return Ray(true);
                 } else {
                     t = r2;
@@ -82,12 +73,12 @@ namespace batoid {
         double vz2 = r.v.z*r.v.z;
         double vrr0 = r.v.x*r.p0.x + r.v.y*r.p0.y;
         double r02 = r.p0.x*r.p0.x + r.p0.y*r.p0.y;
-        double z0term = (r.p0.z-B-R);
+        double z0term = (r.p0.z-_R);
 
         // Quadratic equation coefficients
         double a = vz2 + vr2;
         double b = 2*r.v.z*z0term + 2*vrr0;
-        double c = z0term*z0term - R*R + r02;
+        double c = z0term*z0term - _R*_R + r02;
 
         double r1, r2;
         int n = solveQuadratic(a, b, c, r1, r2);
@@ -97,18 +88,15 @@ namespace batoid {
 
         double t;
         if (n == 0) {
-            // throw NoIntersectionError("");
             return Intersection(true);
         } else if (n == 1) {
             if (r1 < 0) {
-                // throw NoFutureIntersectionError("");
                 return Intersection(true);
             }
             t = r1;
         } else {
             if (r1 < 0) {
                 if (r2 < 0) {
-                    // throw NoFutureIntersectionError("");
                     return Intersection(true);
                 } else {
                     t = r2;
@@ -125,19 +113,17 @@ namespace batoid {
         t += r.t0;
         Vec3 point = r.positionAtTime(t);
         Vec3 surfaceNormal = normal(point.x, point.y);
-        double rho = std::hypot(point.x, point.y);
-        bool isVignetted = rho < Rin || rho > Rout;
-        return Intersection(t, point, surfaceNormal, isVignetted);
+        return Intersection(t, point, surfaceNormal);
     }
 
     std::string Sphere::repr() const {
         std::ostringstream oss(" ");
-        oss << "Sphere(" << R << ", " << B << ")";
+        oss << "Sphere(" << _R << ")";
         return oss.str();
     }
 
     double Sphere::dzdr(double r) const {
-        double rat = r/R;
+        double rat = r/_R;
         return rat/std::sqrt(1-rat*rat);
     }
 

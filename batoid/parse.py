@@ -20,7 +20,7 @@ def parse_obscuration(config):
 
 def parse_surface(config):
     typ = config.pop('type')
-    evalstr = "batoid.{}(B=0.0, **config)".format(typ)
+    evalstr = "batoid.{}(**config)".format(typ)
     return eval(evalstr)
 
 

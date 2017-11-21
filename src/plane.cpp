@@ -2,14 +2,10 @@
 #include <cmath>
 
 namespace batoid {
-    Plane::Plane(double _B, double _Rin, double _Rout) :
-        B(_B), Rin(_Rin), Rout(_Rout) {}
-
     Ray Plane::intercept(const Ray& r) const {
         if (r.failed)
             return Ray(true);
-        double t = (B - r.p0.z)/r.v.z;
-        t += r.t0;
+        double t = -r.p0.z/r.v.z + r.t0;
         Vec3 point = r.positionAtTime(t);
         return Ray(point, r.v, t, r.wavelength, r.isVignetted);
     }
@@ -17,19 +13,14 @@ namespace batoid {
     Intersection Plane::intersect(const Ray& r) const {
         if (r.failed)
             return Intersection(true);
-        double t = (B - r.p0.z)/r.v.z;
-        t += r.t0;
+        double t = -r.p0.z/r.v.z + r.t0;
         Vec3 point = r.positionAtTime(t);
         Vec3 surfaceNormal = normal(point.x, point.y);
-        double rho = std::hypot(point.x, point.y);
-        bool isVignetted = rho < Rin || rho > Rout;
-        return Intersection(t, point, surfaceNormal, isVignetted);
+        return Intersection(t, point, surfaceNormal);
     }
 
     std::string Plane::repr() const {
-        std::ostringstream oss (" ");
-        oss << "Plane(" << B << ")";
-        return oss.str();
+        return std::string("Plane()");
     }
 
     inline std::ostream& operator<<(std::ostream& os, const Plane& p) {

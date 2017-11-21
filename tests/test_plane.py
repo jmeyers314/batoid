@@ -4,35 +4,24 @@ from test_helpers import isclose, timer
 
 
 @timer
-def test_properties():
-    import random
-    random.seed(5)
-    for i in range(100):
-        B = random.gauss(0.8, 1.2)
-        plane = batoid.Plane(B)
-        assert plane.B == B
-
-
-@timer
 def test_sag():
     import random
     random.seed(57)
     for i in range(100):
-        B = random.gauss(0.4, 0.2)
-        plane = batoid.Plane(B)
+        plane = batoid.Plane()
         for j in range(10):
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
             result = plane.sag(x, y)
-            assert isclose(result, B)
+            assert isclose(result, 0.0)
             # Check that it returned a scalar float and not an array
             assert isinstance(result, float)
         # Check vectorization
         x = np.random.normal(0.0, 1.0, size=(10, 10))
         y = np.random.normal(0.0, 1.0, size=(10, 10))
-        np.testing.assert_allclose(plane.sag(x, y), B)
+        np.testing.assert_allclose(plane.sag(x, y), 0.0)
         # Make sure non-unit stride arrays also work
-        np.testing.assert_allclose(plane.sag(x[::5,::2], y[::5,::2]), B)
+        np.testing.assert_allclose(plane.sag(x[::5,::2], y[::5,::2]), 0.0)
 
 
 @timer
@@ -40,8 +29,7 @@ def test_intersect():
     import random
     random.seed(577)
     for i in range(100):
-        B = random.gauss(0.4, 0.2)
-        plane = batoid.Plane(B)
+        plane = batoid.Plane()
         for j in range(10):
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
@@ -56,7 +44,6 @@ def test_intersect():
 
             # We can also check just for mutual consistency of the plane,
             # ray and intersection.
-
             vx = random.gauss(0.0, 0.1)
             vy = random.gauss(0.0, 0.1)
             vz = 1.0
@@ -86,8 +73,7 @@ def test_intersect_vectorized():
     rays = batoid.RayVector(rays)
 
     for i in range(100):
-        B = random.gauss(0.4, 0.2)
-        plane = batoid.Plane(B)
+        plane = batoid.Plane()
         intersections = plane.intersect(rays)
         intersections2 = [plane.intersect(ray) for ray in rays]
         intersections2 = batoid.IntersectionVector(intersections2)
@@ -95,7 +81,6 @@ def test_intersect_vectorized():
 
 
 if __name__ == '__main__':
-    test_properties()
     test_sag()
     test_intersect()
     test_intersect_vectorized()

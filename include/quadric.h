@@ -12,24 +12,20 @@ namespace batoid {
 
     class Quadric : public Surface {
     public:
-        Quadric(double _R, double _kappa, double _B,
-                double _Rin=0.0, double _Rout=std::numeric_limits<double>::infinity());
+        Quadric(double R, double conic);
         virtual double sag(double, double) const;
         virtual Vec3 normal(double, double) const;
         Ray intercept(const Ray&) const;
         using Surface::intersect;
         virtual Intersection intersect(const Ray&) const;
-        double getR() const {return R;}
-        double getKappa() const {return kappa;}
-        double getB() const {return B;}
-        double getRin() const {return Rin;}
-        double getRout() const {return Rout;}
+        double getR() const {return _R;}
+        double getConic() const {return _conic;}
 
         std::string repr() const;
 
     private:
-        const double R, kappa, B;
-        const double Rin, Rout;
+        const double _R;  // Radius of curvature
+        const double _conic;  // Conic constant
 
         double dzdr(double r) const;
     };

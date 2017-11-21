@@ -10,10 +10,8 @@ def test_properties():
     random.seed(5)
     for i in range(100):
         R = random.gauss(0.7, 0.8)
-        B = random.gauss(0.8, 1.2)
-        sphere = batoid.Sphere(R, B)
+        sphere = batoid.Sphere(R)
         assert sphere.R == R
-        assert sphere.B == B
 
 
 @timer
@@ -22,23 +20,22 @@ def test_sag():
     random.seed(57)
     for i in range(100):
         R = random.gauss(4.2, 0.3)
-        B = random.gauss(0.4, 0.2)
-        sphere = batoid.Sphere(R, B)
+        sphere = batoid.Sphere(R)
         for j in range(10):
             x = random.uniform(-0.7*R, 0.7*R)
             y = random.uniform(-0.7*R, 0.7*R)
             result = sphere.sag(x, y)
-            assert isclose(result, R*(1-math.sqrt(1.0-(x*x + y*y)/R/R))+B)
+            assert isclose(result, R*(1-math.sqrt(1.0-(x*x + y*y)/R/R)))
             # Check that it returned a scalar float and not an array
             assert isinstance(result, float)
         # Check vectorization
         x = np.random.uniform(-0.7*R, 0.7*R, size=(10, 10))
         y = np.random.uniform(-0.7*R, 0.7*R, size=(10, 10))
-        np.testing.assert_allclose(sphere.sag(x, y), R*(1-np.sqrt(1.0-(x*x + y*y)/R/R))+B)
+        np.testing.assert_allclose(sphere.sag(x, y), R*(1-np.sqrt(1.0-(x*x + y*y)/R/R)))
         # Make sure non-unit stride arrays also work
         np.testing.assert_allclose(
             sphere.sag(x[::5,::2], y[::5,::2]),
-            (R*(1-np.sqrt(1.0-(x*x + y*y)/R/R))+B)[::5, ::2]
+            (R*(1-np.sqrt(1.0-(x*x + y*y)/R/R)))[::5, ::2]
         )
 
 
@@ -48,8 +45,7 @@ def test_intersect():
     random.seed(577)
     for i in range(100):
         R = random.gauss(10.0, 0.1)
-        B = random.gauss(0.4, 0.2)
-        sphere = batoid.Sphere(R, B)
+        sphere = batoid.Sphere(R)
         for j in range(10):
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
@@ -64,7 +60,6 @@ def test_intersect():
 
             # We can also check just for mutual consistency of the sphere,
             # ray and intersection.
-
             vx = random.gauss(0.0, 0.1)
             vy = random.gauss(0.0, 0.1)
             vz = 1.0
@@ -95,8 +90,7 @@ def test_intersect_vectorized():
 
     for i in range(100):
         R = random.gauss(0.05, 0.01)
-        B = random.gauss(0.4, 0.2)
-        sphere = batoid.Sphere(R, B)
+        sphere = batoid.Sphere(R)
         intersections = sphere.intersect(rays)
         intersections2 = [sphere.intersect(ray) for ray in rays]
         intersections2 = batoid.IntersectionVector(intersections2)

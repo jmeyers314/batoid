@@ -14,12 +14,7 @@ using namespace pybind11::literals;
 namespace batoid {
     void pyExportParaboloid(py::module& m) {
         py::class_<Paraboloid, std::shared_ptr<Paraboloid>, Surface>(m, "Paraboloid")
-            .def(py::init<double,double,double,double>(), "init",
-                 "R"_a, "B"_a,
-                 "Rin"_a=0.0, "Rout"_a=std::numeric_limits<double>::infinity())
-            .def_property_readonly("R", &Paraboloid::getR)
-            .def_property_readonly("B", &Paraboloid::getB)
-            .def_property_readonly("Rin", &Paraboloid::getRin)
-            .def_property_readonly("Rout", &Paraboloid::getRout);
+            .def(py::init<double>(), "init", "R"_a)
+            .def_property_readonly("R", &Paraboloid::getR);
     }
 }

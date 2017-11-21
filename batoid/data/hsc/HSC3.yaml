@@ -92,7 +92,7 @@ opticalSystem:
       surface:
         type: Quadric
         R: 30.0
-        K: -1.00835
+        conic: -1.00835
       # We can omit coordSys here, since it defaults to be the same as the parent coordSys, which
       # is already what we want.
       # Naive outermost-allowed-radius parameterization
@@ -162,8 +162,8 @@ opticalSystem:
               surface:
                 type: Asphere
                 R: 1.3755
-                K: 0.0
-                alpha: [-0.14974887830730002, -0.07579068214673, -0.7705293869522001, 10.26626319251,
+                conic: 0.0
+                coefs: [-0.14974887830730002, -0.07579068214673, -0.7705293869522001, 10.26626319251,
                   -70.78826218129001, 255.96006178059997, -376.1551480577999]
               obscuration:
                 type: ClearCircle
@@ -186,8 +186,8 @@ opticalSystem:
               surface:
                 type: Asphere
                 R: -3.53
-                K: 0.0
-                alpha: [0.06914718060975, 0.603728126364, -15.326231734619999, 361.8110894954,
+                conic: 0.0
+                coefs: [0.06914718060975, 0.603728126364, -15.326231734619999, 361.8110894954,
                   -4741.677881169, 32173.090716919996, -88598.78091629999]
               obscuration:
                 type: ClearCircle
@@ -272,8 +272,8 @@ opticalSystem:
               surface:
                 type: Asphere
                 R: -0.840000170144847
-                K: 0.0
-                alpha: [2.768476102307, -48.556420092589995, 717.6113272765999, -10763.702614520002,
+                conic: 0.0
+                coefs: [2.768476102307, -48.556420092589995, 717.6113272765999, -10763.702614520002,
                   118744.32178099999, -798382.1197395, 2393556.961408]
               obscuration:
                 type: ClearCircle
@@ -302,8 +302,8 @@ opticalSystem:
               surface:
                 type: Asphere
                 R: 0.48
-                K: 0.0
-                alpha: [-4.355533915492, 36.358679149130005, -595.1267151922, 7658.839741989, -71941.20343205,
+                conic: 0.0
+                coefs: [-4.355533915492, 36.358679149130005, -595.1267151922, 7658.839741989, -71941.20343205,
                   394282.0924898, -954342.843455]
               obscuration:
                 type: ClearCircle
@@ -343,8 +343,8 @@ opticalSystem:
               surface:
                 type: Asphere
                 R: -1.2728222984309576
-                K: 0.0
-                alpha: [-1.064687616564, 3.377750239208, -110.26471335, 2282.368582236, -27430.39658171,
+                conic: 0.0
+                coefs: [-1.064687616564, 3.377750239208, -110.26471335, 2282.368582236, -27430.39658171,
                   175577.1152898, -482194.9608578]
               obscuration:
                 type: ClearCircle

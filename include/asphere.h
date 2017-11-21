@@ -13,27 +13,22 @@ namespace batoid {
 
     class Asphere : public Surface {
     public:
-        Asphere(double _R, double _kappa, std::vector<double> _alpha, double _B,
-                double _Rin=0.0, double _Rout=std::numeric_limits<double>::infinity());
+        Asphere(double R, double conic, std::vector<double> coefs);
         virtual double sag(double, double) const;
         virtual Vec3 normal(double, double) const;
         virtual Ray intercept(const Ray&) const;
         using Surface::intersect;
         virtual Intersection intersect(const Ray&) const;
-        double getR() const {return R;}
-        double getKappa() const {return kappa;}
-        const std::vector<double>& getAlpha() const {return alpha;}
-        double getB() const {return B;}
-        double getRin() const {return Rin;}
-        double getRout() const {return Rout;}
+        double getR() const { return _R; }
+        double getConic() const { return _conic; }
+        const std::vector<double>& getCoefs() const { return _coefs; }
 
         std::string repr() const;
 
     private:
-        const double R, kappa;
-        const std::vector<double> alpha;
-        const double B;
-        const double Rin, Rout;  // Inner and outer radii for vignetting
+        const double _R;  // Radius of curvature
+        const double _conic;  // Conic constant
+        const std::vector<double> _coefs;  // Aspheric even polynomial coefficients
 
         double dzdr(double r) const;
     };

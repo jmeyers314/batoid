@@ -9,10 +9,8 @@ def test_properties():
     random.seed(5)
     for i in range(100):
         R = random.gauss(0.7, 0.8)
-        B = random.gauss(0.8, 1.2)
-        para = batoid.Paraboloid(R, B)
+        para = batoid.Paraboloid(R)
         assert para.R == R
-        assert para.B == B
 
 
 @timer
@@ -21,21 +19,20 @@ def test_sag():
     random.seed(57)
     for i in range(100):
         R = random.gauss(0.2, 0.3)
-        B = random.gauss(0.4, 0.2)
-        para = batoid.Paraboloid(R, B)
+        para = batoid.Paraboloid(R)
         for j in range(10):
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
             result = para.sag(x, y)
-            assert isclose(result, (x*x + y*y)/2/R+B)
+            assert isclose(result, (x*x + y*y)/2/R)
             # Check that it returned a scalar float and not an array
             assert isinstance(result, float)
         # Check vectorization
         x = np.random.normal(0.0, 1.0, size=(10, 10))
         y = np.random.normal(0.0, 1.0, size=(10, 10))
-        np.testing.assert_allclose(para.sag(x, y), (x*x + y*y)/2/R+B)
+        np.testing.assert_allclose(para.sag(x, y), (x*x + y*y)/2/R)
         # Make sure non-unit stride arrays also work
-        np.testing.assert_allclose(para.sag(x[::5,::2], y[::5,::2]), ((x*x + y*y)/2/R+B)[::5,::2])
+        np.testing.assert_allclose(para.sag(x[::5,::2], y[::5,::2]), ((x*x + y*y)/2/R)[::5,::2])
 
 
 @timer
@@ -44,8 +41,7 @@ def test_intersect():
     random.seed(577)
     for i in range(100):
         R = random.gauss(10.0, 0.1)
-        B = random.gauss(0.4, 0.2)
-        para = batoid.Paraboloid(R, B)
+        para = batoid.Paraboloid(R)
         for j in range(10):
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
@@ -60,7 +56,6 @@ def test_intersect():
 
             # We can also check just for mutual consistency of the paraboloid,
             # ray and intersection.
-
             vx = random.gauss(0.0, 0.1)
             vy = random.gauss(0.0, 0.1)
             vz = 1.0
@@ -91,8 +86,7 @@ def test_intersect_vectorized():
 
     for i in range(100):
         R = random.gauss(0.05, 0.01)
-        B = random.gauss(0.4, 0.2)
-        para = batoid.Paraboloid(R, B)
+        para = batoid.Paraboloid(R)
         intersections = para.intersect(rays)
         intersections2 = [para.intersect(ray) for ray in rays]
         intersections2 = batoid.IntersectionVector(intersections2)

@@ -14,13 +14,8 @@ using namespace pybind11::literals;
 namespace batoid {
     void pyExportQuadric(py::module& m) {
         py::class_<Quadric, std::shared_ptr<Quadric>, Surface>(m, "Quadric")
-            .def(py::init<double,double,double,double,double>(), "init",
-                 "R"_a, "K"_a, "B"_a,
-                 "Rin"_a=0.0, "Rout"_a=std::numeric_limits<double>::infinity())
+            .def(py::init<double,double>(), "init", "R"_a, "conic"_a)
             .def_property_readonly("R", &Quadric::getR)
-            .def_property_readonly("kappa", &Quadric::getKappa)
-            .def_property_readonly("B", &Quadric::getB)
-            .def_property_readonly("Rin", &Quadric::getRin)
-            .def_property_readonly("Rout", &Quadric::getRout);
+            .def_property_readonly("conic", &Quadric::getConic);
     }
 }

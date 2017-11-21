@@ -6,13 +6,13 @@ from test_helpers import isclose, timer
 def test_plane_reflection_plane():
     import random
     random.seed(5)
-    plane = batoid.Plane(10)
+    plane = batoid.Plane()
     for i in range(1000):
         x = random.gauss(0, 1)
         y = random.gauss(0, 1)
         vx = random.gauss(0, 1e-1)
         vy = random.gauss(0, 1e-1)
-        ray = batoid.Ray(batoid.Vec3(x, y, 0),
+        ray = batoid.Ray(batoid.Vec3(x, y, -10),
                          batoid.Vec3(vx, vy, 1).UnitVec3(),
                          0)
         isec = plane.intersect(ray)
@@ -38,13 +38,13 @@ def test_plane_reflection_plane():
 def test_plane_reflection_reversal():
     import random
     random.seed(57)
-    plane = batoid.Plane(10)
+    plane = batoid.Plane()
     for i in range(1000):
         x = random.gauss(0, 1)
         y = random.gauss(0, 1)
         vx = random.gauss(0, 1e-1)
         vy = random.gauss(0, 1e-1)
-        ray = batoid.Ray(batoid.Vec3(x, y, 0),
+        ray = batoid.Ray(batoid.Vec3(x, y, -10),
                          batoid.Vec3(vx, vy, 1).UnitVec3(),
                          0)
         isec = plane.intersect(ray)
@@ -65,20 +65,20 @@ def test_plane_reflection_reversal():
         cray = cray.positionAtTime(0)
         assert isclose(cray.x, x, rel_tol=0, abs_tol=1e-10)
         assert isclose(cray.y, y, rel_tol=0, abs_tol=1e-10)
-        assert isclose(cray.z, 0, rel_tol=0, abs_tol=1e-10)
+        assert isclose(cray.z, -10, rel_tol=0, abs_tol=1e-10)
 
 
 @timer
 def test_paraboloid_reflection_plane():
     import random
     random.seed(577)
-    para = batoid.Paraboloid(-0.1, 10)
+    para = batoid.Paraboloid(-0.1)
     for i in range(1000):
         x = random.gauss(0, 1)
         y = random.gauss(0, 1)
         vx = random.gauss(0, 1e-1)
         vy = random.gauss(0, 1e-1)
-        ray = batoid.Ray(x, y, 0, vx, vy, 1, 0)
+        ray = batoid.Ray(x, y, -10, vx, vy, 1, 0)
         isec = para.intersect(ray)
         rray = isec.reflectedRay(ray)
 
@@ -96,13 +96,13 @@ def test_paraboloid_reflection_plane():
 def test_paraboloid_reflection_reversal():
     import random
     random.seed(5772)
-    para = batoid.Paraboloid(-5.0, 10)
+    para = batoid.Paraboloid(-5.0)
     for i in range(1000):
         x = random.gauss(0, 1)
         y = random.gauss(0, 1)
         vx = random.gauss(0, 1e-1)
         vy = random.gauss(0, 1e-1)
-        ray = batoid.Ray(batoid.Vec3(x, y, 0),
+        ray = batoid.Ray(batoid.Vec3(x, y, -10),
                          batoid.Vec3(vx, vy, 1).UnitVec3(),
                          0)
         isec = para.intersect(ray)
@@ -124,7 +124,7 @@ def test_paraboloid_reflection_reversal():
         cray = cray.positionAtTime(0)
         assert isclose(cray.x, x, rel_tol=0, abs_tol=1e-10)
         assert isclose(cray.y, y, rel_tol=0, abs_tol=1e-10)
-        assert isclose(cray.z, 0, rel_tol=0, abs_tol=1e-10)
+        assert isclose(cray.z, -10, rel_tol=0, abs_tol=1e-10)
 
 
 @timer
@@ -133,7 +133,7 @@ def test_paraboloid_reflection_to_focus():
     random.seed(57721)
     for i in range(100):
         R = random.gauss(0, 3.0)
-        para = batoid.Paraboloid(R, 0)
+        para = batoid.Paraboloid(R)
         for j in range(100):
             x = random.gauss(0, 1)
             y = random.gauss(0, 1)
@@ -154,13 +154,13 @@ def test_paraboloid_reflection_to_focus():
 def test_asphere_reflection_plane():
     import random
     random.seed(577215)
-    asphere = batoid.Asphere(25.0, -0.97, [1e-3, 1e-5], 0.1)
+    asphere = batoid.Asphere(25.0, -0.97, [1e-3, 1e-5])
     for i in range(1000):
         x = random.gauss(0, 1)
         y = random.gauss(0, 1)
         vx = random.gauss(0, 1e-1)
         vy = random.gauss(0, 1e-1)
-        ray = batoid.Ray(x, y, 0, vx, vy, 1, 0)
+        ray = batoid.Ray(x, y, -0.1, vx, vy, 1, 0)
         isec = asphere.intersect(ray)
         rray = isec.reflectedRay(ray)
 
@@ -178,13 +178,13 @@ def test_asphere_reflection_plane():
 def test_asphere_reflection_reversal():
     import random
     random.seed(5772156)
-    asphere = batoid.Asphere(23.0, -0.97, [1e-5, 1e-6], 0.1)
+    asphere = batoid.Asphere(23.0, -0.97, [1e-5, 1e-6])
     for i in range(1000):
         x = random.gauss(0, 1)
         y = random.gauss(0, 1)
         vx = random.gauss(0, 1e-1)
         vy = random.gauss(0, 1e-1)
-        ray = batoid.Ray(batoid.Vec3(x, y, 0),
+        ray = batoid.Ray(batoid.Vec3(x, y, -0.1),
                          batoid.Vec3(vx, vy, 1).UnitVec3(),
                          0)
         isec = asphere.intersect(ray)
@@ -206,7 +206,7 @@ def test_asphere_reflection_reversal():
         cray = cray.positionAtTime(0)
         assert isclose(cray.x, x, rel_tol=0, abs_tol=1e-9)
         assert isclose(cray.y, y, rel_tol=0, abs_tol=1e-9)
-        assert isclose(cray.z, 0, rel_tol=0, abs_tol=1e-9)
+        assert isclose(cray.z, -0.1, rel_tol=0, abs_tol=1e-9)
 
 
 if __name__ == '__main__':

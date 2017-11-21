@@ -12,28 +12,23 @@ namespace batoid {
 
     class Sphere : public Surface {
     public:
-        Sphere(double _R, double _B,
-                double _Rin=0.0, double _Rout=std::numeric_limits<double>::infinity());
+        Sphere(double R);
         virtual double sag(double, double) const;
         virtual Vec3 normal(double, double) const;
         using Surface::intersect;
         virtual Intersection intersect(const Ray&) const;
         virtual Ray intercept(const Ray&) const;
-        double getR() const {return R;}
-        double getB() const {return B;}
-        double getRin() const {return Rin;}
-        double getRout() const {return Rout;}
+        double getR() const { return _R; }
 
         std::string repr() const;
 
     private:
-        const double R, B;
-        const double Rin, Rout;
+        const double _R;  // Radius of curvature
 
         double dzdr(double r) const;
     };
 
-    inline std::ostream& operator<<(std::ostream& os, const Sphere& q);
+    inline std::ostream& operator<<(std::ostream&, const Sphere&);
 
 }
 #endif

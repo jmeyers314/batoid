@@ -53,7 +53,11 @@ namespace batoid {
          .def("refract", (Ray (*)(const Ray&, const Surface&, const double, const double)) &refract)
          .def("refract", (std::vector<Ray> (*)(const std::vector<Ray>&, const Surface&, const double, const double)) &refract)
          .def("refract", (Ray (*)(const Ray&, const Surface&, const Medium&, const Medium&)) &refract)
-         .def("refract", (std::vector<Ray> (*)(const std::vector<Ray>&, const Surface&, const Medium&, const Medium&)) &refract);
+         .def("refract", (std::vector<Ray> (*)(const std::vector<Ray>&, const Surface&, const Medium&, const Medium&)) &refract)
+         .def("rayGrid", (std::vector<Ray> (*)(double, double, double, double, int, double, double)) &rayGrid)
+         .def("rayGrid", (std::vector<Ray> (*)(double, double, double, double, int, double, const Medium&)) &rayGrid)
+         .def("circularGrid", (std::vector<Ray> (*)(double, double, double, double, double, int, int, double, double)) &circularGrid)
+         .def("circularGrid", (std::vector<Ray> (*)(double, double, double, double, double, int, int, double, const Medium&)) &circularGrid);
 
 
 #if !((PYBIND11_VERSION_MAJOR >= 2) & (PYBIND11_VERSION_MINOR >= 2))

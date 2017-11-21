@@ -4,6 +4,7 @@
 #include "medium.h"
 #include "utils.h"
 #include "intersection.h"
+#include <numeric>
 
 namespace batoid{
     Ray reflect(const Ray& r, const Surface& surface) {
@@ -76,4 +77,84 @@ namespace batoid{
         return result;
     }
 
+    std::vector<Ray> rayGrid(double dist, double length,
+                             double xcos, double ycos,
+                             int nside, double wavelength,
+                             double n) {
+        std::vector<Ray> result;
+        result.reserve(nside*nside);
+
+        // The "velocities" of all the rays in the grid are the same.
+        auto v = Vec3(xcos, ycos, -sqrt(1-xcos*xcos-ycos*ycos))/n;
+
+        double dx = length/(nside-1);
+        double x0 = -length/2;
+        double x = x0;
+        for(int ix=0; ix<nside; ix++) {
+            double y = x0;
+            for(int iy=0; iy<nside; iy++) {
+                Vec3 r(x,y,0);  // The position of the ray when it intersects the pupil
+                // We want adjust the t0 of the Rays such that for a given time t, they all
+                // lie on a plane perpendicular to v.  Can do this by solving
+                // DotProduct(r + v*t + n*v*dist, v) == 0 for t
+                // implies
+                // t = -r.v / v.v - n*d
+                //   = -r.v * n^2 - n*d
+                double t = -DotProduct(r,v)*n*n - n*dist;
+                result.push_back(Ray(r,v,-t,wavelength,false).propagatedToTime(0));
+                y += dx;
+            }
+            x += dx;
+        }
+        return result;
+    }
+
+    std::vector<Ray> rayGrid(double dist, double length,
+                             double xcos, double ycos,
+                             int nside, double wavelength,
+                             const Medium& m) {
+        double n = m.getN(wavelength);
+        return rayGrid(dist, length, xcos, ycos, nside, wavelength, n);
+    }
+
+    std::vector<Ray> circularGrid(double dist, double outer, double inner,
+                                  double xcos, double ycos,
+                                  int nradii, int naz, double wavelength, double n) {
+
+        // Determine number of rays at each radius
+        std::vector<int> nphis(nradii);
+        double drfrac = (outer-inner)/(nradii-1)/outer;
+        double rfrac = 1.0;
+        for (int i=0; i<nradii; i++) {
+            nphis[i] = int(std::ceil(naz*rfrac));
+            rfrac -= drfrac;
+        }
+        int nray = std::accumulate(nphis.begin(), nphis.end(), 0);
+        std::vector<Ray> result;
+        result.reserve(nray);
+
+        // The "velocities" of all the rays in the grid are the same.
+        auto v = Vec3(xcos, ycos, -sqrt(1-xcos*xcos-ycos*ycos))/n;
+
+        rfrac = 1.0;
+        for (int i=0; i<nradii; i++) {
+            double az = 0.0;
+            double daz = 2*M_PI/nphis[i];
+            for (int j=0; j<nphis[i]; j++) {
+                Vec3 r(rfrac*outer*std::cos(az), rfrac*outer*std::sin(az), 0);
+                double t = -DotProduct(r,v)*n*n - n*dist;
+                result.push_back(Ray(r,v,-t,wavelength,false).propagatedToTime(0));
+                az += daz;
+            }
+            rfrac -= drfrac;
+        }
+        return result;
+    }
+
+    std::vector<Ray> circularGrid(double dist, double outer, double inner,
+                                  double xcos, double ycos,
+                                  int nradii, int naz, double wavelength, const Medium& m) {
+        double n = m.getN(wavelength);
+        return circularGrid(dist, outer, inner, xcos, ycos, nradii, naz, wavelength, n);
+    }
 }

@@ -11,8 +11,7 @@ def test_properties():
         kappa = random.uniform(0.9, 1.0)
         nalpha = random.randint(0, 4)
         alpha = [random.gauss(0, 1e-10) for i in range(nalpha)]
-        B = random.gauss(0, 1.1)
-        asphere = batoid.Asphere(R, kappa, alpha, B)
+        asphere = batoid.Asphere(R, kappa, alpha)
         dx = random.gauss(0, 1)
         dy = random.gauss(0, 1)
         dz = random.gauss(0, 1)
@@ -43,8 +42,7 @@ def test_shift():
         kappa = random.uniform(-1.0, -0.9)
         nalpha = random.randint(0, 4)
         alpha = [random.gauss(0, 1e-10) for i in range(nalpha)]
-        B = random.gauss(0, 1.1)
-        asphere = batoid.Asphere(R, kappa, alpha, B)
+        asphere = batoid.Asphere(R, kappa, alpha)
         dx = random.gauss(0, 1)
         dy = random.gauss(0, 1)
         dz = random.gauss(0, 1)
@@ -97,8 +95,7 @@ def test_shift_vectorized():
         kappa = random.uniform(-1.0, -0.9)
         nalpha = random.randint(0, 4)
         alpha = [random.gauss(0, 1e-10) for i in range(nalpha)]
-        B = random.gauss(0, 1.1)
-        asphere = batoid.Asphere(R, kappa, alpha, B)
+        asphere = batoid.Asphere(R, kappa, alpha)
         dx = random.gauss(0, 1)
         dy = random.gauss(0, 1)
         dz = random.gauss(0, 1)
@@ -119,8 +116,7 @@ def test_rotate():
         kappa = random.uniform(-2.0, 2.0)
         nalpha = random.randint(0, 4)
         alpha = [random.gauss(0, 1e-10) for i in range(nalpha)]
-        B = random.gauss(0, 1.1)
-        asphere = batoid.Asphere(R, kappa, alpha, B)
+        asphere = batoid.Asphere(R, kappa, alpha)
         # We're going to rain down some photons, rotate the camera and rotate the position/vectors
         # of the photons, and see if we get the same spot pattern.
         for j in range(10):
@@ -234,8 +230,7 @@ def test_rotate_vectorized():
         kappa = random.uniform(-2.0, 2.0)
         nalpha = random.randint(0, 4)
         alpha = [random.gauss(0, 1e-10) for i in range(nalpha)]
-        B = random.gauss(0, 1.1)
-        asphere = batoid.Asphere(R, kappa, alpha, B)
+        asphere = batoid.Asphere(R, kappa, alpha)
         theta = random.gauss(0, 0.1)
         rotated = asphere.rotX(theta)
         phi = random.gauss(0, 0.1)

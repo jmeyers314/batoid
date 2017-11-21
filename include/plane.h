@@ -12,22 +12,13 @@ namespace batoid {
 
     class Plane : public Surface {
     public:
-        Plane(double _B,
-              double _Rin=0.0, double _Rout=std::numeric_limits<double>::infinity());
-        virtual double sag(double, double) const {return B;}
-        virtual Vec3 normal(double, double) const {return Vec3(0,0,1);}
+        virtual double sag(double, double) const { return 0.0; }
+        virtual Vec3 normal(double, double) const { return Vec3(0,0,1); }
         using Surface::intersect;
         virtual Intersection intersect(const Ray&) const;
         virtual Ray intercept(const Ray&) const;
-        double getB() const {return B;}
-        double getRin() const {return Rin;}
-        double getRout() const {return Rout;}
 
         std::string repr() const;
-
-    private:
-        const double B;
-        const double Rin, Rout;
     };
 
     inline std::ostream& operator<<(std::ostream& os, const Plane& p);

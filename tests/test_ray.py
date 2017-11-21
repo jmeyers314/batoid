@@ -156,8 +156,61 @@ def test_RayVector():
                             np.array([r.amplitude(batoid.Vec3(1, 2, 3), 4.0) for r in rayVector]))
 
 
+@timer
+def test_rayGrid():
+    dist = 10.0
+    length = 10.0
+    xcos = 0.1
+    ycos = 0.2
+    nside = 9
+    wavelength = 500e-9
+    n = 1.2
+
+    rays = batoid._batoid.rayGrid(dist, length, xcos, ycos, nside, wavelength, n)
+    # Check that all rays are perpendicular to v
+    r0 = rays[0]
+    for r in rays:
+        dr = r.p0 - r0.p0
+        dp = batoid.DotProduct(dr, r0.v)
+        assert isclose(dp, 0.0, abs_tol=1e-14, rel_tol=0.0)
+        assert isclose(r.wavelength, wavelength)
+        assert isclose(r.v.Magnitude(), 1/n)
+        assert isclose(r.v.x*n, xcos)
+        assert isclose(r.v.y*n, ycos)
+
+    # Check that ray that intersects at origin is initially dist away.
+    assert isclose((rays[len(rays)//2].p0).Magnitude(), dist)
+
+
+@timer
+def test_circularGrid():
+    dist = 10.0
+    outer = 4.1
+    inner = 0.5
+    xcos = 0.1
+    ycos = 0.2
+    nradii = 5
+    naz = 50
+    wavelength = 500e-9
+    n = 1.2
+
+    rays = batoid._batoid.circularGrid(dist, outer, inner, xcos, ycos, nradii, naz, wavelength, n)
+    # Check that all rays are perpendicular to v
+    r0 = rays[0]
+    for r in rays:
+        dr = r.p0 - r0.p0
+        dp = batoid.DotProduct(dr, r0.v)
+        assert isclose(dp, 0.0, abs_tol=1e-14, rel_tol=0.0)
+        assert isclose(r.wavelength, wavelength)
+        assert isclose(r.v.Magnitude(), 1/n)
+        assert isclose(r.v.x*n, xcos)
+        assert isclose(r.v.y*n, ycos)
+
+
 if __name__ == '__main__':
     test_call()
     test_properties()
     test_phase()
     test_RayVector()
+    test_rayGrid()
+    test_circularGrid()

@@ -9,19 +9,17 @@ def test_properties():
     random.seed(5)
     for i in range(100):
         R = random.gauss(0.7, 0.8)
-        kappa = random.uniform(-2.0, 1.0)
-        B = random.gauss(0, 1.1)
-        quad = batoid.Quadric(R, kappa, B)
+        conic = random.uniform(-2.0, 1.0)
+        quad = batoid.Quadric(R, conic)
         assert quad.R == R
-        assert quad.kappa == kappa
-        assert quad.B == B
+        assert quad.conic == conic
 
 
-def quadric(R, kappa, B):
+def quadric(R, conic):
     def f(x, y):
         r2 = x*x + y*y
-        den = R*(1+np.sqrt(1-(1+kappa)*r2/R/R))
-        return r2/den + B
+        den = R*(1+np.sqrt(1-(1+conic)*r2/R/R))
+        return r2/den
     return f
 
 
@@ -31,24 +29,23 @@ def test_sag():
     random.seed(57)
     for i in range(100):
         R = random.gauss(25.0, 0.2)
-        kappa = random.uniform(-2.0, 1.0)
-        B = random.gauss(0, 1.1)
-        quad = batoid.Quadric(R, kappa, B)
+        conic = random.uniform(-2.0, 1.0)
+        quad = batoid.Quadric(R, conic)
         for j in range(100):
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
             result = quad.sag(x, y)
-            assert isclose(result, quadric(R, kappa, B)(x, y))
+            assert isclose(result, quadric(R, conic)(x, y))
             # Check that it returned a scalar float and not an array
             assert isinstance(result, float)
         # Check vectorization
         x = np.random.normal(0.0, 1.0, size=(10, 10))
         y = np.random.normal(0.0, 1.0, size=(10, 10))
-        np.testing.assert_allclose(quad.sag(x, y), quadric(R, kappa, B)(x, y))
+        np.testing.assert_allclose(quad.sag(x, y), quadric(R, conic)(x, y))
         # Make sure non-unit stride arrays also work
         np.testing.assert_allclose(
             quad.sag(x[::5,::2], y[::5,::2]),
-            quadric(R, kappa, B)(x, y)[::5,::2]
+            quadric(R, conic)(x, y)[::5,::2]
         )
 
 
@@ -58,9 +55,8 @@ def test_intersect():
     random.seed(577)
     for i in range(100):
         R = random.gauss(25.0, 0.2)
-        kappa = random.uniform(-2.0, 1.0)
-        B = 0
-        quad = batoid.Quadric(R, kappa, B)
+        conic = random.uniform(-2.0, 1.0)
+        quad = batoid.Quadric(R, conic)
         for j in range(100):
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
@@ -106,9 +102,8 @@ def test_intersect_vectorized():
 
     for i in range(100):
         R = random.gauss(25.0, 0.2)
-        kappa = random.uniform(-2.0, 1.0)
-        B = random.gauss(0.0, 0.1)
-        quad = batoid.Quadric(R, kappa, B)
+        conic = random.uniform(-2.0, 1.0)
+        quad = batoid.Quadric(R, conic)
         intersections = quad.intersect(rays)
         intersections2 = [quad.intersect(ray) for ray in rays]
         intersections2 = batoid.IntersectionVector(intersections2)
