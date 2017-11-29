@@ -27,6 +27,8 @@ namespace batoid {
     std::vector<Ray> circularGrid(double dist, double outer, double inner,
                                   double xcos, double ycos,
                                   int nradii, int naz, double wavelength, const Medium& m);
+
+    std::vector<Ray> trimVignetted(const std::vector<Ray>& rays);
 }
 
 #endif

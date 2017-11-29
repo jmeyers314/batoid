@@ -9,9 +9,9 @@ import yaml
 @timer
 def test_optic():
     if __name__ == '__main__':
-        nside = 256
+        nside = 128
     else:
-        nside = 64
+        nside = 32
 
     rays = batoid._batoid.rayGrid(20, 2.0, 0.01, 0.01, nside, 500e-9, 1.0)
 
@@ -43,9 +43,9 @@ def test_optic():
 @timer
 def test_traceFull():
     if __name__ == '__main__':
-        nside = 256
+        nside = 128
     else:
-        nside = 64
+        nside = 32
 
     rays = batoid._batoid.rayGrid(20, 2.0, 0.01, 0.01, nside, 500e-9, 1.0)
 

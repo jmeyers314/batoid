@@ -36,6 +36,14 @@ namespace batoid {
         return std::hypot(x-_x0, y-_y0) < _radius;
     }
 
+    ObscAnnulus::ObscAnnulus(double inner, double outer, double x0, double y0) :
+        _inner(inner), _outer(outer), _x0(x0), _y0(y0) {}
+
+    bool ObscAnnulus::contains(double x, double y) const {
+        double h = std::hypot(x-_x0, y-_y0);
+        return (_inner <= h) && (h < _outer);
+    }
+
     ObscRectangle::ObscRectangle(double w, double h, double x0, double y0, double th) :
         _width(w), _height(h), _x0(x0), _y0(y0), _theta(th)
     {

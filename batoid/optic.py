@@ -23,7 +23,7 @@ class Optic(object):
             Optic may contain several lens Optics, and may itself be part of a larger telescope
             Optic.
     """
-    def __init__(self, name=None, coordSys=None, inMedium=batoid.ConstMedium(1.0),
+    def __init__(self, name=None, coordSys=batoid.CoordSys(), inMedium=batoid.ConstMedium(1.0),
                  outMedium=batoid.ConstMedium(1.0)):
         self.name = name
         self.inMedium = inMedium
@@ -61,9 +61,12 @@ class Interface(Optic):
         self.inRadius = 0.0
         self.outRadius = None
         if self.obscuration is not None:
-            if isinstance(self.obscuration, batoid._batoid.ObscNegation):
-                if isinstance(self.obscuration.original, batoid._batoid.ObscCircle):
+            if isinstance(self.obscuration, batoid.ObscNegation):
+                if isinstance(self.obscuration.original, batoid.ObscCircle):
                     self.outRadius = self.obscuration.original.radius
+                elif isinstance(self.obscuration.original, batoid.ObscAnnulus):
+                    self.outRadius = self.obscuration.original.outer
+                    self.inRadius = self.obscuration.original.inner
 
     def draw(self, ax):
         """ Draw this interface on a mplot3d axis.
@@ -86,7 +89,7 @@ class Interface(Optic):
             y = self.inRadius * sth
             z = self.surface.sag(x, y)
             # ax.plot(x, y, z, c='k')
-            transform = batoid._batoid.CoordTransform(self.coordSys, batoid._batoid.CoordSys())
+            transform = batoid.CoordTransform(self.coordSys, batoid.CoordSys())
             x, y, z = transform.applyForward(x, y, z)
             ax.plot(x, y, z, c='k')
 
@@ -96,7 +99,7 @@ class Interface(Optic):
         x = self.outRadius * cth
         y = self.outRadius * sth
         z = self.surface.sag(x, y)
-        transform = batoid._batoid.CoordTransform(self.coordSys, batoid._batoid.CoordSys())
+        transform = batoid.CoordTransform(self.coordSys, batoid.CoordSys())
         x, y, z = transform.applyForward(x, y, z)
         ax.plot(x, y, z, c='k')
 
@@ -104,13 +107,13 @@ class Interface(Optic):
         y = np.linspace(-self.outRadius, -self.inRadius)
         x = np.zeros_like(y)
         z = self.surface.sag(x, y)
-        transform = batoid._batoid.CoordTransform(self.coordSys, batoid._batoid.CoordSys())
+        transform = batoid.CoordTransform(self.coordSys, batoid.CoordSys())
         x, y, z = transform.applyForward(x, y, z)
         ax.plot(x, y, z, c='k')
         y = np.linspace(self.inRadius, self.outRadius)
         x = np.zeros_like(y)
         z = self.surface.sag(x, y)
-        transform = batoid._batoid.CoordTransform(self.coordSys, batoid._batoid.CoordSys())
+        transform = batoid.CoordTransform(self.coordSys, batoid.CoordSys())
         x, y, z = transform.applyForward(x, y, z)
         ax.plot(x, y, z, c='k')
 
@@ -118,17 +121,17 @@ class Interface(Optic):
         x = np.linspace(-self.outRadius, -self.inRadius)
         y = np.zeros_like(x)
         z = self.surface.sag(x, y)
-        transform = batoid._batoid.CoordTransform(self.coordSys, batoid._batoid.CoordSys())
+        transform = batoid.CoordTransform(self.coordSys, batoid.CoordSys())
         x, y, z = transform.applyForward(x, y, z)
         ax.plot(x, y, z, c='k')
         x = np.linspace(self.inRadius, self.outRadius)
         y = np.zeros_like(x)
         z = self.surface.sag(x, y)
-        transform = batoid._batoid.CoordTransform(self.coordSys, batoid._batoid.CoordSys())
+        transform = batoid.CoordTransform(self.coordSys, batoid.CoordSys())
         x, y, z = transform.applyForward(x, y, z)
         ax.plot(x, y, z, c='k')
 
-    def trace(self, r, inCoordSys=batoid._batoid.CoordSys(), outCoordSys=None):
+    def trace(self, r, inCoordSys=batoid.CoordSys(), outCoordSys=None):
         """ Trace a ray through this optical element.
 
         Parameters
@@ -149,24 +152,31 @@ class Interface(Optic):
             Ray or RayVector, output CoordSys.
 
         """
-        transform = batoid._batoid.CoordTransform(inCoordSys, self.coordSys)
+        transform = batoid.CoordTransform(inCoordSys, self.coordSys)
         r = transform.applyForward(r)
         r = self.surface.intercept(r)
-        r = self.obscuration.obscure(r)
+        if self.obscuration is not None:
+            r = self.obscuration.obscure(r)
         # refract, reflect, passthrough, depending on subclass
         r = self.interact(r)
         if outCoordSys is None:
             return r, self.coordSys
         else:
-            transform = batoid._batoid.CoordTransform(self.coordSys, outCoordSys)
+            transform = batoid.CoordTransform(self.coordSys, outCoordSys)
             return transform.applyForward(r), outCoordSys
 
-    def traceFull(self, r, inCoordSys=batoid._batoid.CoordSys(), outCoordSys=None):
+    def traceFull(self, r, inCoordSys=batoid.CoordSys(), outCoordSys=None):
         result = [{'name':self.name, 'in':r, 'inCoordSys':inCoordSys}]
         r, outCoordSys = self.trace(r, inCoordSys=inCoordSys, outCoordSys=outCoordSys)
         result[0]['out'] = r
         result[0]['outCoordSys'] = outCoordSys
         return result
+
+    def printCoordSys(self):
+        print(self.name, self.coordSys)
+
+    def printMedium(self):
+        print(self.name, self.inMedium, self.outMedium)
 
 class RefractiveInterface(Interface):
     """Specialization for refractive interfaces.
@@ -204,7 +214,7 @@ class CompoundOptic(Optic):
         Optic.__init__(self, **kwargs)
         self.items = items
 
-    def trace(self, r, inCoordSys=batoid._batoid.CoordSys(), outCoordSys=None):
+    def trace(self, r, inCoordSys=batoid.CoordSys(), outCoordSys=None):
         """ Recursively trace through this Optic by successively tracing through all subitems.
         """
         coordSys = inCoordSys
@@ -212,7 +222,7 @@ class CompoundOptic(Optic):
             r, coordSys = item.trace(r, inCoordSys=coordSys)
         return self.items[-1].trace(r, inCoordSys=coordSys, outCoordSys=outCoordSys)
 
-    def traceFull(self, r, inCoordSys=batoid._batoid.CoordSys(), outCoordSys=None):
+    def traceFull(self, r, inCoordSys=batoid.CoordSys(), outCoordSys=None):
         """ Recursively trace through this Optic by successively tracing through all subitems.
 
         The return value will contain the incoming and outgoing rays for each Interface.
@@ -232,6 +242,14 @@ class CompoundOptic(Optic):
         """
         for item in self.items:
             item.draw(ax)
+
+    def printCoordSys(self):
+        for item in self.items:
+            item.printCoordSys()
+
+    def printMedium(self):
+        for item in self.items:
+            item.printMedium()
 
 class Lens(CompoundOptic):
     def __init__(self, items, medium, **kwargs):

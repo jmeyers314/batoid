@@ -25,8 +25,9 @@ opticalSystem:
         type: ObscUnion
         items:
           -
-            type: ObscCircle  # camera shadow
-            radius: 0.9471  # Josh's approximate guess
+            type: ClearAnnulus
+            inner: 0.9471 # camera shadow, Josh's approximate guess for radius
+            outer: 4.3 # Just something to define an aperture
             # Note implicit `x: 0.0` and `y: 0.0`
           -
             type: ObscRay

@@ -140,8 +140,9 @@ namespace batoid{
         for (int i=0; i<nradii; i++) {
             double az = 0.0;
             double daz = 2*M_PI/nphis[i];
+            double radius = rfrac*outer;
             for (int j=0; j<nphis[i]; j++) {
-                Vec3 r(rfrac*outer*std::cos(az), rfrac*outer*std::sin(az), 0);
+                Vec3 r(radius*std::cos(az), radius*std::sin(az), 0);
                 double t = -DotProduct(r,v)*n*n - n*dist;
                 result.push_back(Ray(r,v,-t,wavelength,false).propagatedToTime(0));
                 az += daz;
@@ -157,4 +158,15 @@ namespace batoid{
         double n = m.getN(wavelength);
         return circularGrid(dist, outer, inner, xcos, ycos, nradii, naz, wavelength, n);
     }
+
+    std::vector<Ray> trimVignetted(const std::vector<Ray>& rays) {
+        std::vector<Ray> result;
+        result.reserve(rays.size());
+        for (const auto& r : rays) {
+            if (!r.isVignetted)
+                result.push_back(r);
+        }
+        return result;
+    }
+
 }

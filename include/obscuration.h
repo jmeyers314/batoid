@@ -5,9 +5,7 @@
 #include "ray.h"
 #include <vector>
 #include <memory>
-#include <pybind11/stl_bind.h>
 
-PYBIND11_MAKE_OPAQUE(std::vector<batoid::Ray>);
 
 namespace batoid {
     class Obscuration {
@@ -22,6 +20,13 @@ namespace batoid {
         ObscCircle(double radius, double x0=0.0, double y0=0.0);
         bool contains(double x, double y) const override;
         const double _radius, _x0, _y0;
+    };
+
+    class ObscAnnulus : public Obscuration {
+    public:
+        ObscAnnulus(double inner, double outer, double x0=0.0, double y0=0.0);
+        bool contains(double x, double y) const override;
+        const double _inner, _outer, _x0, _y0;
     };
 
     class ObscRectangle : public Obscuration {

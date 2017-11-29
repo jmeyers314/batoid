@@ -2,6 +2,10 @@
 #include <memory>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/stl_bind.h>
+
+
+PYBIND11_MAKE_OPAQUE(std::vector<batoid::Ray>);
 
 namespace py = pybind11;
 using namespace pybind11::literals;
@@ -18,6 +22,13 @@ namespace batoid {
             .def_readonly("radius", &ObscCircle::_radius)
             .def_readonly("x", &ObscCircle::_x0)
             .def_readonly("y", &ObscCircle::_y0);
+
+        py::class_<ObscAnnulus, std::shared_ptr<ObscAnnulus>, Obscuration>(m, "ObscAnnulus")
+            .def(py::init<double,double,double,double>(), "init", "inner"_a, "outer"_a, "x"_a=0.0, "y"_a=0.0)
+            .def_readonly("inner", &ObscAnnulus::_inner)
+            .def_readonly("outer", &ObscAnnulus::_outer)
+            .def_readonly("x", &ObscAnnulus::_x0)
+            .def_readonly("y", &ObscAnnulus::_y0);
 
         py::class_<ObscRectangle, std::shared_ptr<ObscRectangle>, Obscuration>(m, "ObscRectangle")
             .def(py::init<double,double,double,double,double>(), "init",

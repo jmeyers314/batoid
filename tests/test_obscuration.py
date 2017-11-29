@@ -21,9 +21,27 @@ def test_ObscCircle():
 
 
 @timer
-def test_ObscNegation():
+def test_ObscAnnulus():
     import random
     random.seed(57)
+
+    for i in range(100):
+        cx = random.gauss(0.0, 1.0)
+        cy = random.gauss(0.0, 1.0)
+        inner = random.uniform(0.5, 1.5)
+        outer = random.uniform(1.6, 1.9)
+
+        obsc = batoid._batoid.ObscAnnulus(inner, outer, cx, cy)
+        for i in range(100):
+            x = random.gauss(0.0, 1.0)
+            y = random.gauss(0.0, 1.0)
+            assert obsc.contains(x, y) == (inner <= np.hypot(x-cx, y-cy) < outer)
+
+
+@timer
+def test_ObscNegation():
+    import random
+    random.seed(577)
 
     for i in range(100):
         cx = random.gauss(0.0, 1.0)
@@ -48,7 +66,7 @@ def test_ObscNegation():
 @timer
 def test_ObscRectangle():
     import random
-    random.seed(577)
+    random.seed(5772)
 
     for i in range(100):
         cx = random.gauss(0.0, 1.0)
@@ -76,7 +94,7 @@ def test_ObscRectangle():
 @timer
 def test_ObscCompound():
     import random
-    random.seed(5772)
+    random.seed(57721)
 
     for i in range(100):
         rx = random.gauss(0.0, 1.0)
@@ -107,6 +125,7 @@ def test_ObscRay():
 
 if __name__ == '__main__':
     test_ObscCircle()
+    test_ObscAnnulus()
     test_ObscNegation()
     test_ObscRectangle()
     test_ObscCompound()

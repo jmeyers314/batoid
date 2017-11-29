@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import batoid
+import yaml
 from test_helpers import timer, isclose
 
 
@@ -13,33 +14,33 @@ def test_huygens_psf():
         # Could do the integral directly without GalSim?
         return
 
+    if __name__ == '__main__':
+        obscurations = [0.0, 0.25, 0.5, 0.75]
+    else:
+        obscurations = [0.25]
+
     print("Testing HuygensPSF")
     # Just do a single parabolic mirror test
     focalLength = 1.5
     diam = 0.3
     R = 2*focalLength
-    for obscuration in [0.0, 0.25, 0.5, 0.75]:
-        surfaces = [
-            dict(
-                name='Mirror',
-                inner=obscuration*diam/2,
-                outer=diam/2,
-                type='mirror',
-                m0=1.0,
-                m1=1.0,
-                surface=batoid.Paraboloid(R, 0.0, Rin=obscuration*diam/2, Rout=diam/2)
-            ),
-            dict(
-                name='Det',
-                inner=0.0,
-                outer=0.01,
-                type='det',
-                m0=1.0,
-                m1=1.0,
-                surface=batoid.Plane(focalLength, Rout=0.01)
-            )
-        ]
-        telescope = batoid.Telescope(surfaces)
+    for obscuration in obscurations:
+        telescope = batoid.CompoundOptic(
+            items = [
+                batoid.Mirror(
+                    batoid.Paraboloid(R),
+                    name="Mirror",
+                    obscuration=batoid.ObscNegation(
+                        batoid.ObscAnnulus(0.5*obscuration*diam, 0.5*diam)
+                    )
+                ),
+                batoid.Detector(
+                    batoid.Plane(),
+                    name="detector",
+                    coordSys=batoid.CoordSys().shiftGlobal(batoid.Vec3(0,0,focalLength))
+                )
+            ]
+        )
 
         airy_size = 1.22*500e-9/diam * 206265
         print()
@@ -47,14 +48,14 @@ def test_huygens_psf():
 
         size = 3.2
         npix = 128
-        obj = galsim.OpticalPSF(diam=diam, lam=500, obscuration=obscuration)
+        obj = galsim.Airy(lam=500, diam=diam, obscuration=obscuration)
         im = obj.drawImage(nx=npix, ny=npix, scale=size/npix, method='no_pixel')
-        arr = im.array/im.array.sum()
+        arr = im.array/np.max(im.array)
         gs_mom = galsim.hsm.FindAdaptiveMom(im)
 
-        rays = batoid.parallelRays(10, 0.15, 0.0, nradii=20, naz=100, wavelength=500e-9)
-        traced_rays = telescope.trace(rays)
-        traced_rays = batoid.RayVector([r for r in traced_rays if not r.isVignetted])
+        rays = batoid.circularGrid(10.0, 0.5*diam, 0.5*diam*obscuration, 0.0, 0.0, 50, 200, 500e-9, 1.0)
+        traced_rays, _ = telescope.trace(rays)
+        traced_rays = batoid.trimVignetted(traced_rays)
 
         xs = np.linspace(-size/2, size/2, npix) # arcsec
         xs /= (206265/focalLength) # meters
@@ -62,8 +63,8 @@ def test_huygens_psf():
         xs += np.mean(traced_rays.x)
         ys += np.mean(traced_rays.y)
 
-        psf = telescope.huygensPSF(rays=rays, xs=xs, ys=ys)
-        psf = psf/psf.sum()
+        psf = batoid.huygensPSF(telescope, xs=xs, ys=ys, rays=rays)
+        psf = psf/np.max(psf)
 
         psfim = galsim.Image(psf)
         jt_mom = galsim.hsm.FindAdaptiveMom(psfim)
@@ -88,8 +89,8 @@ def test_huygens_psf():
             import matplotlib.pyplot as plt
             fig = plt.figure(figsize=(15, 4))
             ax1 = fig.add_subplot(131)
-            im1 = ax1.imshow(np.log10(arr), extent=[-size/2, size/2, -size/2, size/2], vmin=-7, vmax=-1)
-            plt.colorbar(im1, ax=ax1)
+            im1 = ax1.imshow(np.log10(arr), extent=[-size/2, size/2, -size/2, size/2], vmin=-7, vmax=0)
+            plt.colorbar(im1, ax=ax1, label='$\log_{10}$ flux')
             ax1.set_title('GalSim')
             ax1.set_xlabel("arcsec")
             ax1.set_ylabel("arcsec")
@@ -99,8 +100,8 @@ def test_huygens_psf():
             rayx = traced_rays.x*1e6
             rayy = traced_rays.y*1e6
             ax2 = fig.add_subplot(132)
-            im2 = ax2.imshow(np.log10(psf), extent=[xs.min(), xs.max(), ys.min(), ys.max()], vmin=-7, vmax=-1)
-            plt.colorbar(im2, ax=ax2)
+            im2 = ax2.imshow(np.log10(psf), extent=[xs.min(), xs.max(), ys.min(), ys.max()], vmin=-7, vmax=0)
+            plt.colorbar(im2, ax=ax2, label='$\log_{10}$ flux')
             ax2.scatter(rayx, rayy, s=1, c='r')
             ax2.set_xlim(xs.min(), xs.max())
             ax2.set_ylim(ys.min(), ys.max())
@@ -109,8 +110,8 @@ def test_huygens_psf():
             ax2.set_ylabel("$\mu m$")
 
             ax3 = fig.add_subplot(133)
-            im3 = ax3.imshow((psf-arr)/arr, vmin=-0.1, vmax=0.1)
-            plt.colorbar(im3, ax=ax3)
+            im3 = ax3.imshow((psf-arr)/np.max(arr), vmin=-0.01, vmax=0.01, cmap='seismic')
+            plt.colorbar(im3, ax=ax3, label="(batoid-GalSim)/max(GalSim)")
             ax3.set_title('resid')
             ax3.set_xlabel("$\mu m$")
             ax3.set_ylabel("$\mu m$")
@@ -123,8 +124,17 @@ def test_huygens_psf():
 @timer
 def test_lsst_psf():
     # Just testing that doesn't crash for the moment
-    fn = os.path.join(batoid.datadir, "lsst", "LSST_r.yaml")
-    telescope = batoid.Telescope.makeFromYAML(fn)
+    fn = os.path.join(batoid.datadir, "lsst", "LSST_r2.yaml")
+    config = yaml.load(open(fn))
+    telescope = batoid.parse.parse_optic(config['opticalSystem'])
+
+    # import matplotlib.pyplot as plt
+    # from mpl_toolkits.mplot3d import Axes3D
+    # fig = plt.figure()
+    # ax = fig.add_subplot(111, projection='3d')
+    # telescope.draw(ax)
+    # plt.show()
+    # import sys; sys.exit()
 
     if __name__ == '__main__':
         thetas = [0.0, 1200.0, 3600.0, 6300.0] # arcsec
@@ -132,10 +142,10 @@ def test_lsst_psf():
         thetas = [6300.0]
     for theta in thetas:
         print(theta/3600.0)
-        rays = batoid.parallelRays(10, 4.2, 2.55, theta_x=theta/206265, nradii=10, naz=100,
-                                   wavelength=620e-9, medium=batoid.Air())
-        traced_rays = telescope.trace(rays)
-        traced_rays = batoid.RayVector([r for r in traced_rays if not r.isVignetted])
+        rays = batoid.circularGrid(10.0, 4.2, 2.55,
+                                   np.sin(theta/206265), 0.0,
+                                   10, 100, 620e-9, batoid.Air())
+        traced_rays = batoid.trimVignetted(telescope.trace(rays)[0])
 
         nx = 64
         xs = np.linspace(-10e-6, 10e-6, nx) # 2 pixels wide
@@ -144,14 +154,14 @@ def test_lsst_psf():
         ys += np.mean(traced_rays.y)
         xs, ys = np.meshgrid(xs, ys)
 
-        psf = telescope.huygensPSF(xs=xs, ys=ys, rays=rays)
+        psf = batoid.huygensPSF(telescope, xs=xs, ys=ys, rays=rays)
 
         if __name__ == '__main__':
             import matplotlib.pyplot as plt
             fig = plt.figure(figsize=(12, 8))
             ax = fig.add_subplot(111)
             ax.imshow(psf, extent=np.r_[xs.min(), xs.max(), ys.min(), ys.max()]*1e6)
-            ax.scatter(traced_rays.x*1e6, traced_rays.y*1e6, s=1, c='r')
+            ax.scatter(traced_rays.x*1e6, traced_rays.y*1e6, s=1, c='r', alpha=0.25)
             ax.set_xlim(xs.min()*1e6, xs.max()*1e6)
             ax.set_ylim(ys.min()*1e6, ys.max()*1e6)
             ax.set_title("LSST PSF field={:5.2f}".format(theta/3600.0))
@@ -165,8 +175,9 @@ def test_lsst_psf():
 @timer
 def test_hsc_psf():
     # Just testing that doesn't crash for the moment
-    fn = os.path.join(batoid.datadir, "hsc", "HSC.yaml")
-    telescope = batoid.Telescope.makeFromYAML(fn)
+    fn = os.path.join(batoid.datadir, "hsc", "HSC3.yaml")
+    config = yaml.load(open(fn))
+    telescope = batoid.parse.parse_optic(config['opticalSystem'])
 
     if __name__ == '__main__':
         thetas = [0.0, 1350.0, 2700.0] # arcsec
@@ -174,10 +185,10 @@ def test_hsc_psf():
         thetas = [2700.0]
     for theta in thetas:
         print(theta/3600.0)
-        rays = batoid.parallelRays(10, 4.1, 0.75, theta_y=theta/206265, nradii=10, naz=100,
-                                   wavelength=760e-9)
-        traced_rays = telescope.trace(rays)
-        traced_rays = batoid.RayVector([r for r in traced_rays if not r.isVignetted])
+        rays = batoid.circularGrid(10.0, 4.2, 2.55,
+                                   np.sin(theta/206265), 0.0,
+                                   10, 100, 620e-9, 1.0)
+        traced_rays = batoid.trimVignetted(telescope.trace(rays)[0])
 
         nx = 64
         xs = np.linspace(-27.1e-6, 27.1e-6, nx) # 2 pixels wide
@@ -186,7 +197,7 @@ def test_hsc_psf():
         ys += np.mean(traced_rays.y)
         xs, ys = np.meshgrid(xs, ys)
 
-        psf = telescope.huygensPSF(xs=xs, ys=ys, rays=rays)
+        psf = batoid.huygensPSF(telescope, xs=xs, ys=ys, rays=rays)
 
         if __name__ == '__main__':
             import matplotlib.pyplot as plt
@@ -207,8 +218,17 @@ def test_hsc_psf():
 @timer
 def test_decam_psf():
     # Just testing that doesn't crash for the moment
-    fn = os.path.join(batoid.datadir, "decam", "DECam.yaml")
-    telescope = batoid.Telescope.makeFromYAML(fn)
+    fn = os.path.join(batoid.datadir, "decam", "DECam2.yaml")
+    config = yaml.load(open(fn))
+    telescope = batoid.parse.parse_optic(config['opticalSystem'])
+
+    # import matplotlib.pyplot as plt
+    # from mpl_toolkits.mplot3d import Axes3D
+    # fig = plt.figure()
+    # ax = fig.add_subplot(111, projection='3d')
+    # telescope.draw(ax)
+    # plt.show()
+    # import sys; sys.exit()
 
     if __name__ == '__main__':
         thetas = [0.0, 1800.0, 3960.0] # arcsec
@@ -216,10 +236,10 @@ def test_decam_psf():
         thetas = [3960.0]
     for theta in thetas:
         print(theta/3600.0)
-        rays = batoid.parallelRays(10, 4.1, 0.75, theta_y=theta/206265, nradii=30, naz=200,
-                                   wavelength=760e-9, medium=batoid.Air())
-        traced_rays = telescope.trace(rays)
-        traced_rays = batoid.RayVector([r for r in traced_rays if not r.isVignetted])
+        rays = batoid.circularGrid(10.0, 1.95, 0.5,
+                                   np.sin(theta/206265), 0.0,
+                                   30, 200, 760e-9, batoid.Air())
+        traced_rays = batoid.trimVignetted(telescope.trace(rays)[0])
 
         nx = 64
         xs = np.linspace(-27.1e-6, 27.1e-6, nx)
@@ -228,7 +248,7 @@ def test_decam_psf():
         ys += np.mean(traced_rays.y)
         xs, ys = np.meshgrid(xs, ys)
 
-        psf = telescope.huygensPSF(xs=xs, ys=ys, rays=rays)
+        psf = batoid.huygensPSF(telescope, xs=xs, ys=ys, rays=rays)
 
         if __name__ == '__main__':
             import matplotlib.pyplot as plt

@@ -2,7 +2,7 @@ import batoid
 
 def parse_obscuration(config):
     typ = config.pop('type')
-    if typ in ['ObscCircle', 'ObscRay', 'ObscRectangle']:
+    if typ in ['ObscCircle', 'ObscAnnulus', 'ObscRay', 'ObscRectangle']:
         evalstr = "batoid._batoid.{}(**config)".format(typ)
         return eval(evalstr)
     if typ == 'ObscNegation':
@@ -82,12 +82,6 @@ def parse_optic(config,
     elif typ == 'Baffle':
         surface = parse_surface(config.pop('surface'))
         return batoid.optic.Baffle(
-            surface, name=name,
-            coordSys=coordSys, obscuration=obscuration,
-            inMedium=inMedium, outMedium=outMedium)
-    elif typ == 'Phantom':
-        surface = parse_surface(config.pop('surface'))
-        return batoid.optic.Phantom(
             surface, name=name,
             coordSys=coordSys, obscuration=obscuration,
             inMedium=inMedium, outMedium=outMedium)

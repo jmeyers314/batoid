@@ -1,0 +1,196 @@
+opticalSystem:
+  type: CompoundOptic
+  name: BlancoDECam
+  inMedium: air
+  medium: air
+  items:
+    -
+      type: Mirror
+      name: PM
+      surface:
+        type: Quadric
+        R: 21.3116
+        conic: -1.0976
+      obscuration:
+        type: ClearCircle
+        radius: 1.905
+      # Should really add an obscuration above this...
+    -
+      type: CompoundOptic
+      name: DECam
+      coordSys:
+        z: 8.875037
+      items:
+        -
+          type: Lens
+          name: C1
+          medium: silica
+          items:
+            -
+              type: RefractiveInterface
+              name: C1_entrance
+              surface:
+                type: Sphere
+                R: 0.68598
+              obscuration:
+                type: ClearCircle
+                radius: 0.49
+            -
+              type: RefractiveInterface
+              name: C1_exit
+              surface:
+                type: Sphere
+                R: 0.71187
+              obscuration:
+                type: ClearCircle
+                radius: 0.46
+              coordSys:
+                z: 0.11054
+        -
+          type: Lens
+          name: C2
+          medium: silica
+          coordSys:
+            z: 0.768634
+          items:
+            -
+              type: RefractiveInterface
+              name: C2_entrance
+              surface:
+                type: Sphere
+                R: 3.3856
+              obscuration:
+                type: ClearCircle
+                radius: 0.345
+            -
+              type: RefractiveInterface
+              name: C2_exit
+              coordSys:
+                z: 0.051136
+              surface:
+                type: Asphere
+                R: 0.506944
+                conic: 0.0
+                coefs: [-0.15789999999999998, -0.10429999999999999, 0.1351]
+              obscuration:
+                type: ClearCircle
+                radius: 0.32
+        -
+          type: Lens
+          name: C3
+          medium: silica
+          coordSys:
+            z: 0.914377
+          items:
+            -
+              type: RefractiveInterface
+              name: C3_entrance
+              surface:
+                type: Sphere
+                R: 0.9436
+              obscuration:
+                type: ClearCircle
+                radius: 0.326
+            -
+              type: RefractiveInterface
+              name: C3_exit
+              coordSys:
+                z: 0.07559
+              surface:
+                type: Sphere
+                R: 2.41685
+              obscuration:
+                type: ClearCircle
+                radius: 0.313
+        -
+          type: Lens
+          name: Filter
+          medium: silica
+          coordSys:
+            z:  1.315074
+          items:
+            -
+              type: RefractiveInterface
+              name: Filter_entrance
+              surface:
+                type: Plane
+              obscuration:
+                type: ClearCircle
+                radius: 0.307
+            -
+              type: RefractiveInterface
+              name: Filter_exit
+              coordSys:
+                z: 0.013
+              surface:
+                type: Plane
+              obscuration:
+                type: ClearCircle
+                radius: 0.307
+        -
+          type: Lens
+          name: C4
+          medium: silica
+          coordSys:
+            z:  1.519564
+          items:
+            -
+              type: RefractiveInterface
+              name: C4_entrance
+              surface:
+                type: Asphere
+                R: 0.66243
+                conic: 0.0
+                coefs: [0.1798, 1.126, 7.907]
+              obscuration:
+                type: ClearCircle
+                radius: 0.302
+            -
+              type: RefractiveInterface
+              name: C4_exit
+              coordSys:
+                z: 0.101461
+              surface:
+                type: Sphere
+                R: 1.79728
+              obscuration:
+                type: ClearCircle
+                radius: 0.292
+        -
+          type: Lens
+          name: C5
+          medium: silica
+          coordSys:
+            z:  1.82315
+          items:
+            -
+              type: RefractiveInterface
+              name: C5_entrance
+              surface:
+                type: Sphere
+                R: -0.899815
+              obscuration:
+                type: ClearCircle
+                radius: 0.256
+            -
+              type: RefractiveInterface
+              name: C5_exit
+              coordSys:
+                z: 0.053105
+              surface:
+                type: Sphere
+                R: -0.68501
+              obscuration:
+                type: ClearCircle
+                radius: 0.271
+        -
+          type: Detector
+          name: D
+          coordSys:
+            z: 1.906155
+          surface:
+            type: Plane
+          obscuration:
+            type: ClearCircle
+            # radius: 0.2258
+            radius: 0.23
