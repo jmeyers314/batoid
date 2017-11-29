@@ -18,9 +18,7 @@ namespace batoid {
         return Vec3(-dzdr1*x/r, -dzdr1*y/r, 1).UnitVec3();
     }
 
-    Ray Sphere::intercept(const Ray& r) const {
-        if (r.failed)
-            return Ray(true);
+    bool Sphere::timeToIntercept(const Ray& r, double& t) const {
         double vr2 = r.v.x*r.v.x + r.v.y*r.v.y;
         double vz2 = r.v.z*r.v.z;
         double vrr0 = r.v.x*r.p0.x + r.v.y*r.p0.y;
@@ -37,31 +35,35 @@ namespace batoid {
 
         // Should probably check the solutions here since we obtained the quadratic
         // formula above by squaring both sides of an equation.
-        double t;
         if (n == 0) {
-            return Ray(true);
+            return false;
         } else if (n == 1) {
-            if (r1 < 0) {
-                return Ray(true);
-            }
+            if (r1 < 0)
+                return false;
             t = r1;
         } else {
             if (r1 < 0) {
-                if (r2 < 0) {
-                    return Ray(true);
-                } else {
+                if (r2 < 0)
+                    return false;
+                else
                     t = r2;
-                }
             } else {
-                if (r2 < 0) {
+                if (r2 < 0)
                     t = r1;
-                } else {
+                else
                     t = std::min(r1, r2);
-                }
             }
         }
-
         t += r.t0;
+        return true;
+    }
+
+    Ray Sphere::intercept(const Ray& r) const {
+        if (r.failed)
+            return Ray(true);
+        double t;
+        if (!timeToIntercept(r, t))
+            return Ray(true);
         Vec3 point = r.positionAtTime(t);
         return Ray(point, r.v, t, r.wavelength, r.isVignetted);
     }
@@ -69,48 +71,9 @@ namespace batoid {
     Intersection Sphere::intersect(const Ray &r) const {
         if (r.failed)
             return Intersection(true);
-        double vr2 = r.v.x*r.v.x + r.v.y*r.v.y;
-        double vz2 = r.v.z*r.v.z;
-        double vrr0 = r.v.x*r.p0.x + r.v.y*r.p0.y;
-        double r02 = r.p0.x*r.p0.x + r.p0.y*r.p0.y;
-        double z0term = (r.p0.z-_R);
-
-        // Quadratic equation coefficients
-        double a = vz2 + vr2;
-        double b = 2*r.v.z*z0term + 2*vrr0;
-        double c = z0term*z0term - _R*_R + r02;
-
-        double r1, r2;
-        int n = solveQuadratic(a, b, c, r1, r2);
-
-        // Should probably check the solutions here since we obtained the quadratic
-        // formula above by squaring both sides of an equation.
-
         double t;
-        if (n == 0) {
+        if (!timeToIntercept(r, t))
             return Intersection(true);
-        } else if (n == 1) {
-            if (r1 < 0) {
-                return Intersection(true);
-            }
-            t = r1;
-        } else {
-            if (r1 < 0) {
-                if (r2 < 0) {
-                    return Intersection(true);
-                } else {
-                    t = r2;
-                }
-            } else {
-                if (r2 < 0) {
-                    t = r1;
-                } else {
-                    t = std::min(r1, r2);
-                }
-            }
-        }
-
-        t += r.t0;
         Vec3 point = r.positionAtTime(t);
         Vec3 surfaceNormal = normal(point.x, point.y);
         return Intersection(t, point, surfaceNormal);
@@ -120,6 +83,19 @@ namespace batoid {
         std::ostringstream oss(" ");
         oss << "Sphere(" << _R << ")";
         return oss.str();
+    }
+
+    void Sphere::interceptInPlace(Ray& r) const {
+        if (r.failed)
+            return;
+        double t;
+        if (!timeToIntercept(r, t)) {
+            r.failed=true;
+            return;
+        }
+        r.p0 = r.positionAtTime(t);
+        r.t0 = t;
+        return;
     }
 
     double Sphere::dzdr(double r) const {

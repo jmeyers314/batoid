@@ -32,6 +32,7 @@ class Optic(object):
             raise ValueError("coordSys required for optic")
         self.coordSys = coordSys
 
+
 class Interface(Optic):
     """The most basic category of Optic representing a single surface.  Almost always one of the
     concrete subclasses should be instantiated, depending on whether rays should reflect, refract,

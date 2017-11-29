@@ -16,10 +16,12 @@ namespace batoid {
         virtual Vec3 normal(double, double) const = 0;
 
         virtual Intersection intersect(const Ray&) const = 0;
-        std::vector<Intersection> intersect(const std::vector<Ray>&) const;
-
         virtual Ray intercept(const Ray&) const = 0;
+        virtual void interceptInPlace(Ray&) const = 0;
+
+        std::vector<Intersection> intersect(const std::vector<Ray>&) const;
         std::vector<Ray> intercept(const std::vector<Ray>&) const;
+        void interceptInPlace(std::vector<Ray>&) const;
 
         virtual std::string repr() const = 0;
         Transformation shift(double dx, double dy, double dz) const;

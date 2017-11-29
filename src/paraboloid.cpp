@@ -26,82 +26,68 @@ namespace batoid {
         return Vec3(0,0,1);
     }
 
-    Ray Paraboloid::intercept(const Ray& r) const {
-        if (r.failed)
-            return Ray(true);
+    bool Paraboloid::timeToIntercept(const Ray& r, double& t) const {
         double a = (r.v.x*r.v.x + r.v.y*r.v.y)/2/_R;
         double b = (r.p0.x*r.v.x + r.p0.y*r.v.y)/_R - r.v.z;
         double c = (r.p0.x*r.p0.x + r.p0.y*r.p0.y)/2/_R - r.p0.z;
         double r1, r2;
         int n = solveQuadratic(a, b, c, r1, r2);
 
-        double t;
-        if (n == 0) {
-            return Ray(true);
-        } else if (n == 1) {
-            if (r1 < 0) {
-                return Ray(true);
-            }
+        if (n == 0)
+            return false;
+        else if (n == 1) {
+            if (r1 < 0)
+                return false;
             t = r1;
         } else {
             if (r1 < 0) {
-                if (r2 < 0) {
-                    return Ray(true);
-                } else {
+                if (r2 < 0)
+                    return false;
+                else
                     t = r2;
-                }
             } else {
-                if (r2 < 0) {
+                if (r2 < 0)
                     t = r1;
-                } else {
+                else
                     t = std::min(r1, r2);
-                }
             }
         }
-
         t += r.t0;
+        return true;
+    }
+
+    Ray Paraboloid::intercept(const Ray& r) const {
+        if (r.failed)
+            return Ray(true);
+        double t;
+        if (!timeToIntercept(r, t))
+            return Ray(true);
         Vec3 point = r.positionAtTime(t);
         return Ray(point, r.v, t, r.wavelength, r.isVignetted);
     }
 
-
-    Intersection Paraboloid::intersect(const Ray& ray) const {
-        if (ray.failed)
+    Intersection Paraboloid::intersect(const Ray& r) const {
+        if (r.failed)
             return Intersection(true);
-        double a = (ray.v.x*ray.v.x + ray.v.y*ray.v.y)/2/_R;
-        double b = (ray.p0.x*ray.v.x + ray.p0.y*ray.v.y)/_R - ray.v.z;
-        double c = (ray.p0.x*ray.p0.x + ray.p0.y*ray.p0.y)/2/_R - ray.p0.z;
-        double r1, r2;
-        int n = solveQuadratic(a, b, c, r1, r2);
-
         double t;
-        if (n == 0) {
+        if (!timeToIntercept(r, t))
             return Intersection(true);
-        } else if (n == 1) {
-            if (r1 < 0) {
-                return Intersection(true);
-            }
-            t = r1;
-        } else {
-            if (r1 < 0) {
-                if (r2 < 0) {
-                    return Intersection(true);
-                } else {
-                    t = r2;
-                }
-            } else {
-                if (r2 < 0) {
-                    t = r1;
-                } else {
-                    t = std::min(r1, r2);
-                }
-            }
-        }
-
-        t += ray.t0;
-        Vec3 point = ray.positionAtTime(t);
+        Vec3 point = r.positionAtTime(t);
         Vec3 surfaceNormal = normal(point.x, point.y);
         return Intersection(t, point, surfaceNormal);
+    }
+
+    void Paraboloid::interceptInPlace(Ray& r) const {
+        if (r.failed)
+            return;
+        double t;
+        if (!timeToIntercept(r, t)) {
+            r.failed=true;
+            return;
+        }
+        r.p0 = r.positionAtTime(t);
+        r.t0 = t;
+        return;
     }
 
     inline std::ostream& operator<<(std::ostream& os, const Paraboloid& p) {

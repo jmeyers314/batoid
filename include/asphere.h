@@ -19,10 +19,11 @@ namespace batoid {
         virtual Ray intercept(const Ray&) const;
         using Surface::intersect;
         virtual Intersection intersect(const Ray&) const;
+        virtual void interceptInPlace(Ray&) const;
+
         double getR() const { return _R; }
         double getConic() const { return _conic; }
         const std::vector<double>& getCoefs() const { return _coefs; }
-
         std::string repr() const;
 
     private:
@@ -30,6 +31,7 @@ namespace batoid {
         const double _conic;  // Conic constant
         const std::vector<double> _coefs;  // Aspheric even polynomial coefficients
 
+        bool timeToIntercept(const Ray& r, double& t) const;
         double dzdr(double r) const;
     };
 

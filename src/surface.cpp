@@ -57,4 +57,12 @@ namespace batoid {
         );
         return result;
     }
+
+    void Surface::interceptInPlace(std::vector<Ray>& rays) const {
+        parallel_for_each(
+            rays.begin(), rays.end(),
+            [this](Ray& r) { interceptInPlace(r); },
+            2000
+        );
+    }
 }

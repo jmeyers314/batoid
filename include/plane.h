@@ -17,6 +17,7 @@ namespace batoid {
         using Surface::intersect;
         virtual Intersection intersect(const Ray&) const;
         virtual Ray intercept(const Ray&) const;
+        virtual void interceptInPlace(Ray&) const;
 
         std::string repr() const;
     };

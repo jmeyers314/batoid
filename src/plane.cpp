@@ -19,6 +19,14 @@ namespace batoid {
         return Intersection(t, point, surfaceNormal);
     }
 
+    void Plane::interceptInPlace(Ray& r) const {
+        if (r.failed)
+            return;
+        double t = -r.p0.z/r.v.z + r.t0;
+        r.p0 = r.positionAtTime(t);
+        r.t0 = t;
+    }
+
     std::string Plane::repr() const {
         return std::string("Plane()");
     }

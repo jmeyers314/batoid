@@ -18,10 +18,13 @@ namespace batoid {
         Ray intercept(const Ray&) const;
         using Surface::intersect;
         virtual Intersection intersect(const Ray&) const;
+        virtual void interceptInPlace(Ray&) const;
+
         double getR() const {return _R;}
         double getConic() const {return _conic;}
-
         std::string repr() const;
+
+        bool timeToIntercept(const Ray& r, double& t) const;
 
     private:
         const double _R;  // Radius of curvature

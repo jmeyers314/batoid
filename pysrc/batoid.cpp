@@ -58,7 +58,8 @@ namespace batoid {
          .def("rayGrid", (std::vector<Ray> (*)(double, double, double, double, int, double, const Medium&)) &rayGrid)
          .def("circularGrid", (std::vector<Ray> (*)(double, double, double, double, double, int, int, double, double)) &circularGrid)
          .def("circularGrid", (std::vector<Ray> (*)(double, double, double, double, double, int, int, double, const Medium&)) &circularGrid)
-         .def("trimVignetted", &trimVignetted);
+         .def("trimVignetted", &trimVignetted)
+         .def("trimVignettedInPlace", &trimVignettedInPlace);
 
 #if !((PYBIND11_VERSION_MAJOR >= 2) & (PYBIND11_VERSION_MINOR >= 2))
         return m.ptr();

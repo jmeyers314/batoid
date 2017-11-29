@@ -29,6 +29,7 @@ namespace batoid {
                                   int nradii, int naz, double wavelength, const Medium& m);
 
     std::vector<Ray> trimVignetted(const std::vector<Ray>& rays);
+    void trimVignettedInPlace(std::vector<Ray>& rays);
 }
 
 #endif

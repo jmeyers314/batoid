@@ -119,4 +119,18 @@ namespace batoid {
             }
         }
     }
+
+    void BaseCoordTransform::applyForwardInPlace(std::vector<Ray>& rays) const {
+        parallel_for_each(rays.begin(), rays.end(),
+            [this](Ray& r) { applyForwardInPlace(r); },
+            2000
+        );
+    }
+
+    void BaseCoordTransform::applyReverseInPlace(std::vector<Ray>& rays) const {
+        parallel_for_each(rays.begin(), rays.end(),
+            [this](Ray& r) { applyReverseInPlace(r); },
+            2000
+        );
+    }
 }

@@ -18,12 +18,15 @@ namespace batoid {
         using Surface::intersect;
         virtual Intersection intersect(const Ray&) const;
         virtual Ray intercept(const Ray&) const;
-        double getR() const {return _R;}
+        virtual void interceptInPlace(Ray&) const;
 
+        double getR() const {return _R;}
         std::string repr() const;
 
     private:
         const double _R;  // Radius of curvature
+
+        bool timeToIntercept(const Ray& r, double& t) const;
     };
 
     inline std::ostream& operator<<(std::ostream& os, const Paraboloid& p);

@@ -38,27 +38,32 @@ namespace batoid {
         const Ray& _r;
     };
 
-    Ray Asphere::intercept(const Ray& r) const {
-        if (r.failed)
-            return Ray(true);
+    bool Asphere::timeToIntercept(const Ray& r, double& t) const {
         // Solve the quadric problem analytically to get a good starting point.
         Quadric quad(_R, _conic);
-        Ray rquad = quad.intercept(r);
-        if (rquad.failed)
-            return Ray(true);
+        if (!quad.timeToIntercept(r, t))
+            return false;
 
         AsphereResidual resid(*this, r);
-        Solve<AsphereResidual> solve(resid, rquad.t0, rquad.t0+1e-2);
+        Solve<AsphereResidual> solve(resid, t, t+1e-2);
         solve.setMethod(Method::Brent);
         solve.setXTolerance(1e-12);
-        double t;
+
         try {
             solve.bracket();
             t = solve.root();
         } catch (const SolveError&) {
-            return Ray(true);
+            return false;
         }
+        return true;
+    }
 
+    Ray Asphere::intercept(const Ray& r) const {
+        if (r.failed)
+            return Ray(true);
+        double t;
+        if (!timeToIntercept(r, t))
+            return Ray(true);
         Vec3 point = r.positionAtTime(t);
         return Ray(point, r.v, t, r.wavelength, r.isVignetted);
     }
@@ -66,27 +71,25 @@ namespace batoid {
     Intersection Asphere::intersect(const Ray& r) const {
         if (r.failed)
             return Intersection(true);
-        // Solve the quadric problem analytically to get a good starting point.
-        Quadric quad(_R, _conic);
-        Intersection isec = quad.intersect(r);
-        if (isec.failed)
-            return isec;
-
-        AsphereResidual resid(*this, r);
-        Solve<AsphereResidual> solve(resid, isec.t, isec.t+1e-2);
-        solve.setMethod(Method::Brent);
-        solve.setXTolerance(1e-12);
         double t;
-        try {
-            solve.bracket();
-            t = solve.root();
-        } catch (const SolveError&) {
+        if (!timeToIntercept(r, t))
             return Intersection(true);
-        }
-
         Vec3 point = r.positionAtTime(t);
         Vec3 surfaceNormal = normal(point.x, point.y);
         return Intersection(t, point, surfaceNormal);
+    }
+
+    void Asphere::interceptInPlace(Ray& r) const {
+        if (r.failed)
+            return;
+        double t;
+        if (!timeToIntercept(r, t)) {
+            r.failed=true;
+            return;
+        }
+        r.p0 = r.positionAtTime(t);
+        r.t0 = t;
+        return;
     }
 
     std::string Asphere::repr() const {

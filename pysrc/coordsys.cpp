@@ -27,6 +27,9 @@ namespace batoid {
             .def("rotateLocal", (CoordSys (CoordSys::*) (const Rot3&, const Vec3&, const CoordSys&) const) &CoordSys::rotateLocal);
     }
 
+
+    // Version of applyForward that accepts three congruent numpy arrays (x, y, z), and returns
+    // three transformed numpy arrays with the new coordinates.
     std::tuple<py::array_t<double>, py::array_t<double>, py::array_t<double>>
     numpyApplyForward(const BaseCoordTransform& ct,
                       py::array_t<double> xs,
@@ -63,27 +66,54 @@ namespace batoid {
         return std::make_tuple(resultX, resultY, resultZ);
     }
 
-    void pyExportCoordTransform(py::module& m) {
-        // py::class_<CoordTransform, std::shared_ptr<CoordTransform>>(m, "CoordTransform")
-        //     .def(py::init<std::shared_ptr<CoordSys>,std::shared_ptr<CoordSys>>())
-        //     .def("applyForward", (Vec3 (CoordTransform::*)(const Vec3&) const) &CoordTransform::applyForward)
-        //     .def("applyReverse", (Vec3 (CoordTransform::*)(const Vec3&) const) &CoordTransform::applyReverse)
-        //     .def("applyForward", [](const CoordTransform& ct, py::array_t<double> xs, py::array_t<double> ys, py::array_t<double> zs){
-        //         return numpyApplyForward(ct, xs, ys, zs);
-        //     })
-        //     .def("applyForward", (Ray (CoordTransform::*)(const Ray&) const) &CoordTransform::applyForward)
-        //     .def("applyReverse", (Ray (CoordTransform::*)(const Ray&) const) &CoordTransform::applyReverse)
-        //     .def("applyForward", (std::vector<Ray> (CoordTransform::*)(const std::vector<Ray>&) const) &CoordTransform::applyForward)
-        //     .def("applyReverse", (std::vector<Ray> (CoordTransform::*)(const std::vector<Ray>&) const) &CoordTransform::applyReverse)
-        //     .def_readonly("source", &CoordTransform::source)
-        //     .def_readonly("destination", &CoordTransform::destination);
+    // Version of applyReverse that accepts three congruent numpy arrays (x, y, z), and returns
+    // three transformed numpy arrays with the new coordinates.
+    std::tuple<py::array_t<double>, py::array_t<double>, py::array_t<double>>
+    numpyApplyReverse(const BaseCoordTransform& ct,
+                      py::array_t<double> xs,
+                      py::array_t<double> ys,
+                      py::array_t<double> zs) {
+        auto bufX = xs.request();
+        auto bufY = ys.request();
+        auto bufZ = zs.request();
+        if (bufX.ndim != bufY.ndim || bufX.ndim != bufZ.ndim)
+            throw std::runtime_error("Dimensions must match");
+        if (bufX.size != bufY.size || bufX.size != bufZ.size)
+            throw std::runtime_error("Sizes much match");
+        auto resultX = py::array_t<double>(bufX.shape, bufX.strides);
+        auto resultY = py::array_t<double>(bufY.shape, bufY.strides);
+        auto resultZ = py::array_t<double>(bufZ.shape, bufZ.strides);
+        auto bufXOut = resultX.request();
+        auto bufYOut = resultY.request();
+        auto bufZOut = resultZ.request();
 
+        double *ptrX = (double *) bufX.ptr;
+        double *ptrY = (double *) bufY.ptr;
+        double *ptrZ = (double *) bufZ.ptr;
+        double *ptrXOut = (double *)  bufXOut.ptr;
+        double *ptrYOut = (double *)  bufYOut.ptr;
+        double *ptrZOut = (double *)  bufZOut.ptr;
+
+        auto v = Vec3();
+        for (ssize_t idx = 0; idx < bufX.size; idx++) {
+            v = ct.applyReverse(Vec3(ptrX[idx], ptrY[idx], ptrZ[idx]));
+            ptrXOut[idx] = v.x;
+            ptrYOut[idx] = v.y;
+            ptrZOut[idx] = v.z;
+        }
+        return std::make_tuple(resultX, resultY, resultZ);
+    }
+
+    void pyExportCoordTransform(py::module& m) {
         py::class_<BaseCoordTransform, std::shared_ptr<BaseCoordTransform>>(m, "CoordTransform")
             .def(py::init(&getTransform))
             .def("applyForward", (Vec3 (BaseCoordTransform::*)(const Vec3&) const) &BaseCoordTransform::applyForward)
             .def("applyReverse", (Vec3 (BaseCoordTransform::*)(const Vec3&) const) &BaseCoordTransform::applyReverse)
             .def("applyForward", [](const BaseCoordTransform& ct, py::array_t<double> xs, py::array_t<double> ys, py::array_t<double> zs){
                 return numpyApplyForward(ct, xs, ys, zs);
+            })
+            .def("applyReverse", [](const BaseCoordTransform& ct, py::array_t<double> xs, py::array_t<double> ys, py::array_t<double> zs){
+                return numpyApplyReverse(ct, xs, ys, zs);
             })
             .def("applyForward", (Ray (BaseCoordTransform::*)(const Ray&) const) &BaseCoordTransform::applyForward)
             .def("applyReverse", (Ray (BaseCoordTransform::*)(const Ray&) const) &BaseCoordTransform::applyReverse)

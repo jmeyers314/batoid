@@ -67,7 +67,7 @@ namespace batoid {
             auto handle = std::async(std::launch::async,
                                      parallel_for_each<It, UnaryOperation>,
                                      mid, last, unary_op, chunksize);
-            parallelTransform(first, mid, unary_op, chunksize);
+            parallel_for_each(first, mid, unary_op, chunksize);
             handle.wait();
         }
     }

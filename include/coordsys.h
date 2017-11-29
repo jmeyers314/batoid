@@ -67,8 +67,14 @@ namespace batoid {
 
         virtual Ray applyForward(const Ray& r) const = 0;
         virtual Ray applyReverse(const Ray& r) const = 0;
+
+        virtual void applyForwardInPlace(Ray& r) const = 0;
+        virtual void applyReverseInPlace(Ray& r) const = 0;
+
         std::vector<Ray> applyForward(const std::vector<Ray>& r) const;
         std::vector<Ray> applyReverse(const std::vector<Ray>& r) const;
+        void applyForwardInPlace(std::vector<Ray>& rays) const;
+        void applyReverseInPlace(std::vector<Ray>& rays) const;
 
         virtual Rot3 getRot() const = 0;
         virtual Vec3 getDr() const = 0;
@@ -82,6 +88,9 @@ namespace batoid {
 
         virtual Ray applyForward(const Ray& r) const override { return r; }
         virtual Ray applyReverse(const Ray& r) const override { return r; }
+
+        virtual void applyForwardInPlace(Ray& r) const override {}  // noop
+        virtual void applyReverseInPlace(Ray& r) const override {}
 
         virtual Rot3 getRot() const override { return Rot3(); }
         virtual Vec3 getDr() const override { return Vec3(); }
@@ -97,6 +106,9 @@ namespace batoid {
             { return Ray(r.p0-_dr, r.v, r.t0, r.wavelength, r.isVignetted); }
         virtual Ray applyReverse(const Ray& r) const override
             { return Ray(r.p0+_dr, r.v, r.t0, r.wavelength, r.isVignetted); }
+
+        virtual void applyForwardInPlace(Ray& r) const override { r.p0 -= _dr; }
+        virtual void applyReverseInPlace(Ray& r) const override { r.p0 += _dr; }
 
         virtual Rot3 getRot() const override { return Rot3(); }
         virtual Vec3 getDr() const override { return _dr; }
@@ -117,6 +129,15 @@ namespace batoid {
         virtual Ray applyReverse(const Ray& r) const override {
             return Ray(RotVec(_rot, r.p0), RotVec(_rot, r.v),
                        r.t0, r.wavelength, r.isVignetted);
+        }
+
+        virtual void applyForwardInPlace(Ray& r) const override {
+            r.p0 = UnRotVec(_rot, r.p0);
+            r.v = UnRotVec(_rot, r.v);
+        }
+        virtual void applyReverseInPlace(Ray& r) const override {
+            r.p0 = RotVec(_rot, r.p0);
+            r.v = RotVec(_rot, r.v);
         }
 
         virtual Rot3 getRot() const override { return _rot; }
@@ -143,6 +164,15 @@ namespace batoid {
         virtual Ray applyReverse(const Ray& r) const override {
             return Ray(RotVec(_rot, r.p0) + _dr, RotVec(_rot, r.v),
                 r.t0, r.wavelength, r.isVignetted);
+        }
+
+        virtual void applyForwardInPlace(Ray& r) const override {
+            r.p0 = UnRotVec(_rot, r.p0-_dr);
+            r.v = UnRotVec(_rot, r.v);
+        }
+        virtual void applyReverseInPlace(Ray& r) const override {
+            r.p0 = RotVec(_rot, r.p0)+_dr;
+            r.v = RotVec(_rot, r.v);
         }
 
         virtual Rot3 getRot() const override { return _rot; }

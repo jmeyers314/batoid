@@ -169,4 +169,15 @@ namespace batoid{
         return result;
     }
 
+    void trimVignettedInPlace(std::vector<Ray>& rays) {
+        rays.erase(
+            std::remove_if(
+                rays.begin(),
+                rays.end(),
+                [](const Ray& r){ return r.isVignetted; }
+            ),
+            rays.end()
+        );
+    }
+
 }
