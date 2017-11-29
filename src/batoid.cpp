@@ -174,7 +174,7 @@ namespace batoid{
             std::remove_if(
                 rays.begin(),
                 rays.end(),
-                [](const Ray& r){ return r.isVignetted; }
+                [](const Ray& r){ return r.failed || r.isVignetted; }
             ),
             rays.end()
         );
