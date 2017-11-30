@@ -6,11 +6,17 @@
 
 namespace batoid {
     Ray Obscuration::obscure(const Ray& ray) const {
-        if (ray.failed) return Ray(true);
+        if (ray.failed || ray.isVignetted) return ray;
         if (contains(ray.p0.x, ray.p0.y))
             return Ray(ray.p0, ray.v, ray.t0, ray.wavelength, true);
         else
-            return Ray(ray.p0, ray.v, ray.t0, ray.wavelength, ray.isVignetted);
+            return ray;
+    }
+
+    void Obscuration::obscureInPlace(Ray& ray) const {
+        if (ray.failed || ray.isVignetted) return;
+        if (contains(ray.p0.x, ray.p0.y))
+            ray.isVignetted = true;
     }
 
     std::vector<Ray> Obscuration::obscure(const std::vector<Ray>& rays) const {
@@ -27,6 +33,14 @@ namespace batoid {
             2000
         );
         return result;
+    }
+
+    void Obscuration::obscureInPlace(std::vector<Ray>& rays) const {
+        parallel_for_each(
+            rays.begin(), rays.end(),
+            [this](Ray& r){ obscureInPlace(r); },
+            2000
+        );
     }
 
     ObscCircle::ObscCircle(double radius, double x0, double y0) :

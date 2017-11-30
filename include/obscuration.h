@@ -12,7 +12,10 @@ namespace batoid {
     public:
         virtual bool contains(double x, double y) const = 0;
         Ray obscure(const Ray&) const;
+        void obscureInPlace(Ray&) const;
         std::vector<Ray> obscure(const std::vector<Ray>&) const;
+        void obscureInPlace(std::vector<Ray>&) const;
+
     };
 
     class ObscCircle : public Obscuration {
