@@ -102,13 +102,23 @@ namespace batoid {
         virtual Vec3 applyForward(const Vec3& r) const override { return r-_dr; }
         virtual Vec3 applyReverse(const Vec3& r) const override { return r+_dr; }
 
-        virtual Ray applyForward(const Ray& r) const override
-            { return Ray(r.p0-_dr, r.v, r.t0, r.wavelength, r.isVignetted); }
-        virtual Ray applyReverse(const Ray& r) const override
-            { return Ray(r.p0+_dr, r.v, r.t0, r.wavelength, r.isVignetted); }
+        virtual Ray applyForward(const Ray& r) const override {
+            if (r.failed) return r;
+            return Ray(r.p0-_dr, r.v, r.t0, r.wavelength, r.isVignetted);
+        }
+        virtual Ray applyReverse(const Ray& r) const override {
+            if (r.failed) return r;
+            return Ray(r.p0+_dr, r.v, r.t0, r.wavelength, r.isVignetted);
+        }
 
-        virtual void applyForwardInPlace(Ray& r) const override { r.p0 -= _dr; }
-        virtual void applyReverseInPlace(Ray& r) const override { r.p0 += _dr; }
+        virtual void applyForwardInPlace(Ray& r) const override {
+            if (r.failed) return;
+            r.p0 -= _dr;
+        }
+        virtual void applyReverseInPlace(Ray& r) const override {
+            if (r.failed) return;
+            r.p0 += _dr;
+        }
 
         virtual Rot3 getRot() const override { return Rot3(); }
         virtual Vec3 getDr() const override { return _dr; }
@@ -123,19 +133,23 @@ namespace batoid {
         virtual Vec3 applyReverse(const Vec3& r) const override { return RotVec(_rot, r); }
 
         virtual Ray applyForward(const Ray& r) const override {
+            if (r.failed) return r;
             return Ray(UnRotVec(_rot, r.p0), UnRotVec(_rot, r.v),
                        r.t0, r.wavelength, r.isVignetted);
         }
         virtual Ray applyReverse(const Ray& r) const override {
+            if (r.failed) return r;
             return Ray(RotVec(_rot, r.p0), RotVec(_rot, r.v),
                        r.t0, r.wavelength, r.isVignetted);
         }
 
         virtual void applyForwardInPlace(Ray& r) const override {
+            if (r.failed) return;
             r.p0 = UnRotVec(_rot, r.p0);
             r.v = UnRotVec(_rot, r.v);
         }
         virtual void applyReverseInPlace(Ray& r) const override {
+            if (r.failed) return;
             r.p0 = RotVec(_rot, r.p0);
             r.v = RotVec(_rot, r.v);
         }
@@ -158,19 +172,23 @@ namespace batoid {
         virtual Vec3 applyReverse(const Vec3& r) const override { return RotVec(_rot, r)+_dr; }
 
         virtual Ray applyForward(const Ray& r) const override {
+            if (r.failed) return r;
             return Ray(UnRotVec(_rot, r.p0-_dr), UnRotVec(_rot, r.v),
                     r.t0, r.wavelength, r.isVignetted);
         }
         virtual Ray applyReverse(const Ray& r) const override {
+            if (r.failed) return r;
             return Ray(RotVec(_rot, r.p0) + _dr, RotVec(_rot, r.v),
                 r.t0, r.wavelength, r.isVignetted);
         }
 
         virtual void applyForwardInPlace(Ray& r) const override {
+            if (r.failed) return;
             r.p0 = UnRotVec(_rot, r.p0-_dr);
             r.v = UnRotVec(_rot, r.v);
         }
         virtual void applyReverseInPlace(Ray& r) const override {
+            if (r.failed) return;
             r.p0 = RotVec(_rot, r.p0)+_dr;
             r.v = RotVec(_rot, r.v);
         }

@@ -24,7 +24,7 @@ namespace batoid {
         parallelTransform(rays.cbegin(), rays.cend(), result.begin(),
             [this](const Ray& ray)
             {
-                if (ray.failed) return Ray(true);
+                if (ray.failed) return ray;
                 if (contains(ray.p0.x, ray.p0.y))
                     return Ray(ray.p0, ray.v, ray.t0, ray.wavelength, true);
                 else

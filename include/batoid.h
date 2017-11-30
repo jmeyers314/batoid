@@ -16,6 +16,14 @@ namespace batoid {
     Ray reflect(const Ray& r, const Surface& surface);
     std::vector<Ray> reflect(const std::vector<Ray>& r, const Surface& surface);
 
+    void refractInPlace(Ray& r, const Surface& surface, const Medium& m1, const Medium& m2);
+    void refractInPlace(std::vector<Ray>& rays, const Surface& surface, const Medium& m1, const Medium& m2);
+    void refractInPlace(Ray& r, const Surface& surface, double n1, double n2);
+    void refractInPlace(std::vector<Ray>& rays, const Surface& surface, double n1, double n2);
+
+    void reflectInPlace(Ray& r, const Surface& surface);
+    void reflectInPlace(std::vector<Ray>& r, const Surface& surface);
+
     std::vector<Ray> rayGrid(double dist, double length, double xcos, double ycos,
                              int nside, double wavelength, double n);
     std::vector<Ray> rayGrid(double dist, double length, double xcos, double ycos,

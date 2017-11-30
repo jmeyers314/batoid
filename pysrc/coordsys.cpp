@@ -119,6 +119,8 @@ namespace batoid {
             .def("applyReverse", (Ray (BaseCoordTransform::*)(const Ray&) const) &BaseCoordTransform::applyReverse)
             .def("applyForward", (std::vector<Ray> (BaseCoordTransform::*)(const std::vector<Ray>&) const) &BaseCoordTransform::applyForward)
             .def("applyReverse", (std::vector<Ray> (BaseCoordTransform::*)(const std::vector<Ray>&) const) &BaseCoordTransform::applyReverse)
+            .def("applyForwardInPlace", (void (BaseCoordTransform::*)(Ray&) const) &BaseCoordTransform::applyForwardInPlace)
+            .def("applyForwardInPlace", (void (BaseCoordTransform::*)(std::vector<Ray>&) const) &BaseCoordTransform::applyForwardInPlace)
             ;
     }
 }

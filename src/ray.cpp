@@ -21,11 +21,15 @@ namespace batoid {
 
     std::string Ray::repr() const {
         std::ostringstream oss(" ");
-        oss << "Ray(" << p0 << ", " << v;
-        if (t0 != 0.0) oss << ", t0=" << t0;
-        if (wavelength != 0.0) oss << ", wavelength=" << wavelength;
-        if (isVignetted) oss << ", isVignetted=True";
-        oss << ")";
+        if(failed)
+            oss << "Ray(failed)";
+        else {
+            oss << "Ray(" << p0 << ", " << v;
+            if (t0 != 0.0) oss << ", t0=" << t0;
+            if (wavelength != 0.0) oss << ", wavelength=" << wavelength;
+            if (isVignetted) oss << ", isVignetted=True";
+            oss << ")";
+        }
         return oss.str();
     }
 
@@ -43,6 +47,11 @@ namespace batoid {
     }
 
     bool Ray::operator==(const Ray& other) const {
+        // All failed rays are equal
+        if (failed)
+            return other.failed;
+        if (other.failed)
+            return false;
         return (p0 == other.p0) &&
                (v == other.v) &&
                (t0 == other.t0) &&

@@ -50,10 +50,18 @@ namespace batoid {
 
         m.def("reflect", (Ray (*)(const Ray&, const Surface&)) &reflect)
          .def("reflect", (std::vector<Ray> (*)(const std::vector<Ray>&, const Surface&)) &reflect)
+         .def("reflectInPlace", (void (*)(Ray&, const Surface&)) &reflectInPlace)
+         .def("reflectInPlace", (void (*)(std::vector<Ray>&, const Surface&)) &reflectInPlace)
+
          .def("refract", (Ray (*)(const Ray&, const Surface&, const double, const double)) &refract)
          .def("refract", (std::vector<Ray> (*)(const std::vector<Ray>&, const Surface&, const double, const double)) &refract)
          .def("refract", (Ray (*)(const Ray&, const Surface&, const Medium&, const Medium&)) &refract)
          .def("refract", (std::vector<Ray> (*)(const std::vector<Ray>&, const Surface&, const Medium&, const Medium&)) &refract)
+         .def("refractInPlace", (void (*)(Ray&, const Surface&, const double, const double)) &refractInPlace)
+         .def("refractInPlace", (void (*)(std::vector<Ray>&, const Surface&, const double, const double)) &refractInPlace)
+         .def("refractInPlace", (void (*)(Ray&, const Surface&, const Medium&, const Medium&)) &refractInPlace)
+         .def("refractInPlace", (void (*)(std::vector<Ray>&, const Surface&, const Medium&, const Medium&)) &refractInPlace)
+
          .def("rayGrid", (std::vector<Ray> (*)(double, double, double, double, int, double, double)) &rayGrid)
          .def("rayGrid", (std::vector<Ray> (*)(double, double, double, double, int, double, const Medium&)) &rayGrid)
          .def("circularGrid", (std::vector<Ray> (*)(double, double, double, double, double, int, int, double, double)) &circularGrid)

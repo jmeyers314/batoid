@@ -7,25 +7,36 @@ import yaml
 
 
 @timer
-def parallel_trace_timing(nside=256):
-    rays = batoid._batoid.circularGrid(20, 4.1, 0.5, 0.1, 0.1, nside, nside, 500e-9, 1.0)
+def parallel_trace_timing(nside=512):
+    rays = batoid._batoid.circularGrid(20, 4.1, 0.5, 0.01, 0.01, nside, nside, 500e-9, 1.0)
 
     nrays = len(rays)
     print("Tracing {} rays.".format(nrays))
+    print()
 
     fn = os.path.join(batoid.datadir, "hsc", "HSC3.yaml")
     config = yaml.load(open(fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
 
+    print("Immutable trace")
     t0 = time.time()
     rays_out, _ = telescope.trace(rays)
     t1 = time.time()
     print("{} rays per second".format(int(nrays/(t1-t0))))
+    print()
 
+    print("Trace in place")
+    t0 = time.time()
+    telescope.traceInPlace(rays)
+    t1 = time.time()
+    print("{} rays per second".format(int(nrays/(t1-t0))))
+
+    assert rays == rays_out
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
-    parser.add_argument("--nside", type=int, default=256)
+    parser.add_argument("--nside", type=int, default=512)
     args = parser.parse_args()
+
     parallel_trace_timing(args.nside)

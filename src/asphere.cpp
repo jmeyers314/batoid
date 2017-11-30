@@ -57,8 +57,7 @@ namespace batoid {
     }
 
     Ray Asphere::intercept(const Ray& r) const {
-        if (r.failed)
-            return Ray(true);
+        if (r.failed) return r;
         double t;
         if (!timeToIntercept(r, t))
             return Ray(true);
@@ -78,8 +77,7 @@ namespace batoid {
     }
 
     void Asphere::interceptInPlace(Ray& r) const {
-        if (r.failed)
-            return;
+        if (r.failed) return;
         double t;
         if (!timeToIntercept(r, t)) {
             r.failed=true;

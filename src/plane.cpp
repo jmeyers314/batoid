@@ -3,8 +3,7 @@
 
 namespace batoid {
     Ray Plane::intercept(const Ray& r) const {
-        if (r.failed)
-            return Ray(true);
+        if (r.failed) return r;
         double t = -r.p0.z/r.v.z + r.t0;
         Vec3 point = r.positionAtTime(t);
         return Ray(point, r.v, t, r.wavelength, r.isVignetted);
@@ -20,8 +19,7 @@ namespace batoid {
     }
 
     void Plane::interceptInPlace(Ray& r) const {
-        if (r.failed)
-            return;
+        if (r.failed) return;
         double t = -r.p0.z/r.v.z + r.t0;
         r.p0 = r.positionAtTime(t);
         r.t0 = t;

@@ -7,7 +7,7 @@ namespace batoid{
     XForm::XForm(Rot3 _R, Vec3 _dr) : R(_R), dr(_dr) {}
 
     Ray XForm::to(const Ray& r) const {
-        if (r.failed) return Ray(true);
+        if (r.failed) return r;
         return Ray{RotVec(R, r.p0-dr),
                    RotVec(R, r.v),
                    r.t0,
@@ -16,7 +16,7 @@ namespace batoid{
     }
 
     Ray XForm::from(const Ray& r) const {
-        if (r.failed) return Ray(true);
+        if (r.failed) return r;
         return Ray{UnRotVec(R, r.p0)+dr,
                    UnRotVec(R, r.v),
                    r.t0,

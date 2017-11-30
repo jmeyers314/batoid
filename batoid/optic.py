@@ -173,6 +173,21 @@ class Interface(Optic):
         result[0]['outCoordSys'] = outCoordSys
         return result
 
+    def traceInPlace(self, r, inCoordSys=batoid.CoordSys(), outCoordSys=None):
+        transform = batoid.CoordTransform(inCoordSys, self.coordSys)
+        transform.applyForwardInPlace(r)
+        self.surface.interceptInPlace(r)
+        if self.obscuration is not None:
+            self.obscuration.obscureInPlace(r)
+        # refract, reflect, passthrough, depending on subclass
+        self.interactInPlace(r)
+        if outCoordSys is None:
+            return r, self.coordSys
+        else:
+            transform = batoid.CoordTransform(self.coordSys, outCoordSys)
+            transform.applyForwardInPlace(r)
+            return r, outCoordSys
+
     def printCoordSys(self):
         print(self.name, self.coordSys)
 
@@ -185,6 +200,9 @@ class RefractiveInterface(Interface):
     def interact(self, r):
         return batoid._batoid.refract(r, self.surface, self.inMedium, self.outMedium)
 
+    def interactInPlace(self, r):
+        batoid._batoid.refractInPlace(r, self.surface, self.inMedium, self.outMedium)
+
 
 class Mirror(Interface):
     """Specialization for reflective interfaces.
@@ -192,12 +210,17 @@ class Mirror(Interface):
     def interact(self, r):
         return batoid._batoid.reflect(r, self.surface)
 
+    def interactInPlace(self, r):
+        batoid._batoid.reflectInPlace(r, self.surface)
 
 class Detector(Interface):
     """Specialization for detector interfaces.
     """
     def interact(self, r):
         return r
+
+    def interactInPlace(self, r):
+        pass
 
 
 class Baffle(Interface):
@@ -207,6 +230,8 @@ class Baffle(Interface):
     def interact(self, r):
         return r
 
+    def interactInPlace(self, r):
+        pass
 
 class CompoundOptic(Optic):
     """A Optic containing two or more Optics as subitems.
@@ -222,6 +247,12 @@ class CompoundOptic(Optic):
         for item in self.items[:-1]:
             r, coordSys = item.trace(r, inCoordSys=coordSys)
         return self.items[-1].trace(r, inCoordSys=coordSys, outCoordSys=outCoordSys)
+
+    def traceInPlace(self, r, inCoordSys=batoid.CoordSys(), outCoordSys=None):
+        coordSys = inCoordSys
+        for item in self.items[:-1]:
+            r, coordSys = item.traceInPlace(r, inCoordSys=coordSys)
+        return self.items[-1].traceInPlace(r, inCoordSys=coordSys, outCoordSys=outCoordSys)
 
     def traceFull(self, r, inCoordSys=batoid.CoordSys(), outCoordSys=None):
         """ Recursively trace through this Optic by successively tracing through all subitems.

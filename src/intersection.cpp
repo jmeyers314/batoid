@@ -16,8 +16,7 @@ namespace batoid {
         t(0.0), point(Vec3()), surfaceNormal(Vec3()), isVignetted(true), failed(true) {}
 
     Ray Intersection::reflectedRay(const Ray& r) const {
-        if (failed || r.failed)
-            return Ray(true);
+        if (failed || r.failed) return r;
         double n = 1.0 / r.v.Magnitude();
         Vec3 nv = r.v * n;
         double c1 = DotProduct(nv, surfaceNormal);
@@ -25,8 +24,7 @@ namespace batoid {
     }
 
     Ray Intersection::refractedRay(const Ray& r, double n1, double n2) const {
-        if (failed || r.failed)
-            return Ray(true);
+        if (failed || r.failed) return r;
         //assert n1 == 1./r.Magnitude()
         Vec3 nv = r.v * n1;
         double alpha = DotProduct(nv, surfaceNormal);
@@ -44,8 +42,7 @@ namespace batoid {
     }
 
     Ray Intersection::refractedRay(const Ray& r, const Medium& m1, const Medium& m2) const {
-        if (failed || r.failed)
-            return Ray(true);
+        if (failed || r.failed) return r;
         double n1 = m1.getN(r.wavelength);
         double n2 = m2.getN(r.wavelength);
         return refractedRay(r, n1, n2);
