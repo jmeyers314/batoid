@@ -53,9 +53,9 @@ namespace batoid {
         m.def("propagatedToTimesMany", &propagatedToTimesMany);
         m.def("propagateInPlaceMany", &propagateInPlaceMany);
 
-        auto RV = py::bind_vector<std::vector<Ray>>(m, "RayVector", py::buffer_protocol());
+        auto RV = py::bind_vector<std::vector<Ray>>(m, "RayVector", py::buffer_protocol())
         // This feels a little hacky, but seems to work.
-        RV.def_property_readonly(
+        .def_property_readonly(
             "x",
             [](std::vector<Ray>& rv) {
                 return py::array_t<double>(
