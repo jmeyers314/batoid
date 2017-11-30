@@ -5,13 +5,12 @@
 
 namespace batoid {
     Asphere::Asphere(double R, double conic, std::vector<double> coefs) :
-        _R(R), _conic(conic), _coefs(coefs) {}
+        Quadric(R, conic), _coefs(coefs) {}
 
     double Asphere::sag(double x, double y) const {
         double r2 = x*x + y*y;
-        double result = 0.0;
-        if (_R != 0) result += r2/(_R*(1.+std::sqrt(1.-(1.+_conic)*r2/_R/_R)));
         double rr = r2;
+        double result = Quadric::sag(x, y);
         for (const auto& c : _coefs) {
             rr *= r2;
             result += c*rr;
@@ -40,8 +39,7 @@ namespace batoid {
 
     bool Asphere::timeToIntercept(const Ray& r, double& t) const {
         // Solve the quadric problem analytically to get a good starting point.
-        Quadric quad(_R, _conic);
-        if (!quad.timeToIntercept(r, t))
+        if (!Quadric::timeToIntercept(r, t))
             return false;
 
         AsphereResidual resid(*this, r);
@@ -94,7 +92,7 @@ namespace batoid {
 
     std::string Asphere::repr() const {
         std::ostringstream oss(" ");
-        oss << "Asphere(" << _R << ", " << _conic << ", [";
+        oss << "Asphere(" << getR() << ", " << getConic() << ", [";
         for (const auto& c : _coefs) {
             oss << c << ", ";
         }
@@ -103,9 +101,7 @@ namespace batoid {
     }
 
     double Asphere::dzdr(double r) const {
-        double result = 0.0;
-        if (_R != 0.0)
-            result += r/(_R*std::sqrt(1-r*r*(1+_conic)/_R/_R));
+        double result = Quadric::dzdr(r);
         double rrr = r*r*r;
         int twoi=0;
         for (const auto& c : _coefs) {

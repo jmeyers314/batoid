@@ -8,10 +8,11 @@
 #include "intersection.h"
 #include "ray.h"
 #include "vec3.h"
+#include "quadric.h"
 
 namespace batoid {
 
-    class Asphere : public Surface {
+    class Asphere : public Quadric {
     public:
         Asphere(double R, double conic, std::vector<double> coefs);
         virtual double sag(double, double) const;
@@ -21,14 +22,10 @@ namespace batoid {
         virtual Intersection intersect(const Ray&) const;
         virtual void interceptInPlace(Ray&) const;
 
-        double getR() const { return _R; }
-        double getConic() const { return _conic; }
         const std::vector<double>& getCoefs() const { return _coefs; }
         std::string repr() const;
 
     private:
-        const double _R;  // Radius of curvature
-        const double _conic;  // Conic constant
         const std::vector<double> _coefs;  // Aspheric even polynomial coefficients
 
         bool timeToIntercept(const Ray& r, double& t) const;

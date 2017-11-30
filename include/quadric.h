@@ -24,13 +24,15 @@ namespace batoid {
         double getConic() const {return _conic;}
         std::string repr() const;
 
+
+    protected:
         bool timeToIntercept(const Ray& r, double& t) const;
+        double dzdr(double r) const;
 
     private:
         const double _R;  // Radius of curvature
         const double _conic;  // Conic constant
 
-        double dzdr(double r) const;
     };
 
     inline std::ostream& operator<<(std::ostream& os, const Quadric& q);
