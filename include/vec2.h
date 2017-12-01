@@ -136,6 +136,14 @@ namespace batoid {
         return Vec2(r.data[0]*v.x + r.data[2]*v.y,
                     r.data[1]*v.x + r.data[3]*v.y);
     }
+
+    inline bool operator==(const Rot2& r1, const Rot2& r2) {
+        return r1.data == r2.data;
+    }
+
+    inline bool operator!=(const Rot2& r1, const Rot2& r2) {
+        return r1.data != r2.data;
+    }
 }
 
 #endif

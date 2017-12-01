@@ -1,7 +1,9 @@
 import numpy as np
 
+
 def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
     return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
+
 
 def ray_isclose(r1, r2, abs_tol=1e-14):
     return (isclose(r1.x0, r2.x0, rel_tol=0, abs_tol=abs_tol)
@@ -14,6 +16,7 @@ def ray_isclose(r1, r2, abs_tol=1e-14):
             and isclose(r1.t0, r2.t0, rel_tol=0, abs_tol=abs_tol)
             and r1.isVignetted == r2.isVignetted
             and r1.failed == r2.failed)
+
 
 def rays_allclose(rv1, rv2, abs_tol=1e-14):
     return (np.allclose(rv1.x, rv2.x, rtol=0, atol=abs_tol)
@@ -41,3 +44,14 @@ def timer(f):
         print('time for %s = %.2f' % (fname, t1-t0))
         return result
     return f2
+
+
+def test_pickle(obj):
+    try:
+        import cPickle as pickle
+    except ImportError:
+        import pickle
+
+    obj2 = pickle.loads(pickle.dumps(obj))
+
+    assert obj == obj2, "{} != {}".format(obj, obj2)
