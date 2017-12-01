@@ -1,6 +1,6 @@
 import math
 import batoid
-from test_helpers import isclose, timer
+from test_helpers import isclose, timer, do_pickle
 
 
 @timer
@@ -23,6 +23,7 @@ def test_DotProduct():
                        x1*x2 + y1*y2 + z1*z2)
         assert isclose(batoid.DotProduct(vec1, vec2),
                        vec1.x*vec2.x + vec1.y*vec2.y + vec1.z*vec2.z)
+        do_pickle(vec1)
 
 
 @timer
@@ -253,6 +254,8 @@ def testRotVec():
         assert isclose(vec1.y, vec3.y)
         assert isclose(vec1.z, vec3.z)
 
+        do_pickle(R1)
+
 
 @timer
 def test_determinant():
@@ -269,7 +272,7 @@ def test_determinant():
 def test_euler():
     import math
     import random
-    random.seed(57721566490)
+    random.seed(577215664901)
     for i in range(1000):
         thx = random.uniform(0, 2*math.pi)
         thy = random.uniform(0, 2*math.pi)

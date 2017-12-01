@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include "vec3.h"
 #include <pybind11/pybind11.h>
 #include <pybind11/operators.h>
@@ -56,7 +57,17 @@ namespace batoid {
             .def(py::self /= double())
             .def(py::self == py::self)
             .def(py::self != py::self)
-            .def(-py::self);
+            .def(-py::self)
+            .def(py::pickle(
+                [](const Vec3& r) { // __getstate__
+                    return py::make_tuple(r.x, r.y, r.z);
+                },
+                [](py::tuple t) { // __setstate__
+                    if (t.size() != 3)
+                        throw std::runtime_error("Invalid state!");
+                    return Vec3(t[0].cast<double>(), t[1].cast<double>(), t[2].cast<double>());
+                }
+            ));
 
         py::class_<Rot3>(m, "Rot3", py::buffer_protocol())
             .def_buffer([](Rot3& r) -> py::buffer_info {
@@ -78,7 +89,17 @@ namespace batoid {
             .def(py::self != py::self)
             .def("__repr__", &Rot3::repr)
             .def("determinant", &Rot3::determinant)
-            .def_property_readonly("euler", &Rot3::getEuler);
+            .def_property_readonly("euler", &Rot3::getEuler)
+            .def(py::pickle(
+                [](const Rot3& r) { // __getstate__
+                    return py::make_tuple(r.data);
+                },
+                [](py::tuple t) {
+                    if (t.size() != 1)
+                        throw std::runtime_error("Invalid state!");
+                    return Rot3(t[0].cast<std::array<double,9>>());
+                }
+            ));
 
         m.def("DotProduct", &DotProduct, R"pbdoc(
           Compute the dot-product of two Vec3 objects.

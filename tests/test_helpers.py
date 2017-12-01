@@ -46,7 +46,7 @@ def timer(f):
     return f2
 
 
-def test_pickle(obj):
+def do_pickle(obj):
     try:
         import cPickle as pickle
     except ImportError:

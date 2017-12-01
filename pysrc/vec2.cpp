@@ -36,7 +36,7 @@ namespace batoid {
                 [](const Vec2& v){ // __getstate__
                     return py::make_tuple(v.x, v.y);
                 },
-                [](py::tuple t){
+                [](py::tuple t){ // __setstate__
                     if (t.size() != 2)
                         throw std::runtime_error("Invalid state!");
                     return Vec2(t[0].cast<double>(), t[1].cast<double>());

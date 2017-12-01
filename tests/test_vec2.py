@@ -1,6 +1,6 @@
 import math
 import batoid
-from test_helpers import isclose, timer, test_pickle
+from test_helpers import isclose, timer, do_pickle
 
 
 @timer
@@ -22,7 +22,7 @@ def test_DotProduct():
         assert isclose(batoid.DotProduct(vec1, vec2),
                        vec1.x*vec2.x + vec1.y*vec2.y)
 
-        test_pickle(vec1)
+        do_pickle(vec1)
 
 
 @timer
@@ -185,7 +185,7 @@ def testRotVec():
         assert isclose(vec1.x, vec3.x)
         assert isclose(vec1.y, vec3.y)
 
-        test_pickle(R)
+        do_pickle(R)
 
 
 @timer
