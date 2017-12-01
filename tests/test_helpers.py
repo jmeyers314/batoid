@@ -52,6 +52,7 @@ def do_pickle(obj):
     except ImportError:
         import pickle
 
-    obj2 = pickle.loads(pickle.dumps(obj))
+    pick = pickle.dumps(obj)
+    obj2 = pickle.loads(pick)
 
     assert obj == obj2, "{} != {}".format(obj, obj2)

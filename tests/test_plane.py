@@ -1,6 +1,6 @@
 import batoid
 import numpy as np
-from test_helpers import isclose, timer
+from test_helpers import isclose, timer, do_pickle
 
 
 @timer
@@ -22,6 +22,7 @@ def test_sag():
         np.testing.assert_allclose(plane.sag(x, y), 0.0)
         # Make sure non-unit stride arrays also work
         np.testing.assert_allclose(plane.sag(x[::5,::2], y[::5,::2]), 0.0)
+        do_pickle(plane)
 
 
 @timer

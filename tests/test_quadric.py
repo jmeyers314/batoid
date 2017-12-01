@@ -1,6 +1,6 @@
 import batoid
 import numpy as np
-from test_helpers import isclose, timer
+from test_helpers import isclose, timer, do_pickle
 
 
 @timer
@@ -13,6 +13,7 @@ def test_properties():
         quad = batoid.Quadric(R, conic)
         assert quad.R == R
         assert quad.conic == conic
+        do_pickle(quad)
 
 
 def quadric(R, conic):

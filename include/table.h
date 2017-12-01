@@ -176,6 +176,11 @@ namespace batoid {
 
         void setup() const;
     };
+
+    template<class V, class A>
+    bool operator==(const Table<V,A>& t1, const Table<V,A>& t2);
+    template<class V, class A>
+    bool operator!=(const Table<V,A>& t1, const Table<V,A>& t2);
 }
 
 #endif

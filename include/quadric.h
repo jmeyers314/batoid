@@ -36,6 +36,10 @@ namespace batoid {
     };
 
     inline std::ostream& operator<<(std::ostream& os, const Quadric& q);
+    inline bool operator==(const Quadric& q1, const Quadric& q2)
+        { return q1.getR() == q2.getR() && q1.getConic() == q2.getConic(); }
+    inline bool operator!=(const Quadric& q1, const Quadric& q2)
+        { return q1.getR() != q2.getR() || q1.getConic() != q2.getConic(); }
 
 }
 #endif

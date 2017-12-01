@@ -1,6 +1,6 @@
 import batoid
 import numpy as np
-from test_helpers import isclose, timer
+from test_helpers import isclose, timer, do_pickle
 
 
 @timer
@@ -16,6 +16,7 @@ def test_properties():
         assert asphere.R == R
         assert asphere.conic == conic
         assert asphere.coefs == coefs
+        do_pickle(asphere)
 
 
 def py_asphere(R, conic, coefs):

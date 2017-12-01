@@ -1,5 +1,5 @@
 import batoid
-from test_helpers import isclose, timer
+from test_helpers import isclose, timer, do_pickle
 
 
 @timer
@@ -24,6 +24,7 @@ def test_call():
             assert isclose(r.positionAtTime(t).y, y+vy*(t-t0))
             assert isclose(r.positionAtTime(t).z, z+vz*(t-t0))
         assert r1 == r2
+        do_pickle(r1)
 
 
 @timer

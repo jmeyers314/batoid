@@ -15,6 +15,12 @@ namespace batoid {
     void pyExportParaboloid(py::module& m) {
         py::class_<Paraboloid, std::shared_ptr<Paraboloid>, Surface>(m, "Paraboloid")
             .def(py::init<double>(), "init", "R"_a)
-            .def_property_readonly("R", &Paraboloid::getR);
+            .def_property_readonly("R", &Paraboloid::getR)
+            .def(py::self == py::self)
+            .def(py::self != py::self)
+            .def(py::pickle(
+                [](const Paraboloid& p) { return py::make_tuple(p.getR()); },
+                [](py::tuple t) { return Paraboloid(t[0].cast<double>()); }
+            ));
     }
 }

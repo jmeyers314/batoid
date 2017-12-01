@@ -1,6 +1,6 @@
 import batoid
 import numpy as np
-from test_helpers import isclose, timer
+from test_helpers import isclose, timer, do_pickle
 
 
 @timer
@@ -11,6 +11,7 @@ def test_properties():
         R = random.gauss(0.7, 0.8)
         para = batoid.Paraboloid(R)
         assert para.R == R
+        do_pickle(para)
 
 
 @timer

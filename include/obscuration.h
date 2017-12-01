@@ -15,7 +15,6 @@ namespace batoid {
         void obscureInPlace(Ray&) const;
         std::vector<Ray> obscure(const std::vector<Ray>&) const;
         void obscureInPlace(std::vector<Ray>&) const;
-
     };
 
     class ObscCircle : public Obscuration {

@@ -23,5 +23,7 @@ namespace batoid {
     };
 
     inline std::ostream& operator<<(std::ostream& os, const Plane& p);
+    inline bool operator==(const Plane& p1, const Plane& p2) { return true; }
+    inline bool operator!=(const Plane& p1, const Plane& p2) { return false; }
 }
 #endif

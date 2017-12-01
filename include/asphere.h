@@ -33,6 +33,16 @@ namespace batoid {
     };
 
     inline std::ostream& operator<<(std::ostream& os, const Asphere& a);
+    inline bool operator==(const Asphere& a1, const Asphere& a2) {
+        return a1.getR() == a2.getR() &&
+        a1.getConic() == a2.getConic() &&
+        a1.getCoefs() == a2.getCoefs();
+    }
+    inline bool operator!=(const Asphere& a1, const Asphere& a2) {
+        return a1.getR() != a2.getR() ||
+        a1.getConic() != a2.getConic() ||
+        a1.getCoefs() != a2.getCoefs();
+    }
 
 }
 #endif

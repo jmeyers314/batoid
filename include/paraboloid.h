@@ -30,6 +30,10 @@ namespace batoid {
     };
 
     inline std::ostream& operator<<(std::ostream& os, const Paraboloid& p);
+    inline bool operator==(const Paraboloid& p1, const Paraboloid& p2)
+        { return p1.getR() == p2.getR(); }
+    inline bool operator!=(const Paraboloid& p1, const Paraboloid& p2)
+        { return p1.getR() != p2.getR(); }
 
 }
 #endif

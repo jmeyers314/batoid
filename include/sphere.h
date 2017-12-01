@@ -31,6 +31,9 @@ namespace batoid {
     };
 
     inline std::ostream& operator<<(std::ostream&, const Sphere&);
-
+    inline bool operator==(const Sphere& s1, const Sphere& s2)
+        { return s1.getR() == s2.getR(); }
+    inline bool operator!=(const Sphere& s1, const Sphere& s2)
+        { return s1.getR() != s2.getR(); }
 }
 #endif

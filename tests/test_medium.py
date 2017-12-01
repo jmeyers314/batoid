@@ -1,7 +1,7 @@
 import os
 import batoid
 import numpy as np
-from test_helpers import isclose, timer
+from test_helpers import isclose, timer, do_pickle
 
 
 @timer
@@ -14,6 +14,7 @@ def test_const_medium():
     for i in range(100):
         w = random.uniform(0.5, 1.0)
         assert const_medium.getN(w) == n
+    do_pickle(const_medium)
 
 
 @timer
@@ -30,6 +31,8 @@ def test_table_medium():
     for i in range(100):
         w = random.uniform(0.3e-6, 1.2e-6)
         assert table_medium.getN(w) == table(w)
+    assert table_medium.table == table
+    do_pickle(table_medium)
 
 
 @timer
@@ -67,6 +70,7 @@ def test_silica_sellmeier_table():
     print("TableMedium took {} s".format(t1-t0))
     print("SellmeierMedium took {} s".format(t2-t1))
     np.testing.assert_allclose(table_n, sellmeier_n, atol=1e-6, rtol=0)
+    do_pickle(sellmeier_silica)
 
 
 @timer
@@ -77,6 +81,7 @@ def test_air():
     air = batoid.Air()
     for w, n in zip(ws, gsn):
         assert isclose(n, air.getN(w*1e-6), abs_tol=1e-8, rel_tol=0)
+    do_pickle(air)
 
 
 if __name__ == '__main__':

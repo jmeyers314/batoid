@@ -18,6 +18,20 @@ namespace batoid {
             .def(py::init<double,double,std::vector<double>>(), "init", "R"_a, "conic"_a, "coefs"_a)
             .def_property_readonly("R", &Asphere::getR)
             .def_property_readonly("conic", &Asphere::getConic)
-            .def_property_readonly("coefs", &Asphere::getCoefs);
+            .def_property_readonly("coefs", &Asphere::getCoefs)
+            .def(py::self == py::self)
+            .def(py::self != py::self)
+            .def(py::pickle(
+                [](const Asphere& a) {
+                    return py::make_tuple(a.getR(), a.getConic(), a.getCoefs());
+                },
+                [](py::tuple t) {
+                    return Asphere(
+                        t[0].cast<double>(),
+                        t[1].cast<double>(),
+                        t[2].cast<std::vector<double>>()
+                    );
+                }
+            ));   
     }
 }

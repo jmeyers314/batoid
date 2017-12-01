@@ -1,7 +1,7 @@
 import batoid
 import numpy as np
 import math
-from test_helpers import isclose, timer
+from test_helpers import isclose, timer, do_pickle
 
 
 @timer
@@ -12,6 +12,7 @@ def test_properties():
         R = random.gauss(0.7, 0.8)
         sphere = batoid.Sphere(R)
         assert sphere.R == R
+        do_pickle(sphere)
 
 
 @timer

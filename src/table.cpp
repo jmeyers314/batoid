@@ -217,6 +217,24 @@ namespace batoid {
         return vals[i];
     }
 
+    template<class V, class A>
+    bool operator==(const Table<V,A>& t1, const Table<V,A>& t2) {
+        return t1.getArgs() == t2.getArgs() &&
+               t1.getVals() == t2.getVals() &&
+               t1.getInterp() == t2.getInterp();
+    }
+
+    template<class V, class A>
+    bool operator!=(const Table<V,A>& t1, const Table<V,A>& t2) {
+        return t1.getArgs() != t2.getArgs() ||
+               t1.getVals() != t2.getVals() ||
+               t1.getInterp() != t2.getInterp();
+    }
+
+    // template instantiation
     template class ArgVec<double>;
     template class Table<double, double>;
+
+    template bool operator==<double,double>(const Table<double,double>&, const Table<double,double>&);
+    template bool operator!=<double,double>(const Table<double,double>&, const Table<double,double>&);
 }

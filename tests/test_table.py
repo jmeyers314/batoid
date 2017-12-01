@@ -1,6 +1,6 @@
 import numpy as np
 import batoid
-from test_helpers import timer
+from test_helpers import timer, do_pickle
 
 
 @timer
@@ -22,6 +22,8 @@ def test_table():
     np.testing.assert_allclose(y, table.vals, rtol=0, atol=1e-14)
     np.testing.assert_allclose(ytruth, yinterp, rtol=0, atol=1e-14)
     assert table.interp == batoid.Table.Interpolant.linear
+
+    do_pickle(table)
 
 if __name__ == '__main__':
     test_table()

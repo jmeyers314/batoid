@@ -1,4 +1,4 @@
-from ._batoid import Vec2, Rot2, Vec3, Rot3, RotVec, UnRotVec, Ray
+from ._batoid import Vec2, Rot2, Vec3, Rot3, RotVec, UnRotVec
 from ._batoid import DotProduct, CrossProduct
 from ._batoid import Ray, Intersection, RayVector, IntersectionVector
 from ._batoid import Surface, Plane, Paraboloid, Sphere, Quadric, Asphere

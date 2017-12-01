@@ -47,7 +47,24 @@ namespace batoid {
             .def("phase", &Ray::phase)
             .def("amplitude", &Ray::amplitude)
             .def("propagatedToTime", &Ray::propagatedToTime)
-            .def("propagateInPlace", &Ray::propagateInPlace);
+            .def("propagateInPlace", &Ray::propagateInPlace)
+            .def(py::pickle(
+                [](const Ray& r) { // __getstate__
+                    return py::make_tuple(r.p0, r.v, r.t0, r.wavelength, r.isVignetted, r.failed);
+                },
+                [](py::tuple t) { // __setstate__
+                    Ray r(
+                        t[0].cast<Vec3>(),
+                        t[1].cast<Vec3>(),
+                        t[2].cast<double>(),
+                        t[3].cast<double>(),
+                        t[4].cast<bool>()
+                    );
+                    if (t[5].cast<bool>())
+                        r.setFail();
+                    return r;
+                }
+            ));
         m.def("amplitudeMany", &amplitudeMany);
         m.def("phaseMany", &phaseMany);
         m.def("propagatedToTimesMany", &propagatedToTimesMany);
