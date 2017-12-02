@@ -3,6 +3,7 @@
 #include "ray.h"
 #include "utils.h"
 #include <cmath>
+#include <algorithm>
 
 namespace batoid {
     Ray Obscuration::obscure(const Ray& ray) const {
@@ -43,12 +44,22 @@ namespace batoid {
         );
     }
 
+
     ObscCircle::ObscCircle(double radius, double x0, double y0) :
         _radius(radius), _x0(x0), _y0(y0) {}
 
     bool ObscCircle::contains(double x, double y) const {
         return std::hypot(x-_x0, y-_y0) < _radius;
     }
+
+    bool ObscCircle::operator==(const Obscuration& rhs) const {
+        if (const ObscCircle* other = dynamic_cast<const ObscCircle*> (&rhs)) {
+            return _radius == other->_radius &&
+                   _x0 == other->_x0 &&
+                   _y0 == other->_y0;
+        } else return false;
+    }
+
 
     ObscAnnulus::ObscAnnulus(double inner, double outer, double x0, double y0) :
         _inner(inner), _outer(outer), _x0(x0), _y0(y0) {}
@@ -57,6 +68,16 @@ namespace batoid {
         double h = std::hypot(x-_x0, y-_y0);
         return (_inner <= h) && (h < _outer);
     }
+
+    bool ObscAnnulus::operator==(const Obscuration& rhs) const {
+        if (const ObscAnnulus* other = dynamic_cast<const ObscAnnulus*> (&rhs)) {
+            return _inner == other->_inner &&
+                   _outer == other->_outer &&
+                   _x0 == other->_x0 &&
+                   _y0 == other->_y0;
+        } else return false;
+    }
+
 
     ObscRectangle::ObscRectangle(double w, double h, double x0, double y0, double th) :
         _width(w), _height(h), _x0(x0), _y0(y0), _theta(th)
@@ -86,6 +107,17 @@ namespace batoid {
         return (0 <= ABAM) && (ABAM <= _ABAB) && (0 <= BCBM) && (BCBM <= _BCBC);
     }
 
+    bool ObscRectangle::operator==(const Obscuration& rhs) const {
+        if (const ObscRectangle* other = dynamic_cast<const ObscRectangle*> (&rhs)) {
+            return _width == other->_width &&
+                   _height == other->_height &&
+                   _x0 == other->_x0 &&
+                   _y0 == other->_y0 &&
+                   _theta == other->_theta;
+        } else return false;
+    }
+
+
     ObscRay::ObscRay(double w, double th, double x0, double y0) :
         _width(w), _theta(th), _x0(x0), _y0(y0),
         _rect(ObscRectangle(x0 + 100*std::cos(th)/2,
@@ -95,6 +127,30 @@ namespace batoid {
     bool ObscRay::contains(double x, double y) const {
         return _rect.contains(x, y);
     }
+
+    bool ObscRay::operator==(const Obscuration& rhs) const {
+        if (const ObscRay* other = dynamic_cast<const ObscRay*> (&rhs)) {
+            return _width == other->_width &&
+                   _theta == other->_theta &&
+                   _x0 == other->_x0 &&
+                   _y0 == other->_y0;
+        } else return false;
+    }
+
+
+    ObscNegation::ObscNegation(const std::shared_ptr<Obscuration> original) :
+        _original(original) {}
+
+    bool ObscNegation::contains(double x, double y) const {
+        return !_original->contains(x, y);
+    }
+
+    bool ObscNegation::operator==(const Obscuration& rhs) const {
+        if (const ObscNegation* other = dynamic_cast<const ObscNegation*> (&rhs)) {
+            return *_original == *other->_original;
+        } else return false;
+    }
+
 
     ObscUnion::ObscUnion(const std::vector<std::shared_ptr<Obscuration>> obscVec) :
         _obscVec(obscVec) {}
@@ -107,6 +163,17 @@ namespace batoid {
         return ret;
     }
 
+    bool ObscUnion::operator==(const Obscuration& rhs) const {
+        if (const ObscUnion* other = dynamic_cast<const ObscUnion*> (&rhs)) {
+            return std::equal(
+                _obscVec.begin(), _obscVec.end(), other->_obscVec.begin(),
+                [](std::shared_ptr<Obscuration> a, std::shared_ptr<Obscuration> b){
+                    return *a == *b;
+                });
+        } else return false;
+    }
+
+
     ObscIntersection::ObscIntersection(const std::vector<std::shared_ptr<Obscuration>> obscVec) :
         _obscVec(obscVec) {}
 
@@ -118,10 +185,13 @@ namespace batoid {
         return ret;
     }
 
-    ObscNegation::ObscNegation(const std::shared_ptr<Obscuration> original) :
-        _original(original) {}
-
-    bool ObscNegation::contains(double x, double y) const {
-        return !_original->contains(x, y);
+    bool ObscIntersection::operator==(const Obscuration& rhs) const {
+        if (const ObscIntersection* other = dynamic_cast<const ObscIntersection*> (&rhs)) {
+            return std::equal(
+                _obscVec.begin(), _obscVec.end(), other->_obscVec.begin(),
+                [](std::shared_ptr<Obscuration> a, std::shared_ptr<Obscuration> b){
+                    return *a == *b;
+                });
+        } else return false;
     }
 }

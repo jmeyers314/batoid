@@ -11,6 +11,8 @@ namespace batoid {
     class Obscuration {
     public:
         virtual bool contains(double x, double y) const = 0;
+        virtual bool operator==(const Obscuration& rhs) const = 0;
+        bool operator!=(const Obscuration& rhs) const { return !operator==(rhs); }
         Ray obscure(const Ray&) const;
         void obscureInPlace(Ray&) const;
         std::vector<Ray> obscure(const std::vector<Ray>&) const;
@@ -21,6 +23,7 @@ namespace batoid {
     public:
         ObscCircle(double radius, double x0=0.0, double y0=0.0);
         bool contains(double x, double y) const override;
+        bool operator==(const Obscuration& rhs) const override;
         const double _radius, _x0, _y0;
     };
 
@@ -28,6 +31,7 @@ namespace batoid {
     public:
         ObscAnnulus(double inner, double outer, double x0=0.0, double y0=0.0);
         bool contains(double x, double y) const override;
+        bool operator==(const Obscuration& rhs) const override;
         const double _inner, _outer, _x0, _y0;
     };
 
@@ -35,6 +39,7 @@ namespace batoid {
     public:
         ObscRectangle(double width, double height, double x0=0.0, double y0=0.0, double theta=0.0);
         bool contains(double x, double y) const override;
+        bool operator==(const Obscuration& rhs) const override;
         const double _width, _height, _x0, _y0, _theta;
     private:
         Vec2 _A, _B, _C, _AB, _BC;
@@ -45,15 +50,25 @@ namespace batoid {
     public:
         ObscRay(double width, double theta, double x0=0.0, double y0=0.0);
         bool contains(double x, double y) const override;
+        bool operator==(const Obscuration& rhs) const override;
         const double _width, _theta, _x0, _y0;
     private:
         const ObscRectangle _rect;
+    };
+
+    class ObscNegation : public Obscuration {
+    public:
+        ObscNegation(const std::shared_ptr<Obscuration> original);
+        bool contains(double x, double y) const override;
+        bool operator==(const Obscuration& rhs) const override;
+        const std::shared_ptr<Obscuration> _original;
     };
 
     class ObscUnion : public Obscuration {
     public:
         ObscUnion(const std::vector<std::shared_ptr<Obscuration>> obscVec);
         bool contains(double x, double y) const override;
+        bool operator==(const Obscuration& rhs) const override;
         const std::vector<std::shared_ptr<Obscuration>> _obscVec;
     };
 
@@ -61,14 +76,8 @@ namespace batoid {
     public:
         ObscIntersection(const std::vector<std::shared_ptr<Obscuration>> obscVec);
         bool contains(double x, double y) const override;
+        bool operator==(const Obscuration& rhs) const override;
         const std::vector<std::shared_ptr<Obscuration>> _obscVec;
-    };
-
-    class ObscNegation : public Obscuration {
-    public:
-        ObscNegation(const std::shared_ptr<Obscuration> original);
-        bool contains(double x, double y) const override;
-        const std::shared_ptr<Obscuration> _original;
     };
 }
 
