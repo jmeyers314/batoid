@@ -42,9 +42,9 @@ namespace batoid {
         CoordSys rotateLocal(const Rot3& rotation, const Vec3& rotOrigin, const CoordSys& coordSys) const;
 
         // Get local unit vectors in global coordinates.
-        Vec3 getX() const;
-        Vec3 getY() const;
-        Vec3 getZ() const;
+        Vec3 getXHat() const;
+        Vec3 getYHat() const;
+        Vec3 getZHat() const;
 
         std::string repr() const {
             std::ostringstream oss(" ");
@@ -59,6 +59,8 @@ namespace batoid {
     };
 
     std::ostream& operator<<(std::ostream &os, const CoordSys& cs);
+    bool operator==(const CoordSys& cs1, const CoordSys& cs2);
+    bool operator!=(const CoordSys& cs1, const CoordSys& cs2);
 
     class BaseCoordTransform {
     public:

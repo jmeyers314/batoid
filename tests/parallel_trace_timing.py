@@ -33,6 +33,7 @@ def parallel_trace_timing(nside=512):
 
     assert rays == rays_out
 
+
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()

@@ -52,21 +52,30 @@ namespace batoid {
         );
     }
 
-    Vec3 CoordSys::getX() const {
+    Vec3 CoordSys::getXHat() const {
         return Vec3(rotation.data[0], rotation.data[3], rotation.data[6]);
     }
 
-    Vec3 CoordSys::getY() const {
+    Vec3 CoordSys::getYHat() const {
         return Vec3(rotation.data[1], rotation.data[4], rotation.data[7]);
     }
 
-    Vec3 CoordSys::getZ() const {
+    Vec3 CoordSys::getZHat() const {
         return Vec3(rotation.data[2], rotation.data[5], rotation.data[8]);
     }
 
     std::ostream& operator<<(std::ostream& os, const CoordSys& cs) {
         return os << cs.repr();
     }
+
+    bool operator==(const CoordSys& cs1, const CoordSys& cs2) {
+        return cs1.origin == cs2.origin && cs1.rotation == cs2.rotation;
+    }
+
+    bool operator!=(const CoordSys& cs1, const CoordSys& cs2) {
+        return !(cs1 == cs2);
+    }
+
 
     std::vector<Ray> BaseCoordTransform::applyForward(const std::vector<Ray>& rs) const {
         std::vector<Ray> result(rs.size());

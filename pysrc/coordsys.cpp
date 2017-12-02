@@ -1,6 +1,7 @@
 #include "coordsys.h"
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
+#include <pybind11/operators.h>
 #include <tuple>
 
 PYBIND11_MAKE_OPAQUE(std::vector<batoid::Vec3>);
@@ -15,16 +16,26 @@ namespace batoid {
             .def(py::init<Vec3,Rot3>())
             .def_readonly("origin", &CoordSys::origin, "Global origin")
             .def_readonly("rotation", &CoordSys::rotation, "Unit vector rotation matrix")
-            .def_property_readonly("x", &CoordSys::getX)
-            .def_property_readonly("y", &CoordSys::getY)
-            .def_property_readonly("z", &CoordSys::getZ)
+            .def_property_readonly("xhat", &CoordSys::getXHat)
+            .def_property_readonly("yhat", &CoordSys::getYHat)
+            .def_property_readonly("zhat", &CoordSys::getZHat)
             .def("__repr__", &CoordSys::repr)
             .def("shiftGlobal", &CoordSys::shiftGlobal)
             .def("shiftLocal", &CoordSys::shiftLocal)
             .def("rotateGlobal", (CoordSys (CoordSys::*) (const Rot3&) const) &CoordSys::rotateGlobal)
             .def("rotateGlobal", (CoordSys (CoordSys::*) (const Rot3&, const Vec3&, const CoordSys&) const) &CoordSys::rotateGlobal)
             .def("rotateLocal", (CoordSys (CoordSys::*) (const Rot3&) const) &CoordSys::rotateLocal)
-            .def("rotateLocal", (CoordSys (CoordSys::*) (const Rot3&, const Vec3&, const CoordSys&) const) &CoordSys::rotateLocal);
+            .def("rotateLocal", (CoordSys (CoordSys::*) (const Rot3&, const Vec3&, const CoordSys&) const) &CoordSys::rotateLocal)
+            .def(py::self == py::self)
+            .def(py::self != py::self)
+            .def(py::pickle(
+                [](const CoordSys& cs) { return py::make_tuple(cs.origin, cs.rotation); },
+                [](py::tuple t) {
+                    return CoordSys(
+                        t[0].cast<Vec3>(), t[1].cast<Rot3>()
+                    );
+                }
+            ));
     }
 
 
