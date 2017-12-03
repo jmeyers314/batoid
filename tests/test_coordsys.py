@@ -18,6 +18,10 @@ def test_shift():
         assert newCoordSys.zhat == batoid.Vec3(0,0,1)
         assert newCoordSys.origin == batoid.Vec3(x,y,z)
         assert newCoordSys.rotation == batoid.Rot3()
+
+        coordTransform = batoid.CoordTransform(globalCoordSys, newCoordSys)
+        do_pickle(coordTransform)
+
         for j in range(30):
             x2 = random.gauss(0.1, 2.3)
             y2 = random.gauss(0.1, 2.3)
