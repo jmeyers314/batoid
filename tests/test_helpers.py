@@ -51,8 +51,20 @@ def do_pickle(obj):
         import cPickle as pickle
     except ImportError:
         import pickle
+    import copy
 
     pick = pickle.dumps(obj)
     obj2 = pickle.loads(pick)
 
     assert obj == obj2, "{} != {}".format(obj, obj2)
+
+    from collections import Hashable
+    if isinstance(obj, Hashable):
+        assert hash(obj) == hash(obj2)
+
+    # try out copy too
+    obj3 = copy.copy(obj)
+    assert obj == obj3
+
+    obj4 = copy.deepcopy(obj)
+    assert obj == obj4

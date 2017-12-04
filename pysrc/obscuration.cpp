@@ -21,6 +21,7 @@ namespace batoid {
             .def(py::self == py::self)
             .def(py::self != py::self);
 
+
         py::class_<ObscCircle, std::shared_ptr<ObscCircle>, Obscuration>(m, "ObscCircle")
             .def(py::init<double,double,double>(), "init", "radius"_a, "x"_a=0.0, "y"_a=0.0)
             .def_readonly("radius", &ObscCircle::_radius)
@@ -35,7 +36,11 @@ namespace batoid {
                         t[2].cast<double>()
                     );
                 }
-            ));
+            ))
+            .def("__hash__", [](const ObscCircle& oc) {
+                return py::hash(py::make_tuple("ObscCircle", oc._radius, oc._x0, oc._y0));
+            });
+
 
         py::class_<ObscAnnulus, std::shared_ptr<ObscAnnulus>, Obscuration>(m, "ObscAnnulus")
             .def(py::init<double,double,double,double>(), "init", "inner"_a, "outer"_a, "x"_a=0.0, "y"_a=0.0)
@@ -53,7 +58,11 @@ namespace batoid {
                         t[3].cast<double>()
                     );
                 }
-            ));
+            ))
+            .def("__hash__", [](const ObscAnnulus& oa) {
+                return py::hash(py::make_tuple("ObscAnnulus", oa._inner, oa._outer, oa._x0, oa._y0));
+            });
+
 
         py::class_<ObscRectangle, std::shared_ptr<ObscRectangle>, Obscuration>(m, "ObscRectangle")
             .def(py::init<double,double,double,double,double>(), "init",
@@ -74,7 +83,11 @@ namespace batoid {
                         t[4].cast<double>()
                     );
                 }
-            ));
+            ))
+            .def("__hash__", [](const ObscRectangle& o) {
+                return py::hash(py::make_tuple("ObscRectangle", o._width, o._height, o._x0, o._y0, o._theta));
+            });
+
 
         py::class_<ObscRay, std::shared_ptr<ObscRay>, Obscuration>(m, "ObscRay")
             .def(py::init<double,double,double,double>(), "init",
@@ -93,7 +106,11 @@ namespace batoid {
                         t[3].cast<double>()
                     );
                 }
-            ));
+            ))
+            .def("__hash__", [](const ObscRay& o) {
+                return py::hash(py::make_tuple("ObscRay", o._width, o._theta, o._x0, o._y0));
+            });
+
 
         py::class_<ObscNegation, std::shared_ptr<ObscNegation>, Obscuration>(m, "ObscNegation")
             .def(py::init<std::shared_ptr<Obscuration>>(), "init", "original"_a)
@@ -101,7 +118,11 @@ namespace batoid {
             .def(py::pickle(
                 [](const ObscNegation& o){ return o._original; },
                 [](std::shared_ptr<Obscuration>& o) { return ObscNegation(o); }
-            ));
+            ))
+            .def("__hash__", [](const ObscNegation& o) {
+                return py::hash(py::make_tuple("ObscNegation", o._original));
+            });
+
 
         py::class_<ObscUnion, std::shared_ptr<ObscUnion>, Obscuration>(m, "ObscUnion")
             .def(py::init<std::vector<std::shared_ptr<Obscuration>>>(), "init", "items"_a)
@@ -109,7 +130,14 @@ namespace batoid {
             .def(py::pickle(
                 [](const ObscUnion& o){ return o._obscVec; },
                 [](std::vector<std::shared_ptr<Obscuration>>& o) { return ObscUnion(o); }
-            ));
+            ))
+            .def("__hash__", [](const ObscUnion& o) {
+                auto result = py::hash(py::str("ObscUnion"));
+                for (const auto& oo : o._obscVec)
+                    result ^= py::hash(py::cast(oo));
+                return result;
+            });
+
 
         py::class_<ObscIntersection, std::shared_ptr<ObscIntersection>, Obscuration>(m, "ObscIntersection")
             .def(py::init<std::vector<std::shared_ptr<Obscuration>>>(), "init", "items"_a)
@@ -117,6 +145,12 @@ namespace batoid {
             .def(py::pickle(
                 [](const ObscIntersection& o){ return o._obscVec; },
                 [](std::vector<std::shared_ptr<Obscuration>>& o) { return ObscIntersection(o); }
-            ));
+            ))
+            .def("__hash__", [](const ObscIntersection& o) {
+                auto result = py::hash(py::str("ObscIntersection"));
+                for (const auto& oo : o._obscVec)
+                    result ^= py::hash(py::cast(oo));
+                return result;
+            });
     }
 }

@@ -26,7 +26,15 @@ namespace batoid {
                         t[1].cast<std::vector<double>>(),
                         t[2].cast<TableDD::interpolant>());
                 }
-            ));
+            ))
+            .def("__hash__", [](const TableDD& t) {
+                auto result = py::hash(py::make_tuple("Table", t.getInterp()));
+                for (const auto& arg : t.getArgs())
+                    result ^= py::hash(py::float_(arg));
+                for (const auto& val : t.getVals())
+                    result ^= py::hash(py::float_(val));
+                return result;
+            });
 
         py::enum_<TableDD::interpolant>(table, "Interpolant")
             .value("linear", TableDD::interpolant::linear)

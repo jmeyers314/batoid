@@ -24,6 +24,9 @@ namespace batoid {
                 [](py::tuple t) {
                     return Quadric(t[0].cast<double>(), t[1].cast<double>());
                 }
-            ));
+            ))
+            .def("__hash__", [](const Quadric& q) {
+                return py::hash(py::make_tuple("Quadric", q.getR(), q.getConic()));
+            });
     }
 }

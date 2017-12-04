@@ -41,7 +41,8 @@ namespace batoid {
                         throw std::runtime_error("Invalid state!");
                     return Vec2(t[0].cast<double>(), t[1].cast<double>());
                 }
-            ));
+            ))
+            .def("__hash__", [](const Vec2& r) { return py::hash(py::make_tuple("Ray", r.x, r.y)); });
 
         py::class_<Rot2>(m, "Rot2", py::buffer_protocol())
             .def_buffer([](Rot2& r) -> py::buffer_info {
@@ -69,7 +70,13 @@ namespace batoid {
                         throw std::runtime_error("Invalid state!");
                     return Rot2(t[0].cast<std::array<double,4>>());
                 }
-            ));
+            ))
+            .def("__hash__", [](const Rot2& r) {
+                auto result = py::hash(py::str("Rot2"));
+                for (const auto& elt : r.data)
+                    result ^= py::hash(py::float_(elt));
+                return result;
+            });
 
         m.def("DotProduct", &DotProduct, R"pbdoc(
           Compute the dot-product of two Vec2 objects.

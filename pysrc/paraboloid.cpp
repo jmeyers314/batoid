@@ -21,6 +21,9 @@ namespace batoid {
             .def(py::pickle(
                 [](const Paraboloid& p) { return py::make_tuple(p.getR()); },
                 [](py::tuple t) { return Paraboloid(t[0].cast<double>()); }
-            ));
+            ))
+            .def("__hash__", [](const Paraboloid& p) {
+                return py::hash(py::make_tuple("Paraboloid", p.getR()));
+            });
     }
 }

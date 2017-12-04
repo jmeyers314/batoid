@@ -64,11 +64,18 @@ namespace batoid {
                         r.setFail();
                     return r;
                 }
-            ));
+            ))
+            .def("__hash__", [](const Ray& r) {
+                return py::hash(
+                    py::make_tuple("Ray", r.p0, r.v, r.t0, r.wavelength, r.isVignetted, r.failed)
+                );
+            });
+
         m.def("amplitudeMany", &amplitudeMany);
         m.def("phaseMany", &phaseMany);
         m.def("propagatedToTimesMany", &propagatedToTimesMany);
         m.def("propagateInPlaceMany", &propagateInPlaceMany);
+
 
         auto RV = py::bind_vector<std::vector<Ray>>(m, "RayVector", py::buffer_protocol())
         // This feels a little hacky, but seems to work.

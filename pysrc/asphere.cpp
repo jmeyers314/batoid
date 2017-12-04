@@ -32,6 +32,12 @@ namespace batoid {
                         t[2].cast<std::vector<double>>()
                     );
                 }
-            ));   
+            ))
+            .def("__hash__", [](const Asphere& a) {
+                auto result = py::hash(py::make_tuple("Asphere", a.getR(), a.getConic()));
+                for (const auto& coef : a.getCoefs())
+                    result ^= py::hash(py::float_(coef));
+                return result;
+            });
     }
 }

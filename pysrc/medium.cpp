@@ -21,7 +21,10 @@ namespace batoid {
             .def(py::pickle(
                 [](const ConstMedium& cm) { return py::make_tuple(cm.getN(0.0)); },
                 [](py::tuple t) { return ConstMedium(t[0].cast<double>()); }
-            ));
+            ))
+            .def("__hash__", [](const ConstMedium& cm) {
+                return py::hash(py::make_tuple("ConstMedium", cm.getN(0.0)));
+            });
 
 
         py::class_<TableMedium, std::shared_ptr<TableMedium>, Medium>(m, "TableMedium")
@@ -32,7 +35,10 @@ namespace batoid {
             .def(py::pickle(
                 [](const TableMedium& tm) { return py::make_tuple(*tm.getTable()); },
                 [](py::tuple t) { return TableMedium(t[0].cast<std::shared_ptr<Table<double,double>>>()); }
-            ));
+            ))
+            .def("__hash__", [](const TableMedium& tm) {
+                return py::hash(py::make_tuple("TableMedium", *tm.getTable()));
+            });
 
 
         py::class_<SellmeierMedium, std::shared_ptr<SellmeierMedium>, Medium>(m, "SellmeierMedium")
@@ -46,7 +52,13 @@ namespace batoid {
                 [](std::array<double,6> coefs) {
                     return SellmeierMedium(coefs);
                 }
-            ));
+            ))
+            .def("__hash__", [](const SellmeierMedium& sm) {
+                auto result = py::hash(py::str("SellmeierMedium"));
+                for (const auto& coef : sm.getCoefs())
+                    result ^= py::hash(py::float_(coef));
+                return result;
+            });
 
 
         py::class_<Air, std::shared_ptr<Air>, Medium>(m, "Air")
@@ -66,8 +78,11 @@ namespace batoid {
                 [](py::tuple t) {
                     return Air(t[0].cast<double>(), t[1].cast<double>(), t[2].cast<double>());
                 }
-            ));
-
-
+            ))
+            .def("__hash__", [](const Air& a) {
+                return py::hash(py::make_tuple(
+                    "Air", a.getPressure(), a.getTemperature(), a.getH2OPressure()
+                ));
+            });
     }
 }

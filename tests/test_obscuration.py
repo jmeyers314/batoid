@@ -122,6 +122,7 @@ def test_ObscCompound():
         union = batoid._batoid.ObscUnion([rect, circ])
         do_pickle(union)
         intersection = batoid._batoid.ObscIntersection([rect, circ])
+        do_pickle(intersection)
 
         for i in range(100):
             x = random.gauss(0.0, 2.0)

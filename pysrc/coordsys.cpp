@@ -35,7 +35,10 @@ namespace batoid {
                         t[0].cast<Vec3>(), t[1].cast<Rot3>()
                     );
                 }
-            ));
+            ))
+            .def("__hash__", [](const CoordSys& cs) {
+                return py::hash(py::make_tuple("CoordSys", cs.origin, cs.rotation));
+            });
     }
 
 
@@ -137,6 +140,9 @@ namespace batoid {
             .def(py::pickle(
                 [](const CoordTransform& ct) { return py::make_tuple(ct.getDr(), ct.getRot()); },
                 [](py::tuple t) { return CoordTransform(t[0].cast<Vec3>(), t[1].cast<Rot3>()); }
-            ));
+            ))
+            .def("__hash__", [](CoordTransform& ct) {
+                return py::hash(py::make_tuple("CoordTransform", ct.getDr(), ct.getRot()));
+            });
     }
 }
