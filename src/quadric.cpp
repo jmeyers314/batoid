@@ -107,8 +107,4 @@ namespace batoid {
         return 0.0;
     }
 
-    inline std::ostream& operator<<(std::ostream& os, const Quadric& q) {
-        return os << q.repr();
-    }
-
 }

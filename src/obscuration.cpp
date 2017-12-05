@@ -44,6 +44,10 @@ namespace batoid {
         );
     }
 
+    std::ostream& operator<<(std::ostream& os, const Obscuration& o) {
+        return os << o.repr();
+    }
+
 
     ObscCircle::ObscCircle(double radius, double x0, double y0) :
         _radius(radius), _x0(x0), _y0(y0) {}
@@ -58,6 +62,18 @@ namespace batoid {
                    _x0 == other->_x0 &&
                    _y0 == other->_y0;
         } else return false;
+    }
+
+    std::string ObscCircle::repr() const {
+        std::ostringstream oss;
+        oss << "ObscCircle("
+            << _radius;
+        if (_x0 != 0.0 || _y0 != 0.0) {
+            oss << ", " << _x0
+                << ", " << _y0;
+        }
+        oss << ")";
+        return oss.str();
     }
 
 
@@ -76,6 +92,19 @@ namespace batoid {
                    _x0 == other->_x0 &&
                    _y0 == other->_y0;
         } else return false;
+    }
+
+    std::string ObscAnnulus::repr() const {
+        std::ostringstream oss;
+        oss << "ObscAnnulus("
+            << _inner << ", "
+            << _outer;
+        if (_x0 != 0.0 || _y0 != 0.0) {
+            oss << ", " << _x0
+                << ", " << _y0;
+        }
+        oss << ")";
+        return oss.str();
     }
 
 
@@ -117,6 +146,22 @@ namespace batoid {
         } else return false;
     }
 
+    std::string ObscRectangle::repr() const {
+        std::ostringstream oss;
+        oss << "ObscRectangle("
+            << _width << ", "
+            << _height;
+        if (_x0 != 0.0 || _y0 != 0.0 || _theta != 0.0) {
+            oss << ", " << _x0
+                << ", " << _y0;
+            if (_theta != 0.0)
+                oss << ", " << _theta;
+        }
+        oss << ")";
+        return oss.str();
+    }
+
+
 
     ObscRay::ObscRay(double w, double th, double x0, double y0) :
         _width(w), _theta(th), _x0(x0), _y0(y0),
@@ -137,6 +182,19 @@ namespace batoid {
         } else return false;
     }
 
+    std::string ObscRay::repr() const {
+        std::ostringstream oss;
+        oss << "ObscRay("
+            << _width << ", "
+            << _theta;
+        if (_x0 != 0.0 || _y0 != 0.0) {
+            oss << ", " << _x0
+                << ", " << _y0;
+        }
+        oss << ")";
+        return oss.str();
+    }
+
 
     ObscNegation::ObscNegation(const std::shared_ptr<Obscuration> original) :
         _original(original) {}
@@ -149,6 +207,13 @@ namespace batoid {
         if (const ObscNegation* other = dynamic_cast<const ObscNegation*> (&rhs)) {
             return *_original == *other->_original;
         } else return false;
+    }
+
+    std::string ObscNegation::repr() const {
+        std::ostringstream oss;
+        oss << "ObscNegation("
+            << *_original << ")";
+        return oss.str();
     }
 
 
@@ -173,6 +238,16 @@ namespace batoid {
         } else return false;
     }
 
+    std::string ObscUnion::repr() const {
+        std::ostringstream oss;
+        oss << "ObscUnion([";
+        size_t i=0;
+        for(; i< _obscVec.size()-1; i++)
+            oss << *_obscVec[i] << ", ";
+        oss << *_obscVec[i] << "])";
+        return oss.str();
+    }
+
 
     ObscIntersection::ObscIntersection(const std::vector<std::shared_ptr<Obscuration>> obscVec) :
         _obscVec(obscVec) {}
@@ -193,5 +268,15 @@ namespace batoid {
                     return *a == *b;
                 });
         } else return false;
+    }
+
+    std::string ObscIntersection::repr() const {
+        std::ostringstream oss;
+        oss << "ObscIntersection([";
+        size_t i=0;
+        for(; i< _obscVec.size()-1; i++)
+            oss << *_obscVec[i] << ", ";
+        oss << *_obscVec[i] << "])";
+        return oss.str();
     }
 }

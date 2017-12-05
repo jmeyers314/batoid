@@ -32,7 +32,6 @@ namespace batoid {
         double dzdr(double r) const;
     };
 
-    inline std::ostream& operator<<(std::ostream& os, const Asphere& a);
     inline bool operator==(const Asphere& a1, const Asphere& a2) {
         return a1.getR() == a2.getR() &&
         a1.getConic() == a2.getConic() &&

@@ -32,6 +32,18 @@ class Optic(object):
             raise ValueError("coordSys required for optic")
         self.coordSys = coordSys
 
+    def _repr_helper(self):
+        out = ""
+        if self.name is not None:
+            out += ", name={!r}".format(self.name)
+        out += ", coordSys={!r}".format(self.coordSys)
+        if self.inMedium != batoid.ConstMedium(1.0):
+            out += ", inMedium={!r}".format(self.inMedium)
+        if self.outMedium != batoid.ConstMedium(1.0):
+            out += ", outMedium={!r}".format(self.outMedium)
+        return out
+
+
 
 class Interface(Optic):
     """The most basic category of Optic representing a single surface.  Almost always one of the
@@ -194,6 +206,28 @@ class Interface(Optic):
     def printMedium(self):
         print(self.name, self.inMedium, self.outMedium)
 
+    def __eq__(self, other):
+        if not self.__class__ == other.__class__:
+            return False
+        return (self.surface == other.surface and
+                self.obscuration == other.obscuration and
+                self.name == other.name and
+                self.inMedium == other.inMedium and
+                self.outMedium == other.outMedium and
+                self.coordSys == other.coordSys)
+
+    def __ne__(self, other):
+        return not (self == other)
+
+    def __repr__(self):
+        out = "{!s}({!r}".format(self.__class__.__name__, self.surface)
+        if self.obscuration is not None:
+            out += ", obscuration={!r}".format(self.obscuration)
+        out += Optic._repr_helper(self)
+        out +=")"
+        return out
+
+
 class RefractiveInterface(Interface):
     """Specialization for refractive interfaces.
     """
@@ -232,6 +266,7 @@ class Baffle(Interface):
 
     def interactInPlace(self, r):
         pass
+
 
 class CompoundOptic(Optic):
     """A Optic containing two or more Optics as subitems.
@@ -283,11 +318,46 @@ class CompoundOptic(Optic):
         for item in self.items:
             item.printMedium()
 
+    def __eq__(self, other):
+        if not self.__class__ == other.__class__:
+            return False
+        return (self.items == other.items and
+                self.name == other.name and
+                self.inMedium == other.inMedium and
+                self.outMedium == other.outMedium and
+                self.coordSys == other.coordSys)
+
+    def __ne__(self, other):
+        return not (self == other)
+
+    def __repr__(self):
+        out = "{!s}([".format(self.__class__.__name__)
+        for item in self.items[:-1]:
+            out += "{!r}, ".format(item)
+        out += "{!r}]".format(self.items[-1])
+        out += Optic._repr_helper(self)
+        out += ")"
+        return out
+
+
 class Lens(CompoundOptic):
     def __init__(self, items, medium, **kwargs):
         Optic.__init__(self, **kwargs)
         self.items = items
         self.medium = medium
+
+    def __eq__(self, other):
+        if not CompoundOptic.__eq__(self, other):
+            return False
+        return self.medium == other.medium
+
+    def __repr__(self):
+        out = ("{!s}([{!r}, {!r}], {!r}"
+               .format(self.__class__.__name__, self.items[0], self.items[1], self.medium))
+        out += Optic._repr_helper(self)
+        out += ")"
+        return out
+
 
 # Should pythonize RayVector so can identify when all the wavelengths are the same
 # or not, and elide medium.getN() in the inner loop when possible.

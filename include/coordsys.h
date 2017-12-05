@@ -47,7 +47,7 @@ namespace batoid {
         Vec3 getZHat() const;
 
         std::string repr() const {
-            std::ostringstream oss(" ");
+            std::ostringstream oss;
             oss << "CoordSys(" << origin << ", " << rotation << ')';
             return oss.str();
         }
@@ -84,11 +84,21 @@ namespace batoid {
 
         Rot3 getRot() const { return _rot; }
         Vec3 getDr() const { return _dr; }
+
+        std::string repr() const {
+            std::ostringstream oss;
+            oss << "CoordTransform(" << _source << ", " << _destination << ")";
+            return oss.str();
+        }
+
     private:
         const Vec3 _dr;
         const Rot3 _rot;
+        const CoordSys _source;
+        const CoordSys _destination;
     };
 
+    std::ostream& operator<<(std::ostream &os, const CoordSys& cs);
     bool operator==(const CoordTransform& ct1, const CoordTransform& ct2);
     bool operator!=(const CoordTransform& ct1, const CoordTransform& ct2);
 }

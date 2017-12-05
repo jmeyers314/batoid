@@ -143,6 +143,7 @@ namespace batoid {
             ))
             .def("__hash__", [](CoordTransform& ct) {
                 return py::hash(py::make_tuple("CoordTransform", ct.getDr(), ct.getRot()));
-            });
+            })
+            .def("__repr__", &CoordTransform::repr);
     }
 }

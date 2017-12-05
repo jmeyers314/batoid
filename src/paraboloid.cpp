@@ -88,8 +88,4 @@ namespace batoid {
         return;
     }
 
-    inline std::ostream& operator<<(std::ostream& os, const Paraboloid& p) {
-        return os << p.repr();
-    }
-
 }

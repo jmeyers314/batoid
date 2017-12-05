@@ -1,17 +1,30 @@
 #include "medium.h"
 #include <cmath>
+#include <sstream>
 
 namespace batoid {
+    std::ostream& operator<<(std::ostream& os, const Medium& m) {
+        return os << m.repr();
+    }
+
+
     ConstMedium::ConstMedium(double n) : _n(n) {}
 
     double ConstMedium::getN(double wavelength) const {
         return _n;
     }
 
+    std::string ConstMedium::repr() const {
+        std::ostringstream oss;
+        oss << "ConstMedium(" << getN(0.0) << ")";
+        return oss.str();
+    }
+
     bool operator==(const ConstMedium& cm1, const ConstMedium& cm2)
         { return cm1.getN(0.0) == cm2.getN(0.0); }
     bool operator!=(const ConstMedium& cm1, const ConstMedium& cm2)
         { return cm1.getN(0.0) != cm2.getN(0.0); }
+
 
 
     TableMedium::TableMedium(std::shared_ptr<Table<double,double>> table) :
@@ -25,10 +38,17 @@ namespace batoid {
         return (*_table)(wavelength);
     }
 
+    std::string TableMedium::repr() const {
+        std::ostringstream oss;
+        oss << "TableMedium(" << *_table << ")";
+        return oss.str();
+    }
+
     bool operator==(const TableMedium& tm1, const TableMedium& tm2)
         { return *tm1.getTable() == *tm2.getTable(); }
     bool operator!=(const TableMedium& tm1, const TableMedium& tm2)
         { return *tm1.getTable() != *tm2.getTable(); }
+
 
     SellmeierMedium::SellmeierMedium(
         double B1, double B2, double B3,
@@ -46,6 +66,18 @@ namespace batoid {
 
     std::array<double,6> SellmeierMedium::getCoefs() const {
         return std::array<double,6>{{_B1, _B2, _B3, _C1, _C2, _C3}};
+    }
+
+    std::string SellmeierMedium::repr() const {
+        std::ostringstream oss;
+        oss << "SellmeierMedium("
+            << _B1 << ", "
+            << _B2 << ", "
+            << _B3 << ", "
+            << _C1 << ", "
+            << _C2 << ", "
+            << _C3 << ")";
+        return oss.str();
     }
 
     bool operator==(const SellmeierMedium& sm1, const SellmeierMedium& sm2)
@@ -78,6 +110,15 @@ namespace batoid {
         n_minus_one *= _P * (1.0 + (1.049 - 0.0157 * _T) * 1.e-6 * _P) / (720.883 * (1.0 + 0.003661 * _T));
         n_minus_one -= (0.0624 - 0.000680 * sigma_squared)/(1.0 + 0.003661 * _T) * _W * 1.e-6;
         return 1+n_minus_one;
+    }
+
+    std::string Air::repr() const {
+        std::ostringstream oss;
+        oss << "Air("
+            << getPressure() << ", "
+            << getTemperature() << ", "
+            << getH2OPressure() << ")";
+        return oss.str();
     }
 
     bool operator==(const Air& a1, const Air& a2)

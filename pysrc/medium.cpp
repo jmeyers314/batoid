@@ -11,7 +11,8 @@ using namespace pybind11::literals;
 namespace batoid {
     void pyExportMedium(py::module& m) {
         py::class_<Medium, std::shared_ptr<Medium>>(m, "Medium")
-            .def("getN", &Medium::getN);
+            .def("getN", &Medium::getN)
+            .def("__repr__", &Medium::repr);
 
 
         py::class_<ConstMedium, std::shared_ptr<ConstMedium>, Medium>(m, "ConstMedium")

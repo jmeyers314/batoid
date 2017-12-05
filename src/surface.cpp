@@ -3,6 +3,10 @@
 #include "utils.h"
 
 namespace batoid {
+    std::ostream& operator<<(std::ostream& os, const Surface& s) {
+        return os << s.repr();
+    }
+
     Transformation Surface::shift(double dx, double dy, double dz) const {
         return Transformation(shared_from_this(), dx, dy, dz);
     }

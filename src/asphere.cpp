@@ -110,8 +110,4 @@ namespace batoid {
         return result;
     }
 
-    inline std::ostream& operator<<(std::ostream& os, const Asphere& a) {
-        return os << a.repr();
-    }
-
 }

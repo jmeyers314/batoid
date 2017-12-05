@@ -101,8 +101,4 @@ namespace batoid {
         return rat/std::sqrt(1-rat*rat);
     }
 
-    inline std::ostream& operator<<(std::ostream& os, const Sphere& q) {
-        return os << q.repr();
-    }
-
 }

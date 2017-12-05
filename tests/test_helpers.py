@@ -46,7 +46,7 @@ def timer(f):
     return f2
 
 
-def do_pickle(obj):
+def do_pickle(obj, reprable=True):
     try:
         import cPickle as pickle
     except ImportError:
@@ -68,3 +68,23 @@ def do_pickle(obj):
 
     obj4 = copy.deepcopy(obj)
     assert obj == obj4
+
+    if reprable:
+        from batoid import Vec2, Vec3, Rot2, Rot3, Ray
+        from batoid import Plane, Paraboloid, Sphere, Quadric, Asphere
+        from batoid import Table
+        from batoid import ConstMedium, TableMedium, SellmeierMedium, Air
+        from batoid import ObscCircle, ObscAnnulus, ObscRectangle, ObscRay
+        from batoid import ObscNegation, ObscUnion, ObscIntersection
+        from batoid import CoordSys, CoordTransform
+        from batoid import CompoundOptic, Lens
+        from batoid import RefractiveInterface, Mirror, Detector, Baffle
+        # While eval(repr(obj)) == obj is the python repr gold standard, it can be pretty ugly for
+        # exact reproduction of doubles.  Here, we strive for a lesser goal:
+        #      repr(eval(repr(obj))) == repr(obj).
+        # I.e., it's okay to lose precision, as long as it only happens once.
+        try:
+            obj5 = eval(repr(obj))
+        except SyntaxError:
+            raise RuntimeError("Failed to eval(repr(obj)) for {!r}".format(obj))
+        assert repr(obj) == repr(obj5)

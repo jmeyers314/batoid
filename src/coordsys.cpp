@@ -94,7 +94,8 @@ namespace batoid {
 
     CoordTransform::CoordTransform(const CoordSys& source, const CoordSys& destination) :
         _dr(UnRotVec(source.rotation, destination.origin - source.origin)),
-        _rot(source.rotation.inverse()*destination.rotation) {}
+        _rot(source.rotation.inverse()*destination.rotation),
+        _source(source), _destination(destination) {}
 
     CoordTransform::CoordTransform(const Vec3& dr, const Rot3& rot) :
         _dr(dr), _rot(rot) {}
@@ -175,4 +176,9 @@ namespace batoid {
     bool operator!=(const CoordTransform& ct1, const CoordTransform& ct2) {
         return !(ct1 == ct2);
     }
+
+    std::ostream& operator<<(std::ostream &os, const CoordTransform& ct) {
+        return os << ct.repr();
+    }
+
 }

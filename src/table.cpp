@@ -218,6 +218,43 @@ namespace batoid {
     }
 
     template<class V, class A>
+    std::string Table<V,A>::repr() const {
+        std::ostringstream oss(" ");
+        oss << "Table([";
+        size_t i=0;
+        for(; i<args.size()-1; i++) {
+            oss << args[i] << ", ";
+        }
+        oss << args[i] << "], [";
+        for(i=0; i<vals.size()-1; i++) {
+            oss << vals[i] << ", ";
+        }
+        oss << vals[i] << "], ";
+        switch (iType) {
+            case interpolant::linear:
+                 oss << "Table.Interpolant.linear)";
+                 break;
+            case interpolant::floor:
+                 oss << "Table.Interpolant.floor)";
+                 break;
+            case interpolant::ceil:
+                 oss << "Table.Interpolant.ceil)";
+                 break;
+            case interpolant::nearest:
+                 oss << "Table.Interpolant.nearest)";
+                 break;
+            default:
+                 throw TableError("unknown interpolant");
+        }
+        return oss.str();
+    }
+
+    template<class V, class A>
+    std::ostream& operator<<(std::ostream& os, const Table<V,A>& t) {
+        return os << t.repr();
+    }
+
+    template<class V, class A>
     bool operator==(const Table<V,A>& t1, const Table<V,A>& t2) {
         return t1.getArgs() == t2.getArgs() &&
                t1.getVals() == t2.getVals() &&
@@ -237,4 +274,5 @@ namespace batoid {
 
     template bool operator==<double,double>(const Table<double,double>&, const Table<double,double>&);
     template bool operator!=<double,double>(const Table<double,double>&, const Table<double,double>&);
+    template std::ostream& operator<<<double,double>(std::ostream&, const Table<double,double>&);
 }

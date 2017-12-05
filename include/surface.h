@@ -30,5 +30,6 @@ namespace batoid {
         Transformation rotY(double theta) const;
         Transformation rotZ(double theta) const;
     };
+    std::ostream& operator<<(std::ostream& os, const Surface& s);
 }
 #endif

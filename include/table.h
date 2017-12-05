@@ -158,6 +158,7 @@ namespace batoid {
         const std::vector<V>& getVals() const { return vals; }
         int getN() const {return vals.size();}
         interpolant getInterp() const { return iType; }
+        std::string repr() const;
 
     private:
         interpolant iType;
@@ -181,6 +182,8 @@ namespace batoid {
     bool operator==(const Table<V,A>& t1, const Table<V,A>& t2);
     template<class V, class A>
     bool operator!=(const Table<V,A>& t1, const Table<V,A>& t2);
+    template<class V, class A>
+    std::ostream& operator<<(std::ostream& os, const Table<V,A>& t);
 }
 
 #endif

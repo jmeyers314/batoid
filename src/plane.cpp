@@ -28,8 +28,4 @@ namespace batoid {
     std::string Plane::repr() const {
         return std::string("Plane()");
     }
-
-    inline std::ostream& operator<<(std::ostream& os, const Plane& p) {
-        return os << p.repr();
-    }
 }

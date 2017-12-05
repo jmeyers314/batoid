@@ -34,7 +34,8 @@ namespace batoid {
                 for (const auto& val : t.getVals())
                     result ^= py::hash(py::float_(val));
                 return result;
-            });
+            })
+            .def("__repr__", &TableDD::repr);
 
         py::enum_<TableDD::interpolant>(table, "Interpolant")
             .value("linear", TableDD::interpolant::linear)

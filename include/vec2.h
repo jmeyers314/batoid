@@ -55,8 +55,9 @@ namespace batoid {
         }
 
         std::string repr() const {
-            std::ostringstream oss(" ");
-            oss << "Vec2(" << x << ", " << y << ")";
+            std::ostringstream oss;
+            oss << "Vec2(";
+            oss << x << ", " << y << ")";
             return oss.str();
         }
     };
@@ -116,9 +117,10 @@ namespace batoid {
         }
 
         std::string repr() const {
-            std::ostringstream oss("\n");
-            oss << "Rot2([" << data[0] << ", " << data[1] << ",\n"
-                << "      " << data[2] << ", " << data[3] << "])\n";
+            std::ostringstream oss;
+            oss << "Rot2([";
+            oss << data[0] << ", " << data[1] << ", "
+                << data[2] << ", " << data[3] << "])";
             return oss.str();
         }
     };

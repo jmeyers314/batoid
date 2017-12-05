@@ -61,8 +61,8 @@ namespace batoid {
         }
 
         std::string repr() const {
-            std::ostringstream oss(" ");
-            oss << "Vec3(" << x << ", " << y << ", " << z << ")";
+            std::ostringstream oss("Vec3(", std::ios_base::ate);
+            oss << x << ", " << y << ", " << z << ")";
             return oss.str();
         }
     };
@@ -163,10 +163,10 @@ namespace batoid {
         }
 
         std::string repr() const {
-            std::ostringstream oss("\n");
-            oss << "Rot3([" << data[0] << ", " << data[1] << ", " << data[2] << ", "
-                            << data[3] << ", " << data[4] << ", " << data[5] << ", "
-                            << data[6] << ", " << data[7] << ", " << data[8] << "])";
+            std::ostringstream oss("Rot3([", std::ios_base::ate);
+            oss << data[0] << ", " << data[1] << ", " << data[2] << ", "
+                << data[3] << ", " << data[4] << ", " << data[5] << ", "
+                << data[6] << ", " << data[7] << ", " << data[8] << "])";
             return oss.str();
         }
     };

@@ -1,7 +1,7 @@
 import batoid
 import numpy as np
 import os
-from test_helpers import timer
+from test_helpers import timer, do_pickle
 import time
 import yaml
 
@@ -23,6 +23,7 @@ def test_optic():
     fn = os.path.join(batoid.datadir, "hsc", "HSC3.yaml")
     config = yaml.load(open(fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
+    do_pickle(telescope)
 
     t0 = time.time()
 

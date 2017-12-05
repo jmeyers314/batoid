@@ -20,12 +20,12 @@ namespace batoid {
         p0(Vec3()), v(Vec3()), t0(0.0), wavelength(0.0), isVignetted(true), failed(true) {}
 
     std::string Ray::repr() const {
-        std::ostringstream oss(" ");
+        std::ostringstream oss("Ray(", std::ios_base::ate);
         if(failed)
-            oss << "Ray(failed)";
+            oss << "failed)";
         else {
-            oss << "Ray(" << p0 << ", " << v;
-            if (t0 != 0.0) oss << ", t0=" << t0;
+            oss << p0 << ", " << v;
+            if (t0 != 0.0) oss << ", t=" << t0;
             if (wavelength != 0.0) oss << ", wavelength=" << wavelength;
             if (isVignetted) oss << ", isVignetted=True";
             oss << ")";

@@ -23,8 +23,8 @@ from .psf import huygensPSF
 
 from .coordsys import RotX, RotY, RotZ
 
-from .optic import Optic, CompoundOptic
-from .optic import Interface, RefractiveInterface, Mirror, Detector, Baffle, Lens
+from .optic import Optic, CompoundOptic, Lens
+from .optic import Interface, RefractiveInterface, Mirror, Detector, Baffle
 
 from . import parse
 
