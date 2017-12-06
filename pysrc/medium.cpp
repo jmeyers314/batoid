@@ -54,10 +54,13 @@ namespace batoid {
                     return SellmeierMedium(coefs);
                 }
             ))
+            // See http://effbot.org/zone/python-hash.htm#tuples
             .def("__hash__", [](const SellmeierMedium& sm) {
                 auto result = py::hash(py::str("SellmeierMedium"));
                 for (const auto& coef : sm.getCoefs())
-                    result ^= py::hash(py::float_(coef));
+                    result = 1000003*result ^ py::hash(py::float_(coef));
+                result ^= sm.getCoefs().size();
+                result = (result == -1) ? -2 : result;
                 return result;
             });
 

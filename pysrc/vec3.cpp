@@ -103,10 +103,13 @@ namespace batoid {
                     return Rot3(t[0].cast<std::array<double,9>>());
                 }
             ))
+            // See http://effbot.org/zone/python-hash.htm#tuples
             .def("__hash__", [](const Rot3& r) {
                 auto result = py::hash(py::str("Rot3"));
                 for (const auto& elt : r.data)
-                    result ^= py::hash(py::float_(elt));
+                    result = 1000003*result ^ py::hash(py::float_(elt));
+                result ^= r.data.size();
+                result = (result == -1) ? -2 : result;
                 return result;
             });
 

@@ -91,10 +91,14 @@ namespace batoid {
     std::string Asphere::repr() const {
         std::ostringstream oss(" ");
         oss << "Asphere(" << getR() << ", " << getConic() << ", [";
-        for (const auto& c : _coefs) {
-            oss << c << ", ";
+        if (_coefs.size() == 0) {
+            oss << "])";
+            return oss.str();
         }
-        oss << "])";
+        size_t i=0;
+        for (; i<_coefs.size()-1; i++)
+            oss << _coefs[i] << ", ";
+        oss << _coefs[i] << "])";
         return oss.str();
     }
 

@@ -11,6 +11,12 @@ namespace batoid {
     CoordSys::CoordSys(const Vec3 _origin, const Rot3 _rotation) :
         origin(_origin), rotation(_rotation) {}
 
+    CoordSys::CoordSys(const Vec3 _origin) :
+        origin(_origin), rotation(Rot3()) {}
+
+    CoordSys::CoordSys(const Rot3 _rotation) :
+        origin(Vec3()), rotation(_rotation) {}
+
     CoordSys CoordSys::shiftGlobal(const Vec3& dr) const {
         return CoordSys(origin+dr, rotation);
     }

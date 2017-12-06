@@ -88,3 +88,43 @@ def do_pickle(obj, reprable=True):
         except SyntaxError:
             raise RuntimeError("Failed to eval(repr(obj)) for {!r}".format(obj))
         assert repr(obj) == repr(obj5)
+
+
+def all_obj_diff(objs):
+    """ Helper function that verifies that each element in `objs` is unique and, if hashable,
+    produces a unique hash."""
+
+    from collections import Hashable
+    # Check that all objects are unique.
+    # Would like to use `assert len(objs) == len(set(objs))` here, but this requires that the
+    # elements of objs are hashable (and that they have unique hashes!, which is what we're trying
+    # to test!.  So instead, we just loop over all combinations.
+    for i, obji in enumerate(objs):
+        # Could probably start the next loop at `i+1`, but we start at 0 for completeness
+        # (and to verify a != b implies b != a)
+        for j, objj in enumerate(objs):
+            if i == j:
+                continue
+            assert obji != objj, ("Found equivalent objects {0} == {1} at indices {2} and {3}"
+                                  .format(obji, objj, i, j))
+
+    # Now check that all hashes are unique (if the items are hashable).
+    if not isinstance(objs[0], Hashable):
+        return
+    hashes = [hash(obj) for obj in objs]
+    try:
+        assert len(hashes) == len(set(hashes))
+    except AssertionError as e:
+        try:
+            # Only valid in 2.7, but only needed if we have an error to provide more information.
+            from collections import Counter
+        except ImportError:
+            raise e
+        for k, v in Counter(hashes).items():
+            if v <= 1:
+                continue
+            print("Found multiple equivalent object hashes:")
+            for i, obj in enumerate(objs):
+                if hash(obj) == k:
+                    print(i, repr(obj))
+        raise e

@@ -1,6 +1,6 @@
 import batoid
 import numpy as np
-from test_helpers import timer, do_pickle
+from test_helpers import timer, do_pickle, all_obj_diff
 
 
 @timer
@@ -13,7 +13,7 @@ def test_ObscCircle():
         cy = random.gauss(0.0, 1.0)
         r = random.uniform(0.5, 1.5)
 
-        obsc = batoid._batoid.ObscCircle(r, cx, cy)
+        obsc = batoid.ObscCircle(r, cx, cy)
         for i in range(100):
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
@@ -32,7 +32,7 @@ def test_ObscAnnulus():
         inner = random.uniform(0.5, 1.5)
         outer = random.uniform(1.6, 1.9)
 
-        obsc = batoid._batoid.ObscAnnulus(inner, outer, cx, cy)
+        obsc = batoid.ObscAnnulus(inner, outer, cx, cy)
         for i in range(100):
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
@@ -51,7 +51,7 @@ def test_ObscRectangle():
         w = random.uniform(0.5, 2.5)
         h = random.uniform(0.5, 2.5)
 
-        obsc = batoid._batoid.ObscRectangle(w, h, cx, cy, 0.0)
+        obsc = batoid.ObscRectangle(w, h, cx, cy, 0.0)
 
         for i in range(100):
             x = random.gauss(0.0, 2.0)
@@ -59,7 +59,7 @@ def test_ObscRectangle():
             assert obsc.contains(x, y) == (x > cx-w/2 and x < cx+w/2 and y > cy-h/2 and y < cy+h/2)
 
         th = random.uniform(0.0, np.pi/2)
-        obsc = batoid._batoid.ObscRectangle(w, h, cx, cy, th)
+        obsc = batoid.ObscRectangle(w, h, cx, cy, th)
         for i in range(100):
             x = random.gauss(0.0, 2.0)
             y = random.gauss(0.0, 2.0)
@@ -84,8 +84,8 @@ def test_ObscNegation():
         cy = random.gauss(0.0, 1.0)
         r = random.uniform(0.5, 1.5)
 
-        obsc = batoid._batoid.ObscCircle(r, cx, cy)
-        obsc = batoid._batoid.ObscNegation(obsc)
+        obsc = batoid.ObscCircle(r, cx, cy)
+        obsc = batoid.ObscNegation(obsc)
         do_pickle(obsc)
         for i in range(100):
             x = random.gauss(0.0, 1.0)
@@ -112,23 +112,78 @@ def test_ObscCompound():
         w = random.uniform(0.5, 2.5)
         h = random.uniform(0.5, 2.5)
         th = random.uniform(0.0, np.pi)
-        rect = batoid._batoid.ObscRectangle(w, h, rx, ry, th)
+        rect = batoid.ObscRectangle(w, h, rx, ry, th)
 
         cx = random.gauss(0.0, 1.0)
         cy = random.gauss(0.0, 1.0)
         r = random.uniform(0.5, 1.5)
-        circ = batoid._batoid.ObscCircle(r, cx, cy)
+        circ = batoid.ObscCircle(r, cx, cy)
 
-        union = batoid._batoid.ObscUnion([rect, circ])
+        union = batoid.ObscUnion([rect, circ])
         do_pickle(union)
-        intersection = batoid._batoid.ObscIntersection([rect, circ])
+        union2 = batoid.ObscUnion([circ, rect])
+        assert union == union2  # commutative!
+        assert hash(union) == hash(union2)
+        intersection = batoid.ObscIntersection([rect, circ])
         do_pickle(intersection)
+        intersection2 = batoid.ObscIntersection([circ, rect])
+        assert intersection == intersection2
+        assert hash(intersection) == hash(intersection2)
 
         for i in range(100):
             x = random.gauss(0.0, 2.0)
             y = random.gauss(0.0, 2.0)
-            assert union.contains(x, y) == (rect.contains(x, y) or circ.contains(x, y))
-            assert intersection.contains(x, y) == (rect.contains(x, y) and circ.contains(x, y))
+            assert (union.contains(x, y) == union2.contains(x, y)
+                    == (rect.contains(x, y) or circ.contains(x, y)))
+            assert (intersection.contains(x, y) == intersection2.contains(x, y)
+                    == (rect.contains(x, y) and circ.contains(x, y)))
+
+
+@timer
+def test_ne():
+    objs = [
+        batoid.ObscCircle(1.0),
+        batoid.ObscCircle(2.0),
+        batoid.ObscCircle(1.0, 0.1, 0.1),
+        batoid.ObscAnnulus(0.0, 1.0),
+        batoid.ObscAnnulus(0.1, 1.0),
+        batoid.ObscAnnulus(0.1, 1.0, 0.1, 0.1),
+        batoid.ObscRectangle(1.0, 2.0),
+        batoid.ObscRectangle(1.0, 2.0, 0.1, 0.1),
+        batoid.ObscRectangle(1.0, 2.0, 0.1, 0.1, 1.0),
+        batoid.ObscRay(1.0, 2.0),
+        batoid.ObscRay(1.0, 2.0, 0.1, 0.1),
+        batoid.ObscNegation(batoid.ObscCircle(1.0)),
+        batoid.ObscUnion([
+            batoid.ObscCircle(1.0),
+            batoid.ObscCircle(2.0)
+        ]),
+        batoid.ObscUnion([
+            batoid.ObscCircle(1.0),
+            batoid.ObscCircle(2.2)
+        ]),
+        batoid.ObscUnion([
+            batoid.ObscCircle(1.0),
+            batoid.ObscCircle(2.2),
+            batoid.ObscAnnulus(1.0, 2.0)
+        ]),
+        batoid.ObscIntersection([
+            batoid.ObscCircle(1.0),
+            batoid.ObscCircle(2.0)
+        ]),
+        batoid.ObscIntersection([
+            batoid.ObscCircle(1.0),
+            batoid.ObscCircle(2.2)
+        ]),
+        batoid.ObscIntersection([
+            batoid.ObscCircle(1.0),
+            batoid.ObscCircle(2.2),
+            batoid.ObscAnnulus(1.0, 2.0)
+        ]),
+        batoid.Vec2(),
+    ]
+    all_obj_diff(objs)
+
 
 
 if __name__ == '__main__':
@@ -137,3 +192,4 @@ if __name__ == '__main__':
     test_ObscRectangle()
     test_ObscNegation()
     test_ObscCompound()
+    test_ne()

@@ -17,6 +17,8 @@ namespace batoid {
         // _rotation indicates the rotation applied to the global unit vectors to produce
         // the unit vectors of the new coordinate system.
         CoordSys(Vec3 _origin, Rot3 _rotation);
+        CoordSys(Vec3 _origin);
+        CoordSys(Rot3 _rotation);
 
         // Could add an Euler angle ctor too...
 

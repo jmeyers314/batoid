@@ -218,7 +218,13 @@ namespace batoid {
 
 
     ObscUnion::ObscUnion(const std::vector<std::shared_ptr<Obscuration>> obscVec) :
-        _obscVec(obscVec) {}
+        _obscVec(obscVec) {
+            std::sort(
+                _obscVec.begin(), _obscVec.end(),
+                [](std::shared_ptr<Obscuration> a, std::shared_ptr<Obscuration> b)
+                { return a->repr() < b->repr(); }
+            );
+        }
 
     bool ObscUnion::contains(double x, double y) const {
         bool ret = false;
@@ -250,7 +256,13 @@ namespace batoid {
 
 
     ObscIntersection::ObscIntersection(const std::vector<std::shared_ptr<Obscuration>> obscVec) :
-        _obscVec(obscVec) {}
+        _obscVec(obscVec) {
+            std::sort(
+                _obscVec.begin(), _obscVec.end(),
+                [](std::shared_ptr<Obscuration> a, std::shared_ptr<Obscuration> b)
+                { return a->repr() < b->repr(); }
+            );
+        }
 
     bool ObscIntersection::contains(double x, double y) const {
         bool ret = true;

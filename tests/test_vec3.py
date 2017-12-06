@@ -1,6 +1,6 @@
 import math
 import batoid
-from test_helpers import isclose, timer, do_pickle
+from test_helpers import isclose, timer, do_pickle, all_obj_diff
 
 
 @timer
@@ -295,6 +295,19 @@ def test_euler():
         assert all([isclose(r1, r5, rel_tol=0, abs_tol=1e-15) for r1, r5 in zip(R.euler, R5.euler)])
 
 
+@timer
+def test_ne():
+    objs = [batoid.Vec3(),
+            batoid.Vec3(0,0,1),
+            batoid.Vec3(0,1,0),
+            batoid.Vec3(1,0,0),
+            batoid.Vec2(),
+            batoid.Rot3(),
+            batoid.RotX(0.1),
+            batoid.Rot3([1,1,1,0,0,0,0,0,0])]
+    all_obj_diff(objs)
+
+
 if __name__ == '__main__':
     test_DotProduct()
     test_CrossProduct()
@@ -308,3 +321,4 @@ if __name__ == '__main__':
     testRotVec()
     test_determinant()
     test_euler()
+    test_ne()

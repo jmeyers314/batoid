@@ -1,6 +1,6 @@
 import batoid
 import numpy as np
-from test_helpers import isclose, timer, do_pickle
+from test_helpers import isclose, timer, do_pickle, all_obj_diff
 
 
 @timer
@@ -111,8 +111,20 @@ def test_intersect_vectorized():
         assert intersections == intersections2
 
 
+@timer
+def test_ne():
+    objs = [
+        batoid.Quadric(10.0, 1.0),
+        batoid.Quadric(11.0, 1.0),
+        batoid.Quadric(10.0, 1.1),
+        batoid.Sphere(10.0)
+    ]
+    all_obj_diff(objs)
+
+
 if __name__ == '__main__':
     test_properties()
     test_sag()
     test_intersect()
     test_intersect_vectorized()
+    test_ne()

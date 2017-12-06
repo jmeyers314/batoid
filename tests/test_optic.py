@@ -1,7 +1,7 @@
 import batoid
 import numpy as np
 import os
-from test_helpers import timer, do_pickle
+from test_helpers import timer, do_pickle, all_obj_diff
 import time
 import yaml
 
@@ -64,6 +64,40 @@ def test_traceFull():
 
     assert rays == tf[-1]['out']
 
+
+@timer
+def test_ne():
+    objs = [
+        batoid.Mirror(batoid.Plane()),
+        batoid.Detector(batoid.Plane()),
+        batoid.Baffle(batoid.Plane()),
+        batoid.RefractiveInterface(batoid.Plane()),
+        batoid.Mirror(batoid.Paraboloid(0.1)),
+        batoid.Detector(batoid.Paraboloid(0.1)),
+        batoid.Baffle(batoid.Paraboloid(0.1)),
+        batoid.RefractiveInterface(batoid.Paraboloid(0.1)),        
+        batoid.Mirror(batoid.Plane(), obscuration=batoid.ObscCircle(0.1)),
+        batoid.Mirror(batoid.Plane(), inMedium=batoid.ConstMedium(1.1)),
+        batoid.Mirror(batoid.Plane(), outMedium=batoid.ConstMedium(1.1)),
+        batoid.Mirror(batoid.Plane(), coordSys=batoid.CoordSys(batoid.Vec3(0,0,1))),
+        batoid.CompoundOptic([
+            batoid.Mirror(batoid.Plane()),
+            batoid.Mirror(batoid.Plane())
+        ]),
+        batoid.CompoundOptic(
+            [batoid.Mirror(batoid.Plane()),
+             batoid.Baffle(batoid.Plane())]
+        ),
+        batoid.Lens(
+            [batoid.RefractiveInterface(batoid.Plane()),
+             batoid.RefractiveInterface(batoid.Plane())],
+            batoid.ConstMedium(1.1)
+        )
+    ]
+    all_obj_diff(objs)
+
+
 if __name__ == '__main__':
     test_optic()
     test_traceFull()
+    test_ne()

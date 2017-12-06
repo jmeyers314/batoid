@@ -1,6 +1,6 @@
 import math
 import batoid
-from test_helpers import isclose, timer, do_pickle
+from test_helpers import isclose, timer, do_pickle, all_obj_diff
 
 
 @timer
@@ -199,6 +199,18 @@ def test_determinant():
         assert isclose(np.linalg.det(R), R.determinant())
 
 
+@timer
+def test_ne():
+    objs = [batoid.Vec2(),
+            batoid.Vec2(0,1),
+            batoid.Vec2(1,0),
+            batoid.Vec3(),
+            batoid.Rot2(),
+            batoid.Rot2([0,1,1,0]),
+            batoid.Rot3()]
+    all_obj_diff(objs)
+
+
 if __name__ == '__main__':
     test_DotProduct()
     test_Magnitude()
@@ -210,3 +222,4 @@ if __name__ == '__main__':
     test_ne()
     testRotVec()
     test_determinant()
+    test_ne()

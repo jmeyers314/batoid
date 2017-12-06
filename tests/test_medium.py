@@ -1,7 +1,7 @@
 import os
 import batoid
 import numpy as np
-from test_helpers import isclose, timer, do_pickle
+from test_helpers import isclose, timer, do_pickle, all_obj_diff
 
 
 @timer
@@ -84,8 +84,32 @@ def test_air():
     do_pickle(air)
 
 
+@timer
+def test_ne():
+    filename = os.path.join(batoid.datadir, "media", "silica_dispersion.txt")
+    wave, n = np.genfromtxt(filename).T
+    wave *= 1e-6    # microns -> meters
+    table = batoid.Table(wave, n, batoid.Table.Interpolant.linear)
+
+    objs = [
+        batoid.ConstMedium(1.0),
+        batoid.ConstMedium(1.1),
+        batoid.TableMedium(table),
+        batoid.SellmeierMedium(
+            0.6961663, 0.4079426, 0.8974794,
+            0.0684043**2, 0.1162414**2, 9.896161**2),
+        batoid.SellmeierMedium(
+            0.4079426, 0.6961663, 0.8974794,
+            0.0684043**2, 0.1162414**2, 9.896161**2),
+        batoid.Air(),
+        batoid.Air(pressure=100)
+    ]
+    all_obj_diff(objs)
+
+
 if __name__ == '__main__':
     test_const_medium()
     test_table_medium()
     test_silica_sellmeier_table()
     test_air()
+    test_ne()

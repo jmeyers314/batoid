@@ -1,5 +1,5 @@
 import batoid
-from test_helpers import isclose, timer, do_pickle
+from test_helpers import isclose, timer, do_pickle, all_obj_diff
 
 
 @timer
@@ -208,6 +208,29 @@ def test_circularGrid():
         assert isclose(r.v.y*n, ycos)
 
 
+@timer
+def test_ne():
+    objs = [batoid.Ray(batoid.Vec3(), batoid.Vec3()),
+            batoid.Ray(batoid.Vec3(0,0,1), batoid.Vec3()),
+            batoid.Ray(batoid.Vec3(0,1,0), batoid.Vec3()),
+            batoid.Ray(batoid.Vec3(), batoid.Vec3(), t=1),
+            batoid.Ray(batoid.Vec3(), batoid.Vec3(), w=500e-9),
+            batoid.Ray(batoid.Vec3(), batoid.Vec3(), isV=True),
+            # Should really get a failed Ray to test here...
+            batoid.Vec3(),
+            batoid.RayVector(),
+            batoid.RayVector([
+                batoid.Ray(batoid.Vec3(0,0,1), batoid.Vec3()),
+                batoid.Ray(batoid.Vec3(), batoid.Vec3())
+            ]),
+            batoid.RayVector([
+                batoid.Ray(batoid.Vec3(), batoid.Vec3()),
+                batoid.Ray(batoid.Vec3(0,0,1), batoid.Vec3())
+            ]),
+            batoid.RayVector([batoid.Ray(batoid.Vec3(), batoid.Vec3())])
+    ]
+    all_obj_diff(objs)
+
 if __name__ == '__main__':
     test_call()
     test_properties()
@@ -215,3 +238,4 @@ if __name__ == '__main__':
     test_RayVector()
     test_rayGrid()
     test_circularGrid()
+    test_ne()

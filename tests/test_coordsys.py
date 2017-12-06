@@ -1,5 +1,5 @@
 import batoid
-from test_helpers import isclose, timer, do_pickle
+from test_helpers import isclose, timer, do_pickle, all_obj_diff
 
 
 @timer
@@ -41,5 +41,20 @@ def test_shift():
             assert newNewCoordSys.rotation == batoid.Rot3()
 
 
+@timer
+def test_ne():
+    objs = [
+        batoid.CoordSys(),
+        batoid.CoordSys(batoid.Vec3(0,0,1)),
+        batoid.CoordSys(batoid.Vec3(0,1,0)),
+        batoid.CoordSys(batoid.RotX(0.1)),
+        batoid.CoordTransform(batoid.CoordSys(), batoid.CoordSys()),
+        batoid.CoordTransform(batoid.CoordSys(), batoid.CoordSys(batoid.Vec3(0,0,1))),
+        batoid.CoordTransform(batoid.CoordSys(), batoid.CoordSys(batoid.RotX(0.1)))
+    ]
+    all_obj_diff(objs)
+
+
 if __name__ == '__main__':
     test_shift()
+    test_ne()

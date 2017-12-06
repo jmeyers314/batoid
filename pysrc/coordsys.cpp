@@ -13,6 +13,8 @@ namespace batoid {
     void pyExportCoordSys(py::module& m) {
         py::class_<CoordSys, std::shared_ptr<CoordSys>>(m, "CoordSys")
             .def(py::init<>())
+            .def(py::init<Vec3>())
+            .def(py::init<Rot3>())
             .def(py::init<Vec3,Rot3>())
             .def_readonly("origin", &CoordSys::origin, "Global origin")
             .def_readonly("rotation", &CoordSys::rotation, "Unit vector rotation matrix")

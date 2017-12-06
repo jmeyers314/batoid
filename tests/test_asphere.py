@@ -1,6 +1,6 @@
 import batoid
 import numpy as np
-from test_helpers import isclose, timer, do_pickle
+from test_helpers import isclose, timer, do_pickle, all_obj_diff
 
 
 @timer
@@ -150,9 +150,23 @@ def test_quad_plus_poly():
             assert isclose(asphere.sag(x, y), quad.sag(x, y)+poly(x, y))
 
 
+@timer
+def test_ne():
+    objs = [
+        batoid.Asphere(10.0, 1.0, []),
+        batoid.Asphere(10.0, 1.0, [0]),
+        batoid.Asphere(10.0, 1.0, [0,1]),
+        batoid.Asphere(10.0, 1.0, [1,0]),
+        batoid.Asphere(10.0, 1.1, []),
+        batoid.Asphere(10.1, 1.0, []),
+        batoid.Quadric(10.0, 1.0)
+    ]
+    all_obj_diff(objs)
+
 if __name__ == '__main__':
     test_properties()
     test_sag()
     test_intersect()
     test_intersect_vectorized()
     test_quad_plus_poly()
+    test_ne()

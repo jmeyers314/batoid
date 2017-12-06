@@ -81,6 +81,10 @@ class Interface(Optic):
                     self.outRadius = self.obscuration.original.outer
                     self.inRadius = self.obscuration.original.inner
 
+    def __hash__(self):
+        return hash((self.__class__.__name__, self.surface, self.obscuration, self.name,
+                     self.inMedium, self.outMedium, self.coordSys))
+
     def draw(self, ax):
         """ Draw this interface on a mplot3d axis.
 
@@ -247,6 +251,7 @@ class Mirror(Interface):
     def interactInPlace(self, r):
         batoid._batoid.reflectInPlace(r, self.surface)
 
+
 class Detector(Interface):
     """Specialization for detector interfaces.
     """
@@ -273,7 +278,7 @@ class CompoundOptic(Optic):
     """
     def __init__(self, items, **kwargs):
         Optic.__init__(self, **kwargs)
-        self.items = items
+        self.items = tuple(items)
 
     def trace(self, r, inCoordSys=batoid.CoordSys(), outCoordSys=None):
         """ Recursively trace through this Optic by successively tracing through all subitems.
@@ -339,11 +344,15 @@ class CompoundOptic(Optic):
         out += ")"
         return out
 
+    def __hash__(self):
+        return hash((self.__class__.__name__, self.items,
+                     self.name, self.inMedium, self.outMedium, self.coordSys))
+
 
 class Lens(CompoundOptic):
     def __init__(self, items, medium, **kwargs):
         Optic.__init__(self, **kwargs)
-        self.items = items
+        self.items = tuple(items)
         self.medium = medium
 
     def __eq__(self, other):
@@ -357,6 +366,9 @@ class Lens(CompoundOptic):
         out += Optic._repr_helper(self)
         out += ")"
         return out
+
+    def __hash__(self):
+        return hash((self.medium, CompoundOptic.__hash__(self)))
 
 
 # Should pythonize RayVector so can identify when all the wavelengths are the same
