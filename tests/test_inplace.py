@@ -5,7 +5,7 @@ from test_helpers import timer
 
 @timer
 def test_inplace():
-    rays = batoid._batoid.rayGrid(10.0, 10.0, 0.1, 0.1, 1024, 500e-9, 1.2)
+    rays = batoid.rayGrid(10.0, 10.0, 0.1, 0.1, 1024, 500e-9, 1.2)
     print("propagating {} rays.".format(len(rays)))
     ts = np.random.uniform(size=len(rays))
 

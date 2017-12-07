@@ -167,7 +167,7 @@ def test_rayGrid():
     wavelength = 500e-9
     n = 1.2
 
-    rays = batoid._batoid.rayGrid(dist, length, xcos, ycos, nside, wavelength, n)
+    rays = batoid.rayGrid(dist, length, xcos, ycos, nside, wavelength, n)
     # Check that all rays are perpendicular to v
     r0 = rays[0]
     for r in rays:
@@ -195,7 +195,7 @@ def test_circularGrid():
     wavelength = 500e-9
     n = 1.2
 
-    rays = batoid._batoid.circularGrid(dist, outer, inner, xcos, ycos, nradii, naz, wavelength, n)
+    rays = batoid.circularGrid(dist, outer, inner, xcos, ycos, nradii, naz, wavelength, n)
     # Check that all rays are perpendicular to v
     r0 = rays[0]
     for r in rays:

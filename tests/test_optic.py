@@ -13,7 +13,7 @@ def test_optic():
     else:
         nside = 32
 
-    rays = batoid._batoid.rayGrid(20, 2.0, 0.01, 0.01, nside, 500e-9, 1.0)
+    rays = batoid.rayGrid(20, 2.0, 0.01, 0.01, nside, 500e-9, 1.0)
 
     nrays = len(rays)
     print("Tracing {} rays.".format(nrays))
@@ -48,7 +48,7 @@ def test_traceFull():
     else:
         nside = 32
 
-    rays = batoid._batoid.rayGrid(20, 2.0, 0.01, 0.01, nside, 500e-9, 1.0)
+    rays = batoid.rayGrid(20, 2.0, 0.01, 0.01, nside, 500e-9, 1.0)
 
     nrays = len(rays)
     print("Tracing {} rays.".format(nrays))
@@ -75,7 +75,7 @@ def test_ne():
         batoid.Mirror(batoid.Paraboloid(0.1)),
         batoid.Detector(batoid.Paraboloid(0.1)),
         batoid.Baffle(batoid.Paraboloid(0.1)),
-        batoid.RefractiveInterface(batoid.Paraboloid(0.1)),        
+        batoid.RefractiveInterface(batoid.Paraboloid(0.1)),
         batoid.Mirror(batoid.Plane(), obscuration=batoid.ObscCircle(0.1)),
         batoid.Mirror(batoid.Plane(), inMedium=batoid.ConstMedium(1.1)),
         batoid.Mirror(batoid.Plane(), outMedium=batoid.ConstMedium(1.1)),

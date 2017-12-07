@@ -3,19 +3,19 @@ import batoid
 def parse_obscuration(config):
     typ = config.pop('type')
     if typ in ['ObscCircle', 'ObscAnnulus', 'ObscRay', 'ObscRectangle']:
-        evalstr = "batoid._batoid.{}(**config)".format(typ)
+        evalstr = "batoid.{}(**config)".format(typ)
         return eval(evalstr)
     if typ == 'ObscNegation':
         original = parse_obscuration(config['original'])
-        return batoid._batoid.ObscNegation(original)
+        return batoid.ObscNegation(original)
     if typ in ['ObscUnion', 'ObscIntersection']:
         items = [parse_obscuration(c) for c in config['items']]  # noqa
-        evalstr = "batoid._batoid.{}(items)".format(typ)
+        evalstr = "batoid.{}(items)".format(typ)
         return eval(evalstr)
     if typ.startswith('Clear'): # triggers negation
         # put type back into config, but with Clear->Obsc
         config['type'] = typ.replace("Clear", "Obsc")
-        return batoid._batoid.ObscNegation(parse_obscuration(config))
+        return batoid.ObscNegation(parse_obscuration(config))
 
 
 def parse_surface(config):
@@ -24,7 +24,7 @@ def parse_surface(config):
     return eval(evalstr)
 
 
-def parse_coordSys(config, coordSys=batoid._batoid.CoordSys()):
+def parse_coordSys(config, coordSys=batoid.CoordSys()):
     """
     @param config  configuration dictionary
     @param coordSys  sys to which transformations in config are added
@@ -44,7 +44,7 @@ def parse_coordSys(config, coordSys=batoid._batoid.CoordSys()):
     return coordSys
 
 def parse_optic(config,
-                coordSys=batoid._batoid.CoordSys(),
+                coordSys=batoid.CoordSys(),
                 inMedium=batoid.ConstMedium(1.0),
                 outMedium=None):
     """
