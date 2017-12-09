@@ -96,7 +96,6 @@ class Interface(Optic):
         """
         if self.outRadius is None:
             return
-        print("drawing {}".format(self.name))
         # Going to draw 4 objects here: inner circle, outer circle, sag along x=0, sag along y=0
         # inner circle
         if self.inRadius != 0.0:

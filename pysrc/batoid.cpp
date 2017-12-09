@@ -48,6 +48,8 @@ namespace batoid {
         pyExportCoordSys(m);
         pyExportCoordTransform(m);
 
+        using namespace pybind11::literals;
+
         m.def("reflect", (Ray (*)(const Ray&, const Surface&)) &reflect)
          .def("reflect", (std::vector<Ray> (*)(const std::vector<Ray>&, const Surface&)) &reflect)
          .def("reflectInPlace", (void (*)(Ray&, const Surface&)) &reflectInPlace)
@@ -64,8 +66,12 @@ namespace batoid {
 
          .def("rayGrid", (std::vector<Ray> (*)(double, double, double, double, int, double, double)) &rayGrid)
          .def("rayGrid", (std::vector<Ray> (*)(double, double, double, double, int, double, const Medium&)) &rayGrid)
-         .def("circularGrid", (std::vector<Ray> (*)(double, double, double, double, double, int, int, double, double)) &circularGrid)
-         .def("circularGrid", (std::vector<Ray> (*)(double, double, double, double, double, int, int, double, const Medium&)) &circularGrid)
+         .def("circularGrid", (std::vector<Ray> (*)(double, double, double, double, double, int, int, double, double)) &circularGrid,
+              "Generate circularly symmetric grid of rays",
+              "zdist"_a, "outer"_a, "inner"_a, "xcos"_a, "ycos"_a, "nradii"_a, "naz"_a, "wavelength"_a, "n"_a)
+         .def("circularGrid", (std::vector<Ray> (*)(double, double, double, double, double, int, int, double, const Medium&)) &circularGrid,
+              "Generate circularly symmetric grid of rays",
+              "zdist"_a, "outer"_a, "inner"_a, "xcos"_a, "ycos"_a, "nradii"_a, "naz"_a, "wavelength"_a, "n"_a)
          .def("trimVignetted", &trimVignetted)
          .def("trimVignettedInPlace", &trimVignettedInPlace);
 
