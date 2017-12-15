@@ -1,0 +1,41 @@
+cmake_minimum_required(VERSION 2.8.12)
+project(_batoid)
+
+include_directories(include)
+add_subdirectory(pybind11)
+set(SRC_FILES
+  pysrc/asphere.cpp
+  pysrc/batoid.cpp
+  pysrc/coordsys.cpp
+  pysrc/intersection.cpp
+  pysrc/medium.cpp
+  pysrc/obscuration.cpp
+  pysrc/paraboloid.cpp
+  pysrc/plane.cpp
+  pysrc/quadric.cpp
+  pysrc/ray.cpp
+  pysrc/sphere.cpp
+  pysrc/surface.cpp
+  pysrc/table.cpp
+  pysrc/transformation.cpp
+  pysrc/vec2.cpp
+  pysrc/vec3.cpp
+  pysrc/xform.cpp
+  src/asphere.cpp
+  src/batoid.cpp
+  src/coordsys.cpp
+  src/intersection.cpp
+  src/medium.cpp
+  src/obscuration.cpp
+  src/paraboloid.cpp
+  src/plane.cpp
+  src/quadric.cpp
+  src/ray.cpp
+  src/sphere.cpp
+  src/surface.cpp
+  src/table.cpp
+  src/transformation.cpp
+  src/utils.cpp
+  src/xform.cpp
+  )
+pybind11_add_module(_batoid ${SRC_FILES})
