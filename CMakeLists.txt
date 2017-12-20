@@ -1,9 +1,13 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(_batoid)
+set(CMAKE_MACOSX_RPATH 1)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 include_directories(include)
 add_subdirectory(pybind11)
-set(SRC_FILES
+set(PYSRC_FILES
   pysrc/asphere.cpp
   pysrc/batoid.cpp
   pysrc/coordsys.cpp
@@ -21,6 +25,8 @@ set(SRC_FILES
   pysrc/vec2.cpp
   pysrc/vec3.cpp
   pysrc/xform.cpp
+)
+set(SRC_FILES
   src/asphere.cpp
   src/batoid.cpp
   src/coordsys.cpp
@@ -37,5 +43,7 @@ set(SRC_FILES
   src/transformation.cpp
   src/utils.cpp
   src/xform.cpp
-  )
-pybind11_add_module(_batoid ${SRC_FILES})
+)
+add_library(batoid SHARED ${SRC_FILES})
+pybind11_add_module(_batoid ${PYSRC_FILES})
+target_link_libraries(_batoid PUBLIC batoid)
