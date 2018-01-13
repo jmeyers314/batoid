@@ -20,8 +20,7 @@ namespace batoid{
         auto result = std::vector<Ray>(rays.size());
         parallelTransform(
             rays.cbegin(), rays.cend(), result.begin(),
-            [&](const Ray& r){ return reflect(r, surface); },
-            2000
+            [&](const Ray& r){ return reflect(r, surface); }
         );
         return result;
     }
@@ -38,8 +37,7 @@ namespace batoid{
     void reflectInPlace(std::vector<Ray>& rays, const Surface& surface) {
         parallel_for_each(
             rays.begin(), rays.end(),
-            [&](Ray& r) { reflectInPlace(r, surface); },
-            2000
+            [&](Ray& r) { reflectInPlace(r, surface); }
         );
     }
 
@@ -66,8 +64,7 @@ namespace batoid{
         auto result = std::vector<Ray>(rays.size());
         parallelTransform(
             rays.cbegin(), rays.cend(), result.begin(),
-            [&](const Ray& r){ return refract(r, surface, n1, n2); },
-            2000
+            [&](const Ray& r){ return refract(r, surface, n1, n2); }
         );
         return result;
     }
@@ -84,8 +81,7 @@ namespace batoid{
         auto result = std::vector<Ray>(rays.size());
         parallelTransform(
             rays.cbegin(), rays.cend(), result.begin(),
-            [&](const Ray& r){ return refract(r, surface, m1, m2); },
-            2000
+            [&](const Ray& r){ return refract(r, surface, m1, m2); }
         );
         return result;
     }
@@ -111,8 +107,7 @@ namespace batoid{
     void refractInPlace(std::vector<Ray>& rays, const Surface& surface, double n1, double n2) {
         parallel_for_each(
             rays.begin(), rays.end(),
-            [&](Ray& r) { refractInPlace(r, surface, n1, n2); },
-            2000
+            [&](Ray& r) { refractInPlace(r, surface, n1, n2); }
         );
     }
 
@@ -126,8 +121,7 @@ namespace batoid{
     void refractInPlace(std::vector<Ray>& rays, const Surface& surface, const Medium& m1, const Medium& m2) {
         parallel_for_each(
             rays.begin(), rays.end(),
-            [&](Ray& r) { refractInPlace(r, surface, m1, m2); },
-            2000
+            [&](Ray& r) { refractInPlace(r, surface, m1, m2); }
         );
     }
 

@@ -46,8 +46,7 @@ namespace batoid {
         auto result = std::vector<Intersection>(rays.size());
         parallelTransform(rays.cbegin(), rays.cend(), result.begin(),
             [this](const Ray& ray)
-            { return intersect(ray); },
-            2000
+            { return intersect(ray); }
         );
         return result;
     }
@@ -56,8 +55,7 @@ namespace batoid {
         auto result = std::vector<Ray>(rays.size());
         parallelTransform(rays.cbegin(), rays.cend(), result.begin(),
             [this](const Ray& ray)
-            { return intercept(ray); },
-            2000
+            { return intercept(ray); }
         );
         return result;
     }
@@ -65,8 +63,7 @@ namespace batoid {
     void Surface::interceptInPlace(std::vector<Ray>& rays) const {
         parallel_for_each(
             rays.begin(), rays.end(),
-            [this](Ray& r) { interceptInPlace(r); },
-            2000
+            [this](Ray& r) { interceptInPlace(r); }
         );
     }
 }

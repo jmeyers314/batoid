@@ -4,6 +4,8 @@
 #include <iterator>
 #include <future>
 #include <algorithm>
+#include <cmath>
+#include <iostream>
 
 namespace batoid {
 
@@ -12,34 +14,34 @@ namespace batoid {
     // InputIt models a RandomAccessIterator
     // OutputIt models a RandomAccessIterator
     template<typename InputIt, typename OutputIt, typename UnaryOperation>
-    void parallelTransform(
+    void chunkedParallelTransform(
         InputIt first1, InputIt last1, OutputIt d_first,
         UnaryOperation unary_op,
         typename std::iterator_traits<InputIt>::difference_type chunksize)
     {
         auto len = last1 - first1;
-        if (len < chunksize) {
+        if (len <= chunksize) {
             std::transform(first1, last1, d_first, unary_op);
         } else {
             InputIt mid = first1 + len/2;
             OutputIt d_mid = d_first + len/2;
             auto handle = std::async(std::launch::async,
-                                     parallelTransform<InputIt, OutputIt, UnaryOperation>,
+                                     chunkedParallelTransform<InputIt, OutputIt, UnaryOperation>,
                                      mid, last1, d_mid, unary_op, chunksize);
-            parallelTransform(first1, mid, d_first, unary_op, chunksize);
+            chunkedParallelTransform(first1, mid, d_first, unary_op, chunksize);
             handle.wait();
         }
     }
 
     // Same as above, but for a binary operation
     template<typename InputIt1, typename InputIt2, typename OutputIt, typename BinaryOperation>
-    void parallelTransform(
+    void chunkedParallelTransform(
         InputIt1 first1, InputIt1 last1, InputIt2 first2, OutputIt d_first,
         BinaryOperation binary_op,
         typename std::iterator_traits<InputIt1>::difference_type chunksize)
     {
         auto len = last1 - first1;
-        if (len < chunksize) {
+        if (len <= chunksize) {
             std::transform(first1, last1, first2, d_first, binary_op);
         } else {
             InputIt1 mid1 = first1 + len/2;
@@ -47,27 +49,27 @@ namespace batoid {
             OutputIt d_mid = d_first + len/2;
 
             auto handle = std::async(std::launch::async,
-                                     parallelTransform<InputIt1, InputIt2, OutputIt, BinaryOperation>,
+                                     chunkedParallelTransform<InputIt1, InputIt2, OutputIt, BinaryOperation>,
                                      mid1, last1, mid2, d_mid, binary_op, chunksize);
-            parallelTransform(first1, mid1, first2, d_first, binary_op, chunksize);
+            chunkedParallelTransform(first1, mid1, first2, d_first, binary_op, chunksize);
             handle.wait();
         }
     }
 
     template<typename It, typename UnaryOperation>
-    void parallel_for_each(
+    void chunked_parallel_for_each(
         It first, It last, UnaryOperation unary_op,
         typename std::iterator_traits<It>::difference_type chunksize)
     {
         auto len = last - first;
-        if (len < chunksize) {
+        if (len <= chunksize) {
             std::for_each(first, last, unary_op);
         } else {
             It mid = first + len/2;
             auto handle = std::async(std::launch::async,
-                                     parallel_for_each<It, UnaryOperation>,
+                                     chunked_parallel_for_each<It, UnaryOperation>,
                                      mid, last, unary_op, chunksize);
-            parallel_for_each(first, mid, unary_op, chunksize);
+            chunked_parallel_for_each(first, mid, unary_op, chunksize);
             handle.wait();
         }
     }
@@ -84,23 +86,74 @@ namespace batoid {
     }
 
     template<typename It1, typename It2, typename BinaryOperation>
-    void parallel_for_each(
+    void chunked_parallel_for_each(
         It1 first1, It1 last1, It2 first2, BinaryOperation binary_op,
         typename std::iterator_traits<It1>::difference_type chunksize)
     {
         auto len = last1 - first1;
-        if (len < chunksize) {
+        if (len <= chunksize) {
             for_each(first1, last1, first2, binary_op);
         } else {
             It1 mid1 = first1 + len/2;
             It2 mid2 = first2 + len/2;
             auto handle = std::async(std::launch::async,
-                                     parallel_for_each<It1, It2, BinaryOperation>,
+                                     chunked_parallel_for_each<It1, It2, BinaryOperation>,
                                      mid1, last1, mid2, binary_op, chunksize);
-            parallel_for_each(first1, mid1, first2, binary_op, chunksize);
+            chunked_parallel_for_each(first1, mid1, first2, binary_op, chunksize);
             handle.wait();
         }
     }
+
+    // And now some versions that automatically choose a chunksize based on
+    // hardware concurrency
+    // These currently only really work as intended if hardware_concurrency is a
+    // power of 2, but that seems to be okay for now.
+    template<typename InputIt, typename OutputIt, typename UnaryOperation>
+    void parallelTransform(
+        InputIt first1, InputIt last1, OutputIt d_first,
+        UnaryOperation unary_op)
+    {
+        auto len = last1 - first1;
+        len /= std::thread::hardware_concurrency();
+        // a bit of slop.  We want to be efficient, but not launch more threads than necessary.
+        len += 1;
+        chunkedParallelTransform(first1, last1, d_first, unary_op, len);
+    }
+
+    template<typename InputIt1, typename InputIt2, typename OutputIt, typename BinaryOperation>
+    void parallelTransform(
+        InputIt1 first1, InputIt1 last1, InputIt2 first2, OutputIt d_first,
+        BinaryOperation binary_op)
+    {
+        auto len = last1 - first1;
+        len /= std::thread::hardware_concurrency();
+        // a bit of slop.  We want to be efficient, but not launch more threads than necessary.
+        len += 1;
+        chunkedParallelTransform(first1, last1, first2, d_first, binary_op, len);
+    }
+
+    template<typename It, typename UnaryOperation>
+    void parallel_for_each(
+        It first, It last, UnaryOperation unary_op)
+    {
+        auto len = last - first;
+        len /= std::thread::hardware_concurrency();
+        // a bit of slop.  We want to be efficient, but not launch more threads than necessary.
+        len += 1;
+        chunked_parallel_for_each(first, last, unary_op, len);
+    }
+
+    template<typename It1, typename It2, typename BinaryOperation>
+    void parallel_for_each(
+        It1 first1, It1 last1, It2 first2, BinaryOperation binary_op)
+    {
+        auto len = last1 - first1;
+        len /= std::thread::hardware_concurrency();
+        // a bit of slop.  We want to be efficient, but not launch more threads than necessary.
+        len += 1;
+        chunked_parallel_for_each(first1, last1, first2, binary_op, len);
+    }
+
 }
 
 #endif

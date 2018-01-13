@@ -145,8 +145,7 @@ namespace batoid {
     std::vector<Ray> CoordTransform::applyForward(const std::vector<Ray>& rs) const {
         std::vector<Ray> result(rs.size());
         parallelTransform(rs.cbegin(), rs.cend(), result.begin(),
-            [this](const Ray& r) { return applyForward(r); },
-            2000
+            [this](const Ray& r) { return applyForward(r); }
         );
         return result;
     }
@@ -154,23 +153,20 @@ namespace batoid {
     std::vector<Ray> CoordTransform::applyReverse(const std::vector<Ray>& rs) const {
         std::vector<Ray> result(rs.size());
         parallelTransform(rs.cbegin(), rs.cend(), result.begin(),
-            [this](const Ray& r) { return applyReverse(r); },
-            2000
+            [this](const Ray& r) { return applyReverse(r); }
         );
         return result;
     }
 
     void CoordTransform::applyForwardInPlace(std::vector<Ray>& rays) const {
         parallel_for_each(rays.begin(), rays.end(),
-            [this](Ray& r) { applyForwardInPlace(r); },
-            2000
+            [this](Ray& r) { applyForwardInPlace(r); }
         );
     }
 
     void CoordTransform::applyReverseInPlace(std::vector<Ray>& rays) const {
         parallel_for_each(rays.begin(), rays.end(),
-            [this](Ray& r) { applyReverseInPlace(r); },
-            2000
+            [this](Ray& r) { applyReverseInPlace(r); }
         );
     }
 

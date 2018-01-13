@@ -30,8 +30,7 @@ namespace batoid {
                     return Ray(ray.p0, ray.v, ray.t0, ray.wavelength, true);
                 else
                     return Ray(ray.p0, ray.v, ray.t0, ray.wavelength, ray.isVignetted);
-            },
-            2000
+            }
         );
         return result;
     }
@@ -39,8 +38,7 @@ namespace batoid {
     void Obscuration::obscureInPlace(std::vector<Ray>& rays) const {
         parallel_for_each(
             rays.begin(), rays.end(),
-            [this](Ray& r){ obscureInPlace(r); },
-            2000
+            [this](Ray& r){ obscureInPlace(r); }
         );
     }
 

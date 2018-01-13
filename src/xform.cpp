@@ -27,8 +27,7 @@ namespace batoid{
     std::vector<Ray> XForm::to(const std::vector<Ray>& rays) const {
         std::vector<Ray> result(rays.size());
         parallelTransform(rays.cbegin(), rays.cend(), result.begin(),
-            [this](const Ray& ray) { return to(ray); },
-            2000
+            [this](const Ray& ray) { return to(ray); }
         );
         return result;
     }
@@ -36,8 +35,7 @@ namespace batoid{
     std::vector<Ray> XForm::from(const std::vector<Ray>& rays) const {
         std::vector<Ray> result(rays.size());
         parallelTransform(rays.cbegin(), rays.cend(), result.begin(),
-            [this](const Ray& ray) { return from(ray); },
-            2000
+            [this](const Ray& ray) { return from(ray); }
         );
         return result;
     }

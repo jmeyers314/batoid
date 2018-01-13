@@ -75,8 +75,7 @@ namespace batoid {
         auto result = std::vector<double>(rays.size());
         parallelTransform(rays.cbegin(), rays.cend(), result.begin(),
             [=](const Ray& ray)
-                { return ray.phase(r, t); },
-            2000
+                { return ray.phase(r, t); }
         );
         return result;
     }
@@ -85,8 +84,7 @@ namespace batoid {
         auto result = std::vector<std::complex<double>>(rays.size());
         parallelTransform(rays.cbegin(), rays.cend(), result.begin(),
             [=](const Ray& ray)
-                { return ray.amplitude(r, t); },
-            2000
+                { return ray.amplitude(r, t); }
         );
         return result;
     }
@@ -95,8 +93,7 @@ namespace batoid {
         auto result = std::vector<Ray>(rays.size());
         parallelTransform(rays.cbegin(), rays.cend(), ts.cbegin(), result.begin(),
             [](const Ray& ray, double t)
-                { return ray.propagatedToTime(t); },
-            2000
+                { return ray.propagatedToTime(t); }
         );
         return result;
     }
@@ -104,8 +101,7 @@ namespace batoid {
     void propagateInPlaceMany(std::vector<Ray>& rays, const std::vector<double>& ts) {
         parallel_for_each(rays.begin(), rays.end(), ts.begin(),
             [](Ray& ray, double t)
-                { ray.propagateInPlace(t); },
-            2000
+                { ray.propagateInPlace(t); }
         );
     }
 }

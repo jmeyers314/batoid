@@ -60,8 +60,7 @@ namespace batoid {
         parallelTransform(
             isecs.cbegin(), isecs.cend(), rays.cbegin(), result.begin(),
             [](const Intersection& isec, const Ray& ray)
-                { return isec.reflectedRay(ray); },
-            2000
+                { return isec.reflectedRay(ray); }
         );
         return result;
     }
@@ -72,8 +71,7 @@ namespace batoid {
         parallelTransform(
             isecs.cbegin(), isecs.cend(), rays.cbegin(), result.begin(),
             [=](const Intersection& isec, const Ray& ray)
-                { return isec.refractedRay(ray, n1, n2); },
-            2000
+                { return isec.refractedRay(ray, n1, n2); }
         );
         return result;
     }
@@ -83,8 +81,7 @@ namespace batoid {
         parallelTransform(
             isecs.cbegin(), isecs.cend(), rays.cbegin(), result.begin(),
             [&](const Intersection& isec, const Ray& ray)
-                { return isec.refractedRay(ray, m1, m2); },
-            2000
+                { return isec.refractedRay(ray, m1, m2); }
         );
         return result;
     }
