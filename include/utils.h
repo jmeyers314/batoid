@@ -13,6 +13,8 @@ namespace batoid {
 
     // InputIt models a RandomAccessIterator
     // OutputIt models a RandomAccessIterator
+    // Note that the output must already be allocated!  I.e., no back_inserter
+    // should be used for d_first.
     template<typename InputIt, typename OutputIt, typename UnaryOperation>
     void chunkedParallelTransform(
         InputIt first1, InputIt last1, OutputIt d_first,

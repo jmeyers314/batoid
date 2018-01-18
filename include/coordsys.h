@@ -13,12 +13,12 @@ namespace batoid {
         // explicitly construct the global coordinate system
         CoordSys();
 
-        // _origin indicates the origin in global coordinates of the new coordinate system.
-        // _rotation indicates the rotation applied to the global unit vectors to produce
+        // origin indicates the origin in global coordinates of the new coordinate system.
+        // rot indicates the rotation applied to the global unit vectors to produce
         // the unit vectors of the new coordinate system.
-        CoordSys(Vec3 _origin, Rot3 _rotation);
-        CoordSys(Vec3 _origin);
-        CoordSys(Rot3 _rotation);
+        CoordSys(Vec3 origin, Rot3 rot);
+        CoordSys(Vec3 origin);
+        CoordSys(Rot3 rot);
 
         // Could add an Euler angle ctor too...
 
@@ -30,34 +30,34 @@ namespace batoid {
         CoordSys shiftLocal(const Vec3& dr) const;
 
         // Rotate wrt the global axes, where the center of rotation is the global origin.
-        CoordSys rotateGlobal(const Rot3& rotation) const;
+        CoordSys rotateGlobal(const Rot3& rot) const;
 
         // Rotate wrt the global axes, around the given center of rotation, which is expressed
         // in the given coordinate system.
-        CoordSys rotateGlobal(const Rot3& rotation, const Vec3& rotOrigin, const CoordSys& coordSys) const;
+        CoordSys rotateGlobal(const Rot3& rot, const Vec3& rotCenter, const CoordSys& coordSys) const;
 
         // Rotate wrt the local axes, around the local origin
-        CoordSys rotateLocal(const Rot3& rotation) const;
+        CoordSys rotateLocal(const Rot3& rot) const;
 
         // Rotate wrt the local axes, around the given center of rotation, which is expressed
         // in the given coordinate system.
-        CoordSys rotateLocal(const Rot3& rotation, const Vec3& rotOrigin, const CoordSys& coordSys) const;
+        CoordSys rotateLocal(const Rot3& rot, const Vec3& rotCenter, const CoordSys& coordSys) const;
 
-        // Get local unit vectors in global coordinates.
+        // Get coordSys unit vectors in global coordinates.
         Vec3 getXHat() const;
         Vec3 getYHat() const;
         Vec3 getZHat() const;
 
         std::string repr() const {
             std::ostringstream oss;
-            oss << "CoordSys(" << origin << ", " << rotation << ')';
+            oss << "CoordSys(" << m_origin << ", " << m_rot << ')';
             return oss.str();
         }
 
-        const Vec3 origin;
+        const Vec3 m_origin;
         // Could potentially use Euler angles instead of rotation matrix here to be
         // more compact?
-        const Rot3 rotation;
+        const Rot3 m_rot;
     };
 
     std::ostream& operator<<(std::ostream &os, const CoordSys& cs);

@@ -1,4 +1,5 @@
 import batoid
+import numpy as np
 from test_helpers import isclose, timer, do_pickle, all_obj_diff
 
 
@@ -163,11 +164,12 @@ def test_rayGrid():
     length = 10.0
     xcos = 0.1
     ycos = 0.2
+    zcos = -np.sqrt(1.0 - xcos**2 - ycos**2)
     nside = 9
     wavelength = 500e-9
     n = 1.2
 
-    rays = batoid.rayGrid(dist, length, xcos, ycos, nside, wavelength, n)
+    rays = batoid.rayGrid(dist, length, xcos, ycos, zcos, nside, wavelength, n)
     # Check that all rays are perpendicular to v
     r0 = rays[0]
     for r in rays:
@@ -190,12 +192,13 @@ def test_circularGrid():
     inner = 0.5
     xcos = 0.1
     ycos = 0.2
+    zcos = -np.sqrt(1.0 - xcos**2 - ycos**2)
     nradii = 5
     naz = 50
     wavelength = 500e-9
     n = 1.2
 
-    rays = batoid.circularGrid(dist, outer, inner, xcos, ycos, nradii, naz, wavelength, n)
+    rays = batoid.circularGrid(dist, outer, inner, xcos, ycos, zcos, nradii, naz, wavelength, n)
     # Check that all rays are perpendicular to v
     r0 = rays[0]
     for r in rays:

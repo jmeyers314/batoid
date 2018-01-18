@@ -13,7 +13,7 @@ def test_optic():
     else:
         nside = 32
 
-    rays = batoid.rayGrid(20, 2.0, 0.01, 0.01, nside, 500e-9, 1.0)
+    rays = batoid.rayGrid(20, 12.0, 0.005, 0.005, -1.0, nside, 500e-9, 1.0)
 
     nrays = len(rays)
     print("Tracing {} rays.".format(nrays))
@@ -48,12 +48,10 @@ def test_traceFull():
     else:
         nside = 32
 
-    rays = batoid.rayGrid(20, 2.0, 0.01, 0.01, nside, 500e-9, 1.0)
+    rays = batoid.rayGrid(20, 12.0, 0.005, 0.005, -1.0, nside, 500e-9, 1.0)
 
     nrays = len(rays)
     print("Tracing {} rays.".format(nrays))
-    t_fast = 0.0
-    t_slow = 0.0
 
     fn = os.path.join(batoid.datadir, "hsc", "HSC3.yaml")
     config = yaml.load(open(fn))
@@ -63,6 +61,41 @@ def test_traceFull():
     rays, _ = telescope.trace(rays)
 
     assert rays == tf[-1]['out']
+
+
+@timer
+def test_traceReverse():
+    if __name__ == '__main__':
+        nside = 128
+    else:
+        nside = 32
+
+    fn = os.path.join(batoid.datadir, "hsc", "HSC3.yaml")
+    config = yaml.load(open(fn))
+    telescope = batoid.parse.parse_optic(config['opticalSystem'])
+
+    init_rays = batoid.rayGrid(20, 12.0, 0.005, 0.005, -1.0, nside, 500e-9, 1.0)
+    forward_rays, _ = telescope.trace(init_rays, outCoordSys=batoid.CoordSys())
+
+    # Now, turn the result rays around and trace backwards
+    forward_rays = batoid.propagatedToTimesMany(forward_rays, [40]*len(forward_rays))
+    reverse_rays = batoid.RayVector(
+        [batoid.Ray(r.p0, -r.v, -r.t0, r.wavelength) for r in forward_rays]
+    )
+
+    final_rays, _ = telescope.traceReverse(reverse_rays, outCoordSys=batoid.CoordSys())
+    # propagate all the way to t=0
+    final_rays = batoid.propagatedToTimesMany(final_rays, [0]*len(final_rays))
+
+    w = np.where(np.logical_not(final_rays.isVignetted))[0]
+    for idx in w:
+        np.testing.assert_allclose(init_rays[idx].x0, final_rays[idx].x0)
+        np.testing.assert_allclose(init_rays[idx].y0, final_rays[idx].y0)
+        np.testing.assert_allclose(init_rays[idx].z0, final_rays[idx].z0)
+        np.testing.assert_allclose(init_rays[idx].vx, -final_rays[idx].vx)
+        np.testing.assert_allclose(init_rays[idx].vy, -final_rays[idx].vy)
+        np.testing.assert_allclose(init_rays[idx].vz, -final_rays[idx].vz)
+        np.testing.assert_allclose(final_rays[idx].t0, 0)
 
 
 @timer
@@ -100,4 +133,5 @@ def test_ne():
 if __name__ == '__main__':
     test_optic()
     test_traceFull()
+    test_traceReverse()
     test_ne()

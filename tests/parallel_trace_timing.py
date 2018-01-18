@@ -8,7 +8,7 @@ import yaml
 
 @timer
 def parallel_trace_timing(nside=512):
-    rays = batoid._batoid.circularGrid(20, 4.1, 0.5, 0.01, 0.01, nside, nside, 500e-9, 1.0)
+    rays = batoid._batoid.circularGrid(20, 4.1, 0.5, 0.01, 0.01, -1.0, nside, nside, 500e-9, 1.0)
 
     nrays = len(rays)
     print("Tracing {} rays.".format(nrays))

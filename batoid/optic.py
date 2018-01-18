@@ -1,6 +1,7 @@
 import batoid
 import numpy as np
 
+
 class Optic(object):
     """This is the most general category of batoid optical system.  It can include
     a single reflective or refractive surface, a lens consisting of two surfaces, or
@@ -22,15 +23,19 @@ class Optic(object):
             with respect to it's parent's coordinate system.  Optics can be nested, i.e., a camera
             Optic may contain several lens Optics, and may itself be part of a larger telescope
             Optic.
+
+        skip : bool
+            Whether or not to skip this optic when tracing.
     """
     def __init__(self, name=None, coordSys=batoid.CoordSys(), inMedium=batoid.ConstMedium(1.0),
-                 outMedium=batoid.ConstMedium(1.0)):
+                 outMedium=batoid.ConstMedium(1.0), skip=False):
         self.name = name
         self.inMedium = inMedium
         self.outMedium = outMedium
         if coordSys is None:
             raise ValueError("coordSys required for optic")
         self.coordSys = coordSys
+        self.skip = False
 
     def _repr_helper(self):
         out = ""
@@ -42,7 +47,6 @@ class Optic(object):
         if self.outMedium != batoid.ConstMedium(1.0):
             out += ", outMedium={!r}".format(self.outMedium)
         return out
-
 
 
 class Interface(Optic):
@@ -69,8 +73,7 @@ class Interface(Optic):
         self.obscuration = obscuration
 
         # Stealing inRadius and outRadius from self.obscuration.  These are required for the draw
-        # method.  Only works at the moment if obscuration is a negated circle.  Should at least
-        # extend this to negated annulus.
+        # methods.  Only works at the moment if obscuration is a negated circle or negated annulus.
         self.inRadius = 0.0
         self.outRadius = None
         if self.obscuration is not None:
@@ -85,7 +88,7 @@ class Interface(Optic):
         return hash((self.__class__.__name__, self.surface, self.obscuration, self.name,
                      self.inMedium, self.outMedium, self.coordSys))
 
-    def draw(self, ax):
+    def draw3d(self, ax, **kwargs):
         """ Draw this interface on a mplot3d axis.
 
         Parameters
@@ -104,10 +107,9 @@ class Interface(Optic):
             x = self.inRadius * cth
             y = self.inRadius * sth
             z = self.surface.sag(x, y)
-            # ax.plot(x, y, z, c='k')
             transform = batoid.CoordTransform(self.coordSys, batoid.CoordSys())
             x, y, z = transform.applyForward(x, y, z)
-            ax.plot(x, y, z, c='k')
+            ax.plot(x, y, z, **kwargs)
 
         #outer circle
         th = np.linspace(0, 2*np.pi, 100)
@@ -117,7 +119,7 @@ class Interface(Optic):
         z = self.surface.sag(x, y)
         transform = batoid.CoordTransform(self.coordSys, batoid.CoordSys())
         x, y, z = transform.applyForward(x, y, z)
-        ax.plot(x, y, z, c='k')
+        ax.plot(x, y, z, **kwargs)
 
         #next, a line at X=0
         y = np.linspace(-self.outRadius, -self.inRadius)
@@ -125,13 +127,13 @@ class Interface(Optic):
         z = self.surface.sag(x, y)
         transform = batoid.CoordTransform(self.coordSys, batoid.CoordSys())
         x, y, z = transform.applyForward(x, y, z)
-        ax.plot(x, y, z, c='k')
+        ax.plot(x, y, z, **kwargs)
         y = np.linspace(self.inRadius, self.outRadius)
         x = np.zeros_like(y)
         z = self.surface.sag(x, y)
         transform = batoid.CoordTransform(self.coordSys, batoid.CoordSys())
         x, y, z = transform.applyForward(x, y, z)
-        ax.plot(x, y, z, c='k')
+        ax.plot(x, y, z, **kwargs)
 
         #next, a line at Y=0
         x = np.linspace(-self.outRadius, -self.inRadius)
@@ -139,13 +141,34 @@ class Interface(Optic):
         z = self.surface.sag(x, y)
         transform = batoid.CoordTransform(self.coordSys, batoid.CoordSys())
         x, y, z = transform.applyForward(x, y, z)
-        ax.plot(x, y, z, c='k')
+        ax.plot(x, y, z, **kwargs)
         x = np.linspace(self.inRadius, self.outRadius)
         y = np.zeros_like(x)
         z = self.surface.sag(x, y)
         transform = batoid.CoordTransform(self.coordSys, batoid.CoordSys())
         x, y, z = transform.applyForward(x, y, z)
-        ax.plot(x, y, z, c='k')
+        ax.plot(x, y, z, **kwargs)
+
+    def draw2d(self, ax, **kwargs):
+        """ Draw this interface on a 2d matplotlib axis.
+        May not work if elements are non-circular or not axis-aligned.
+        """
+        if self.outRadius is None:
+            return
+        # Drawing in the x-z plane.
+        x = np.linspace(-self.outRadius, -self.inRadius)
+        y = np.zeros_like(x)
+        z = self.surface.sag(x, y)
+        transform = batoid.CoordTransform(self.coordSys, batoid.CoordSys())
+        x, y, z = transform.applyForward(x, y, z)
+        ax.plot(x, z, **kwargs)
+
+        x = np.linspace(self.inRadius, self.outRadius)
+        y = np.zeros_like(x)
+        z = self.surface.sag(x, y)
+        transform = batoid.CoordTransform(self.coordSys, batoid.CoordSys())
+        x, y, z = transform.applyForward(x, y, z)
+        ax.plot(x, z, **kwargs)
 
     def trace(self, r, inCoordSys=batoid.CoordSys(), outCoordSys=None):
         """ Trace a ray through this optical element.
@@ -168,6 +191,8 @@ class Interface(Optic):
             Ray or RayVector, output CoordSys.
 
         """
+        if self.skip:
+            return r, inCoordSys
         transform = batoid.CoordTransform(inCoordSys, self.coordSys)
         r = transform.applyForward(r)
         r = self.surface.intercept(r)
@@ -182,6 +207,8 @@ class Interface(Optic):
             return transform.applyForward(r), outCoordSys
 
     def traceFull(self, r, inCoordSys=batoid.CoordSys(), outCoordSys=None):
+        if self.skip:
+            return []
         result = [{'name':self.name, 'in':r, 'inCoordSys':inCoordSys}]
         r, outCoordSys = self.trace(r, inCoordSys=inCoordSys, outCoordSys=outCoordSys)
         result[0]['out'] = r
@@ -189,6 +216,8 @@ class Interface(Optic):
         return result
 
     def traceInPlace(self, r, inCoordSys=batoid.CoordSys(), outCoordSys=None):
+        if self.skip:
+            return r, inCoordSys
         transform = batoid.CoordTransform(inCoordSys, self.coordSys)
         transform.applyForwardInPlace(r)
         self.surface.interceptInPlace(r)
@@ -202,6 +231,24 @@ class Interface(Optic):
             transform = batoid.CoordTransform(self.coordSys, outCoordSys)
             transform.applyForwardInPlace(r)
             return r, outCoordSys
+
+    def traceReverse(self, r, inCoordSys=batoid.CoordSys(), outCoordSys=None):
+        """Trace through optic(s) in reverse.  Note, you may need to reverse the direction
+        of rays for this to work.
+        """
+        if self.skip:
+            return r, inCoordSys
+        transform = batoid.CoordTransform(inCoordSys, self.coordSys)
+        r = transform.applyForward(r)
+        r = self.surface.intercept(r)
+        if self.obscuration is not None:
+            r = self.obscuration.obscure(r)
+        r = self.interactReverse(r)
+        if outCoordSys is None:
+            return r, self.coordSys
+        else:
+            transform = batoid.CoordTransform(self.coordSys, outCoordSys)
+            return transform.applyForward(r), outCoordSys
 
     def printCoordSys(self):
         print(self.name, self.coordSys)
@@ -230,12 +277,38 @@ class Interface(Optic):
         out +=")"
         return out
 
+    def withGlobalShift(self, shift):
+        ret = self.__class__.__new__(self.__class__)
+        ret.__init__(
+            self.surface, self.obscuration,
+            name=self.name, coordSys=self.coordSys.shiftGlobal(shift),
+            inMedium=self.inMedium, outMedium=self.outMedium,
+            skip=self.skip
+        )
+        return ret
+
+    def withLocalRotation(self, rot, rotOrigin=None, coordSys=None):
+        if rotOrigin is None and coordSys is None:
+            coordSys = self.coordSys
+            rotOrigin = batoid.Vec3()
+        ret = self.__class__.__new__(self.__class__)
+        ret.__init__(
+            self.surface, self.obscuration,
+            name=self.name, coordSys=self.coordSys.rotateLocal(rot, rotOrigin, coordSys),
+            inMedium=self.inMedium, outMedium=self.outMedium,
+            skip=self.skip
+        )
+        return ret
+
 
 class RefractiveInterface(Interface):
     """Specialization for refractive interfaces.
     """
     def interact(self, r):
         return batoid._batoid.refract(r, self.surface, self.inMedium, self.outMedium)
+
+    def interactReverse(self, r):
+        return batoid._batoid.refract(r, self.surface, self.outMedium, self.inMedium)
 
     def interactInPlace(self, r):
         batoid._batoid.refractInPlace(r, self.surface, self.inMedium, self.outMedium)
@@ -247,6 +320,9 @@ class Mirror(Interface):
     def interact(self, r):
         return batoid._batoid.reflect(r, self.surface)
 
+    def interactReverse(self, r):
+        return batoid._batoid.reflect(r, self.surface)
+
     def interactInPlace(self, r):
         batoid._batoid.reflectInPlace(r, self.surface)
 
@@ -255,6 +331,9 @@ class Detector(Interface):
     """Specialization for detector interfaces.
     """
     def interact(self, r):
+        return r
+
+    def interactReverse(self, r):
         return r
 
     def interactInPlace(self, r):
@@ -268,6 +347,9 @@ class Baffle(Interface):
     def interact(self, r):
         return r
 
+    def interactReverse(self, r):
+        return r
+
     def interactInPlace(self, r):
         pass
 
@@ -279,15 +361,40 @@ class CompoundOptic(Optic):
         Optic.__init__(self, **kwargs)
         self.items = tuple(items)
 
+    @property
+    def itemDict(self):
+        """A dictionary providing convenient access to the entire hierarchy of this CompoundOptic's
+        constituent components.  The key for the first leevl is just the name of the CompoundOptic,
+        e.g., `optic.itemDict['SubaruHSC']`.  The next level is accessed by appending a `.`, e.g.,
+        `optic.itemDict['SubaruHSC.HSC']` and so on:
+        `optic.itemDict['SubaruHSC.HSC.ADC']`
+        `optic.itemDict['SubaruHSC.HSC.ADC.ADC1']`
+        `optic.itemDict['SubaruHSC.HSC.ADC.ADC1.ADC1_entrance']`
+        """
+        if not hasattr(self, '_itemDict'):
+            self._itemDict = {}
+            self._itemDict[self.name] = self
+            for item in self.items:
+                self._itemDict[self.name+'.'+item.name] = item
+                if hasattr(item, 'itemDict'):
+                    for k, v in item.itemDict.items():
+                        self._itemDict[self.name+'.'+k] = v
+        return self._itemDict
+
     def trace(self, r, inCoordSys=batoid.CoordSys(), outCoordSys=None):
         """ Recursively trace through this Optic by successively tracing through all subitems.
         """
+        if self.skip:
+            return r, inCoordSys # should maybe make a copy of r here?
         coordSys = inCoordSys
         for item in self.items[:-1]:
-            r, coordSys = item.trace(r, inCoordSys=coordSys)
+            if not item.skip:
+                r, coordSys = item.trace(r, inCoordSys=coordSys)
         return self.items[-1].trace(r, inCoordSys=coordSys, outCoordSys=outCoordSys)
 
     def traceInPlace(self, r, inCoordSys=batoid.CoordSys(), outCoordSys=None):
+        if self.skip:
+            return r, inCoordSys
         coordSys = inCoordSys
         for item in self.items[:-1]:
             r, coordSys = item.traceInPlace(r, inCoordSys=coordSys)
@@ -298,6 +405,8 @@ class CompoundOptic(Optic):
 
         The return value will contain the incoming and outgoing rays for each Interface.
         """
+        if self.skip:
+            return []
         result = []
         r_in = r
         coordSys = inCoordSys
@@ -308,11 +417,26 @@ class CompoundOptic(Optic):
         result.extend(self.items[-1].traceFull(r_in, inCoordSys=coordSys, outCoordSys=outCoordSys))
         return result
 
-    def draw(self, ax):
+    def traceReverse(self, r, inCoordSys=batoid.CoordSys(), outCoordSys=None):
+        """Trace through optic(s) in reverse.  Note, you may need to reverse the direction
+        of rays for this to work.
+        """
+        if self.skip:
+            return r, inCoordSys
+        coordSys = inCoordSys
+        for item in reversed(self.items[1:]):
+            r, coordSys = item.traceReverse(r, inCoordSys=coordSys)
+        return self.items[0].traceReverse(r, inCoordSys=coordSys, outCoordSys=outCoordSys)
+
+    def draw3d(self, ax, **kwargs):
         """ Recursively draw this Optic by successively drawing all subitems.
         """
         for item in self.items:
-            item.draw(ax)
+            item.draw3d(ax, **kwargs)
+
+    def draw2d(self, ax, **kwargs):
+        for item in self.items:
+            item.draw2d(ax, **kwargs)
 
     def printCoordSys(self):
         for item in self.items:
@@ -347,6 +471,97 @@ class CompoundOptic(Optic):
         return hash((self.__class__.__name__, self.items,
                      self.name, self.inMedium, self.outMedium, self.coordSys))
 
+    def withGlobalShift(self, shift):
+        """Shift the origin of this optic by `shift`.
+        """
+        newItems = [item.withGlobalShift(shift) for item in self.items]
+        ret = self.__class__.__new__(self.__class__)
+        ret.__init__(
+            newItems,
+            name=self.name, coordSys=self.coordSys.shiftGlobal(shift),
+            inMedium=self.inMedium, outMedium=self.outMedium,
+            skip=self.skip
+        )
+        return ret
+
+    def withGloballyShiftedOptic(self, name, shift):
+        """Shift the origin of a subitem given by name (see itemDict docstring for the name format)
+        by `shift`.
+        """
+        # If name is one of items.names, the we use withGlobalShift, and we're done.
+        # If not, then we need to recurse down to whichever item contains name.
+        # First verify that name is in self.itemDict
+        if name not in self.itemDict:
+            raise ValueError("Optic {} not found".format(name))
+        if name == self.name:
+            return self.withGlobalShift(shift)
+        # Clip off leading token
+        assert name[:len(self.name)+1] == self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
+        name = name[len(self.name)+1:]
+        newItems = []
+        for i, item in enumerate(self.items):
+            if name.startswith(item.name):
+                if name == item.name:
+                    newItems.append(item.withGlobalShift(shift))
+                else:
+                    newItems.append(item.withGloballyShiftedOptic(name, shift))
+                newItems.extend(self.items[i+1:])
+                return self.__class__(
+                    newItems,
+                    name=self.name, coordSys=self.coordSys,
+                    inMedium=self.inMedium, outMedium=self.outMedium
+                )
+            newItems.append(item)
+        raise RuntimeError("Error in withGloballyShiftedOptic!, Shouldn't get here!")
+
+    def withLocalRotation(self, rot, rotOrigin=None, coordSys=None):
+        """Rotate optic by `rot`.
+        """
+        if rotOrigin is None and coordSys is None:
+            coordSys = self.coordSys
+            rotOrigin = batoid.Vec3()
+        newItems = [item.withLocalRotation(rot, rotOrigin, coordSys) for item in self.items]
+        ret = self.__class__.__new__(self.__class__)
+        ret.__init__(
+            newItems,
+            name=self.name, coordSys=self.coordSys.rotateLocal(rot, rotOrigin, coordSys),
+            inMedium=self.inMedium, outMedium=self.outMedium,
+            skip=self.skip
+        )
+        return ret
+
+    def withLocallyRotatedOptic(self, name, rot, rotOrigin=None, coordSys=None):
+        """Rotate the subitem by `rot`.
+        """
+        # If name is one of items.names, the we use withLocalRotation, and we're done.
+        # If not, then we need to recurse down to whichever item contains name.
+        # First verify that name is in self.itemDict
+        if name not in self.itemDict:
+            raise ValueError("Optic {} not found".format(name))
+        if name == self.name:
+            return self.withLocalRotation(rot, rotOrigin, coordSys)
+        if rotOrigin is None and coordSys is None:
+            coordSys = self.itemDict[name].coordSys
+            rotOrigin = batoid.Vec3()
+        # Clip off leading token
+        assert name[:len(self.name)+1] == self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
+        name = name[len(self.name)+1:]
+        newItems = []
+        for i, item in enumerate(self.items):
+            if name.startswith(item.name):
+                if name == item.name:
+                    newItems.append(item.withLocalRotation(rot, rotOrigin, coordSys))
+                else:
+                    newItems.append(item.withLocallyRotatedOptic(name, rot, rotOrigin, coordSys))
+                newItems.extend(self.items[i+1:])
+                return self.__class__(
+                    newItems,
+                    name=self.name, coordSys=self.coordSys,
+                    inMedium=self.inMedium, outMedium=self.outMedium
+                )
+            newItems.append(item)
+        raise RuntimeError("Error in withLocallyRotatedOptic!, Shouldn't get here!")
+
 
 class Lens(CompoundOptic):
     def __init__(self, items, medium, **kwargs):
@@ -368,6 +583,146 @@ class Lens(CompoundOptic):
 
     def __hash__(self):
         return hash((self.medium, CompoundOptic.__hash__(self)))
+
+    def withGlobalShift(self, shift):
+        newItems = [item.withGlobalShift(shift) for item in self.items]
+        ret = self.__class__.__new__(self.__class__)
+        ret.__init__(
+            newItems, self.medium,
+            name=self.name, coordSys=self.coordSys.shiftGlobal(shift),
+            inMedium=self.inMedium, outMedium=self.outMedium,
+            skip=self.skip
+        )
+        return ret
+
+    def withGloballyShiftedOptic(self, name, shift):
+        """Shift the origin of a subitem given by name (see itemDict docstring for the name format)
+        by `shift`.
+        """
+        # If name is one of items.names, the we use withGlobalShift, and we're done.
+        # If not, then we need to recurse down to whicever item contains name.
+        # First verify that name is in self.itemDict
+        if name not in self.itemDict:
+            raise ValueError("Optic {} not found".format(name))
+        if name == self.name:
+            return self.withGlobalShift(shift)
+        # Clip off leading token
+        assert name[:len(self.name)+1] == self.name+":"
+        name = name[len(self.name)+1:]
+        newItems = []
+        for i, item in enumerate(self.items):
+            if name.startswith(item.name):
+                if name == item.name:
+                    newItems.append(item.withGlobalShift(shift))
+                else:
+                    newItems.append(item.withGloballyShiftedOptic(name, shift))
+                newItems.extend(self.items[i+1:])
+                return self.__class__(
+                    newItems, medium=self.medium,
+                    name=self.name, coordSys=self.coordSys,
+                    inMedium=self.inMedium, outMedium=self.outMedium
+                )
+            newItems.append(item)
+        raise RuntimeError("Error in withGloballyShiftedOptic!, Shouldn't get here!")
+
+    def withLocalRotation(self, rot, rotOrigin=None, coordSys=None):
+        """Rotate optic by `rot`.
+        """
+        if rotOrigin is None and coordSys is None:
+            coordSys = self.coordSys
+            rotOrigin = batoid.Vec3()
+        newItems = [item.withLocalRotation(rot, rotOrigin, coordSys) for item in self.items]
+        ret = self.__class__.__new__(self.__class__)
+        ret.__init__(
+            newItems, medium=self.medium,
+            name=self.name, coordSys=self.coordSys.rotateLocal(rot, rotOrigin, coordSys),
+            inMedium=self.inMedium, outMedium=self.outMedium,
+            skip=self.skip
+        )
+        return ret
+
+    def withLocallyRotatedOptic(self, name, rot, rotOrigin=None, coordSys=None):
+        """Rotate the subitem by `rot`.
+        """
+        # If name is one of items.names, the we use withLocalRotation, and we're done.
+        # If not, then we need to recurse down to whichever item contains name.
+        # First verify that name is in self.itemDict
+        if name not in self.itemDict:
+            raise ValueError("Optic {} not found".format(name))
+        if name == self.name:
+            return self.withLocalRotation(rot, rotOrigin, coordSys)
+        if rotOrigin is None and coordSys is None:
+            coordSys = self.itemDict[name].coordSys
+            rotOrigin = batoid.Vec3()
+        # Clip off leading token
+        assert name[:len(self.name)+1] == self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
+        name = name[len(self.name)+1:]
+        newItems = []
+        for i, item in enumerate(self.items):
+            if name.startswith(item.name):
+                if name == item.name:
+                    newItems.append(item.withLocalRotation(rot, rotOrigin, coordSys))
+                else:
+                    newItems.append(item.withLocallyRotatedOptic(name, rot, rotOrigin, coordSys))
+                newItems.extend(self.items[i+1:])
+                return self.__class__(
+                    newItems, medium=self.medium,
+                    name=self.name, coordSys=self.coordSys,
+                    inMedium=self.inMedium, outMedium=self.outMedium
+                )
+            newItems.append(item)
+        raise RuntimeError("Error in withLocallyRotatedOptic!, Shouldn't get here!")
+
+
+def drawTrace3d(ax, traceFull, start=None, end=None, **kwargs):
+    if start is None:
+        start = traceFull[0]['name']
+    if end is None:
+        end = traceFull[-1]['name']
+    doPlot = False
+    for surface in traceFull:
+        if surface['name'] == start:
+            doPlot = True
+        if doPlot:
+            inTransform = batoid.CoordTransform(surface['inCoordSys'], batoid.CoordSys())
+            outTransform = batoid.CoordTransform(surface['outCoordSys'], batoid.CoordSys())
+            for inray, outray in zip(surface['in'], surface['out']):
+                if not outray.isVignetted:
+                    inray = inTransform.applyForward(inray)
+                    outray = outTransform.applyForward(outray)
+                    ax.plot(
+                        [inray.x0, outray.x0],
+                        [inray.y0, outray.y0],
+                        [inray.z0, outray.z0],
+                        **kwargs
+                    )
+        if surface['name'] == end:
+            break
+
+
+def drawTrace2d(ax, traceFull, start=None, end=None, **kwargs):
+    if start is None:
+        start = traceFull[0]['name']
+    if end is None:
+        end = traceFull[-1]['name']
+    doPlot = False
+    for surface in traceFull:
+        if surface['name'] == start:
+            doPlot = True
+        if doPlot:
+            inTransform = batoid.CoordTransform(surface['inCoordSys'], batoid.CoordSys())
+            outTransform = batoid.CoordTransform(surface['outCoordSys'], batoid.CoordSys())
+            for inray, outray in zip(surface['in'], surface['out']):
+                if not outray.isVignetted:
+                    inray = inTransform.applyForward(inray)
+                    outray = outTransform.applyForward(outray)
+                    ax.plot(
+                        [inray.x0, outray.x0],
+                        [inray.z0, outray.z0],
+                        **kwargs
+                    )
+        if surface['name'] == end:
+            break
 
 
 # Should pythonize RayVector so can identify when all the wavelengths are the same

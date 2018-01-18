@@ -53,7 +53,7 @@ def test_huygens_psf():
         arr = im.array/np.max(im.array)
         gs_mom = galsim.hsm.FindAdaptiveMom(im)
 
-        rays = batoid.circularGrid(10.0, 0.5*diam, 0.5*diam*obscuration, 0.0, 0.0, 50, 200, 500e-9, 1.0)
+        rays = batoid.circularGrid(10.0, 0.5*diam, 0.5*diam*obscuration, 0.0, 0.0, -1.0, 50, 200, 500e-9, 1.0)
         traced_rays = batoid.RayVector(rays)
         telescope.traceInPlace(traced_rays)
         batoid._batoid.trimVignettedInPlace(traced_rays)
@@ -144,7 +144,7 @@ def test_lsst_psf():
     for theta in thetas:
         print(theta/3600.0)
         rays = batoid.circularGrid(10.0, 4.2, 2.55,
-                                   np.sin(theta/206265), 0.0,
+                                   np.sin(theta/206265), 0.0, -1.0,
                                    10, 100, 620e-9, batoid.Air())
         traced_rays = batoid.RayVector(rays)
         telescope.traceInPlace(traced_rays)
@@ -189,7 +189,7 @@ def test_hsc_psf():
     for theta in thetas:
         print(theta/3600.0)
         rays = batoid.circularGrid(10.0, 4.2, 2.55,
-                                   np.sin(theta/206265), 0.0,
+                                   np.sin(theta/206265), 0.0, -1.0,
                                    10, 100, 620e-9, 1.0)
         traced_rays = batoid.RayVector(rays)
         telescope.traceInPlace(traced_rays)
@@ -242,7 +242,7 @@ def test_decam_psf():
     for theta in thetas:
         print(theta/3600.0)
         rays = batoid.circularGrid(10.0, 1.95, 0.5,
-                                   np.sin(theta/206265), 0.0,
+                                   np.sin(theta/206265), 0.0, -1.0,
                                    30, 200, 760e-9, batoid.Air())
         traced_rays = batoid.RayVector(rays)
         telescope.traceInPlace(traced_rays)

@@ -6,68 +6,65 @@
 namespace batoid {
 
     CoordSys::CoordSys() :
-        origin(Vec3()), rotation(Rot3()) {}
+        m_origin(Vec3()), m_rot(Rot3()) {}
 
-    CoordSys::CoordSys(const Vec3 _origin, const Rot3 _rotation) :
-        origin(_origin), rotation(_rotation) {}
+    CoordSys::CoordSys(const Vec3 origin, const Rot3 rot) :
+        m_origin(origin), m_rot(rot) {}
 
-    CoordSys::CoordSys(const Vec3 _origin) :
-        origin(_origin), rotation(Rot3()) {}
+    CoordSys::CoordSys(const Vec3 origin) :
+        m_origin(origin), m_rot(Rot3()) {}
 
-    CoordSys::CoordSys(const Rot3 _rotation) :
-        origin(Vec3()), rotation(_rotation) {}
+    CoordSys::CoordSys(const Rot3 rot) :
+        m_origin(Vec3()), m_rot(rot) {}
 
     CoordSys CoordSys::shiftGlobal(const Vec3& dr) const {
-        return CoordSys(origin+dr, rotation);
+        return CoordSys(m_origin+dr, m_rot);
     }
 
     CoordSys CoordSys::shiftLocal(const Vec3& dr) const {
         // Note RotVec instead of UnRotVec, b/c we are doing a passive rotation
         // instead of an active one.
-        return shiftGlobal(RotVec(rotation, dr));
+        return shiftGlobal(RotVec(m_rot, dr));
     }
 
-    CoordSys CoordSys::rotateGlobal(const Rot3& _rotation) const {
-        return CoordSys(RotVec(_rotation, origin), _rotation*rotation);
+    CoordSys CoordSys::rotateGlobal(const Rot3& rot) const {
+        return CoordSys(RotVec(rot, m_origin), rot*m_rot);
     }
 
-    CoordSys CoordSys::rotateGlobal(const Rot3& _rotation, const Vec3& rotCenter, const CoordSys& coordSys) const {
+    CoordSys CoordSys::rotateGlobal(const Rot3& rot, const Vec3& rotCenter, const CoordSys& coordSys) const {
         CoordTransform toGlobal(coordSys, CoordSys());
         Vec3 globalRotCenter = toGlobal.applyForward(rotCenter);
         return CoordSys(
-            RotVec(_rotation, origin-globalRotCenter)+globalRotCenter,
-            _rotation*rotation
+            RotVec(rot, m_origin-globalRotCenter)+globalRotCenter,
+            rot*m_rot
         );
     }
 
-    CoordSys CoordSys::rotateLocal(const Rot3& _rotation) const {
-        return CoordSys(
-            origin,
-            rotation.inverse()*_rotation*rotation
-        );
+    CoordSys CoordSys::rotateLocal(const Rot3& rot) const {
+        // first rotate rot into global coords, then apply that
+        // m_rot rot m_rot^-1 m_rot = m_rot rot
+        return CoordSys(m_origin, m_rot*rot);
     }
 
-    CoordSys CoordSys::rotateLocal(const Rot3& _rotation, const Vec3& rotCenter, const CoordSys& coordSys) const {
+    CoordSys CoordSys::rotateLocal(const Rot3& rot, const Vec3& rotCenter, const CoordSys& coordSys) const {
         CoordTransform toGlobal(coordSys, CoordSys());
         Vec3 globalRotCenter = toGlobal.applyForward(rotCenter);
-        std::cout << "globalRotCenter = " << globalRotCenter << '\n';
-        std::cout << "origin = " << origin << '\n';
         return CoordSys(
-            RotVec(_rotation, origin-globalRotCenter),
-            rotation.inverse()*_rotation*rotation
+            RotVec(m_rot*rot*m_rot.inverse(), m_origin-globalRotCenter)+globalRotCenter,
+            m_rot*rot
         );
     }
 
     Vec3 CoordSys::getXHat() const {
-        return Vec3(rotation.data[0], rotation.data[3], rotation.data[6]);
+        return Vec3(m_rot.data[0], m_rot.data[3], m_rot.data[6]);
     }
 
     Vec3 CoordSys::getYHat() const {
-        return Vec3(rotation.data[1], rotation.data[4], rotation.data[7]);
+        return Vec3(m_rot.data[1], m_rot.data[4], m_rot.data[7]);
     }
 
     Vec3 CoordSys::getZHat() const {
-        return Vec3(rotation.data[2], rotation.data[5], rotation.data[8]);
+        return Vec3(m_rot.data[2], m_rot.data[5], m_rot.data[8]);
     }
 
     std::ostream& operator<<(std::ostream& os, const CoordSys& cs) {
@@ -75,7 +72,7 @@ namespace batoid {
     }
 
     bool operator==(const CoordSys& cs1, const CoordSys& cs2) {
-        return cs1.origin == cs2.origin && cs1.rotation == cs2.rotation;
+        return cs1.m_origin == cs2.m_origin && cs1.m_rot == cs2.m_rot;
     }
 
     bool operator!=(const CoordSys& cs1, const CoordSys& cs2) {
@@ -83,12 +80,13 @@ namespace batoid {
     }
 
 
-    // x is global
+    // x is global coordinate
     // y is destination, with corresponding R and dr
     // z is source, with corresponding S and ds
     //
     // y = Rinv(x-dr)
     // z = Sinv(x-ds)
+    // implies
     // x = S z + ds
     //
     // y = Rinv(S z + ds - dr)
@@ -99,8 +97,8 @@ namespace batoid {
     //   = (Sinv R)^-1 (z - Sinv (dr - ds))
 
     CoordTransform::CoordTransform(const CoordSys& source, const CoordSys& destination) :
-        _dr(UnRotVec(source.rotation, destination.origin - source.origin)),
-        _rot(source.rotation.inverse()*destination.rotation),
+        _dr(UnRotVec(source.m_rot, destination.m_origin - source.m_origin)),
+        _rot(source.m_rot.inverse()*destination.m_rot),
         _source(source), _destination(destination) {}
 
     CoordTransform::CoordTransform(const Vec3& dr, const Rot3& rot) :

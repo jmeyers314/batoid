@@ -5,6 +5,16 @@ def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
     return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
 
 
+def vec3_isclose(v1, v2, abs_tol=1e-14):
+    return (isclose(v1.x, v2.x, rel_tol=0, abs_tol=abs_tol)
+            and isclose(v1.y, v2.y, rel_tol=0, abs_tol=abs_tol)
+            and isclose(v1.z, v2.z, rel_tol=0, abs_tol=abs_tol))
+
+
+def rot3_isclose(r1, r2, abs_tol=1e-14):
+    return np.allclose(r1.euler, r2.euler, atol=abs_tol)
+
+
 def ray_isclose(r1, r2, abs_tol=1e-14):
     return (isclose(r1.x0, r2.x0, rel_tol=0, abs_tol=abs_tol)
             and isclose(r1.y0, r2.y0, rel_tol=0, abs_tol=abs_tol)

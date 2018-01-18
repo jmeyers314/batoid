@@ -92,6 +92,7 @@ namespace batoid {
             .def(py::self != py::self)
             .def("__repr__", &Rot3::repr)
             .def("determinant", &Rot3::determinant)
+            .def("inverse", &Rot3::inverse)
             .def_property_readonly("euler", &Rot3::getEuler)
             .def(py::pickle(
                 [](const Rot3& r) { // __getstate__

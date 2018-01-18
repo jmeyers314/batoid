@@ -16,8 +16,8 @@ namespace batoid {
             .def(py::init<Vec3>())
             .def(py::init<Rot3>())
             .def(py::init<Vec3,Rot3>())
-            .def_readonly("origin", &CoordSys::origin, "Global origin")
-            .def_readonly("rotation", &CoordSys::rotation, "Unit vector rotation matrix")
+            .def_readonly("origin", &CoordSys::m_origin, "Global origin")
+            .def_readonly("rot", &CoordSys::m_rot, "Unit vector rotation matrix")
             .def_property_readonly("xhat", &CoordSys::getXHat)
             .def_property_readonly("yhat", &CoordSys::getYHat)
             .def_property_readonly("zhat", &CoordSys::getZHat)
@@ -31,7 +31,7 @@ namespace batoid {
             .def(py::self == py::self)
             .def(py::self != py::self)
             .def(py::pickle(
-                [](const CoordSys& cs) { return py::make_tuple(cs.origin, cs.rotation); },
+                [](const CoordSys& cs) { return py::make_tuple(cs.m_origin, cs.m_rot); },
                 [](py::tuple t) {
                     return CoordSys(
                         t[0].cast<Vec3>(), t[1].cast<Rot3>()
@@ -39,7 +39,7 @@ namespace batoid {
                 }
             ))
             .def("__hash__", [](const CoordSys& cs) {
-                return py::hash(py::make_tuple("CoordSys", cs.origin, cs.rotation));
+                return py::hash(py::make_tuple("CoordSys", cs.m_origin, cs.m_rot));
             });
     }
 

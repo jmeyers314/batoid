@@ -13,7 +13,8 @@ from ._batoid import ObscUnion, ObscIntersection, ObscNegation
 from ._batoid import CoordSys, CoordTransform
 
 from ._batoid import rayGrid, circularGrid
-from ._batoid import trimVignetted
+from ._batoid import trimVignetted, trimVignettedInPlace
+from ._batoid import propagatedToTimesMany
 
 from .psf import huygensPSF
 
@@ -25,6 +26,7 @@ from .coordsys import RotX, RotY, RotZ
 
 from .optic import Optic, CompoundOptic, Lens
 from .optic import Interface, RefractiveInterface, Mirror, Detector, Baffle
+from .optic import drawTrace2d, drawTrace3d
 
 from . import parse
 

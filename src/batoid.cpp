@@ -126,14 +126,14 @@ namespace batoid{
     }
 
     std::vector<Ray> rayGrid(double dist, double length,
-                             double xcos, double ycos,
+                             double xcos, double ycos, double zcos,
                              int nside, double wavelength,
                              double n) {
         std::vector<Ray> result;
         result.reserve(nside*nside);
 
         // The "velocities" of all the rays in the grid are the same.
-        auto v = Vec3(xcos, ycos, -sqrt(1-xcos*xcos-ycos*ycos))/n;
+        auto v = Vec3(xcos, ycos, zcos).UnitVec3()/n;
 
         double dx = length/(nside-1);
         double x0 = -length/2;
@@ -158,15 +158,15 @@ namespace batoid{
     }
 
     std::vector<Ray> rayGrid(double dist, double length,
-                             double xcos, double ycos,
+                             double xcos, double ycos, double zcos,
                              int nside, double wavelength,
                              const Medium& m) {
         double n = m.getN(wavelength);
-        return rayGrid(dist, length, xcos, ycos, nside, wavelength, n);
+        return rayGrid(dist, length, xcos, ycos, zcos, nside, wavelength, n);
     }
 
     std::vector<Ray> circularGrid(double dist, double outer, double inner,
-                                  double xcos, double ycos,
+                                  double xcos, double ycos, double zcos,
                                   int nradii, int naz, double wavelength, double n) {
 
         // Determine number of rays at each radius
@@ -182,7 +182,7 @@ namespace batoid{
         result.reserve(nray);
 
         // The "velocities" of all the rays in the grid are the same.
-        auto v = Vec3(xcos, ycos, -sqrt(1-xcos*xcos-ycos*ycos))/n;
+        auto v = Vec3(xcos, ycos, zcos).UnitVec3()/n;
 
         rfrac = 1.0;
         for (int i=0; i<nradii; i++) {
@@ -201,19 +201,21 @@ namespace batoid{
     }
 
     std::vector<Ray> circularGrid(double dist, double outer, double inner,
-                                  double xcos, double ycos,
+                                  double xcos, double ycos, double zcos,
                                   int nradii, int naz, double wavelength, const Medium& m) {
         double n = m.getN(wavelength);
-        return circularGrid(dist, outer, inner, xcos, ycos, nradii, naz, wavelength, n);
+        return circularGrid(dist, outer, inner, xcos, ycos, zcos, nradii, naz, wavelength, n);
     }
 
     std::vector<Ray> trimVignetted(const std::vector<Ray>& rays) {
         std::vector<Ray> result;
         result.reserve(rays.size());
-        for (const auto& r : rays) {
-            if (!r.isVignetted)
-                result.push_back(r);
-        }
+        std::copy_if(
+            rays.begin(),
+            rays.end(),
+            std::back_inserter(result),
+            [](const Ray& r){return !r.isVignetted;}
+        );
         return result;
     }
 

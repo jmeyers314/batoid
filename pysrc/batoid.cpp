@@ -64,14 +64,18 @@ namespace batoid {
          .def("refractInPlace", (void (*)(Ray&, const Surface&, const Medium&, const Medium&)) &refractInPlace)
          .def("refractInPlace", (void (*)(std::vector<Ray>&, const Surface&, const Medium&, const Medium&)) &refractInPlace)
 
-         .def("rayGrid", (std::vector<Ray> (*)(double, double, double, double, int, double, double)) &rayGrid)
-         .def("rayGrid", (std::vector<Ray> (*)(double, double, double, double, int, double, const Medium&)) &rayGrid)
-         .def("circularGrid", (std::vector<Ray> (*)(double, double, double, double, double, int, int, double, double)) &circularGrid,
+         .def("rayGrid", (std::vector<Ray> (*)(double, double, double, double, double, int, double, double)) &rayGrid,
+              "Generate a square grid of rays",
+              "zdist"_a, "length"_a, "xcos"_a, "ycos"_a, "zcos"_a, "nside"_a, "wavelength"_a, "n"_a)
+         .def("rayGrid", (std::vector<Ray> (*)(double, double, double, double, double, int, double, const Medium&)) &rayGrid,
+              "Generate a square grid of rays",
+              "zdist"_a, "length"_a, "xcos"_a, "ycos"_a, "zcos"_a, "nside"_a, "wavelength"_a, "n"_a)
+         .def("circularGrid", (std::vector<Ray> (*)(double, double, double, double, double, double, int, int, double, double)) &circularGrid,
               "Generate circularly symmetric grid of rays",
-              "zdist"_a, "outer"_a, "inner"_a, "xcos"_a, "ycos"_a, "nradii"_a, "naz"_a, "wavelength"_a, "n"_a)
-         .def("circularGrid", (std::vector<Ray> (*)(double, double, double, double, double, int, int, double, const Medium&)) &circularGrid,
+              "zdist"_a, "outer"_a, "inner"_a, "xcos"_a, "ycos"_a, "zcos"_a, "nradii"_a, "naz"_a, "wavelength"_a, "n"_a)
+         .def("circularGrid", (std::vector<Ray> (*)(double, double, double, double, double, double, int, int, double, const Medium&)) &circularGrid,
               "Generate circularly symmetric grid of rays",
-              "zdist"_a, "outer"_a, "inner"_a, "xcos"_a, "ycos"_a, "nradii"_a, "naz"_a, "wavelength"_a, "n"_a)
+              "zdist"_a, "outer"_a, "inner"_a, "xcos"_a, "ycos"_a, "zcos"_a, "nradii"_a, "naz"_a, "wavelength"_a, "n"_a)
          .def("trimVignetted", &trimVignetted)
          .def("trimVignettedInPlace", &trimVignettedInPlace);
 

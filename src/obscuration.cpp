@@ -160,12 +160,12 @@ namespace batoid {
     }
 
 
-
     ObscRay::ObscRay(double w, double th, double x0, double y0) :
         _width(w), _theta(th), _x0(x0), _y0(y0),
-        _rect(ObscRectangle(x0 + 100*std::cos(th)/2,
-                            y0 + 100*std::sin(th)/2,
-                            100, w, th)) {}
+        _rect(ObscRectangle(10, w,
+                            x0 + 10*std::cos(th)/2,
+                            y0 + 10*std::sin(th)/2,
+                            th)) { }
 
     bool ObscRay::contains(double x, double y) const {
         return _rect.contains(x, y);
