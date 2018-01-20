@@ -129,6 +129,13 @@ namespace batoid{
                              double xcos, double ycos, double zcos,
                              int nside, double wavelength,
                              double n) {
+    // `dist` is the distance from the center of the pupil to the center of the rayGrid.
+    // `length` is the length of one side of the rayGrid square.
+    // `xcos`, `ycos`, `zcos` are the direction cosines of the ray velocities
+    // `nside` is the number of rays on a side of the rayGrid.
+    // `wavelength` is the wavelength assigned to the rays
+    // `n` is the refractive index at the position of the rays.  (Needed to properly normalize the
+    //     ray magnitudes).
         std::vector<Ray> result;
         result.reserve(nside*nside);
 
@@ -141,15 +148,23 @@ namespace batoid{
         for(int ix=0; ix<nside; ix++) {
             double y = x0;
             for(int iy=0; iy<nside; iy++) {
-                Vec3 r(x,y,0);  // The position of the ray when it intersects the pupil
-                // We want adjust the t0 of the Rays such that for a given time t, they all
-                // lie on a plane perpendicular to v.  Can do this by solving
-                // DotProduct(r + v*t + n*v*dist, v) == 0 for t
-                // implies
-                // t = -r.v / v.v - n*d
-                //   = -r.v * n^2 - n*d
-                double t = -DotProduct(r,v)*n*n - n*dist;
-                result.push_back(Ray(r,v,-t,wavelength,false).propagatedToTime(0));
+                // Start with the position of the ray when it intersects the pupil
+                Vec3 r(x,y,0);
+                // We know that the position of the ray that goes through the origin
+                // (which is also the center of the pupil), is given by
+                //   a = -dist * vhat = -dist * v * n
+                // We want to find the position r0 that satisfies
+                // 1) r0 - a is perpendicular to v
+                // 2) r = r0 + v t
+                // The first equation can be rewritten as
+                // (r0 - a) . v = 0
+                // some algebra reveals
+                // (r + v n d) . v - t v . v = 0
+                // => t = (r + v n d) . v / v . v
+                //      = (r + v n d) . v n^2
+                // => r0 = r - v t
+                double t = DotProduct(r + v*n*dist, v) * n * n;
+                result.push_back(Ray(r-v*t, v, 0, wavelength, false));
                 y += dx;
             }
             x += dx;
@@ -191,8 +206,8 @@ namespace batoid{
             double radius = rfrac*outer;
             for (int j=0; j<nphis[i]; j++) {
                 Vec3 r(radius*std::cos(az), radius*std::sin(az), 0);
-                double t = -DotProduct(r,v)*n*n - n*dist;
-                result.push_back(Ray(r,v,-t,wavelength,false).propagatedToTime(0));
+                double t = DotProduct(r + v*n*dist, v) * n * n;
+                result.push_back(Ray(r-v*t, v, 0, wavelength, false));
                 az += daz;
             }
             rfrac -= drfrac;
