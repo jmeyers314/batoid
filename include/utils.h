@@ -9,6 +9,10 @@
 
 namespace batoid {
 
+    /// solve a x^2 + b x + c == 0 for x robustly.
+    /// return value is number of solutions.
+    /// if only 1 solution is found, result is placed in r1
+    /// if 2 solutions are found, results are placed in r1 and r2 with r1 <= r2.
     int solveQuadratic(double a, double b, double c, double& r1, double& r2);
 
     // InputIt models a RandomAccessIterator
@@ -58,6 +62,7 @@ namespace batoid {
         }
     }
 
+    // Now parallelize for_each in addition to transform
     template<typename It, typename UnaryOperation>
     void chunked_parallel_for_each(
         It first, It last, UnaryOperation unary_op,

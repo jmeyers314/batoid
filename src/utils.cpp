@@ -22,24 +22,29 @@ namespace batoid {
             // No constant term.
             r1 = 0;
             r2 = -b / a;
-            if (r2 < 0) {
+            if (r2 < r1) {
                 std::swap(r1, r2);
             }
             return 2;
         } else {
-            const double discriminant = b*b - 4.0*a*c;
+            const double discriminant = b*b - 4*a*c;
             if (IsZero(discriminant)) {
-                r1 = r2 = -b / (2.0 * a);
+                // Degenerate case.  Should I return 1 or 2?
+                r1 = r2 = -b / (2*a);
                 return 1;
-            } else if (discriminant < 0.0) {
+            } else if (discriminant < 0) {
+                // Results would be complex.  This version only works for real results.
                 return 0;
             } else {
+                // Avoid subtracting similar valued numbers (abs(b) and sqrt(discriminant)).
                 if (b > 0) {
                     r1 = (-b - std::sqrt(discriminant)) / (2*a);
-                    r2 = c / (a*r1);
                 } else {
                     r1 = 2*c / (-b + std::sqrt(discriminant));
-                    r2 = c / (a*r1);
+                }
+                r2 = c / (a*r1);
+                if (r2 < r1) {
+                    std::swap(r1, r2);
                 }
                 return 2;
             }

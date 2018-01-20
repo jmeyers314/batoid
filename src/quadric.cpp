@@ -51,12 +51,8 @@ namespace batoid {
                     return false;
                 else
                     t = r2;
-            } else {
-                if (r2 < 0)
-                    t = r1;
-                else
-                    t = std::min(r1, r2);
-            }
+            } else
+                t = std::min(r1, r2);
         }
         t += r.t0;
 
