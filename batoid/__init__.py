@@ -16,7 +16,7 @@ from ._batoid import rayGrid, circularGrid
 from ._batoid import trimVignetted, trimVignettedInPlace
 from ._batoid import propagatedToTimesMany
 
-from .psf import huygensPSF, wavefront
+from .psf import huygensPSF, wavefront, fftPSF
 
 # from .telescope import Telescope
 

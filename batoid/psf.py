@@ -60,3 +60,16 @@ def wavefront(optic, wavelength, theta_x=0, theta_y=0, nx=32, rays=None, saveRay
     ts /= wavelength
     wf = np.ma.masked_array(ts, mask=isV)
     return wf
+
+
+def fftPSF(optic, wavelength, theta_x, theta_y, nx=32, pad_factor=2):
+    L = optic.pupil_size*pad_factor
+    im_dtheta = wavelength / L
+    wf = wavefront(optic, wavelength, theta_x, theta_y, nx).reshape(nx, nx)
+    pad_size = nx*pad_factor
+    expwf = np.zeros((pad_size, pad_size), dtype=np.complex128)
+    start = pad_size//2-nx//2
+    stop = pad_size//2+nx//2
+    expwf[start:stop, start:stop][~wf.mask] = np.exp(2j*np.pi*wf[~wf.mask])
+    psf = np.abs(np.fft.fftshift(np.fft.fft2(np.fft.fftshift(expwf))))**2
+    return im_dtheta, psf
