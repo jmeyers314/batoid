@@ -22,3 +22,41 @@ def huygensPSF(optic, xs=None, ys=None, zs=None, rays=None, saveRays=False):
             )
         )
     return np.abs(amplitudes)**2
+
+
+def wavefront(optic, wavelength, theta_x=0, theta_y=0, nx=32, rays=None, saveRays=False,
+              sphereRadius=None):
+    if rays is None:
+        xcos = np.sin(theta_x*np.pi/180)
+        ycos = np.sin(theta_y*np.pi/180)
+        zcos = -np.sqrt(1.0 - xcos**2 - ycos**2)
+
+        rays = batoid.rayGrid(
+                optic.dist, optic.pupil_size, xcos, ycos, zcos, nx, wavelength, optic.inMedium)
+    if saveRays:
+        rays = batoid.RayVector(rays)
+    if sphereRadius is None:
+        sphereRadius = optic.sphereRadius
+
+    outCoordSys = batoid.CoordSys()
+    optic.traceInPlace(rays, outCoordSys=outCoordSys)
+    goodRays = batoid._batoid.trimVignetted(rays)
+    point = batoid.Vec3(np.mean(goodRays.x), np.mean(goodRays.y), np.mean(goodRays.z))
+
+    # We want to place the vertex of the reference sphere one radius length away from the intersection point
+    # So transform our rays into that coordinate system.
+    transform = batoid.CoordTransform(
+            outCoordSys, batoid.CoordSys(point+batoid.Vec3(0,0,sphereRadius)))
+    transform.applyForwardInPlace(rays)
+
+    sphere = batoid.Sphere(-sphereRadius)
+    sphere.interceptInPlace(rays)
+    goodRays = batoid._batoid.trimVignetted(rays)
+    t0 = np.mean(goodRays.t0)
+
+    ts = rays.t0[:]
+    isV = rays.isVignetted[:]
+    ts -= t0
+    ts /= wavelength
+    wf = np.ma.masked_array(ts, mask=isV)
+    return wf
