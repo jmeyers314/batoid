@@ -1,6 +1,7 @@
 import numpy as np
 import batoid
 
+
 def huygensPSF(optic, xs=None, ys=None, zs=None, rays=None, saveRays=False):
     if zs is None:
         zs = np.zeros_like(xs)
@@ -43,8 +44,8 @@ def wavefront(optic, wavelength, theta_x=0, theta_y=0, nx=32, rays=None, saveRay
     goodRays = batoid._batoid.trimVignetted(rays)
     point = batoid.Vec3(np.mean(goodRays.x), np.mean(goodRays.y), np.mean(goodRays.z))
 
-    # We want to place the vertex of the reference sphere one radius length away from the intersection point
-    # So transform our rays into that coordinate system.
+    # We want to place the vertex of the reference sphere one radius length away from the
+    # intersection point.  So transform our rays into that coordinate system.
     transform = batoid.CoordTransform(
             outCoordSys, batoid.CoordSys(point+batoid.Vec3(0,0,sphereRadius)))
     transform.applyForwardInPlace(rays)
@@ -52,6 +53,8 @@ def wavefront(optic, wavelength, theta_x=0, theta_y=0, nx=32, rays=None, saveRay
     sphere = batoid.Sphere(-sphereRadius)
     sphere.interceptInPlace(rays)
     goodRays = batoid._batoid.trimVignetted(rays)
+    # Should potentially try to make the reference time w.r.t. the chief ray instead of the mean
+    # of the good (unvignetted) rays.
     t0 = np.mean(goodRays.t0)
 
     ts = rays.t0[:]
@@ -73,3 +76,29 @@ def fftPSF(optic, wavelength, theta_x, theta_y, nx=32, pad_factor=2):
     expwf[start:stop, start:stop][~wf.mask] = np.exp(2j*np.pi*wf[~wf.mask])
     psf = np.abs(np.fft.fftshift(np.fft.fft2(np.fft.fftshift(expwf))))**2
     return im_dtheta, psf
+
+
+def zernike(optic, wavelength, theta_x, theta_y, jmax=22, nx=32, eps=0.0):
+    import galsim.zernike as zern
+
+    xcos = np.sin(theta_x*np.pi/180)
+    ycos = np.sin(theta_y*np.pi/180)
+    zcos = -np.sqrt(1.0 - xcos**2 - ycos**2)
+
+    rays = batoid.rayGrid(
+            optic.dist, optic.pupil_size, xcos, ycos, zcos, nx, wavelength, optic.inMedium)
+
+    orig_x = rays.x[:]
+    orig_y = rays.y[:]
+
+    wf = wavefront(optic, wavelength, rays=rays)
+
+    w = ~wf.mask
+
+    basis = zern.zernikeBasis(
+            jmax, orig_x[w], orig_y[w],
+            R_outer=optic.pupil_size/2, R_inner=optic.pupil_size/2*eps
+    )
+    coefs, _, _, _ = np.linalg.lstsq(basis.T, wf[w])
+
+    return coefs

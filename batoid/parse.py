@@ -1,5 +1,6 @@
 import batoid
 
+
 def parse_obscuration(config):
     typ = config.pop('type')
     if typ in ['ObscCircle', 'ObscAnnulus', 'ObscRay', 'ObscRectangle']:
@@ -42,6 +43,7 @@ def parse_coordSys(config, coordSys=batoid.CoordSys()):
     if shift != [0.0, 0.0, 0.0]:
         coordSys = coordSys.shiftLocal(batoid.Vec3(shift))
     return coordSys
+
 
 def parse_optic(config,
                 coordSys=batoid.CoordSys(),
@@ -107,7 +109,9 @@ def parse_optic(config,
             parse_optic(iC, coordSys=coordSys, inMedium=inMedium, outMedium=outMedium)
             for iC in itemsConfig
         ]
-        return batoid.optic.CompoundOptic(items, name=name, coordSys=coordSys)
+        return batoid.optic.CompoundOptic(
+                items, inMedium=inMedium, outMedium=outMedium,
+                name=name, coordSys=coordSys)
     else:
         raise ValueError("Unknown optic type")
 

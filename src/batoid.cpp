@@ -142,12 +142,12 @@ namespace batoid{
         // The "velocities" of all the rays in the grid are the same.
         auto v = Vec3(xcos, ycos, zcos).UnitVec3()/n;
 
-        double dx = length/(nside-1);
-        double x0 = -length/2;
-        double x = x0;
-        for(int ix=0; ix<nside; ix++) {
-            double y = x0;
-            for(int iy=0; iy<nside; iy++) {
+        double dy = length/(nside-1);
+        double y0 = -length/2;
+        double y = y0;
+        for(int iy=0; iy<nside; iy++) {
+            double x = y0;
+            for(int ix=0; ix<nside; ix++) {
                 // Start with the position of the ray when it intersects the pupil
                 Vec3 r(x,y,0);
                 // We know that the position of the ray that goes through the origin
@@ -165,9 +165,9 @@ namespace batoid{
                 // => r0 = r - v t
                 double t = DotProduct(r + v*n*dist, v) * n * n;
                 result.push_back(Ray(r-v*t, v, 0, wavelength, false));
-                y += dx;
+                x += dy;
             }
-            x += dx;
+            y += dy;
         }
         return result;
     }
