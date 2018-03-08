@@ -1,6 +1,3 @@
-branches:
-  only:
-    - master
 language: cpp
 sudo: false
 matrix:
