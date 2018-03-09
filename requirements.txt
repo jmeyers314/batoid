@@ -2,5 +2,3 @@ pybind11>=2.2.1
 pyyaml
 numpy
 future
-pytest>=3.4
-pytest-xdist>=1.19

@@ -22,7 +22,7 @@ before_install:
   - virtualenv -p python$PYTHON venv
   - source venv/bin/activate
   - pip install -r requirements.txt
-  - pip install pytest-cov
+  - pip install -r test_requirements.txt
 cache:
   directories:
     - $HOME/.cache/pip
