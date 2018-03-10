@@ -63,7 +63,7 @@ def do_pickle(obj, reprable=True):
         import pickle
     import copy
 
-    pick = pickle.dumps(obj)
+    pick = pickle.dumps(obj, -1)
     obj2 = pickle.loads(pick)
 
     assert obj == obj2, "{} != {}".format(obj, obj2)
