@@ -3,17 +3,29 @@ sudo: false
 matrix:
   include:
     - os: linux
-      env: PYTHON=2.7 CPP=11 GCC=4.8
+      env: PYTHON=3.3 CPP=11 GCC=4.8
       addons:
         apt:
-          sources: [ubuntu-toolchain-r-test, kubuntu-backports]
-          packages: [g++-4.8, cmake, lcov]
+          sources: [ubuntu-toolchain-r-test, kubuntu-backports, deadsnakes]
+          packages: [g++-4.8, cmake, python3.3, lcov]
+    - os: linux
+      env: PYTHON=3.4 CPP=11 GCC=4.8
+      addons:
+        apt:
+          sources: [ubuntu-toolchain-r-test, kubuntu-backports, deadsnakes]
+          packages: [g++-4.8, cmake, python3.4, lcov]
     - os: linux
       env: PYTHON=3.5 CPP=11 GCC=4.8
       addons:
         apt:
           sources: [ubuntu-toolchain-r-test, kubuntu-backports, deadsnakes]
-          packages: [g++-4.8, cmake, python3.5-dev, lcov]
+          packages: [g++-4.8, cmake, python3.5, lcov]
+    - os: linux
+      env: PYTHON=3.5 CPP=11 GCC=4.8
+      addons:
+        apt:
+          sources: [ubuntu-toolchain-r-test, kubuntu-backports, deadsnakes]
+          packages: [g++-4.8, cmake, python3.6, lcov]
 before_install:
   - export CPP=-std=c++$CPP
   - export CFLAGS=-coverage
