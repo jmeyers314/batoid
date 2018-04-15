@@ -1,46 +1,82 @@
-language: cpp
-sudo: false
-matrix:
-  include:
-    - os: linux
-      env: PYTHON=3.4 CPP=11 GCC=4.8
-      addons:
-        apt:
-          sources: [ubuntu-toolchain-r-test, kubuntu-backports, deadsnakes]
-          packages: [g++-4.8, cmake, python3.4, lcov]
-    - os: linux
-      env: PYTHON=3.5 CPP=11 GCC=4.8
-      addons:
-        apt:
-          sources: [ubuntu-toolchain-r-test, kubuntu-backports, deadsnakes]
-          packages: [g++-4.8, cmake, python3.5, lcov]
-    - os: linux
-      env: PYTHON=3.6 CPP=11 GCC=4.8
-      addons:
-        apt:
-          sources: [ubuntu-toolchain-r-test, kubuntu-backports, deadsnakes]
-          packages: [g++-4.8, cmake, python3.6, lcov]
+language: python
+
+python:
+  - 3.4
+  - 3.5
+  - 3.6
+
+env:
+  # These currently fail...
+  # -
+  #   - export COMPILER=clang-3.3
+  #   - export CC=/usr/bin/clang
+  #   - export CXX=/usr/bin/clang++
+  # -
+  #   - export COMPILER=clang-3.4
+  #   - export CC=/usr/bin/clang
+  #   - export CXX=/usr/bin/clang++
+  -
+    - export COMPILER=clang
+    - export CC=clang
+    - export CXX=clang++
+  -
+    - export COMPILER=gcc
+    - export CC=gcc
+    - export CXX=g++
+  # Following don't seem to actually exist on travis-ci...
+  # -
+  #   - export COMPILER=gcc-5.3
+  #   - export CC=gcc
+  #   - export CXX=g++
+  # -
+  #   - export COMPILER=gcc-6.2
+  #   - export CC=gcc
+  #   - export CXX=g++
+
 before_install:
-  - export CPP=-std=c++$CPP
-  - export CFLAGS=-coverage
-  - export CXX=g++-$GCC CC=gcc-$GCC
-  - pip install --user --upgrade pip virtualenv
-  - virtualenv -p python$PYTHON venv
-  - source venv/bin/activate
+  - |
+    if [ "$COMPILER" == "clang-3.3" ];
+    then
+      sudo apt-get install clang-3.3 clang++-3.3
+    fi
+  - |
+    if [ "$COMPILER" == "clang-3.4" ];
+    then
+      sudo apt-get install clang-3.4 clang++-3.4
+    fi
+  - |
+    if [ "$COMPILER" == "gcc-5.3" ];
+    then
+      sudo apt-get install gcc-5.3
+    fi
+  - |
+    if [ "$COMPILER" == "gcc-6.2" ];
+    then
+      sudo apt-get install gcc-6.2
+    fi
+  - echo $CC
+  - echo $CFLAGS
+  - echo $CXXFLAGS
   - pip install -r requirements.txt
   - pip install -r test_requirements.txt
+  - $CC --version
+
 cache:
   directories:
     - $HOME/.cache/pip
     - $HOME/Library/Caches/pip
+
 install:
-  python setup.py develop
+  - export CMAKE_VERBOSE_MAKEFILE=1
+  - python setup.py develop
+
 script:
   pytest --cov=batoid --cov-report=xml
+
 after_success:
-  - "ls -rtlha build/*/src/*.gc*"
-  - cp build/*/src/*.gc* src/
-#  - cp build/*/pysrc/*.gc* pysrc/
-  - gcov-4.8 -o src/ src/*.cpp
-# - gcov-4.8 -o src/ src/*.cpp -o pysrc/ pysrc/*.cpp
-  - bash <(curl -s https://codecov.io/bash)
+  - "ls /usr/local/"
+  # - "ls -rtlha build/**/*.gc*"
+  - find ./build -iname "*.gc*"
+  # - cp build/*/src/*.gc* src/
+  # - gcov-4.8 -o src/ src/*.cpp
+  # - bash <(curl -s https://codecov.io/bash)
