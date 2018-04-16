@@ -79,4 +79,4 @@ after_success:
   - find ./build -iname "*.gc*"
   # - cp build/*/src/*.gc* src/
   # - gcov-4.8 -o src/ src/*.cpp
-  # - bash <(curl -s https://codecov.io/bash)
+  - bash <(curl -s https://codecov.io/bash)
