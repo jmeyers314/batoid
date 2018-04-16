@@ -35,7 +35,6 @@ class CMakeBuild(build_ext):
     def build_extension(self, ext):
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
-                      '-DCMAKE_VERBOSE_MAKEFILE=1',
                       '-DPYTHON_EXECUTABLE=' + sys.executable]
 
         cfg = 'Debug' if self.debug else 'Release'
@@ -55,6 +54,8 @@ class CMakeBuild(build_ext):
                                                               self.distribution.get_version())
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
+        if 'CMAKE_VERBOSE_MAKEFILE' in env:
+            cmake_args += ['-DCMAKE_VERBOSE_MAKEFILE=1']
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
         subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
 
