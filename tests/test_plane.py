@@ -38,7 +38,7 @@ def test_intersect():
             # If we shoot rays straight up, then it's easy to predict the
             # intersection points.
             r0 = batoid.Ray(x, y, -1000, 0, 0, 1, 0)
-            r = plane.intercept(r0)
+            r = plane.intersect(r0)
             assert isclose(r.p0.x, x)
             assert isclose(r.p0.y, y)
             assert isclose(r.p0.z, plane.sag(x, y), rel_tol=0, abs_tol=1e-9)
@@ -60,8 +60,8 @@ def test_intersect_vectorized():
 
     for i in range(100):
         plane = batoid.Plane()
-        r1s = plane.intercept(r0s)
-        r2s = batoid.RayVector([plane.intercept(r0) for r0 in r0s])
+        r1s = plane.intersect(r0s)
+        r2s = batoid.RayVector([plane.intersect(r0) for r0 in r0s])
         assert r1s == r2s
 
 

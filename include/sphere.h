@@ -14,8 +14,8 @@ namespace batoid {
         Sphere(double R);
         virtual double sag(double, double) const;
         virtual Vec3 normal(double, double) const;
-        virtual Ray intercept(const Ray&) const;
-        virtual void interceptInPlace(Ray&) const;
+        virtual Ray intersect(const Ray&) const;
+        virtual void intersectInPlace(Ray&) const;
 
         double getR() const { return _R; }
         std::string repr() const;
@@ -23,7 +23,7 @@ namespace batoid {
     private:
         const double _R;  // Radius of curvature
 
-        bool timeToIntercept(const Ray& r, double& t) const;
+        bool timeToIntersect(const Ray& r, double& t) const;
         double dzdr(double r) const;
     };
 

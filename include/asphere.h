@@ -16,8 +16,8 @@ namespace batoid {
         Asphere(double R, double conic, std::vector<double> coefs);
         virtual double sag(double, double) const;
         virtual Vec3 normal(double, double) const;
-        virtual Ray intercept(const Ray&) const;
-        virtual void interceptInPlace(Ray&) const;
+        virtual Ray intersect(const Ray&) const;
+        virtual void intersectInPlace(Ray&) const;
 
         const std::vector<double>& getCoefs() const { return _coefs; }
         std::string repr() const;
@@ -25,7 +25,7 @@ namespace batoid {
     private:
         const std::vector<double> _coefs;  // Aspheric even polynomial coefficients
 
-        bool timeToIntercept(const Ray& r, double& t) const;
+        bool timeToIntersect(const Ray& r, double& t) const;
         double dzdr(double r) const;
     };
 

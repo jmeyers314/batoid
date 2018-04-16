@@ -54,7 +54,7 @@ def test_intersect():
             # If we shoot rays straight up, then it's easy to predict the
             # intersection points.
             r0 = batoid.Ray(x, y, -1000, 0, 0, 1, 0)
-            r = sphere.intercept(r0)
+            r = sphere.intersect(r0)
             assert isclose(r.p0.x, x)
             assert isclose(r.p0.y, y)
             assert isclose(r.p0.z, sphere.sag(x, y), rel_tol=0, abs_tol=1e-9)
@@ -77,8 +77,8 @@ def test_intersect_vectorized():
     for i in range(100):
         R = random.gauss(0.05, 0.01)
         sphere = batoid.Sphere(R)
-        r1s = sphere.intercept(r0s)
-        r2s = batoid.RayVector([sphere.intercept(r0) for r0 in r0s])
+        r1s = sphere.intersect(r0s)
+        r2s = batoid.RayVector([sphere.intersect(r0) for r0 in r0s])
         assert r1s == r2s
 
 

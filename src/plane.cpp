@@ -2,14 +2,14 @@
 #include <cmath>
 
 namespace batoid {
-    Ray Plane::intercept(const Ray& r) const {
+    Ray Plane::intersect(const Ray& r) const {
         if (r.failed) return r;
         double t = -r.p0.z/r.v.z + r.t0;
         Vec3 point = r.positionAtTime(t);
         return Ray(point, r.v, t, r.wavelength, r.isVignetted);
     }
 
-    void Plane::interceptInPlace(Ray& r) const {
+    void Plane::intersectInPlace(Ray& r) const {
         if (r.failed) return;
         double t = -r.p0.z/r.v.z + r.t0;
         r.p0 = r.positionAtTime(t);

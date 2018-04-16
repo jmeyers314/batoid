@@ -51,7 +51,7 @@ def wavefront(optic, wavelength, theta_x=0, theta_y=0, nx=32, rays=None, saveRay
     transform.applyForwardInPlace(rays)
 
     sphere = batoid.Sphere(-sphereRadius)
-    sphere.interceptInPlace(rays)
+    sphere.intersectInPlace(rays)
     goodRays = batoid._batoid.trimVignetted(rays)
     # Should potentially try to make the reference time w.r.t. the chief ray instead of the mean
     # of the good (unvignetted) rays.

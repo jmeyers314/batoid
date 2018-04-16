@@ -19,7 +19,7 @@ def test_plane_refraction_plane():
         ray = batoid.Ray(batoid.Vec3(x, y, -10),
                          batoid.Vec3(vx, vy, 1).UnitVec3()/n1,
                          0)
-        iray = plane.intercept(ray)
+        iray = plane.intersect(ray)
         rray = batoid._batoid.refract(iray, plane, n1, n2)
         assert isclose(rray.v.Magnitude(), 1./n2, rel_tol=1e-15)
 
@@ -54,7 +54,7 @@ def test_plane_refraction_reversal():
         ray = batoid.Ray(batoid.Vec3(x, y, -10),
                          batoid.Vec3(vx, vy, 1).UnitVec3()/n1,
                          0)
-        iray = plane.intercept(ray)
+        iray = plane.intersect(ray)
         rray = batoid._batoid.refract(iray, plane, n1, n2)
         assert isclose(rray.v.Magnitude(), 1./n2, rel_tol=1e-15)
 
@@ -64,7 +64,7 @@ def test_plane_refraction_reversal():
         # Keep going a bit before turning around though
         turn_around = rray.positionAtTime(rray.t0+0.1)
         return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t0+0.1))
-        riray = plane.intercept(return_ray)
+        riray = plane.intersect(return_ray)
         assert isclose(iray.p0.x, riray.p0.x, rel_tol=0, abs_tol=1e-10)
         assert isclose(iray.p0.y, riray.p0.y, rel_tol=0, abs_tol=1e-10)
         assert isclose(iray.p0.z, riray.p0.z, rel_tol=0, abs_tol=1e-10)
@@ -91,7 +91,7 @@ def test_paraboloid_refraction_plane():
         vy = random.gauss(0, 1e-1)
         v = batoid.Vec3(vx, vy, 1).UnitVec3()/n1
         ray = batoid.Ray(x, y, -10, v.x, v.y, v.z, 0)
-        iray = para.intercept(ray)
+        iray = para.intersect(ray)
         rray = batoid._batoid.refract(iray, para, n1, n2)
         assert isclose(rray.v.Magnitude(), 1./n2, rel_tol=1e-15)
 
@@ -127,7 +127,7 @@ def test_paraboloid_refraction_reversal():
         ray = batoid.Ray(batoid.Vec3(x, y, -10),
                          batoid.Vec3(vx, vy, 1).UnitVec3()/n1,
                          0)
-        iray = para.intercept(ray)
+        iray = para.intersect(ray)
         rray = batoid._batoid.refract(iray, para, n1, n2)
         assert isclose(rray.v.Magnitude(), 1./n2, rel_tol=1e-15)
 
@@ -137,7 +137,7 @@ def test_paraboloid_refraction_reversal():
         # Keep going a bit before turning around though
         turn_around = rray.positionAtTime(rray.t0+0.1)
         return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t0+0.1))
-        riray = para.intercept(return_ray)
+        riray = para.intersect(return_ray)
         # First check that we intersected at the same point
         assert isclose(iray.p0.x, riray.p0.x, rel_tol=0, abs_tol=1e-10)
         assert isclose(iray.p0.y, riray.p0.y, rel_tol=0, abs_tol=1e-10)
@@ -165,7 +165,7 @@ def test_asphere_refraction_plane():
         vy = random.gauss(0, 1e-1)
         v = batoid.Vec3(vx, vy, 1).UnitVec3()/n1
         ray = batoid.Ray(x, y, -0.1, v.x, v.y, v.z, 0)
-        iray = asphere.intercept(ray)
+        iray = asphere.intersect(ray)
         rray = batoid._batoid.refract(iray, asphere, n1, n2)
         assert isclose(rray.v.Magnitude(), 1./n2, rel_tol=1e-15)
 
@@ -201,7 +201,7 @@ def test_asphere_refraction_reversal():
         ray = batoid.Ray(batoid.Vec3(x, y, -0.1),
                          batoid.Vec3(vx, vy, 1).UnitVec3()/n1,
                          0)
-        iray = asphere.intercept(ray)
+        iray = asphere.intersect(ray)
         rray = batoid._batoid.refract(iray, asphere, n1, n2)
         assert isclose(rray.v.Magnitude(), 1./n2, rel_tol=1e-15)
 
@@ -211,7 +211,7 @@ def test_asphere_refraction_reversal():
         # Keep going a bit before turning around though
         turn_around = rray.positionAtTime(rray.t0+0.1)
         return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t0+0.1))
-        riray = asphere.intercept(return_ray)
+        riray = asphere.intersect(return_ray)
         # First check that we intersected at the same point
         assert isclose(iray.p0.x, riray.p0.x, rel_tol=0, abs_tol=1e-10)
         assert isclose(iray.p0.y, riray.p0.y, rel_tol=0, abs_tol=1e-10)
@@ -237,7 +237,7 @@ def test_const_medium_refraction():
         vx = random.gauss(0, 1e-1)
         vy = random.gauss(0, 1e-1)
         ray = batoid.Ray(x, y, -0.1, vx, vy, 1, 0)
-        iray = asphere.intercept(ray)
+        iray = asphere.intersect(ray)
         n1 = 1.7
         n2 = 1.2
         m1 = batoid.ConstMedium(n1)
@@ -267,7 +267,7 @@ def test_table_medium_refraction():
         vy = random.gauss(0, 1e-1)
         wavelength = random.uniform(0.3, 1.2)
         ray = batoid.Ray(x, y, -0.1, vx, vy, 1, 0, wavelength)
-        iray = asphere.intercept(ray)
+        iray = asphere.intersect(ray)
 
         n1 = silica.getN(wavelength)
         n2 = air.getN(wavelength)

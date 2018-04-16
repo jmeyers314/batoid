@@ -195,7 +195,7 @@ class Interface(Optic):
             return r, inCoordSys
         transform = batoid.CoordTransform(inCoordSys, self.coordSys)
         r = transform.applyForward(r)
-        r = self.surface.intercept(r)
+        r = self.surface.intersect(r)
         if self.obscuration is not None:
             r = self.obscuration.obscure(r)
         # refract, reflect, passthrough, depending on subclass
@@ -220,7 +220,7 @@ class Interface(Optic):
             return r, inCoordSys
         transform = batoid.CoordTransform(inCoordSys, self.coordSys)
         transform.applyForwardInPlace(r)
-        self.surface.interceptInPlace(r)
+        self.surface.intersectInPlace(r)
         if self.obscuration is not None:
             self.obscuration.obscureInPlace(r)
         # refract, reflect, passthrough, depending on subclass
@@ -240,7 +240,7 @@ class Interface(Optic):
             return r, inCoordSys
         transform = batoid.CoordTransform(inCoordSys, self.coordSys)
         r = transform.applyForward(r)
-        r = self.surface.intercept(r)
+        r = self.surface.intersect(r)
         if self.obscuration is not None:
             r = self.obscuration.obscure(r)
         r = self.interactReverse(r)

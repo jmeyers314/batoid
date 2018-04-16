@@ -13,8 +13,8 @@ namespace batoid {
     public:
         virtual double sag(double, double) const { return 0.0; }
         virtual Vec3 normal(double, double) const { return Vec3(0,0,1); }
-        virtual Ray intercept(const Ray&) const;
-        virtual void interceptInPlace(Ray&) const;
+        virtual Ray intersect(const Ray&) const;
+        virtual void intersectInPlace(Ray&) const;
 
         std::string repr() const;
     };

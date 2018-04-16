@@ -18,7 +18,7 @@ namespace batoid {
         return Vec3(-dzdr1*x/r, -dzdr1*y/r, 1).UnitVec3();
     }
 
-    bool Sphere::timeToIntercept(const Ray& r, double& t) const {
+    bool Sphere::timeToIntersect(const Ray& r, double& t) const {
         double vr2 = r.v.x*r.v.x + r.v.y*r.v.y;
         double vz2 = r.v.z*r.v.z;
         double vrr0 = r.v.x*r.p0.x + r.v.y*r.p0.y;
@@ -54,10 +54,10 @@ namespace batoid {
         return true;
     }
 
-    Ray Sphere::intercept(const Ray& r) const {
+    Ray Sphere::intersect(const Ray& r) const {
         if (r.failed) return r;
         double t;
-        if (!timeToIntercept(r, t))
+        if (!timeToIntersect(r, t))
             return Ray(true);
         Vec3 point = r.positionAtTime(t);
         return Ray(point, r.v, t, r.wavelength, r.isVignetted);
@@ -69,10 +69,10 @@ namespace batoid {
         return oss.str();
     }
 
-    void Sphere::interceptInPlace(Ray& r) const {
+    void Sphere::intersectInPlace(Ray& r) const {
         if (r.failed) return;
         double t;
-        if (!timeToIntercept(r, t)) {
+        if (!timeToIntersect(r, t)) {
             r.failed=true;
             return;
         }

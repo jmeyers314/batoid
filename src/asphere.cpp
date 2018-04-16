@@ -37,9 +37,9 @@ namespace batoid {
         const Ray& _r;
     };
 
-    bool Asphere::timeToIntercept(const Ray& r, double& t) const {
+    bool Asphere::timeToIntersect(const Ray& r, double& t) const {
         // Solve the quadric problem analytically to get a good starting point.
-        if (!Quadric::timeToIntercept(r, t))
+        if (!Quadric::timeToIntersect(r, t))
             return false;
 
         AsphereResidual resid(*this, r);
@@ -56,19 +56,19 @@ namespace batoid {
         return true;
     }
 
-    Ray Asphere::intercept(const Ray& r) const {
+    Ray Asphere::intersect(const Ray& r) const {
         if (r.failed) return r;
         double t;
-        if (!timeToIntercept(r, t))
+        if (!timeToIntersect(r, t))
             return Ray(true);
         Vec3 point = r.positionAtTime(t);
         return Ray(point, r.v, t, r.wavelength, r.isVignetted);
     }
 
-    void Asphere::interceptInPlace(Ray& r) const {
+    void Asphere::intersectInPlace(Ray& r) const {
         if (r.failed) return;
         double t;
-        if (!timeToIntercept(r, t)) {
+        if (!timeToIntersect(r, t)) {
             r.failed=true;
             return;
         }

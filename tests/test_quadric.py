@@ -65,7 +65,7 @@ def test_intersect():
             # If we shoot rays straight up, then it's easy to predict the
             # intersection points.
             r0 = batoid.Ray(x, y, -10, 0, 0, 1, 0)
-            r = quad.intercept(r0)
+            r = quad.intersect(r0)
             assert isclose(r.p0.x, x)
             assert isclose(r.p0.y, y)
             assert isclose(r.p0.z, quad.sag(x, y), rel_tol=0, abs_tol=1e-9)
@@ -89,8 +89,8 @@ def test_intersect_vectorized():
         R = random.gauss(25.0, 0.2)
         conic = random.uniform(-2.0, 1.0)
         quad = batoid.Quadric(R, conic)
-        r1s = quad.intercept(r0s)
-        r2s = batoid.RayVector([quad.intercept(r0) for r0 in r0s])
+        r1s = quad.intersect(r0s)
+        r2s = batoid.RayVector([quad.intersect(r0) for r0 in r0s])
         assert r1s == r2s
 
 

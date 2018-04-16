@@ -14,8 +14,8 @@ namespace batoid {
         Quadric(double R, double conic);
         virtual double sag(double, double) const;
         virtual Vec3 normal(double, double) const;
-        Ray intercept(const Ray&) const;
-        virtual void interceptInPlace(Ray&) const;
+        Ray intersect(const Ray&) const;
+        virtual void intersectInPlace(Ray&) const;
 
         double getR() const {return _R;}
         double getConic() const {return _conic;}
@@ -23,7 +23,7 @@ namespace batoid {
 
 
     protected:
-        bool timeToIntercept(const Ray& r, double& t) const;
+        bool timeToIntersect(const Ray& r, double& t) const;
         double dzdr(double r) const;
 
     private:

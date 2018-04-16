@@ -6,19 +6,19 @@ namespace batoid {
         return os << s.repr();
     }
 
-    std::vector<Ray> Surface::intercept(const std::vector<Ray>& rays) const {
+    std::vector<Ray> Surface::intersect(const std::vector<Ray>& rays) const {
         auto result = std::vector<Ray>(rays.size());
         parallelTransform(rays.cbegin(), rays.cend(), result.begin(),
             [this](const Ray& ray)
-            { return intercept(ray); }
+            { return intersect(ray); }
         );
         return result;
     }
 
-    void Surface::interceptInPlace(std::vector<Ray>& rays) const {
+    void Surface::intersectInPlace(std::vector<Ray>& rays) const {
         parallel_for_each(
             rays.begin(), rays.end(),
-            [this](Ray& r) { interceptInPlace(r); }
+            [this](Ray& r) { intersectInPlace(r); }
         );
     }
 }

@@ -15,7 +15,7 @@ def test_plane_reflection_plane():
         ray = batoid.Ray(batoid.Vec3(x, y, -10),
                          batoid.Vec3(vx, vy, 1).UnitVec3(),
                          0)
-        iray = plane.intercept(ray)
+        iray = plane.intersect(ray)
         rray = batoid._batoid.reflect(iray, plane)
 
         # ray.v, surfaceNormal, and rray.v should all be in the same plane, and
@@ -47,7 +47,7 @@ def test_plane_reflection_reversal():
         ray = batoid.Ray(batoid.Vec3(x, y, -10),
                          batoid.Vec3(vx, vy, 1).UnitVec3(),
                          0)
-        iray = plane.intercept(ray)
+        iray = plane.intersect(ray)
         rray = batoid._batoid.reflect(iray, plane)
 
         # Invert the reflected ray, and see that it ends back at the starting
@@ -56,7 +56,7 @@ def test_plane_reflection_reversal():
         # Keep going a bit before turning around though
         turn_around = rray.positionAtTime(rray.t0+0.1)
         return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t0+0.1))
-        riray = plane.intercept(return_ray)
+        riray = plane.intersect(return_ray)
         assert isclose(iray.p0.x, riray.p0.x, rel_tol=0, abs_tol=1e-10)
         assert isclose(iray.p0.y, riray.p0.y, rel_tol=0, abs_tol=1e-10)
         assert isclose(iray.p0.z, riray.p0.z, rel_tol=0, abs_tol=1e-10)
@@ -79,7 +79,7 @@ def test_paraboloid_reflection_plane():
         vx = random.gauss(0, 1e-1)
         vy = random.gauss(0, 1e-1)
         ray = batoid.Ray(x, y, -10, vx, vy, 1, 0)
-        iray = para.intercept(ray)
+        iray = para.intersect(ray)
         rray = batoid._batoid.reflect(iray, para)
 
         # ray.v, surfaceNormal, and rray.v should all be in the same plane, and
@@ -105,7 +105,7 @@ def test_paraboloid_reflection_reversal():
         ray = batoid.Ray(batoid.Vec3(x, y, -10),
                          batoid.Vec3(vx, vy, 1).UnitVec3(),
                          0)
-        iray = para.intercept(ray)
+        iray = para.intersect(ray)
         rray = batoid._batoid.reflect(iray, para)
 
         # Invert the reflected ray, and see that it ends back at the starting
@@ -114,7 +114,7 @@ def test_paraboloid_reflection_reversal():
         # Keep going a bit before turning around though
         turn_around = rray.positionAtTime(rray.t0+0.1)
         return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t0+0.1))
-        riray = para.intercept(return_ray)
+        riray = para.intersect(return_ray)
         # First check that we intersected at the same point
         assert isclose(iray.p0.x, riray.p0.x, rel_tol=0, abs_tol=1e-10)
         assert isclose(iray.p0.y, riray.p0.y, rel_tol=0, abs_tol=1e-10)
@@ -138,7 +138,7 @@ def test_paraboloid_reflection_to_focus():
             x = random.gauss(0, 1)
             y = random.gauss(0, 1)
             ray = batoid.Ray(x,y,-1000, 0,0,1, 0)
-            iray = para.intercept(ray)
+            iray = para.intersect(ray)
             rray = batoid._batoid.reflect(iray, para)
             # Now see if rray goes through (0,0,R/2)
             # Solve the x equation: 0 = rray.p0.x + rray.v.x*(t-t0) for t:
@@ -161,7 +161,7 @@ def test_asphere_reflection_plane():
         vx = random.gauss(0, 1e-1)
         vy = random.gauss(0, 1e-1)
         ray = batoid.Ray(x, y, -0.1, vx, vy, 1, 0)
-        iray = asphere.intercept(ray)
+        iray = asphere.intersect(ray)
         rray = batoid._batoid.reflect(iray, asphere)
 
         # ray.v, surfaceNormal, and rray.v should all be in the same plane, and
@@ -187,7 +187,7 @@ def test_asphere_reflection_reversal():
         ray = batoid.Ray(batoid.Vec3(x, y, -0.1),
                          batoid.Vec3(vx, vy, 1).UnitVec3(),
                          0)
-        iray = asphere.intercept(ray)
+        iray = asphere.intersect(ray)
         rray = batoid._batoid.reflect(iray, asphere)
 
         # Invert the reflected ray, and see that it ends back at the starting
@@ -196,7 +196,7 @@ def test_asphere_reflection_reversal():
         # Keep going a bit before turning around though
         turn_around = rray.positionAtTime(rray.t0+0.1)
         return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t0+0.1))
-        riray = asphere.intercept(return_ray)
+        riray = asphere.intersect(return_ray)
         # First check that we intersected at the same point
         assert isclose(iray.p0.x, riray.p0.x, rel_tol=0, abs_tol=1e-9)
         assert isclose(iray.p0.y, riray.p0.y, rel_tol=0, abs_tol=1e-9)

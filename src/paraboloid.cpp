@@ -26,7 +26,7 @@ namespace batoid {
         return Vec3(0,0,1);
     }
 
-    bool Paraboloid::timeToIntercept(const Ray& r, double& t) const {
+    bool Paraboloid::timeToIntersect(const Ray& r, double& t) const {
         double a = (r.v.x*r.v.x + r.v.y*r.v.y)/2/_R;
         double b = (r.p0.x*r.v.x + r.p0.y*r.v.y)/_R - r.v.z;
         double c = (r.p0.x*r.p0.x + r.p0.y*r.p0.y)/2/_R - r.p0.z;
@@ -52,19 +52,19 @@ namespace batoid {
         return true;
     }
 
-    Ray Paraboloid::intercept(const Ray& r) const {
+    Ray Paraboloid::intersect(const Ray& r) const {
         if (r.failed) return r;
         double t;
-        if (!timeToIntercept(r, t))
+        if (!timeToIntersect(r, t))
             return Ray(true);
         Vec3 point = r.positionAtTime(t);
         return Ray(point, r.v, t, r.wavelength, r.isVignetted);
     }
 
-    void Paraboloid::interceptInPlace(Ray& r) const {
+    void Paraboloid::intersectInPlace(Ray& r) const {
         if (r.failed) return;
         double t;
-        if (!timeToIntercept(r, t)) {
+        if (!timeToIntersect(r, t)) {
             r.failed=true;
             return;
         }

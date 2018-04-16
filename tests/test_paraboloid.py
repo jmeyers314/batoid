@@ -50,7 +50,7 @@ def test_intersect():
             # If we shoot rays straight up, then it's easy to predict the
             # intersection points.
             r0 = batoid.Ray(x, y, -1000, 0, 0, 1, 0)
-            r = para.intercept(r0)
+            r = para.intersect(r0)
             assert isclose(r.p0.x, x)
             assert isclose(r.p0.y, y)
             assert isclose(r.p0.z, para.sag(x, y), rel_tol=0, abs_tol=1e-9)
@@ -73,8 +73,8 @@ def test_intersect_vectorized():
     for i in range(100):
         R = random.gauss(0.05, 0.01)
         para = batoid.Paraboloid(R)
-        r1s = para.intercept(r0s)
-        r2s = batoid.RayVector([para.intercept(r0) for r0 in r0s])
+        r1s = para.intersect(r0s)
+        r2s = batoid.RayVector([para.intersect(r0) for r0 in r0s])
         assert r1s == r2s
 
 
