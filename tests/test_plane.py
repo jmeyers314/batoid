@@ -37,48 +37,32 @@ def test_intersect():
 
             # If we shoot rays straight up, then it's easy to predict the
             # intersection points.
-            r = batoid.Ray(x, y, -1000, 0, 0, 1, 0)
-            isec = plane.intersect(r)
-            assert isclose(isec.point.x, x)
-            assert isclose(isec.point.y, y)
-            assert isclose(isec.point.z, plane.sag(x, y), rel_tol=0, abs_tol=1e-9)
-
-            # We can also check just for mutual consistency of the plane,
-            # ray and intersection.
-            vx = random.gauss(0.0, 0.1)
-            vy = random.gauss(0.0, 0.1)
-            vz = 1.0
-            v = batoid.Vec3(vx, vy, vz).UnitVec3()
-            r = batoid.Ray(batoid.Vec3(x, y, -10), v, 0)
-            isec = plane.intersect(r)
-            p1 = r.positionAtTime(isec.t)
-            p2 = isec.point
-            assert isclose(p1.x, p2.x)
-            assert isclose(p1.y, p2.y)
-            assert isclose(p1.z, p2.z)
-            assert isclose(plane.sag(p1.x, p2.y), p1.z, rel_tol=0, abs_tol=1e-6)
+            r0 = batoid.Ray(x, y, -1000, 0, 0, 1, 0)
+            r = plane.intercept(r0)
+            assert isclose(r.p0.x, x)
+            assert isclose(r.p0.y, y)
+            assert isclose(r.p0.z, plane.sag(x, y), rel_tol=0, abs_tol=1e-9)
 
 
 @timer
 def test_intersect_vectorized():
     import random
     random.seed(5772)
-    rays = [batoid.Ray([random.gauss(0.0, 0.1),
-                        random.gauss(0.0, 0.1),
-                        random.gauss(10.0, 0.1)],
-                       [random.gauss(0.0, 0.1),
-                        random.gauss(0.0, 0.1),
-                        random.gauss(-1.0, 0.1)],
-                       random.gauss(0.0, 0.1))
-            for i in range(1000)]
-    rays = batoid.RayVector(rays)
+    r0s = [batoid.Ray([random.gauss(0.0, 0.1),
+                       random.gauss(0.0, 0.1),
+                       random.gauss(10.0, 0.1)],
+                      [random.gauss(0.0, 0.1),
+                       random.gauss(0.0, 0.1),
+                       random.gauss(-1.0, 0.1)],
+                      random.gauss(0.0, 0.1))
+           for i in range(1000)]
+    r0s = batoid.RayVector(r0s)
 
     for i in range(100):
         plane = batoid.Plane()
-        intersections = plane.intersect(rays)
-        intersections2 = [plane.intersect(ray) for ray in rays]
-        intersections2 = batoid.IntersectionVector(intersections2)
-        assert intersections == intersections2
+        r1s = plane.intercept(r0s)
+        r2s = batoid.RayVector([plane.intercept(r0) for r0 in r0s])
+        assert r1s == r2s
 
 
 if __name__ == '__main__':

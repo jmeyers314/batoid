@@ -4,7 +4,6 @@
 #include <sstream>
 #include <limits>
 #include "surface.h"
-#include "intersection.h"
 #include "ray.h"
 #include "vec3.h"
 
@@ -16,8 +15,6 @@ namespace batoid {
         virtual double sag(double, double) const;
         virtual Vec3 normal(double, double) const;
         Ray intercept(const Ray&) const;
-        using Surface::intersect;
-        virtual Intersection intersect(const Ray&) const;
         virtual void interceptInPlace(Ray&) const;
 
         double getR() const {return _R;}

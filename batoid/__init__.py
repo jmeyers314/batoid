@@ -1,8 +1,7 @@
 from ._batoid import Vec2, Rot2, Vec3, Rot3, RotVec, UnRotVec
 from ._batoid import DotProduct, CrossProduct
-from ._batoid import Ray, Intersection, RayVector, IntersectionVector
+from ._batoid import Ray, RayVector
 from ._batoid import Surface, Plane, Paraboloid, Sphere, Quadric, Asphere
-from ._batoid import Transformation
 from ._batoid import Table
 
 from ._batoid import Medium, ConstMedium, TableMedium, SellmeierMedium, Air
@@ -17,10 +16,6 @@ from ._batoid import trimVignetted, trimVignettedInPlace
 from ._batoid import propagatedToTimesMany
 
 from .psf import huygensPSF, wavefront, fftPSF, zernike
-
-# from .telescope import Telescope
-
-# from .rays import parallelRays, rayGrid
 
 from .coordsys import RotX, RotY, RotZ
 

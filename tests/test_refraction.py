@@ -19,22 +19,23 @@ def test_plane_refraction_plane():
         ray = batoid.Ray(batoid.Vec3(x, y, -10),
                          batoid.Vec3(vx, vy, 1).UnitVec3()/n1,
                          0)
-        isec = plane.intersect(ray)
-        rray = isec.refractedRay(ray, n1, n2)
+        iray = plane.intercept(ray)
+        rray = batoid._batoid.refract(iray, plane, n1, n2)
         assert isclose(rray.v.Magnitude(), 1./n2, rel_tol=1e-15)
 
         # ray.v, surfaceNormal, and rray.v should all be in the same plane, and
         # hence (ray.v x surfaceNormal) . rray.v should have zero magnitude.
+        normal = plane.normal(iray.p0.x, iray.p0.y)
         assert isclose(
             batoid.DotProduct(
-                batoid.CrossProduct(ray.v, isec.surfaceNormal),
+                batoid.CrossProduct(ray.v, normal),
                 rray.v),
             0.0, rel_tol=0, abs_tol=1e-15)
 
         # Test Snell's law
         assert isclose(
-            n1*batoid.CrossProduct(ray.v.UnitVec3(), isec.surfaceNormal).Magnitude(),
-            n2*batoid.CrossProduct(rray.v.UnitVec3(), isec.surfaceNormal).Magnitude(),
+            n1*batoid.CrossProduct(ray.v.UnitVec3(), normal).Magnitude(),
+            n2*batoid.CrossProduct(rray.v.UnitVec3(), normal).Magnitude(),
             rel_tol=0, abs_tol=1e-15)
 
 
@@ -53,8 +54,8 @@ def test_plane_refraction_reversal():
         ray = batoid.Ray(batoid.Vec3(x, y, -10),
                          batoid.Vec3(vx, vy, 1).UnitVec3()/n1,
                          0)
-        isec = plane.intersect(ray)
-        rray = isec.refractedRay(ray, n1, n2)
+        iray = plane.intercept(ray)
+        rray = batoid._batoid.refract(iray, plane, n1, n2)
         assert isclose(rray.v.Magnitude(), 1./n2, rel_tol=1e-15)
 
         # Invert the refracted ray, and see that it ends back at the starting
@@ -63,12 +64,12 @@ def test_plane_refraction_reversal():
         # Keep going a bit before turning around though
         turn_around = rray.positionAtTime(rray.t0+0.1)
         return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t0+0.1))
-        risec = plane.intersect(return_ray)
-        assert isclose(isec.point.x, risec.point.x, rel_tol=0, abs_tol=1e-10)
-        assert isclose(isec.point.y, risec.point.y, rel_tol=0, abs_tol=1e-10)
-        assert isclose(isec.point.z, risec.point.z, rel_tol=0, abs_tol=1e-10)
+        riray = plane.intercept(return_ray)
+        assert isclose(iray.p0.x, riray.p0.x, rel_tol=0, abs_tol=1e-10)
+        assert isclose(iray.p0.y, riray.p0.y, rel_tol=0, abs_tol=1e-10)
+        assert isclose(iray.p0.z, riray.p0.z, rel_tol=0, abs_tol=1e-10)
         # Refract and propagate back to t=0.
-        cray = risec.refractedRay(return_ray, n2, n1)
+        cray = batoid._batoid.refract(riray, plane, n2, n1)
         assert isclose(cray.v.Magnitude(), 1./n1, rel_tol=1e-15)
         cpoint = cray.positionAtTime(0)
         assert isclose(cpoint.x, x, rel_tol=0, abs_tol=1e-10)
@@ -90,23 +91,24 @@ def test_paraboloid_refraction_plane():
         vy = random.gauss(0, 1e-1)
         v = batoid.Vec3(vx, vy, 1).UnitVec3()/n1
         ray = batoid.Ray(x, y, -10, v.x, v.y, v.z, 0)
-        isec = para.intersect(ray)
-        rray = isec.refractedRay(ray, n1, n2)
+        iray = para.intercept(ray)
+        rray = batoid._batoid.refract(iray, para, n1, n2)
         assert isclose(rray.v.Magnitude(), 1./n2, rel_tol=1e-15)
 
         # ray.v, surfaceNormal, and rray.v should all be in the same plane, and
         # hence (ray.v x surfaceNormal) . rray.v should have zero magnitude.
         # magnitude zero.
+        normal = para.normal(iray.p0.x, iray.p0.y)
         assert isclose(
             batoid.DotProduct(
-                batoid.CrossProduct(ray.v, isec.surfaceNormal),
+                batoid.CrossProduct(ray.v, normal),
                 rray.v),
             0.0, rel_tol=0, abs_tol=1e-15)
 
         # Test Snell's law
         assert isclose(
-            n1*batoid.CrossProduct(ray.v.UnitVec3(), isec.surfaceNormal).Magnitude(),
-            n2*batoid.CrossProduct(rray.v.UnitVec3(), isec.surfaceNormal).Magnitude(),
+            n1*batoid.CrossProduct(ray.v.UnitVec3(), normal).Magnitude(),
+            n2*batoid.CrossProduct(rray.v.UnitVec3(), normal).Magnitude(),
             rel_tol=0, abs_tol=1e-15)
 
 
@@ -125,8 +127,8 @@ def test_paraboloid_refraction_reversal():
         ray = batoid.Ray(batoid.Vec3(x, y, -10),
                          batoid.Vec3(vx, vy, 1).UnitVec3()/n1,
                          0)
-        isec = para.intersect(ray)
-        rray = isec.refractedRay(ray, n1, n2)
+        iray = para.intercept(ray)
+        rray = batoid._batoid.refract(iray, para, n1, n2)
         assert isclose(rray.v.Magnitude(), 1./n2, rel_tol=1e-15)
 
         # Invert the refracted ray, and see that it ends back at the starting
@@ -135,13 +137,13 @@ def test_paraboloid_refraction_reversal():
         # Keep going a bit before turning around though
         turn_around = rray.positionAtTime(rray.t0+0.1)
         return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t0+0.1))
-        risec = para.intersect(return_ray)
+        riray = para.intercept(return_ray)
         # First check that we intersected at the same point
-        assert isclose(isec.point.x, risec.point.x, rel_tol=0, abs_tol=1e-10)
-        assert isclose(isec.point.y, risec.point.y, rel_tol=0, abs_tol=1e-10)
-        assert isclose(isec.point.z, risec.point.z, rel_tol=0, abs_tol=1e-10)
+        assert isclose(iray.p0.x, riray.p0.x, rel_tol=0, abs_tol=1e-10)
+        assert isclose(iray.p0.y, riray.p0.y, rel_tol=0, abs_tol=1e-10)
+        assert isclose(iray.p0.z, riray.p0.z, rel_tol=0, abs_tol=1e-10)
         # Refract and propagate back to t=0.
-        cray = risec.refractedRay(return_ray, n2, n1)
+        cray = batoid._batoid.refract(riray, para, n2, n1)
         assert isclose(cray.v.Magnitude(), 1./n1, rel_tol=1e-15)
         cpoint = cray.positionAtTime(0)
         assert isclose(cpoint.x, x, rel_tol=0, abs_tol=1e-10)
@@ -163,23 +165,24 @@ def test_asphere_refraction_plane():
         vy = random.gauss(0, 1e-1)
         v = batoid.Vec3(vx, vy, 1).UnitVec3()/n1
         ray = batoid.Ray(x, y, -0.1, v.x, v.y, v.z, 0)
-        isec = asphere.intersect(ray)
-        rray = isec.refractedRay(ray, n1, n2)
+        iray = asphere.intercept(ray)
+        rray = batoid._batoid.refract(iray, asphere, n1, n2)
         assert isclose(rray.v.Magnitude(), 1./n2, rel_tol=1e-15)
 
         # ray.v, surfaceNormal, and rray.v should all be in the same plane, and
         # hence (ray.v x surfaceNormal) . rray.v should have zero magnitude.
         # magnitude zero.
+        normal = asphere.normal(iray.p0.x, iray.p0.y)
         assert isclose(
             batoid.DotProduct(
-                batoid.CrossProduct(ray.v, isec.surfaceNormal),
+                batoid.CrossProduct(ray.v, normal),
                 rray.v),
             0.0, rel_tol=0, abs_tol=1e-15)
 
         # Test Snell's law
         assert isclose(
-            n1*batoid.CrossProduct(ray.v.UnitVec3(), isec.surfaceNormal).Magnitude(),
-            n2*batoid.CrossProduct(rray.v.UnitVec3(), isec.surfaceNormal).Magnitude(),
+            n1*batoid.CrossProduct(ray.v.UnitVec3(), normal).Magnitude(),
+            n2*batoid.CrossProduct(rray.v.UnitVec3(), normal).Magnitude(),
             rel_tol=0, abs_tol=1e-15)
 
 
@@ -198,8 +201,8 @@ def test_asphere_refraction_reversal():
         ray = batoid.Ray(batoid.Vec3(x, y, -0.1),
                          batoid.Vec3(vx, vy, 1).UnitVec3()/n1,
                          0)
-        isec = asphere.intersect(ray)
-        rray = isec.refractedRay(ray, n1, n2)
+        iray = asphere.intercept(ray)
+        rray = batoid._batoid.refract(iray, asphere, n1, n2)
         assert isclose(rray.v.Magnitude(), 1./n2, rel_tol=1e-15)
 
         # Invert the refracted ray, and see that it ends back at the starting
@@ -208,18 +211,18 @@ def test_asphere_refraction_reversal():
         # Keep going a bit before turning around though
         turn_around = rray.positionAtTime(rray.t0+0.1)
         return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t0+0.1))
-        risec = asphere.intersect(return_ray)
+        riray = asphere.intercept(return_ray)
         # First check that we intersected at the same point
-        assert isclose(isec.point.x, risec.point.x, rel_tol=0, abs_tol=1e-9)
-        assert isclose(isec.point.y, risec.point.y, rel_tol=0, abs_tol=1e-9)
-        assert isclose(isec.point.z, risec.point.z, rel_tol=0, abs_tol=1e-9)
+        assert isclose(iray.p0.x, riray.p0.x, rel_tol=0, abs_tol=1e-10)
+        assert isclose(iray.p0.y, riray.p0.y, rel_tol=0, abs_tol=1e-10)
+        assert isclose(iray.p0.z, riray.p0.z, rel_tol=0, abs_tol=1e-10)
         # Refract and propagate back to t=0.
-        cray = risec.refractedRay(return_ray, n2, n1)
+        cray = batoid._batoid.refract(riray, asphere, n2, n1)
         assert isclose(cray.v.Magnitude(), 1./n1, rel_tol=1e-15)
         cpoint = cray.positionAtTime(0)
-        assert isclose(cpoint.x, x, rel_tol=0, abs_tol=1e-9)
-        assert isclose(cpoint.y, y, rel_tol=0, abs_tol=1e-9)
-        assert isclose(cpoint.z, -0.1, rel_tol=0, abs_tol=1e-9)
+        assert isclose(cpoint.x, x, rel_tol=0, abs_tol=1e-10)
+        assert isclose(cpoint.y, y, rel_tol=0, abs_tol=1e-10)
+        assert isclose(cpoint.z, -0.1, rel_tol=0, abs_tol=1e-10)
 
 
 @timer
@@ -234,13 +237,13 @@ def test_const_medium_refraction():
         vx = random.gauss(0, 1e-1)
         vy = random.gauss(0, 1e-1)
         ray = batoid.Ray(x, y, -0.1, vx, vy, 1, 0)
-        isec = asphere.intersect(ray)
+        iray = asphere.intercept(ray)
         n1 = 1.7
         n2 = 1.2
         m1 = batoid.ConstMedium(n1)
         m2 = batoid.ConstMedium(n2)
-        rray1 = isec.refractedRay(ray, n1, n2)
-        rray2 = isec.refractedRay(ray, m1, m2)
+        rray1 = batoid._batoid.refract(ray, asphere, n1, n2)
+        rray2 = batoid._batoid.refract(ray, asphere, m1, m2)
 
         assert rray1 == rray2
 
@@ -264,13 +267,13 @@ def test_table_medium_refraction():
         vy = random.gauss(0, 1e-1)
         wavelength = random.uniform(0.3, 1.2)
         ray = batoid.Ray(x, y, -0.1, vx, vy, 1, 0, wavelength)
-        isec = asphere.intersect(ray)
+        iray = asphere.intercept(ray)
 
         n1 = silica.getN(wavelength)
         n2 = air.getN(wavelength)
 
-        rray1 = isec.refractedRay(ray, silica, air)
-        rray2 = isec.refractedRay(ray, n1, n2)
+        rray1 = batoid._batoid.refract(ray, asphere, silica, air)
+        rray2 = batoid._batoid.refract(ray, asphere, n1, n2)
 
         assert rray1 == rray2
 

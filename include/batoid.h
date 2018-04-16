@@ -3,7 +3,7 @@
 
 #include "vec3.h"
 #include "ray.h"
-#include "intersection.h"
+#include "medium.h"
 #include "surface.h"
 #include "utils.h"
 

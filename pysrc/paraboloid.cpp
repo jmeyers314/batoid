@@ -6,7 +6,6 @@
 #include <pybind11/numpy.h>
 
 PYBIND11_MAKE_OPAQUE(std::vector<batoid::Ray>);
-PYBIND11_MAKE_OPAQUE(std::vector<batoid::Intersection>);
 
 namespace py = pybind11;
 using namespace pybind11::literals;

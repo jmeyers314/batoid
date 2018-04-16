@@ -9,18 +9,15 @@ namespace batoid {
     void pyExportVec3(py::module&);
     void pyExportVec2(py::module&);
     void pyExportRay(py::module&);
-    void pyExportIntersection(py::module&);
     void pyExportSurface(py::module&);
     void pyExportParaboloid(py::module&);
     void pyExportAsphere(py::module&);
     void pyExportQuadric(py::module&);
     void pyExportSphere(py::module&);
     void pyExportPlane(py::module&);
-    void pyExportTransformation(py::module&);
     void pyExportTable(py::module&);
     void pyExportMedium(py::module&);
     void pyExportObscuration(py::module&);
-    void pyExportXForm(py::module&);
     void pyExportCoordSys(py::module&);
     void pyExportCoordTransform(py::module&);
 
@@ -33,18 +30,15 @@ namespace batoid {
         pyExportVec3(m);
         pyExportVec2(m);
         pyExportRay(m);
-        pyExportIntersection(m);
         pyExportSurface(m);
         pyExportParaboloid(m);
         pyExportAsphere(m);
         pyExportQuadric(m);
         pyExportSphere(m);
         pyExportPlane(m);
-        pyExportTransformation(m);
         pyExportTable(m);
         pyExportMedium(m);
         pyExportObscuration(m);
-        pyExportXForm(m);
         pyExportCoordSys(m);
         pyExportCoordTransform(m);
 

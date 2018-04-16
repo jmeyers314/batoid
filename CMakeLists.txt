@@ -11,7 +11,6 @@ set(PYSRC_FILES
   pysrc/asphere.cpp
   pysrc/batoid.cpp
   pysrc/coordsys.cpp
-  pysrc/intersection.cpp
   pysrc/medium.cpp
   pysrc/obscuration.cpp
   pysrc/paraboloid.cpp
@@ -21,16 +20,13 @@ set(PYSRC_FILES
   pysrc/sphere.cpp
   pysrc/surface.cpp
   pysrc/table.cpp
-  pysrc/transformation.cpp
   pysrc/vec2.cpp
   pysrc/vec3.cpp
-  pysrc/xform.cpp
 )
 set(SRC_FILES
   src/asphere.cpp
   src/batoid.cpp
   src/coordsys.cpp
-  src/intersection.cpp
   src/medium.cpp
   src/obscuration.cpp
   src/paraboloid.cpp
@@ -40,9 +36,7 @@ set(SRC_FILES
   src/sphere.cpp
   src/surface.cpp
   src/table.cpp
-  src/transformation.cpp
   src/utils.cpp
-  src/xform.cpp
 )
 add_library(batoid SHARED ${SRC_FILES})
 pybind11_add_module(_batoid ${PYSRC_FILES})

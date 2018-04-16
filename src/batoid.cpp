@@ -3,7 +3,6 @@
 #include "surface.h"
 #include "medium.h"
 #include "utils.h"
-#include "intersection.h"
 #include <numeric>
 
 namespace batoid{

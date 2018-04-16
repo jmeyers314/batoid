@@ -65,17 +65,6 @@ namespace batoid {
         return Ray(point, r.v, t, r.wavelength, r.isVignetted);
     }
 
-    Intersection Asphere::intersect(const Ray& r) const {
-        if (r.failed)
-            return Intersection(true);
-        double t;
-        if (!timeToIntercept(r, t))
-            return Intersection(true);
-        Vec3 point = r.positionAtTime(t);
-        Vec3 surfaceNormal = normal(point.x, point.y);
-        return Intersection(t, point, surfaceNormal);
-    }
-
     void Asphere::interceptInPlace(Ray& r) const {
         if (r.failed) return;
         double t;
