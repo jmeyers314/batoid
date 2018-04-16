@@ -88,7 +88,7 @@ class Interface(Optic):
         return hash((self.__class__.__name__, self.surface, self.obscuration, self.name,
                      self.inMedium, self.outMedium, self.coordSys))
 
-    def draw3d(self, ax, **kwargs):
+    def draw3d(self, ax, **kwargs):  # pragma: no cover
         """ Draw this interface on a mplot3d axis.
 
         Parameters
@@ -149,7 +149,7 @@ class Interface(Optic):
         x, y, z = transform.applyForward(x, y, z)
         ax.plot(x, y, z, **kwargs)
 
-    def draw2d(self, ax, **kwargs):
+    def draw2d(self, ax, **kwargs):  # pragma: no cover
         """ Draw this interface on a 2d matplotlib axis.
         May not work if elements are non-circular or not axis-aligned.
         """
@@ -428,13 +428,13 @@ class CompoundOptic(Optic):
             r, coordSys = item.traceReverse(r, inCoordSys=coordSys)
         return self.items[0].traceReverse(r, inCoordSys=coordSys, outCoordSys=outCoordSys)
 
-    def draw3d(self, ax, **kwargs):
+    def draw3d(self, ax, **kwargs):  # pragma: no cover
         """ Recursively draw this Optic by successively drawing all subitems.
         """
         for item in self.items:
             item.draw3d(ax, **kwargs)
 
-    def draw2d(self, ax, **kwargs):
+    def draw2d(self, ax, **kwargs):  # pragma: no cover
         for item in self.items:
             item.draw2d(ax, **kwargs)
 
@@ -674,7 +674,7 @@ class Lens(CompoundOptic):
         raise RuntimeError("Error in withLocallyRotatedOptic!, Shouldn't get here!")
 
 
-def drawTrace3d(ax, traceFull, start=None, end=None, **kwargs):
+def drawTrace3d(ax, traceFull, start=None, end=None, **kwargs):  # pragma: no cover
     if start is None:
         start = traceFull[0]['name']
     if end is None:
@@ -700,7 +700,7 @@ def drawTrace3d(ax, traceFull, start=None, end=None, **kwargs):
             break
 
 
-def drawTrace2d(ax, traceFull, start=None, end=None, **kwargs):
+def drawTrace2d(ax, traceFull, start=None, end=None, **kwargs):  # pragma: no cover
     if start is None:
         start = traceFull[0]['name']
     if end is None:

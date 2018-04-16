@@ -1,0 +1,5 @@
+[report]
+# Regexes for lines to exclude from consideration
+exclude_lines =
+    # If you put this in a comment, you can manually exclude code from being covered.
+    pragma: no cover
