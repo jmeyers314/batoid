@@ -8,13 +8,13 @@ import yaml
 
 @timer
 def parallel_trace_timing(nside=512):
-    rays = batoid._batoid.circularGrid(20, 4.1, 0.5, 0.01, 0.01, -1.0, nside, nside, 500e-9, 1.0)
+    rays = batoid._batoid.circularGrid(20, 4.1, 0.5, 0.001, 0.001, -1.0, nside, nside, 500e-9, 1.0)
 
     nrays = len(rays)
     print("Tracing {} rays.".format(nrays))
     print()
 
-    fn = os.path.join(batoid.datadir, "hsc", "HSC3.yaml")
+    fn = os.path.join(batoid.datadir, "HSC", "HSC.yaml")
     config = yaml.load(open(fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
 

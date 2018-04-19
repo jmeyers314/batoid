@@ -1,4 +1,5 @@
 import math
+import numpy as np
 import batoid
 from test_helpers import isclose, timer, do_pickle, all_obj_diff
 
@@ -288,7 +289,7 @@ def test_euler():
 
         # Check ctor against rotating one at a time.
         R4 = batoid.RotX(thx)*batoid.RotY(thy)*batoid.RotZ(thz)
-        assert R == R4
+        np.testing.assert_allclose(R, R4, rtol=0, atol=1e-20)
 
         # Check round trip of .euler property
         R5 = batoid.Rot3(R.euler)
