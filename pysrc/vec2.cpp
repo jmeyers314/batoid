@@ -81,42 +81,7 @@ namespace batoid {
                 return result;
             });
 
-        m.def("DotProduct", &DotProduct, R"pbdoc(
-          Compute the dot-product of two Vec2 objects.
-
-          Parameters
-          ----------
-          v1 : Vec2
-            First vector
-          v2 : Vec2
-            Second vector
-
-          Returns
-          -------
-          float
-            The dot product.
-
-          Notes
-          -----
-          The dot product is defined as the sum of the component-wise products of two vectors.  It
-          is useful for computing the magnitude of a vector, or the angle between two vectors as
-
-          .. math::
-            v1 \dot v2 = \cos(\theta)
-
-          where :math:`\theta` is the angle in between the two vectors.
-
-          Examples
-          --------
-          >>> v1 = batoid.Vec2(0, 1, 0)
-          >>> v2 = batoid.Vec2(0, 0, 1)
-          >>> print(batoid.DotProduct(v1, v2))
-          0.0
-          >>> v1 = batoid.Vec2(0, 1, 2)
-          >>> v2 = batoid.Vec2(1, 2, 3)
-          >>> assert batoid.DotProduct(v1, v2) == v1.x*v2.x + v1.y*v2.y + v1.z*v2.z
-
-        )pbdoc");
+        m.def("DotProduct", &DotProduct);
 
         m.def("RotVec", &RotVec);
         m.def("UnRotVec", &UnRotVec);

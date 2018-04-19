@@ -1,2 +1,5 @@
+Batoid
+------
+
 .. automodule:: batoid
-  :members:
+    :members:
