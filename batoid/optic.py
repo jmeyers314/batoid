@@ -2,7 +2,7 @@ import batoid
 import numpy as np
 
 
-class Optic(object):
+class Optic:
     """This is the most general category of batoid optical system.  It can include
     a single reflective or refractive surface, a lens consisting of two surfaces, or
     an entire telescope including multiple mirrors and/or surfaces.
