@@ -20,7 +20,7 @@ def test_optic():
     t_fast = 0.0
     t_slow = 0.0
 
-    fn = os.path.join(batoid.datadir, "hsc", "HSC3.yaml")
+    fn = os.path.join(batoid.datadir, "HSC", "HSC.yaml")
     config = yaml.load(open(fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
     do_pickle(telescope)
@@ -53,7 +53,7 @@ def test_traceFull():
     nrays = len(rays)
     print("Tracing {} rays.".format(nrays))
 
-    fn = os.path.join(batoid.datadir, "hsc", "HSC3.yaml")
+    fn = os.path.join(batoid.datadir, "HSC", "HSC.yaml")
     config = yaml.load(open(fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
 
@@ -70,7 +70,7 @@ def test_traceReverse():
     else:
         nside = 32
 
-    fn = os.path.join(batoid.datadir, "hsc", "HSC3.yaml")
+    fn = os.path.join(batoid.datadir, "HSC", "HSC.yaml")
     config = yaml.load(open(fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
 

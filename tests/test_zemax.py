@@ -7,9 +7,10 @@ import yaml
 
 directory = os.path.dirname(__file__)
 
+
 @timer
 def test_HSC_trace():
-    fn = os.path.join(batoid.datadir, "hsc", "HSC3.yaml")
+    fn = os.path.join(batoid.datadir, "HSC", "HSC.yaml")
     config = yaml.load(open(fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
 

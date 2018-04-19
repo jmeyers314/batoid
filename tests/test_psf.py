@@ -125,7 +125,7 @@ def test_huygens_psf():
 @timer
 def test_lsst_psf():
     # Just testing that doesn't crash for the moment
-    fn = os.path.join(batoid.datadir, "lsst", "LSST_r2.yaml")
+    fn = os.path.join(batoid.datadir, "LSST", "LSST_r.yaml")
     config = yaml.load(open(fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
 
@@ -178,7 +178,7 @@ def test_lsst_psf():
 @timer
 def test_hsc_psf():
     # Just testing that doesn't crash for the moment
-    fn = os.path.join(batoid.datadir, "hsc", "HSC3.yaml")
+    fn = os.path.join(batoid.datadir, "HSC", "HSC.yaml")
     config = yaml.load(open(fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
 
@@ -223,7 +223,7 @@ def test_hsc_psf():
 @timer
 def test_decam_psf():
     # Just testing that doesn't crash for the moment
-    fn = os.path.join(batoid.datadir, "decam", "DECam2.yaml")
+    fn = os.path.join(batoid.datadir, "DECam", "DECam.yaml")
     config = yaml.load(open(fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
 

@@ -1,119 +1,170 @@
-name: LSST
-config: g
-init_medium: air
-surfaces:
-  M1:
-    sagtype: asphere
-    surftype: mirror
-    zvertex: 0.0
-    thickness: 0.0
-    inner: 2.558
-    outer: 4.18
-    medium: air
-    R: 19.835
-    conic: -1.215
-    coef: [-0.0, -1.381e-09]
-  M2:
-    sagtype: asphere
-    surftype: mirror
-    zvertex: 6.1562006
-    thickness: 6.1562006
-    inner: 0.9
-    outer: 1.71
-    medium: air
-    R: 6.788
-    conic: -0.222
-    coef: [-0.0, 1.274e-05, 9.68e-07]
-  M3:
-    sagtype: asphere
-    surftype: mirror
-    zvertex: -0.23380000000000045
-    thickness: -6.3900006000000005
-    inner: 0.55
-    outer: 2.508
-    medium: air
-    R: 8.3445
-    conic: 0.155
-    coef: [-0.0, 4.5000000000000003e-07, 8.149999999999999e-09]
-  L1:
-    sagtype: sphere
-    surftype: lens
-    zvertex: 3.3986166314330655
-    thickness: 3.632416631433066
-    inner: 0.0
-    outer: 0.775
-    medium: silica
-    R: 2.824
-  L1E:
-    sagtype: sphere
-    surftype: lens
-    zvertex: 3.4808466314330655
-    thickness: 0.08223
-    inner: 0.0
-    outer: 0.775
-    medium: air
-    R: 5.021
-  L2:
-    sagtype: plane
-    surftype: lens
-    zvertex: 3.8934886514330653
-    thickness: 0.41264202
-    inner: 0.0
-    outer: 0.551
-    medium: silica
-  L2E:
-    sagtype: asphere
-    surftype: lens
-    zvertex: 3.923488651433065
-    thickness: 0.03
-    inner: 0.0
-    outer: 0.551
-    medium: air
-    R: 2.529
-    conic: -1.57
-    coef: [-0.0, -0.0016560000000000001]
-  F:
-    sagtype: sphere
-    surftype: filter
-    zvertex: 4.273068651433065
-    thickness: 0.34958
-    inner: 0.0
-    outer: 0.375
-    medium: silica
-    R: 5.632
-  FE:
-    sagtype: sphere
-    surftype: filter
-    zvertex: 4.294568651433065
-    thickness: 0.0215
-    inner: 0.0
-    outer: 0.375
-    medium: air
-    R: 5.576
-  L3:
-    sagtype: quadric
-    surftype: lens
-    zvertex: 4.342068651433065
-    thickness: 0.0475
-    inner: 0.0
-    outer: 0.361
-    medium: silica
-    R: 3.169
-    conic: -0.962
-  L3E:
-    sagtype: sphere
-    surftype: lens
-    zvertex: 4.402068651433065
-    thickness: 0.06
-    inner: 0.0
-    outer: 0.361
-    medium: air
-    R: -13.36
-  D:
-    sagtype: plane
-    surftype: det
-    zvertex: 4.430568651433065
-    thickness: 0.0285
-    inner: 0.0
-    outer: 0.4
-    medium: air
+opticalSystem:
+  type: CompoundOptic
+  name: LSST
+  inMedium: air
+  medium: air
+  items:
+    -
+      type: Mirror
+      name: M1
+      surface:
+        type: Asphere
+        R: 19.835
+        conic: -1.215
+        coefs: [-0.0, -1.381e-9]
+      obscuration:
+        type: ClearAnnulus
+        outer: 4.18
+        inner: 2.558
+    -
+      type: Mirror
+      name: M2
+      surface:
+        type: Asphere
+        R: 6.788
+        conic: -0.222
+        coefs: [-0.0, 1.274e-5, 9.68e-7]
+      obscuration:
+        type: ClearAnnulus
+        outer: 1.71
+        inner: 0.9
+      coordSys:
+        z: 6.1562006
+    -
+      type: Mirror
+      name: M3
+      surface:
+        type: Asphere
+        R: 8.3445
+        conic: 0.155
+        coefs: [-0.0, 4.5e-7, 8.15e-9]
+      obscuration:
+        type: ClearAnnulus
+        outer: 2.508
+        inner: 0.55
+      coordSys:
+        z: -0.2338
+    -
+      type: CompoundOptic
+      name: LSSTCamera
+      coordSys:
+        z: 3.3986166314330655
+      items:
+        -
+          type: Lens
+          name: L1
+          medium: silica
+          items:
+            -
+              type: RefractiveInterface
+              name: L1_entrance
+              surface:
+                type: Sphere
+                R: 2.824
+              obscuration:
+                type: ClearCircle
+                radius: 0.775
+            -
+              type: RefractiveInterface
+              name: L1_exit
+              surface:
+                type: Sphere
+                R: 5.021
+              obscuration:
+                type: ClearCircle
+                radius: 0.775
+              coordSys:
+                z: 0.08223
+        -
+          type: Lens
+          name: L2
+          medium: silica
+          coordSys:
+            z: 0.49487202
+          items:
+            -
+              type: RefractiveInterface
+              name: L2_entrance
+              surface:
+                type: Plane
+              obscuration:
+                type: ClearCircle
+                radius: 0.551
+            -
+              type: RefractiveInterface
+              name: L2_exit
+              surface:
+                type: Asphere
+                R: 2.529
+                conic: -1.57
+                coefs: [-0.0, -0.001656]
+              obscuration:
+                type: ClearCircle
+                radius: 0.551
+              coordSys:
+                z: 0.03
+        -
+          type: Lens
+          name: Filter
+          medium: silica
+          coordSys:
+            z: 0.87445202
+          items:
+            -
+              type: RefractiveInterface
+              name: Filter_entrance
+              surface:
+                type: Sphere
+                R: 5.632
+              obscuration:
+                type: ClearCircle
+                radius: 0.375
+            -
+              type: RefractiveInterface
+              name: Filter_exit
+              surface:
+                type: Sphere
+                R: 5.576
+              obscuration:
+                type: ClearCircle
+                radius: 0.375
+              coordSys:
+                z: 0.0215
+        -
+          type: Lens
+          name: L3
+          medium: silica
+          coordSys:
+            z: 0.94345202
+          items:
+            -
+              type: RefractiveInterface
+              name: L3_entrance
+              surface:
+                type: Quadric
+                R: 3.169
+                conic: -0.962
+              obscuration:
+                type: ClearCircle
+                radius: 0.361
+            -
+              type: RefractiveInterface
+              name: L3_exit
+              surface:
+                type: Sphere
+                R: -13.36
+              obscuration:
+                type: ClearCircle
+                radius: 0.361
+              coordSys:
+                z: 0.06
+        -
+          type: Detector
+          name: Detector
+          surface:
+            type: Plane
+          obscuration:
+            type: ClearCircle
+            radius: 0.4
+          coordSys:
+            z: 1.03195202
