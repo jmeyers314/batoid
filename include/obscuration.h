@@ -1,11 +1,13 @@
 #ifndef batoid_obscuration_h
 #define batoid_obscuration_h
 
-#include "vec2.h"
 #include "ray.h"
 #include <vector>
 #include <memory>
+#include <Eigen/Dense>
 
+using Eigen::Vector2d;
+using Eigen::Matrix2d;
 
 namespace batoid {
     class Obscuration {
@@ -50,7 +52,7 @@ namespace batoid {
 
         const double _width, _height, _x0, _y0, _theta;
     private:
-        Vec2 _A, _B, _C, _AB, _BC;
+        Vector2d _A, _B, _C, _AB, _BC;
         double _ABAB, _BCBC;
     };
 

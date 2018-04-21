@@ -1,4 +1,4 @@
-from ._batoid import Vec2, Rot2, Vec3, Rot3, RotVec, UnRotVec
+from ._batoid import Vec3, Rot3, RotVec, UnRotVec
 from ._batoid import DotProduct, CrossProduct
 from ._batoid import Ray, RayVector
 from ._batoid import Surface, Plane, Paraboloid, Sphere, Quadric, Asphere
@@ -30,7 +30,7 @@ datadir = os.path.join(os.path.dirname(__file__), "data")
 
 __all__ = []
 __all__ += ["Ray", "RayVector"]
-__all__ += ["Vec2", "Rot2", "Vec3", "Rot3", "RotVec", "UnRotVec"]
+__all__ += ["Vec3", "Rot3", "RotVec", "UnRotVec"]
 __all__ += ["DotProduct", "CrossProduct"]
 __all__ += ["Surface", "Plane", "Paraboloid", "Sphere", "Quadric", "Asphere"]
 __all__ += ["Table"]

@@ -180,7 +180,6 @@ def test_ne():
             batoid.ObscCircle(2.2),
             batoid.ObscAnnulus(1.0, 2.0)
         ]),
-        batoid.Vec2(),
     ]
     all_obj_diff(objs)
 

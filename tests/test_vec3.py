@@ -301,7 +301,6 @@ def test_ne():
             batoid.Vec3(0,0,1),
             batoid.Vec3(0,1,0),
             batoid.Vec3(1,0,0),
-            batoid.Vec2(),
             batoid.Rot3(),
             batoid.RotX(0.1),
             batoid.Rot3([1,1,1,0,0,0,0,0,0])]

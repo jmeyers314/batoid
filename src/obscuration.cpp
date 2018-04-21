@@ -1,5 +1,4 @@
 #include "obscuration.h"
-#include "vec2.h"
 #include "ray.h"
 #include "utils.h"
 #include <cmath>
@@ -114,23 +113,24 @@ namespace batoid {
         _C = {+_width/2, +_height/2};
         double sth = std::sin(_theta);
         double cth = std::cos(_theta);
-        Rot2 R{{{cth, -sth, sth, cth}}};
-        Vec2 center(_x0, _y0);
-        _A = RotVec(R, _A) + center;
-        _B = RotVec(R, _B) + center;
-        _C = RotVec(R, _C) + center;
+        Matrix2d R;
+        R << cth, -sth, sth, cth;
+        Vector2d center(_x0, _y0);
+        _A = R*_A + center;
+        _B = R*_B + center;
+        _C = R*_C + center;
         _AB = _B - _A;
-        _ABAB = DotProduct(_AB, _AB);
+        _ABAB = _AB.squaredNorm();
         _BC = _C - _B;
-        _BCBC = DotProduct(_BC, _BC);
+        _BCBC = _BC.squaredNorm();
     }
 
     bool ObscRectangle::contains(double x, double y) const {
-        Vec2 M(x, y);
-        Vec2 AM(M - _A);
-        Vec2 BM(M - _B);
-        double ABAM(DotProduct(AM, _AB));
-        double BCBM(DotProduct(BM, _BC));
+        Vector2d M(x, y);
+        Vector2d AM(M - _A);
+        Vector2d BM(M - _B);
+        double ABAM = AM.dot(_AB);
+        double BCBM = BM.dot(_BC);
         return (0 <= ABAM) && (ABAM <= _ABAB) && (0 <= BCBM) && (BCBM <= _BCBC);
     }
 

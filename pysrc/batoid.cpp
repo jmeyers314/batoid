@@ -7,7 +7,6 @@ namespace py = pybind11;
 
 namespace batoid {
     void pyExportVec3(py::module&);
-    void pyExportVec2(py::module&);
     void pyExportRay(py::module&);
     void pyExportSurface(py::module&);
     void pyExportParaboloid(py::module&);
@@ -28,7 +27,6 @@ namespace batoid {
         py::module m("_batoid", "ray tracer");
 #endif
         pyExportVec3(m);
-        pyExportVec2(m);
         pyExportRay(m);
         pyExportSurface(m);
         pyExportParaboloid(m);

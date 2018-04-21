@@ -80,7 +80,7 @@ def do_pickle(obj, reprable=True):
     assert obj == obj4
 
     if reprable:
-        from batoid import Vec2, Vec3, Rot2, Rot3, Ray
+        from batoid import Vec3, Rot3, Ray
         from batoid import Plane, Paraboloid, Sphere, Quadric, Asphere
         from batoid import Table
         from batoid import ConstMedium, TableMedium, SellmeierMedium, Air

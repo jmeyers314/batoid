@@ -10,7 +10,7 @@ if (DEFINED ENV{CMAKE_COVER})
     APPEND_COVERAGE_COMPILER_FLAGS()
 endif()
 
-include_directories(include)
+include_directories(include eigen)
 add_subdirectory(pybind11)
 set(PYSRC_FILES
   pysrc/asphere.cpp
@@ -25,7 +25,6 @@ set(PYSRC_FILES
   pysrc/sphere.cpp
   pysrc/surface.cpp
   pysrc/table.cpp
-  pysrc/vec2.cpp
   pysrc/vec3.cpp
 )
 set(SRC_FILES
