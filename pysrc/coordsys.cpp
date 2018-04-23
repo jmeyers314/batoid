@@ -2,9 +2,9 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include <pybind11/operators.h>
+#include <pybind11/eigen.h>
 #include <tuple>
 
-PYBIND11_MAKE_OPAQUE(std::vector<batoid::Vec3>);
 PYBIND11_MAKE_OPAQUE(std::vector<batoid::Ray>);
 
 namespace py = pybind11;
@@ -13,9 +13,9 @@ namespace batoid {
     void pyExportCoordSys(py::module& m) {
         py::class_<CoordSys, std::shared_ptr<CoordSys>>(m, "CoordSys")
             .def(py::init<>())
-            .def(py::init<Vec3>())
-            .def(py::init<Rot3>())
-            .def(py::init<Vec3,Rot3>())
+            .def(py::init<Vector3d>())
+            .def(py::init<Matrix3d>())
+            .def(py::init<Vector3d,Matrix3d>())
             .def_readonly("origin", &CoordSys::m_origin, "Global origin")
             .def_readonly("rot", &CoordSys::m_rot, "Unit vector rotation matrix")
             .def_property_readonly("xhat", &CoordSys::getXHat)
@@ -24,22 +24,30 @@ namespace batoid {
             .def("__repr__", &CoordSys::repr)
             .def("shiftGlobal", &CoordSys::shiftGlobal)
             .def("shiftLocal", &CoordSys::shiftLocal)
-            .def("rotateGlobal", (CoordSys (CoordSys::*) (const Rot3&) const) &CoordSys::rotateGlobal)
-            .def("rotateGlobal", (CoordSys (CoordSys::*) (const Rot3&, const Vec3&, const CoordSys&) const) &CoordSys::rotateGlobal)
-            .def("rotateLocal", (CoordSys (CoordSys::*) (const Rot3&) const) &CoordSys::rotateLocal)
-            .def("rotateLocal", (CoordSys (CoordSys::*) (const Rot3&, const Vec3&, const CoordSys&) const) &CoordSys::rotateLocal)
+            .def("rotateGlobal", (CoordSys (CoordSys::*) (const Matrix3d&) const) &CoordSys::rotateGlobal)
+            .def("rotateGlobal", (CoordSys (CoordSys::*) (const Matrix3d&, const Vector3d&, const CoordSys&) const) &CoordSys::rotateGlobal)
+            .def("rotateLocal", (CoordSys (CoordSys::*) (const Matrix3d&) const) &CoordSys::rotateLocal)
+            .def("rotateLocal", (CoordSys (CoordSys::*) (const Matrix3d&, const Vector3d&, const CoordSys&) const) &CoordSys::rotateLocal)
             .def(py::self == py::self)
             .def(py::self != py::self)
             .def(py::pickle(
                 [](const CoordSys& cs) { return py::make_tuple(cs.m_origin, cs.m_rot); },
                 [](py::tuple t) {
                     return CoordSys(
-                        t[0].cast<Vec3>(), t[1].cast<Rot3>()
+                        t[0].cast<Vector3d>(), t[1].cast<Matrix3d>()
                     );
                 }
             ))
             .def("__hash__", [](const CoordSys& cs) {
-                return py::hash(py::make_tuple("CoordSys", cs.m_origin, cs.m_rot));
+                auto result = py::hash(py::make_tuple("CoordSys"));
+                const double* d = &cs.m_origin[0];
+                for (int i=0; i<3; i++)
+                    result = 1000003*result ^ py::hash(py::float_(d[i]));
+                d = &cs.m_rot(0,0);
+                for (int i=0; i<9; i++)
+                    result = 1000003*result ^ py::hash(py::float_(d[i]));
+                result = (result == -1) ? -2 : result;
+                return result;
             });
     }
 
@@ -72,12 +80,12 @@ namespace batoid {
         double *ptrYOut = (double *)  bufYOut.ptr;
         double *ptrZOut = (double *)  bufZOut.ptr;
 
-        auto v = Vec3();
+        auto v = Vector3d();
         for (ssize_t idx = 0; idx < bufX.size; idx++) {
-            v = ct.applyForward(Vec3(ptrX[idx], ptrY[idx], ptrZ[idx]));
-            ptrXOut[idx] = v.x;
-            ptrYOut[idx] = v.y;
-            ptrZOut[idx] = v.z;
+            v = ct.applyForward(Vector3d(ptrX[idx], ptrY[idx], ptrZ[idx]));
+            ptrXOut[idx] = v[0];
+            ptrYOut[idx] = v[1];
+            ptrZOut[idx] = v[2];
         }
         return std::make_tuple(resultX, resultY, resultZ);
     }
@@ -110,12 +118,12 @@ namespace batoid {
         double *ptrYOut = (double *)  bufYOut.ptr;
         double *ptrZOut = (double *)  bufZOut.ptr;
 
-        auto v = Vec3();
+        auto v = Vector3d();
         for (ssize_t idx = 0; idx < bufX.size; idx++) {
-            v = ct.applyReverse(Vec3(ptrX[idx], ptrY[idx], ptrZ[idx]));
-            ptrXOut[idx] = v.x;
-            ptrYOut[idx] = v.y;
-            ptrZOut[idx] = v.z;
+            v = ct.applyReverse(Vector3d(ptrX[idx], ptrY[idx], ptrZ[idx]));
+            ptrXOut[idx] = v[0];
+            ptrYOut[idx] = v[1];
+            ptrZOut[idx] = v[2];
         }
         return std::make_tuple(resultX, resultY, resultZ);
     }
@@ -123,8 +131,8 @@ namespace batoid {
     void pyExportCoordTransform(py::module& m) {
         py::class_<CoordTransform, std::shared_ptr<CoordTransform>>(m, "CoordTransform")
             .def(py::init<const CoordSys&, const CoordSys&>())
-            .def("applyForward", (Vec3 (CoordTransform::*)(const Vec3&) const) &CoordTransform::applyForward)
-            .def("applyReverse", (Vec3 (CoordTransform::*)(const Vec3&) const) &CoordTransform::applyReverse)
+            .def("applyForward", (Vector3d (CoordTransform::*)(const Vector3d&) const) &CoordTransform::applyForward)
+            .def("applyReverse", (Vector3d (CoordTransform::*)(const Vector3d&) const) &CoordTransform::applyReverse)
             .def("applyForward", [](const CoordTransform& ct, py::array_t<double> xs, py::array_t<double> ys, py::array_t<double> zs){
                 return numpyApplyForward(ct, xs, ys, zs);
             })
@@ -133,18 +141,40 @@ namespace batoid {
             })
             .def("applyForward", (Ray (CoordTransform::*)(const Ray&) const) &CoordTransform::applyForward)
             .def("applyReverse", (Ray (CoordTransform::*)(const Ray&) const) &CoordTransform::applyReverse)
-            .def("applyForward", (std::vector<Ray> (CoordTransform::*)(const std::vector<Ray>&) const) &CoordTransform::applyForward)
-            .def("applyReverse", (std::vector<Ray> (CoordTransform::*)(const std::vector<Ray>&) const) &CoordTransform::applyReverse)
+            .def("applyForward", [](const CoordTransform& ct, const RayVector& rv){
+                RayVector result;
+                result.rays = std::move(ct.applyForward(rv.rays));
+                return result;
+            })
+            .def("applyReverse", [](const CoordTransform& ct, const RayVector& rv){
+                RayVector result;
+                result.rays = std::move(ct.applyReverse(rv.rays));
+                return result;
+            })
             .def("applyForwardInPlace", (void (CoordTransform::*)(Ray&) const) &CoordTransform::applyForwardInPlace)
-            .def("applyForwardInPlace", (void (CoordTransform::*)(std::vector<Ray>&) const) &CoordTransform::applyForwardInPlace)
+            .def("applyForwardInPlace", [](const CoordTransform& ct, RayVector& rv){
+                ct.applyForwardInPlace(rv.rays);
+            })
+            .def("applyReverseInPlace", (void (CoordTransform::*)(Ray&) const) &CoordTransform::applyReverseInPlace)
+            .def("applyReverseInPlace", [](const CoordTransform& ct, RayVector& rv){
+                ct.applyReverseInPlace(rv.rays);
+            })
             .def(py::self == py::self)
             .def(py::self != py::self)
             .def(py::pickle(
                 [](const CoordTransform& ct) { return py::make_tuple(ct.getDr(), ct.getRot()); },
-                [](py::tuple t) { return CoordTransform(t[0].cast<Vec3>(), t[1].cast<Rot3>()); }
+                [](py::tuple t) { return CoordTransform(t[0].cast<Vector3d>(), t[1].cast<Matrix3d>()); }
             ))
             .def("__hash__", [](CoordTransform& ct) {
-                return py::hash(py::make_tuple("CoordTransform", ct.getDr(), ct.getRot()));
+                auto result = py::hash(py::make_tuple("CoordTransform"));
+                const double* d = &ct.getDr()[0];
+                for (int i=0; i<3; i++)
+                    result = 1000003*result ^ py::hash(py::float_(d[i]));
+                d = &ct.getRot()(0,0);
+                for (int i=0; i<9; i++)
+                    result = 1000003*result ^ py::hash(py::float_(d[i]));
+                result = (result == -1) ? -2 : result;
+                return result;
             })
             .def("__repr__", &CoordTransform::repr);
     }

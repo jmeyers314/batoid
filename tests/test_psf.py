@@ -37,7 +37,7 @@ def test_huygens_psf():
                 batoid.Detector(
                     batoid.Plane(),
                     name="detector",
-                    coordSys=batoid.CoordSys().shiftGlobal(batoid.Vec3(0,0,focalLength))
+                    coordSys=batoid.CoordSys().shiftGlobal([0,0,focalLength])
                 )
             ]
         )

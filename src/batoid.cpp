@@ -4,15 +4,18 @@
 #include "medium.h"
 #include "utils.h"
 #include <numeric>
+#include <Eigen/Dense>
+
+using Eigen::Vector3d;
 
 namespace batoid{
     Ray reflect(const Ray& r, const Surface& surface) {
         if (r.failed) return r;
-        double n = 1.0 / r.v.Magnitude();
-        Vec3 nv = r.v * n;
-        Vec3 normal = surface.normal(r.p0.x, r.p0.y);
-        double c1 = DotProduct(nv, normal);
-        return Ray(r.p0, (nv - 2*c1*normal).UnitVec3()/n, r.t0, r.wavelength, r.isVignetted);
+        double n = 1.0 / r.v.norm();
+        Vector3d nv = r.v * n;
+        Vector3d normal(surface.normal(r.p0[0], r.p0[1]));
+        double c1 = nv.dot(normal);
+        return Ray(r.p0, (nv - 2*c1*normal).normalized()/n, r.t0, r.wavelength, r.isVignetted);
     }
 
     std::vector<Ray> reflect(const std::vector<Ray>& rays, const Surface& surface) {
@@ -26,11 +29,11 @@ namespace batoid{
 
     void reflectInPlace(Ray& r, const Surface& surface) {
         if (r.failed) return;
-        double n = 1.0 / r.v.Magnitude();
-        Vec3 nv = r.v * n;
-        Vec3 normal = surface.normal(r.p0.x, r.p0.y);
-        double c1 = DotProduct(nv, normal);
-        r.v = (nv - 2*c1*normal).UnitVec3()/n;
+        double n = 1.0 / r.v.norm();
+        Vector3d nv = r.v * n;
+        Vector3d normal(surface.normal(r.p0[0], r.p0[1]));
+        double c1 = nv.dot(normal);
+        r.v = (nv - 2*c1*normal).normalized()/n;
     }
 
     void reflectInPlace(std::vector<Ray>& rays, const Surface& surface) {
@@ -42,17 +45,17 @@ namespace batoid{
 
     Ray refract(const Ray& r, const Surface& surface, const double n1, const double n2) {
         if (r.failed) return r;
-        Vec3 nv = r.v * n1;
-        Vec3 normal = surface.normal(r.p0.x, r.p0.y);
-        double alpha = DotProduct(nv, normal);
+        Vector3d nv = r.v * n1;
+        Vector3d normal(surface.normal(r.p0[0], r.p0[1]));
+        double alpha = nv.dot(normal);
         double a = 1.;
         double b = 2*alpha;
         double c = (1. - (n2*n2)/(n1*n1));
         double k1, k2;
         solveQuadratic(a, b, c, k1, k2);
-        Vec3 f1 = (nv+k1*normal).UnitVec3();
-        Vec3 f2 = (nv+k2*normal).UnitVec3();
-        if (DotProduct(f1, nv) > DotProduct(f2, nv))
+        Vector3d f1 = (nv+k1*normal).normalized();
+        Vector3d f2 = (nv+k2*normal).normalized();
+        if (f1.dot(nv) > f2.dot(nv))
             return Ray(r.p0, f1/n2, r.t0, r.wavelength, r.isVignetted);
         else
             return Ray(r.p0, f2/n2, r.t0, r.wavelength, r.isVignetted);
@@ -87,17 +90,17 @@ namespace batoid{
 
     void refractInPlace(Ray& r, const Surface& surface, double n1, double n2) {
         if (r.failed) return;
-        Vec3 nv = r.v * n1;
-        Vec3 normal = surface.normal(r.p0.x, r.p0.y);
-        double alpha = DotProduct(nv, normal);
+        Vector3d nv = r.v * n1;
+        Vector3d normal(surface.normal(r.p0[0], r.p0[1]));
+        double alpha = nv.dot(normal);
         double a = 1.;
         double b = 2*alpha;
         double c = (1. - (n2*n2)/(n1*n1));
         double k1, k2;
         solveQuadratic(a, b, c, k1, k2);
-        Vec3 f1 = (nv+k1*normal).UnitVec3();
-        Vec3 f2 = (nv+k2*normal).UnitVec3();
-        if (DotProduct(f1, nv) > DotProduct(f2, nv))
+        Vector3d f1 = (nv+k1*normal).normalized();
+        Vector3d f2 = (nv+k2*normal).normalized();
+        if (f1.dot(nv) > f2.dot(nv))
             r.v = f1/n2;
         else
             r.v = f2/n2;
@@ -139,7 +142,9 @@ namespace batoid{
         result.reserve(nside*nside);
 
         // The "velocities" of all the rays in the grid are the same.
-        auto v = Vec3(xcos, ycos, zcos).UnitVec3()/n;
+        Vector3d v(xcos, ycos, zcos);
+        v.normalize();
+        v /= n;
 
         double dy = length/(nside-1);
         double y0 = -length/2;
@@ -148,7 +153,7 @@ namespace batoid{
             double x = y0;
             for(int ix=0; ix<nside; ix++) {
                 // Start with the position of the ray when it intersects the pupil
-                Vec3 r(x,y,0);
+                Vector3d r(x,y,0);
                 // We know that the position of the ray that goes through the origin
                 // (which is also the center of the pupil), is given by
                 //   a = -dist * vhat = -dist * v * n
@@ -162,7 +167,7 @@ namespace batoid{
                 // => t = (r + v n d) . v / v . v
                 //      = (r + v n d) . v n^2
                 // => r0 = r - v t
-                double t = DotProduct(r + v*n*dist, v) * n * n;
+                double t = (r + v*n*dist).dot(v) * n * n;
                 result.push_back(Ray(r-v*t, v, 0, wavelength, false));
                 x += dy;
             }
@@ -196,7 +201,9 @@ namespace batoid{
         result.reserve(nray);
 
         // The "velocities" of all the rays in the grid are the same.
-        auto v = Vec3(xcos, ycos, zcos).UnitVec3()/n;
+        Vector3d v(xcos, ycos, zcos);
+        v.normalize();
+        v /= n;
 
         rfrac = 1.0;
         for (int i=0; i<nradii; i++) {
@@ -204,8 +211,8 @@ namespace batoid{
             double daz = 2*M_PI/nphis[i];
             double radius = rfrac*outer;
             for (int j=0; j<nphis[i]; j++) {
-                Vec3 r(radius*std::cos(az), radius*std::sin(az), 0);
-                double t = DotProduct(r + v*n*dist, v) * n * n;
+                Vector3d r(radius*std::cos(az), radius*std::sin(az), 0);
+                double t = (r + v*n*dist).dot(v) * n * n;
                 result.push_back(Ray(r-v*t, v, 0, wavelength, false));
                 az += daz;
             }

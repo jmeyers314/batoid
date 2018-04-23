@@ -3,14 +3,17 @@
 
 #include <vector>
 #include <memory>
-#include "vec3.h"
 #include "ray.h"
+
+#include <Eigen/Dense>
+
+using Eigen::Vector3d;
 
 namespace batoid {
     class Surface : public std::enable_shared_from_this<Surface> {
     public:
         virtual double sag(double, double) const = 0;
-        virtual Vec3 normal(double, double) const = 0;
+        virtual Vector3d normal(double, double) const = 0;
 
         virtual Ray intersect(const Ray&) const = 0;
         virtual void intersectInPlace(Ray&) const = 0;

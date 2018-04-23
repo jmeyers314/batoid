@@ -18,19 +18,20 @@ namespace batoid {
         return result;
     }
 
-    Vec3 Asphere::normal(double x, double y) const {
+    Vector3d Asphere::normal(double x, double y) const {
         double r = std::sqrt(x*x + y*y);
-        if (r == 0.0) return Vec3(0,0,1);
+        if (r == 0.0)
+            return Vector3d(0,0,1);
         double dzdr1 = dzdr(r);
-        return Vec3(-dzdr1*x/r, -dzdr1*y/r, 1).UnitVec3();
+        return Vector3d(-dzdr1*x/r, -dzdr1*y/r, 1).normalized();
     }
 
     class AsphereResidual {
     public:
         AsphereResidual(const Asphere& a, const Ray& r) : _a(a), _r(r) {}
         double operator()(double t) const {
-            Vec3 p = _r.positionAtTime(t);
-            return _a.sag(p.x, p.y) - p.z;
+            Vector3d p = _r.positionAtTime(t);
+            return _a.sag(p(0), p(1)) - p(2);
         }
     private:
         const Asphere& _a;
@@ -61,7 +62,7 @@ namespace batoid {
         double t;
         if (!timeToIntersect(r, t))
             return Ray(true);
-        Vec3 point = r.positionAtTime(t);
+        Vector3d point = r.positionAtTime(t);
         return Ray(point, r.v, t, r.wavelength, r.isVignetted);
     }
 

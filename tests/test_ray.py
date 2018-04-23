@@ -19,11 +19,13 @@ def test_call():
 
         # Test both ways of constructing a Ray
         r1 = batoid.Ray(x, y, z, vx, vy, vz, t0)
-        r2 = batoid.Ray(batoid.Vec3(x, y, z), batoid.Vec3(vx, vy, vz), t0)
-        for r in [r1, r2]:
-            assert isclose(r.positionAtTime(t).x, x+vx*(t-t0))
-            assert isclose(r.positionAtTime(t).y, y+vy*(t-t0))
-            assert isclose(r.positionAtTime(t).z, z+vz*(t-t0))
+        r2 = batoid.Ray([x, y, z], [vx, vy, vz], t0)
+        r3 = batoid.Ray((x, y, z), (vx, vy, vz), t0)
+        r4 = batoid.Ray(np.array([x, y, z]), np.array([vx, vy, vz]), t0)
+        for r in [r1, r2, r3, r4]:
+            np.testing.assert_allclose(r.positionAtTime(t)[0], x+vx*(t-t0))
+            np.testing.assert_allclose(r.positionAtTime(t)[1], y+vy*(t-t0))
+            np.testing.assert_allclose(r.positionAtTime(t)[2], z+vz*(t-t0))
         assert r1 == r2
         do_pickle(r1)
 
@@ -42,7 +44,7 @@ def test_properties():
         t0 = random.gauss(0.1, 1.1)
 
         r1 = batoid.Ray(x, y, z, vx, vy, vz, t0)
-        r2 = batoid.Ray(batoid.Vec3(x, y, z), batoid.Vec3(vx, vy, vz), t0)
+        r2 = batoid.Ray([x, y, z], [vx, vy, vz], t0)
         for r in [r1, r2]:
             assert r.x0 == x
             assert r.y0 == y
@@ -68,9 +70,9 @@ def test_phase():
             vz = random.gauss(-1.13, 31.3)
             t0 = random.gauss(0.1, 1.1)
             w = random.uniform(300e-9, 1100e-9)
-            p0 = batoid.Vec3(x, y, z)
-            v0 = batoid.Vec3(vx, vy, vz)
-            v0 /= v0.Magnitude()*n
+            p0 = np.array([x, y, z])
+            v0 = np.array([vx, vy, vz])
+            v0 /= np.linalg.norm(v0)*n
             r = batoid.Ray(p0, v0, t0, w)
 
             # Phase is always 0 at current location and time of ray.
@@ -110,12 +112,12 @@ def test_phase():
             # position, but orthogonal to its direction of propagation, then we
             # should get phase = 0 (mod 2pi).
             for j in range(10):
-                v1 = batoid.Vec3(
+                v1 = np.array([
                     random.gauss(0.0, 2.3),
                     random.gauss(0.0, 20.3),
                     random.gauss(0.0, 1.1)
-                )
-                v1 = batoid.CrossProduct(v1, r.v)
+                ])
+                v1 = np.cross(v1, r.v)
                 p1 = r.p0 + v1
                 assert isclose(r.amplitude(p1, t0).real, 1.0,
                                rel_tol=0, abs_tol=1e-9)
@@ -124,7 +126,6 @@ def test_phase():
 @timer
 def test_RayVector():
     import random
-    import numpy as np
     random.seed(5772)
     rayList = []
     for i in range(1000):
@@ -152,10 +153,10 @@ def test_RayVector():
     np.testing.assert_equal(rayVector.wavelength, np.array([r.wavelength for r in rayVector]))
     np.testing.assert_equal(rayVector.isVignetted, np.array([r.isVignetted for r in rayVector]))
     np.testing.assert_equal(rayVector.failed, np.array([r.failed for r in rayVector]))
-    np.testing.assert_equal(batoid._batoid.phaseMany(rayVector, batoid.Vec3(1, 2, 3), 4.0),
-                            np.array([r.phase(batoid.Vec3(1, 2, 3), 4.0) for r in rayVector]))
-    np.testing.assert_equal(batoid._batoid.amplitudeMany(rayVector, batoid.Vec3(1, 2, 3), 4.0),
-                            np.array([r.amplitude(batoid.Vec3(1, 2, 3), 4.0) for r in rayVector]))
+    np.testing.assert_equal(batoid._batoid.phaseMany(rayVector, [1, 2, 3], 4.0),
+                            np.array([r.phase([1, 2, 3], 4.0) for r in rayVector]))
+    np.testing.assert_equal(batoid._batoid.amplitudeMany(rayVector, [1, 2, 3], 4.0),
+                            np.array([r.amplitude([1, 2, 3], 4.0) for r in rayVector]))
 
 
 @timer
@@ -167,22 +168,23 @@ def test_rayGrid():
     zcos = -np.sqrt(1.0 - xcos**2 - ycos**2)
     nside = 9
     wavelength = 500e-9
-    n = 1.2
 
-    rays = batoid.rayGrid(dist, length, xcos, ycos, zcos, nside, wavelength, n)
-    # Check that all rays are perpendicular to v
-    r0 = rays[0]
-    for r in rays:
-        dr = r.p0 - r0.p0
-        dp = batoid.DotProduct(dr, r0.v)
-        assert isclose(dp, 0.0, abs_tol=1e-14, rel_tol=0.0)
-        assert isclose(r.wavelength, wavelength)
-        assert isclose(r.v.Magnitude(), 1/n)
-        assert isclose(r.v.x*n, xcos)
-        assert isclose(r.v.y*n, ycos)
+    for n in [1.2, batoid.ConstMedium(1.2)]:
 
-    # Check that ray that intersects at origin is initially dist away.
-    assert isclose((rays[len(rays)//2].p0).Magnitude(), dist)
+        rays = batoid.rayGrid(dist, length, xcos, ycos, zcos, nside, wavelength, n)
+        # Check that all rays are perpendicular to v
+        r0 = rays[0]
+        for r in rays:
+            dr = r.p0 - r0.p0
+            dp = np.dot(dr, r0.v)
+            np.testing.assert_allclose(dp, 0.0, atol=1e-14, rtol=0.0)
+            np.testing.assert_allclose(r.wavelength, wavelength)
+            np.testing.assert_allclose(np.linalg.norm(r.v), 1./1.2)
+            np.testing.assert_allclose(r.v[0]*1.2, xcos)
+            np.testing.assert_allclose(r.v[1]*1.2, ycos)
+
+        # Check that ray that intersects at origin is initially dist away.
+        np.testing.assert_allclose(np.linalg.norm(rays[len(rays)//2].p0), dist)
 
 
 @timer
@@ -196,41 +198,42 @@ def test_circularGrid():
     nradii = 5
     naz = 50
     wavelength = 500e-9
-    n = 1.2
 
-    rays = batoid.circularGrid(dist, outer, inner, xcos, ycos, zcos, nradii, naz, wavelength, n)
-    # Check that all rays are perpendicular to v
-    r0 = rays[0]
-    for r in rays:
-        dr = r.p0 - r0.p0
-        dp = batoid.DotProduct(dr, r0.v)
-        assert isclose(dp, 0.0, abs_tol=1e-14, rel_tol=0.0)
-        assert isclose(r.wavelength, wavelength)
-        assert isclose(r.v.Magnitude(), 1/n)
-        assert isclose(r.v.x*n, xcos)
-        assert isclose(r.v.y*n, ycos)
+    for n in [1.2, batoid.ConstMedium(1.2)]:
+
+        rays = batoid.circularGrid(dist, outer, inner, xcos, ycos, zcos, nradii, naz, wavelength, n)
+        # Check that all rays are perpendicular to v
+        r0 = rays[0]
+        for r in rays:
+            dr = r.p0 - r0.p0
+            dp = np.dot(dr, r0.v)
+            np.testing.assert_allclose(dp, 0.0, atol=1e-14, rtol=0.0)
+            np.testing.assert_allclose(r.wavelength, wavelength)
+            np.testing.assert_allclose(np.linalg.norm(r.v), 1./1.2)
+            np.testing.assert_allclose(r.v[0]*1.2, xcos)
+            np.testing.assert_allclose(r.v[1]*1.2, ycos)
 
 
 @timer
 def test_ne():
-    objs = [batoid.Ray(batoid.Vec3(), batoid.Vec3()),
-            batoid.Ray(batoid.Vec3(0,0,1), batoid.Vec3()),
-            batoid.Ray(batoid.Vec3(0,1,0), batoid.Vec3()),
-            batoid.Ray(batoid.Vec3(), batoid.Vec3(), t=1),
-            batoid.Ray(batoid.Vec3(), batoid.Vec3(), w=500e-9),
-            batoid.Ray(batoid.Vec3(), batoid.Vec3(), isV=True),
+    objs = [batoid.Ray((0,0,0), (0,0,0)),
+            batoid.Ray((0,0,1), (0,0,0)),
+            batoid.Ray((0,1,0), (0,0,0)),
+            batoid.Ray((0,0,0), (0,0,0), t=1),
+            batoid.Ray((0,0,0), (0,0,0), w=500e-9),
+            batoid.Ray((0,0,0), (0,0,0), isV=True),
             # Should really get a failed Ray to test here...
-            batoid.Vec3(),
+            (0,0,0),
             batoid.RayVector(),
             batoid.RayVector([
-                batoid.Ray(batoid.Vec3(0,0,1), batoid.Vec3()),
-                batoid.Ray(batoid.Vec3(), batoid.Vec3())
+                batoid.Ray((0,0,1), (0,0,0)),
+                batoid.Ray((0,0,0), (0,0,0))
             ]),
             batoid.RayVector([
-                batoid.Ray(batoid.Vec3(), batoid.Vec3()),
-                batoid.Ray(batoid.Vec3(0,0,1), batoid.Vec3())
+                batoid.Ray((0,0,0), (0,0,0)),
+                batoid.Ray((0,0,1), (0,0,0))
             ]),
-            batoid.RayVector([batoid.Ray(batoid.Vec3(), batoid.Vec3())])
+            batoid.RayVector([batoid.Ray((0,0,0), (0,0,0))])
     ]
     all_obj_diff(objs)
 
