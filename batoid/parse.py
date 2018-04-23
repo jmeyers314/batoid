@@ -41,7 +41,7 @@ def parse_coordSys(config, coordSys=batoid.CoordSys()):
         shift = config.pop('shift')
     # Leaving rotation out for the moment...
     if shift != [0.0, 0.0, 0.0]:
-        coordSys = coordSys.shiftLocal(batoid.Vec3(shift))
+        coordSys = coordSys.shiftLocal(shift)
     return coordSys
 
 

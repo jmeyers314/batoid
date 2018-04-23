@@ -6,8 +6,10 @@
 #include <limits>
 #include "surface.h"
 #include "ray.h"
-#include "vec3.h"
 #include "quadric.h"
+#include <Eigen/Dense>
+
+using Eigen::Vector3d;
 
 namespace batoid {
 
@@ -15,7 +17,7 @@ namespace batoid {
     public:
         Asphere(double R, double conic, std::vector<double> coefs);
         virtual double sag(double, double) const;
-        virtual Vec3 normal(double, double) const;
+        virtual Vector3d normal(double, double) const;
         virtual Ray intersect(const Ray&) const;
         virtual void intersectInPlace(Ray&) const;
 

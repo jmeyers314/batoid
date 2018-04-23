@@ -1,7 +1,6 @@
 #ifndef batoid_batoid_h
 #define batoid_batoid_h
 
-#include "vec3.h"
 #include "ray.h"
 #include "medium.h"
 #include "surface.h"

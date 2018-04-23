@@ -5,14 +5,16 @@
 #include <limits>
 #include "surface.h"
 #include "ray.h"
-#include "vec3.h"
+#include <Eigen/Dense>
+
+using Eigen::Vector3d;
 
 namespace batoid {
 
     class Plane : public Surface {
     public:
         virtual double sag(double, double) const { return 0.0; }
-        virtual Vec3 normal(double, double) const { return Vec3(0,0,1); }
+        virtual Vector3d normal(double, double) const { return Vector3d(0.0, 0.0, 1.0); }
         virtual Ray intersect(const Ray&) const;
         virtual void intersectInPlace(Ray&) const;
 

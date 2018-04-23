@@ -20,16 +20,16 @@ namespace batoid {
         return 0.0;
     }
 
-    Vec3 Paraboloid::normal(double x, double y) const {
-        if (_R != 0.0)
-            return Vec3(-x/_R, -y/_R, 1).UnitVec3();
-        return Vec3(0,0,1);
+    Vector3d Paraboloid::normal(double x, double y) const {
+        if (_R == 0)
+            return Vector3d(0,0,1);
+        return Vector3d(-x/_R, -y/_R, 1).normalized();
     }
 
     bool Paraboloid::timeToIntersect(const Ray& r, double& t) const {
-        double a = (r.v.x*r.v.x + r.v.y*r.v.y)/2/_R;
-        double b = (r.p0.x*r.v.x + r.p0.y*r.v.y)/_R - r.v.z;
-        double c = (r.p0.x*r.p0.x + r.p0.y*r.p0.y)/2/_R - r.p0.z;
+        double a = (r.v[0]*r.v[0] + r.v[1]*r.v[1])/2/_R;
+        double b = (r.p0[0]*r.v[0] + r.p0[1]*r.v[1])/_R - r.v[2];
+        double c = (r.p0[0]*r.p0[0] + r.p0[1]*r.p0[1])/2/_R - r.p0[2];
         double r1, r2;
         int n = solveQuadratic(a, b, c, r1, r2);
 
@@ -57,7 +57,7 @@ namespace batoid {
         double t;
         if (!timeToIntersect(r, t))
             return Ray(true);
-        Vec3 point = r.positionAtTime(t);
+        Vector3d point = r.positionAtTime(t);
         return Ray(point, r.v, t, r.wavelength, r.isVignetted);
     }
 

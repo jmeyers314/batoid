@@ -37,7 +37,7 @@ def test_HSC_trace():
                 continue
 
             s = surface['out']
-            v = s.v.UnitVec3()
+            v = s.v/np.linalg.norm(s.v)
 
             transform = batoid.CoordTransform(surface['outCoordSys'], batoid.CoordSys())
             s = transform.applyForward(s)
@@ -45,7 +45,7 @@ def test_HSC_trace():
             zx_isec = arr[HSC_surfaces[i]-1][1:4]/1000
             np.testing.assert_allclose(jt_isec, zx_isec, rtol=0, atol=1e-9) # nanometer agreement
 
-            jt_angle = np.array([v.x, v.y, v.z])
+            jt_angle = np.array([v[0], v[1], v[2]])
             zx_angle = arr[HSC_surfaces[i]-1][4:7]
             # direction cosines agree to 1e-9
             np.testing.assert_allclose(jt_angle, zx_angle, rtol=0, atol=1e-9)

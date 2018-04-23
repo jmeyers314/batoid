@@ -14,23 +14,24 @@ namespace batoid {
         // return R/(1+_conic)*(1-std::sqrt(1-(1+_conic)*r2/R/R))+B;
     }
 
-    Vec3 Quadric::normal(double x, double y) const {
+    Vector3d Quadric::normal(double x, double y) const {
         double r = std::sqrt(x*x + y*y);
-        if (r == 0.0) return Vec3(0,0,1);
+        if (r == 0.0)
+            return Vector3d(0,0,1);
         double dzdr1 = dzdr(r);
-        return Vec3(-dzdr1*x/r, -dzdr1*y/r, 1).UnitVec3();
+        return Vector3d(-dzdr1*x/r, -dzdr1*y/r, 1).normalized();
     }
 
     bool Quadric::timeToIntersect(const Ray& r, double& t) const {
-        double vr2 = r.v.x*r.v.x + r.v.y*r.v.y;
-        double vz2 = r.v.z*r.v.z;
-        double vrr0 = r.v.x*r.p0.x + r.v.y*r.p0.y;
-        double r02 = r.p0.x*r.p0.x + r.p0.y*r.p0.y;
-        double z0term = (r.p0.z-_R/(1+_conic));
+        double vr2 = r.v[0]*r.v[0] + r.v[1]*r.v[1];
+        double vz2 = r.v[2]*r.v[2];
+        double vrr0 = r.v[0]*r.p0[0] + r.v[1]*r.p0[1];
+        double r02 = r.p0[0]*r.p0[0] + r.p0[1]*r.p0[1];
+        double z0term = (r.p0[2]-_R/(1+_conic));
 
         // Quadratic equation coefficients
         double a = vz2 + vr2/(1+_conic);
-        double b = 2*r.v.z*z0term + 2*vrr0/(1+_conic);
+        double b = 2*r.v[2]*z0term + 2*vrr0/(1+_conic);
         double c = z0term*z0term - _R*_R/(1+_conic)/(1+_conic) + r02/(1+_conic);
 
         double r1, r2;
@@ -64,7 +65,7 @@ namespace batoid {
         double t;
         if (!timeToIntersect(r, t))
             return Ray(true);
-        Vec3 point = r.positionAtTime(t);
+        Vector3d point = r.positionAtTime(t);
         return Ray(point, r.v, t, r.wavelength, r.isVignetted);
     }
 

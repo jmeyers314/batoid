@@ -5,7 +5,9 @@
 #include <limits>
 #include "surface.h"
 #include "ray.h"
-#include "vec3.h"
+#include <Eigen/Dense>
+
+using Eigen::Vector3d;
 
 namespace batoid {
 
@@ -13,7 +15,7 @@ namespace batoid {
     public:
         Quadric(double R, double conic);
         virtual double sag(double, double) const;
-        virtual Vec3 normal(double, double) const;
+        virtual Vector3d normal(double, double) const;
         Ray intersect(const Ray&) const;
         virtual void intersectInPlace(Ray&) const;
 

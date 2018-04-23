@@ -1,3 +1,4 @@
+import numpy as np
 import batoid
 from test_helpers import isclose, timer
 
@@ -12,9 +13,9 @@ def test_plane_reflection_plane():
         y = random.gauss(0, 1)
         vx = random.gauss(0, 1e-1)
         vy = random.gauss(0, 1e-1)
-        ray = batoid.Ray(batoid.Vec3(x, y, -10),
-                         batoid.Vec3(vx, vy, 1).UnitVec3(),
-                         0)
+        v = np.array([vx, vy, 1])
+        v / np.linalg.norm(v)
+        ray = batoid.Ray([x, y, -10], v, 0)
         iray = plane.intersect(ray)
         rray = batoid._batoid.reflect(iray, plane)
 
@@ -22,16 +23,14 @@ def test_plane_reflection_plane():
         # hence (ray.v x surfaceNormal) . rray.v should have zero magnitude.
         # magnitude zero.
         assert isclose(
-            batoid.DotProduct(
-                batoid.CrossProduct(ray.v, plane.normal(iray.p0.x, iray.p0.y)),
-                rray.v),
+            np.dot(np.cross(ray.v, plane.normal(iray.p0[0], iray.p0[1])), rray.v),
             0.0, rel_tol=0, abs_tol=1e-15)
 
         # Actually, reflection off a plane is pretty straigtforward to test
         # directly.
-        assert isclose(ray.v.x, rray.v.x)
-        assert isclose(ray.v.y, rray.v.y)
-        assert isclose(ray.v.z, -rray.v.z)
+        assert isclose(ray.v[0], rray.v[0])
+        assert isclose(ray.v[1], rray.v[1])
+        assert isclose(ray.v[2], -rray.v[2])
 
 
 @timer
@@ -44,9 +43,9 @@ def test_plane_reflection_reversal():
         y = random.gauss(0, 1)
         vx = random.gauss(0, 1e-1)
         vy = random.gauss(0, 1e-1)
-        ray = batoid.Ray(batoid.Vec3(x, y, -10),
-                         batoid.Vec3(vx, vy, 1).UnitVec3(),
-                         0)
+        v = np.array([vx, vy, 1])
+        v / np.linalg.norm(v)
+        ray = batoid.Ray([x, y, -10], v, 0)
         iray = plane.intersect(ray)
         rray = batoid._batoid.reflect(iray, plane)
 
@@ -57,15 +56,15 @@ def test_plane_reflection_reversal():
         turn_around = rray.positionAtTime(rray.t0+0.1)
         return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t0+0.1))
         riray = plane.intersect(return_ray)
-        assert isclose(iray.p0.x, riray.p0.x, rel_tol=0, abs_tol=1e-10)
-        assert isclose(iray.p0.y, riray.p0.y, rel_tol=0, abs_tol=1e-10)
-        assert isclose(iray.p0.z, riray.p0.z, rel_tol=0, abs_tol=1e-10)
+        assert isclose(iray.p0[0], riray.p0[0], rel_tol=0, abs_tol=1e-10)
+        assert isclose(iray.p0[1], riray.p0[1], rel_tol=0, abs_tol=1e-10)
+        assert isclose(iray.p0[2], riray.p0[2], rel_tol=0, abs_tol=1e-10)
         # Reflect and propagate back to t=0.
         cray = batoid._batoid.reflect(riray, plane)
         cray = cray.positionAtTime(0)
-        assert isclose(cray.x, x, rel_tol=0, abs_tol=1e-10)
-        assert isclose(cray.y, y, rel_tol=0, abs_tol=1e-10)
-        assert isclose(cray.z, -10, rel_tol=0, abs_tol=1e-10)
+        assert isclose(cray[0], x, rel_tol=0, abs_tol=1e-10)
+        assert isclose(cray[1], y, rel_tol=0, abs_tol=1e-10)
+        assert isclose(cray[2], -10, rel_tol=0, abs_tol=1e-10)
 
 
 @timer
@@ -86,9 +85,7 @@ def test_paraboloid_reflection_plane():
         # hence (ray.v x surfaceNormal) . rray.v should have zero magnitude.
         # magnitude zero.
         assert isclose(
-            batoid.DotProduct(
-                batoid.CrossProduct(ray.v, para.normal(iray.p0.x, iray.p0.y)),
-                rray.v),
+            np.dot(np.cross(ray.v, para.normal(iray.p0[0], iray.p0[1])), rray.v),
             0.0, rel_tol=0, abs_tol=1e-15)
 
 
@@ -102,9 +99,10 @@ def test_paraboloid_reflection_reversal():
         y = random.gauss(0, 1)
         vx = random.gauss(0, 1e-1)
         vy = random.gauss(0, 1e-1)
-        ray = batoid.Ray(batoid.Vec3(x, y, -10),
-                         batoid.Vec3(vx, vy, 1).UnitVec3(),
-                         0)
+        v = np.array([vx, vy, 1])
+        v /= np.linalg.norm(v)
+
+        ray = batoid.Ray([x, y, -10], v, 0)
         iray = para.intersect(ray)
         rray = batoid._batoid.reflect(iray, para)
 
@@ -116,15 +114,15 @@ def test_paraboloid_reflection_reversal():
         return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t0+0.1))
         riray = para.intersect(return_ray)
         # First check that we intersected at the same point
-        assert isclose(iray.p0.x, riray.p0.x, rel_tol=0, abs_tol=1e-10)
-        assert isclose(iray.p0.y, riray.p0.y, rel_tol=0, abs_tol=1e-10)
-        assert isclose(iray.p0.z, riray.p0.z, rel_tol=0, abs_tol=1e-10)
+        assert isclose(iray.p0[0], riray.p0[0], rel_tol=0, abs_tol=1e-10)
+        assert isclose(iray.p0[1], riray.p0[1], rel_tol=0, abs_tol=1e-10)
+        assert isclose(iray.p0[2], riray.p0[2], rel_tol=0, abs_tol=1e-10)
         # Reflect and propagate back to t=0.
         cray = batoid._batoid.reflect(riray, para)
         cray = cray.positionAtTime(0)
-        assert isclose(cray.x, x, rel_tol=0, abs_tol=1e-10)
-        assert isclose(cray.y, y, rel_tol=0, abs_tol=1e-10)
-        assert isclose(cray.z, -10, rel_tol=0, abs_tol=1e-10)
+        assert isclose(cray[0], x, rel_tol=0, abs_tol=1e-10)
+        assert isclose(cray[1], y, rel_tol=0, abs_tol=1e-10)
+        assert isclose(cray[2], -10, rel_tol=0, abs_tol=1e-10)
 
 
 @timer
@@ -141,13 +139,13 @@ def test_paraboloid_reflection_to_focus():
             iray = para.intersect(ray)
             rray = batoid._batoid.reflect(iray, para)
             # Now see if rray goes through (0,0,R/2)
-            # Solve the x equation: 0 = rray.p0.x + rray.v.x*(t-t0) for t:
-            # t = t0 - p0.x/vx
-            t = rray.t0 - rray.p0.x/rray.v.x
+            # Solve the x equation: 0 = rray.p0[0] + rray.v[0]*(t-t0) for t:
+            # t = t0 - p0[0]/vx
+            t = rray.t0 - rray.p0[0]/rray.v[0]
             focus = rray.positionAtTime(t)
-            assert isclose(focus.x, 0, abs_tol=1e-12)
-            assert isclose(focus.y, 0, abs_tol=1e-12)
-            assert isclose(focus.z, R/2.0, abs_tol=1e-12)
+            assert isclose(focus[0], 0, abs_tol=1e-12)
+            assert isclose(focus[1], 0, abs_tol=1e-12)
+            assert isclose(focus[2], R/2.0, abs_tol=1e-12)
 
 
 @timer
@@ -168,9 +166,7 @@ def test_asphere_reflection_plane():
         # hence (ray.v x surfaceNormal) . rray.v should have zero magnitude.
         # magnitude zero.
         assert isclose(
-            batoid.DotProduct(
-                batoid.CrossProduct(ray.v, asphere.normal(iray.p0.x, iray.p0.y)),
-                rray.v),
+            np.dot(np.cross(ray.v, asphere.normal(iray.p0[0], iray.p0[1])), rray.v),
             0.0, rel_tol=0, abs_tol=1e-15)
 
 
@@ -184,9 +180,9 @@ def test_asphere_reflection_reversal():
         y = random.gauss(0, 1)
         vx = random.gauss(0, 1e-1)
         vy = random.gauss(0, 1e-1)
-        ray = batoid.Ray(batoid.Vec3(x, y, -0.1),
-                         batoid.Vec3(vx, vy, 1).UnitVec3(),
-                         0)
+        v = np.array([vx, vy, 1])
+        v /= np.linalg.norm(v)
+        ray = batoid.Ray([x, y, -0.1], v, 0)
         iray = asphere.intersect(ray)
         rray = batoid._batoid.reflect(iray, asphere)
 
@@ -198,15 +194,15 @@ def test_asphere_reflection_reversal():
         return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t0+0.1))
         riray = asphere.intersect(return_ray)
         # First check that we intersected at the same point
-        assert isclose(iray.p0.x, riray.p0.x, rel_tol=0, abs_tol=1e-9)
-        assert isclose(iray.p0.y, riray.p0.y, rel_tol=0, abs_tol=1e-9)
-        assert isclose(iray.p0.z, riray.p0.z, rel_tol=0, abs_tol=1e-9)
+        assert isclose(iray.p0[0], riray.p0[0], rel_tol=0, abs_tol=1e-9)
+        assert isclose(iray.p0[1], riray.p0[1], rel_tol=0, abs_tol=1e-9)
+        assert isclose(iray.p0[2], riray.p0[2], rel_tol=0, abs_tol=1e-9)
         # Reflect and propagate back to t=0.
         cray = batoid._batoid.reflect(riray, asphere)
         cray = cray.positionAtTime(0)
-        assert isclose(cray.x, x, rel_tol=0, abs_tol=1e-9)
-        assert isclose(cray.y, y, rel_tol=0, abs_tol=1e-9)
-        assert isclose(cray.z, -0.1, rel_tol=0, abs_tol=1e-9)
+        assert isclose(cray[0], x, rel_tol=0, abs_tol=1e-9)
+        assert isclose(cray[1], y, rel_tol=0, abs_tol=1e-9)
+        assert isclose(cray[2], -0.1, rel_tol=0, abs_tol=1e-9)
 
 
 if __name__ == '__main__':

@@ -290,7 +290,7 @@ class Interface(Optic):
     def withLocalRotation(self, rot, rotOrigin=None, coordSys=None):
         if rotOrigin is None and coordSys is None:
             coordSys = self.coordSys
-            rotOrigin = batoid.Vec3()
+            rotOrigin = [0,0,0]
         ret = self.__class__.__new__(self.__class__)
         ret.__init__(
             self.surface, self.obscuration,
@@ -519,7 +519,7 @@ class CompoundOptic(Optic):
         """
         if rotOrigin is None and coordSys is None:
             coordSys = self.coordSys
-            rotOrigin = batoid.Vec3()
+            rotOrigin = [0,0,0]
         newItems = [item.withLocalRotation(rot, rotOrigin, coordSys) for item in self.items]
         ret = self.__class__.__new__(self.__class__)
         ret.__init__(
@@ -542,7 +542,7 @@ class CompoundOptic(Optic):
             return self.withLocalRotation(rot, rotOrigin, coordSys)
         if rotOrigin is None and coordSys is None:
             coordSys = self.itemDict[name].coordSys
-            rotOrigin = batoid.Vec3()
+            rotOrigin = [0,0,0]
         # Clip off leading token
         assert name[:len(self.name)+1] == self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
         name = name[len(self.name)+1:]
@@ -630,7 +630,7 @@ class Lens(CompoundOptic):
         """
         if rotOrigin is None and coordSys is None:
             coordSys = self.coordSys
-            rotOrigin = batoid.Vec3()
+            rotOrigin = [0,0,0]
         newItems = [item.withLocalRotation(rot, rotOrigin, coordSys) for item in self.items]
         ret = self.__class__.__new__(self.__class__)
         ret.__init__(
@@ -653,7 +653,7 @@ class Lens(CompoundOptic):
             return self.withLocalRotation(rot, rotOrigin, coordSys)
         if rotOrigin is None and coordSys is None:
             coordSys = self.itemDict[name].coordSys
-            rotOrigin = batoid.Vec3()
+            rotOrigin = [0,0,0]
         # Clip off leading token
         assert name[:len(self.name)+1] == self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
         name = name[len(self.name)+1:]

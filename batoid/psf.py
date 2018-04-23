@@ -18,7 +18,7 @@ def huygensPSF(optic, xs=None, ys=None, zs=None, rays=None, saveRays=False):
         amplitudes[i, j] = np.sum(
             batoid._batoid.amplitudeMany(
                 rays,
-                batoid.Vec3(*points[i, j]),
+                points[i, j],
                 time
             )
         )
@@ -42,12 +42,12 @@ def wavefront(optic, wavelength, theta_x=0, theta_y=0, nx=32, rays=None, saveRay
     outCoordSys = batoid.CoordSys()
     optic.traceInPlace(rays, outCoordSys=outCoordSys)
     goodRays = batoid._batoid.trimVignetted(rays)
-    point = batoid.Vec3(np.mean(goodRays.x), np.mean(goodRays.y), np.mean(goodRays.z))
+    point = np.array([np.mean(goodRays.x), np.mean(goodRays.y), np.mean(goodRays.z)])
 
     # We want to place the vertex of the reference sphere one radius length away from the
     # intersection point.  So transform our rays into that coordinate system.
     transform = batoid.CoordTransform(
-            outCoordSys, batoid.CoordSys(point+batoid.Vec3(0,0,sphereRadius)))
+            outCoordSys, batoid.CoordSys(point+np.array([0,0,sphereRadius])))
     transform.applyForwardInPlace(rays)
 
     sphere = batoid.Sphere(-sphereRadius)

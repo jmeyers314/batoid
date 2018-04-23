@@ -7,7 +7,7 @@
 namespace batoid {
     Ray Obscuration::obscure(const Ray& ray) const {
         if (ray.failed || ray.isVignetted) return ray;
-        if (contains(ray.p0.x, ray.p0.y))
+        if (contains(ray.p0[0], ray.p0[1]))
             return Ray(ray.p0, ray.v, ray.t0, ray.wavelength, true);
         else
             return ray;
@@ -15,7 +15,7 @@ namespace batoid {
 
     void Obscuration::obscureInPlace(Ray& ray) const {
         if (ray.failed || ray.isVignetted) return;
-        if (contains(ray.p0.x, ray.p0.y))
+        if (contains(ray.p0[0], ray.p0[1]))
             ray.isVignetted = true;
     }
 
@@ -25,7 +25,7 @@ namespace batoid {
             [this](const Ray& ray)
             {
                 if (ray.failed) return ray;
-                if (contains(ray.p0.x, ray.p0.y))
+                if (contains(ray.p0[0], ray.p0[1]))
                     return Ray(ray.p0, ray.v, ray.t0, ray.wavelength, true);
                 else
                     return Ray(ray.p0, ray.v, ray.t0, ray.wavelength, ray.isVignetted);

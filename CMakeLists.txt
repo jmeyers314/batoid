@@ -25,7 +25,6 @@ set(PYSRC_FILES
   pysrc/sphere.cpp
   pysrc/surface.cpp
   pysrc/table.cpp
-  pysrc/vec3.cpp
 )
 set(SRC_FILES
   src/asphere.cpp

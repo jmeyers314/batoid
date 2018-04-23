@@ -112,7 +112,7 @@ def test_ne():
         batoid.Mirror(batoid.Plane(), obscuration=batoid.ObscCircle(0.1)),
         batoid.Mirror(batoid.Plane(), inMedium=batoid.ConstMedium(1.1)),
         batoid.Mirror(batoid.Plane(), outMedium=batoid.ConstMedium(1.1)),
-        batoid.Mirror(batoid.Plane(), coordSys=batoid.CoordSys(batoid.Vec3(0,0,1))),
+        batoid.Mirror(batoid.Plane(), coordSys=batoid.CoordSys([0,0,1])),
         batoid.CompoundOptic([
             batoid.Mirror(batoid.Plane()),
             batoid.Mirror(batoid.Plane())

@@ -16,8 +16,14 @@ namespace batoid {
             .def("contains", &Obscuration::contains)
             .def("obscure", (Ray (Obscuration::*)(const Ray&) const) &Obscuration::obscure)
             .def("obscureInPlace", (void (Obscuration::*)(Ray&) const) &Obscuration::obscureInPlace)
-            .def("obscure", (std::vector<Ray> (Obscuration::*)(const std::vector<Ray>&) const) &Obscuration::obscure)
-            .def("obscureInPlace", (void (Obscuration::*)(std::vector<Ray>&) const) &Obscuration::obscureInPlace)
+            .def("obscure", [](const Obscuration& obsc, const RayVector& rv){
+                RayVector result;
+                result.rays = std::move(obsc.obscure(rv.rays));
+                return result;
+            })
+            .def("obscureInPlace", [](const Obscuration& obsc, RayVector& rv){
+                obsc.obscureInPlace(rv.rays);
+            })
             .def("__repr__", &Obscuration::repr);
 
 
