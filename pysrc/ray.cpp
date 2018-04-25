@@ -271,6 +271,36 @@ namespace batoid {
                     );
                 }
             )
+            .def_property_readonly(
+                "k",
+                [](const RayVector& rv) {
+                    std::vector<Vector3d> result;
+                    result.reserve(rv.size());
+                    for (int i=0; i < rv.size(); i++) {
+                        result.push_back(rv.rays[i].k());
+                    }
+                    return py::array_t<double>(
+                        {int(rv.size()), 3},
+                        {3*sizeof(double), sizeof(double)},
+                        &result[0].data()[0]
+                    );
+                }
+            )
+            .def_property_readonly(
+                "omega",
+                [](const RayVector& rv) {
+                    std::vector<double> result;
+                    result.reserve(rv.size());
+                    for (int i=0; i < rv.size(); i++) {
+                        result.push_back(rv.rays[i].omega());
+                    }
+                    return py::array_t<double>(
+                        {rv.size()},
+                        {sizeof(double)},
+                        &result[0]
+                    );
+                }
+            )
 
             .def("__getitem__",
                 [](RayVector &rv, typename std::vector<Ray>::size_type i) -> Ray& {

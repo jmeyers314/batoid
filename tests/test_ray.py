@@ -160,6 +160,8 @@ def test_RayVector():
 
     np.testing.assert_equal(rayVector.v, np.array([[r.vx, r.vy, r.vz] for r in rayVector]))
     np.testing.assert_equal(rayVector.p0, np.array([[r.x0, r.y0, r.z0] for r in rayVector]))
+    np.testing.assert_equal(rayVector.k, np.array([r.k for r in rayVector]))
+    np.testing.assert_equal(rayVector.omega, np.array([r.omega for r in rayVector]))
 
 
 @timer
