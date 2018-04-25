@@ -158,6 +158,9 @@ def test_RayVector():
     np.testing.assert_equal(batoid._batoid.amplitudeMany(rayVector, [1, 2, 3], 4.0),
                             np.array([r.amplitude([1, 2, 3], 4.0) for r in rayVector]))
 
+    np.testing.assert_equal(rayVector.v, np.array([[r.vx, r.vy, r.vz] for r in rayVector]))
+    np.testing.assert_equal(rayVector.p0, np.array([[r.x0, r.y0, r.z0] for r in rayVector]))
+
 
 @timer
 def test_rayGrid():

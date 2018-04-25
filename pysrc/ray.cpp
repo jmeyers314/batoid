@@ -8,15 +8,11 @@
 #include <pybind11/eigen.h>
 
 
-// PYBIND11_MAKE_OPAQUE(std::vector<batoid::Ray>);
-
 namespace py = pybind11;
 using namespace pybind11::literals;
 
 namespace batoid {
     void pyExportRay(py::module& m) {
-        // PYBIND11_NUMPY_DTYPE(Vector3d, data);
-        // PYBIND11_NUMPY_DTYPE(Ray, p0, v, t0, wavelength, isVignetted, failed);
         py::class_<Ray>(m, "Ray")
             .def(py::init<double,double,double,double,double,double,double,double,bool>(),
                  "init",
@@ -25,9 +21,6 @@ namespace batoid {
             .def(py::init<Vector3d,Vector3d,double,double,bool>(),
                  "init",
                  "p0"_a, "v"_a, "t"_a=0.0, "w"_a=0.0, "isV"_a=false)
-            // .def(py::init<std::array<double,3>,std::array<double,3>,double,double,bool>(),
-            //      "init",
-            //      "p0"_a, "v"_a, "t"_a=0.0, "w"_a=0.0, "isV"_a=false)
             .def_readonly("p0", &Ray::p0)
             .def_readonly("v", &Ray::v)
             .def_readonly("t0", &Ray::t0)
@@ -244,6 +237,36 @@ namespace batoid {
                             1,
                             {rv.size()},
                             {sizeof(Ray)}
+                        )
+                    );
+                }
+            )
+            .def_property_readonly(
+                "v",
+                [](RayVector& rv) {
+                    return py::array_t<double>(
+                        py::buffer_info(
+                            &rv.rays[0].v,
+                            sizeof(double),
+                            py::format_descriptor<double>::format(),
+                            2,
+                            {int(rv.size()), 3},
+                            {sizeof(Ray), sizeof(double)}
+                        )
+                    );
+                }
+            )
+            .def_property_readonly(
+                "p0",
+                [](RayVector& rv) {
+                    return py::array_t<double>(
+                        py::buffer_info(
+                            &rv.rays[0].p0[0],
+                            sizeof(double),
+                            py::format_descriptor<double>::format(),
+                            2,
+                            {int(rv.size()), 3},
+                            {sizeof(Ray), sizeof(double)}
                         )
                     );
                 }
