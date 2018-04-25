@@ -6,8 +6,6 @@
 #include <pybind11/stl_bind.h>
 #include <pybind11/numpy.h>
 
-PYBIND11_MAKE_OPAQUE(std::vector<batoid::Ray>);
-
 namespace py = pybind11;
 using namespace pybind11::literals;
 

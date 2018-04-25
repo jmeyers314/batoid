@@ -163,6 +163,18 @@ def test_RayVector():
     np.testing.assert_equal(rayVector.k, np.array([r.k for r in rayVector]))
     np.testing.assert_equal(rayVector.omega, np.array([r.omega for r in rayVector]))
 
+    # Make sure we really got a view and not a copy
+    x = rayVector.x
+    x[0] += 1
+    assert np.all(x == rayVector.x)
+    assert not rayVector.x.flags.owndata
+
+    # What about lifetimes?  What happens to x if rayVector disappears?
+    x2 = np.copy(x)
+    assert x is not x2
+    del rayVector
+    assert np.all(x == x2)
+
 
 @timer
 def test_rayGrid():

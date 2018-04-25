@@ -7,7 +7,6 @@
 #include <pybind11/numpy.h>
 #include <pybind11/eigen.h>
 
-
 namespace py = pybind11;
 using namespace pybind11::literals;
 
@@ -93,182 +92,110 @@ namespace batoid {
             .def(py::init<std::vector<Ray>>())
             .def_property_readonly(
                 "x",
-                [](RayVector& rv) {
-                    return py::array_t<double>(
-                        py::buffer_info(
-                            &rv.rays[0].p0[0],
-                            sizeof(double),
-                            py::format_descriptor<double>::format(),
-                            1,
-                            {rv.size()},
-                            {sizeof(Ray)}
-                        )
-                    );
+                [](RayVector& rv) -> py::array_t<double> {
+                    return {{rv.size()},
+                        {sizeof(Ray)},
+                        &rv.rays[0].p0[0],
+                        py::cast(rv)};
                 }
             )
             .def_property_readonly(
                 "y",
-                [](RayVector& rv) {
-                    return py::array_t<double>(
-                        py::buffer_info(
-                            &rv.rays[0].p0[1],
-                            sizeof(double),
-                            py::format_descriptor<double>::format(),
-                            1,
-                            {rv.size()},
-                            {sizeof(Ray)}
-                        )
-                    );
+                [](RayVector& rv) -> py::array_t<double> {
+                    return {{rv.size()},
+                        {sizeof(Ray)},
+                        &rv.rays[0].p0[1],
+                        py::cast(rv)};
                 }
             )
             .def_property_readonly(
                 "z",
-                [](RayVector& rv) {
-                    return py::array_t<double>(
-                        py::buffer_info(
-                            &rv.rays[0].p0[2],
-                            sizeof(double),
-                            py::format_descriptor<double>::format(),
-                            1,
-                            {rv.size()},
-                            {sizeof(Ray)}
-                        )
-                    );
+                [](RayVector& rv) -> py::array_t<double> {
+                    return {{rv.size()},
+                        {sizeof(Ray)},
+                        &rv.rays[0].p0[2],
+                        py::cast(rv)};
                 }
             )
             .def_property_readonly(
                 "vx",
-                [](RayVector& rv) {
-                    return py::array_t<double>(
-                        py::buffer_info(
-                            &rv.rays[0].v[0],
-                            sizeof(double),
-                            py::format_descriptor<double>::format(),
-                            1,
-                            {rv.size()},
-                            {sizeof(Ray)}
-                        )
-                    );
+                [](RayVector& rv) -> py::array_t<double> {
+                    return {{rv.size()},
+                        {sizeof(Ray)},
+                        &rv.rays[0].v[0],
+                        py::cast(rv)};
                 }
             )
             .def_property_readonly(
                 "vy",
-                [](RayVector& rv) {
-                    return py::array_t<double>(
-                        py::buffer_info(
-                            &rv.rays[0].v[1],
-                            sizeof(double),
-                            py::format_descriptor<double>::format(),
-                            1,
-                            {rv.size()},
-                            {sizeof(Ray)}
-                        )
-                    );
+                [](RayVector& rv) -> py::array_t<double> {
+                    return {{rv.size()},
+                        {sizeof(Ray)},
+                        &rv.rays[0].v[1],
+                        py::cast(rv)};
                 }
             )
             .def_property_readonly(
                 "vz",
-                [](RayVector& rv) {
-                    return py::array_t<double>(
-                        py::buffer_info(
-                            &rv.rays[0].v[2],
-                            sizeof(double),
-                            py::format_descriptor<double>::format(),
-                            1,
-                            {rv.size()},
-                            {sizeof(Ray)}
-                        )
-                    );
+                [](RayVector& rv) -> py::array_t<double> {
+                    return {{rv.size()},
+                        {sizeof(Ray)},
+                        &rv.rays[0].v[2],
+                        py::cast(rv)};
                 }
             )
             .def_property_readonly(
                 "t0",
-                [](RayVector& rv) {
-                    return py::array_t<double>(
-                        py::buffer_info(
-                            &rv.rays[0].t0,
-                            sizeof(double),
-                            py::format_descriptor<double>::format(),
-                            1,
-                            {rv.size()},
-                            {sizeof(Ray)}
-                        )
-                    );
+                [](RayVector& rv) -> py::array_t<double> {
+                    return {{rv.size()},
+                        {sizeof(Ray)},
+                        &rv.rays[0].t0,
+                        py::cast(rv)};
                 }
             )
             .def_property_readonly(
                 "wavelength",
-                [](RayVector& rv) {
-                    return py::array_t<double>(
-                        py::buffer_info(
-                            &rv.rays[0].wavelength,
-                            sizeof(double),
-                            py::format_descriptor<double>::format(),
-                            1,
-                            {rv.size()},
-                            {sizeof(Ray)}
-                        )
-                    );
+                [](RayVector& rv) -> py::array_t<double> {
+                    return {{rv.size()},
+                        {sizeof(Ray)},
+                        &rv.rays[0].wavelength,
+                        py::cast(rv)};
                 }
             )
             .def_property_readonly(
                 "isVignetted",
-                [](RayVector& rv) {
-                    return py::array_t<bool>(
-                        py::buffer_info(
-                            &rv.rays[0].isVignetted,
-                            sizeof(bool),
-                            py::format_descriptor<bool>::format(),
-                            1,
-                            {rv.size()},
-                            {sizeof(Ray)}
-                        )
-                    );
+                [](RayVector& rv) -> py::array_t<bool> {
+                    return {{rv.size()},
+                        {sizeof(Ray)},
+                        &rv.rays[0].isVignetted,
+                        py::cast(rv)};
                 }
             )
             .def_property_readonly(
                 "failed",
-                [](RayVector& rv) {
-                    return py::array_t<bool>(
-                        py::buffer_info(
-                            &rv.rays[0].failed,
-                            sizeof(bool),
-                            py::format_descriptor<bool>::format(),
-                            1,
-                            {rv.size()},
-                            {sizeof(Ray)}
-                        )
-                    );
+                [](RayVector& rv) -> py::array_t<bool> {
+                    return {{rv.size()},
+                        {sizeof(Ray)},
+                        &rv.rays[0].failed,
+                        py::cast(rv)};
                 }
             )
             .def_property_readonly(
                 "v",
-                [](RayVector& rv) {
-                    return py::array_t<double>(
-                        py::buffer_info(
-                            &rv.rays[0].v,
-                            sizeof(double),
-                            py::format_descriptor<double>::format(),
-                            2,
-                            {int(rv.size()), 3},
-                            {sizeof(Ray), sizeof(double)}
-                        )
-                    );
+                [](RayVector& rv) -> py::array_t<double> {
+                    return {{rv.size(), 3ul},
+                        {sizeof(Ray), sizeof(double)},
+                        &rv.rays[0].v[0],
+                        py::cast(rv)};
                 }
             )
             .def_property_readonly(
                 "p0",
-                [](RayVector& rv) {
-                    return py::array_t<double>(
-                        py::buffer_info(
-                            &rv.rays[0].p0[0],
-                            sizeof(double),
-                            py::format_descriptor<double>::format(),
-                            2,
-                            {int(rv.size()), 3},
-                            {sizeof(Ray), sizeof(double)}
-                        )
-                    );
+                [](RayVector& rv) -> py::array_t<double> {
+                    return {{rv.size(), 3ul},
+                        {sizeof(Ray), sizeof(double)},
+                        &rv.rays[0].p0[0],
+                        py::cast(rv)};
                 }
             )
             .def_property_readonly(
@@ -280,7 +207,7 @@ namespace batoid {
                         result.push_back(rv.rays[i].k());
                     }
                     return py::array_t<double>(
-                        {int(rv.size()), 3},
+                        {rv.size(), 3ul},
                         {3*sizeof(double), sizeof(double)},
                         &result[0].data()[0]
                     );

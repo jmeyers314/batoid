@@ -5,8 +5,6 @@
 #include <pybind11/eigen.h>
 #include <tuple>
 
-PYBIND11_MAKE_OPAQUE(std::vector<batoid::Ray>);
-
 namespace py = pybind11;
 
 namespace batoid {

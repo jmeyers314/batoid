@@ -1,8 +1,6 @@
 #include "batoid.h"
 #include <pybind11/pybind11.h>
 
-PYBIND11_MAKE_OPAQUE(std::vector<batoid::Ray>);
-
 namespace py = pybind11;
 
 namespace batoid {
