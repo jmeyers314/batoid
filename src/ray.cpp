@@ -1,6 +1,7 @@
 #include "ray.h"
 #include "utils.h"
 #include <cmath>
+#include <numeric>
 #include <algorithm>
 #include <Eigen/Dense>
 
@@ -91,6 +92,15 @@ namespace batoid {
                 { return ray.amplitude(r, t); }
         );
         return result;
+    }
+
+    std::complex<double> sumAmplitudeMany(const std::vector<Ray>& rays, const Vector3d& r, double t) {
+        auto result = std::vector<std::complex<double>>(rays.size());
+        parallelTransform(rays.cbegin(), rays.cend(), result.begin(),
+            [=](const Ray& ray)
+                { return ray.amplitude(r, t); }
+        );
+        return std::accumulate(result.begin(), result.end(), std::complex<double>(0,0));
     }
 
     std::vector<Ray> propagatedToTimesMany(const std::vector<Ray>& rays, const std::vector<double>& ts) {

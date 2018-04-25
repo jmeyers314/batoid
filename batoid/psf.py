@@ -15,12 +15,10 @@ def huygensPSF(optic, xs=None, ys=None, zs=None, rays=None, saveRays=False):
     time = rays[0].t0
     amplitudes = np.empty(xs.shape, dtype=np.complex128)
     for (i, j) in np.ndindex(xs.shape):
-        amplitudes[i, j] = np.sum(
-            batoid._batoid.amplitudeMany(
-                rays,
-                points[i, j],
-                time
-            )
+        amplitudes[i, j] = batoid._batoid.sumAmplitudeMany(
+            rays,
+            points[i, j],
+            time
         )
     return np.abs(amplitudes)**2
 

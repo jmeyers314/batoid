@@ -74,6 +74,9 @@ namespace batoid {
         m.def("amplitudeMany", [](const RayVector& rv, const Vector3d& r, double t){
             return amplitudeMany(rv.rays, r, t);
         });
+        m.def("sumAmplitudeMany", [](const RayVector& rv, const Vector3d& r, double t) {
+            return sumAmplitudeMany(rv.rays, r, t);
+        });
         m.def("phaseMany", [](const RayVector& rv, const Vector3d& r, double t){
             return phaseMany(rv.rays, r, t);
         });

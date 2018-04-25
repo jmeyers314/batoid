@@ -65,6 +65,7 @@ namespace batoid {
 
     std::vector<double> phaseMany(const std::vector<Ray>&, const Vector3d& r, double t);
     std::vector<std::complex<double>> amplitudeMany(const std::vector<Ray>&, const Vector3d& r, double t);
+    std::complex<double> sumAmplitudeMany(const std::vector<Ray>&, const Vector3d& r, double t);
     std::vector<Ray> propagatedToTimesMany(const std::vector<Ray>&, const std::vector<double>& t);
     void propagateInPlaceMany(std::vector<Ray>&, const std::vector<double>& t);
 }
