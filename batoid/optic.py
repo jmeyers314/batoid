@@ -26,9 +26,12 @@ class Optic:
 
         skip : bool
             Whether or not to skip this optic when tracing.
+
+        **kwargs : other
+            Other attributes to add as object attributes.
     """
     def __init__(self, name=None, coordSys=batoid.CoordSys(), inMedium=batoid.ConstMedium(1.0),
-                 outMedium=batoid.ConstMedium(1.0), skip=False):
+                 outMedium=batoid.ConstMedium(1.0), skip=False, **kwargs):
         self.name = name
         self.inMedium = inMedium
         self.outMedium = outMedium
@@ -36,6 +39,8 @@ class Optic:
             raise ValueError("coordSys required for optic")
         self.coordSys = coordSys
         self.skip = False
+        kwargs.pop('_itemDict', None)
+        self.__dict__.update(**kwargs)
 
     def _repr_helper(self):
         out = ""
@@ -279,11 +284,12 @@ class Interface(Optic):
 
     def withGlobalShift(self, shift):
         ret = self.__class__.__new__(self.__class__)
+        newDict = dict(self.__dict__)
+        newDict['coordSys'] = self.coordSys.shiftGlobal(shift)
+        del newDict['surface']
         ret.__init__(
-            self.surface, self.obscuration,
-            name=self.name, coordSys=self.coordSys.shiftGlobal(shift),
-            inMedium=self.inMedium, outMedium=self.outMedium,
-            skip=self.skip
+            self.surface,
+            **newDict
         )
         return ret
 
@@ -292,11 +298,12 @@ class Interface(Optic):
             coordSys = self.coordSys
             rotOrigin = [0,0,0]
         ret = self.__class__.__new__(self.__class__)
+        newDict = dict(self.__dict__)
+        newDict['coordSys'] = self.coordSys.rotateLocal(rot, rotOrigin, coordSys)
+        del newDict['surface']
         ret.__init__(
-            self.surface, self.obscuration,
-            name=self.name, coordSys=self.coordSys.rotateLocal(rot, rotOrigin, coordSys),
-            inMedium=self.inMedium, outMedium=self.outMedium,
-            skip=self.skip
+            self.surface,
+            **newDict
         )
         return ret
 
@@ -476,11 +483,13 @@ class CompoundOptic(Optic):
         """
         newItems = [item.withGlobalShift(shift) for item in self.items]
         ret = self.__class__.__new__(self.__class__)
+
+        newDict = dict(self.__dict__)
+        newDict['coordSys'] = self.coordSys.shiftGlobal(shift)
+        del newDict['items']
         ret.__init__(
             newItems,
-            name=self.name, coordSys=self.coordSys.shiftGlobal(shift),
-            inMedium=self.inMedium, outMedium=self.outMedium,
-            skip=self.skip
+            **newDict
         )
         return ret
 
@@ -499,6 +508,8 @@ class CompoundOptic(Optic):
         assert name[:len(self.name)+1] == self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
         name = name[len(self.name)+1:]
         newItems = []
+        newDict = dict(self.__dict__)
+        del newDict['items']
         for i, item in enumerate(self.items):
             if name.startswith(item.name):
                 if name == item.name:
@@ -508,8 +519,7 @@ class CompoundOptic(Optic):
                 newItems.extend(self.items[i+1:])
                 return self.__class__(
                     newItems,
-                    name=self.name, coordSys=self.coordSys,
-                    inMedium=self.inMedium, outMedium=self.outMedium
+                    **newDict
                 )
             newItems.append(item)
         raise RuntimeError("Error in withGloballyShiftedOptic!, Shouldn't get here!")
@@ -522,11 +532,12 @@ class CompoundOptic(Optic):
             rotOrigin = [0,0,0]
         newItems = [item.withLocalRotation(rot, rotOrigin, coordSys) for item in self.items]
         ret = self.__class__.__new__(self.__class__)
+        newDict = dict(self.__dict__)
+        newDict['coordSys'] = self.coordSys.rotateLocal(rot, rotOrigin, coordSys)
+        del newDict['items']
         ret.__init__(
             newItems,
-            name=self.name, coordSys=self.coordSys.rotateLocal(rot, rotOrigin, coordSys),
-            inMedium=self.inMedium, outMedium=self.outMedium,
-            skip=self.skip
+            **newDict
         )
         return ret
 
@@ -547,6 +558,8 @@ class CompoundOptic(Optic):
         assert name[:len(self.name)+1] == self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
         name = name[len(self.name)+1:]
         newItems = []
+        newDict = dict(self.__dict__)
+        del newDict['items']
         for i, item in enumerate(self.items):
             if name.startswith(item.name):
                 if name == item.name:
@@ -556,8 +569,7 @@ class CompoundOptic(Optic):
                 newItems.extend(self.items[i+1:])
                 return self.__class__(
                     newItems,
-                    name=self.name, coordSys=self.coordSys,
-                    inMedium=self.inMedium, outMedium=self.outMedium
+                    **newDict
                 )
             newItems.append(item)
         raise RuntimeError("Error in withLocallyRotatedOptic!, Shouldn't get here!")
@@ -587,11 +599,13 @@ class Lens(CompoundOptic):
     def withGlobalShift(self, shift):
         newItems = [item.withGlobalShift(shift) for item in self.items]
         ret = self.__class__.__new__(self.__class__)
+        newDict = dict(self.__dict__)
+        newDict['coordSys'] = self.coordSys.shiftGlobal(shift)
+        del newDict['items']
+        del newDict['medium']
         ret.__init__(
             newItems, self.medium,
-            name=self.name, coordSys=self.coordSys.shiftGlobal(shift),
-            inMedium=self.inMedium, outMedium=self.outMedium,
-            skip=self.skip
+            **newDict
         )
         return ret
 
@@ -610,6 +624,9 @@ class Lens(CompoundOptic):
         assert name[:len(self.name)+1] == self.name+":"
         name = name[len(self.name)+1:]
         newItems = []
+        newDict = dict(self.__dict__)
+        del newDict['items']
+        del newDict['medium']
         for i, item in enumerate(self.items):
             if name.startswith(item.name):
                 if name == item.name:
@@ -618,9 +635,8 @@ class Lens(CompoundOptic):
                     newItems.append(item.withGloballyShiftedOptic(name, shift))
                 newItems.extend(self.items[i+1:])
                 return self.__class__(
-                    newItems, medium=self.medium,
-                    name=self.name, coordSys=self.coordSys,
-                    inMedium=self.inMedium, outMedium=self.outMedium
+                    newItems, self.medium,
+                    **newDict
                 )
             newItems.append(item)
         raise RuntimeError("Error in withGloballyShiftedOptic!, Shouldn't get here!")
@@ -632,12 +648,13 @@ class Lens(CompoundOptic):
             coordSys = self.coordSys
             rotOrigin = [0,0,0]
         newItems = [item.withLocalRotation(rot, rotOrigin, coordSys) for item in self.items]
+        newDict = dict(self.__dict__)
+        del newDict['items']
+        del newDict['medium']
         ret = self.__class__.__new__(self.__class__)
         ret.__init__(
-            newItems, medium=self.medium,
-            name=self.name, coordSys=self.coordSys.rotateLocal(rot, rotOrigin, coordSys),
-            inMedium=self.inMedium, outMedium=self.outMedium,
-            skip=self.skip
+            newItems, self.medium,
+            **newDict
         )
         return ret
 
@@ -658,6 +675,9 @@ class Lens(CompoundOptic):
         assert name[:len(self.name)+1] == self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
         name = name[len(self.name)+1:]
         newItems = []
+        newDict = dict(self.__dict__)
+        del newDict['items']
+        del newDict['medium']
         for i, item in enumerate(self.items):
             if name.startswith(item.name):
                 if name == item.name:
@@ -666,9 +686,8 @@ class Lens(CompoundOptic):
                     newItems.append(item.withLocallyRotatedOptic(name, rot, rotOrigin, coordSys))
                 newItems.extend(self.items[i+1:])
                 return self.__class__(
-                    newItems, medium=self.medium,
-                    name=self.name, coordSys=self.coordSys,
-                    inMedium=self.inMedium, outMedium=self.outMedium
+                    newItems, self.medium,
+                    **newDict
                 )
             newItems.append(item)
         raise RuntimeError("Error in withLocallyRotatedOptic!, Shouldn't get here!")

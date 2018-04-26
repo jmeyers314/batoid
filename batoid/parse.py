@@ -109,9 +109,14 @@ def parse_optic(config,
             parse_optic(iC, coordSys=coordSys, inMedium=inMedium, outMedium=outMedium)
             for iC in itemsConfig
         ]
+        # Look for a few more possible attributes
+        kwargs = {}
+        for k in ['dist', 'sphereRadius', 'pupilSize', 'pupilObscuration']:
+            if k in config:
+                kwargs[k] = config[k]
         return batoid.optic.CompoundOptic(
                 items, inMedium=inMedium, outMedium=outMedium,
-                name=name, coordSys=coordSys)
+                name=name, coordSys=coordSys, **kwargs)
     else:
         raise ValueError("Unknown optic type")
 

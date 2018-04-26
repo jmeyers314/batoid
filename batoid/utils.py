@@ -1,10 +1,10 @@
-# https://stackoverflow.com/questions/5121931/in-python-how-can-you-load-yaml-mappings-as-ordereddicts
-
+import numpy as np
 import yaml
 from collections import OrderedDict
 from past.builtins import basestring
 from numbers import Integral
 
+# https://stackoverflow.com/questions/5121931/in-python-how-can-you-load-yaml-mappings-as-ordereddicts
 def ordered_load(stream, Loader=yaml.Loader, object_pairs_hook=OrderedDict):
     class OrderedLoader(Loader):
         pass
@@ -65,3 +65,15 @@ class ListDict(OrderedDict):
         if isinstance(key, Integral):
             key = self._getKeyFromIndex(key)
         OrderedDict.__delitem__(self, key)
+
+
+def bivariate_fit(ux, uy, kx, ky):
+    a = np.empty((len(ux), 3), dtype=float)
+    a[:,0] = 1
+    a[:,1] = ux
+    a[:,2] = uy
+    b = np.empty((len(ux), 2), dtype=float)
+    b[:,0] = kx
+    b[:,1] = ky
+    x, _, _, _ = np.linalg.lstsq(a, b, rcond=-1)
+    return x
