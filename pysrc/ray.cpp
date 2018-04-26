@@ -33,6 +33,9 @@ namespace batoid {
             .def_property_readonly("vy", [](const Ray& r){ return r.v[1]; })
             .def_property_readonly("vz", [](const Ray& r){ return r.v[2]; })
             .def_property_readonly("k", &Ray::k)
+            .def_property_readonly("kx", [](const Ray& r){ return r.k()[0]; })
+            .def_property_readonly("ky", [](const Ray& r){ return r.k()[1]; })
+            .def_property_readonly("kz", [](const Ray& r){ return r.k()[2]; })
             .def_property_readonly("omega", &Ray::omega)
             .def("positionAtTime", &Ray::positionAtTime)
             .def("__repr__", &Ray::repr)
@@ -213,6 +216,51 @@ namespace batoid {
                         {rv.size(), 3ul},
                         {3*sizeof(double), sizeof(double)},
                         &result[0].data()[0]
+                    );
+                }
+            )
+            .def_property_readonly(
+                "kx",
+                [](const RayVector& rv) {
+                    std::vector<double> result;
+                    result.reserve(rv.size());
+                    for (int i=0; i < rv.size(); i++) {
+                        result.push_back(rv.rays[i].k()[0]);
+                    }
+                    return py::array_t<double>(
+                        {rv.size()},
+                        {sizeof(double)},
+                        result.data()
+                    );
+                }
+            )
+            .def_property_readonly(
+                "ky",
+                [](const RayVector& rv) {
+                    std::vector<double> result;
+                    result.reserve(rv.size());
+                    for (int i=0; i < rv.size(); i++) {
+                        result.push_back(rv.rays[i].k()[1]);
+                    }
+                    return py::array_t<double>(
+                        {rv.size()},
+                        {sizeof(double)},
+                        result.data()
+                    );
+                }
+            )
+            .def_property_readonly(
+                "kz",
+                [](const RayVector& rv) {
+                    std::vector<double> result;
+                    result.reserve(rv.size());
+                    for (int i=0; i < rv.size(); i++) {
+                        result.push_back(rv.rays[i].k()[2]);
+                    }
+                    return py::array_t<double>(
+                        {rv.size()},
+                        {sizeof(double)},
+                        result.data()
                     );
                 }
             )

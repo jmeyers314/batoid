@@ -163,6 +163,10 @@ def test_RayVector():
     np.testing.assert_equal(rayVector.k, np.array([r.k for r in rayVector]))
     np.testing.assert_equal(rayVector.omega, np.array([r.omega for r in rayVector]))
 
+    np.testing.assert_equal(rayVector.kx, np.array([r.kx for r in rayVector]))
+    np.testing.assert_equal(rayVector.ky, np.array([r.ky for r in rayVector]))
+    np.testing.assert_equal(rayVector.kz, np.array([r.kz for r in rayVector]))
+
     # Make sure we really got a view and not a copy
     x = rayVector.x
     x[0] += 1
