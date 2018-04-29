@@ -12,9 +12,9 @@ def test_inplace():
     rays2 = batoid.RayVector(rays)
 
     t0 = time.time()
-    outrays = batoid._batoid.propagatedToTimesMany(rays, ts)
+    outrays = batoid.propagatedToTimesMany(rays, ts)
     t1 = time.time()
-    batoid._batoid.propagateInPlaceMany(rays2, ts)
+    batoid.propagateInPlaceMany(rays2, ts)
     t2 = time.time()
 
     print("immutable propagation took {:6.3f} seconds.".format(t1-t0))

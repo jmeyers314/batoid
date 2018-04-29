@@ -30,17 +30,17 @@ def huygensPSF(optic, xs, ys, zs=None, rays=None, saveRays=False):
 
     I(r) \propto \Sum_u exp(i phi(u)) exp(i k(u).r)
 
-    The u are assumed to uniformly sample the entrance pupil.  The phis are the phases of the exit
-    rays evaluated at a single arbitrary time.  The k(u) indicates the conversion of the uniform
-    entrance pupil samples into nearly (though not exactly) uniform samples in k-space of the output
-    rays.
+    The u are assumed to uniformly sample the entrance pupil, but not include any rays that get
+    vignetted before they reach the focal plane.  The phis are the phases of the exit rays evaluated
+    at a single arbitrary time.  The k(u) indicates the conversion of the uniform entrance pupil
+    samples into nearly (though not exactly) uniform samples in k-space of the output rays.
     """
     if zs is None:
         zs = np.zeros_like(xs)
     if saveRays:
         rays = batoid.RayVector(rays)  # Make a copy
     rays, outCoordSys = optic.traceInPlace(rays)
-    batoid._batoid.trimVignettedInPlace(rays)
+    batoid.trimVignettedInPlace(rays)
     # transform = batoid.CoordTransform(outCoordSys, batoid.CoordSys())
     # transform.applyForwardInPlace(rays)
     points = np.concatenate([aux[..., None] for aux in (xs, ys, zs)], axis=-1)
@@ -177,7 +177,7 @@ def dkdu(optic, theta_x, theta_y, wavelength, nx=16):
         nx, wavelength, optic.inMedium
     )
 
-    pupilRays = batoid._batoid.propagatedToTimesMany(rays, np.zeros_like(rays.x))
+    pupilRays = batoid.propagatedToTimesMany(rays, np.zeros_like(rays.x))
     ux = np.array(pupilRays.x)
     uy = np.array(pupilRays.y)
 

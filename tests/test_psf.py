@@ -56,7 +56,7 @@ def test_huygens_psf():
         rays = batoid.circularGrid(10.0, 0.5*diam, 0.5*diam*obscuration, 0.0, 0.0, -1.0, 50, 200, 500e-9, 1.0)
         traced_rays = batoid.RayVector(rays)
         telescope.traceInPlace(traced_rays)
-        batoid._batoid.trimVignettedInPlace(traced_rays)
+        batoid.trimVignettedInPlace(traced_rays)
 
         xs = np.linspace(-size/2, size/2, npix) # arcsec
         xs /= (206265/focalLength) # meters
@@ -148,7 +148,7 @@ def test_lsst_psf():
                                    10, 100, 620e-9, batoid.Air())
         traced_rays = batoid.RayVector(rays)
         telescope.traceInPlace(traced_rays)
-        batoid._batoid.trimVignettedInPlace(traced_rays)
+        batoid.trimVignettedInPlace(traced_rays)
 
         nx = 64
         xs = np.linspace(-10e-6, 10e-6, nx) # 2 pixels wide
@@ -193,7 +193,7 @@ def test_hsc_psf():
                                    10, 100, 620e-9, 1.0)
         traced_rays = batoid.RayVector(rays)
         telescope.traceInPlace(traced_rays)
-        batoid._batoid.trimVignettedInPlace(traced_rays)
+        batoid.trimVignettedInPlace(traced_rays)
 
         nx = 64
         xs = np.linspace(-27.1e-6, 27.1e-6, nx) # 2 pixels wide
@@ -246,7 +246,7 @@ def test_decam_psf():
                                    30, 200, 760e-9, batoid.Air())
         traced_rays = batoid.RayVector(rays)
         telescope.traceInPlace(traced_rays)
-        batoid._batoid.trimVignettedInPlace(traced_rays)
+        batoid.trimVignettedInPlace(traced_rays)
 
         nx = 64
         xs = np.linspace(-27.1e-6, 27.1e-6, nx)
