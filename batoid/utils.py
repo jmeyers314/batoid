@@ -97,11 +97,18 @@ def gnomicToDirCos(u, v):
     The tangent plane reference is at (u,v) = (0,0) and (alpha, beta, gamma) = (0,0,1),
     and u.x > 0, u.y=0, v.x=0, v.y > 0.
     """
+    u = np.atleast_1d(u)
+    v = np.atleast_1d(v)
     rhosqr = u*u + v*v
     rho = np.sqrt(rhosqr)
     gamma = 1./np.sqrt(1 + rhosqr)
     alpha = np.sqrt(1-gamma**2) * u/rho
     beta = np.sqrt(1-gamma**2) * v/rho
+
+    # Fixup where rho is 0
+    w = np.where(rho == 0)[0]
+    alpha[w] = 0.0
+    beta[w] = 0.0
     return alpha, beta, gamma
 
 def dirCosToGnomic(alpha, beta, gamma):
@@ -122,8 +129,17 @@ def dirCosToGnomic(alpha, beta, gamma):
     The tangent plane reference is at (u,v) = (0,0) and (alpha, beta, gamma) = (0,0,1)
     and u.x > 0, u.y=0, v.x=0, v.y > 0.
     """
+    alpha = np.atleast_1d(alpha)
+    beta = np.atleast_1d(beta)
+    gamma = np.atleast_1d(gamma)
     r = np.sqrt(alpha**2 + beta**2)
     rho = r/gamma
     u = alpha * rho/r
     v = beta * rho/r
+
+    # Fixup where rho is 0
+    w = np.where(r == 0.0)[0]
+    u[w] = 0.0
+    v[w] = 0.0
+
     return u, v

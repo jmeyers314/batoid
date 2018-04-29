@@ -1,6 +1,6 @@
 import numpy as np
 import batoid
-from .utils import bivariate_fit
+from .utils import bivariate_fit, gnomicToDirCos, dirCosToGnomic
 
 
 def huygensPSF(optic, xs, ys, zs=None, rays=None, saveRays=False):
@@ -63,7 +63,7 @@ def drdth(optic, theta_x, theta_y, wavelength, nx=16):
     optic : batoid.Optic
         Optical system
     theta_x, theta_y : float
-        Field angle in radians
+        Field angle in radians (gnomic tangent plane projection)
     wavelength : float
         Wavelength in meters
     nx : int, optional
@@ -77,31 +77,29 @@ def drdth(optic, theta_x, theta_y, wavelength, nx=16):
 
     Notes
     -----
-        This is essentially the inverse plate scale in meters per radian.
+        This is the Jacobian of pixels -> tangent plane, (and importantly, not pixels -> ra/dec).
+        It should be *close* to the inverse plate scale though, especially near the center of the
+        tangent plane projection.
     """
     # We just use a finite difference approach here.
     dth = 1e-5
 
-    nominalCos = [np.sin(theta_x),
-                  np.sin(theta_y),
-                  -np.sqrt(1.0 - np.sin(theta_x)**2 - np.sin(theta_y)**2)]
-    dthxCos = [np.sin(theta_x+dth),
-               np.sin(theta_y),
-               -np.sqrt(1.0 - np.sin(theta_x+dth)**2 - np.sin(theta_y)**2)]
-    dthyCos = [np.sin(theta_x),
-               np.sin(theta_y+dth),
-               -np.sqrt(1.0 - np.sin(theta_x)**2 - np.sin(theta_y+dth)**2)]
+    # Make direction cosine vectors
+    nominalCos = gnomicToDirCos(theta_x, theta_y)
+    dthxCos = gnomicToDirCos(theta_x + dth, theta_y)
+    dthyCos = gnomicToDirCos(theta_x, theta_y+ dth)
 
+    # Flip the dirCos z-components so rays are headed downwards
     rays = batoid.rayGrid(optic.dist, optic.pupilSize,
-        nominalCos[0], nominalCos[1], nominalCos[2],
+        nominalCos[0], nominalCos[1], -nominalCos[2],
         nx, wavelength=wavelength, medium=optic.inMedium)
 
     rays_x = batoid.rayGrid(optic.dist, optic.pupilSize,
-        dthxCos[0], dthxCos[1], dthxCos[2],
+        dthxCos[0], dthxCos[1], -dthxCos[2],
         nx, wavelength=wavelength, medium=optic.inMedium)
 
     rays_y = batoid.rayGrid(optic.dist, optic.pupilSize,
-        dthyCos[0], dthyCos[1], dthyCos[2],
+        dthyCos[0], dthyCos[1], -dthyCos[2],
         nx, wavelength=wavelength, medium=optic.inMedium)
 
     optic.traceInPlace(rays)
@@ -129,7 +127,7 @@ def dthdr(optic, theta_x, theta_y, wavelength, nx=16):
     optic : batoid.Optic
         Optical system
     theta_x, theta_y : float
-        Field angle in radians
+        Field angle in radians (gnomic tangent plane projection)
     wavelength : float
         Wavelength in meters
     nx : int, optional
@@ -143,7 +141,9 @@ def dthdr(optic, theta_x, theta_y, wavelength, nx=16):
 
     Notes
     -----
-        This is essentially the plate scale in radians per meter.
+        This is the Jacobian of tangen plane -> pixels, (and importantly, not ra/dec -> pixels).
+        It should be *close* to the plate scale though, especially near the center of the tangent
+        plane projection.
     """
     return np.linalg.inv(drdth(optic, theta_x, theta_y, wavelength, nx=nx))
 
@@ -158,7 +158,7 @@ def dkdu(optic, theta_x, theta_y, wavelength, nx=16):
     optic : batoid.Optic
         Optical system
     theta_x, theta_y : float
-        Field angle in radians
+        Field angle in radians (gnomic tangent plane projection)
     wavelength : float
         Wavelength in meters
     nx : int, optional
@@ -168,15 +168,12 @@ def dkdu(optic, theta_x, theta_y, wavelength, nx=16):
     -------
     dkdu : (2, 2), ndarray
         Jacobian transformation matrix for converting between (kx, ky) of rays impacting the focal
-        plane and initial field angle.
-
-    Notes
-    -----
-        This is essentially the plate scale in radians per meter.
+        plane and initial field angle (gnomic tangent plane projection).
     """
+    dirCos = gnomicToDirCos(theta_x, theta_y)
     rays = batoid.rayGrid(
         optic.dist, optic.pupilSize,
-        theta_x, theta_y, -1.0,
+        dirCos[0], dirCos[1], -dirCos[2],
         nx, wavelength, optic.inMedium
     )
 
@@ -196,24 +193,21 @@ def dkdu(optic, theta_x, theta_y, wavelength, nx=16):
     return soln[1:]
 
 
-def wavefront(optic, wavelength, theta_x=0, theta_y=0, nx=32, rays=None, saveRays=False,
-              sphereRadius=None):
-    if rays is None:
-        xcos = np.sin(theta_x*np.pi/180)
-        ycos = np.sin(theta_y*np.pi/180)
-        zcos = -np.sqrt(1.0 - xcos**2 - ycos**2)
+def wavefront(optic, theta_x, theta_y, wavelength, nx=32, sphereRadius=None):
+    dirCos = gnomicToDirCos(theta_x, theta_y)
+    rays = batoid.rayGrid(
+        optic.dist, optic.pupilSize,
+        dirCos[0], dirCos[1], -dirCos[2],
+        nx, wavelength, optic.inMedium
+    )
 
-        rays = batoid.rayGrid(
-                optic.dist, optic.pupilSize, xcos, ycos, zcos, nx, wavelength, optic.inMedium)
-    if saveRays:
-        rays = batoid.RayVector(rays)
     if sphereRadius is None:
         sphereRadius = optic.sphereRadius
 
     outCoordSys = batoid.CoordSys()
     optic.traceInPlace(rays, outCoordSys=outCoordSys)
-    goodRays = batoid._batoid.trimVignetted(rays)
-    point = np.array([np.mean(goodRays.x), np.mean(goodRays.y), np.mean(goodRays.z)])
+    w = np.where(1-rays.isVignetted)[0]
+    point = np.mean(rays.p0[w], axis=0)
 
     # We want to place the vertex of the reference sphere one radius length away from the
     # intersection point.  So transform our rays into that coordinate system.
@@ -223,23 +217,19 @@ def wavefront(optic, wavelength, theta_x=0, theta_y=0, nx=32, rays=None, saveRay
 
     sphere = batoid.Sphere(-sphereRadius)
     sphere.intersectInPlace(rays)
-    goodRays = batoid._batoid.trimVignetted(rays)
+
+    w = np.where(1-rays.isVignetted)[0]
     # Should potentially try to make the reference time w.r.t. the chief ray instead of the mean
     # of the good (unvignetted) rays.
-    t0 = np.mean(goodRays.t0)
+    t0 = np.mean(rays.t0[w])
 
-    ts = rays.t0[:]
-    isV = rays.isVignetted[:]
-    ts -= t0
-    ts /= wavelength
-    wf = np.ma.masked_array(ts, mask=isV)
-    return wf
+    return np.ma.masked_array((rays.t0-t0)/wavelength, mask=rays.isVignetted).reshape(nx, nx)
 
 
-def fftPSF(optic, wavelength, theta_x, theta_y, nx=32, pad_factor=2):
+def fftPSF(optic, theta_x, theta_y, wavelength, nx=32, pad_factor=2):
     L = optic.pupilSize*pad_factor
     im_dtheta = wavelength / L
-    wf = wavefront(optic, wavelength, theta_x, theta_y, nx).reshape(nx, nx)
+    wf = wavefront(optic, theta_x, theta_y, wavelength, nx)
     pad_size = nx*pad_factor
     expwf = np.zeros((pad_size, pad_size), dtype=np.complex128)
     start = pad_size//2-nx//2
@@ -249,27 +239,28 @@ def fftPSF(optic, wavelength, theta_x, theta_y, nx=32, pad_factor=2):
     return im_dtheta, psf
 
 
-def zernike(optic, wavelength, theta_x, theta_y, jmax=22, nx=32, eps=0.0):
+def zernike(optic, theta_x, theta_y, wavelength, nx=32, jmax=22, eps=0.0):
     import galsim.zernike as zern
 
-    xcos = np.sin(theta_x*np.pi/180)
-    ycos = np.sin(theta_y*np.pi/180)
-    zcos = -np.sqrt(1.0 - xcos**2 - ycos**2)
-
+    dirCos = gnomicToDirCos(theta_x, theta_y)
     rays = batoid.rayGrid(
-            optic.dist, optic.pupilSize, xcos, ycos, zcos, nx, wavelength, optic.inMedium)
+        optic.dist, optic.pupilSize,
+        dirCos[0], dirCos[1], -dirCos[2],
+        nx, wavelength, optic.inMedium
+    )
 
-    orig_x = np.array(rays.x)
-    orig_y = np.array(rays.y)
+    batoid.propagateInPlaceMany(rays, np.zeros_like(rays.x))
 
-    wf = wavefront(optic, wavelength, rays=rays)
+    orig_x = np.array(rays.x).reshape(nx,nx)
+    orig_y = np.array(rays.y).reshape(nx,nx)
 
+    wf = wavefront(optic, theta_x, theta_y, wavelength, nx=nx)
     w = ~wf.mask
 
     basis = zern.zernikeBasis(
             jmax, orig_x[w], orig_y[w],
             R_outer=optic.pupilSize/2, R_inner=optic.pupilSize/2*eps
     )
-    coefs, _, _, _ = np.linalg.lstsq(basis.T, wf[w])
+    coefs, _, _, _ = np.linalg.lstsq(basis.T, wf[w], rcond=-1)
 
     return coefs
