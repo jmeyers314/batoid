@@ -77,3 +77,53 @@ def bivariate_fit(ux, uy, kx, ky):
     b[:,1] = ky
     x, _, _, _ = np.linalg.lstsq(a, b, rcond=-1)
     return x
+
+
+def gnomicToDirCos(u, v):
+    """Convert gnomic tangent plane projection u,v to direction cosines.
+
+    Parameters
+    ----------
+    u, v : float
+        Gnomic tangent plane coordinates in radians.
+
+    Returns
+    -------
+    alpha, beta, gamma : float
+        Direction cosines (unit vector projected onto x, y, z in order)
+
+    Notes
+    -----
+    The tangent plane reference is at (u,v) = (0,0) and (alpha, beta, gamma) = (0,0,1),
+    and u.x > 0, u.y=0, v.x=0, v.y > 0.
+    """
+    rhosqr = u*u + v*v
+    rho = np.sqrt(rhosqr)
+    gamma = 1./np.sqrt(1 + rhosqr)
+    alpha = np.sqrt(1-gamma**2) * u/rho
+    beta = np.sqrt(1-gamma**2) * v/rho
+    return alpha, beta, gamma
+
+def dirCosToGnomic(alpha, beta, gamma):
+    """Convert direction cosines to gnomic tangent plane projection.
+
+    Parameters
+    ----------
+    alpha, beta, gamma : float
+        Direction cosines (unit vector projected onto x, y, z in order)
+
+    Returns
+    -------
+    u, v : float
+        Gnomic tangent plane coordinates in radians.
+
+    Notes
+    -----
+    The tangent plane reference is at (u,v) = (0,0) and (alpha, beta, gamma) = (0,0,1)
+    and u.x > 0, u.y=0, v.x=0, v.y > 0.
+    """
+    r = np.sqrt(alpha**2 + beta**2)
+    rho = r/gamma
+    u = alpha * rho/r
+    v = beta * rho/r
+    return u, v
