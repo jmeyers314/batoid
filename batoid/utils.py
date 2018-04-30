@@ -99,16 +99,11 @@ def gnomicToDirCos(u, v):
     """
     u = np.atleast_1d(u)
     v = np.atleast_1d(v)
-    rhosqr = u*u + v*v
-    rho = np.sqrt(rhosqr)
-    gamma = 1./np.sqrt(1 + rhosqr)
-    alpha = np.sqrt(1-gamma**2) * u/rho
-    beta = np.sqrt(1-gamma**2) * v/rho
 
-    # Fixup where rho is 0
-    w = np.where(rho == 0)[0]
-    alpha[w] = 0.0
-    beta[w] = 0.0
+    gamma = 1/np.sqrt(1.0 + u*u + v*v)
+    alpha = u*gamma
+    beta = v*gamma
+
     return alpha, beta, gamma
 
 def dirCosToGnomic(alpha, beta, gamma):
@@ -132,14 +127,8 @@ def dirCosToGnomic(alpha, beta, gamma):
     alpha = np.atleast_1d(alpha)
     beta = np.atleast_1d(beta)
     gamma = np.atleast_1d(gamma)
-    r = np.sqrt(alpha**2 + beta**2)
-    rho = r/gamma
-    u = alpha * rho/r
-    v = beta * rho/r
 
-    # Fixup where rho is 0
-    w = np.where(r == 0.0)[0]
-    u[w] = 0.0
-    v[w] = 0.0
+    u = alpha / gamma
+    v = beta / gamma
 
     return u, v

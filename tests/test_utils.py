@@ -33,7 +33,7 @@ def test_gnomic():
     np.testing.assert_allclose(beta, v, rtol=0, atol=1e-8)
 
     # Check normalization of direction cosines
-    np.testing.assert_allclose(np.sqrt(alpha*alpha+beta*beta+gamma*gamma), 1, rtol=0, atol=1e-16)
+    np.testing.assert_allclose(np.sqrt(alpha*alpha+beta*beta+gamma*gamma), 1, rtol=0, atol=1e-15)
 
 if __name__ == '__main__':
     test_gnomic()
