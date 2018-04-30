@@ -189,3 +189,62 @@ def sphericalToGnomic(phi, theta):
     v = tph * np.sin(theta)
 
     return u, v
+
+
+def dirCosToSpherical(alpha, beta, gamma):
+    """Convert direction cosines into spherical coordinates.
+
+    Parameters
+    ----------
+    alpha, beta, gamma : float
+        Direction cosines (unit vector projected onto x, y, z in order)
+
+    Returns
+    -------
+    phi : float
+        Polar angle in radians
+    theta : float
+        Azimuthal angle in radians
+
+    Notes
+    -----
+    The azimuthal angle is measured from the +alpha axis through the +beta axis (CCW).
+    """
+    alpha = np.atleast_1d(alpha)
+    beta = np.atleast_1d(beta)
+    gamma = np.atleast_1d(gamma)
+
+    phi = np.arccos(gamma)
+    theta = np.arctan2(beta, alpha)
+
+    return phi, theta
+
+
+def sphericalToDirCos(phi, theta):
+    """Convert spherical coordinates into direction cosines.
+
+    Parameters
+    ----------
+    phi : float
+        Polar angle in radians
+    theta : float
+        Azimuthal angle in radians
+
+    Returns
+    -------
+    alpha, beta, gamma : float
+        Direction cosines (unit vector projected onto x, y, z in order)
+
+    Notes
+    -----
+    The azimuthal angle is measured from the +alpha axis through the +beta axis (CCW).
+    """
+    phi = np.atleast_1d(phi)
+    theta = np.atleast_1d(theta)
+
+    r = np.sin(phi)
+    alpha = r * np.cos(theta)
+    beta = r * np.sin(theta)
+    gamma = np.cos(phi)
+
+    return alpha, beta, gamma
