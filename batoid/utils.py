@@ -132,3 +132,60 @@ def dirCosToGnomic(alpha, beta, gamma):
     v = beta / gamma
 
     return u, v
+
+
+def gnomicToSpherical(u, v):
+    """Convert gnomic tangent plane projection u, v to spherical coordinates.
+
+    Parameters
+    ----------
+    u, v : float
+        Gnomic tangent plane coordinates in radians.
+
+    Returns
+    -------
+    phi : float
+        Polar angle in radians
+    theta : float
+        Azimuthal angle in radians (always in [-pi, pi], and 0 by convention when phi=0)
+
+    Notes
+    -----
+    The azimuthal angle is measured from +u through +v (CCW).
+    """
+    u = np.atleast_1d(u)
+    v = np.atleast_1d(v)
+
+    phi = np.arctan(np.sqrt(u*u + v*v))
+    theta = np.arctan2(v, u)
+
+    return phi, theta
+
+
+def sphericalToGnomic(phi, theta):
+    """Convert spherical coordiantes to gnomic tangent plane projection.
+
+    Parameters
+    ----------
+    phi : float
+        Polar angle in radians
+    theta : float
+        Azimuthal angle in radians
+
+    Returns
+    -------
+    u, v : float
+        Gnomic tangent plane coordinates in radians.
+
+    Notes
+    -----
+    The azimuthal angle is measured from +u through +v (CCW).
+    """
+    phi = np.atleast_1d(phi)
+    theta = np.atleast_1d(theta)
+
+    tph = np.tan(phi)
+    u = tph * np.cos(theta)
+    v = tph * np.sin(theta)
+
+    return u, v
