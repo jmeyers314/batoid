@@ -97,9 +97,6 @@ def gnomicToDirCos(u, v):
     The tangent plane reference is at (u,v) = (0,0) and (alpha, beta, gamma) = (0,0,1),
     and u.x > 0, u.y=0, v.x=0, v.y > 0.
     """
-    u = np.atleast_1d(u)
-    v = np.atleast_1d(v)
-
     gamma = 1/np.sqrt(1.0 + u*u + v*v)
     alpha = u*gamma
     beta = v*gamma
@@ -124,10 +121,6 @@ def dirCosToGnomic(alpha, beta, gamma):
     The tangent plane reference is at (u,v) = (0,0) and (alpha, beta, gamma) = (0,0,1)
     and u.x > 0, u.y=0, v.x=0, v.y > 0.
     """
-    alpha = np.atleast_1d(alpha)
-    beta = np.atleast_1d(beta)
-    gamma = np.atleast_1d(gamma)
-
     u = alpha / gamma
     v = beta / gamma
 
@@ -153,9 +146,6 @@ def gnomicToSpherical(u, v):
     -----
     The azimuthal angle is measured from +u through +v (CCW).
     """
-    u = np.atleast_1d(u)
-    v = np.atleast_1d(v)
-
     phi = np.arctan(np.sqrt(u*u + v*v))
     theta = np.arctan2(v, u)
 
@@ -181,9 +171,6 @@ def sphericalToGnomic(phi, theta):
     -----
     The azimuthal angle is measured from +u through +v (CCW).
     """
-    phi = np.atleast_1d(phi)
-    theta = np.atleast_1d(theta)
-
     tph = np.tan(phi)
     u = tph * np.cos(theta)
     v = tph * np.sin(theta)
@@ -210,10 +197,6 @@ def dirCosToSpherical(alpha, beta, gamma):
     -----
     The azimuthal angle is measured from the +alpha axis through the +beta axis (CCW).
     """
-    alpha = np.atleast_1d(alpha)
-    beta = np.atleast_1d(beta)
-    gamma = np.atleast_1d(gamma)
-
     phi = np.arccos(gamma)
     theta = np.arctan2(beta, alpha)
 
@@ -239,9 +222,6 @@ def sphericalToDirCos(phi, theta):
     -----
     The azimuthal angle is measured from the +alpha axis through the +beta axis (CCW).
     """
-    phi = np.atleast_1d(phi)
-    theta = np.atleast_1d(theta)
-
     r = np.sin(phi)
     alpha = r * np.cos(theta)
     beta = r * np.sin(theta)
@@ -265,9 +245,6 @@ def dSphericalDGnomic(u, v):
         [[dphi/du, dphi/dv],
          [sin(phi) dtheta/du, sin(phi) dtheta/dv]]
     """
-    u = np.atleast_1d(u)
-    v = np.atleast_1d(v)
-
     rsqr = u*u + v*v
     r = np.sqrt(rsqr)
     den = (1+rsqr)*r
@@ -299,9 +276,6 @@ def dGnomicDSpherical(phi, theta):
         [[du/dphi, csc(phi) du/dtheta],
          [dv/dphi, csc(phi) dv/dtheta]]
     """
-    phi = np.atleast_1d(phi)
-    theta = np.atleast_1d(theta)
-
     sc2ph = np.cos(phi)**(-2)
     tph = np.tan(phi)
     cth = np.cos(theta)
