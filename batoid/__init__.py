@@ -21,6 +21,8 @@ from .optic import Optic, CompoundOptic, Lens
 from .optic import Interface, RefractiveInterface, Mirror, Detector, Baffle
 from .optic import drawTrace2d, drawTrace3d
 
+from .lattice import Lattice
+
 from . import parse
 
 import os
