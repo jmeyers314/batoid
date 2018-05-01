@@ -248,3 +248,70 @@ def sphericalToDirCos(phi, theta):
     gamma = np.cos(phi)
 
     return alpha, beta, gamma
+
+
+def dSphericalDGnomic(u, v):
+    """Compute Jacobian of transformation from gnomic tangent plane coordinates to spherical
+    coordinates.
+
+    Parameters
+    ----------
+    u, v : float
+        Gnomic tangent plane coordinates in radians.
+
+    Returns
+    -------
+    jac : (2, 2) ndarray
+        [[dphi/du, dphi/dv],
+         [sin(phi) dtheta/du, sin(phi) dtheta/dv]]
+    """
+    u = np.atleast_1d(u)
+    v = np.atleast_1d(v)
+
+    rsqr = u*u + v*v
+    r = np.sqrt(rsqr)
+    den = (1+rsqr)*r
+    sph = r/np.sqrt(1+rsqr)
+
+    dphdu = u/den
+    dphdv = v/den
+
+    dthdu = -v/rsqr
+    dthdv = u/rsqr
+
+    return np.array([[dphdu, dphdv], [sph*dthdu, sph*dthdv]])
+
+
+def dGnomicDSpherical(phi, theta):
+    """Compute Jacobian of transformation from spherical coordinates to gnomic tangent plane
+    coordinates.
+
+    Parameters
+    ----------
+    phi : float
+        Polar angle in radians
+    theta : float
+        Azimuthal angle in radians
+
+    Returns
+    -------
+    jac : (2, 2) ndarray
+        [[du/dphi, csc(phi) du/dtheta],
+         [dv/dphi, csc(phi) dv/dtheta]]
+    """
+    phi = np.atleast_1d(phi)
+    theta = np.atleast_1d(theta)
+
+    sc2ph = np.cos(phi)**(-2)
+    tph = np.tan(phi)
+    cth = np.cos(theta)
+    sth = np.sin(theta)
+    cscph = 1/np.sin(phi)
+
+    dudph = sc2ph * cth
+    dvdph = sc2ph * sth
+
+    dudth = -tph * sth
+    dvdth = tph * cth
+
+    return np.array([[dudph, cscph*dudth], [dvdph, cscph*dvdth]])

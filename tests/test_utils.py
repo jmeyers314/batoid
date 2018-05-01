@@ -146,9 +146,86 @@ def test_composition():
     np.testing.assert_allclose(v1, v2, rtol=1e-10, atol=1e-10)
 
 
+@timer
+def test_jacobian():
+    np.random.seed(57721)
+
+    u = np.random.uniform(-0.1, 0.1, size=1000)
+    v = np.random.uniform(-0.1, 0.1, size=1000)
+    phi, theta = batoid.utils.gnomicToSpherical(u, v)
+
+    jac1 = batoid.utils.dSphericalDGnomic(u, v)
+    jac2 = batoid.utils.dGnomicDSpherical(phi, theta)
+
+    # Check that the product of the jacobian and its inverse is the identity matrix
+    np.testing.assert_allclose(
+        np.matmul(np.transpose(jac1, (2,0,1)), np.transpose(jac2, (2,0,1))),
+        np.transpose(np.tile(np.eye(2)[:,:,None], 1000), (2,0,1)),
+        rtol=0, atol=1e-15
+    )
+    np.testing.assert_allclose(
+        np.matmul(np.transpose(jac2, (2,0,1)), np.transpose(jac1, (2,0,1))),
+        np.transpose(np.tile(np.eye(2)[:,:,None], 1000), (2,0,1)),
+        rtol=0, atol=1e-15
+    )
+
+    # Check d(u, v)/d(phi, theta) against finite difference
+    du = dv = 1e-8
+    phi2, theta2 = batoid.utils.gnomicToSpherical(u+du, v)
+    phi3, theta3 = batoid.utils.gnomicToSpherical(u, v+dv)
+    np.testing.assert_allclose(
+        jac1[0,0,:],
+        (phi2-phi)/du,
+        atol=1e-5
+    )
+    np.testing.assert_allclose(
+        jac1[0,1,:],
+        (phi3-phi)/du,
+        atol=1e-5
+    )
+    np.testing.assert_allclose(
+        jac1[1,0,:],
+        np.sin(phi)*(theta2-theta)/du,
+        atol=1e-5
+    )
+    np.testing.assert_allclose(
+        jac1[1,1,:],
+        np.sin(phi)*(theta3-theta)/dv,
+        atol=1e-5
+    )
+
+    # Check d(phi, theta)/d(u, v) too
+    dphi = 1e-8
+    dtheta = 1e-8
+
+    u2, v2 = batoid.utils.sphericalToGnomic(phi+dphi, theta)
+    u3, v3 = batoid.utils.sphericalToGnomic(phi, theta+dtheta)
+
+    np.testing.assert_allclose(
+        jac2[0,0,:],
+        (u2-u)/dphi,
+        atol=1e-5
+    )
+    np.testing.assert_allclose(
+        jac2[0,1,:],
+        (u3-u)/dtheta/np.sin(phi),
+        atol=1e-5
+    )
+    np.testing.assert_allclose(
+        jac2[1,0,:],
+        (v2-v)/dphi,
+        atol=1e-5
+    )
+    np.testing.assert_allclose(
+        jac2[1,1,:],
+        (v3-v)/dtheta/np.sin(phi),
+        atol=1e-5
+    )
+
 
 if __name__ == '__main__':
     test_gnomicDirCos()
     test_gnomicSpherical()
     test_sphericalToDirCos()
     test_composition()
+    test_jacobian()
