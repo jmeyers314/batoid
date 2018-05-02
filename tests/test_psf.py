@@ -39,35 +39,35 @@ def test_huygens_psf():
                     name="detector",
                     coordSys=batoid.CoordSys().shiftGlobal([0,0,focalLength])
                 )
-            ]
+            ],
+            pupilSize=diam,
+            dist=10.0,
+            inMedium=batoid.ConstMedium(1.0)
         )
 
         airy_size = 1.22*500e-9/diam * 206265
         print()
         print("Airy radius: {:4.2f} arcsec".format(airy_size))
 
-        size = 3.2
-        npix = 128
+        # Start with the HuygensPSF
+        npix = 96
+        size = 3.0
+        dsize = size/npix  # arcsec
+        dsize_X = dsize*focalLength/206265  # meters
+
+        psf = batoid.huygensPSF(telescope, 0.0, 0.0, 500e-9, nx=npix, dx=dsize_X, dy=dsize_X)
+        psf.array /= np.max(psf.array)
+
+        scale = np.sqrt(np.abs(np.linalg.det(psf.primitiveVectors)))  # meters
+        scale *= 206265/focalLength  # arcsec
         obj = galsim.Airy(lam=500, diam=diam, obscuration=obscuration)
-        im = obj.drawImage(nx=npix, ny=npix, scale=size/npix, method='no_pixel')
+        # Need to shift by half a pixel.
+        obj = obj.shift(scale/2, scale/2)
+        im = obj.drawImage(nx=npix, ny=npix, scale=scale, method='no_pixel')
         arr = im.array/np.max(im.array)
         gs_mom = galsim.hsm.FindAdaptiveMom(im)
 
-        rays = batoid.circularGrid(10.0, 0.5*diam, 0.5*diam*obscuration, 0.0, 0.0, -1.0, 50, 200, 500e-9, 1.0)
-        traced_rays = batoid.RayVector(rays)
-        telescope.traceInPlace(traced_rays)
-        batoid.trimVignettedInPlace(traced_rays)
-
-        xs = np.linspace(-size/2, size/2, npix) # arcsec
-        xs /= (206265/focalLength) # meters
-        xs, ys = np.meshgrid(xs, xs)
-        xs += np.mean(traced_rays.x)
-        ys += np.mean(traced_rays.y)
-
-        psf = batoid.huygensPSF(telescope, xs=xs, ys=ys, rays=rays)
-        psf = psf/np.max(psf)
-
-        psfim = galsim.Image(psf)
+        psfim = galsim.Image(psf.array)
         jt_mom = galsim.hsm.FindAdaptiveMom(psfim)
 
         print("GalSim shape: ", gs_mom.observed_shape)
@@ -83,35 +83,30 @@ def test_huygens_psf():
         assert isclose(gs_mom.observed_shape.g2, jt_mom.observed_shape.g2, abs_tol=3e-3, rel_tol=0.0)
         assert isclose(gs_mom.moments_centroid.x, jt_mom.moments_centroid.x, abs_tol=1e-9, rel_tol=0.0)
         assert isclose(gs_mom.moments_centroid.y, jt_mom.moments_centroid.y, abs_tol=1e-9, rel_tol=0.0)
-        assert isclose(gs_mom.moments_sigma, jt_mom.moments_sigma, rel_tol=1e-1) # why not better?!
+        assert isclose(gs_mom.moments_sigma, jt_mom.moments_sigma, rel_tol=1e-2) # why not better?!
         assert isclose(gs_mom.moments_rho4, jt_mom.moments_rho4, rel_tol=2e-2)
 
         if __name__ == '__main__':
+            size = scale*npix
             import matplotlib.pyplot as plt
             fig = plt.figure(figsize=(15, 4))
             ax1 = fig.add_subplot(131)
-            im1 = ax1.imshow(np.log10(arr), extent=[-size/2, size/2, -size/2, size/2], vmin=-7, vmax=0)
+            im1 = ax1.imshow(np.log10(arr), extent=np.r_[-1,1,-1,1]*size/2, vmin=-7, vmax=0)
             plt.colorbar(im1, ax=ax1, label='$\log_{10}$ flux')
             ax1.set_title('GalSim')
             ax1.set_xlabel("arcsec")
             ax1.set_ylabel("arcsec")
 
-            xs *= 1e6 # m -> micron
-            ys *= 1e6
-            rayx = traced_rays.x*1e6
-            rayy = traced_rays.y*1e6
+            sizeX = dsize_X * npix * 1e6  # microns
             ax2 = fig.add_subplot(132)
-            im2 = ax2.imshow(np.log10(psf), extent=[xs.min(), xs.max(), ys.min(), ys.max()], vmin=-7, vmax=0)
+            im2 = ax2.imshow(np.log10(psf.array), extent=np.r_[-1,1,-1,1]*sizeX/2, vmin=-7, vmax=0)
             plt.colorbar(im2, ax=ax2, label='$\log_{10}$ flux')
-            ax2.scatter(rayx, rayy, s=1, c='r')
-            ax2.set_xlim(xs.min(), xs.max())
-            ax2.set_ylim(ys.min(), ys.max())
             ax2.set_title('batoid')
             ax2.set_xlabel("$\mu m$")
             ax2.set_ylabel("$\mu m$")
 
             ax3 = fig.add_subplot(133)
-            im3 = ax3.imshow((psf-arr)/np.max(arr), vmin=-0.01, vmax=0.01, cmap='seismic')
+            im3 = ax3.imshow((psf.array-arr)/np.max(arr), vmin=-0.01, vmax=0.01, cmap='seismic')
             plt.colorbar(im3, ax=ax3, label="(batoid-GalSim)/max(GalSim)")
             ax3.set_title('resid')
             ax3.set_xlabel("$\mu m$")
@@ -129,13 +124,9 @@ def test_lsst_psf():
     config = yaml.load(open(fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
 
-    # import matplotlib.pyplot as plt
-    # from mpl_toolkits.mplot3d import Axes3D
-    # fig = plt.figure()
-    # ax = fig.add_subplot(111, projection='3d')
-    # telescope.draw(ax)
-    # plt.show()
-    # import sys; sys.exit()
+    stampSize = 0.5 # arcsec
+    nx = 64
+    focalLength = 1.234*8.36 # meters
 
     if __name__ == '__main__':
         thetas = [0.0, 1200.0, 3600.0, 6300.0] # arcsec
@@ -143,33 +134,35 @@ def test_lsst_psf():
         thetas = [6300.0]
     for theta in thetas:
         print(theta/3600.0)
+        dirCos = batoid.utils.gnomicToDirCos(0.0, theta/206265)
         rays = batoid.circularGrid(10.0, 4.2, 2.55,
-                                   np.sin(theta/206265), 0.0, -1.0,
+                                   dirCos[0], dirCos[1], -dirCos[2],
                                    10, 100, 620e-9, batoid.Air())
-        traced_rays = batoid.RayVector(rays)
-        telescope.traceInPlace(traced_rays)
-        batoid.trimVignettedInPlace(traced_rays)
+        telescope.traceInPlace(rays)
+        batoid.trimVignettedInPlace(rays)
+        xs = rays.x - np.mean(rays.x)
+        ys = rays.y - np.mean(rays.y)
 
-        nx = 64
-        xs = np.linspace(-10e-6, 10e-6, nx) # 2 pixels wide
-        ys = np.linspace(-10e-6, 10e-6, nx)
-        xs += np.mean(traced_rays.x)
-        ys += np.mean(traced_rays.y)
-        xs, ys = np.meshgrid(xs, ys)
+        xs *= 206265/focalLength
+        ys *= 206265/focalLength
 
-        psf = batoid.huygensPSF(telescope, xs=xs, ys=ys, rays=rays)
+        # Need to add half-pixel offset
+        xs += stampSize/nx/2
+        ys += stampSize/nx/2
+
+        dx = stampSize/nx * focalLength/206265 # meters
+
+        psf = batoid.huygensPSF(telescope, 0.0, theta/206265, 620e-9, nx=64, dx=dx, dy=dx)
 
         if __name__ == '__main__':
             import matplotlib.pyplot as plt
             fig = plt.figure(figsize=(12, 8))
             ax = fig.add_subplot(111)
-            ax.imshow(psf, extent=np.r_[xs.min(), xs.max(), ys.min(), ys.max()]*1e6)
-            ax.scatter(traced_rays.x*1e6, traced_rays.y*1e6, s=1, c='r', alpha=0.25)
-            ax.set_xlim(xs.min()*1e6, xs.max()*1e6)
-            ax.set_ylim(ys.min()*1e6, ys.max()*1e6)
+            ax.imshow(psf.array, extent=np.r_[-1,1,-1,1]*stampSize/2)
+            ax.scatter(xs, ys, s=5, c='r', alpha=0.5)
             ax.set_title("LSST PSF field={:5.2f}".format(theta/3600.0))
-            ax.set_xlabel("$\mu m$")
-            ax.set_ylabel("$\mu m$")
+            ax.set_xlabel("arcsec")
+            ax.set_ylabel("arcsec")
 
             fig.tight_layout()
             plt.show()
@@ -182,39 +175,45 @@ def test_hsc_psf():
     config = yaml.load(open(fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
 
+    stampSize = 0.75  # arcsec
+    nx = 64
+    focalLength = 15.0  # guess
+
     if __name__ == '__main__':
         thetas = [0.0, 1350.0, 2700.0] # arcsec
     else:
         thetas = [2700.0]
     for theta in thetas:
         print(theta/3600.0)
+        dirCos = batoid.utils.gnomicToDirCos(0.0, theta/206265)
         rays = batoid.circularGrid(10.0, 4.2, 2.55,
-                                   np.sin(theta/206265), 0.0, -1.0,
+                                   dirCos[0], dirCos[1], -dirCos[2],
                                    10, 100, 620e-9, 1.0)
-        traced_rays = batoid.RayVector(rays)
-        telescope.traceInPlace(traced_rays)
-        batoid.trimVignettedInPlace(traced_rays)
+        telescope.traceInPlace(rays)
+        batoid.trimVignettedInPlace(rays)
+        xs = rays.x - np.mean(rays.x)
+        ys = rays.y - np.mean(rays.y)
 
-        nx = 64
-        xs = np.linspace(-27.1e-6, 27.1e-6, nx) # 2 pixels wide
-        ys = np.linspace(-27.1e-6, 27.1e-6, nx)
-        xs += np.mean(traced_rays.x)
-        ys += np.mean(traced_rays.y)
-        xs, ys = np.meshgrid(xs, ys)
+        xs *= 206265/focalLength  # meters to arcsec
+        ys *= 206265/focalLength
 
-        psf = batoid.huygensPSF(telescope, xs=xs, ys=ys, rays=rays)
+        # Need to add half-pixel offset
+        xs += stampSize/nx/2
+        ys += stampSize/nx/2
+
+        dx = stampSize/nx * focalLength/206265 # meters
+
+        psf = batoid.huygensPSF(telescope, 0.0, theta/206265, 620e-9, nx=nx, dx=dx, dy=dx)
 
         if __name__ == '__main__':
             import matplotlib.pyplot as plt
             fig = plt.figure(figsize=(12, 8))
             ax = fig.add_subplot(111)
-            ax.imshow(psf, extent=np.r_[xs.min(), xs.max(), ys.min(), ys.max()]*1e6)
-            ax.scatter(traced_rays.x*1e6, traced_rays.y*1e6, s=1, c='r')
-            ax.set_xlim(xs.min()*1e6, xs.max()*1e6)
-            ax.set_ylim(ys.min()*1e6, ys.max()*1e6)
+            ax.imshow(psf.array, extent=np.r_[-1,1,-1,1]*stampSize/2)
+            ax.scatter(xs, ys, s=5, c='r', alpha=0.5)
             ax.set_title("HSC PSF field={:5.2f}".format(theta/3600.0))
-            ax.set_xlabel("$\mu m$")
-            ax.set_ylabel("$\mu m$")
+            ax.set_xlabel("arcsec")
+            ax.set_ylabel("arcsec")
 
             fig.tight_layout()
             plt.show()
@@ -227,13 +226,9 @@ def test_decam_psf():
     config = yaml.load(open(fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
 
-    # import matplotlib.pyplot as plt
-    # from mpl_toolkits.mplot3d import Axes3D
-    # fig = plt.figure()
-    # ax = fig.add_subplot(111, projection='3d')
-    # telescope.draw(ax)
-    # plt.show()
-    # import sys; sys.exit()
+    stampSize = 1.0  # arcsec
+    nx = 64
+    focalLength = 10.0  # guess
 
     if __name__ == '__main__':
         thetas = [0.0, 1800.0, 3960.0] # arcsec
@@ -241,33 +236,35 @@ def test_decam_psf():
         thetas = [3960.0]
     for theta in thetas:
         print(theta/3600.0)
+        dirCos = batoid.utils.gnomicToDirCos(0.0, theta/206265)
         rays = batoid.circularGrid(10.0, 1.95, 0.5,
-                                   np.sin(theta/206265), 0.0, -1.0,
-                                   30, 200, 760e-9, batoid.Air())
-        traced_rays = batoid.RayVector(rays)
-        telescope.traceInPlace(traced_rays)
-        batoid.trimVignettedInPlace(traced_rays)
+                                   dirCos[0], dirCos[1], -dirCos[2],
+                                   10, 100, 620e-9, batoid.Air())
+        telescope.traceInPlace(rays)
+        batoid.trimVignettedInPlace(rays)
+        xs = rays.x - np.mean(rays.x)
+        ys = rays.y - np.mean(rays.y)
 
-        nx = 64
-        xs = np.linspace(-27.1e-6, 27.1e-6, nx)
-        ys = np.linspace(-27.1e-6, 27.1e-6, nx)
-        xs += np.mean(traced_rays.x)
-        ys += np.mean(traced_rays.y)
-        xs, ys = np.meshgrid(xs, ys)
+        xs *= 206265/focalLength  # meters to arcsec
+        ys *= 206265/focalLength
 
-        psf = batoid.huygensPSF(telescope, xs=xs, ys=ys, rays=rays)
+        # Need to add half-pixel offset
+        xs += stampSize/nx/2
+        ys += stampSize/nx/2
+
+        dx = stampSize/nx * focalLength/206265 # meters
+
+        psf = batoid.huygensPSF(telescope, 0.0, theta/206265, 620e-9, nx=nx, dx=dx, dy=dx)
 
         if __name__ == '__main__':
             import matplotlib.pyplot as plt
             fig = plt.figure(figsize=(12, 8))
             ax = fig.add_subplot(111)
-            ax.imshow(psf, extent=np.r_[xs.min(), xs.max(), ys.min(), ys.max()]*1e6)
-            ax.scatter(traced_rays.x*1e6, traced_rays.y*1e6, s=1, c='r')
-            ax.set_xlim(xs.min()*1e6, xs.max()*1e6)
-            ax.set_ylim(ys.min()*1e6, ys.max()*1e6)
+            ax.imshow(psf.array, extent=np.r_[-1,1,-1,1]*stampSize/2)
+            ax.scatter(xs, ys, s=5, c='r', alpha=0.5)
             ax.set_title("DECam PSF field={:5.2f}".format(theta/3600.0))
-            ax.set_xlabel("$\mu m$")
-            ax.set_ylabel("$\mu m$")
+            ax.set_xlabel("arcsec")
+            ax.set_ylabel("arcsec")
 
             fig.tight_layout()
             plt.show()

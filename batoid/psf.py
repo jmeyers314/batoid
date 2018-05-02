@@ -3,54 +3,87 @@ import batoid
 from .utils import bivariate_fit, gnomicToDirCos, dirCosToGnomic
 
 
-def huygensPSF(optic, xs, ys, zs=None, rays=None, saveRays=False):
+def huygensPSF(optic, theta_x=None, theta_y=None, wavelength=None, nx=None,
+               dx=None, dy=None, nxOut=None):
     """Compute a PSF via the Huygens construction.
 
     Parameters
     ----------
     optic : batoid.Optic
         Optical system
-    xs, ys : ndarray
-        Coordinates at which to evaluate the PSF in the optic.outCoordSys system.
-    zs : ndarray, optional
-        Optional z coordinates at which to evaluate the PSF.  Default: 0.
-    rays : RayVector
-        Input rays to optical system.
-    saveRays : bool, optional
-        Whether or not to preserve input rays or overwrite.  Default: False
+    theta_x, theta_y : float, optional
+        Field angle in radians (gnomic tangent plane projection)
+    wavelength : float, optional
+        Wavelength in meters
+    nx : int, optional
+        Size of ray grid to use.
+    dx, dy : float, optional
+        Lattice scales to use for PSF evaluation locations.  Default, use fftPSF lattice.
 
     Returns
     -------
-    psf : ndarray
-        The PSF
+    psf : batoid.Lattice
+        The PSF.
 
     Notes
     -----
     The Huygens construction is to evaluate the PSF as
 
-    I(r) \propto \Sum_u exp(i phi(u)) exp(i k(u).r)
+    I(x) \propto \Sum_u exp(i phi(u)) exp(i k(u).r)
 
     The u are assumed to uniformly sample the entrance pupil, but not include any rays that get
     vignetted before they reach the focal plane.  The phis are the phases of the exit rays evaluated
     at a single arbitrary time.  The k(u) indicates the conversion of the uniform entrance pupil
     samples into nearly (though not exactly) uniform samples in k-space of the output rays.
+
+    The output locations where the PSF is evaluated are governed by dx, dy and nx.  If dx and dy are
+    None, then the same lattice as in fftPSF will be used.  If dx and dy are scalars, then a lattice
+    with primitive vectors [dx, 0] and [0, dy] will be used.  If dx and dy are 2-vectors, then those
+    will be the primitive vectors of the output lattice.
     """
-    if zs is None:
-        zs = np.zeros_like(xs)
-    if saveRays:
-        rays = batoid.RayVector(rays)  # Make a copy
+    from numbers import Real
+
+    if dx is None:
+        primitiveU = np.array([[optic.pupilSize/nx,0], [0, optic.pupilSize/nx]])
+        primitiveK = dkdu(optic, theta_x, theta_y, wavelength).dot(primitiveU)
+        pad_factor = 2
+        primitiveX = np.vstack(
+            reciprocalLatticeVectors(primitiveK[0], primitiveK[1], pad_factor*nx)
+        )
+    elif isinstance(dx, Real):
+        primitiveX = np.vstack([[dx, 0], [0, dy]])
+        pad_factor = 1
+    else:
+        primitiveX = np.vstack([dx, dy])
+        pad_factor = 1
+
+    if nxOut is None:
+        nxOut = nx
+
+    dirCos = gnomicToDirCos(theta_x, theta_y)
+    rays = batoid.rayGrid(optic.dist, optic.pupilSize,
+        dirCos[0], dirCos[1], -dirCos[2],
+        nx, wavelength=wavelength, medium=optic.inMedium)
+
+    amplitudes = np.zeros((nxOut*pad_factor, nxOut*pad_factor), dtype=np.complex128)
+    out = batoid.Lattice(np.zeros((nxOut*pad_factor, nxOut*pad_factor), dtype=float), primitiveX)
+
     rays, outCoordSys = optic.traceInPlace(rays)
     batoid.trimVignettedInPlace(rays)
+    # Need transpose to conform to numpy [y,x] ordering convention
+    xs = out.coords[..., 0].T + np.mean(rays.x)
+    ys = out.coords[..., 1].T + np.mean(rays.y)
+    zs = np.zeros_like(xs)
+
     points = np.concatenate([aux[..., None] for aux in (xs, ys, zs)], axis=-1)
     time = rays[0].t0
-    amplitudes = np.empty(xs.shape, dtype=np.complex128)
-    for idx in np.ndindex(xs.shape):
+    for idx in np.ndindex(amplitudes.shape):
         amplitudes[idx] = batoid._batoid.sumAmplitudeMany(
             rays,
             points[idx],
             time
         )
-    return np.abs(amplitudes)**2
+    return batoid.Lattice(np.abs(amplitudes)**2, primitiveX)
 
 
 def drdth(optic, theta_x, theta_y, wavelength, nx=16):
@@ -242,15 +275,15 @@ def wavefront(optic, theta_x, theta_y, wavelength, nx=32, sphereRadius=None):
     # of the good (unvignetted) rays.
     t0 = np.mean(rays.t0[w])
 
-    arr = np.ma.masked_array((rays.t0-t0)/wavelength, mask=rays.isVignetted).reshape(nx, nx)
+    arr = np.ma.masked_array((t0-rays.t0)/wavelength, mask=rays.isVignetted).reshape(nx, nx)
     primitiveVectors = np.vstack([[optic.pupilSize/nx, 0], [0, optic.pupilSize/nx]])
     return batoid.Lattice(arr, primitiveVectors)
 
 
-def reciprocalLattiveVectors(a1, a2, N):
+def reciprocalLatticeVectors(a1, a2, N):
     norm = 2*np.pi/(a1[0]*a2[1] - a1[1]*a2[0])/N
-    b1 = norm*np.array([a2[1], -a2[0]])
-    b2 = norm*np.array([a1[1], -a1[0]])
+    b1 = norm*np.array([a2[1], a2[0]])
+    b2 = norm*np.array([a1[1], a1[0]])
     return b1, b2
 
 
@@ -280,17 +313,16 @@ def fftPSF(optic, theta_x, theta_y, wavelength, nx=32, pad_factor=2):
     # im_dtheta = wavelength / L
     wf = wavefront(optic, theta_x, theta_y, wavelength, nx)
     wfarr = wf.array
-    primitiveU = wf.primitiveVectors
     pad_size = nx*pad_factor
     expwf = np.zeros((pad_size, pad_size), dtype=np.complex128)
     start = pad_size//2-nx//2
     stop = pad_size//2+nx//2
     expwf[start:stop, start:stop][~wfarr.mask] = np.exp(2j*np.pi*wfarr[~wfarr.mask])
-    psf = np.abs(np.fft.fftshift(np.fft.fft2(np.fft.fftshift(expwf))))**2
+    psf = np.abs(np.fft.fftshift(np.fft.fft2(expwf)))**2
 
     primitiveU = wf.primitiveVectors
     primitiveK = dkdu(optic, theta_x, theta_y, wavelength).dot(primitiveU)
-    primitiveX = np.vstack(reciprocalLattiveVectors(primitiveK[0], primitiveK[1], pad_size))
+    primitiveX = np.vstack(reciprocalLatticeVectors(primitiveK[0], primitiveK[1], pad_size))
 
     return batoid.Lattice(psf, primitiveX)
 

@@ -2,6 +2,17 @@ import numpy as np
 from .utils import lazy_property
 
 
+def primitiveToLattice(primitiveVectors, Ns):
+    # 2D output should be [N1, N2, 2]
+    # 3D output should be [N1, N2, N3, 3]
+    # and so on...
+    ns = []
+    for d in np.arange(len(Ns)):
+        ns.append(np.arange(-Ns[d]/2, Ns[d]/2))
+    ns = np.meshgrid(*ns, indexing='ij')
+    return np.matmul(np.moveaxis(ns, 0, -1), primitiveVectors)
+
+
 class Lattice:
     """Simple container class for an ndarray + primitive lattice vectors.
 
@@ -31,11 +42,4 @@ class Lattice:
 
     @lazy_property
     def coords(self):
-        # 2D output should be [N1, N2, 2]
-        # 3D output should be [N1, N2, N3, 3]
-        # and so on...
-        ns = []
-        for d in np.arange(self.array.ndim):
-            ns.append(np.arange(-self.array.shape[d]/2, self.array.shape[d]/2))
-        ns = np.meshgrid(*ns, indexing='ij')
-        return np.matmul(np.moveaxis(ns, 0, -1), self.primitiveVectors)
+        return primitiveToLattice(self.primitiveVectors, self.array.shape)

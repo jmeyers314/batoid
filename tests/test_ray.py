@@ -187,7 +187,7 @@ def test_rayGrid():
     xcos = 0.1
     ycos = 0.2
     zcos = -np.sqrt(1.0 - xcos**2 - ycos**2)
-    nside = 9
+    nside = 10
     wavelength = 500e-9
 
     for n in [1.2, batoid.ConstMedium(1.2)]:
@@ -205,7 +205,9 @@ def test_rayGrid():
             np.testing.assert_allclose(r.v[1]*1.2, ycos)
 
         # Check that ray that intersects at origin is initially dist away.
-        np.testing.assert_allclose(np.linalg.norm(rays[len(rays)//2].p0), dist)
+        # Need the ray that is in the middle in both dimensions...
+        idx = np.ravel_multi_index((nside//2, nside//2), (nside, nside))
+        np.testing.assert_allclose(np.linalg.norm(rays[idx].p0), dist)
 
 
 @timer
