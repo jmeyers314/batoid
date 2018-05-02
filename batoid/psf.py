@@ -41,15 +41,13 @@ def huygensPSF(optic, xs, ys, zs=None, rays=None, saveRays=False):
         rays = batoid.RayVector(rays)  # Make a copy
     rays, outCoordSys = optic.traceInPlace(rays)
     batoid.trimVignettedInPlace(rays)
-    # transform = batoid.CoordTransform(outCoordSys, batoid.CoordSys())
-    # transform.applyForwardInPlace(rays)
     points = np.concatenate([aux[..., None] for aux in (xs, ys, zs)], axis=-1)
     time = rays[0].t0
     amplitudes = np.empty(xs.shape, dtype=np.complex128)
-    for (i, j) in np.ndindex(xs.shape):
-        amplitudes[i, j] = batoid._batoid.sumAmplitudeMany(
+    for idx in np.ndindex(xs.shape):
+        amplitudes[idx] = batoid._batoid.sumAmplitudeMany(
             rays,
-            points[i, j],
+            points[idx],
             time
         )
     return np.abs(amplitudes)**2
@@ -194,6 +192,27 @@ def dkdu(optic, theta_x, theta_y, wavelength, nx=16):
 
 
 def wavefront(optic, theta_x, theta_y, wavelength, nx=32, sphereRadius=None):
+    """Compute wavefront.
+
+    Parameters
+    ----------
+    optic : batoid.Optic
+        Optic for which to compute wavefront.
+    theta_x, theta_y : float
+        Field of incoming rays (gnomic projection)
+    wavelength : float
+        Wavelength of incoming rays
+    nx : int (optional)
+        Size of ray grid to generate to compute wavefront.  Default: 32
+    sphereRadius : float (optional)
+        Radius of reference sphere in meters.  If None, then use optic.sphereRadius.
+
+    Returns
+    -------
+    wavefront : batoid.Lattice
+        A batoid.Lattice object containing the wavefront values in waves and
+        the primitive lattice vectors of the entrance pupil grid in meters.
+    """
     dirCos = gnomicToDirCos(theta_x, theta_y)
     rays = batoid.rayGrid(
         optic.dist, optic.pupilSize,
@@ -223,20 +242,57 @@ def wavefront(optic, theta_x, theta_y, wavelength, nx=32, sphereRadius=None):
     # of the good (unvignetted) rays.
     t0 = np.mean(rays.t0[w])
 
-    return np.ma.masked_array((rays.t0-t0)/wavelength, mask=rays.isVignetted).reshape(nx, nx)
+    arr = np.ma.masked_array((rays.t0-t0)/wavelength, mask=rays.isVignetted).reshape(nx, nx)
+    primitiveVectors = np.vstack([[optic.pupilSize/nx, 0], [0, optic.pupilSize/nx]])
+    return batoid.Lattice(arr, primitiveVectors)
+
+
+def reciprocalLattiveVectors(a1, a2, N):
+    norm = 2*np.pi/(a1[0]*a2[1] - a1[1]*a2[0])/N
+    b1 = norm*np.array([a2[1], -a2[0]])
+    b2 = norm*np.array([a1[1], -a1[0]])
+    return b1, b2
 
 
 def fftPSF(optic, theta_x, theta_y, wavelength, nx=32, pad_factor=2):
+    """Compute PSF using FFT.
+
+    Parameters
+    ----------
+    optic : batoid.Optic
+        Optic for which to compute wavefront.
+    theta_x, theta_y : float
+        Field of incoming rays (gnomic projection)
+    wavelength : float
+        Wavelength of incoming rays
+    nx : int (optional)
+        Size of ray grid to generate to compute wavefront.  Default: 32
+    pad_factor : int (optional)
+        Factor by which to pad pupil array.  Default: 2
+
+    Returns
+    -------
+    psf : batoid.Lattice
+        A batoid.Lattice object containing the relative PSF values and
+        the primitive lattice vectors of the focal plane grid.
+    """
     L = optic.pupilSize*pad_factor
-    im_dtheta = wavelength / L
+    # im_dtheta = wavelength / L
     wf = wavefront(optic, theta_x, theta_y, wavelength, nx)
+    wfarr = wf.array
+    primitiveU = wf.primitiveVectors
     pad_size = nx*pad_factor
     expwf = np.zeros((pad_size, pad_size), dtype=np.complex128)
     start = pad_size//2-nx//2
     stop = pad_size//2+nx//2
-    expwf[start:stop, start:stop][~wf.mask] = np.exp(2j*np.pi*wf[~wf.mask])
+    expwf[start:stop, start:stop][~wfarr.mask] = np.exp(2j*np.pi*wfarr[~wfarr.mask])
     psf = np.abs(np.fft.fftshift(np.fft.fft2(np.fft.fftshift(expwf))))**2
-    return im_dtheta, psf
+
+    primitiveU = wf.primitiveVectors
+    primitiveK = dkdu(optic, theta_x, theta_y, wavelength).dot(primitiveU)
+    primitiveX = np.vstack(reciprocalLattiveVectors(primitiveK[0], primitiveK[1], pad_size))
+
+    return batoid.Lattice(psf, primitiveX)
 
 
 def zernike(optic, theta_x, theta_y, wavelength, nx=32, jmax=22, eps=0.0):
@@ -249,18 +305,20 @@ def zernike(optic, theta_x, theta_y, wavelength, nx=32, jmax=22, eps=0.0):
         nx, wavelength, optic.inMedium
     )
 
+    # Propagate to t=0 where rays are in the entrance pupil.
     batoid.propagateInPlaceMany(rays, np.zeros_like(rays.x))
 
     orig_x = np.array(rays.x).reshape(nx,nx)
     orig_y = np.array(rays.y).reshape(nx,nx)
 
     wf = wavefront(optic, theta_x, theta_y, wavelength, nx=nx)
-    w = ~wf.mask
+    wfarr = wf.array
+    w = ~wfarr.mask
 
     basis = zern.zernikeBasis(
             jmax, orig_x[w], orig_y[w],
             R_outer=optic.pupilSize/2, R_inner=optic.pupilSize/2*eps
     )
-    coefs, _, _, _ = np.linalg.lstsq(basis.T, wf[w], rcond=-1)
+    coefs, _, _, _ = np.linalg.lstsq(basis.T, wfarr[w], rcond=-1)
 
     return coefs
