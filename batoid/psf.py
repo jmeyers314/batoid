@@ -61,6 +61,7 @@ def huygensPSF(optic, theta_x=None, theta_y=None, wavelength=None, nx=None,
         nxOut = nx
 
     dirCos = gnomicToDirCos(theta_x, theta_y)
+
     rays = batoid.rayGrid(optic.dist, optic.pupilSize,
         dirCos[0], dirCos[1], -dirCos[2],
         nx, wavelength=wavelength, medium=optic.inMedium)
@@ -235,9 +236,9 @@ def wavefront(optic, theta_x, theta_y, wavelength, nx=32, sphereRadius=None):
         Field of incoming rays (gnomic projection)
     wavelength : float
         Wavelength of incoming rays
-    nx : int (optional)
+    nx : int, optional
         Size of ray grid to generate to compute wavefront.  Default: 32
-    sphereRadius : float (optional)
+    sphereRadius : float, optional
         Radius of reference sphere in meters.  If None, then use optic.sphereRadius.
 
     Returns
@@ -298,9 +299,9 @@ def fftPSF(optic, theta_x, theta_y, wavelength, nx=32, pad_factor=2):
         Field of incoming rays (gnomic projection)
     wavelength : float
         Wavelength of incoming rays
-    nx : int (optional)
+    nx : int, optional
         Size of ray grid to generate to compute wavefront.  Default: 32
-    pad_factor : int (optional)
+    pad_factor : int, optional
         Factor by which to pad pupil array.  Default: 2
 
     Returns
