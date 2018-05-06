@@ -49,11 +49,6 @@ namespace batoid {
              reflectInPlace(rv.rays, s);
          })
          .def("refract", (Ray (*)(const Ray&, const Surface&, const double, const double)) &refract)
-         .def("refract", [](const RayVector& rv, const Surface& s, const double n1, const double n2){
-             RayVector result;
-             result.rays = std::move(refract(rv.rays, s, n1, n2));
-             return result;
-         })
          .def("refract", (Ray (*)(const Ray&, const Surface&, const Medium&, const Medium&)) &refract)
          .def("refract", [](const RayVector& rv, const Surface& s, const Medium& m1, const Medium& m2){
              RayVector result;
@@ -61,9 +56,6 @@ namespace batoid {
              return result;
          })
          .def("refractInPlace", (void (*)(Ray&, const Surface&, const double, const double)) &refractInPlace)
-         .def("refractInPlace", [](RayVector& rv, const Surface& s, const double n1, const double n2){
-             refractInPlace(rv.rays, s, n1, n2);
-         })
          .def("refractInPlace", (void (*)(Ray&, const Surface&, const Medium&, const Medium&)) &refractInPlace)
          .def("refractInPlace", [](RayVector& rv, const Surface& s, const Medium& m1, const Medium& m2){
              refractInPlace(rv.rays, s, m1, m2);

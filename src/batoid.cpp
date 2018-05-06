@@ -61,16 +61,6 @@ namespace batoid{
             return Ray(r.p0, f2/n2, r.t0, r.wavelength, r.isVignetted);
     }
 
-    std::vector<Ray> refract(const std::vector<Ray>& rays, const Surface& surface,
-                             const double n1, const double n2) {
-        auto result = std::vector<Ray>(rays.size());
-        parallelTransform(
-            rays.cbegin(), rays.cend(), result.begin(),
-            [&](const Ray& r){ return refract(r, surface, n1, n2); }
-        );
-        return result;
-    }
-
     Ray refract(const Ray& r, const Surface& surface, const Medium& m1, const Medium& m2) {
         if (r.failed) return r;
         double n1 = m1.getN(r.wavelength);
@@ -80,6 +70,7 @@ namespace batoid{
 
     std::vector<Ray> refract(const std::vector<Ray>& rays, const Surface& surface,
                              const Medium& m1, const Medium& m2) {
+        // TODO: optimize case where all wavelengths are the same
         auto result = std::vector<Ray>(rays.size());
         parallelTransform(
             rays.cbegin(), rays.cend(), result.begin(),
@@ -106,13 +97,6 @@ namespace batoid{
             r.v = f2/n2;
     }
 
-    void refractInPlace(std::vector<Ray>& rays, const Surface& surface, double n1, double n2) {
-        parallel_for_each(
-            rays.begin(), rays.end(),
-            [&](Ray& r) { refractInPlace(r, surface, n1, n2); }
-        );
-    }
-
     void refractInPlace(Ray& r, const Surface& surface, const Medium& m1, const Medium& m2) {
         if (r.failed) return;
         double n1 = m1.getN(r.wavelength);
@@ -121,6 +105,7 @@ namespace batoid{
     }
 
     void refractInPlace(std::vector<Ray>& rays, const Surface& surface, const Medium& m1, const Medium& m2) {
+        // TODO: optimize case where all wavelengths are the same
         parallel_for_each(
             rays.begin(), rays.end(),
             [&](Ray& r) { refractInPlace(r, surface, m1, m2); }
