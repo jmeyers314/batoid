@@ -2,6 +2,7 @@
 #define batoid_coordsys_h
 
 #include "ray.h"
+#include "rayVector.h"
 #include <memory>
 #include <vector>
 #include <string>

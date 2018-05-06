@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include "ray.h"
+#include "rayVector.h"
 
 #include <Eigen/Dense>
 

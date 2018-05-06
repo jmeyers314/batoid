@@ -22,6 +22,7 @@ set(PYSRC_FILES
   pysrc/plane.cpp
   pysrc/quadric.cpp
   pysrc/ray.cpp
+  pysrc/rayVector.cpp
   pysrc/sphere.cpp
   pysrc/surface.cpp
   pysrc/table.cpp
@@ -36,6 +37,7 @@ set(SRC_FILES
   src/plane.cpp
   src/quadric.cpp
   src/ray.cpp
+  src/rayVector.cpp
   src/sphere.cpp
   src/surface.cpp
   src/table.cpp

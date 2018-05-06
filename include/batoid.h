@@ -2,6 +2,7 @@
 #define batoid_batoid_h
 
 #include "ray.h"
+#include "rayVector.h"
 #include "medium.h"
 #include "surface.h"
 #include "utils.h"

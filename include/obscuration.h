@@ -2,6 +2,7 @@
 #define batoid_obscuration_h
 
 #include "ray.h"
+#include "rayVector.h"
 #include <vector>
 #include <memory>
 #include <Eigen/Dense>
