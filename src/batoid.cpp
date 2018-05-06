@@ -112,10 +112,10 @@ namespace batoid{
         );
     }
 
-    std::vector<Ray> rayGrid(double dist, double length,
-                             double xcos, double ycos, double zcos,
-                             int nside, double wavelength,
-                             const Medium& m) {
+    RayVector rayGrid(double dist, double length,
+                      double xcos, double ycos, double zcos,
+                      int nside, double wavelength,
+                      const Medium& m) {
         double n = m.getN(wavelength);
     // `dist` is the distance from the center of the pupil to the center of the rayGrid.
     // `length` is the length of one side of the rayGrid square.
@@ -154,17 +154,17 @@ namespace batoid{
                 //      = (r + v n d) . v n^2
                 // => r0 = r - v t
                 double t = (r + v*n*dist).dot(v) * n * n;
-                result.push_back(Ray(r-v*t, v, 0, wavelength, false));
+                result.emplace_back(r-v*t, v, 0, wavelength, false);
                 x += dy;
             }
             y += dy;
         }
-        return result;
+        return RayVector(std::move(result));
     }
 
-    std::vector<Ray> circularGrid(double dist, double outer, double inner,
-                                  double xcos, double ycos, double zcos,
-                                  int nradii, int naz, double wavelength, const Medium& m) {
+    RayVector circularGrid(double dist, double outer, double inner,
+                           double xcos, double ycos, double zcos,
+                           int nradii, int naz, double wavelength, const Medium& m) {
         double n = m.getN(wavelength);
 
         // Determine number of rays at each radius
@@ -192,12 +192,12 @@ namespace batoid{
             for (int j=0; j<nphis[i]; j++) {
                 Vector3d r(radius*std::cos(az), radius*std::sin(az), 0);
                 double t = (r + v*n*dist).dot(v) * n * n;
-                result.push_back(Ray(r-v*t, v, 0, wavelength, false));
+                result.emplace_back(r-v*t, v, 0, wavelength, false);
                 az += daz;
             }
             rfrac -= drfrac;
         }
-        return result;
+        return RayVector(std::move(result));
     }
 
     std::vector<Ray> trimVignetted(const std::vector<Ray>& rays) {

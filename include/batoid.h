@@ -22,11 +22,11 @@ namespace batoid {
     void reflectInPlace(Ray& r, const Surface& surface);
     void reflectInPlace(std::vector<Ray>& r, const Surface& surface);
 
-    std::vector<Ray> rayGrid(double dist, double length, double xcos, double ycos, double zcos,
-                             int nside, double wavelength, const Medium& m);
-    std::vector<Ray> circularGrid(double dist, double outer, double inner,
-                                  double xcos, double ycos, double zcos,
-                                  int nradii, int naz, double wavelength, const Medium& m);
+    RayVector rayGrid(double dist, double length, double xcos, double ycos, double zcos,
+                      int nside, double wavelength, const Medium& m);
+    RayVector circularGrid(double dist, double outer, double inner,
+                           double xcos, double ycos, double zcos,
+                           int nradii, int naz, double wavelength, const Medium& m);
 
     std::vector<Ray> trimVignetted(const std::vector<Ray>& rays);
     void trimVignettedInPlace(std::vector<Ray>& rays);
