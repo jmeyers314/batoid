@@ -24,13 +24,7 @@ namespace batoid {
     void reflectInPlace(std::vector<Ray>& r, const Surface& surface);
 
     std::vector<Ray> rayGrid(double dist, double length, double xcos, double ycos, double zcos,
-                             int nside, double wavelength, double n);
-    std::vector<Ray> rayGrid(double dist, double length, double xcos, double ycos, double zcos,
                              int nside, double wavelength, const Medium& m);
-
-    std::vector<Ray> circularGrid(double dist, double outer, double inner,
-                                  double xcos, double ycos, double zcos,
-                                  int nradii, int naz, double wavelength, double n);
     std::vector<Ray> circularGrid(double dist, double outer, double inner,
                                   double xcos, double ycos, double zcos,
                                   int nradii, int naz, double wavelength, const Medium& m);

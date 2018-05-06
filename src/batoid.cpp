@@ -130,14 +130,15 @@ namespace batoid{
     std::vector<Ray> rayGrid(double dist, double length,
                              double xcos, double ycos, double zcos,
                              int nside, double wavelength,
-                             double n) {
+                             const Medium& m) {
+        double n = m.getN(wavelength);
     // `dist` is the distance from the center of the pupil to the center of the rayGrid.
     // `length` is the length of one side of the rayGrid square.
     // `xcos`, `ycos`, `zcos` are the direction cosines of the ray velocities
     // `nside` is the number of rays on a side of the rayGrid.
     // `wavelength` is the wavelength assigned to the rays
-    // `n` is the refractive index at the position of the rays.  (Needed to properly normalize the
-    //     ray magnitudes).
+    // `m` is the medium (from which we get the refractive index) at the position of the rays.
+    // (Needed to properly normalize the ray magnitudes).
         std::vector<Ray> result;
         result.reserve(nside*nside);
 
@@ -176,17 +177,10 @@ namespace batoid{
         return result;
     }
 
-    std::vector<Ray> rayGrid(double dist, double length,
-                             double xcos, double ycos, double zcos,
-                             int nside, double wavelength,
-                             const Medium& m) {
-        double n = m.getN(wavelength);
-        return rayGrid(dist, length, xcos, ycos, zcos, nside, wavelength, n);
-    }
-
     std::vector<Ray> circularGrid(double dist, double outer, double inner,
                                   double xcos, double ycos, double zcos,
-                                  int nradii, int naz, double wavelength, double n) {
+                                  int nradii, int naz, double wavelength, const Medium& m) {
+        double n = m.getN(wavelength);
 
         // Determine number of rays at each radius
         std::vector<int> nphis(nradii);
@@ -219,13 +213,6 @@ namespace batoid{
             rfrac -= drfrac;
         }
         return result;
-    }
-
-    std::vector<Ray> circularGrid(double dist, double outer, double inner,
-                                  double xcos, double ycos, double zcos,
-                                  int nradii, int naz, double wavelength, const Medium& m) {
-        double n = m.getN(wavelength);
-        return circularGrid(dist, outer, inner, xcos, ycos, zcos, nradii, naz, wavelength, n);
     }
 
     std::vector<Ray> trimVignetted(const std::vector<Ray>& rays) {

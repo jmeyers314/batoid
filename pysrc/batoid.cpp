@@ -68,17 +68,6 @@ namespace batoid {
          .def("refractInPlace", [](RayVector& rv, const Surface& s, const Medium& m1, const Medium& m2){
              refractInPlace(rv.rays, s, m1, m2);
          })
-
-         .def("rayGrid",
-             [](double zdist, double length, double xcos, double ycos, double zcos, int nside, double wavelength, double n)
-                 {
-                     RayVector rv;
-                     rv.rays = std::move(rayGrid(zdist, length, xcos, ycos, zcos, nside, wavelength, n));
-                     return rv;
-                 },
-             "Make a RayVector in a grid",
-             "zdist"_a, "length"_a, "xcos"_a, "ycos"_a, "zcos"_a, "nside"_a, "wavelength"_a, "n"_a
-         )
          .def("rayGrid",
              [](double zdist, double length, double xcos, double ycos, double zcos, int nside, double wavelength, const Medium& m)
                  {
@@ -88,16 +77,6 @@ namespace batoid {
                  },
              "Make a RayVector in a grid",
              "zdist"_a, "length"_a, "xcos"_a, "ycos"_a, "zcos"_a, "nside"_a, "wavelength"_a, "medium"_a
-         )
-         .def("circularGrid",
-             [](double zdist, double outer, double inner, double xcos, double ycos, double zcos, int nradii, int naz, double wavelength, double n)
-                 {
-                     RayVector rv;
-                     rv.rays = std::move(circularGrid(zdist, outer, inner, xcos, ycos, zcos, nradii, naz, wavelength, n));
-                     return rv;
-                 },
-             "Make a RayVector on a circle",
-             "zdist"_a, "outer"_a, "inner"_a, "xcos"_a, "ycos"_a, "zcos"_a, "nradii"_a, "naz"_a, "wavelength"_a, "n"_a
          )
          .def("circularGrid",
              [](double zdist, double outer, double inner, double xcos, double ycos, double zcos, int nradii, int naz, double wavelength, const Medium& m)

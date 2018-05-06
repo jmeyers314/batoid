@@ -189,25 +189,24 @@ def test_rayGrid():
     zcos = -np.sqrt(1.0 - xcos**2 - ycos**2)
     nside = 10
     wavelength = 500e-9
+    medium = batoid.ConstMedium(1.2)
 
-    for n in [1.2, batoid.ConstMedium(1.2)]:
+    rays = batoid.rayGrid(dist, length, xcos, ycos, zcos, nside, wavelength, medium)
+    # Check that all rays are perpendicular to v
+    r0 = rays[0]
+    for r in rays:
+        dr = r.p0 - r0.p0
+        dp = np.dot(dr, r0.v)
+        np.testing.assert_allclose(dp, 0.0, atol=1e-14, rtol=0.0)
+        np.testing.assert_allclose(r.wavelength, wavelength)
+        np.testing.assert_allclose(np.linalg.norm(r.v), 1./1.2)
+        np.testing.assert_allclose(r.v[0]*1.2, xcos)
+        np.testing.assert_allclose(r.v[1]*1.2, ycos)
 
-        rays = batoid.rayGrid(dist, length, xcos, ycos, zcos, nside, wavelength, n)
-        # Check that all rays are perpendicular to v
-        r0 = rays[0]
-        for r in rays:
-            dr = r.p0 - r0.p0
-            dp = np.dot(dr, r0.v)
-            np.testing.assert_allclose(dp, 0.0, atol=1e-14, rtol=0.0)
-            np.testing.assert_allclose(r.wavelength, wavelength)
-            np.testing.assert_allclose(np.linalg.norm(r.v), 1./1.2)
-            np.testing.assert_allclose(r.v[0]*1.2, xcos)
-            np.testing.assert_allclose(r.v[1]*1.2, ycos)
-
-        # Check that ray that intersects at origin is initially dist away.
-        # Need the ray that is in the middle in both dimensions...
-        idx = np.ravel_multi_index((nside//2, nside//2), (nside, nside))
-        np.testing.assert_allclose(np.linalg.norm(rays[idx].p0), dist)
+    # Check that ray that intersects at origin is initially dist away.
+    # Need the ray that is in the middle in both dimensions...
+    idx = np.ravel_multi_index((nside//2, nside//2), (nside, nside))
+    np.testing.assert_allclose(np.linalg.norm(rays[idx].p0), dist)
 
 
 @timer
@@ -221,20 +220,19 @@ def test_circularGrid():
     nradii = 5
     naz = 50
     wavelength = 500e-9
+    medium = batoid.ConstMedium(1.2)
 
-    for n in [1.2, batoid.ConstMedium(1.2)]:
-
-        rays = batoid.circularGrid(dist, outer, inner, xcos, ycos, zcos, nradii, naz, wavelength, n)
-        # Check that all rays are perpendicular to v
-        r0 = rays[0]
-        for r in rays:
-            dr = r.p0 - r0.p0
-            dp = np.dot(dr, r0.v)
-            np.testing.assert_allclose(dp, 0.0, atol=1e-14, rtol=0.0)
-            np.testing.assert_allclose(r.wavelength, wavelength)
-            np.testing.assert_allclose(np.linalg.norm(r.v), 1./1.2)
-            np.testing.assert_allclose(r.v[0]*1.2, xcos)
-            np.testing.assert_allclose(r.v[1]*1.2, ycos)
+    rays = batoid.circularGrid(dist, outer, inner, xcos, ycos, zcos, nradii, naz, wavelength, medium)
+    # Check that all rays are perpendicular to v
+    r0 = rays[0]
+    for r in rays:
+        dr = r.p0 - r0.p0
+        dp = np.dot(dr, r0.v)
+        np.testing.assert_allclose(dp, 0.0, atol=1e-14, rtol=0.0)
+        np.testing.assert_allclose(r.wavelength, wavelength)
+        np.testing.assert_allclose(np.linalg.norm(r.v), 1./1.2)
+        np.testing.assert_allclose(r.v[0]*1.2, xcos)
+        np.testing.assert_allclose(r.v[1]*1.2, ycos)
 
 
 @timer

@@ -188,7 +188,7 @@ def test_hsc_psf():
         dirCos = batoid.utils.gnomicToDirCos(0.0, theta/206265)
         rays = batoid.circularGrid(10.0, 4.2, 2.55,
                                    dirCos[0], dirCos[1], -dirCos[2],
-                                   10, 100, 620e-9, 1.0)
+                                   10, 100, 620e-9, batoid.ConstMedium(1.0))
         telescope.traceInPlace(rays)
         batoid.trimVignettedInPlace(rays)
         xs = rays.x - np.mean(rays.x)
