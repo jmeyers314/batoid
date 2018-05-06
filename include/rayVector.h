@@ -11,7 +11,10 @@ using Eigen::Vector3d;
 namespace batoid {
     struct RayVector {
         RayVector() {}
-        RayVector(std::vector<Ray> _rays) : rays(_rays) {}
+        RayVector(const RayVector& _rv) : rays(_rv.rays) {}
+        RayVector(RayVector&& _rv) : rays(std::move(_rv.rays)) {}
+        RayVector(const std::vector<Ray>& _rays) : rays(_rays) {}
+        RayVector(std::vector<Ray>&& _rays) : rays(std::move(_rays)) {}
 
         // std::vector forwarding
         typename std::vector<Ray>::const_reference operator[](std::vector<Ray>::size_type i) const
