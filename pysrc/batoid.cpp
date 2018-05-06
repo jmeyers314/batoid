@@ -41,25 +41,13 @@ namespace batoid {
         using namespace pybind11::literals;
 
         m.def("reflect", (Ray (*)(const Ray&, const Surface&)) &reflect)
-         .def("reflect", [](const RayVector& rv, const Surface& s){
-             RayVector result;
-             result.rays = std::move(reflect(rv.rays, s));
-             return result;
-         })
+         .def("reflect", (RayVector (*)(const RayVector&, const Surface&)) &reflect)
          .def("reflectInPlace", (void (*)(Ray&, const Surface&)) &reflectInPlace)
-         .def("reflectInPlace", [](RayVector& rv, const Surface& s){
-             reflectInPlace(rv.rays, s);
-         })
+         .def("reflectInPlace", (void (*)(RayVector&, const Surface&)) &reflectInPlace)
          .def("refract", (Ray (*)(const Ray&, const Surface&, const Medium&, const Medium&)) &refract)
-         .def("refract", [](const RayVector& rv, const Surface& s, const Medium& m1, const Medium& m2){
-             RayVector result;
-             result.rays = std::move(refract(rv.rays, s, m1, m2));
-             return result;
-         })
+         .def("refract", (RayVector (*)(const RayVector&, const Surface&, const Medium&, const Medium&)) &refract)
          .def("refractInPlace", (void (*)(Ray&, const Surface&, const Medium&, const Medium&)) &refractInPlace)
-         .def("refractInPlace", [](RayVector& rv, const Surface& s, const Medium& m1, const Medium& m2){
-             refractInPlace(rv.rays, s, m1, m2);
-         })
+         .def("refractInPlace", (void (*)(RayVector&, const Surface&, const Medium&, const Medium&)) &refractInPlace)
          .def("rayGrid",
              &rayGrid,
              "Make a RayVector in a grid",
