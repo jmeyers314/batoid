@@ -48,14 +48,12 @@ namespace batoid {
          .def("reflectInPlace", [](RayVector& rv, const Surface& s){
              reflectInPlace(rv.rays, s);
          })
-         .def("refract", (Ray (*)(const Ray&, const Surface&, const double, const double)) &refract)
          .def("refract", (Ray (*)(const Ray&, const Surface&, const Medium&, const Medium&)) &refract)
          .def("refract", [](const RayVector& rv, const Surface& s, const Medium& m1, const Medium& m2){
              RayVector result;
              result.rays = std::move(refract(rv.rays, s, m1, m2));
              return result;
          })
-         .def("refractInPlace", (void (*)(Ray&, const Surface&, const double, const double)) &refractInPlace)
          .def("refractInPlace", (void (*)(Ray&, const Surface&, const Medium&, const Medium&)) &refractInPlace)
          .def("refractInPlace", [](RayVector& rv, const Surface& s, const Medium& m1, const Medium& m2){
              refractInPlace(rv.rays, s, m1, m2);
