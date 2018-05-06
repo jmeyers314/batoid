@@ -28,8 +28,8 @@ namespace batoid {
                            double xcos, double ycos, double zcos,
                            int nradii, int naz, double wavelength, const Medium& m);
 
-    std::vector<Ray> trimVignetted(const std::vector<Ray>& rays);
-    void trimVignettedInPlace(std::vector<Ray>& rays);
+    RayVector trimVignetted(const RayVector& rays);
+    void trimVignettedInPlace(RayVector& rays);
 }
 
 #endif
