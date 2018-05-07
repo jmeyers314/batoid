@@ -2,6 +2,7 @@
 #define batoid_rayVector_h
 
 #include "ray.h"
+#include <cmath>
 #include <complex>
 #include <vector>
 #include <Eigen/Dense>
@@ -10,11 +11,19 @@ using Eigen::Vector3d;
 
 namespace batoid {
     struct RayVector {
-        RayVector() {}
-        RayVector(const RayVector& _rv) : rays(_rv.rays) {}
-        RayVector(RayVector&& _rv) : rays(std::move(_rv.rays)) {}
+        RayVector() = default;
+        RayVector(const RayVector& _rv) = default;
+        RayVector(RayVector&& _rv) = default;
+        RayVector& operator=(const RayVector& rv) = default;
+        RayVector& operator=(RayVector&& rv) = default;
+
         RayVector(const std::vector<Ray>& _rays) : rays(_rays) {}
         RayVector(std::vector<Ray>&& _rays) : rays(std::move(_rays)) {}
+
+        RayVector(const std::vector<Ray>& _rays, double _wavelength)
+            : rays(_rays), wavelength(_wavelength) {}
+        RayVector(std::vector<Ray>&& _rays, double _wavelength)
+            : rays(std::move(_rays)), wavelength(_wavelength) {}
 
         // std::vector forwarding
         typename std::vector<Ray>::const_reference operator[](std::vector<Ray>::size_type i) const
@@ -34,6 +43,7 @@ namespace batoid {
 
         // data
         std::vector<Ray> rays;
+        double wavelength{NAN};  // If not NAN, then all wavelengths are this wavelength
     };
 }
 

@@ -13,7 +13,7 @@ namespace batoid {
             [this](const Ray& ray)
             { return intersect(ray); }
         );
-        return RayVector(std::move(rays));
+        return RayVector(std::move(rays), rv.wavelength);
     }
 
     void Surface::intersectInPlace(RayVector& rv) const {

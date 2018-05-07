@@ -3,6 +3,7 @@
 #include "surface.h"
 #include "medium.h"
 #include "utils.h"
+#include <cmath>
 #include <numeric>
 #include <Eigen/Dense>
 
@@ -70,12 +71,21 @@ namespace batoid{
 
     RayVector refract(const RayVector& rv, const Surface& surface,
                       const Medium& m1, const Medium& m2) {
-        // TODO: optimize case where all wavelengths are the same
         auto result = std::vector<Ray>(rv.rays.size());
-        parallelTransform(
-            rv.rays.cbegin(), rv.rays.cend(), result.begin(),
-            [&](const Ray& r){ return refract(r, surface, m1, m2); }
-        );
+        // use double version of refract if possible
+        if (std::isnan(rv.wavelength)) {
+            parallelTransform(
+                rv.rays.cbegin(), rv.rays.cend(), result.begin(),
+                [&](const Ray& r){ return refract(r, surface, m1, m2); }
+            );
+        } else {
+            double n1 = m1.getN(rv.wavelength);
+            double n2 = m2.getN(rv.wavelength);
+            parallelTransform(
+                rv.rays.cbegin(), rv.rays.cend(), result.begin(),
+                [&](const Ray& r){ return refract(r, surface, n1, n2); }
+            );
+        }
         return RayVector(std::move(result));
     }
 
@@ -105,11 +115,20 @@ namespace batoid{
     }
 
     void refractInPlace(RayVector& rv, const Surface& surface, const Medium& m1, const Medium& m2) {
-        // TODO: optimize case where all wavelengths are the same
-        parallel_for_each(
-            rv.rays.begin(), rv.rays.end(),
-            [&](Ray& r) { refractInPlace(r, surface, m1, m2); }
-        );
+        // Use double version of refractInPlace if possible
+        if (std::isnan(rv.wavelength)) {
+            parallel_for_each(
+                rv.rays.begin(), rv.rays.end(),
+                [&](Ray& r) { refractInPlace(r, surface, m1, m2); }
+            );
+        } else {
+            double n1 = m1.getN(rv.wavelength);
+            double n2 = m2.getN(rv.wavelength);
+            parallel_for_each(
+                rv.rays.begin(), rv.rays.end(),
+                [&](Ray& r) { refractInPlace(r, surface, n1, n2); }
+            );
+        }
     }
 
     RayVector rayGrid(double dist, double length,
@@ -159,7 +178,7 @@ namespace batoid{
             }
             y += dy;
         }
-        return RayVector(std::move(result));
+        return RayVector(std::move(result), wavelength);
     }
 
     RayVector circularGrid(double dist, double outer, double inner,
@@ -197,6 +216,6 @@ namespace batoid{
             }
             rfrac -= drfrac;
         }
-        return RayVector(std::move(result));
+        return RayVector(std::move(result), wavelength);
     }
 }
