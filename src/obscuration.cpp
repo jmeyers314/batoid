@@ -1,5 +1,6 @@
 #include "obscuration.h"
 #include "ray.h"
+#include "rayVector.h"
 #include "utils.h"
 #include <cmath>
 #include <algorithm>
@@ -19,9 +20,9 @@ namespace batoid {
             ray.isVignetted = true;
     }
 
-    std::vector<Ray> Obscuration::obscure(const std::vector<Ray>& rays) const {
-        auto result = std::vector<Ray>(rays.size());
-        parallelTransform(rays.cbegin(), rays.cend(), result.begin(),
+    RayVector Obscuration::obscure(const RayVector& rv) const {
+        std::vector<Ray> result(rv.rays.size());
+        parallelTransform(rv.rays.cbegin(), rv.rays.cend(), result.begin(),
             [this](const Ray& ray)
             {
                 if (ray.failed) return ray;
@@ -31,12 +32,12 @@ namespace batoid {
                     return Ray(ray.p0, ray.v, ray.t0, ray.wavelength, ray.isVignetted);
             }
         );
-        return result;
+        return RayVector(std::move(result), rv.wavelength);
     }
 
-    void Obscuration::obscureInPlace(std::vector<Ray>& rays) const {
+    void Obscuration::obscureInPlace(RayVector& rv) const {
         parallel_for_each(
-            rays.begin(), rays.end(),
+            rv.rays.begin(), rv.rays.end(),
             [this](Ray& r){ obscureInPlace(r); }
         );
     }

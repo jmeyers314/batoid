@@ -13,15 +13,9 @@ namespace batoid {
         py::class_<Obscuration, std::shared_ptr<Obscuration>>(m, "Obscuration")
             .def("contains", &Obscuration::contains)
             .def("obscure", (Ray (Obscuration::*)(const Ray&) const) &Obscuration::obscure)
+            .def("obscure", (RayVector (Obscuration::*)(const RayVector&) const) &Obscuration::obscure)
             .def("obscureInPlace", (void (Obscuration::*)(Ray&) const) &Obscuration::obscureInPlace)
-            .def("obscure", [](const Obscuration& obsc, const RayVector& rv){
-                RayVector result;
-                result.rays = std::move(obsc.obscure(rv.rays));
-                return result;
-            })
-            .def("obscureInPlace", [](const Obscuration& obsc, RayVector& rv){
-                obsc.obscureInPlace(rv.rays);
-            })
+            .def("obscureInPlace", (void (Obscuration::*)(RayVector&) const) &Obscuration::obscureInPlace)
             .def("__repr__", &Obscuration::repr);
 
 

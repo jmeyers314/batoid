@@ -18,8 +18,8 @@ namespace batoid {
         bool operator!=(const Obscuration& rhs) const { return !operator==(rhs); }
         Ray obscure(const Ray&) const;
         void obscureInPlace(Ray&) const;
-        std::vector<Ray> obscure(const std::vector<Ray>&) const;
-        void obscureInPlace(std::vector<Ray>&) const;
+        RayVector obscure(const RayVector&) const;
+        void obscureInPlace(RayVector&) const;
         virtual std::string repr() const = 0;
     };
     std::ostream& operator<<(std::ostream& os, const Obscuration& o);
