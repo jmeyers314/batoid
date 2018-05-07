@@ -153,9 +153,9 @@ def test_RayVector():
     np.testing.assert_equal(rayVector.wavelength, np.array([r.wavelength for r in rayVector]))
     np.testing.assert_equal(rayVector.isVignetted, np.array([r.isVignetted for r in rayVector]))
     np.testing.assert_equal(rayVector.failed, np.array([r.failed for r in rayVector]))
-    np.testing.assert_equal(batoid._batoid.phaseMany(rayVector, [1, 2, 3], 4.0),
+    np.testing.assert_equal(rayVector.phase([1, 2, 3], 4.0),
                             np.array([r.phase([1, 2, 3], 4.0) for r in rayVector]))
-    np.testing.assert_equal(batoid._batoid.amplitudeMany(rayVector, [1, 2, 3], 4.0),
+    np.testing.assert_equal(rayVector.amplitude([1, 2, 3], 4.0),
                             np.array([r.amplitude([1, 2, 3], 4.0) for r in rayVector]))
 
     np.testing.assert_equal(rayVector.v, np.array([[r.vx, r.vy, r.vz] for r in rayVector]))

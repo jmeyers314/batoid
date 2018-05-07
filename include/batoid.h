@@ -27,9 +27,6 @@ namespace batoid {
     RayVector circularGrid(double dist, double outer, double inner,
                            double xcos, double ycos, double zcos,
                            int nradii, int naz, double wavelength, const Medium& m);
-
-    RayVector trimVignetted(const RayVector& rv);
-    void trimVignettedInPlace(RayVector& rv);
 }
 
 #endif

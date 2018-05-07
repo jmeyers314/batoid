@@ -78,14 +78,14 @@ def test_traceReverse():
     forward_rays, _ = telescope.trace(init_rays, outCoordSys=batoid.CoordSys())
 
     # Now, turn the result rays around and trace backwards
-    forward_rays = batoid.propagatedToTimesMany(forward_rays, [40]*len(forward_rays))
+    forward_rays = forward_rays.propagatedToTime(40.0)
     reverse_rays = batoid.RayVector(
         [batoid.Ray(r.p0, -r.v, -r.t0, r.wavelength) for r in forward_rays]
     )
 
     final_rays, _ = telescope.traceReverse(reverse_rays, outCoordSys=batoid.CoordSys())
     # propagate all the way to t=0
-    final_rays = batoid.propagatedToTimesMany(final_rays, [0]*len(final_rays))
+    final_rays = final_rays.propagatedToTime(0.0)
 
     w = np.where(np.logical_not(final_rays.isVignetted))[0]
     for idx in w:

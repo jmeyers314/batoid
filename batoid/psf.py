@@ -70,7 +70,7 @@ def huygensPSF(optic, theta_x=None, theta_y=None, wavelength=None, nx=None,
     out = batoid.Lattice(np.zeros((nxOut*pad_factor, nxOut*pad_factor), dtype=float), primitiveX)
 
     rays, outCoordSys = optic.traceInPlace(rays)
-    batoid.trimVignettedInPlace(rays)
+    rays.trimVignettedInPlace()
     # Need transpose to conform to numpy [y,x] ordering convention
     xs = out.coords[..., 0].T + np.mean(rays.x)
     ys = out.coords[..., 1].T + np.mean(rays.y)
@@ -79,11 +79,7 @@ def huygensPSF(optic, theta_x=None, theta_y=None, wavelength=None, nx=None,
     points = np.concatenate([aux[..., None] for aux in (xs, ys, zs)], axis=-1)
     time = rays[0].t0
     for idx in np.ndindex(amplitudes.shape):
-        amplitudes[idx] = batoid._batoid.sumAmplitudeMany(
-            rays,
-            points[idx],
-            time
-        )
+        amplitudes[idx] = rays.sumAmplitude(points[idx], time)
     return batoid.Lattice(np.abs(amplitudes)**2, primitiveX)
 
 
@@ -138,9 +134,9 @@ def drdth(optic, theta_x, theta_y, wavelength, nx=16):
     optic.traceInPlace(rays_x)
     optic.traceInPlace(rays_y)
 
-    batoid.trimVignettedInPlace(rays)
-    batoid.trimVignettedInPlace(rays_x)
-    batoid.trimVignettedInPlace(rays_y)
+    rays.trimVignettedInPlace()
+    rays_x.trimVignettedInPlace()
+    rays_y.trimVignettedInPlace()
 
     # meters / radian
     drx_dthx = (np.mean(rays_x.x) - np.mean(rays.x))/dth
@@ -209,7 +205,7 @@ def dkdu(optic, theta_x, theta_y, wavelength, nx=16):
         nx, wavelength, optic.inMedium
     )
 
-    pupilRays = batoid.propagatedToTimesMany(rays, np.zeros_like(rays.x))
+    pupilRays = rays.propagatedToTime(0.0)
     ux = np.array(pupilRays.x)
     uy = np.array(pupilRays.y)
 
@@ -339,7 +335,7 @@ def zernike(optic, theta_x, theta_y, wavelength, nx=32, jmax=22, eps=0.0):
     )
 
     # Propagate to t=0 where rays are in the entrance pupil.
-    batoid.propagateInPlaceMany(rays, np.zeros_like(rays.x))
+    rays.propagateInPlace(0.0)
 
     orig_x = np.array(rays.x).reshape(nx,nx)
     orig_y = np.array(rays.y).reshape(nx,nx)

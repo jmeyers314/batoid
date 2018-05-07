@@ -57,9 +57,7 @@ namespace batoid {
              &circularGrid,
              "Make a RayVector on a circle",
              "zdist"_a, "outer"_a, "inner"_a, "xcos"_a, "ycos"_a, "zcos"_a, "nradii"_a, "naz"_a, "wavelength"_a, "medium"_a
-         )
-         .def("trimVignetted", &trimVignetted)
-         .def("trimVignettedInPlace", &trimVignettedInPlace);
+         );
 
 #if !((PYBIND11_VERSION_MAJOR >= 2) & (PYBIND11_VERSION_MINOR >= 2))
         return m.ptr();

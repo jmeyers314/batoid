@@ -139,7 +139,7 @@ def test_lsst_psf():
                                    dirCos[0], dirCos[1], -dirCos[2],
                                    10, 100, 620e-9, batoid.Air())
         telescope.traceInPlace(rays)
-        batoid.trimVignettedInPlace(rays)
+        rays.trimVignettedInPlace()
         xs = rays.x - np.mean(rays.x)
         ys = rays.y - np.mean(rays.y)
 
@@ -190,7 +190,7 @@ def test_hsc_psf():
                                    dirCos[0], dirCos[1], -dirCos[2],
                                    10, 100, 620e-9, batoid.ConstMedium(1.0))
         telescope.traceInPlace(rays)
-        batoid.trimVignettedInPlace(rays)
+        rays.trimVignettedInPlace()
         xs = rays.x - np.mean(rays.x)
         ys = rays.y - np.mean(rays.y)
 
@@ -241,7 +241,7 @@ def test_decam_psf():
                                    dirCos[0], dirCos[1], -dirCos[2],
                                    10, 100, 620e-9, batoid.Air())
         telescope.traceInPlace(rays)
-        batoid.trimVignettedInPlace(rays)
+        rays.trimVignettedInPlace()
         xs = rays.x - np.mean(rays.x)
         ys = rays.y - np.mean(rays.y)
 

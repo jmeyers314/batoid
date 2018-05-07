@@ -1,3 +1,4 @@
+#include "rayVector.h"
 #include "ray.h"
 #include "utils.h"
 #include <cmath>
@@ -8,7 +9,7 @@
 using Eigen::Vector3d;
 
 namespace batoid {
-    std::vector<double> phaseMany(const std::vector<Ray>& rays, const Vector3d& r, double t) {
+    std::vector<double> RayVector::phase(const Vector3d& r, double t) {
         auto result = std::vector<double>(rays.size());
         parallelTransform(rays.cbegin(), rays.cend(), result.begin(),
             [=](const Ray& ray)
@@ -17,7 +18,7 @@ namespace batoid {
         return result;
     }
 
-    std::vector<std::complex<double>> amplitudeMany(const std::vector<Ray>& rays, const Vector3d& r, double t) {
+    std::vector<std::complex<double>> RayVector::amplitude(const Vector3d& r, double t) {
         auto result = std::vector<std::complex<double>>(rays.size());
         parallelTransform(rays.cbegin(), rays.cend(), result.begin(),
             [=](const Ray& ray)
@@ -26,7 +27,7 @@ namespace batoid {
         return result;
     }
 
-    std::complex<double> sumAmplitudeMany(const std::vector<Ray>& rays, const Vector3d& r, double t) {
+    std::complex<double> RayVector::sumAmplitude(const Vector3d& r, double t) {
         auto result = std::vector<std::complex<double>>(rays.size());
         parallelTransform(rays.cbegin(), rays.cend(), result.begin(),
             [=](const Ray& ray)
@@ -35,19 +36,43 @@ namespace batoid {
         return std::accumulate(result.begin(), result.end(), std::complex<double>(0,0));
     }
 
-    std::vector<Ray> propagatedToTimesMany(const std::vector<Ray>& rays, const std::vector<double>& ts) {
+    RayVector RayVector::propagatedToTime(double t) {
         auto result = std::vector<Ray>(rays.size());
-        parallelTransform(rays.cbegin(), rays.cend(), ts.cbegin(), result.begin(),
-            [](const Ray& ray, double t)
+        parallelTransform(rays.cbegin(), rays.cend(), result.begin(),
+            [=](const Ray& ray)
                 { return ray.propagatedToTime(t); }
         );
         return result;
     }
 
-    void propagateInPlaceMany(std::vector<Ray>& rays, const std::vector<double>& ts) {
-        parallel_for_each(rays.begin(), rays.end(), ts.begin(),
-            [](Ray& ray, double t)
+    void RayVector::propagateInPlace(double t) {
+        parallel_for_each(rays.begin(), rays.end(),
+            [=](Ray& ray)
                 { ray.propagateInPlace(t); }
         );
     }
+
+    RayVector RayVector::trimVignetted() {
+        RayVector result;
+        result.rays.reserve(rays.size());
+        std::copy_if(
+            rays.begin(),
+            rays.end(),
+            std::back_inserter(result.rays),
+            [](const Ray& r){return !r.isVignetted;}
+        );
+        return result;
+    }
+
+    void RayVector::trimVignettedInPlace() {
+        rays.erase(
+            std::remove_if(
+                rays.begin(),
+                rays.end(),
+                [](const Ray& r){ return r.failed || r.isVignetted; }
+            ),
+            rays.end()
+        );
+    }
+
 }

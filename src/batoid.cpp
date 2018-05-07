@@ -199,28 +199,4 @@ namespace batoid{
         }
         return RayVector(std::move(result));
     }
-
-    RayVector trimVignetted(const RayVector& rv) {
-        std::vector<Ray> result;
-        result.reserve(rv.rays.size());
-        std::copy_if(
-            rv.rays.begin(),
-            rv.rays.end(),
-            std::back_inserter(result),
-            [](const Ray& r){return !r.isVignetted;}
-        );
-        return RayVector(std::move(result));
-    }
-
-    void trimVignettedInPlace(RayVector& rv) {
-        rv.rays.erase(
-            std::remove_if(
-                rv.rays.begin(),
-                rv.rays.end(),
-                [](const Ray& r){ return r.failed || r.isVignetted; }
-            ),
-            rv.rays.end()
-        );
-    }
-
 }

@@ -23,15 +23,18 @@ namespace batoid {
         typename std::vector<Ray>::iterator end() noexcept { return rays.end(); }
         typename std::vector<Ray>::size_type size() const noexcept { return rays.size(); }
 
+        // methods
+        std::vector<double> phase(const Vector3d& r, double t);
+        std::vector<std::complex<double>> amplitude(const Vector3d& r, double t);
+        std::complex<double> sumAmplitude(const Vector3d& r, double t);
+        RayVector propagatedToTime(double t);
+        void propagateInPlace(double t);
+        RayVector trimVignetted();
+        void trimVignettedInPlace();
+
         // data
         std::vector<Ray> rays;
     };
-
-    std::vector<double> phaseMany(const std::vector<Ray>&, const Vector3d& r, double t);
-    std::vector<std::complex<double>> amplitudeMany(const std::vector<Ray>&, const Vector3d& r, double t);
-    std::complex<double> sumAmplitudeMany(const std::vector<Ray>&, const Vector3d& r, double t);
-    std::vector<Ray> propagatedToTimesMany(const std::vector<Ray>&, const std::vector<double>& t);
-    void propagateInPlaceMany(std::vector<Ray>&, const std::vector<double>& t);
 }
 
 #endif

@@ -16,6 +16,13 @@ namespace batoid {
             .def(py::init<>())
             .def(py::init<RayVector>())
             .def(py::init<std::vector<Ray>>())
+            .def("amplitude", &RayVector::amplitude)
+            .def("sumAmplitude", &RayVector::sumAmplitude)
+            .def("phase", &RayVector::phase)
+            .def("propagatedToTime", &RayVector::propagatedToTime)
+            .def("propagateInPlace", &RayVector::propagateInPlace)
+            .def("trimVignetted", &RayVector::trimVignetted)
+            .def("trimVignettedInPlace", &RayVector::trimVignettedInPlace)
             .def_property_readonly(
                 "x",
                 [](RayVector& rv) -> py::array_t<double> {
@@ -222,24 +229,5 @@ namespace batoid {
             .def("__len__", &RayVector::size)
             .def("__eq__", [](const RayVector& lhs, const RayVector& rhs) { return lhs.rays == rhs.rays; }, py::is_operator())
             .def("__ne__", [](const RayVector& lhs, const RayVector& rhs) { return lhs.rays != rhs.rays; }, py::is_operator());
-
-
-        m.def("amplitudeMany", [](const RayVector& rv, const Vector3d& r, double t){
-            return amplitudeMany(rv.rays, r, t);
-        });
-        m.def("sumAmplitudeMany", [](const RayVector& rv, const Vector3d& r, double t) {
-            return sumAmplitudeMany(rv.rays, r, t);
-        });
-        m.def("phaseMany", [](const RayVector& rv, const Vector3d& r, double t){
-            return phaseMany(rv.rays, r, t);
-        });
-        m.def("propagatedToTimesMany", [](const RayVector &rv, const std::vector<double>& t){
-            RayVector result;
-            result.rays = std::move(propagatedToTimesMany(rv.rays, t));
-            return result;
-        });
-        m.def("propagateInPlaceMany", [](RayVector& rv, const std::vector<double>& t){
-            propagateInPlaceMany(rv.rays, t);
-        });
     }
 }

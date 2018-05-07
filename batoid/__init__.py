@@ -10,8 +10,6 @@ from ._batoid import ObscUnion, ObscIntersection, ObscNegation
 from ._batoid import CoordSys, CoordTransform
 
 from ._batoid import rayGrid, circularGrid
-from ._batoid import trimVignetted, trimVignettedInPlace
-from ._batoid import propagatedToTimesMany, propagateInPlaceMany
 
 from .psf import huygensPSF, wavefront, fftPSF, zernike
 
