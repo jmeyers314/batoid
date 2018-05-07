@@ -6,18 +6,19 @@ namespace batoid {
         return os << s.repr();
     }
 
-    std::vector<Ray> Surface::intersect(const std::vector<Ray>& rays) const {
-        auto result = std::vector<Ray>(rays.size());
-        parallelTransform(rays.cbegin(), rays.cend(), result.begin(),
+    RayVector Surface::intersect(const RayVector& rv) const {
+        std::vector<Ray> rays(rv.rays.size());
+
+        parallelTransform(rv.rays.cbegin(), rv.rays.cend(), rays.begin(),
             [this](const Ray& ray)
             { return intersect(ray); }
         );
-        return result;
+        return RayVector(std::move(rays));
     }
 
-    void Surface::intersectInPlace(std::vector<Ray>& rays) const {
+    void Surface::intersectInPlace(RayVector& rv) const {
         parallel_for_each(
-            rays.begin(), rays.end(),
+            rv.rays.begin(), rv.rays.end(),
             [this](Ray& r) { intersectInPlace(r); }
         );
     }

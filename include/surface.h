@@ -19,8 +19,8 @@ namespace batoid {
         virtual Ray intersect(const Ray&) const = 0;
         virtual void intersectInPlace(Ray&) const = 0;
 
-        std::vector<Ray> intersect(const std::vector<Ray>&) const;
-        void intersectInPlace(std::vector<Ray>&) const;
+        RayVector intersect(const RayVector&) const;
+        void intersectInPlace(RayVector&) const;
 
         virtual std::string repr() const = 0;
     };
