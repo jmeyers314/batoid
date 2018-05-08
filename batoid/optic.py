@@ -200,11 +200,13 @@ class Interface(Optic):
             return r, inCoordSys
         transform = batoid.CoordTransform(inCoordSys, self.coordSys)
         r = transform.applyForward(r)
-        r = self.surface.intersect(r)
+
+        # refract, reflect, pass-through - depending on subclass
+        r = self.interact(r)
+
         if self.obscuration is not None:
             r = self.obscuration.obscure(r)
-        # refract, reflect, passthrough, depending on subclass
-        r = self.interact(r)
+
         if outCoordSys is None:
             return r, self.coordSys
         else:
@@ -225,11 +227,13 @@ class Interface(Optic):
             return r, inCoordSys
         transform = batoid.CoordTransform(inCoordSys, self.coordSys)
         transform.applyForwardInPlace(r)
-        self.surface.intersectInPlace(r)
+
+        # refract, reflect, pass-through - depending on subclass
+        self.interactInPlace(r)
+
         if self.obscuration is not None:
             self.obscuration.obscureInPlace(r)
-        # refract, reflect, passthrough, depending on subclass
-        self.interactInPlace(r)
+
         if outCoordSys is None:
             return r, self.coordSys
         else:
@@ -312,39 +316,39 @@ class RefractiveInterface(Interface):
     """Specialization for refractive interfaces.
     """
     def interact(self, r):
-        return batoid._batoid.refract(r, self.surface, self.inMedium, self.outMedium)
+        return self.surface.refract(r, self.inMedium, self.outMedium)
 
     def interactReverse(self, r):
         return batoid._batoid.refract(r, self.surface, self.outMedium, self.inMedium)
 
     def interactInPlace(self, r):
-        batoid._batoid.refractInPlace(r, self.surface, self.inMedium, self.outMedium)
+        self.surface.refractInPlace(r, self.inMedium, self.outMedium)
 
 
 class Mirror(Interface):
     """Specialization for reflective interfaces.
     """
     def interact(self, r):
-        return batoid._batoid.reflect(r, self.surface)
+        return self.surface.reflect(r)
 
     def interactReverse(self, r):
         return batoid._batoid.reflect(r, self.surface)
 
     def interactInPlace(self, r):
-        batoid._batoid.reflectInPlace(r, self.surface)
+        self.surface.reflectInPlace(r)
 
 
 class Detector(Interface):
     """Specialization for detector interfaces.
     """
     def interact(self, r):
-        return r
+        return self.surface.intersect(r)
 
     def interactReverse(self, r):
         return r
 
     def interactInPlace(self, r):
-        pass
+        self.surface.intersectInPlace(r)
 
 
 class Baffle(Interface):
@@ -352,13 +356,13 @@ class Baffle(Interface):
     straight lines.
     """
     def interact(self, r):
-        return r
+        return self.surface.intersect(r)
 
     def interactReverse(self, r):
         return r
 
     def interactInPlace(self, r):
-        pass
+        self.surface.intersectInPlace(r)
 
 
 class CompoundOptic(Optic):

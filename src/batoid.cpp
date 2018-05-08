@@ -25,7 +25,7 @@ namespace batoid{
             rv.rays.cbegin(), rv.rays.cend(), result.begin(),
             [&](const Ray& r){ return reflect(r, surface); }
         );
-        return RayVector(std::move(result));
+        return RayVector(std::move(result), rv.wavelength);
     }
 
     void reflectInPlace(Ray& r, const Surface& surface) {
@@ -86,7 +86,7 @@ namespace batoid{
                 [&](const Ray& r){ return refract(r, surface, n1, n2); }
             );
         }
-        return RayVector(std::move(result));
+        return RayVector(std::move(result), rv.wavelength);
     }
 
     void refractInPlace(Ray& r, const Surface& surface, double n1, double n2) {
