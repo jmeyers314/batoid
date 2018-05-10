@@ -29,7 +29,8 @@ namespace batoid {
         if(failed)
             oss << "failed)";
         else {
-            oss << p0 << ", " << v;
+            oss << "[" << p0[0] << "," << p0[1] << "," << p0[2] << "],["
+                << v[0] << "," << v[1] << "," << v[2] << "]";
             if (t0 != 0.0) oss << ", t=" << t0;
             if (wavelength != 0.0) oss << ", wavelength=" << wavelength;
             if (isVignetted) oss << ", isVignetted=True";

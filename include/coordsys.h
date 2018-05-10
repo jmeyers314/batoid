@@ -56,7 +56,10 @@ namespace batoid {
 
         std::string repr() const {
             std::ostringstream oss;
-            oss << "CoordSys(" << m_origin << ", " << m_rot << ')';
+            oss << "CoordSys([" << m_origin[0] << "," << m_origin[1] << "," << m_origin[2] << "],[["
+                << m_rot(0) << "," << m_rot(1) << "," << m_rot(2) << "],["
+                << m_rot(3) << "," << m_rot(4) << "," << m_rot(5) << "],["
+                << m_rot(6) << "," << m_rot(7) << "," << m_rot(8) << "]])";
             return oss.str();
         }
 
