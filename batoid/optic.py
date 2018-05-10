@@ -249,10 +249,12 @@ class Interface(Optic):
             return r, inCoordSys
         transform = batoid.CoordTransform(inCoordSys, self.coordSys)
         r = transform.applyForward(r)
-        r = self.surface.intersect(r)
+
+        r = self.interactReverse(r)
+
         if self.obscuration is not None:
             r = self.obscuration.obscure(r)
-        r = self.interactReverse(r)
+
         if outCoordSys is None:
             return r, self.coordSys
         else:
@@ -319,7 +321,7 @@ class RefractiveInterface(Interface):
         return self.surface.refract(r, self.inMedium, self.outMedium)
 
     def interactReverse(self, r):
-        return batoid._batoid.refract(r, self.surface, self.outMedium, self.inMedium)
+        return self.surface.refract(r, self.outMedium, self.inMedium)
 
     def interactInPlace(self, r):
         self.surface.refractInPlace(r, self.inMedium, self.outMedium)
@@ -332,7 +334,7 @@ class Mirror(Interface):
         return self.surface.reflect(r)
 
     def interactReverse(self, r):
-        return batoid._batoid.reflect(r, self.surface)
+        return self.surface.reflect(r)
 
     def interactInPlace(self, r):
         self.surface.reflectInPlace(r)
@@ -345,7 +347,7 @@ class Detector(Interface):
         return self.surface.intersect(r)
 
     def interactReverse(self, r):
-        return r
+        return self.surface.intersect(r)
 
     def interactInPlace(self, r):
         self.surface.intersectInPlace(r)
@@ -359,7 +361,7 @@ class Baffle(Interface):
         return self.surface.intersect(r)
 
     def interactReverse(self, r):
-        return r
+        return self.surface.intersect(r)
 
     def interactInPlace(self, r):
         self.surface.intersectInPlace(r)
@@ -436,7 +438,8 @@ class CompoundOptic(Optic):
             return r, inCoordSys
         coordSys = inCoordSys
         for item in reversed(self.items[1:]):
-            r, coordSys = item.traceReverse(r, inCoordSys=coordSys)
+            if not item.skip:
+                r, coordSys = item.traceReverse(r, inCoordSys=coordSys)
         return self.items[0].traceReverse(r, inCoordSys=coordSys, outCoordSys=outCoordSys)
 
     def draw3d(self, ax, **kwargs):  # pragma: no cover
