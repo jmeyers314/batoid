@@ -1,6 +1,6 @@
 import numpy as np
 import batoid
-from .utils import bivariate_fit, gnomicToDirCos, dirCosToGnomic
+from .utils import bilinear_fit, gnomicToDirCos, dirCosToGnomic
 
 
 def huygensPSF(optic, theta_x=None, theta_y=None, wavelength=None, nx=None,
@@ -217,7 +217,7 @@ def dkdu(optic, theta_x, theta_y, wavelength, nx=16):
     kx = rays.kx[w]
     ky = rays.ky[w]
 
-    soln = bivariate_fit(ux, uy, kx, ky)
+    soln = bilinear_fit(ux, uy, kx, ky)
     return soln[1:]
 
 
