@@ -261,12 +261,6 @@ class Interface(Optic):
             transform = batoid.CoordTransform(self.coordSys, outCoordSys)
             return transform.applyForward(r), outCoordSys
 
-    def printCoordSys(self):
-        print(self.name, self.coordSys)
-
-    def printMedium(self):
-        print(self.name, self.inMedium, self.outMedium)
-
     def __eq__(self, other):
         if not self.__class__ == other.__class__:
             return False
@@ -451,14 +445,6 @@ class CompoundOptic(Optic):
     def draw2d(self, ax, **kwargs):  # pragma: no cover
         for item in self.items:
             item.draw2d(ax, **kwargs)
-
-    def printCoordSys(self):
-        for item in self.items:
-            item.printCoordSys()
-
-    def printMedium(self):
-        for item in self.items:
-            item.printMedium()
 
     def __eq__(self, other):
         if not self.__class__ == other.__class__:
