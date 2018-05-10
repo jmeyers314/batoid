@@ -40,15 +40,7 @@ namespace batoid {
 
         using namespace pybind11::literals;
 
-        m.def("reflect", (Ray (*)(const Ray&, const Surface&)) &reflect)
-         .def("reflect", (RayVector (*)(const RayVector&, const Surface&)) &reflect)
-         .def("reflectInPlace", (void (*)(Ray&, const Surface&)) &reflectInPlace)
-         .def("reflectInPlace", (void (*)(RayVector&, const Surface&)) &reflectInPlace)
-         .def("refract", (Ray (*)(const Ray&, const Surface&, const Medium&, const Medium&)) &refract)
-         .def("refract", (RayVector (*)(const RayVector&, const Surface&, const Medium&, const Medium&)) &refract)
-         .def("refractInPlace", (void (*)(Ray&, const Surface&, const Medium&, const Medium&)) &refractInPlace)
-         .def("refractInPlace", (void (*)(RayVector&, const Surface&, const Medium&, const Medium&)) &refractInPlace)
-         .def("rayGrid",
+        m.def("rayGrid",
              &rayGrid,
              "Make a RayVector in a grid",
              "zdist"_a, "length"_a, "xcos"_a, "ycos"_a, "zcos"_a, "nside"_a, "wavelength"_a, "medium"_a
