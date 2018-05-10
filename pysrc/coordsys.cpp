@@ -4,6 +4,7 @@
 #include <pybind11/operators.h>
 #include <pybind11/eigen.h>
 #include <tuple>
+#include <iostream>
 
 namespace py = pybind11;
 
@@ -64,31 +65,50 @@ namespace batoid {
             throw std::runtime_error("Dimensions must match");
         if (bufX.size != bufY.size || bufX.size != bufZ.size)
             throw std::runtime_error("Sizes much match");
-        auto resultX = py::array_t<double>(bufX.shape, bufX.strides);
-        auto resultY = py::array_t<double>(bufY.shape, bufY.strides);
-        auto resultZ = py::array_t<double>(bufZ.shape, bufZ.strides);
+
+        auto resultX = py::array_t<double>(bufX.shape);
+        auto resultY = py::array_t<double>(bufY.shape);
+        auto resultZ = py::array_t<double>(bufZ.shape);
         auto bufXOut = resultX.request();
         auto bufYOut = resultY.request();
         auto bufZOut = resultZ.request();
 
-        double *ptrX = (double *) bufX.ptr;
-        double *ptrY = (double *) bufY.ptr;
-        double *ptrZ = (double *) bufZ.ptr;
-        double *ptrXOut = (double *)  bufXOut.ptr;
-        double *ptrYOut = (double *)  bufYOut.ptr;
-        double *ptrZOut = (double *)  bufZOut.ptr;
+        double *ptrXOut = (double *) bufXOut.ptr;
+        double *ptrYOut = (double *) bufYOut.ptr;
+        double *ptrZOut = (double *) bufZOut.ptr;
 
-        auto v = Vector3d();
+        // note the mixed radix counting ...
+        Vector3d v;
+        std::vector<unsigned int> idxVec(bufX.ndim, 0);
         for (ssize_t idx = 0; idx < bufX.size; idx++) {
-            v = ct.applyForward(Vector3d(ptrX[idx], ptrY[idx], ptrZ[idx]));
+            char *ptrX = (char *) bufX.ptr;
+            char *ptrY = (char *) bufY.ptr;
+            char *ptrZ = (char *) bufZ.ptr;
+            for (auto idim=bufX.ndim-1; idim >= 0; idim--) {
+                ptrX += idxVec[idim]*bufX.strides[idim];
+                ptrY += idxVec[idim]*bufX.strides[idim];
+                ptrZ += idxVec[idim]*bufX.strides[idim];
+            }
+
+            v = ct.applyForward(Vector3d(*(double *)ptrX, *(double *)ptrY, *(double *)ptrZ));
+
             ptrXOut[idx] = v[0];
             ptrYOut[idx] = v[1];
             ptrZOut[idx] = v[2];
+
+            for (auto idim=bufX.ndim-1; idim >= 0; idim--) {
+                idxVec[idim]++;
+                if (idxVec[idim] == bufX.shape[idim])
+                    idxVec[idim] = 0;
+                else
+                    break;
+            }
         }
         return std::make_tuple(resultX, resultY, resultZ);
     }
 
-    // Version of applyReverse that accepts three congruent numpy arrays (x, y, z), and returns
+
+    // Version of applyForward that accepts three congruent numpy arrays (x, y, z), and returns
     // three transformed numpy arrays with the new coordinates.
     std::tuple<py::array_t<double>, py::array_t<double>, py::array_t<double>>
     numpyApplyReverse(const CoordTransform& ct,
@@ -102,29 +122,48 @@ namespace batoid {
             throw std::runtime_error("Dimensions must match");
         if (bufX.size != bufY.size || bufX.size != bufZ.size)
             throw std::runtime_error("Sizes much match");
-        auto resultX = py::array_t<double>(bufX.shape, bufX.strides);
-        auto resultY = py::array_t<double>(bufY.shape, bufY.strides);
-        auto resultZ = py::array_t<double>(bufZ.shape, bufZ.strides);
+
+        auto resultX = py::array_t<double>(bufX.shape);
+        auto resultY = py::array_t<double>(bufY.shape);
+        auto resultZ = py::array_t<double>(bufZ.shape);
         auto bufXOut = resultX.request();
         auto bufYOut = resultY.request();
         auto bufZOut = resultZ.request();
 
-        double *ptrX = (double *) bufX.ptr;
-        double *ptrY = (double *) bufY.ptr;
-        double *ptrZ = (double *) bufZ.ptr;
-        double *ptrXOut = (double *)  bufXOut.ptr;
-        double *ptrYOut = (double *)  bufYOut.ptr;
-        double *ptrZOut = (double *)  bufZOut.ptr;
+        double *ptrXOut = (double *) bufXOut.ptr;
+        double *ptrYOut = (double *) bufYOut.ptr;
+        double *ptrZOut = (double *) bufZOut.ptr;
 
-        auto v = Vector3d();
+        // note the mixed radix counting ...
+        Vector3d v;
+        std::vector<unsigned int> idxVec(bufX.ndim, 0);
         for (ssize_t idx = 0; idx < bufX.size; idx++) {
-            v = ct.applyReverse(Vector3d(ptrX[idx], ptrY[idx], ptrZ[idx]));
+            char *ptrX = (char *) bufX.ptr;
+            char *ptrY = (char *) bufY.ptr;
+            char *ptrZ = (char *) bufZ.ptr;
+            for (auto idim=bufX.ndim-1; idim >= 0; idim--) {
+                ptrX += idxVec[idim]*bufX.strides[idim];
+                ptrY += idxVec[idim]*bufX.strides[idim];
+                ptrZ += idxVec[idim]*bufX.strides[idim];
+            }
+
+            v = ct.applyReverse(Vector3d(*(double *)ptrX, *(double *)ptrY, *(double *)ptrZ));
+
             ptrXOut[idx] = v[0];
             ptrYOut[idx] = v[1];
             ptrZOut[idx] = v[2];
+
+            for (auto idim=bufX.ndim-1; idim >= 0; idim--) {
+                idxVec[idim]++;
+                if (idxVec[idim] == bufX.shape[idim])
+                    idxVec[idim] = 0;
+                else
+                    break;
+            }
         }
         return std::make_tuple(resultX, resultY, resultZ);
     }
+
 
     void pyExportCoordTransform(py::module& m) {
         py::class_<CoordTransform, std::shared_ptr<CoordTransform>>(m, "CoordTransform")

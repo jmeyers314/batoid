@@ -74,14 +74,30 @@ def test_composition():
             ray_rb = transform1to2.applyReverse(transform2to3.applyReverse(ray))
             assert ray_isclose(ray_ra, ray_rb), "error with reverse composite transform of Ray"
 
-            # rv = randomRayVector()
-            # rv_a = transform1to3.applyForward(rv)
-            # rv_b = transform2to3.applyForward(transform1to2.applyForward(rv))
-            # assert rays_allclose(rv_a, rv_b), "error with composite transform of RayVector"
-            # rv_ra = transform1to3.applyReverse(rv)
-            # rv_rb = transform1to2.applyReverse(transform2to3.applyReverse(rv))
-            # assert rays_allclose(rv_ra, rv_rb), "error with reverse composite transform of RayVector"
+            rv = randomRayVector()
+            rv_a = transform1to3.applyForward(rv)
+            rv_b = transform2to3.applyForward(transform1to2.applyForward(rv))
+            assert rays_allclose(rv_a, rv_b), "error with composite transform of RayVector"
+            rv_ra = transform1to3.applyReverse(rv)
+            rv_rb = transform1to2.applyReverse(transform2to3.applyReverse(rv))
+            assert rays_allclose(rv_ra, rv_rb), "error with reverse composite transform of RayVector"
 
+            # Test with numpy arrays
+            xyz = rv.x, rv.y, rv.z
+            xyz_a = transform1to3.applyForward(*xyz)
+            xyz_b = transform2to3.applyForward(*transform1to2.applyForward(*xyz))
+            xyz_c = [transform2to3.applyForward(transform1to2.applyForward(r.p0)) for r in rv]
+            np.testing.assert_allclose(xyz_a, xyz_b)
+            np.testing.assert_allclose(xyz_a, np.transpose(xyz_c))
+            # Should still work if we reshape.
+            xyz2 = rv.x.reshape((2, 5)), rv.y.reshape((2, 5)), rv.z.reshape((2, 5))
+            xyz2_a = transform1to3.applyForward(*xyz2)
+            xyz2_b = transform2to3.applyForward(*transform1to2.applyForward(*xyz2))
+            np.testing.assert_allclose(xyz2_a, xyz2_b)
+
+            # And also work if we reverse
+            np.testing.assert_allclose(xyz, transform1to3.applyReverse(*xyz_a))
+            np.testing.assert_allclose(xyz, transform1to2.applyReverse(*transform2to3.applyReverse(*xyz_b)))
 
 if __name__ == '__main__':
     test_composition()
