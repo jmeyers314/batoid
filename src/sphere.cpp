@@ -1,6 +1,5 @@
 #include "sphere.h"
 #include "utils.h"
-#include "except.h"
 
 namespace batoid {
     Sphere::Sphere(double R) : _R(R) {}

@@ -1,6 +1,5 @@
 #include "paraboloid.h"
 #include "utils.h"
-#include "except.h"
 #include <cmath>
 
 namespace batoid {

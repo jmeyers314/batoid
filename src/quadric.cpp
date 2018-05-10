@@ -1,6 +1,5 @@
 #include "quadric.h"
 #include "utils.h"
-#include "except.h"
 
 namespace batoid {
     Quadric::Quadric(double R, double conic) : _R(R), _conic(conic) {}
