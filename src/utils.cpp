@@ -50,4 +50,14 @@ namespace batoid {
             }
         }
     }
+
+    unsigned int nthread = std::thread::hardware_concurrency();
+
+    void setNThread(unsigned int _nthread) {
+        nthread = _nthread;
+    }
+
+    unsigned int getNThread() {
+        return nthread;
+    }
 }

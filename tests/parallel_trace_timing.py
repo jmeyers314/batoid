@@ -7,7 +7,12 @@ import yaml
 
 
 @timer
-def parallel_trace_timing(nside=512):
+def parallel_trace_timing(nside=512, nthread=None):
+    if nthread is not None:
+        print("setting to nthread to {}".format(nthread))
+        batoid._batoid.setNThread(nthread)
+    print("Using {} threads".format(batoid._batoid.getNThread()))
+
     rays = batoid.circularGrid(20, 4.1, 0.5, 0.001, 0.001, -1.0, nside, nside, 500e-9, batoid.ConstMedium(1.0))
 
     nrays = len(rays)
@@ -38,6 +43,7 @@ if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
     parser.add_argument("--nside", type=int, default=512)
+    parser.add_argument("--nthread", type=int, default=None)
     args = parser.parse_args()
 
-    parallel_trace_timing(args.nside)
+    parallel_trace_timing(args.nside, args.nthread)

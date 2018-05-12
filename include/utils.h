@@ -113,15 +113,20 @@ namespace batoid {
 
     // And now some versions that automatically choose a chunksize based on
     // hardware concurrency
-    // These currently only really work as intended if hardware_concurrency is a
+    // These currently only really work as intended if nthread is a
     // power of 2, but that seems to be okay for now.
+
+    extern unsigned int nthread;
+    void setNThread(unsigned int);
+    unsigned int getNThread();
+
     template<typename InputIt, typename OutputIt, typename UnaryOperation>
     void parallelTransform(
         InputIt first1, InputIt last1, OutputIt d_first,
         UnaryOperation unary_op)
     {
         auto len = last1 - first1;
-        len /= std::thread::hardware_concurrency();
+        len /= nthread;
         // a bit of slop.  We want to be efficient, but not launch more threads than necessary.
         len += 1;
         chunkedParallelTransform(first1, last1, d_first, unary_op, len);
@@ -133,7 +138,7 @@ namespace batoid {
         BinaryOperation binary_op)
     {
         auto len = last1 - first1;
-        len /= std::thread::hardware_concurrency();
+        len /= nthread;
         // a bit of slop.  We want to be efficient, but not launch more threads than necessary.
         len += 1;
         chunkedParallelTransform(first1, last1, first2, d_first, binary_op, len);
@@ -144,7 +149,7 @@ namespace batoid {
         It first, It last, UnaryOperation unary_op)
     {
         auto len = last - first;
-        len /= std::thread::hardware_concurrency();
+        len /= nthread;
         // a bit of slop.  We want to be efficient, but not launch more threads than necessary.
         len += 1;
         chunked_parallel_for_each(first, last, unary_op, len);
@@ -155,7 +160,7 @@ namespace batoid {
         It1 first1, It1 last1, It2 first2, BinaryOperation binary_op)
     {
         auto len = last1 - first1;
-        len /= std::thread::hardware_concurrency();
+        len /= nthread;
         // a bit of slop.  We want to be efficient, but not launch more threads than necessary.
         len += 1;
         chunked_parallel_for_each(first1, last1, first2, binary_op, len);
