@@ -160,6 +160,35 @@ def test_rotation():
 
 
 @timer
+def test_thread():
+    fn = os.path.join(batoid.datadir, "HSC", "HSC.yaml")
+    config = yaml.load(open(fn))
+    telescope = batoid.parse.parse_optic(config['opticalSystem'])
+
+    rayGrid = batoid.rayGrid(
+        telescope.dist, telescope.pupilSize,
+        0.0, 0.0, -1.0,
+        32, 750e-9, telescope.inMedium)
+
+    batoid._batoid.setNThread(4)
+    assert batoid._batoid.getNThread() == 4
+
+    rays4, _ = telescope.trace(rayGrid)
+
+    batoid._batoid.setNThread(2)
+    assert batoid._batoid.getNThread() == 2
+
+    rays2, _ = telescope.trace(rayGrid)
+
+    batoid._batoid.setNThread(1)
+    assert batoid._batoid.getNThread() == 1
+
+    rays1, _ = telescope.trace(rayGrid)
+
+    assert rays1 == rays2 == rays4
+
+
+@timer
 def test_ne():
     objs = [
         batoid.Mirror(batoid.Plane()),
@@ -197,4 +226,5 @@ if __name__ == '__main__':
     test_traceReverse()
     test_shift()
     test_rotation()
+    test_thread()
     test_ne()
