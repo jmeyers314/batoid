@@ -99,6 +99,67 @@ def test_traceReverse():
 
 
 @timer
+def test_shift():
+    np.random.seed(5)
+
+    fn = os.path.join(batoid.datadir, "HSC", "HSC.yaml")
+    config = yaml.load(open(fn))
+    telescope = batoid.parse.parse_optic(config['opticalSystem'])
+
+    shift = np.random.uniform(low=-1, high=1, size=3)
+    assert telescope.withGlobalShift(shift).withGlobalShift(-shift) == telescope
+    for item in telescope.itemDict:
+        shifted = telescope.withGloballyShiftedOptic(item, shift)
+        shifted = shifted.withGloballyShiftedOptic(item, -shift)
+        assert telescope == shifted
+
+
+@timer
+def test_rotation():
+    try:
+        import galsim
+    except:
+        print("optic rotation test requires GalSim")
+        return
+
+    np.random.seed(57)
+
+    fn = os.path.join(batoid.datadir, "HSC", "HSC.yaml")
+    config = yaml.load(open(fn))
+    telescope = batoid.parse.parse_optic(config['opticalSystem'])
+
+    rot = batoid.RotX(np.random.uniform(low=0.0, high=2*np.pi))
+    rot = rot.dot(batoid.RotY(np.random.uniform(low=0.0, high=2*np.pi)))
+    rot = rot.dot(batoid.RotZ(np.random.uniform(low=0.0, high=2*np.pi)))
+    rotInv = np.linalg.inv(rot)
+
+    # It's hard to test the two telescopes for equality due to rounding errors, so we test by
+    # comparing zernikes
+    rotTel = telescope.withLocalRotation(rot).withLocalRotation(rotInv)
+
+    theta_x = np.random.uniform(-0.005, 0.005)
+    theta_y = np.random.uniform(-0.005, 0.005)
+    wavelength = 750e-9
+
+    np.testing.assert_allclose(
+        batoid.psf.zernike(telescope, theta_x, theta_y, wavelength),
+        batoid.psf.zernike(rotTel, theta_x, theta_y, wavelength),
+        atol=1e-5
+    )
+
+    for item in telescope.itemDict:
+        rotTel = telescope.withLocallyRotatedOptic(item, rot)
+        rotTel = rotTel.withLocallyRotatedOptic(item, rotInv)
+        theta_x = np.random.uniform(-0.005, 0.005)
+        theta_y = np.random.uniform(-0.005, 0.005)
+        np.testing.assert_allclose(
+            batoid.psf.zernike(telescope, theta_x, theta_y, wavelength),
+            batoid.psf.zernike(rotTel, theta_x, theta_y, wavelength),
+            atol=1e-5
+        )
+
+
+@timer
 def test_ne():
     objs = [
         batoid.Mirror(batoid.Plane()),
@@ -134,4 +195,6 @@ if __name__ == '__main__':
     test_optic()
     test_traceFull()
     test_traceReverse()
+    test_shift()
+    test_rotation()
     test_ne()

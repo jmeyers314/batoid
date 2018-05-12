@@ -371,7 +371,7 @@ class CompoundOptic(Optic):
     @property
     def itemDict(self):
         """A dictionary providing convenient access to the entire hierarchy of this CompoundOptic's
-        constituent components.  The key for the first leevl is just the name of the CompoundOptic,
+        constituent components.  The key for the first level is just the name of the CompoundOptic,
         e.g., `optic.itemDict['SubaruHSC']`.  The next level is accessed by appending a `.`, e.g.,
         `optic.itemDict['SubaruHSC.HSC']` and so on:
         `optic.itemDict['SubaruHSC.HSC.ADC']`
@@ -614,7 +614,7 @@ class Lens(CompoundOptic):
         if name == self.name:
             return self.withGlobalShift(shift)
         # Clip off leading token
-        assert name[:len(self.name)+1] == self.name+":"
+        assert name[:len(self.name)+1] == self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
         name = name[len(self.name)+1:]
         newItems = []
         newDict = dict(self.__dict__)

@@ -325,7 +325,7 @@ def fftPSF(optic, theta_x, theta_y, wavelength, nx=32, pad_factor=2):
 
 
 def zernike(optic, theta_x, theta_y, wavelength, nx=32, jmax=22, eps=0.0):
-    import galsim.zernike as zern
+    import galsim
 
     dirCos = gnomicToDirCos(theta_x, theta_y)
     rays = batoid.rayGrid(
@@ -344,7 +344,7 @@ def zernike(optic, theta_x, theta_y, wavelength, nx=32, jmax=22, eps=0.0):
     wfarr = wf.array
     w = ~wfarr.mask
 
-    basis = zern.zernikeBasis(
+    basis = galsim.zernike.zernikeBasis(
             jmax, orig_x[w], orig_y[w],
             R_outer=optic.pupilSize/2, R_inner=optic.pupilSize/2*eps
     )
