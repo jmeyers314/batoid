@@ -55,6 +55,9 @@ def test_intersect():
             assert isclose(r.p0[1], y)
             assert isclose(r.p0[2], para.sag(x, y), rel_tol=0, abs_tol=1e-9)
 
+        # Check normal at vertex
+        np.testing.assert_array_equal(para.normal(0,0), [0,0,1])
+
 
 @timer
 def test_intersect_vectorized():
@@ -88,9 +91,22 @@ def test_ne():
     all_obj_diff(objs)
 
 
+@timer
+def test_fail():
+    para = batoid.Paraboloid(1.0)
+    ray = batoid.Ray([0,0,-1], [0,0,-1])
+    ray = para.intersect(ray)
+    assert ray.failed
+
+    ray = batoid.Ray([0,0,-1], [0,0,-1])
+    para.intersectInPlace(ray)
+    assert ray.failed
+
+
 if __name__ == '__main__':
     test_properties()
     test_sag()
     test_intersect()
     test_intersect_vectorized()
     test_ne()
+    test_fail()
