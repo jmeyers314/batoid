@@ -20,6 +20,7 @@ namespace batoid {
             .def(py::init<Vector3d,Vector3d,double,double,bool>(),
                  "init",
                  "p0"_a, "v"_a, "t"_a=0.0, "w"_a=0.0, "isV"_a=false)
+            .def(py::init<Ray>())
             .def_readonly("p0", &Ray::p0)
             .def_readonly("v", &Ray::v)
             .def_readonly("t0", &Ray::t0)

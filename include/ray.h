@@ -15,8 +15,7 @@ namespace batoid {
         Ray(double x0, double y0, double z0, double vx, double vy, double vz,
             double t, double w, bool isVignetted);
         Ray(Vector3d _p0, Vector3d _v, double t, double w, bool isVignetted);
-        // Ray(std::array<double,3> _p0, std::array<double,3> _v,
-        //     double t, double w, bool isVignetted);
+        Ray(const Ray& _ray) = default;
         Ray(bool failed);
         Ray() = default;
 
