@@ -26,6 +26,10 @@ def test_plane_refraction_plane():
         ray = batoid.Ray([x, y, -10], v/m1.getN(wavelength), 0)
         rray = plane.refract(ray, m1, m2)
         assert isclose(np.linalg.norm(rray.v), 1./m2.getN(wavelength), rel_tol=1e-15)
+        # also check refractInPlace
+        rray2 = batoid.Ray(ray)
+        plane.refractInPlace(rray2, m1, m2)
+        assert rray == rray2
 
         # ray.v, surfaceNormal, and rray.v should all be in the same plane, and
         # hence (ray.v x surfaceNormal) . rray.v should have zero magnitude.
@@ -96,6 +100,10 @@ def test_paraboloid_refraction_plane():
         ray = batoid.Ray(x, y, -10, v[0], v[1], v[2], 0)
         rray = para.refract(ray, m1, m2)
         assert isclose(np.linalg.norm(rray.v), 1./m2.getN(wavelength), rel_tol=1e-15)
+        # also check refractInPlace
+        rray2 = batoid.Ray(ray)
+        para.refractInPlace(rray2, m1, m2)
+        assert rray == rray2
 
         # ray.v, surfaceNormal, and rray.v should all be in the same plane, and
         # hence (ray.v x surfaceNormal) . rray.v should have zero magnitude.
@@ -168,6 +176,10 @@ def test_asphere_refraction_plane():
         ray = batoid.Ray(x, y, -0.1, v[0], v[1], v[2], 0)
         rray = asphere.refract(ray, m1, m2)
         assert isclose(np.linalg.norm(rray.v), 1./m2.getN(wavelength), rel_tol=1e-15)
+        # also check refractInPlace
+        rray2 = batoid.Ray(ray)
+        asphere.refractInPlace(rray2, m1, m2)
+        assert rray == rray2
 
         # ray.v, surfaceNormal, and rray.v should all be in the same plane, and
         # hence (ray.v x surfaceNormal) . rray.v should have zero magnitude.
@@ -252,6 +264,46 @@ def test_table_medium_refraction():
         assert rray1 == rray2
 
 
+@timer
+def test_refraction_chromatic():
+    import random
+    random.seed(577215664)
+    wavelength1 = 500e-9
+    wavelength2 = 600e-9
+
+    plane = batoid.Plane()
+    filename = os.path.join(batoid.datadir, "media", "silica_dispersion.txt")
+    wave, n = np.genfromtxt(filename).T
+    wave *= 1e-6  # micron -> meters
+    table = batoid.Table(wave, n, batoid.Table.Interpolant.linear)
+    silica = batoid.TableMedium(table)
+    air = batoid.Air()
+
+    thx, thy = 0.001, 0.0001
+    dirCos = batoid.utils.gnomicToDirCos(thx, thy)
+    rv1 = batoid.rayGrid(10.0, 1., dirCos[0], dirCos[1], -dirCos[2], 2, wavelength1, silica)
+    rv2 = batoid.rayGrid(10.0, 1., dirCos[0], dirCos[1], -dirCos[2], 2, wavelength2, silica)
+    rvCombined = batoid.RayVector([*rv1, *rv2])
+
+    rv1r = plane.refract(rv1, silica, air)
+    rv2r = plane.refract(rv2, silica, air)
+    assert rv1r != rv2r
+    rvrCombined1 = batoid.RayVector([*rv1r, *rv2r])
+
+    rvrCombined2 = plane.refract(rvCombined, silica, air)
+
+    assert rvrCombined1 == rvrCombined2
+
+    # Check in-place
+    plane.refractInPlace(rv1, silica, air)
+    plane.refractInPlace(rv2, silica, air)
+    assert rv1 != rv2
+    plane.refractInPlace(rvCombined, silica, air)
+    rvCombined2 = batoid.RayVector([*rv1, *rv2])
+
+    assert rvCombined == rvCombined2
+
+
 if __name__ == '__main__':
     test_plane_refraction_plane()
     test_plane_refraction_reversal()
@@ -260,3 +312,4 @@ if __name__ == '__main__':
     test_asphere_refraction_plane()
     test_asphere_refraction_reversal()
     test_table_medium_refraction()
+    test_refraction_chromatic()
