@@ -26,9 +26,11 @@ namespace batoid {
 
     private:
         const std::vector<double> _coefs;  // Aspheric even polynomial coefficients
+        const std::vector<double> _dzdrcoefs;  // Coefficients for computing dzdr
 
         bool timeToIntersect(const Ray& r, double& t) const;
         double dzdr(double r) const;
+        static std::vector<double> computeDzDrCoefs(const std::vector<double>& coefs);
     };
 
     inline bool operator==(const Asphere& a1, const Asphere& a2) {

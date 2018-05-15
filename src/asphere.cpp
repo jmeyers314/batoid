@@ -5,7 +5,18 @@
 
 namespace batoid {
     Asphere::Asphere(double R, double conic, std::vector<double> coefs) :
-        Quadric(R, conic), _coefs(coefs) {}
+        Quadric(R, conic), _coefs(coefs),
+        _dzdrcoefs(computeDzDrCoefs(coefs)) {}
+
+    std::vector<double> Asphere::computeDzDrCoefs(const std::vector<double>& coefs) {
+        std::vector<double> result;
+        unsigned int i=4;
+        for (const auto& c : coefs) {
+            result.push_back(c*i);
+            i += 2;
+        }
+        return result;
+    }
 
     double Asphere::sag(double x, double y) const {
         double r2 = x*x + y*y;
@@ -94,12 +105,11 @@ namespace batoid {
 
     double Asphere::dzdr(double r) const {
         double result = Quadric::dzdr(r);
-        double rrr = r*r*r;
-        int twoi=0;
-        for (const auto& c : _coefs) {
-            result += (4+twoi)*c*rrr;
-            rrr *= r*r;
-            twoi += 2;
+        double rr = r*r;
+        double rrr = rr*r;
+        for (const auto& c : _dzdrcoefs) {
+            result += c*rrr;
+            rrr *= rr;
         }
         return result;
     }
