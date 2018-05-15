@@ -86,8 +86,8 @@ namespace batoid {
             char *ptrZ = (char *) bufZ.ptr;
             for (auto idim=bufX.ndim-1; idim >= 0; idim--) {
                 ptrX += idxVec[idim]*bufX.strides[idim];
-                ptrY += idxVec[idim]*bufX.strides[idim];
-                ptrZ += idxVec[idim]*bufX.strides[idim];
+                ptrY += idxVec[idim]*bufY.strides[idim];
+                ptrZ += idxVec[idim]*bufZ.strides[idim];
             }
 
             v = ct.applyForward(Vector3d(*(double *)ptrX, *(double *)ptrY, *(double *)ptrZ));
@@ -143,8 +143,8 @@ namespace batoid {
             char *ptrZ = (char *) bufZ.ptr;
             for (auto idim=bufX.ndim-1; idim >= 0; idim--) {
                 ptrX += idxVec[idim]*bufX.strides[idim];
-                ptrY += idxVec[idim]*bufX.strides[idim];
-                ptrZ += idxVec[idim]*bufX.strides[idim];
+                ptrY += idxVec[idim]*bufY.strides[idim];
+                ptrZ += idxVec[idim]*bufZ.strides[idim];
             }
 
             v = ct.applyReverse(Vector3d(*(double *)ptrX, *(double *)ptrY, *(double *)ptrZ));
