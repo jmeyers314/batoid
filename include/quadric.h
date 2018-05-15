@@ -32,6 +32,13 @@ namespace batoid {
         const double _R;  // Radius of curvature
         const double _conic;  // Conic constant
 
+        const double _Rsq;  // R*R
+        const double _Rinvsq;  // 1/R/R
+        const double _cp1; // 1 + conic
+        const double _cp1inv; // 1/(1 + conic)
+        const double _Rcp1; // R/(1+conic)
+        const double _RRcp1cp1; // R*R/(1+conic)/(1+conic)
+        const double _cp1RR; // (1+conic)/R/R
     };
 
     inline bool operator==(const Quadric& q1, const Quadric& q2)
