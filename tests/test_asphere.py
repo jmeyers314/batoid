@@ -147,6 +147,19 @@ def test_ne():
     ]
     all_obj_diff(objs)
 
+
+@timer
+def test_fail():
+    asphere = batoid.Asphere(1.0, 1.0, [1.0, 1.0])
+    ray = batoid.Ray([0,0,-1], [0,0,-1])
+    ray = asphere.intersect(ray)
+    assert ray.failed
+
+    ray = batoid.Ray([0,0,-1], [0,0,-1])
+    asphere.intersectInPlace(ray)
+    assert ray.failed
+
+
 if __name__ == '__main__':
     test_properties()
     test_sag()
@@ -154,3 +167,4 @@ if __name__ == '__main__':
     test_intersect_vectorized()
     test_quad_plus_poly()
     test_ne()
+    test_fail()

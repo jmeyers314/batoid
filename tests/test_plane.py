@@ -65,7 +65,20 @@ def test_intersect_vectorized():
         assert r1s == r2s
 
 
+@timer
+def test_fail():
+    plane = batoid.Plane()
+    ray = batoid.Ray([0,0,-1], [0,0,-1])
+    ray = plane.intersect(ray)
+    assert ray.failed
+
+    ray = batoid.Ray([0,0,-1], [0,0,-1])
+    plane.intersectInPlace(ray)
+    assert ray.failed
+
+
 if __name__ == '__main__':
     test_sag()
     test_intersect()
     test_intersect_vectorized()
+    test_fail()
