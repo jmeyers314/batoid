@@ -4,7 +4,7 @@
 
 namespace batoid {
 
-    Paraboloid::Paraboloid(double R) : _R(R) {}
+    Paraboloid::Paraboloid(double R) : _R(R), _Rinv(1./R), _2Rinv(1./2/R) {}
 
     std::string Paraboloid::repr() const {
         std::ostringstream oss(" ");
@@ -15,7 +15,7 @@ namespace batoid {
     double Paraboloid::sag(double x, double y) const {
         if (_R != 0) {
             double r2 = x*x + y*y;
-            return r2/(2*_R);
+            return r2*_2Rinv;
         }
         return 0.0;
     }
@@ -23,13 +23,13 @@ namespace batoid {
     Vector3d Paraboloid::normal(double x, double y) const {
         if (_R == 0)
             return Vector3d(0,0,1);
-        return Vector3d(-x/_R, -y/_R, 1).normalized();
+        return Vector3d(-x*_Rinv, -y*_Rinv, 1).normalized();
     }
 
     bool Paraboloid::timeToIntersect(const Ray& r, double& t) const {
-        double a = (r.v[0]*r.v[0] + r.v[1]*r.v[1])/2/_R;
-        double b = (r.p0[0]*r.v[0] + r.p0[1]*r.v[1])/_R - r.v[2];
-        double c = (r.p0[0]*r.p0[0] + r.p0[1]*r.p0[1])/2/_R - r.p0[2];
+        double a = (r.v[0]*r.v[0] + r.v[1]*r.v[1])*_2Rinv;
+        double b = (r.p0[0]*r.v[0] + r.p0[1]*r.v[1])*_Rinv - r.v[2];
+        double c = (r.p0[0]*r.p0[0] + r.p0[1]*r.p0[1])*_2Rinv - r.p0[2];
         double r1, r2;
         int n = solveQuadratic(a, b, c, r1, r2);
 
