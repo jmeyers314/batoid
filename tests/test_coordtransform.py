@@ -1,6 +1,6 @@
 import numpy as np
 import batoid
-from test_helpers import vec3_isclose, ray_isclose, timer, rays_allclose
+from test_helpers import vec3_isclose, ray_isclose, timer, rays_allclose, do_pickle
 
 
 def randomVec3():
@@ -53,9 +53,13 @@ def test_composition():
         assert coordSys1 != coordSys2
         assert coordSys1 != coordSys3
 
+        do_pickle(coordSys1)
+
         transform1to2 = batoid.CoordTransform(coordSys1, coordSys2)
         transform1to3 = batoid.CoordTransform(coordSys1, coordSys3)
         transform2to3 = batoid.CoordTransform(coordSys2, coordSys3)
+
+        do_pickle(transform1to2)
 
         for i in range(10):
             vec3 = randomVec3()
