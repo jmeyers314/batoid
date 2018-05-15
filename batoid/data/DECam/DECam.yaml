@@ -16,9 +16,9 @@ opticalSystem:
         R: 21.3116
         conic: -1.0976
       obscuration:
-        type: ClearCircle
-        radius: 1.905
-      # Should really add an obscuration above this...
+        type: ClearAnnulus
+        outer: 1.905
+        inner: 0.762  # 40% as a guess
     -
       type: CompoundOptic
       name: DECam
