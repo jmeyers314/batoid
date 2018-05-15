@@ -283,12 +283,22 @@ def test_refraction_chromatic():
     dirCos = batoid.utils.gnomicToDirCos(thx, thy)
     rv1 = batoid.rayGrid(10.0, 1., dirCos[0], dirCos[1], -dirCos[2], 2, wavelength1, silica)
     rv2 = batoid.rayGrid(10.0, 1., dirCos[0], dirCos[1], -dirCos[2], 2, wavelength2, silica)
-    rvCombined = batoid.RayVector([*rv1, *rv2])
+    rays = []
+    for ray in rv1:
+        rays.append(ray)
+    for ray in rv2:
+        rays.append(ray)
+    rvCombined = batoid.RayVector(rays)
 
     rv1r = plane.refract(rv1, silica, air)
     rv2r = plane.refract(rv2, silica, air)
     assert rv1r != rv2r
-    rvrCombined1 = batoid.RayVector([*rv1r, *rv2r])
+    rays = []
+    for ray in rv1r:
+        rays.append(ray)
+    for ray in rv2r:
+        rays.append(ray)
+    rvrCombined1 = batoid.RayVector(rays)
 
     rvrCombined2 = plane.refract(rvCombined, silica, air)
 
@@ -299,7 +309,12 @@ def test_refraction_chromatic():
     plane.refractInPlace(rv2, silica, air)
     assert rv1 != rv2
     plane.refractInPlace(rvCombined, silica, air)
-    rvCombined2 = batoid.RayVector([*rv1, *rv2])
+    rays = []
+    for ray in rv1:
+        rays.append(ray)
+    for ray in rv2:
+        rays.append(ray)
+    rvCombined2 = batoid.RayVector(rays)
 
     assert rvCombined == rvCombined2
 
