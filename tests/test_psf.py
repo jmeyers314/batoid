@@ -186,7 +186,7 @@ def test_hsc_psf():
     for theta in thetas:
         print(theta/3600.0)
         dirCos = batoid.utils.gnomicToDirCos(0.0, theta/206265)
-        rays = batoid.circularGrid(10.0, 4.2, 2.55,
+        rays = batoid.circularGrid(20.0, 4.1, 0.9,
                                    dirCos[0], dirCos[1], -dirCos[2],
                                    10, 100, 620e-9, batoid.ConstMedium(1.0))
         telescope.traceInPlace(rays)
