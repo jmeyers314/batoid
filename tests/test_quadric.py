@@ -70,6 +70,10 @@ def test_intersect():
             assert isclose(r.p0[1], y)
             assert isclose(r.p0[2], quad.sag(x, y), rel_tol=0, abs_tol=1e-9)
 
+    # Check normal for R=0 paraboloid (a plane)
+    quad = batoid.Quadric(0.0, 0.0)
+    np.testing.assert_array_equal(quad.normal(0.1, 0.1), [0,0,1])
+
 
 @timer
 def test_intersect_vectorized():

@@ -13,9 +13,10 @@ namespace batoid {
     }
 
     double Paraboloid::sag(double x, double y) const {
-        double r2 = x*x + y*y;
-        if (_R != 0)
+        if (_R != 0) {
+            double r2 = x*x + y*y;
             return r2/(2*_R);
+        }
         return 0.0;
     }
 

@@ -11,6 +11,8 @@ namespace batoid {
     }
 
     Vector3d Sphere::normal(double x, double y) const {
+        if (_R == 0.0)
+            return Vector3d(0,0,1);
         double r = std::sqrt(x*x + y*y);
         if (r == 0)
             return Vector3d(0,0,1);

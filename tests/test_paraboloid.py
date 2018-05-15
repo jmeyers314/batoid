@@ -55,8 +55,9 @@ def test_intersect():
             assert isclose(r.p0[1], y)
             assert isclose(r.p0[2], para.sag(x, y), rel_tol=0, abs_tol=1e-9)
 
-        # Check normal at vertex
-        np.testing.assert_array_equal(para.normal(0,0), [0,0,1])
+    # Check normal for R=0 paraboloid (a plane)
+    para = batoid.Paraboloid(0.0)
+    np.testing.assert_array_equal(para.normal(0.1, 0.1), [0,0,1])
 
 
 @timer
