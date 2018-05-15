@@ -258,6 +258,17 @@ def test_ne():
     ]
     all_obj_diff(objs)
 
+
+@timer
+def test_fail():
+    surface = batoid.Sphere(1.0)
+    ray = batoid.Ray([0,10,-1], [0,0,1])
+
+    ray = surface.intersect(ray)
+    assert ray.failed
+    do_pickle(ray)
+
+
 if __name__ == '__main__':
     test_call()
     test_properties()
@@ -266,3 +277,4 @@ if __name__ == '__main__':
     test_rayGrid()
     test_circularGrid()
     test_ne()
+    test_fail()

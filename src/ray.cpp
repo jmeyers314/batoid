@@ -27,7 +27,7 @@ namespace batoid {
     std::string Ray::repr() const {
         std::ostringstream oss("Ray(", std::ios_base::ate);
         if(failed)
-            oss << "failed)";
+            oss << "failed=True)";
         else {
             oss << "[" << p0[0] << "," << p0[1] << "," << p0[2] << "],["
                 << v[0] << "," << v[1] << "," << v[2] << "]";
