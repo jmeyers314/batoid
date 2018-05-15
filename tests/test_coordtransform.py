@@ -103,5 +103,38 @@ def test_composition():
             np.testing.assert_allclose(xyz, transform1to3.applyReverse(*xyz_a))
             np.testing.assert_allclose(xyz, transform1to2.applyReverse(*transform2to3.applyReverse(*xyz_b)))
 
+            # Test in-place on Ray
+            ray = randomRay()
+            ray_copy = batoid.Ray(ray)
+            transform1to2.applyForwardInPlace(ray)
+            transform2to3.applyForwardInPlace(ray)
+            transform1to3.applyForwardInPlace(ray_copy)
+            assert ray_isclose(ray, ray_copy)
+
+            # in-place reverse on Ray
+            ray = randomRay()
+            ray_copy = batoid.Ray(ray)
+            transform2to3.applyReverseInPlace(ray)
+            transform1to2.applyReverseInPlace(ray)
+            transform1to3.applyReverseInPlace(ray_copy)
+            assert ray_isclose(ray, ray_copy)
+
+            # Test in-place on RayVector
+            rv = randomRayVector()
+            rv_copy = batoid.RayVector(rv)
+            transform1to2.applyForwardInPlace(rv)
+            transform2to3.applyForwardInPlace(rv)
+            transform1to3.applyForwardInPlace(rv_copy)
+            assert rays_allclose(rv, rv_copy)
+
+            # in-place reverse on RayVector
+            rv = randomRayVector()
+            rv_copy = batoid.RayVector(rv)
+            transform2to3.applyReverseInPlace(rv)
+            transform1to2.applyReverseInPlace(rv)
+            transform1to3.applyReverseInPlace(rv_copy)
+            assert rays_allclose(rv, rv_copy)
+
+
 if __name__ == '__main__':
     test_composition()
