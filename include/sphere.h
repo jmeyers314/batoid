@@ -24,6 +24,9 @@ namespace batoid {
 
     private:
         const double _R;  // Radius of curvature
+        const double _Rsq; // R*R
+        const double _Rinv; // 1/R
+        const double _Rinvsq; // 1/R/R
 
         bool timeToIntersect(const Ray& r, double& t) const;
         double dzdr(double r) const;

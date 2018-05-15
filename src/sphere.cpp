@@ -2,11 +2,11 @@
 #include "utils.h"
 
 namespace batoid {
-    Sphere::Sphere(double R) : _R(R) {}
+    Sphere::Sphere(double R) : _R(R), _Rsq(R*R), _Rinv(1./R), _Rinvsq(1./R/R) {}
 
     double Sphere::sag(double x, double y) const {
         if (_R != 0)
-            return _R*(1-std::sqrt(1-(x*x + y*y)/_R/_R));
+            return _R*(1-std::sqrt(1-(x*x + y*y)*_Rinvsq));
         return 0.0;
     }
 
@@ -30,7 +30,7 @@ namespace batoid {
         // Quadratic equation coefficients
         double a = vz2 + vr2;
         double b = 2*r.v[2]*z0term + 2*vrr0;
-        double c = z0term*z0term - _R*_R + r02;
+        double c = z0term*z0term - _Rsq + r02;
 
         double r1, r2;
         int n = solveQuadratic(a, b, c, r1, r2);
@@ -84,7 +84,7 @@ namespace batoid {
     }
 
     double Sphere::dzdr(double r) const {
-        double rat = r/_R;
+        double rat = r*_Rinv;
         return rat/std::sqrt(1-rat*rat);
     }
 
