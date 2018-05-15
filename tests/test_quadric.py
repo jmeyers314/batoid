@@ -105,9 +105,22 @@ def test_ne():
     all_obj_diff(objs)
 
 
+@timer
+def test_fail():
+    quad = batoid.Quadric(1.0, 1.0)
+    ray = batoid.Ray([0,0,-1], [0,0,-1])
+    ray = quad.intersect(ray)
+    assert ray.failed
+
+    ray = batoid.Ray([0,0,-1], [0,0,-1])
+    quad.intersectInPlace(ray)
+    assert ray.failed
+
+
 if __name__ == '__main__':
     test_properties()
     test_sag()
     test_intersect()
     test_intersect_vectorized()
     test_ne()
+    test_fail()
