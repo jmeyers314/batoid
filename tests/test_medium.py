@@ -90,11 +90,13 @@ def test_ne():
     wave, n = np.genfromtxt(filename).T
     wave *= 1e-6    # microns -> meters
     table = batoid.Table(wave, n, batoid.Table.Interpolant.linear)
+    table2 = batoid.Table(wave*1.01, n, batoid.Table.Interpolant.linear)
 
     objs = [
         batoid.ConstMedium(1.0),
         batoid.ConstMedium(1.1),
         batoid.TableMedium(table),
+        batoid.TableMedium(table2),
         batoid.SellmeierMedium(
             0.6961663, 0.4079426, 0.8974794,
             0.0684043**2, 0.1162414**2, 9.896161**2),
