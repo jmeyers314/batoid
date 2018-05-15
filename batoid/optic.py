@@ -33,11 +33,9 @@ class Optic:
     def __init__(self, name=None, coordSys=batoid.CoordSys(), inMedium=batoid.ConstMedium(1.0),
                  outMedium=batoid.ConstMedium(1.0), skip=False, **kwargs):
         self.name = name
+        self.coordSys = coordSys
         self.inMedium = inMedium
         self.outMedium = outMedium
-        if coordSys is None:
-            raise ValueError("coordSys required for optic")
-        self.coordSys = coordSys
         self.skip = False
         kwargs.pop('_itemDict', None)
         self.__dict__.update(**kwargs)
