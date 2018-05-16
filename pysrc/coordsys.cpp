@@ -38,15 +38,11 @@ namespace batoid {
                 }
             ))
             .def("__hash__", [](const CoordSys& cs) {
-                auto result = py::hash(py::make_tuple("CoordSys"));
-                const double* d = &cs.m_origin[0];
-                for (int i=0; i<3; i++)
-                    result = 1000003*result ^ py::hash(py::float_(d[i]));
-                d = &cs.m_rot(0,0);
-                for (int i=0; i<9; i++)
-                    result = 1000003*result ^ py::hash(py::float_(d[i]));
-                result = (result == -1) ? -2 : result;
-                return result;
+                return py::hash(py::make_tuple(
+                    "CoordSys",
+                    py::tuple(py::cast(cs.m_origin)),
+                    py::tuple(py::cast(cs.m_rot).attr("ravel")())
+                ));
             });
     }
 
@@ -203,15 +199,11 @@ namespace batoid {
                 [](py::tuple t) { return CoordTransform(t[0].cast<Vector3d>(), t[1].cast<Matrix3d>()); }
             ))
             .def("__hash__", [](CoordTransform& ct) {
-                auto result = py::hash(py::make_tuple("CoordTransform"));
-                const double* d = &ct.getDr()[0];
-                for (int i=0; i<3; i++)
-                    result = 1000003*result ^ py::hash(py::float_(d[i]));
-                d = &ct.getRot()(0,0);
-                for (int i=0; i<9; i++)
-                    result = 1000003*result ^ py::hash(py::float_(d[i]));
-                result = (result == -1) ? -2 : result;
-                return result;
+                return py::hash(py::make_tuple(
+                    "CoordTransform",
+                    py::tuple(py::cast(ct.getDr())),
+                    py::tuple(py::cast(ct.getRot()).attr("ravel")())
+                ));
             })
             .def("__repr__", &CoordTransform::repr);
     }

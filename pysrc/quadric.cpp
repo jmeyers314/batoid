@@ -23,7 +23,11 @@ namespace batoid {
                 }
             ))
             .def("__hash__", [](const Quadric& q) {
-                return py::hash(py::make_tuple("Quadric", q.getR(), q.getConic()));
+                return py::hash(py::make_tuple(
+                    "Quadric",
+                    q.getR(),
+                    q.getConic()
+                ));
             });
     }
 }

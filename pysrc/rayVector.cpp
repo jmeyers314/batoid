@@ -36,16 +36,11 @@ namespace batoid {
                 }
             ))
             .def("__hash__", [](const RayVector& rv) {
-                auto result = py::hash(py::make_tuple("RayVector", rv.wavelength));
-                for (const auto& r : rv.rays) {
-                    for (int i=0; i<3; i++) {
-                        result = 1000003*result ^ py::hash(py::float_(r.p0[i]));
-                        result = 1000003*result ^ py::hash(py::float_(r.v[i]));
-                    }
-                    result = 1000003*result ^ py::hash(py::make_tuple(r.t0, r.wavelength, r.isVignetted, r.failed));
-                }
-                result = (result == -1) ? -2 : result;
-                return result;
+                return py::hash(py::make_tuple(
+                    "RayVector",
+                    py::tuple(py::cast(rv.rays)),
+                    rv.wavelength
+                ));
             })
             .def_property_readonly(
                 "x",

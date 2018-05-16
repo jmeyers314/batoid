@@ -24,7 +24,10 @@ namespace batoid {
                 [](py::tuple t) { return ConstMedium(t[0].cast<double>()); }
             ))
             .def("__hash__", [](const ConstMedium& cm) {
-                return py::hash(py::make_tuple("ConstMedium", cm.getN(0.0)));
+                return py::hash(py::make_tuple(
+                    "ConstMedium", 
+                    cm.getN(0.0)
+                ));
             });
 
 
@@ -38,7 +41,10 @@ namespace batoid {
                 [](py::tuple t) { return TableMedium(t[0].cast<std::shared_ptr<Table<double,double>>>()); }
             ))
             .def("__hash__", [](const TableMedium& tm) {
-                return py::hash(py::make_tuple("TableMedium", *tm.getTable()));
+                return py::hash(py::make_tuple(
+                    "TableMedium",
+                    *tm.getTable()
+                ));
             });
 
 
@@ -56,12 +62,10 @@ namespace batoid {
             ))
             // See http://effbot.org/zone/python-hash.htm#tuples
             .def("__hash__", [](const SellmeierMedium& sm) {
-                auto result = py::hash(py::str("SellmeierMedium"));
-                for (const auto& coef : sm.getCoefs())
-                    result = 1000003*result ^ py::hash(py::float_(coef));
-                result ^= sm.getCoefs().size();
-                result = (result == -1) ? -2 : result;
-                return result;
+                return py::hash(py::make_tuple(
+                    "SellmeierMedium",
+                    py::tuple(py::cast(sm.getCoefs()))
+                ));
             });
 
 
@@ -85,7 +89,10 @@ namespace batoid {
             ))
             .def("__hash__", [](const Air& a) {
                 return py::hash(py::make_tuple(
-                    "Air", a.getPressure(), a.getTemperature(), a.getH2OPressure()
+                    "Air",
+                    a.getPressure(),
+                    a.getTemperature(),
+                    a.getH2OPressure()
                 ));
             });
     }

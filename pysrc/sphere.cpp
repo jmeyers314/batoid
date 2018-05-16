@@ -20,7 +20,10 @@ namespace batoid {
                 [](py::tuple t) { return Sphere(t[0].cast<double>()); }
             ))
             .def("__hash__", [](const Sphere& s) {
-                return py::hash(py::make_tuple("Sphere", s.getR()));
+                return py::hash(py::make_tuple(
+                    "Sphere",
+                    s.getR()
+                ));
             });
     }
 }

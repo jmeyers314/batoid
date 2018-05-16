@@ -65,15 +65,15 @@ namespace batoid {
                 }
             ))
             .def("__hash__", [](const Ray& r) {
-                auto result = py::hash(py::make_tuple("Ray", r.t0, r.wavelength, r.isVignetted, r.failed));
-                const double* d = &r.p0[0];
-                for (int i=0; i<3; i++)
-                    result = 1000003*result ^ py::hash(py::float_(d[i]));
-                d = &r.v[0];
-                for (int i=0; i<3; i++)
-                    result = 1000003*result ^ py::hash(py::float_(d[i]));
-                result = (result == -1) ? -2 : result;
-                return result;
+                return py::hash(py::make_tuple(
+                    "Ray",
+                    py::tuple(py::cast(r.p0)),
+                    py::tuple(py::cast(r.v)),
+                    r.t0,
+                    r.wavelength,
+                    r.isVignetted,
+                    r.failed
+                ));
             });
 
     }

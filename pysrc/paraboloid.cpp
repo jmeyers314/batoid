@@ -20,7 +20,10 @@ namespace batoid {
                 [](py::tuple t) { return Paraboloid(t[0].cast<double>()); }
             ))
             .def("__hash__", [](const Paraboloid& p) {
-                return py::hash(py::make_tuple("Paraboloid", p.getR()));
+                return py::hash(py::make_tuple(
+                    "Paraboloid",
+                    p.getR()
+                ));
             });
     }
 }

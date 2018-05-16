@@ -37,7 +37,12 @@ namespace batoid {
                 }
             ))
             .def("__hash__", [](const ObscCircle& oc) {
-                return py::hash(py::make_tuple("ObscCircle", oc._radius, oc._x0, oc._y0));
+                return py::hash(py::make_tuple(
+                    "ObscCircle",
+                    oc._radius,
+                    oc._x0,
+                    oc._y0
+                ));
             });
 
 
@@ -61,7 +66,13 @@ namespace batoid {
                 }
             ))
             .def("__hash__", [](const ObscAnnulus& oa) {
-                return py::hash(py::make_tuple("ObscAnnulus", oa._inner, oa._outer, oa._x0, oa._y0));
+                return py::hash(py::make_tuple(
+                    "ObscAnnulus", 
+                    oa._inner,
+                    oa._outer,
+                    oa._x0,
+                    oa._y0
+                ));
             });
 
 
@@ -88,7 +99,14 @@ namespace batoid {
                 }
             ))
             .def("__hash__", [](const ObscRectangle& o) {
-                return py::hash(py::make_tuple("ObscRectangle", o._width, o._height, o._x0, o._y0, o._theta));
+                return py::hash(py::make_tuple(
+                    "ObscRectangle",
+                    o._width,
+                    o._height,
+                    o._x0,
+                    o._y0,
+                    o._theta
+                ));
             });
 
 
@@ -113,7 +131,13 @@ namespace batoid {
                 }
             ))
             .def("__hash__", [](const ObscRay& o) {
-                return py::hash(py::make_tuple("ObscRay", o._width, o._theta, o._x0, o._y0));
+                return py::hash(py::make_tuple(
+                    "ObscRay",
+                    o._width,
+                    o._theta,
+                    o._x0,
+                    o._y0
+                ));
             });
 
 
@@ -127,7 +151,10 @@ namespace batoid {
                 [](std::shared_ptr<Obscuration>& o) { return ObscNegation(o); }
             ))
             .def("__hash__", [](const ObscNegation& o) {
-                return py::hash(py::make_tuple("ObscNegation", o._original));
+                return py::hash(py::make_tuple(
+                    "ObscNegation",
+                    o._original
+                ));
             });
 
 
@@ -141,10 +168,10 @@ namespace batoid {
                 [](std::vector<std::shared_ptr<Obscuration>>& o) { return ObscUnion(o); }
             ))
             .def("__hash__", [](const ObscUnion& o) {
-                auto result = py::hash(py::str("ObscUnion"));
-                for (const auto& oo : o._obscVec)
-                    result ^= py::hash(py::cast(oo));
-                return result;
+                return py::hash(py::make_tuple(
+                    "ObscUnion",
+                    py::tuple(py::cast(o._obscVec))
+                ));
             });
 
 
@@ -158,10 +185,10 @@ namespace batoid {
                 [](std::vector<std::shared_ptr<Obscuration>>& o) { return ObscIntersection(o); }
             ))
             .def("__hash__", [](const ObscIntersection& o) {
-                auto result = py::hash(py::str("ObscIntersection"));
-                for (const auto& oo : o._obscVec)
-                    result ^= py::hash(py::cast(oo));
-                return result;
+                return py::hash(py::make_tuple(
+                    "ObscIntersection",
+                    py::tuple(py::cast(o._obscVec))
+                ));
             });
     }
 }

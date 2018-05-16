@@ -30,14 +30,13 @@ namespace batoid {
                     );
                 }
             ))
-            // See http://effbot.org/zone/python-hash.htm#tuples
             .def("__hash__", [](const Asphere& a) {
-                auto result = py::hash(py::make_tuple("Asphere", a.getR(), a.getConic()));
-                for (const auto& coef : a.getCoefs())
-                    result = 1000003*result ^ py::hash(py::float_(coef));
-                result ^= a.getCoefs().size();
-                result = (result == -1) ? -2 : result;
-                return result;
+                return py::hash(py::make_tuple(
+                    "Asphere",
+                    a.getR(),
+                    a.getConic(),
+                    py::tuple(py::cast(a.getCoefs()))
+                ));
             });
     }
 }

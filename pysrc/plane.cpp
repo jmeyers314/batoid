@@ -18,6 +18,8 @@ namespace batoid {
                 [](const Plane&) { return py::make_tuple(); },
                 [](py::tuple t) { return Plane(); }
             ))
-            .def("__hash__", [](const Plane& p) { return py::hash(py::str("Plane")); });
+            .def("__hash__", [](const Plane& p) {
+                return py::hash(py::str("Plane"));
+            });
     }
 }

@@ -27,17 +27,13 @@ namespace batoid {
                         t[2].cast<TableDD::interpolant>());
                 }
             ))
-            // See http://effbot.org/zone/python-hash.htm#tuples
             .def("__hash__", [](const TableDD& t) {
-                auto result = py::hash(py::make_tuple("Table", t.getInterp()));
-                for (const auto& arg : t.getArgs())
-                    result = 1000003*result ^ py::hash(py::float_(arg));
-                result ^= t.getArgs().size();
-                for (const auto& val : t.getVals())
-                    result = 1000003*result ^ py::hash(py::float_(val));
-                result ^= t.getVals().size();
-                result = (result == -1) ? -2 : result;
-                return result;
+                return py::hash(py::make_tuple(
+                    "Table",
+                    t.getInterp(),
+                    py::tuple(py::cast(t.getArgs())),
+                    py::tuple(py::cast(t.getVals()))
+                ));
             })
             .def("__repr__", &TableDD::repr);
 
