@@ -89,3 +89,4 @@ ENV/
 .ropeproject
 
 .clang_complete
+.pytest_cache
