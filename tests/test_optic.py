@@ -118,7 +118,7 @@ def test_shift():
 def test_rotation():
     try:
         import galsim
-    except:
+    except ImportError:
         print("optic rotation test requires GalSim")
         return
 

@@ -16,11 +16,6 @@ namespace batoid {
     Ray::Ray(Vector3d _p0, Vector3d _v, double t=0.0, double w=0.0, bool isV=false) :
         p0(_p0), v(_v), t0(t), wavelength(w), isVignetted(isV), failed(false) {}
 
-    // Ray::Ray(std::array<double,3> _p0, std::array<double,3> _v,
-    //          double t=0.0, double w=0.0, bool isV=false) :
-    //     p0(Vector3d(_p0[0], _p0[1], _p0[2])), v(Vector3d(_v[0], _v[1], _v[2])),
-    //     t0(t), wavelength(w), isVignetted(isV), failed(false) {}
-
     Ray::Ray(const bool failed) :
         p0(Vector3d::Zero()), v(Vector3d::Zero()), t0(0.0), wavelength(0.0), isVignetted(true), failed(true) {}
 

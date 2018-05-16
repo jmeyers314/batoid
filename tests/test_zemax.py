@@ -29,7 +29,8 @@ def test_HSC_trace():
         with open(filename) as f:
             arr = np.loadtxt(f, skiprows=22, usecols=list(range(0, 12)))
         arr0 = arr[0]
-        ray = batoid.Ray(arr0[1]/1000, arr0[2]/1000, 16.0, arr0[4], arr0[5], -arr0[6], t=0, w=750e-9)
+        ray = batoid.Ray(arr0[1]/1000, arr0[2]/1000, 16.0, arr0[4], arr0[5], -arr0[6],
+                         t=0, wavelength=750e-9)
         tf = telescope.traceFull(ray)
 
         i = 0

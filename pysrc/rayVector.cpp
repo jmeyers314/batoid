@@ -16,6 +16,7 @@ namespace batoid {
             .def(py::init<>())
             .def(py::init<RayVector>())
             .def(py::init<std::vector<Ray>>())
+            .def("__repr__", &RayVector::repr)
             .def("amplitude", &RayVector::amplitude)
             .def("sumAmplitude", &RayVector::sumAmplitude)
             .def("phase", &RayVector::phase)
@@ -23,6 +24,29 @@ namespace batoid {
             .def("propagateInPlace", &RayVector::propagateInPlace)
             .def("trimVignetted", &RayVector::trimVignetted)
             .def("trimVignettedInPlace", &RayVector::trimVignettedInPlace)
+            .def(py::pickle(
+                [](const RayVector& rv) {  // __getstate__
+                    return py::make_tuple(rv.rays, rv.wavelength);
+                },
+                [](py::tuple t) {  // __setstate__
+                    return RayVector(
+                        t[0].cast<std::vector<Ray>>(),
+                        t[1].cast<double>()
+                    );
+                }
+            ))
+            .def("__hash__", [](const RayVector& rv) {
+                auto result = py::hash(py::make_tuple("RayVector", rv.wavelength));
+                for (const auto& r : rv.rays) {
+                    for (int i=0; i<3; i++) {
+                        result = 1000003*result ^ py::hash(py::float_(r.p0[i]));
+                        result = 1000003*result ^ py::hash(py::float_(r.v[i]));
+                    }
+                    result = 1000003*result ^ py::hash(py::make_tuple(r.t0, r.wavelength, r.isVignetted, r.failed));
+                }
+                result = (result == -1) ? -2 : result;
+                return result;
+            })
             .def_property_readonly(
                 "x",
                 [](RayVector& rv) -> py::array_t<double> {

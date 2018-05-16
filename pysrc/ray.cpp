@@ -16,10 +16,10 @@ namespace batoid {
             .def(py::init<double,double,double,double,double,double,double,double,bool>(),
                  "init",
                  "x0"_a, "y0"_a, "z0"_a, "vx"_a, "vy"_a, "vz"_a, "t"_a=0.0,
-                 "w"_a=0.0, "isV"_a=false)
+                 "wavelength"_a=0.0, "isVignetted"_a=false)
             .def(py::init<Vector3d,Vector3d,double,double,bool>(),
                  "init",
-                 "p0"_a, "v"_a, "t"_a=0.0, "w"_a=0.0, "isV"_a=false)
+                 "p0"_a, "v"_a, "t"_a=0.0, "wavelength"_a=0.0, "isVignetted"_a=false)
             .def(py::init<bool>(),"init", "failed"_a)
             .def(py::init<Ray>())
             .def_readonly("p0", &Ray::p0)

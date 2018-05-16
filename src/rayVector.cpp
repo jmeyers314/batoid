@@ -9,6 +9,19 @@
 using Eigen::Vector3d;
 
 namespace batoid {
+    std::string RayVector::repr() const {
+        std::ostringstream oss("RayVector([", std::ios_base::ate);
+        oss << rays[0];
+        for(int i=1; i<rays.size(); i++) {
+            oss << ", " << rays[i];
+        }
+        oss << ']';
+        if (!std::isnan(wavelength))
+            oss << ", wavelength=" << wavelength;
+        oss << ')';
+        return oss.str();
+    }
+
     std::vector<double> RayVector::phase(const Vector3d& r, double t) {
         auto result = std::vector<double>(rays.size());
         parallelTransform(rays.cbegin(), rays.cend(), result.begin(),

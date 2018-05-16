@@ -9,7 +9,7 @@ from test_helpers import timer, isclose
 def test_huygens_psf():
     try:
         import galsim
-    except:
+    except ImportError:
         print("Huygens PSF test requires GalSim")
         # Could do the integral directly without GalSim?
         return

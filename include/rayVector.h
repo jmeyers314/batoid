@@ -40,11 +40,16 @@ namespace batoid {
         void propagateInPlace(double t);
         RayVector trimVignetted();
         void trimVignettedInPlace();
+        std::string repr() const;
 
         // data
         std::vector<Ray> rays;
         double wavelength{NAN};  // If not NAN, then all wavelengths are this wavelength
     };
+
+    inline std::ostream& operator<<(std::ostream& os, const RayVector& rv) {
+        return os << rv.repr();
+    }
 }
 
 #endif

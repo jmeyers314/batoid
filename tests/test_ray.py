@@ -143,6 +143,7 @@ def test_RayVector():
             )
         )
     rayVector = batoid.RayVector(rayList)
+    do_pickle(rayVector)
     np.testing.assert_equal(rayVector.x, np.array([r.x0 for r in rayVector]))
     np.testing.assert_equal(rayVector.y, np.array([r.y0 for r in rayVector]))
     np.testing.assert_equal(rayVector.z, np.array([r.z0 for r in rayVector]))
@@ -241,8 +242,8 @@ def test_ne():
             batoid.Ray((0,0,1), (0,0,0)),
             batoid.Ray((0,1,0), (0,0,0)),
             batoid.Ray((0,0,0), (0,0,0), t=1),
-            batoid.Ray((0,0,0), (0,0,0), w=500e-9),
-            batoid.Ray((0,0,0), (0,0,0), isV=True),
+            batoid.Ray((0,0,0), (0,0,0), wavelength=500e-9),
+            batoid.Ray((0,0,0), (0,0,0), isVignetted=True),
             # Should really get a failed Ray to test here...
             (0,0,0),
             batoid.RayVector(),
