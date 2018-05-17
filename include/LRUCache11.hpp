@@ -212,6 +212,7 @@ class Cache {
 // https://stackoverflow.com/a/21439212
 // function has to live in the std namespace
 // so that it is picked up by argument-dependent name lookup (ADL).
+// a bit smelly, perhaps...
 namespace std{
     namespace
     {

@@ -2,12 +2,15 @@
 #define batoid_zernike_h
 
 #include <vector>
+#include <mutex>
 #include "surface.h"
 #include "ray.h"
 #include <Eigen/Dense>
 
 using Eigen::MatrixXd;
+using Eigen::MatrixXcd;
 using Eigen::Vector3d;
+using Eigen::VectorXd;
 
 namespace batoid {
 
@@ -21,6 +24,8 @@ namespace batoid {
         virtual void intersectInPlace(Ray&) const;
 
         const std::vector<double>& getCoefs() const { return _coefs; }
+        double getROuter() const { return _R_outer; }
+        double getRInner() const { return _R_inner; }
         std::string repr() const;
 
     private:
@@ -31,19 +36,30 @@ namespace batoid {
         mutable MatrixXd _coef_array_grady;
         mutable bool _coef_array_ready{false};
         mutable bool _coef_array_grad_ready{false};
+        mutable std::mutex _mtx;
+
+        bool timeToIntersect(const Ray& r, double& t) const;
     };
 
     namespace zernike {
         unsigned long long nCr(unsigned n, unsigned k);
-        std::vector<double> binomial(double a, double b, unsigned n);
+        std::vector<double> binomial(double a, double b, int n);
+        double horner2d(double x, double y, const MatrixXd&);
 
-        std::pair<unsigned int,int> noll_to_zern(unsigned j);
-        double _zern_norm(int n, int m);
-        std::vector<long long> _zern_rho_coefs(unsigned n, int m);
+        std::pair<int,int> noll_to_zern(int j);
+        double zern_norm(int n, int m);
+        std::vector<double> zern_rho_coefs(int n, int m);
         double h(int m, int j, double eps);
         std::vector<double> Q(int m, int j, double eps);
         double Q0(int m, int j, double eps);
-        std::vector<double> _annular_zern_rho_coefs(int n, int m, double eps);
+        std::vector<double> annular_zern_rho_coefs(int n, int m, double eps);
+
+        MatrixXcd xy_contribution(int rho2_power, int rho_power, std::pair<int,int> shape);
+        MatrixXd rrsq_to_xy(const MatrixXcd& coefs, std::pair<int,int> shape);
+
+        MatrixXcd zern_coef_array(int n, int m, double eps, std::pair<int,int> shape);
+        std::vector<MatrixXcd> noll_coef_array(int jmax, double eps);
+        std::vector<MatrixXd> noll_coef_array_xy(int jmax, double eps);
     }
 }
 
