@@ -26,6 +26,7 @@ set(PYSRC_FILES
   pysrc/sphere.cpp
   pysrc/surface.cpp
   pysrc/table.cpp
+  pysrc/zernike.cpp
 )
 set(SRC_FILES
   src/asphere.cpp
@@ -42,6 +43,7 @@ set(SRC_FILES
   src/surface.cpp
   src/table.cpp
   src/utils.cpp
+  src/zernike.cpp
 )
 add_library(batoid SHARED ${SRC_FILES})
 pybind11_add_module(_batoid ${PYSRC_FILES})

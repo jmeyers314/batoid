@@ -29,15 +29,16 @@ namespace batoid {
         void reflectInPlace(Ray&) const;
         void reflectInPlace(RayVector&) const;
 
-        Ray refract(const Ray&, const double, const double) const;
         Ray refract(const Ray&, const Medium&, const Medium&) const;
         RayVector refract(const RayVector&, const Medium&, const Medium&) const;
 
-        void refractInPlace(Ray&, const double, const double) const;
         void refractInPlace(Ray&, const Medium&, const Medium&) const;
         void refractInPlace(RayVector&, const Medium&, const Medium&) const;
 
         virtual std::string repr() const = 0;
+    private:
+        Ray refract(const Ray&, const double, const double) const;
+        void refractInPlace(Ray&, const double, const double) const;
     };
     std::ostream& operator<<(std::ostream& os, const Surface& s);
 }

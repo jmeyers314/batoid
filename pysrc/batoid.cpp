@@ -6,12 +6,15 @@ namespace py = pybind11;
 namespace batoid {
     void pyExportRay(py::module&);
     void pyExportRayVector(py::module&);
+
     void pyExportSurface(py::module&);
-    void pyExportParaboloid(py::module&);
     void pyExportAsphere(py::module&);
     void pyExportQuadric(py::module&);
     void pyExportSphere(py::module&);
+    void pyExportParaboloid(py::module&);
     void pyExportPlane(py::module&);
+    void pyExportZernike(py::module&);
+
     void pyExportTable(py::module&);
     void pyExportMedium(py::module&);
     void pyExportObscuration(py::module&);
@@ -26,12 +29,15 @@ namespace batoid {
 #endif
         pyExportRay(m);
         pyExportRayVector(m);
+
         pyExportSurface(m);
-        pyExportParaboloid(m);
         pyExportAsphere(m);
         pyExportQuadric(m);
         pyExportSphere(m);
+        pyExportParaboloid(m);
         pyExportPlane(m);
+        pyExportZernike(m);
+
         pyExportTable(m);
         pyExportMedium(m);
         pyExportObscuration(m);
