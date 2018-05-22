@@ -7,6 +7,8 @@ namespace batoid {
     Zernike::Zernike(std::vector<double> coefs, double R_outer, double R_inner) :
         _coefs(coefs), _R_outer(R_outer), _R_inner(R_inner) {}
 
+    Zernike::Zernike(Zernike&& z) : _coefs(std::move(z._coefs)), _R_outer(z._R_outer), _R_inner(z._R_inner) {}
+
     double Zernike::sag(double x, double y) const {
         if (!_coef_array_ready) {
             std::lock_guard<std::mutex> lock(_mtx);
@@ -87,6 +89,39 @@ namespace batoid {
 
     std::string Zernike::repr() const {
         return "Zernike";
+    }
+
+    void Zernike::computeGradCoefs() const {
+        std::lock_guard<std::mutex> lock(_mtx);
+        if (!_coef_array_grad_ready) {
+            VectorXd coefx{zernike::noll_coef_array_gradx(_coefs.size()-1, _R_inner/_R_outer)*(Eigen::Map<const VectorXd>(&_coefs[1], _coefs.size()-1))};
+            _coefs_gradx = std::vector<double>{coefx.data(), coefx.data()+coefx.size()};
+            _coefs_gradx.insert(_coefs_gradx.begin(), 0.0);
+            for (auto& c : _coefs_gradx) {
+                c /= _R_outer;
+            }
+            VectorXd coefy{zernike::noll_coef_array_grady(_coefs.size()-1, _R_inner/_R_outer)*(Eigen::Map<const VectorXd>(&_coefs[1], _coefs.size()-1))};
+            _coefs_grady = std::vector<double>{coefy.data(), coefy.data()+coefy.size()};
+            _coefs_grady.insert(_coefs_grady.begin(), 0.0);
+            for (auto& c : _coefs_grady) {
+                c /= _R_outer;
+            }
+            _coef_array_grad_ready = true;
+        }
+    }
+
+    Zernike Zernike::getGradX() const {
+        if (!_coef_array_grad_ready) {
+            computeGradCoefs();
+        }
+        return std::move(Zernike(_coefs_gradx, _R_outer, _R_inner));
+    }
+
+    Zernike Zernike::getGradY() const {
+        if (!_coef_array_grad_ready) {
+            computeGradCoefs();
+        }
+        return std::move(Zernike(_coefs_grady, _R_outer, _R_inner));
     }
 
     namespace zernike {
@@ -409,9 +444,10 @@ namespace batoid {
 
         MatrixXd xycoef_gradx(const MatrixXd& coefs, std::pair<int,int> shape) {
             MatrixXd result = MatrixXd::Zero(shape.first, shape.second);
-            for(int i=0; i<shape.first; i++) {
-                for(int j=0; j<shape.second; j++) {
-                    if (i>0) result(i-1, j) = coefs(i, j)*i;
+            for(int i=1; i<coefs.rows(); i++) {
+                for(int j=0; j<coefs.cols(); j++) {
+                    if (coefs(i, j) == 0.0) continue;
+                    result(i-1, j) = coefs(i, j)*i;
                 }
             }
             return result;
@@ -419,9 +455,9 @@ namespace batoid {
 
         MatrixXd xycoef_grady(const MatrixXd& coefs, std::pair<int,int> shape) {
             MatrixXd result = MatrixXd::Zero(shape.first, shape.second);
-            for(int i=0; i<shape.first; i++) {
-                for(int j=0; j<shape.second; j++) {
-                    if (j>0) result(i, j-1) = coefs(i, j)*j;
+            for(int i=0; i<coefs.rows(); i++) {
+                for(int j=1; j<coefs.cols(); j++) {
+                    result(i, j-1) = coefs(i, j)*j;
                 }
             }
             return result;
@@ -446,5 +482,135 @@ namespace batoid {
             ncaxyCache.insert(key, result);
             return result;
         }
+
+        lru11::Cache<id_t,std::vector<MatrixXd>,std::mutex> ncaxygxCache(1024);
+        std::vector<MatrixXd> noll_coef_array_xy_gradx(int jmax, double eps) {
+            std::vector<MatrixXd> result;
+            id_t key = std::make_tuple(jmax, eps);
+            if (ncaxygxCache.tryGet(key, result)) {
+                return result;
+            }
+
+            int maxn = noll_to_zern(jmax).first;
+            std::pair<int,int> shape(maxn+1, maxn+1);
+
+            std::vector<MatrixXcd> nca{noll_coef_array(jmax, eps)};
+            for(int j=1; j<jmax+1; j++) {
+                result.push_back(
+                    xycoef_gradx(rrsq_to_xy(nca[j-1], shape), shape).block(0,0,shape.first-1,shape.second-1)
+                );
+            }
+
+            ncaxygxCache.insert(key, result);
+            return result;
+        }
+
+        lru11::Cache<id_t,std::vector<MatrixXd>,std::mutex> ncaxygyCache(1024);
+        std::vector<MatrixXd> noll_coef_array_xy_grady(int jmax, double eps) {
+            std::vector<MatrixXd> result;
+            id_t key = std::make_tuple(jmax, eps);
+            if (ncaxygyCache.tryGet(key, result)) {
+                return result;
+            }
+
+            int maxn = noll_to_zern(jmax).first;
+            std::pair<int,int> shape(maxn+1, maxn+1);
+
+            std::vector<MatrixXcd> nca{noll_coef_array(jmax, eps)};
+            for(int j=1; j<jmax+1; j++) {
+                result.push_back(
+                    xycoef_grady(rrsq_to_xy(nca[j-1], shape), shape).block(0,0,shape.first-1,shape.second-1)
+                );
+            }
+
+            ncaxygyCache.insert(key, result);
+            return result;
+        }
+
+        lru11::Cache<id_t,MatrixXd,std::mutex> ncagxCache(1024);
+        MatrixXd noll_coef_array_gradx(int jmax, double eps) {
+            MatrixXd result;
+            id_t key = std::make_tuple(jmax, eps);
+            if (ncagxCache.tryGet(key, result)) {
+                return result;
+            }
+
+            if (jmax == 1) return MatrixXd::Ones(1,1);
+
+            int maxn = noll_to_zern(jmax).first;
+            // Gradient of Zernike with radial coefficient n has radial coefficient n-1.
+            // Next line computes the largest j for which radial coefficient is n-1.
+            int jgrad = maxn*(maxn+1)/2;
+
+            std::vector<MatrixXd> nca{noll_coef_array_xy(jgrad, eps)};
+            std::vector<MatrixXd> ncagx{noll_coef_array_xy_gradx(jmax, eps)};
+
+            // Need to flatten each MatrixXd into VectorXd, and concatenate into new MaxtrixXd
+            MatrixXd ncaFlat(nca[0].size(), jgrad);
+            MatrixXd ncagxFlat(ncagx[0].size(), jmax);
+
+            for(int j=0; j<jgrad; j++) {
+                ncaFlat.col(j) = Eigen::Map<Eigen::RowVectorXd> (nca[j].data(), nca[j].size());
+            }
+            for(int j=0; j<jmax; j++) {
+                ncagxFlat.col(j) = Eigen::Map<Eigen::RowVectorXd> (ncagx[j].data(), ncagx[j].size());
+            }
+
+            auto svd = ncaFlat.bdcSvd(Eigen::ComputeThinU | Eigen::ComputeThinV);
+            result.resize(jgrad, jmax);
+
+            for(int i=0; i<ncagxFlat.cols(); i++) {
+                VectorXd b{ncagxFlat.col(i)};
+                auto partial = svd.solve(b);
+                result.col(i) = partial;
+            }
+
+            ncagxCache.insert(key, result);
+            return result;
+        }
+
+
+        lru11::Cache<id_t,MatrixXd,std::mutex> ncagyCache(1024);
+        MatrixXd noll_coef_array_grady(int jmax, double eps) {
+            MatrixXd result;
+            id_t key = std::make_tuple(jmax, eps);
+            if (ncagyCache.tryGet(key, result)) {
+                return result;
+            }
+
+            if (jmax == 1) return MatrixXd::Ones(1,1);
+
+            int maxn = noll_to_zern(jmax).first;
+            // Gradient of Zernike with radial coefficient n has radial coefficient n-1.
+            // Next line computes the largest j for which radial coefficient is n-1.
+            int jgrad = maxn*(maxn+1)/2;
+
+            std::vector<MatrixXd> nca{noll_coef_array_xy(jgrad, eps)};
+            std::vector<MatrixXd> ncagy{noll_coef_array_xy_grady(jmax, eps)};
+
+            // Need to flatten each MatrixXd into VectorXd, and concatenate into new MaxtrixXd
+            MatrixXd ncaFlat(nca[0].size(), jgrad);
+            MatrixXd ncagyFlat(ncagy[0].size(), jmax);
+
+            for(int j=0; j<jgrad; j++) {
+                ncaFlat.col(j) = Eigen::Map<Eigen::RowVectorXd> (nca[j].data(), nca[j].size());
+            }
+            for(int j=0; j<jmax; j++) {
+                ncagyFlat.col(j) = Eigen::Map<Eigen::RowVectorXd> (ncagy[j].data(), ncagy[j].size());
+            }
+
+            auto svd = ncaFlat.bdcSvd(Eigen::ComputeThinU | Eigen::ComputeThinV);
+            result.resize(jgrad, jmax);
+
+            for(int i=0; i<ncagyFlat.cols(); i++) {
+                VectorXd b{ncagyFlat.col(i)};
+                auto partial = svd.solve(b);
+                result.col(i) = partial;
+            }
+
+            ncagyCache.insert(key, result);
+            return result;
+        }
+
     } // namespace zernike
 } // namespace batoid

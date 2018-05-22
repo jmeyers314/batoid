@@ -17,6 +17,7 @@ namespace batoid {
     class Zernike : public Surface {
     public:
         Zernike(std::vector<double> coefs, double R_outer=1.0, double R_inner=0.0);
+        Zernike(Zernike&& z);
 
         virtual double sag(double, double) const;
         virtual Vector3d normal(double, double) const;
@@ -28,16 +29,20 @@ namespace batoid {
         double getRInner() const { return _R_inner; }
         std::string repr() const;
 
+        Zernike getGradX() const;
+        Zernike getGradY() const;
+
     private:
         const std::vector<double> _coefs;
         const double _R_outer, _R_inner;
         mutable MatrixXd _coef_array;
-        mutable MatrixXd _coef_array_gradx;
-        mutable MatrixXd _coef_array_grady;
+        mutable std::vector<double> _coefs_gradx;
+        mutable std::vector<double> _coefs_grady;
         mutable bool _coef_array_ready{false};
         mutable bool _coef_array_grad_ready{false};
         mutable std::mutex _mtx;
 
+        void computeGradCoefs() const;
         bool timeToIntersect(const Ray& r, double& t) const;
     };
 
@@ -60,6 +65,10 @@ namespace batoid {
         MatrixXcd zern_coef_array(int n, int m, double eps, std::pair<int,int> shape);
         std::vector<MatrixXcd> noll_coef_array(int jmax, double eps);
         std::vector<MatrixXd> noll_coef_array_xy(int jmax, double eps);
+        std::vector<MatrixXd> noll_coef_array_xy_gradx(int jmax, double eps);
+        std::vector<MatrixXd> noll_coef_array_xy_grady(int jmax, double eps);
+        MatrixXd noll_coef_array_gradx(int jmax, double eps);
+        MatrixXd noll_coef_array_grady(int jmax, double eps);
     }
 }
 
