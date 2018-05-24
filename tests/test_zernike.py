@@ -71,8 +71,8 @@ def test_sag():
     np.random.seed(5772)
     jmaxmax=200
     for _ in range(100):
-        jmax = np.random.randint(5, jmaxmax)
-        coefs = np.random.normal(size=jmax)*1e-3
+        jmax = np.random.randint(1, jmaxmax)
+        coefs = np.random.normal(size=jmax+1)*1e-3
         R_outer = np.random.uniform(0.5, 5.0)
         R_inner = np.random.uniform(0.0, 0.65*R_outer)
 
@@ -105,8 +105,8 @@ def test_properties():
     np.random.seed(57721)
     jmaxmax=200
     for _ in range(100):
-        n = np.random.randint(5, jmaxmax)
-        coefs = np.random.normal(size=n)*1e-3
+        jmax = np.random.randint(1, jmaxmax)
+        coefs = np.random.normal(size=jmax+1)*1e-3
         R_outer = np.random.uniform(0.5, 5.0)
         R_inner = np.random.uniform(0.0, 0.8*R_outer)
         zernike = batoid._batoid.Zernike(coefs, R_outer=R_outer, R_inner=R_inner)
@@ -121,8 +121,8 @@ def test_intersect():
     np.random.seed(577215)
     jmaxmax=50
     for i in range(100):
-        n = np.random.randint(5, jmaxmax)
-        coefs = np.random.normal(size=n)*1e-3
+        jmax = np.random.randint(1, jmaxmax)
+        coefs = np.random.normal(size=jmax+1)*1e-3
         R_outer = np.random.uniform(0.5, 5.0)
         R_inner = np.random.uniform(0.0, 0.8*R_outer)
         zernike = batoid._batoid.Zernike(coefs, R_outer=R_outer, R_inner=R_inner)
@@ -154,8 +154,8 @@ def test_intersect_vectorized():
     r0s = batoid.RayVector(r0s)
 
     for i in range(100):
-        n = np.random.randint(5, jmaxmax)
-        coefs = np.random.normal(size=n)*1e-3
+        jmax = np.random.randint(1, jmaxmax)
+        coefs = np.random.normal(size=jmax+1)*1e-3
         R_outer = np.random.uniform(0.5, 5.0)
         R_inner = np.random.uniform(0.0, 0.8*R_outer)
         zernike = batoid._batoid.Zernike(coefs, R_outer=R_outer, R_inner=R_inner)
@@ -171,8 +171,8 @@ def test_grad():
     np.random.seed(57721566)
     jmaxmax = 100
     for i in range(100):
-        j = np.random.randint(5, jmaxmax)
-        coefs = np.random.normal(size=j+1)*1e-3
+        jmax = np.random.randint(1, jmaxmax)
+        coefs = np.random.normal(size=jmax+1)*1e-3
         R_outer = np.random.uniform(0.5, 5.0)
         R_inner = np.random.uniform(0.0, 0.8*R_outer)
 
@@ -185,11 +185,11 @@ def test_grad():
 
 @timer
 def test_normal():
-    np.random.seed(57721566)
+    np.random.seed(577215664)
     jmaxmax = 200
     for i in range(100):
-        j = np.random.randint(5, jmaxmax)
-        coefs = np.random.normal(size=j+1)*1e-3
+        jmax = np.random.randint(1, jmaxmax)
+        coefs = np.random.normal(size=jmax+1)*1e-3
         R_outer = np.random.uniform(0.5, 5.0)
         R_inner = np.random.uniform(0.0, 0.8*R_outer)
 
@@ -210,7 +210,6 @@ def test_normal():
                 rtol=0,
                 atol=1e-12
             )
-
 
 
 if __name__ == '__main__':

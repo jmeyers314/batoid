@@ -549,7 +549,7 @@ namespace batoid {
                 return result;
             }
 
-            if (jmax == 1) return MatrixXd::Ones(1,1);
+            if (jmax == 1) return MatrixXd::Zero(1,1);
 
             int maxn = noll_to_zern(jmax).first;
             // Gradient of Zernike with radial coefficient n has radial coefficient n-1.
@@ -592,7 +592,7 @@ namespace batoid {
                 return result;
             }
 
-            if (jmax == 1) return MatrixXd::Ones(1,1);
+            if (jmax == 1) return MatrixXd::Zero(1,1);
 
             int maxn = noll_to_zern(jmax).first;
             // Gradient of Zernike with radial coefficient n has radial coefficient n-1.
