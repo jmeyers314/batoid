@@ -1,6 +1,7 @@
 #include "zernike.h"
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/stl_bind.h>
 #include <pybind11/eigen.h>
 
 namespace py = pybind11;
@@ -19,6 +20,27 @@ namespace batoid {
             .def_property_readonly("R_outer", &Zernike::getROuter)
             .def_property_readonly("R_inner", &Zernike::getRInner)
             .def_property_readonly("gradX", &Zernike::getGradX)
-            .def_property_readonly("gradY", &Zernike::getGradY);
+            .def_property_readonly("gradY", &Zernike::getGradY)
+            .def(py::self == py::self)
+            .def(py::self != py::self)
+            .def(py::pickle(
+                [](const Zernike& z){ return py::make_tuple(z.getCoefs(), z.getROuter(), z.getRInner()); },
+                [](py::tuple t) {
+                    return Zernike(
+                        t[0].cast<std::vector<double>>(),
+                        t[1].cast<double>(),
+                        t[2].cast<double>()
+                    );
+                }
+            ))
+            .def("__hash__", [](const Zernike& z) {
+                return py::hash(py::make_tuple(
+                    "Zernike",
+                    py::tuple(py::cast(z.getCoefs())),
+                    z.getROuter(),
+                    z.getRInner()
+                ));
+            });
+
     }
 }

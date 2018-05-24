@@ -1,6 +1,6 @@
 import batoid
 import numpy as np
-from test_helpers import timer
+from test_helpers import timer, do_pickle
 import pytest
 
 
@@ -77,7 +77,7 @@ def test_sag():
         R_inner = np.random.uniform(0.0, 0.65*R_outer)
 
         gz = galsim.zernike.Zernike(coefs, R_outer=R_outer, R_inner=R_inner)
-        bz = batoid._batoid.Zernike(coefs, R_outer=R_outer, R_inner=R_inner)
+        bz = batoid.Zernike(coefs, R_outer=R_outer, R_inner=R_inner)
 
         x = np.random.uniform(-R_outer, R_outer, size=5000)
         y = np.random.uniform(-R_outer, R_outer, size=5000)
@@ -109,11 +109,12 @@ def test_properties():
         coefs = np.random.normal(size=jmax+1)*1e-3
         R_outer = np.random.uniform(0.5, 5.0)
         R_inner = np.random.uniform(0.0, 0.8*R_outer)
-        zernike = batoid._batoid.Zernike(coefs, R_outer=R_outer, R_inner=R_inner)
+        zernike = batoid.Zernike(coefs, R_outer=R_outer, R_inner=R_inner)
 
         assert np.all(zernike.coefs == coefs)
         assert zernike.R_outer == R_outer
         assert zernike.R_inner == R_inner
+        do_pickle(zernike)
 
 
 @timer
@@ -125,7 +126,7 @@ def test_intersect():
         coefs = np.random.normal(size=jmax+1)*1e-3
         R_outer = np.random.uniform(0.5, 5.0)
         R_inner = np.random.uniform(0.0, 0.8*R_outer)
-        zernike = batoid._batoid.Zernike(coefs, R_outer=R_outer, R_inner=R_inner)
+        zernike = batoid.Zernike(coefs, R_outer=R_outer, R_inner=R_inner)
         for j in range(100):
             x = np.random.normal(0.0, 1.0)
             y = np.random.normal(0.0, 1.0)
@@ -158,7 +159,7 @@ def test_intersect_vectorized():
         coefs = np.random.normal(size=jmax+1)*1e-3
         R_outer = np.random.uniform(0.5, 5.0)
         R_inner = np.random.uniform(0.0, 0.8*R_outer)
-        zernike = batoid._batoid.Zernike(coefs, R_outer=R_outer, R_inner=R_inner)
+        zernike = batoid.Zernike(coefs, R_outer=R_outer, R_inner=R_inner)
 
         r1s = zernike.intersect(r0s)
         r2s = batoid.RayVector([zernike.intersect(r0) for r0 in r0s])
@@ -176,7 +177,7 @@ def test_grad():
         R_outer = np.random.uniform(0.5, 5.0)
         R_inner = np.random.uniform(0.0, 0.8*R_outer)
 
-        zernike = batoid._batoid.Zernike(coefs, R_outer=R_outer, R_inner=R_inner)
+        zernike = batoid.Zernike(coefs, R_outer=R_outer, R_inner=R_inner)
         gz = galsim.zernike.Zernike(coefs, R_outer=R_outer, R_inner=R_inner)
 
         np.testing.assert_allclose(zernike.gradX.coefs, gz.gradX.coef, rtol=1e-9, atol=1e-9)
@@ -193,7 +194,7 @@ def test_normal():
         R_outer = np.random.uniform(0.5, 5.0)
         R_inner = np.random.uniform(0.0, 0.8*R_outer)
 
-        zernike = batoid._batoid.Zernike(coefs, R_outer=R_outer, R_inner=R_inner)
+        zernike = batoid.Zernike(coefs, R_outer=R_outer, R_inner=R_inner)
         gradx = zernike.gradX
         grady = zernike.gradY
 

@@ -49,6 +49,18 @@ namespace batoid {
         bool timeToIntersect(const Ray& r, double& t) const;
     };
 
+    inline bool operator==(const Zernike& z1, const Zernike& z2) {
+        return z1.getCoefs() == z2.getCoefs() &&
+        z1.getROuter() == z2.getROuter() &&
+        z1.getRInner() == z2.getRInner();
+    }
+
+    inline bool operator!=(const Zernike& z1, const Zernike& z2) {
+        return z1.getCoefs() != z2.getCoefs() ||
+        z1.getROuter() != z2.getROuter() ||
+        z1.getRInner() != z2.getRInner();
+    }
+
     namespace zernike {
         unsigned long long nCr(unsigned n, unsigned k);
         std::vector<double> binomial(double a, double b, int n);

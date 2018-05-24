@@ -81,7 +81,7 @@ def do_pickle(obj, reprable=True):
 
     if reprable:
         from batoid import Ray, RayVector
-        from batoid import Plane, Paraboloid, Sphere, Quadric, Asphere
+        from batoid import Plane, Paraboloid, Sphere, Quadric, Asphere, Zernike, Sum
         from batoid import Table
         from batoid import ConstMedium, TableMedium, SellmeierMedium, Air
         from batoid import ObscCircle, ObscAnnulus, ObscRectangle, ObscRay

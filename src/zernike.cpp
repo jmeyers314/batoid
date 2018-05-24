@@ -95,7 +95,18 @@ namespace batoid {
     }
 
     std::string Zernike::repr() const {
-        return "Zernike";
+        std::ostringstream oss;
+        oss << "Zernike([";
+        size_t i=0;
+        for (; i<_coefs.size()-1; i++)
+            oss << _coefs[i] << ", ";
+        oss << _coefs[i] << "]";
+        if (_R_outer != 1.0)
+            oss << ", R_outer=" << _R_outer;
+        if (_R_inner != 0.0)
+            oss << ", R_inner=" << _R_inner;
+        oss << ")";
+        return oss.str();
     }
 
     void Zernike::computeGradCoefs() const {
