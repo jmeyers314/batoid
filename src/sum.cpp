@@ -22,6 +22,7 @@ namespace batoid {
             norm /= norm[2];  //normalize to unit z-component
             result += norm;
         }
+        result[2] = 1; // reset z-component
         return result.normalized();
     }
 
