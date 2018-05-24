@@ -11,6 +11,7 @@ namespace batoid {
     void pyExportAsphere(py::module&);
     void pyExportQuadric(py::module&);
     void pyExportSphere(py::module&);
+    void pyExportSum(py::module&);
     void pyExportParaboloid(py::module&);
     void pyExportPlane(py::module&);
     void pyExportZernike(py::module&);
@@ -37,6 +38,7 @@ namespace batoid {
         pyExportParaboloid(m);
         pyExportPlane(m);
         pyExportZernike(m);
+        pyExportSum(m);
 
         pyExportTable(m);
         pyExportMedium(m);

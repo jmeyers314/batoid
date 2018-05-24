@@ -24,6 +24,7 @@ set(PYSRC_FILES
   pysrc/ray.cpp
   pysrc/rayVector.cpp
   pysrc/sphere.cpp
+  pysrc/sum.cpp
   pysrc/surface.cpp
   pysrc/table.cpp
   pysrc/zernike.cpp
@@ -40,6 +41,7 @@ set(SRC_FILES
   src/ray.cpp
   src/rayVector.cpp
   src/sphere.cpp
+  src/sum.cpp
   src/surface.cpp
   src/table.cpp
   src/utils.cpp
