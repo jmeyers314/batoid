@@ -1,6 +1,6 @@
 import batoid
 import numpy as np
-from test_helpers import timer, do_pickle
+from test_helpers import timer, do_pickle, rays_allclose
 
 
 @timer
@@ -120,8 +120,41 @@ def test_sum_paraboloid():
             )
 
 
+@timer
+def test_intersect():
+    np.random.seed(57721)
+    rv = batoid.RayVector([
+        batoid.Ray(
+            np.random.normal(scale=0.1),
+            np.random.normal(scale=0.1),
+            10,
+            np.random.normal(scale=1e-4),
+            np.random.normal(scale=1e-4),
+            -1
+        )
+        for _ in range(100)
+    ])
+    for _ in range(100):
+        s1 = batoid.Sphere(np.random.uniform(3, 10))
+        s2 = batoid.Paraboloid(np.random.uniform(3, 10))
+        sum = batoid.Sum([s1, s2])
+
+        rv1 = sum.intersect(rv)
+        rv2 = batoid.RayVector([sum.intersect(r) for r in rv])
+        rv3 = batoid.RayVector(rv)
+        sum.intersectInPlace(rv)
+
+        for r in rv3:
+            sum.intersectInPlace(r)
+
+        assert rays_allclose(rv1, rv)
+        assert rays_allclose(rv2, rv)
+        assert rays_allclose(rv3, rv)
+
+
 if __name__ == '__main__':
     test_properties()
     test_sag()
     test_add_plane()
     test_sum_paraboloid()
+    test_intersect()
