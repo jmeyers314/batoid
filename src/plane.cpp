@@ -25,4 +25,8 @@ namespace batoid {
     std::string Plane::repr() const {
         return std::string("Plane()");
     }
+
+    bool Plane::operator==(const Surface& rhs) const {
+        return bool(dynamic_cast<const Plane*>(&rhs));
+    }
 }

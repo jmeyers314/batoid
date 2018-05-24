@@ -16,13 +16,14 @@ namespace batoid {
     class Asphere : public Quadric {
     public:
         Asphere(double R, double conic, std::vector<double> coefs);
-        virtual double sag(double, double) const;
-        virtual Vector3d normal(double, double) const;
-        virtual Ray intersect(const Ray&) const;
-        virtual void intersectInPlace(Ray&) const;
+        virtual double sag(double, double) const override;
+        virtual Vector3d normal(double, double) const override;
+        virtual Ray intersect(const Ray&) const override;
+        virtual void intersectInPlace(Ray&) const override;
+        virtual bool operator==(const Surface&) const override;
 
         const std::vector<double>& getCoefs() const { return _coefs; }
-        std::string repr() const;
+        std::string repr() const override;
 
     private:
         const std::vector<double> _coefs;  // Aspheric even polynomial coefficients
@@ -32,17 +33,6 @@ namespace batoid {
         double dzdr(double r) const;
         static std::vector<double> computeDzDrCoefs(const std::vector<double>& coefs);
     };
-
-    inline bool operator==(const Asphere& a1, const Asphere& a2) {
-        return a1.getR() == a2.getR() &&
-        a1.getConic() == a2.getConic() &&
-        a1.getCoefs() == a2.getCoefs();
-    }
-    inline bool operator!=(const Asphere& a1, const Asphere& a2) {
-        return a1.getR() != a2.getR() ||
-        a1.getConic() != a2.getConic() ||
-        a1.getCoefs() != a2.getCoefs();
-    }
 
 }
 #endif

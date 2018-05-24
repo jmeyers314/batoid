@@ -14,13 +14,14 @@ namespace batoid {
     class Sphere : public Surface {
     public:
         Sphere(double R);
-        virtual double sag(double, double) const;
-        virtual Vector3d normal(double, double) const;
-        virtual Ray intersect(const Ray&) const;
-        virtual void intersectInPlace(Ray&) const;
+        virtual double sag(double, double) const override;
+        virtual Vector3d normal(double, double) const override;
+        virtual Ray intersect(const Ray&) const override;
+        virtual void intersectInPlace(Ray&) const override;
+        virtual bool operator==(const Surface& rhs) const override;
 
         double getR() const { return _R; }
-        std::string repr() const;
+        std::string repr() const override;
 
     private:
         const double _R;  // Radius of curvature
@@ -32,9 +33,5 @@ namespace batoid {
         double dzdr(double r) const;
     };
 
-    inline bool operator==(const Sphere& s1, const Sphere& s2)
-        { return s1.getR() == s2.getR(); }
-    inline bool operator!=(const Sphere& s1, const Sphere& s2)
-        { return s1.getR() != s2.getR(); }
 }
 #endif

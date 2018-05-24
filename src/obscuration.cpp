@@ -55,7 +55,7 @@ namespace batoid {
     }
 
     bool ObscCircle::operator==(const Obscuration& rhs) const {
-        if (const ObscCircle* other = dynamic_cast<const ObscCircle*> (&rhs)) {
+        if (const ObscCircle* other = dynamic_cast<const ObscCircle*>(&rhs)) {
             return _radius == other->_radius &&
                    _x0 == other->_x0 &&
                    _y0 == other->_y0;
@@ -84,7 +84,7 @@ namespace batoid {
     }
 
     bool ObscAnnulus::operator==(const Obscuration& rhs) const {
-        if (const ObscAnnulus* other = dynamic_cast<const ObscAnnulus*> (&rhs)) {
+        if (const ObscAnnulus* other = dynamic_cast<const ObscAnnulus*>(&rhs)) {
             return _inner == other->_inner &&
                    _outer == other->_outer &&
                    _x0 == other->_x0 &&
@@ -136,7 +136,7 @@ namespace batoid {
     }
 
     bool ObscRectangle::operator==(const Obscuration& rhs) const {
-        if (const ObscRectangle* other = dynamic_cast<const ObscRectangle*> (&rhs)) {
+        if (const ObscRectangle* other = dynamic_cast<const ObscRectangle*>(&rhs)) {
             return _width == other->_width &&
                    _height == other->_height &&
                    _x0 == other->_x0 &&
@@ -173,7 +173,7 @@ namespace batoid {
     }
 
     bool ObscRay::operator==(const Obscuration& rhs) const {
-        if (const ObscRay* other = dynamic_cast<const ObscRay*> (&rhs)) {
+        if (const ObscRay* other = dynamic_cast<const ObscRay*>(&rhs)) {
             return _width == other->_width &&
                    _theta == other->_theta &&
                    _x0 == other->_x0 &&
@@ -203,7 +203,7 @@ namespace batoid {
     }
 
     bool ObscNegation::operator==(const Obscuration& rhs) const {
-        if (const ObscNegation* other = dynamic_cast<const ObscNegation*> (&rhs)) {
+        if (const ObscNegation* other = dynamic_cast<const ObscNegation*>(&rhs)) {
             return *_original == *other->_original;
         } else return false;
     }
@@ -234,7 +234,7 @@ namespace batoid {
     }
 
     bool ObscUnion::operator==(const Obscuration& rhs) const {
-        if (const ObscUnion* other = dynamic_cast<const ObscUnion*> (&rhs)) {
+        if (const ObscUnion* other = dynamic_cast<const ObscUnion*>(&rhs)) {
             return std::equal(
                 _obscVec.begin(), _obscVec.end(), other->_obscVec.begin(),
                 [](std::shared_ptr<Obscuration> a, std::shared_ptr<Obscuration> b){
@@ -247,7 +247,7 @@ namespace batoid {
         std::ostringstream oss;
         oss << "ObscUnion([";
         size_t i=0;
-        for(; i< _obscVec.size()-1; i++)
+        for(; i<_obscVec.size()-1; i++)
             oss << *_obscVec[i] << ", ";
         oss << *_obscVec[i] << "])";
         return oss.str();
@@ -272,7 +272,7 @@ namespace batoid {
     }
 
     bool ObscIntersection::operator==(const Obscuration& rhs) const {
-        if (const ObscIntersection* other = dynamic_cast<const ObscIntersection*> (&rhs)) {
+        if (const ObscIntersection* other = dynamic_cast<const ObscIntersection*>(&rhs)) {
             return std::equal(
                 _obscVec.begin(), _obscVec.end(), other->_obscVec.begin(),
                 [](std::shared_ptr<Obscuration> a, std::shared_ptr<Obscuration> b){
@@ -285,7 +285,7 @@ namespace batoid {
         std::ostringstream oss;
         oss << "ObscIntersection([";
         size_t i=0;
-        for(; i< _obscVec.size()-1; i++)
+        for(; i<_obscVec.size()-1; i++)
             oss << *_obscVec[i] << ", ";
         oss << *_obscVec[i] << "])";
         return oss.str();

@@ -19,15 +19,16 @@ namespace batoid {
         Zernike(std::vector<double> coefs, double R_outer=1.0, double R_inner=0.0);
         Zernike(Zernike&& z);
 
-        virtual double sag(double, double) const;
-        virtual Vector3d normal(double, double) const;
-        virtual Ray intersect(const Ray&) const;
-        virtual void intersectInPlace(Ray&) const;
+        virtual double sag(double, double) const override;
+        virtual Vector3d normal(double, double) const override;
+        virtual Ray intersect(const Ray&) const override;
+        virtual void intersectInPlace(Ray&) const override;
+        virtual bool operator==(const Surface&) const override;
 
         const std::vector<double>& getCoefs() const { return _coefs; }
         double getROuter() const { return _R_outer; }
         double getRInner() const { return _R_inner; }
-        std::string repr() const;
+        std::string repr() const override;
 
         Zernike getGradX() const;
         Zernike getGradY() const;
@@ -48,18 +49,6 @@ namespace batoid {
         void computeGradCoefs() const;
         bool timeToIntersect(const Ray& r, double& t) const;
     };
-
-    inline bool operator==(const Zernike& z1, const Zernike& z2) {
-        return z1.getCoefs() == z2.getCoefs() &&
-        z1.getROuter() == z2.getROuter() &&
-        z1.getRInner() == z2.getRInner();
-    }
-
-    inline bool operator!=(const Zernike& z1, const Zernike& z2) {
-        return z1.getCoefs() != z2.getCoefs() ||
-        z1.getROuter() != z2.getROuter() ||
-        z1.getRInner() != z2.getRInner();
-    }
 
     namespace zernike {
         unsigned long long nCr(unsigned n, unsigned k);

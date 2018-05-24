@@ -2,7 +2,6 @@
 #include "LRUCache11.hpp"
 #include "solve.h"
 
-
 namespace batoid {
     Zernike::Zernike(std::vector<double> coefs, double R_outer, double R_inner) :
         _coefs(coefs), _R_outer(R_outer), _R_inner(R_inner) {}
@@ -92,6 +91,14 @@ namespace batoid {
             return false;
         }
         return true;
+    }
+
+    bool Zernike::operator==(const Surface& rhs) const {
+        if (const Zernike* other = dynamic_cast<const Zernike*>(&rhs)) {
+            return _coefs == other->_coefs &&
+            _R_outer == other->_R_outer &&
+            _R_inner == other->_R_inner;
+        } else return false;
     }
 
     std::string Zernike::repr() const {

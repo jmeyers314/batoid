@@ -13,15 +13,13 @@ namespace batoid {
 
     class Plane : public Surface {
     public:
-        virtual double sag(double, double) const { return 0.0; }
-        virtual Vector3d normal(double, double) const { return Vector3d(0.0, 0.0, 1.0); }
-        virtual Ray intersect(const Ray&) const;
-        virtual void intersectInPlace(Ray&) const;
+        virtual double sag(double, double) const override { return 0.0; }
+        virtual Vector3d normal(double, double) const override { return Vector3d(0.0, 0.0, 1.0); }
+        virtual Ray intersect(const Ray&) const override;
+        virtual void intersectInPlace(Ray&) const override;
+        virtual bool operator==(const Surface& rhs) const override;
 
-        std::string repr() const;
+        std::string repr() const override;
     };
-
-    inline bool operator==(const Plane& p1, const Plane& p2) { return true; }
-    inline bool operator!=(const Plane& p1, const Plane& p2) { return false; }
 }
 #endif

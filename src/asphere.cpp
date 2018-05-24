@@ -89,6 +89,14 @@ namespace batoid {
         return;
     }
 
+    bool Asphere::operator==(const Surface& rhs) const {
+        if (const Asphere* other = dynamic_cast<const Asphere*>(&rhs)) {
+            return _R == other->_R &&
+            _conic == other->_conic &&
+            _coefs == other->_coefs;
+        } else return false;
+    }
+
     std::string Asphere::repr() const {
         std::ostringstream oss(" ");
         oss << "Asphere(" << getR() << ", " << getConic() << ", [";

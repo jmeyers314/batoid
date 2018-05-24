@@ -20,6 +20,9 @@ namespace batoid {
         virtual Ray intersect(const Ray&) const = 0;
         virtual void intersectInPlace(Ray&) const = 0;
 
+        virtual bool operator==(const Surface& rhs) const = 0;
+        bool operator!=(const Surface& rhs) const { return !operator==(rhs); }
+
         RayVector intersect(const RayVector&) const;
         void intersectInPlace(RayVector&) const;
 

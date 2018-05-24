@@ -14,13 +14,14 @@ namespace batoid {
     class Paraboloid : public Surface {
     public:
         Paraboloid(double R);
-        virtual double sag(double, double) const;
-        virtual Vector3d normal(double, double) const;
-        virtual Ray intersect(const Ray&) const;
-        virtual void intersectInPlace(Ray&) const;
+        virtual double sag(double, double) const override;
+        virtual Vector3d normal(double, double) const override;
+        virtual Ray intersect(const Ray&) const override;
+        virtual void intersectInPlace(Ray&) const override;
+        virtual bool operator==(const Surface& rhs) const override;
 
         double getR() const {return _R;}
-        std::string repr() const;
+        std::string repr() const override;
 
     private:
         const double _R;  // Radius of curvature
@@ -29,11 +30,6 @@ namespace batoid {
 
         bool timeToIntersect(const Ray& r, double& t) const;
     };
-
-    inline bool operator==(const Paraboloid& p1, const Paraboloid& p2)
-        { return p1.getR() == p2.getR(); }
-    inline bool operator!=(const Paraboloid& p1, const Paraboloid& p2)
-        { return p1.getR() != p2.getR(); }
 
 }
 #endif

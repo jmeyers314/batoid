@@ -65,6 +65,12 @@ namespace batoid {
         return Ray(point, r.v, t, r.wavelength, r.isVignetted);
     }
 
+    bool Sphere::operator==(const Surface& rhs) const {
+        if (const Sphere* other = dynamic_cast<const Sphere*>(&rhs)) {
+            return _R == other->_R;
+        } else return false;
+    }
+
     std::string Sphere::repr() const {
         std::ostringstream oss(" ");
         oss << "Sphere(" << _R << ")";

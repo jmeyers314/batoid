@@ -14,24 +14,25 @@ namespace batoid {
     class Quadric : public Surface {
     public:
         Quadric(double R, double conic);
-        virtual double sag(double, double) const;
-        virtual Vector3d normal(double, double) const;
-        Ray intersect(const Ray&) const;
-        virtual void intersectInPlace(Ray&) const;
+        virtual double sag(double, double) const override;
+        virtual Vector3d normal(double, double) const override;
+        Ray intersect(const Ray&) const override;
+        virtual void intersectInPlace(Ray&) const override;
+        virtual bool operator==(const Surface& rhs) const override;
 
         double getR() const {return _R;}
         double getConic() const {return _conic;}
-        std::string repr() const;
+        std::string repr() const override;
 
 
     protected:
+        const double _R;  // Radius of curvature
+        const double _conic;  // Conic constant
+
         bool timeToIntersect(const Ray& r, double& t) const;
         double dzdr(double r) const;
 
     private:
-        const double _R;  // Radius of curvature
-        const double _conic;  // Conic constant
-
         const double _Rsq;  // R*R
         const double _Rinvsq;  // 1/R/R
         const double _cp1; // 1 + conic
@@ -40,11 +41,6 @@ namespace batoid {
         const double _RRcp1cp1; // R*R/(1+conic)/(1+conic)
         const double _cp1RR; // (1+conic)/R/R
     };
-
-    inline bool operator==(const Quadric& q1, const Quadric& q2)
-        { return q1.getR() == q2.getR() && q1.getConic() == q2.getConic(); }
-    inline bool operator!=(const Quadric& q1, const Quadric& q2)
-        { return q1.getR() != q2.getR() || q1.getConic() != q2.getConic(); }
 
 }
 #endif

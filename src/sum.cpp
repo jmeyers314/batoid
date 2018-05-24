@@ -75,7 +75,24 @@ namespace batoid {
         return true;
     }
 
+    bool Sum::operator==(const Surface& rhs) const {
+        if (const Sum* other = dynamic_cast<const Sum*>(&rhs)) {
+            return std::equal(
+                _surfaces.begin(), _surfaces.end(), other->_surfaces.begin(),
+                [](std::shared_ptr<Surface> a, std::shared_ptr<Surface> b){
+                    return *a == *b;
+                });
+        } else return false;
+    }
+
     std::string Sum::repr() const {
-        return std::string("Sum");
+        std::ostringstream oss;
+        oss << "Sum([";
+        size_t i=0;
+        for(; i<_surfaces.size()-1; i++) {
+            oss << *_surfaces[i] << ", ";
+        }
+        oss << *_surfaces[i] << "])";
+        return oss.str();
     }
 }

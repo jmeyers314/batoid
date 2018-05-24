@@ -84,6 +84,13 @@ namespace batoid {
         return;
     }
 
+    bool Quadric::operator==(const Surface& rhs) const {
+        if (const Quadric* other = dynamic_cast<const Quadric*>(&rhs)) {
+            return _R == other->_R &&
+            _conic == other->_conic;
+        } else return false;
+    }
+
     std::string Quadric::repr() const {
         std::ostringstream oss(" ");
         oss << "Quadric(" << _R << ", " << _conic << ")";
