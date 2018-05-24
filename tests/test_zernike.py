@@ -11,6 +11,10 @@ except ImportError:
     hasGalSim = False
 
 
+def normalized(v):
+    return v/np.linalg.norm(v)
+
+
 @pytest.mark.skipif(not hasGalSim, reason="galsim not found")
 @timer
 def test_nCr():
@@ -179,6 +183,36 @@ def test_grad():
         np.testing.assert_allclose(zernike.gradY.coefs, gz.gradY.coef, rtol=1e-9, atol=1e-9)
 
 
+@timer
+def test_normal():
+    np.random.seed(57721566)
+    jmaxmax = 200
+    for i in range(100):
+        j = np.random.randint(5, jmaxmax)
+        coefs = np.random.normal(size=j+1)*1e-3
+        R_outer = np.random.uniform(0.5, 5.0)
+        R_inner = np.random.uniform(0.0, 0.8*R_outer)
+
+        zernike = batoid._batoid.Zernike(coefs, R_outer=R_outer, R_inner=R_inner)
+        gradx = zernike.gradX
+        grady = zernike.gradY
+
+        x = np.random.uniform(-R_outer, R_outer, size=500)
+        y = np.random.uniform(-R_outer, R_outer, size=500)
+        w = np.hypot(x, y) < R_outer
+        x = x[w]
+        y = y[w]
+
+        for _x, _y in zip(x, y):
+            np.testing.assert_allclose(
+                zernike.normal(_x, _y),
+                normalized(np.array([-gradx.sag(_x, _y), -grady.sag(_x, _y), 1])),
+                rtol=0,
+                atol=1e-12
+            )
+
+
+
 if __name__ == '__main__':
     test_nCr()
     test_binomial()
@@ -188,3 +222,4 @@ if __name__ == '__main__':
     test_intersect()
     test_intersect_vectorized()
     test_grad()
+    test_normal()

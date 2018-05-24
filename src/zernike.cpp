@@ -10,30 +10,37 @@ namespace batoid {
     Zernike::Zernike(Zernike&& z) : _coefs(std::move(z._coefs)), _R_outer(z._R_outer), _R_inner(z._R_inner) {}
 
     double Zernike::sag(double x, double y) const {
-        if (!_coef_array_ready) {
-            std::lock_guard<std::mutex> lock(_mtx);
-            if (!_coef_array_ready) {
-                std::vector<MatrixXd> coef_array_vec(
-                    zernike::noll_coef_array_xy(_coefs.size()-1, _R_inner/_R_outer)
-                );
-                _coef_array = MatrixXd::Zero(coef_array_vec[0].rows(), coef_array_vec[0].cols());
-                for(int j=1; j<_coefs.size(); j++) {
-                    _coef_array += _coefs[j]*coef_array_vec[j-1];
-                }
-                // Need to adjust for R_outer != 1.0 here
-                for(int i=0; i<_coef_array.rows(); i++) {
-                    for(int j=0; j<_coef_array.cols(); j++) {
-                        _coef_array(i, j) /= std::pow(_R_outer, i+j);
-                    }
-                }
-                _coef_array_ready = true;
-            }
-        }
+        if (!_coef_array_ready)
+            computeCoefArray();
         return zernike::horner2d(x, y, _coef_array);
     }
 
+    void Zernike::computeCoefArray() const {
+        std::lock_guard<std::mutex> lock(_mtx);
+        if (!_coef_array_ready) {
+            std::vector<MatrixXd> coef_array_vec(
+                zernike::noll_coef_array_xy(_coefs.size()-1, _R_inner/_R_outer)
+            );
+            _coef_array = MatrixXd::Zero(coef_array_vec[0].rows(), coef_array_vec[0].cols());
+            for(int j=1; j<_coefs.size(); j++) {
+                _coef_array += _coefs[j]*coef_array_vec[j-1];
+            }
+            // Need to adjust for R_outer != 1.0 here
+            for(int i=0; i<_coef_array.rows(); i++) {
+                for(int j=0; j<_coef_array.cols(); j++) {
+                    _coef_array(i, j) /= std::pow(_R_outer, i+j);
+                }
+            }
+            _coef_array_ready = true;
+        }
+    }
+
     Vector3d Zernike::normal(double x, double y) const {
-        return {0,0,1};
+        if (!_coef_array_grad_ready)
+            computeGradCoefs();
+        double dzdx = zernike::horner2d(x, y, _coefx_array);
+        double dzdy = zernike::horner2d(x, y, _coefy_array);
+        return Vector3d(-dzdx,-dzdy,1).normalized();
     }
 
     Ray Zernike::intersect(const Ray& r) const {
@@ -94,6 +101,7 @@ namespace batoid {
     void Zernike::computeGradCoefs() const {
         std::lock_guard<std::mutex> lock(_mtx);
         if (!_coef_array_grad_ready) {
+            // Get the zernike basis coeffecients first
             VectorXd coefx{zernike::noll_coef_array_gradx(_coefs.size()-1, _R_inner/_R_outer)*(Eigen::Map<const VectorXd>(&_coefs[1], _coefs.size()-1))};
             _coefs_gradx = std::vector<double>{coefx.data(), coefx.data()+coefx.size()};
             _coefs_gradx.insert(_coefs_gradx.begin(), 0.0);
@@ -107,20 +115,26 @@ namespace batoid {
                 c /= _R_outer;
             }
             _coef_array_grad_ready = true;
+
+            Zernike ZX{_coefs_gradx, _R_outer, _R_inner};
+            ZX.computeCoefArray();
+            _coefx_array = ZX._coef_array;
+
+            Zernike ZY{_coefs_grady, _R_outer, _R_inner};
+            ZY.computeCoefArray();
+            _coefy_array = ZY._coef_array;
         }
     }
 
     Zernike Zernike::getGradX() const {
-        if (!_coef_array_grad_ready) {
+        if (!_coef_array_grad_ready)
             computeGradCoefs();
-        }
         return std::move(Zernike(_coefs_gradx, _R_outer, _R_inner));
     }
 
     Zernike Zernike::getGradY() const {
-        if (!_coef_array_grad_ready) {
+        if (!_coef_array_grad_ready)
             computeGradCoefs();
-        }
         return std::move(Zernike(_coefs_grady, _R_outer, _R_inner));
     }
 

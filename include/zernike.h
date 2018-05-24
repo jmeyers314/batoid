@@ -38,10 +38,13 @@ namespace batoid {
         mutable MatrixXd _coef_array;
         mutable std::vector<double> _coefs_gradx;
         mutable std::vector<double> _coefs_grady;
+        mutable MatrixXd _coefx_array;
+        mutable MatrixXd _coefy_array;
         mutable bool _coef_array_ready{false};
         mutable bool _coef_array_grad_ready{false};
         mutable std::mutex _mtx;
 
+        void computeCoefArray() const;
         void computeGradCoefs() const;
         bool timeToIntersect(const Ray& r, double& t) const;
     };
