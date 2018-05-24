@@ -23,6 +23,13 @@ def parallel_trace_timing(nside=1024, nthread=None):
     config = yaml.load(open(fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
 
+    # Optionally perturb the primary mirror
+    if args.perturbN != 0:
+        orig = telescope.itemDict['SubaruHSC.PM'].surface
+        coefs = np.random.normal(size=args.perturbN+1)*1e-6 # micron perturbations
+        perturbation = batoid.Zernike(coefs, R_outer=8.2)
+        telescope.itemDict['SubaruHSC.PM'].surface = batoid.Sum([orig, perturbation])
+
     print("Immutable trace")
     t0 = time.time()
     rays_out, _ = telescope.trace(rays)
@@ -44,6 +51,7 @@ if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument("--nside", type=int, default=1024)
     parser.add_argument("--nthread", type=int, default=None)
+    parser.add_argument("--perturbN", type=int, default=0)
     args = parser.parse_args()
 
     parallel_trace_timing(args.nside, args.nthread)
