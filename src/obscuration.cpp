@@ -235,6 +235,7 @@ namespace batoid {
 
     bool ObscUnion::operator==(const Obscuration& rhs) const {
         if (const ObscUnion* other = dynamic_cast<const ObscUnion*>(&rhs)) {
+            if (_obscVec.size() != other->_obscVec.size()) return false;
             return std::equal(
                 _obscVec.begin(), _obscVec.end(), other->_obscVec.begin(),
                 [](std::shared_ptr<Obscuration> a, std::shared_ptr<Obscuration> b){
@@ -273,6 +274,7 @@ namespace batoid {
 
     bool ObscIntersection::operator==(const Obscuration& rhs) const {
         if (const ObscIntersection* other = dynamic_cast<const ObscIntersection*>(&rhs)) {
+            if (_obscVec.size() != other->_obscVec.size()) return false;
             return std::equal(
                 _obscVec.begin(), _obscVec.end(), other->_obscVec.begin(),
                 [](std::shared_ptr<Obscuration> a, std::shared_ptr<Obscuration> b){

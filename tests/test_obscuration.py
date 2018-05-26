@@ -154,6 +154,7 @@ def test_ne():
         batoid.ObscRay(1.0, 2.0),
         batoid.ObscRay(1.0, 2.0, 0.1, 0.1),
         batoid.ObscNegation(batoid.ObscCircle(1.0)),
+        batoid.ObscUnion([batoid.ObscCircle(1.0)]),
         batoid.ObscUnion([
             batoid.ObscCircle(1.0),
             batoid.ObscCircle(2.0)
@@ -167,6 +168,7 @@ def test_ne():
             batoid.ObscCircle(2.2),
             batoid.ObscAnnulus(1.0, 2.0)
         ]),
+        batoid.ObscIntersection([batoid.ObscCircle(1.0)]),
         batoid.ObscIntersection([
             batoid.ObscCircle(1.0),
             batoid.ObscCircle(2.0)
