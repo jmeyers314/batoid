@@ -1,6 +1,6 @@
 import batoid
 import numpy as np
-from test_helpers import timer, do_pickle
+from test_helpers import timer, do_pickle, all_obj_diff
 import pytest
 
 
@@ -123,7 +123,7 @@ def test_intersect():
     jmaxmax=50
     for i in range(100):
         jmax = np.random.randint(1, jmaxmax)
-        coefs = np.random.normal(size=jmax+1)*1e-3
+        coefs = np.random.normal(size=jmax+1)*1e-6
         R_outer = np.random.uniform(0.5, 5.0)
         R_inner = np.random.uniform(0.0, 0.8*R_outer)
         zernike = batoid.Zernike(coefs, R_outer=R_outer, R_inner=R_inner)
@@ -133,7 +133,7 @@ def test_intersect():
 
             # If we shoot rays straight up, then it's easy to predict the
             # intersection points.
-            r0 = batoid.Ray(x, y, -10, 0, 0, 1, 0)
+            r0 = batoid.Ray(x, y, -10000, 0, 0, 1)
             r = zernike.intersect(r0)
             np.testing.assert_allclose(r.p0[0], x, rtol=0, atol=1e-9)
             np.testing.assert_allclose(r.p0[1], y, rtol=0, atol=1e-9)
@@ -213,6 +213,31 @@ def test_normal():
             )
 
 
+@timer
+def test_ne():
+    objs = [
+        batoid.Zernike([0,0,0,0,1]),
+        batoid.Zernike([0,0,0,1]),
+        batoid.Zernike([0,0,0,0,1], R_outer=1.1),
+        batoid.Zernike([0,0,0,0,1], R_inner=0.8),
+        batoid.Zernike([0,0,0,0,1], R_outer=1.1, R_inner=0.8),
+        batoid.Quadric(10.0, 1.0)
+    ]
+    all_obj_diff(objs)
+
+
+@timer
+def test_fail():
+    zernike = batoid.Zernike([0,0,0,0,1])
+    ray = batoid.Ray([0,0,zernike.sag(0,0)-1], [0,0,-1])
+    ray = zernike.intersect(ray)
+    assert ray.failed
+
+    ray = batoid.Ray([0,0,zernike.sag(0,0)-1], [0,0,-1])
+    zernike.intersectInPlace(ray)
+    assert ray.failed
+
+
 if __name__ == '__main__':
     test_nCr()
     test_binomial()
@@ -223,3 +248,5 @@ if __name__ == '__main__':
     test_intersect_vectorized()
     test_grad()
     test_normal()
+    test_ne()
+    test_fail()

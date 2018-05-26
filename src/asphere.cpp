@@ -65,6 +65,7 @@ namespace batoid {
         } catch (const SolveError&) {
             return false;
         }
+        if (t < r.t0) return false;
         return true;
     }
 

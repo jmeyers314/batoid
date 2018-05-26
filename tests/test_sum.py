@@ -1,6 +1,6 @@
 import batoid
 import numpy as np
-from test_helpers import timer, do_pickle, rays_allclose
+from test_helpers import timer, do_pickle, rays_allclose, all_obj_diff
 
 
 @timer
@@ -123,7 +123,7 @@ def test_sum_paraboloid():
 @timer
 def test_intersect():
     np.random.seed(57721)
-    rv = batoid.RayVector([
+    rv0 = batoid.RayVector([
         batoid.Ray(
             np.random.normal(scale=0.1),
             np.random.normal(scale=0.1),
@@ -139,6 +139,7 @@ def test_intersect():
         s2 = batoid.Paraboloid(np.random.uniform(3, 10))
         sum = batoid.Sum([s1, s2])
 
+        rv = batoid.RayVector(rv0)
         rv1 = sum.intersect(rv)
         rv2 = batoid.RayVector([sum.intersect(r) for r in rv])
         rv3 = batoid.RayVector(rv)
@@ -152,9 +153,34 @@ def test_intersect():
         assert rays_allclose(rv3, rv)
 
 
+@timer
+def test_ne():
+    objs = [
+        batoid.Sum([batoid.Plane(), batoid.Plane()]),
+        batoid.Sum([batoid.Plane(), batoid.Sphere(1.0)]),
+        batoid.Sum([batoid.Plane(), batoid.Plane(), batoid.Plane()]),
+        batoid.Plane()
+    ]
+    all_obj_diff(objs)
+
+
+@timer
+def test_fail():
+    sum = batoid.Sum([batoid.Zernike([0,0,0,0,1]), batoid.Sphere(1.0)])
+    ray = batoid.Ray([0,0,sum.sag(0,0)-1], [0,0,-1])
+    ray = sum.intersect(ray)
+    assert ray.failed
+
+    ray = batoid.Ray([0,0,sum.sag(0,0)-1], [0,0,-1])
+    sum.intersectInPlace(ray)
+    assert ray.failed
+
+
 if __name__ == '__main__':
     test_properties()
     test_sag()
     test_add_plane()
     test_sum_paraboloid()
     test_intersect()
+    test_ne()
+    test_fail()
