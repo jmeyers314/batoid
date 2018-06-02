@@ -21,6 +21,8 @@ namespace batoid {
         RayVector obscure(const RayVector&) const;
         void obscureInPlace(RayVector&) const;
         virtual std::string repr() const = 0;
+    protected:
+        static std::vector<std::shared_ptr<Obscuration>> sortedObscurations(const std::vector<std::shared_ptr<Obscuration>>);
     };
     std::ostream& operator<<(std::ostream& os, const Obscuration& o);
 
@@ -86,8 +88,7 @@ namespace batoid {
         bool operator==(const Obscuration& rhs) const override;
         std::string repr() const override;
 
-        // Don't make const, so can sort in the ctor
-        std::vector<std::shared_ptr<Obscuration>> _obscVec;
+        const std::vector<std::shared_ptr<Obscuration>> _obscVec;
     };
 
     class ObscIntersection : public Obscuration {
@@ -97,8 +98,7 @@ namespace batoid {
         bool operator==(const Obscuration& rhs) const override;
         std::string repr() const override;
 
-        // Don't make const, so can sort in the ctor
-        std::vector<std::shared_ptr<Obscuration>> _obscVec;
+        const std::vector<std::shared_ptr<Obscuration>> _obscVec;
     };
 }
 
