@@ -11,17 +11,26 @@ def test_properties():
         s2 = batoid.Paraboloid(np.random.uniform(1, 3))
         sum = batoid.Sum([s1, s2])
         do_pickle(sum)
+        # check commutativity
+        assert sum == batoid.Sum([s2, s1])
 
-        assert sum.surfaces[0] == s1
-        assert sum.surfaces[1] == s2
+        # order of sum.surfaces is not guaranteed
+        assert s1 in sum.surfaces
+        assert s2 in sum.surfaces
 
         s3 = batoid.Zernike([0]*np.random.randint(1, 55)+[np.random.normal()])
         sum2 = batoid.Sum([s1, s2, s3])
         do_pickle(sum2)
+        # check commutativity
+        assert sum2 == batoid.Sum([s2, s3, s1])
+        assert sum2 == batoid.Sum([s3, s1, s2])
+        assert sum2 == batoid.Sum([s3, s2, s1])
+        assert sum2 == batoid.Sum([s2, s1, s3])
+        assert sum2 == batoid.Sum([s1, s3, s2])
 
-        assert sum2.surfaces[0] == s1
-        assert sum2.surfaces[1] == s2
-        assert sum2.surfaces[2] == s3
+        assert s1 in sum2.surfaces
+        assert s2 in sum2.surfaces
+        assert s3 in sum2.surfaces
 
         do_pickle(sum)
 

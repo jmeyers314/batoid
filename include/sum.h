@@ -11,7 +11,7 @@ namespace batoid {
 
     class Sum : public Surface {
     public:
-        Sum(std::vector<std::shared_ptr<Surface>> surfaces);
+        Sum(const std::vector<std::shared_ptr<Surface>> surfaces);
 
         virtual double sag(double, double) const override;
         virtual Vector3d normal(double, double) const override;
@@ -26,6 +26,7 @@ namespace batoid {
         const std::vector<std::shared_ptr<Surface>> _surfaces;
 
         bool timeToIntersect(const Ray& r, double& t) const;
+        static std::vector<std::shared_ptr<Surface>> sortedSurfaces(const std::vector<std::shared_ptr<Surface>>);
     };
 
 }

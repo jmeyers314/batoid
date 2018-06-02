@@ -4,9 +4,18 @@
 
 namespace batoid {
 
-    // Note not commutative for now.
-    Sum::Sum(std::vector<std::shared_ptr<Surface>> surfaces) :
-        _surfaces(surfaces) {}
+    Sum::Sum(const std::vector<std::shared_ptr<Surface>> surfaces) :
+        _surfaces(sortedSurfaces(surfaces)) {}
+
+    std::vector<std::shared_ptr<Surface>> Sum::sortedSurfaces(const std::vector<std::shared_ptr<Surface>> surfaces) {
+        std::vector<std::shared_ptr<Surface>> result(surfaces);
+        std::sort(
+            result.begin(), result.end(),
+            [](std::shared_ptr<Surface> a, std::shared_ptr<Surface> b)
+            { return a->repr() < b->repr(); }
+        );
+        return result;
+    }
 
     double Sum::sag(double x, double y) const {
         double result = 0.0;
