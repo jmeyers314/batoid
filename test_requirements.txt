@@ -3,5 +3,6 @@ pytest-xdist>=1.19
 pytest-timeout
 pytest-cov
 jupyter
+jupyter_contrib_nbextensions
 notebook
 matplotlib
