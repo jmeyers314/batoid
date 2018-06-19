@@ -38,7 +38,7 @@ namespace batoid {
         std::string repr() const;
 
         Vector3d k() const { return 2 * PI * v / wavelength / v.squaredNorm(); }
-        double omega() const { return 2 * PI / wavelength; }
+        double omega() const { return 2 * PI / wavelength; }  // really omega/c.
         double phase(const Vector3d& r, double t) const;
         std::complex<double> amplitude(const Vector3d& r, double t) const;
     };

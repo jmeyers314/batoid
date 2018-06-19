@@ -1,5 +1,5 @@
-Batoid
-------
+batoid package
+==============
 
-.. automodule:: batoid
+.. autoclass:: batoid.Ray
     :members:
