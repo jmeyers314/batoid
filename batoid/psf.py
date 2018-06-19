@@ -350,4 +350,4 @@ def zernike(optic, theta_x, theta_y, wavelength, nx=32, jmax=22, eps=0.0):
     )
     coefs, _, _, _ = np.linalg.lstsq(basis.T, wfarr[w], rcond=-1)
 
-    return coefs
+    return np.array(coefs)
