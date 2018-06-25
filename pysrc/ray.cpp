@@ -81,8 +81,8 @@ namespace batoid {
         std::string docRayK(R"pbdoc(
             (3,) ndarray of float
             Wavevector of planewave in units of radians per meter.  The magnitude of the wavevector
-            is equal to $2 \pi n / \lambda$, where $n$ is the refractive index and $\lambda$ is the
-            wavelength.
+            is equal to :math:`2 \pi n / \lambda`, where :math:`n` is the refractive index and
+            :math:`\lambda` is the wavelength.
         )pbdoc");
 
         std::string docRayKX(R"pbdoc(
@@ -101,7 +101,7 @@ namespace batoid {
         std::string docRayOmega(R"pbdoc(
             float
             Temporal frequency of the planewave over the speed of light.  Units are inverse meters.
-            Equals $2 \pi / \lambda$.
+            Equals :math:`2 \pi / \lambda`.
         )pbdoc");
 
         std::string docRayPositionAtTime(R"pbdoc(
