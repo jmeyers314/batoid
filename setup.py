@@ -48,6 +48,9 @@ class CMakeBuild(build_ext):
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
         subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
 
+with open("README.md", 'r') as fh:
+    long_description = fh.read()
+
 setup(
     name='batoid',
     version=__version__,
@@ -55,15 +58,31 @@ setup(
     author_email='jmeyers314@gmail.com',
     url='https://github.com/jmeyers314/batoid',
     description="Optics raytracer",
-    long_description='',
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     packages=['batoid'],
     package_dir={'batoid': 'batoid'},
     package_data={'batoid' : ['data/**/*']},
     ext_modules=[CMakeExtension('batoid._batoid')],
     install_requires=['numpy', 'pyyaml'],
+    python_requires='>=3.4',
     setup_requires=['pytest-runner'],
     tests_require=['pytest'],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
-    include_package_data=True
+    include_package_data=True,
+    classifiers=[
+        "Development Status :: 3 - Alpha",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: BSD License",
+        "Programming Language :: C++",
+        "Programming Language :: Python :: 3",
+        "Topic :: Scientific/Engineering :: Astronomy",
+        "Topic :: Scientific/Engineering :: Physics",
+    ],
+    project_urls={
+        'Documentation': "https://batoid.readthedocs.io",
+        'Source': "https://github.com/jmeyers314/batoid",
+        'Tracker': "https://github.com/jmeyers314/batoid/issues"
+    }
 )
