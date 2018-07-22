@@ -51,9 +51,9 @@ def test_intersect():
             # intersection points.
             r0 = batoid.Ray(x, y, -1000, 0, 0, 1, 0)
             r = para.intersect(r0)
-            assert isclose(r.p0[0], x)
-            assert isclose(r.p0[1], y)
-            assert isclose(r.p0[2], para.sag(x, y), rel_tol=0, abs_tol=1e-9)
+            assert isclose(r.r[0], x)
+            assert isclose(r.r[1], y)
+            assert isclose(r.r[2], para.sag(x, y), rel_tol=0, abs_tol=1e-9)
 
     # Check normal for R=0 paraboloid (a plane)
     para = batoid.Paraboloid(0.0)

@@ -43,7 +43,7 @@ def test_HSC_trace():
 
             transform = batoid.CoordTransform(surface['outCoordSys'], batoid.CoordSys())
             s = transform.applyForward(s)
-            jt_isec = np.array([s.x0, s.y0, s.z0-16.0])
+            jt_isec = np.array([s.x, s.y, s.z-16.0])
             zx_isec = arr[HSC_surfaces[i]-1][1:4]/1000
             np.testing.assert_allclose(jt_isec, zx_isec, rtol=0, atol=1e-9) # nanometer agreement
 

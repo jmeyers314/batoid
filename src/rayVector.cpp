@@ -72,7 +72,7 @@ namespace batoid {
             rays.begin(),
             rays.end(),
             std::back_inserter(result.rays),
-            [](const Ray& r){return !r.isVignetted;}
+            [](const Ray& r){return !r.vignetted;}
         );
         return result;
     }
@@ -82,7 +82,7 @@ namespace batoid {
             std::remove_if(
                 rays.begin(),
                 rays.end(),
-                [](const Ray& r){ return r.failed || r.isVignetted; }
+                [](const Ray& r){ return r.failed || r.vignetted; }
             ),
             rays.end()
         );

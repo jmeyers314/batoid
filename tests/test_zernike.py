@@ -135,9 +135,9 @@ def test_intersect():
             # intersection points.
             r0 = batoid.Ray(x, y, -10000, 0, 0, 1)
             r = zernike.intersect(r0)
-            np.testing.assert_allclose(r.p0[0], x, rtol=0, atol=1e-9)
-            np.testing.assert_allclose(r.p0[1], y, rtol=0, atol=1e-9)
-            np.testing.assert_allclose(r.p0[2], zernike.sag(x, y), rtol=0, atol=1e-9)
+            np.testing.assert_allclose(r.r[0], x, rtol=0, atol=1e-9)
+            np.testing.assert_allclose(r.r[1], y, rtol=0, atol=1e-9)
+            np.testing.assert_allclose(r.r[2], zernike.sag(x, y), rtol=0, atol=1e-9)
 
 
 @timer

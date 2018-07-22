@@ -20,7 +20,7 @@ namespace batoid {
             A Ray can alternately be thought of as a geometric ray or as a monochromatic plane wave.
         )pbdoc");
 
-        std::string docRayP0(R"pbdoc(
+        std::string docRayR(R"pbdoc(
             (3,), ndarray of float
             Reference point in meters.
         )pbdoc");
@@ -31,7 +31,7 @@ namespace batoid {
             if the Ray is inside a refractive medium.
         )pbdoc");
 
-        std::string docRayT0(R"pbdoc(
+        std::string docRayT(R"pbdoc(
             float
             Reference time (over the speed of light) in units of meters.
         )pbdoc");
@@ -41,7 +41,7 @@ namespace batoid {
             Vacuum wavelength in meters.
         )pbdoc");
 
-        std::string docRayIsVignetted(R"pbdoc(
+        std::string docRayVignetted(R"pbdoc(
             bool
             Whether Ray has been vignetted or not.
         )pbdoc");
@@ -52,15 +52,15 @@ namespace batoid {
             surface is requested but cannot be found.
         )pbdoc");
 
-        std::string docRayX0(R"pbdoc(
+        std::string docRayX(R"pbdoc(
             float
             X-coordinate of reference position in meters.
         )pbdoc");
-        std::string docRayY0(R"pbdoc(
+        std::string docRayY(R"pbdoc(
             float
             Y-coordinate of reference position in meters.
         )pbdoc");
-        std::string docRayZ0(R"pbdoc(
+        std::string docRayZ(R"pbdoc(
             float
             Z-coordinate of reference position in meters.
         )pbdoc");
@@ -109,7 +109,7 @@ namespace batoid {
 
             Parameters
             ----------
-            t : float
+            time : float
                 Time (over the speed of light; in meters) at which to compute position.
 
             Returns
@@ -123,7 +123,7 @@ namespace batoid {
 
             Parameters
             ----------
-            t : float
+            time : float
                 Time (over the speed of light; in meters) to which to propagate ray.
 
             Returns
@@ -173,10 +173,31 @@ namespace batoid {
         std::string docRayInit1(R"pbdoc(
             Parameters
             ----------
-            x0, y0, z0 : float
+            x, y, z : float
                 Reference position (meters)
-            t0 : float
+            vx, vy, vz : float
+                Velocity in units of the speed of light.
+            t : float, optional
                 Reference time over the speed of light; in meters.
+            wavelength : float, optional
+                Vacuum wavelength in meters.
+            vignetted : bool, optional
+                Whether Ray has been vignetted or not.
+        )pbdoc");
+
+        std::string docRayInit2(R"pbdoc(
+            Parameters
+            ----------
+            r : (3,), ndarray of float
+                Reference position (meters)
+            v : (3,), ndarray of float
+                Velocity in units of the speed of light.
+            t : float, optional
+                Reference time over the speed of light; in meters.
+            wavelength : float, optional
+                Vacuum wavelength in meters.
+            vignetted : bool, optional
+                Whether Ray has been vignetted or not.
         )pbdoc");
 
         py::options options;
@@ -184,23 +205,23 @@ namespace batoid {
 
         py::class_<Ray>(m, "Ray", docRay.c_str())
             .def(py::init<double,double,double,double,double,double,double,double,bool>(),
-                 "x0"_a, "y0"_a, "z0"_a, "vx"_a, "vy"_a, "vz"_a, "t"_a=0.0,
-                 "wavelength"_a=0.0, "isVignetted"_a=false,
-                 "banana doc")
+                 "x"_a, "y"_a, "z"_a, "vx"_a, "vy"_a, "vz"_a, "t"_a=0.0,
+                 "wavelength"_a=0.0, "vignetted"_a=false,
+                 docRayInit1.c_str())
             .def(py::init<Vector3d,Vector3d,double,double,bool>(),
-                 "p0"_a, "v"_a, "t"_a=0.0, "wavelength"_a=0.0, "isVignetted"_a=false,
-                 "papaya doc")
+                 "r"_a, "v"_a, "t"_a=0.0, "wavelength"_a=0.0, "vignetted"_a=false,
+                 docRayInit2.c_str())
             .def(py::init<bool>(), "failed"_a)
             .def(py::init<Ray>())
-            .def_readonly("p0", &Ray::p0, docRayP0.c_str())
+            .def_readonly("r", &Ray::r, docRayR.c_str())
             .def_readonly("v", &Ray::v, docRayV.c_str())
-            .def_readonly("t0", &Ray::t0, docRayT0.c_str())
+            .def_readonly("t", &Ray::t, docRayT.c_str())
             .def_readonly("wavelength", &Ray::wavelength, docRayWavelength.c_str())
-            .def_readonly("isVignetted", &Ray::isVignetted, docRayIsVignetted.c_str())
+            .def_readonly("vignetted", &Ray::vignetted, docRayVignetted.c_str())
             .def_readonly("failed", &Ray::failed, docRayFailed.c_str())
-            .def_property_readonly("x0", [](const Ray& r){ return r.p0[0]; }, docRayX0.c_str())
-            .def_property_readonly("y0", [](const Ray& r){ return r.p0[1]; }, docRayY0.c_str())
-            .def_property_readonly("z0", [](const Ray& r){ return r.p0[2]; }, docRayZ0.c_str())
+            .def_property_readonly("x", [](const Ray& r){ return r.r[0]; }, docRayX.c_str())
+            .def_property_readonly("y", [](const Ray& r){ return r.r[1]; }, docRayY.c_str())
+            .def_property_readonly("z", [](const Ray& r){ return r.r[2]; }, docRayZ.c_str())
             .def_property_readonly("vx", [](const Ray& r){ return r.v[0]; }, docRayVX.c_str())
             .def_property_readonly("vy", [](const Ray& r){ return r.v[1]; }, docRayVY.c_str())
             .def_property_readonly("vz", [](const Ray& r){ return r.v[2]; }, docRayVZ.c_str())
@@ -221,7 +242,7 @@ namespace batoid {
 
             .def(py::pickle(
                 [](const Ray& r) { // __getstate__
-                    return py::make_tuple(r.p0, r.v, r.t0, r.wavelength, r.isVignetted, r.failed);
+                    return py::make_tuple(r.r, r.v, r.t, r.wavelength, r.vignetted, r.failed);
                 },
                 [](py::tuple t) { // __setstate__
                     Ray r(
@@ -239,11 +260,11 @@ namespace batoid {
             .def("__hash__", [](const Ray& r) {
                 return py::hash(py::make_tuple(
                     "Ray",
-                    py::tuple(py::cast(r.p0)),
+                    py::tuple(py::cast(r.r)),
                     py::tuple(py::cast(r.v)),
-                    r.t0,
+                    r.t,
                     r.wavelength,
-                    r.isVignetted,
+                    r.vignetted,
                     r.failed
                 ));
             });

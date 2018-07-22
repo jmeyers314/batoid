@@ -12,23 +12,23 @@ using Eigen::Vector3d;
 namespace batoid {
     const double PI = 3.14159265358979323846;
     struct Ray {
-        Ray(double x0, double y0, double z0, double vx, double vy, double vz,
-            double t, double w, bool isVignetted);
-        Ray(Vector3d _p0, Vector3d _v, double t, double w, bool isVignetted);
+        Ray(double x, double y, double z, double vx, double vy, double vz,
+            double t, double w, bool vignetted);
+        Ray(Vector3d _r, Vector3d _v, double _t, double w, bool vignetted);
         Ray(const Ray& _ray) = default;
         Ray(bool failed);
         Ray() = default;
 
-        Vector3d p0; // reference position
+        Vector3d r;  // reference position
         Vector3d v;  // "velocity" Vector3d, really v/c
-        double t0; // reference time, really c*t0
+        double t; // reference time, really c*t0
         double wavelength; // in vacuum, in meters
-        bool isVignetted;
+        bool vignetted;
         bool failed;
 
-        Vector3d positionAtTime(double t) const;
-        Ray propagatedToTime(double t) const;
-        void propagateInPlace(double t);
+        Vector3d positionAtTime(double _t) const;
+        Ray propagatedToTime(double _t) const;
+        void propagateInPlace(double _t);
         bool operator==(const Ray&) const;
         bool operator!=(const Ray&) const;
 
@@ -39,12 +39,12 @@ namespace batoid {
 
         Vector3d k() const { return 2 * PI * v / wavelength / v.squaredNorm(); }
         double omega() const { return 2 * PI / wavelength; }  // really omega/c.
-        double phase(const Vector3d& r, double t) const;
-        std::complex<double> amplitude(const Vector3d& r, double t) const;
+        double phase(const Vector3d& _r, double _t) const;
+        std::complex<double> amplitude(const Vector3d& _r, double _t) const;
     };
 
-    inline std::ostream& operator<<(std::ostream& os, const Ray& r) {
-        return os << r.repr();
+    inline std::ostream& operator<<(std::ostream& os, const Ray& _r) {
+        return os << _r.repr();
     }
 
 }

@@ -28,9 +28,9 @@ namespace batoid {
     bool Quadric::timeToIntersect(const Ray& r, double& t) const {
         double vr2 = r.v[0]*r.v[0] + r.v[1]*r.v[1];
         double vz2 = r.v[2]*r.v[2];
-        double vrr0 = r.v[0]*r.p0[0] + r.v[1]*r.p0[1];
-        double r02 = r.p0[0]*r.p0[0] + r.p0[1]*r.p0[1];
-        double z0term = r.p0[2]-_Rcp1;
+        double vrr0 = r.v[0]*r.r[0] + r.v[1]*r.r[1];
+        double r02 = r.r[0]*r.r[0] + r.r[1]*r.r[1];
+        double z0term = r.r[2]-_Rcp1;
 
         // Quadratic equation coefficients
         double a = vz2 + vr2*_cp1inv;
@@ -58,7 +58,7 @@ namespace batoid {
             } else
                 t = std::min(r1, r2);
         }
-        t += r.t0;
+        t += r.t;
 
         return true;
     }
@@ -69,7 +69,7 @@ namespace batoid {
         if (!timeToIntersect(r, t))
             return Ray(true);
         Vector3d point = r.positionAtTime(t);
-        return Ray(point, r.v, t, r.wavelength, r.isVignetted);
+        return Ray(point, r.v, t, r.wavelength, r.vignetted);
     }
 
     void Quadric::intersectInPlace(Ray& r) const {
@@ -79,8 +79,8 @@ namespace batoid {
             r.failed=true;
             return;
         }
-        r.p0 = r.positionAtTime(t);
-        r.t0 = t;
+        r.r = r.positionAtTime(t);
+        r.t = t;
         return;
     }
 

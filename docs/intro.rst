@@ -23,16 +23,16 @@ batoid.Ray
 A batoid.Ray represents a single geometric ray that can be traced through an optical system.  A ray
 has attributes including
 
-- a position `.p0`.  This is always a 3-vector measured in meters.
+- a position `.r`.  This is always a 3-vector measured in meters.
 - a velocity `.v`.  This is a 3-vector and is measured in units of the speed of light.  I.e.,
   for a Ray in a vacuum, the norm of the velocity 3-vector is :math:`1`.  In a medium with
   refractive index :math:`n`, the norm will be :math:`1/n`.
-- a time `.t0`.  This is a reference time indicating when the ray was, is, or will be at the
-  reference position `.p0`.  Although this variable may be thought of as time, it's more precisely
+- a time `.t`.  This is a reference time indicating when the ray was, is, or will be at the
+  reference position `.r`.  Although this variable may be thought of as time, it's more precisely
   an optical path length.  I.e., it's the accumulated time multiplied by the speed-of-light. The
   units are meters.
 - a wavelength `.wavelength`.  This is the vacuum wavelength in meters.
-- a boolean indicator `.isVignetted`, which indicates if the ray has been vignetted while being
+- a boolean indicator `.vignetted`, which indicates if the ray has been vignetted while being
   traced through an optical system.
 - a boolean indicatory `.failed`, which indicates if some attempted calculation, like an
   intersection of a Ray with a Surface, failed.

@@ -28,8 +28,8 @@ namespace batoid {
 
     bool Paraboloid::timeToIntersect(const Ray& r, double& t) const {
         double a = (r.v[0]*r.v[0] + r.v[1]*r.v[1])*_2Rinv;
-        double b = (r.p0[0]*r.v[0] + r.p0[1]*r.v[1])*_Rinv - r.v[2];
-        double c = (r.p0[0]*r.p0[0] + r.p0[1]*r.p0[1])*_2Rinv - r.p0[2];
+        double b = (r.r[0]*r.v[0] + r.r[1]*r.v[1])*_Rinv - r.v[2];
+        double c = (r.r[0]*r.r[0] + r.r[1]*r.r[1])*_2Rinv - r.r[2];
         double r1, r2;
         int n = solveQuadratic(a, b, c, r1, r2);
 
@@ -48,7 +48,7 @@ namespace batoid {
             } else
                 t = std::min(r1, r2);
         }
-        t += r.t0;
+        t += r.t;
         return true;
     }
 
@@ -58,7 +58,7 @@ namespace batoid {
         if (!timeToIntersect(r, t))
             return Ray(true);
         Vector3d point = r.positionAtTime(t);
-        return Ray(point, r.v, t, r.wavelength, r.isVignetted);
+        return Ray(point, r.v, t, r.wavelength, r.vignetted);
     }
 
     void Paraboloid::intersectInPlace(Ray& r) const {
@@ -68,8 +68,8 @@ namespace batoid {
             r.failed=true;
             return;
         }
-        r.p0 = r.positionAtTime(t);
-        r.t0 = t;
+        r.r = r.positionAtTime(t);
+        r.t = t;
         return;
     }
 

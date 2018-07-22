@@ -80,22 +80,22 @@ def test_traceReverse():
     # Now, turn the result rays around and trace backwards
     forward_rays = forward_rays.propagatedToTime(40.0)
     reverse_rays = batoid.RayVector(
-        [batoid.Ray(r.p0, -r.v, -r.t0, r.wavelength) for r in forward_rays]
+        [batoid.Ray(r.r, -r.v, -r.t, r.wavelength) for r in forward_rays]
     )
 
     final_rays, _ = telescope.traceReverse(reverse_rays, outCoordSys=batoid.CoordSys())
     # propagate all the way to t=0
     final_rays = final_rays.propagatedToTime(0.0)
 
-    w = np.where(np.logical_not(final_rays.isVignetted))[0]
+    w = np.where(np.logical_not(final_rays.vignetted))[0]
     for idx in w:
-        np.testing.assert_allclose(init_rays[idx].x0, final_rays[idx].x0)
-        np.testing.assert_allclose(init_rays[idx].y0, final_rays[idx].y0)
-        np.testing.assert_allclose(init_rays[idx].z0, final_rays[idx].z0)
+        np.testing.assert_allclose(init_rays[idx].x, final_rays[idx].x)
+        np.testing.assert_allclose(init_rays[idx].y, final_rays[idx].y)
+        np.testing.assert_allclose(init_rays[idx].z, final_rays[idx].z)
         np.testing.assert_allclose(init_rays[idx].vx, -final_rays[idx].vx)
         np.testing.assert_allclose(init_rays[idx].vy, -final_rays[idx].vy)
         np.testing.assert_allclose(init_rays[idx].vz, -final_rays[idx].vz)
-        np.testing.assert_allclose(final_rays[idx].t0, 0)
+        np.testing.assert_allclose(final_rays[idx].t, 0)
 
 
 @timer

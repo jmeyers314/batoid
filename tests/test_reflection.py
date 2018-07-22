@@ -22,7 +22,7 @@ def test_plane_reflection_plane():
         # hence (ray.v x surfaceNormal) . rray.v should have zero magnitude.
         # magnitude zero.
         assert isclose(
-            np.dot(np.cross(ray.v, plane.normal(rray.p0[0], rray.p0[1])), rray.v),
+            np.dot(np.cross(ray.v, plane.normal(rray.r[0], rray.r[1])), rray.v),
             0.0, rel_tol=0, abs_tol=1e-15)
 
         # Actually, reflection off a plane is pretty straigtforward to test
@@ -51,12 +51,12 @@ def test_plane_reflection_reversal():
         # point
 
         # Keep going a bit before turning around though
-        turn_around = rray.positionAtTime(rray.t0+0.1)
-        return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t0+0.1))
+        turn_around = rray.positionAtTime(rray.t+0.1)
+        return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t+0.1))
         riray = plane.intersect(return_ray)
-        assert isclose(rray.p0[0], riray.p0[0], rel_tol=0, abs_tol=1e-10)
-        assert isclose(rray.p0[1], riray.p0[1], rel_tol=0, abs_tol=1e-10)
-        assert isclose(rray.p0[2], riray.p0[2], rel_tol=0, abs_tol=1e-10)
+        assert isclose(rray.r[0], riray.r[0], rel_tol=0, abs_tol=1e-10)
+        assert isclose(rray.r[1], riray.r[1], rel_tol=0, abs_tol=1e-10)
+        assert isclose(rray.r[2], riray.r[2], rel_tol=0, abs_tol=1e-10)
         # Reflect and propagate back to t=0.
         cray = plane.reflect(return_ray)
         cray = cray.positionAtTime(0)
@@ -82,7 +82,7 @@ def test_paraboloid_reflection_plane():
         # hence (ray.v x surfaceNormal) . rray.v should have zero magnitude.
         # magnitude zero.
         assert isclose(
-            np.dot(np.cross(ray.v, para.normal(rray.p0[0], rray.p0[1])), rray.v),
+            np.dot(np.cross(ray.v, para.normal(rray.r[0], rray.r[1])), rray.v),
             0.0, rel_tol=0, abs_tol=1e-15)
 
 
@@ -106,13 +106,13 @@ def test_paraboloid_reflection_reversal():
         # point
 
         # Keep going a bit before turning around though
-        turn_around = rray.positionAtTime(rray.t0+0.1)
-        return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t0+0.1))
+        turn_around = rray.positionAtTime(rray.t+0.1)
+        return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t+0.1))
         riray = para.intersect(return_ray)
         # First check that we intersected at the same point
-        assert isclose(rray.p0[0], riray.p0[0], rel_tol=0, abs_tol=1e-10)
-        assert isclose(rray.p0[1], riray.p0[1], rel_tol=0, abs_tol=1e-10)
-        assert isclose(rray.p0[2], riray.p0[2], rel_tol=0, abs_tol=1e-10)
+        assert isclose(rray.r[0], riray.r[0], rel_tol=0, abs_tol=1e-10)
+        assert isclose(rray.r[1], riray.r[1], rel_tol=0, abs_tol=1e-10)
+        assert isclose(rray.r[2], riray.r[2], rel_tol=0, abs_tol=1e-10)
         # Reflect and propagate back to t=0.
         cray = para.reflect(return_ray)
         cray = cray.positionAtTime(0)
@@ -134,9 +134,9 @@ def test_paraboloid_reflection_to_focus():
             ray = batoid.Ray(x,y,-1000, 0,0,1, 0)
             rray = para.reflect(ray)
             # Now see if rray goes through (0,0,R/2)
-            # Solve the x equation: 0 = rray.p0[0] + rray.v[0]*(t-t0) for t:
+            # Solve the x equation: 0 = rray.r[0] + rray.v[0]*(t-t0) for t:
             # t = t0 - p0[0]/vx
-            t = rray.t0 - rray.p0[0]/rray.v[0]
+            t = rray.t - rray.r[0]/rray.v[0]
             focus = rray.positionAtTime(t)
             assert isclose(focus[0], 0, abs_tol=1e-12)
             assert isclose(focus[1], 0, abs_tol=1e-12)
@@ -160,7 +160,7 @@ def test_asphere_reflection_plane():
         # hence (ray.v x surfaceNormal) . rray.v should have zero magnitude.
         # magnitude zero.
         assert isclose(
-            np.dot(np.cross(ray.v, asphere.normal(rray.p0[0], rray.p0[1])), rray.v),
+            np.dot(np.cross(ray.v, asphere.normal(rray.r[0], rray.r[1])), rray.v),
             0.0, rel_tol=0, abs_tol=1e-15)
 
 
@@ -183,13 +183,13 @@ def test_asphere_reflection_reversal():
         # point
 
         # Keep going a bit before turning around though
-        turn_around = rray.positionAtTime(rray.t0+0.1)
-        return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t0+0.1))
+        turn_around = rray.positionAtTime(rray.t+0.1)
+        return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t+0.1))
         riray = asphere.intersect(return_ray)
         # First check that we intersected at the same point
-        assert isclose(rray.p0[0], riray.p0[0], rel_tol=0, abs_tol=1e-9)
-        assert isclose(rray.p0[1], riray.p0[1], rel_tol=0, abs_tol=1e-9)
-        assert isclose(rray.p0[2], riray.p0[2], rel_tol=0, abs_tol=1e-9)
+        assert isclose(rray.r[0], riray.r[0], rel_tol=0, abs_tol=1e-9)
+        assert isclose(rray.r[1], riray.r[1], rel_tol=0, abs_tol=1e-9)
+        assert isclose(rray.r[2], riray.r[2], rel_tol=0, abs_tol=1e-9)
         # Reflect and propagate back to t=0.
         cray = asphere.reflect(return_ray)
         cray = cray.positionAtTime(0)

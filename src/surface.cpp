@@ -30,9 +30,9 @@ namespace batoid {
         if (r2.failed) return r2;
         double n = 1.0 / r2.v.norm();
         Vector3d nv = r2.v * n;
-        Vector3d normVec(normal(r2.p0[0], r2.p0[1]));
+        Vector3d normVec(normal(r2.r[0], r2.r[1]));
         double c1 = nv.dot(normVec);
-        return Ray(r2.p0, (nv - 2*c1*normVec).normalized()/n, r2.t0, r2.wavelength, r2.isVignetted);
+        return Ray(r2.r, (nv - 2*c1*normVec).normalized()/n, r2.t, r2.wavelength, r2.vignetted);
     }
 
     RayVector Surface::reflect(const RayVector& rv) const {
@@ -50,7 +50,7 @@ namespace batoid {
         if (r.failed) return;
         double n = 1.0 / r.v.norm();
         Vector3d nv = r.v * n;
-        Vector3d normVec(normal(r.p0[0], r.p0[1]));
+        Vector3d normVec(normal(r.r[0], r.r[1]));
         double c1 = nv.dot(normVec);
         r.v = (nv - 2*c1*normVec).normalized()/n;
     }
@@ -67,7 +67,7 @@ namespace batoid {
         Ray r2 = intersect(r);
         if (r2.failed) return r2;
         Vector3d nv = r2.v * n1;
-        Vector3d normVec(normal(r2.p0[0], r2.p0[1]));
+        Vector3d normVec(normal(r2.r[0], r2.r[1]));
         double alpha = nv.dot(normVec);
         double a = 1.;
         double b = 2*alpha;
@@ -77,9 +77,9 @@ namespace batoid {
         Vector3d f1 = (nv+k1*normVec).normalized();
         Vector3d f2 = (nv+k2*normVec).normalized();
         if (f1.dot(nv) > f2.dot(nv))
-            return Ray(r2.p0, f1/n2, r2.t0, r2.wavelength, r2.isVignetted);
+            return Ray(r2.r, f1/n2, r2.t, r2.wavelength, r2.vignetted);
         else
-            return Ray(r2.p0, f2/n2, r2.t0, r2.wavelength, r2.isVignetted);
+            return Ray(r2.r, f2/n2, r2.t, r2.wavelength, r2.vignetted);
     }
 
     Ray Surface::refract(const Ray& r, const Medium& m1, const Medium& m2) const {
@@ -112,7 +112,7 @@ namespace batoid {
         intersectInPlace(r);
         if (r.failed) return;
         Vector3d nv = r.v * n1;
-        Vector3d normVec(normal(r.p0[0], r.p0[1]));
+        Vector3d normVec(normal(r.r[0], r.r[1]));
         double alpha = nv.dot(normVec);
         double a = 1.;
         double b = 2*alpha;

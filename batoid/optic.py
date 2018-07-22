@@ -697,13 +697,13 @@ def drawTrace3d(ax, traceFull, start=None, end=None, **kwargs):  # pragma: no co
             inTransform = batoid.CoordTransform(surface['inCoordSys'], batoid.CoordSys())
             outTransform = batoid.CoordTransform(surface['outCoordSys'], batoid.CoordSys())
             for inray, outray in zip(surface['in'], surface['out']):
-                if not outray.isVignetted:
+                if not outray.vignetted:
                     inray = inTransform.applyForward(inray)
                     outray = outTransform.applyForward(outray)
                     ax.plot(
-                        [inray.x0, outray.x0],
-                        [inray.y0, outray.y0],
-                        [inray.z0, outray.z0],
+                        [inray.x, outray.x],
+                        [inray.y, outray.y],
+                        [inray.z, outray.z],
                         **kwargs
                     )
         if surface['name'] == end:
@@ -723,12 +723,12 @@ def drawTrace2d(ax, traceFull, start=None, end=None, **kwargs):  # pragma: no co
             inTransform = batoid.CoordTransform(surface['inCoordSys'], batoid.CoordSys())
             outTransform = batoid.CoordTransform(surface['outCoordSys'], batoid.CoordSys())
             for inray, outray in zip(surface['in'], surface['out']):
-                if not outray.isVignetted:
+                if not outray.vignetted:
                     inray = inTransform.applyForward(inray)
                     outray = outTransform.applyForward(outray)
                     ax.plot(
-                        [inray.x0, outray.x0],
-                        [inray.z0, outray.z0],
+                        [inray.x, outray.x],
+                        [inray.z, outray.z],
                         **kwargs
                     )
         if surface['name'] == end:

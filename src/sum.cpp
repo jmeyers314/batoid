@@ -41,7 +41,7 @@ namespace batoid {
         if (!timeToIntersect(r, t))
             return Ray(true);
         Vector3d point = r.positionAtTime(t);
-        return Ray(point, r.v, t, r.wavelength, r.isVignetted);
+        return Ray(point, r.v, t, r.wavelength, r.vignetted);
     }
 
     void Sum::intersectInPlace(Ray& r) const {
@@ -51,8 +51,8 @@ namespace batoid {
             r.failed=true;
             return;
         }
-        r.p0 = r.positionAtTime(t);
-        r.t0 = t;
+        r.r = r.positionAtTime(t);
+        r.t = t;
         return;
     }
 
@@ -82,7 +82,7 @@ namespace batoid {
         } catch (const SolveError&) {
             return false;
         }
-        if (t < r.t0) return false;
+        if (t < r.t) return false;
         return true;
     }
 

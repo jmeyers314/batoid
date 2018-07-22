@@ -17,17 +17,17 @@ namespace batoid {
     }
 
     Ray Obscuration::obscure(const Ray& ray) const {
-        if (ray.failed || ray.isVignetted) return ray;
-        if (contains(ray.p0[0], ray.p0[1]))
-            return Ray(ray.p0, ray.v, ray.t0, ray.wavelength, true);
+        if (ray.failed || ray.vignetted) return ray;
+        if (contains(ray.r[0], ray.r[1]))
+            return Ray(ray.r, ray.v, ray.t, ray.wavelength, true);
         else
             return ray;
     }
 
     void Obscuration::obscureInPlace(Ray& ray) const {
-        if (ray.failed || ray.isVignetted) return;
-        if (contains(ray.p0[0], ray.p0[1]))
-            ray.isVignetted = true;
+        if (ray.failed || ray.vignetted) return;
+        if (contains(ray.r[0], ray.r[1]))
+            ray.vignetted = true;
     }
 
     RayVector Obscuration::obscure(const RayVector& rv) const {
@@ -36,10 +36,10 @@ namespace batoid {
             [this](const Ray& ray)
             {
                 if (ray.failed) return ray;
-                if (contains(ray.p0[0], ray.p0[1]))
-                    return Ray(ray.p0, ray.v, ray.t0, ray.wavelength, true);
+                if (contains(ray.r[0], ray.r[1]))
+                    return Ray(ray.r, ray.v, ray.t, ray.wavelength, true);
                 else
-                    return Ray(ray.p0, ray.v, ray.t0, ray.wavelength, ray.isVignetted);
+                    return Ray(ray.r, ray.v, ray.t, ray.wavelength, ray.vignetted);
             }
         );
         return RayVector(std::move(result), rv.wavelength);

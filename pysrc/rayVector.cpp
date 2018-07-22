@@ -47,7 +47,7 @@ namespace batoid {
                 [](RayVector& rv) -> py::array_t<double> {
                     return {{rv.size()},
                         {sizeof(Ray)},
-                        &rv.rays[0].p0[0],
+                        &rv.rays[0].r[0],
                         py::cast(rv)};
                 }
             )
@@ -56,7 +56,7 @@ namespace batoid {
                 [](RayVector& rv) -> py::array_t<double> {
                     return {{rv.size()},
                         {sizeof(Ray)},
-                        &rv.rays[0].p0[1],
+                        &rv.rays[0].r[1],
                         py::cast(rv)};
                 }
             )
@@ -65,7 +65,7 @@ namespace batoid {
                 [](RayVector& rv) -> py::array_t<double> {
                     return {{rv.size()},
                         {sizeof(Ray)},
-                        &rv.rays[0].p0[2],
+                        &rv.rays[0].r[2],
                         py::cast(rv)};
                 }
             )
@@ -97,11 +97,11 @@ namespace batoid {
                 }
             )
             .def_property_readonly(
-                "t0",
+                "t",
                 [](RayVector& rv) -> py::array_t<double> {
                     return {{rv.size()},
                         {sizeof(Ray)},
-                        &rv.rays[0].t0,
+                        &rv.rays[0].t,
                         py::cast(rv)};
                 }
             )
@@ -115,11 +115,11 @@ namespace batoid {
                 }
             )
             .def_property_readonly(
-                "isVignetted",
+                "vignetted",
                 [](RayVector& rv) -> py::array_t<bool> {
                     return {{rv.size()},
                         {sizeof(Ray)},
-                        &rv.rays[0].isVignetted,
+                        &rv.rays[0].vignetted,
                         py::cast(rv)};
                 }
             )
@@ -142,11 +142,11 @@ namespace batoid {
                 }
             )
             .def_property_readonly(
-                "p0",
+                "r",
                 [](RayVector& rv) -> py::array_t<double> {
                     return {{rv.size(), 3ul},
                         {sizeof(Ray), sizeof(double)},
-                        &rv.rays[0].p0[0],
+                        &rv.rays[0].r[0],
                         py::cast(rv)};
                 }
             )

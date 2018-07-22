@@ -33,7 +33,7 @@ def test_plane_refraction_plane():
 
         # ray.v, surfaceNormal, and rray.v should all be in the same plane, and
         # hence (ray.v x surfaceNormal) . rray.v should have zero magnitude.
-        normal = plane.normal(rray.p0[0], rray.p0[1])
+        normal = plane.normal(rray.r[0], rray.r[1])
         assert isclose(
             np.dot(np.cross(ray.v, normal), rray.v),
             0.0, rel_tol=0, abs_tol=1e-15)
@@ -68,12 +68,12 @@ def test_plane_refraction_reversal():
         # point
 
         # Keep going a bit before turning around though
-        turn_around = rray.positionAtTime(rray.t0+0.1)
-        return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t0+0.1))
+        turn_around = rray.positionAtTime(rray.t+0.1)
+        return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t+0.1))
         riray = plane.intersect(return_ray)
-        assert isclose(rray.p0[0], riray.p0[0], rel_tol=0, abs_tol=1e-10)
-        assert isclose(rray.p0[1], riray.p0[1], rel_tol=0, abs_tol=1e-10)
-        assert isclose(rray.p0[2], riray.p0[2], rel_tol=0, abs_tol=1e-10)
+        assert isclose(rray.r[0], riray.r[0], rel_tol=0, abs_tol=1e-10)
+        assert isclose(rray.r[1], riray.r[1], rel_tol=0, abs_tol=1e-10)
+        assert isclose(rray.r[2], riray.r[2], rel_tol=0, abs_tol=1e-10)
         # Refract and propagate back to t=0.
         cray = plane.refract(return_ray, m2, m1)
         assert isclose(np.linalg.norm(cray.v), 1./m1.getN(wavelength), rel_tol=1e-15)
@@ -108,7 +108,7 @@ def test_paraboloid_refraction_plane():
         # ray.v, surfaceNormal, and rray.v should all be in the same plane, and
         # hence (ray.v x surfaceNormal) . rray.v should have zero magnitude.
         # magnitude zero.
-        normal = para.normal(rray.p0[0], rray.p0[1])
+        normal = para.normal(rray.r[0], rray.r[1])
         assert isclose(
             np.dot(np.cross(ray.v, normal), rray.v),
             0.0, rel_tol=0, abs_tol=1e-15)
@@ -143,13 +143,13 @@ def test_paraboloid_refraction_reversal():
         # point
 
         # Keep going a bit before turning around though
-        turn_around = rray.positionAtTime(rray.t0+0.1)
-        return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t0+0.1))
+        turn_around = rray.positionAtTime(rray.t+0.1)
+        return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t+0.1))
         riray = para.intersect(return_ray)
         # First check that we intersected at the same point
-        assert isclose(rray.p0[0], riray.p0[0], rel_tol=0, abs_tol=1e-10)
-        assert isclose(rray.p0[1], riray.p0[1], rel_tol=0, abs_tol=1e-10)
-        assert isclose(rray.p0[2], riray.p0[2], rel_tol=0, abs_tol=1e-10)
+        assert isclose(rray.r[0], riray.r[0], rel_tol=0, abs_tol=1e-10)
+        assert isclose(rray.r[1], riray.r[1], rel_tol=0, abs_tol=1e-10)
+        assert isclose(rray.r[2], riray.r[2], rel_tol=0, abs_tol=1e-10)
         # Refract and propagate back to t=0.
         cray = para.refract(return_ray, m2, m1)
         assert isclose(np.linalg.norm(cray.v), 1./m1.getN(wavelength), rel_tol=1e-15)
@@ -184,7 +184,7 @@ def test_asphere_refraction_plane():
         # ray.v, surfaceNormal, and rray.v should all be in the same plane, and
         # hence (ray.v x surfaceNormal) . rray.v should have zero magnitude.
         # magnitude zero.
-        normal = asphere.normal(rray.p0[0], rray.p0[1])
+        normal = asphere.normal(rray.r[0], rray.r[1])
         assert isclose(
             np.dot(np.cross(ray.v, normal), rray.v),
             0.0, rel_tol=0, abs_tol=1e-15)
@@ -219,13 +219,13 @@ def test_asphere_refraction_reversal():
         # point
 
         # Keep going a bit before turning around though
-        turn_around = rray.positionAtTime(rray.t0+0.1)
-        return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t0+0.1))
+        turn_around = rray.positionAtTime(rray.t+0.1)
+        return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t+0.1))
         riray = asphere.intersect(return_ray)
         # First check that we intersected at the same point
-        assert isclose(rray.p0[0], riray.p0[0], rel_tol=0, abs_tol=1e-10)
-        assert isclose(rray.p0[1], riray.p0[1], rel_tol=0, abs_tol=1e-10)
-        assert isclose(rray.p0[2], riray.p0[2], rel_tol=0, abs_tol=1e-10)
+        assert isclose(rray.r[0], riray.r[0], rel_tol=0, abs_tol=1e-10)
+        assert isclose(rray.r[1], riray.r[1], rel_tol=0, abs_tol=1e-10)
+        assert isclose(rray.r[2], riray.r[2], rel_tol=0, abs_tol=1e-10)
         # Refract and propagate back to t=0.
         cray = asphere.refract(return_ray, m2, m1)
         assert isclose(np.linalg.norm(cray.v), 1./m1.getN(wavelength), rel_tol=1e-15)

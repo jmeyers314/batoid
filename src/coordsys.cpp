@@ -122,25 +122,25 @@ namespace batoid {
 
     Ray CoordTransform::applyForward(const Ray& r) const {
         if (r.failed) return r;
-        return Ray(_rot.transpose()*(r.p0-_dr), _rot.transpose()*r.v,
-                r.t0, r.wavelength, r.isVignetted);
+        return Ray(_rot.transpose()*(r.r-_dr), _rot.transpose()*r.v,
+                r.t, r.wavelength, r.vignetted);
     }
 
     Ray CoordTransform::applyReverse(const Ray& r) const {
         if (r.failed) return r;
-        return Ray(_rot*r.p0 + _dr, _rot*r.v,
-            r.t0, r.wavelength, r.isVignetted);
+        return Ray(_rot*r.r + _dr, _rot*r.v,
+            r.t, r.wavelength, r.vignetted);
     }
 
     void CoordTransform::applyForwardInPlace(Ray& r) const {
         if (r.failed) return;
-        r.p0 = _rot.transpose()*(r.p0-_dr);
+        r.r = _rot.transpose()*(r.r-_dr);
         r.v = _rot.transpose()*r.v;
     }
 
     void CoordTransform::applyReverseInPlace(Ray& r) const {
         if (r.failed) return;
-        r.p0 = _rot*r.p0+_dr;
+        r.r = _rot*r.r+_dr;
         r.v = _rot*r.v;
     }
 

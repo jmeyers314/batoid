@@ -90,7 +90,7 @@ def test_composition():
             xyz = rv.x, rv.y, rv.z
             xyz_a = transform1to3.applyForward(*xyz)
             xyz_b = transform2to3.applyForward(*transform1to2.applyForward(*xyz))
-            xyz_c = [transform2to3.applyForward(transform1to2.applyForward(r.p0)) for r in rv]
+            xyz_c = [transform2to3.applyForward(transform1to2.applyForward(r.r)) for r in rv]
             np.testing.assert_allclose(xyz_a, xyz_b)
             np.testing.assert_allclose(xyz_a, np.transpose(xyz_c))
             # Should still work if we reshape.

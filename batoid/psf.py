@@ -77,7 +77,7 @@ def huygensPSF(optic, theta_x=None, theta_y=None, wavelength=None, nx=None,
     zs = np.zeros_like(xs)
 
     points = np.concatenate([aux[..., None] for aux in (xs, ys, zs)], axis=-1)
-    time = rays[0].t0
+    time = rays[0].t
     for idx in np.ndindex(amplitudes.shape):
         amplitudes[idx] = rays.sumAmplitude(points[idx], time)
     return batoid.Lattice(np.abs(amplitudes)**2, primitiveX)
@@ -210,7 +210,7 @@ def dkdu(optic, theta_x, theta_y, wavelength, nx=16):
     uy = np.array(pupilRays.y)
 
     optic.traceInPlace(rays)
-    w = np.where(1-rays.isVignetted)[0]
+    w = np.where(1-rays.vignetted)[0]
     ux = ux[w]
     uy = uy[w]
 
@@ -255,8 +255,8 @@ def wavefront(optic, theta_x, theta_y, wavelength, nx=32, sphereRadius=None):
 
     outCoordSys = batoid.CoordSys()
     optic.traceInPlace(rays, outCoordSys=outCoordSys)
-    w = np.where(1-rays.isVignetted)[0]
-    point = np.mean(rays.p0[w], axis=0)
+    w = np.where(1-rays.vignetted)[0]
+    point = np.mean(rays.r[w], axis=0)
 
     # We want to place the vertex of the reference sphere one radius length away from the
     # intersection point.  So transform our rays into that coordinate system.
@@ -267,12 +267,12 @@ def wavefront(optic, theta_x, theta_y, wavelength, nx=32, sphereRadius=None):
     sphere = batoid.Sphere(-sphereRadius)
     sphere.intersectInPlace(rays)
 
-    w = np.where(1-rays.isVignetted)[0]
+    w = np.where(1-rays.vignetted)[0]
     # Should potentially try to make the reference time w.r.t. the chief ray instead of the mean
     # of the good (unvignetted) rays.
-    t0 = np.mean(rays.t0[w])
+    t0 = np.mean(rays.t[w])
 
-    arr = np.ma.masked_array((t0-rays.t0)/wavelength, mask=rays.isVignetted).reshape(nx, nx)
+    arr = np.ma.masked_array((t0-rays.t)/wavelength, mask=rays.vignetted).reshape(nx, nx)
     primitiveVectors = np.vstack([[optic.pupilSize/nx, 0], [0, optic.pupilSize/nx]])
     return batoid.Lattice(arr, primitiveVectors)
 

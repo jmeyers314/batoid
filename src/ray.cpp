@@ -8,43 +8,45 @@
 using Eigen::Vector3d;
 
 namespace batoid {
-    Ray::Ray(double x0, double y0, double z0, double vx, double vy, double vz, double t=0.0,
-             double w=0.0, bool isV=false) :
-        p0(Vector3d(x0, y0, z0)), v(Vector3d(vx, vy, vz)), t0(t),
-        wavelength(w), isVignetted(isV), failed(false) {}
+    Ray::Ray(double x, double y, double z, double vx, double vy, double vz, double _t=0.0,
+             double _wavelength=0.0, bool _vignetted=false) :
+        r(Vector3d(x, y, z)), v(Vector3d(vx, vy, vz)), t(_t),
+        wavelength(_wavelength), vignetted(_vignetted), failed(false) {}
 
-    Ray::Ray(Vector3d _p0, Vector3d _v, double t=0.0, double w=0.0, bool isV=false) :
-        p0(_p0), v(_v), t0(t), wavelength(w), isVignetted(isV), failed(false) {}
+    Ray::Ray(Vector3d _r, Vector3d _v, double _t=0.0, double _wavelength=0.0,
+             bool _vignetted=false) :
+        r(_r), v(_v), t(_t), wavelength(_wavelength), vignetted(_vignetted), failed(false) {}
 
     Ray::Ray(const bool failed) :
-        p0(Vector3d::Zero()), v(Vector3d::Zero()), t0(0.0), wavelength(0.0), isVignetted(true), failed(true) {}
+        r(Vector3d::Zero()), v(Vector3d::Zero()), t(0.0), wavelength(0.0), vignetted(true),
+        failed(true) {}
 
     std::string Ray::repr() const {
         std::ostringstream oss("Ray(", std::ios_base::ate);
         if(failed)
             oss << "failed=True)";
         else {
-            oss << "[" << p0[0] << "," << p0[1] << "," << p0[2] << "],["
+            oss << "[" << r[0] << "," << r[1] << "," << r[2] << "],["
                 << v[0] << "," << v[1] << "," << v[2] << "]";
-            if (t0 != 0.0) oss << ", t=" << t0;
+            if (t != 0.0) oss << ", t=" << t;
             if (wavelength != 0.0) oss << ", wavelength=" << wavelength;
-            if (isVignetted) oss << ", isVignetted=True";
+            if (vignetted) oss << ", vignetted=True";
             oss << ")";
         }
         return oss.str();
     }
 
-    Vector3d Ray::positionAtTime(const double t) const {
-        return p0+v*(t-t0);
+    Vector3d Ray::positionAtTime(const double _t) const {
+        return r+v*(_t-t);
     }
 
-    Ray Ray::propagatedToTime(const double t) const {
-        return Ray(positionAtTime(t), v, t, wavelength, isVignetted);
+    Ray Ray::propagatedToTime(const double _t) const {
+        return Ray(positionAtTime(_t), v, _t, wavelength, vignetted);
     }
 
-    void Ray::propagateInPlace(const double t) {
-        p0 += v*(t-t0);
-        t0 = t;
+    void Ray::propagateInPlace(const double _t) {
+        r += v*(_t-t);
+        t = _t;
     }
 
     bool Ray::operator==(const Ray& other) const {
@@ -53,22 +55,22 @@ namespace batoid {
             return other.failed;
         if (other.failed)
             return false;
-        return (p0 == other.p0) &&
+        return (r == other.r) &&
                (v == other.v) &&
-               (t0 == other.t0) &&
+               (t == other.t) &&
                (wavelength == other.wavelength) &&
-               (isVignetted == other.isVignetted);
+               (vignetted == other.vignetted);
     }
 
     bool Ray::operator!=(const Ray& other) const {
         return !(*this == other);
     }
 
-    double Ray::phase(const Vector3d& r, double t) const {
-        return k().dot(r-p0) - (t-t0)*omega();
+    double Ray::phase(const Vector3d& _r, double _t) const {
+        return k().dot(_r-r) - (_t-t)*omega();
     }
 
-    std::complex<double> Ray::amplitude(const Vector3d& r, double t) const {
-        return std::exp(std::complex<double>(0, 1)*phase(r, t));
+    std::complex<double> Ray::amplitude(const Vector3d& _r, double _t) const {
+        return std::exp(std::complex<double>(0, 1)*phase(_r, _t));
     }
 }
