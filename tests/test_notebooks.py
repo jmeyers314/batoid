@@ -45,6 +45,7 @@ notebooks = [
     "LSST trace.ipynb",
     "Newtonian Telescope.ipynb",
     "PH != Pupil.ipynb",
+    "Rays.ipynb",
     "Thin Lens.ipynb"
 ]
 

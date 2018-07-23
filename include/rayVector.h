@@ -33,12 +33,14 @@ namespace batoid {
         typename std::vector<Ray>::size_type size() const noexcept { return rays.size(); }
 
         // methods
-        std::vector<double> phase(const Vector3d& r, double t);
-        std::vector<std::complex<double>> amplitude(const Vector3d& r, double t);
-        std::complex<double> sumAmplitude(const Vector3d& r, double t);
-        RayVector propagatedToTime(double t);
+        std::vector<Vector3d> positionAtTime(double t) const;
+        RayVector propagatedToTime(double t) const;
         void propagateInPlace(double t);
-        RayVector trimVignetted();
+
+        std::vector<double> phase(const Vector3d& r, double t) const;
+        std::vector<std::complex<double>> amplitude(const Vector3d& r, double t) const;
+        std::complex<double> sumAmplitude(const Vector3d& r, double t) const;
+        RayVector trimVignetted() const;
         void trimVignettedInPlace();
         std::string repr() const;
 

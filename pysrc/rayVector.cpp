@@ -20,6 +20,16 @@ namespace batoid {
             .def("amplitude", &RayVector::amplitude)
             .def("sumAmplitude", &RayVector::sumAmplitude)
             .def("phase", &RayVector::phase)
+            .def("positionAtTime",
+                [](const RayVector& rv, double t){
+                    std::vector<Vector3d> result(rv.positionAtTime(t));
+                    return py::array_t<double>(
+                        {result.size(), 3ul},
+                        {3*sizeof(double), sizeof(double)},
+                        &result[0].data()[0]
+                    );
+                }
+            )
             .def("propagatedToTime", &RayVector::propagatedToTime)
             .def("propagateInPlace", &RayVector::propagateInPlace)
             .def("trimVignetted", &RayVector::trimVignetted)
@@ -42,8 +52,7 @@ namespace batoid {
                     rv.wavelength
                 ));
             })
-            .def_property_readonly(
-                "x",
+            .def_property_readonly("x",
                 [](RayVector& rv) -> py::array_t<double> {
                     return {{rv.size()},
                         {sizeof(Ray)},
@@ -51,8 +60,7 @@ namespace batoid {
                         py::cast(rv)};
                 }
             )
-            .def_property_readonly(
-                "y",
+            .def_property_readonly("y",
                 [](RayVector& rv) -> py::array_t<double> {
                     return {{rv.size()},
                         {sizeof(Ray)},
@@ -60,8 +68,7 @@ namespace batoid {
                         py::cast(rv)};
                 }
             )
-            .def_property_readonly(
-                "z",
+            .def_property_readonly("z",
                 [](RayVector& rv) -> py::array_t<double> {
                     return {{rv.size()},
                         {sizeof(Ray)},
@@ -69,8 +76,7 @@ namespace batoid {
                         py::cast(rv)};
                 }
             )
-            .def_property_readonly(
-                "vx",
+            .def_property_readonly("vx",
                 [](RayVector& rv) -> py::array_t<double> {
                     return {{rv.size()},
                         {sizeof(Ray)},
@@ -78,8 +84,7 @@ namespace batoid {
                         py::cast(rv)};
                 }
             )
-            .def_property_readonly(
-                "vy",
+            .def_property_readonly("vy",
                 [](RayVector& rv) -> py::array_t<double> {
                     return {{rv.size()},
                         {sizeof(Ray)},
@@ -87,8 +92,7 @@ namespace batoid {
                         py::cast(rv)};
                 }
             )
-            .def_property_readonly(
-                "vz",
+            .def_property_readonly("vz",
                 [](RayVector& rv) -> py::array_t<double> {
                     return {{rv.size()},
                         {sizeof(Ray)},
@@ -96,8 +100,7 @@ namespace batoid {
                         py::cast(rv)};
                 }
             )
-            .def_property_readonly(
-                "t",
+            .def_property_readonly("t",
                 [](RayVector& rv) -> py::array_t<double> {
                     return {{rv.size()},
                         {sizeof(Ray)},
@@ -105,8 +108,7 @@ namespace batoid {
                         py::cast(rv)};
                 }
             )
-            .def_property_readonly(
-                "wavelength",
+            .def_property_readonly("wavelength",
                 [](RayVector& rv) -> py::array_t<double> {
                     return {{rv.size()},
                         {sizeof(Ray)},
@@ -114,8 +116,7 @@ namespace batoid {
                         py::cast(rv)};
                 }
             )
-            .def_property_readonly(
-                "vignetted",
+            .def_property_readonly("vignetted",
                 [](RayVector& rv) -> py::array_t<bool> {
                     return {{rv.size()},
                         {sizeof(Ray)},
@@ -123,8 +124,7 @@ namespace batoid {
                         py::cast(rv)};
                 }
             )
-            .def_property_readonly(
-                "failed",
+            .def_property_readonly("failed",
                 [](RayVector& rv) -> py::array_t<bool> {
                     return {{rv.size()},
                         {sizeof(Ray)},
@@ -132,8 +132,7 @@ namespace batoid {
                         py::cast(rv)};
                 }
             )
-            .def_property_readonly(
-                "v",
+            .def_property_readonly("v",
                 [](RayVector& rv) -> py::array_t<double> {
                     return {{rv.size(), 3ul},
                         {sizeof(Ray), sizeof(double)},
@@ -141,8 +140,7 @@ namespace batoid {
                         py::cast(rv)};
                 }
             )
-            .def_property_readonly(
-                "r",
+            .def_property_readonly("r",
                 [](RayVector& rv) -> py::array_t<double> {
                     return {{rv.size(), 3ul},
                         {sizeof(Ray), sizeof(double)},
@@ -150,8 +148,7 @@ namespace batoid {
                         py::cast(rv)};
                 }
             )
-            .def_property_readonly(
-                "k",
+            .def_property_readonly("k",
                 [](const RayVector& rv) {
                     std::vector<Vector3d> result;
                     result.reserve(rv.size());
@@ -165,8 +162,7 @@ namespace batoid {
                     );
                 }
             )
-            .def_property_readonly(
-                "kx",
+            .def_property_readonly("kx",
                 [](const RayVector& rv) {
                     std::vector<double> result;
                     result.reserve(rv.size());
@@ -180,8 +176,7 @@ namespace batoid {
                     );
                 }
             )
-            .def_property_readonly(
-                "ky",
+            .def_property_readonly("ky",
                 [](const RayVector& rv) {
                     std::vector<double> result;
                     result.reserve(rv.size());
@@ -195,8 +190,7 @@ namespace batoid {
                     );
                 }
             )
-            .def_property_readonly(
-                "kz",
+            .def_property_readonly("kz",
                 [](const RayVector& rv) {
                     std::vector<double> result;
                     result.reserve(rv.size());
@@ -210,8 +204,7 @@ namespace batoid {
                     );
                 }
             )
-            .def_property_readonly(
-                "omega",
+            .def_property_readonly("omega",
                 [](const RayVector& rv) {
                     std::vector<double> result;
                     result.reserve(rv.size());

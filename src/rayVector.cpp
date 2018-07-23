@@ -22,7 +22,7 @@ namespace batoid {
         return oss.str();
     }
 
-    std::vector<double> RayVector::phase(const Vector3d& r, double t) {
+    std::vector<double> RayVector::phase(const Vector3d& r, double t) const {
         auto result = std::vector<double>(rays.size());
         parallelTransform(rays.cbegin(), rays.cend(), result.begin(),
             [=](const Ray& ray)
@@ -31,7 +31,7 @@ namespace batoid {
         return result;
     }
 
-    std::vector<std::complex<double>> RayVector::amplitude(const Vector3d& r, double t) {
+    std::vector<std::complex<double>> RayVector::amplitude(const Vector3d& r, double t) const {
         auto result = std::vector<std::complex<double>>(rays.size());
         parallelTransform(rays.cbegin(), rays.cend(), result.begin(),
             [=](const Ray& ray)
@@ -40,7 +40,7 @@ namespace batoid {
         return result;
     }
 
-    std::complex<double> RayVector::sumAmplitude(const Vector3d& r, double t) {
+    std::complex<double> RayVector::sumAmplitude(const Vector3d& r, double t) const {
         auto result = std::vector<std::complex<double>>(rays.size());
         parallelTransform(rays.cbegin(), rays.cend(), result.begin(),
             [=](const Ray& ray)
@@ -49,7 +49,16 @@ namespace batoid {
         return std::accumulate(result.begin(), result.end(), std::complex<double>(0,0));
     }
 
-    RayVector RayVector::propagatedToTime(double t) {
+    std::vector<Vector3d> RayVector::positionAtTime(double t) const {
+        auto result = std::vector<Vector3d>(rays.size());
+        parallelTransform(rays.cbegin(), rays.cend(), result.begin(),
+            [=](const Ray& ray)
+                { return ray.positionAtTime(t); }
+        );
+        return result;
+    }
+
+    RayVector RayVector::propagatedToTime(double t) const {
         auto result = std::vector<Ray>(rays.size());
         parallelTransform(rays.cbegin(), rays.cend(), result.begin(),
             [=](const Ray& ray)
@@ -65,7 +74,7 @@ namespace batoid {
         );
     }
 
-    RayVector RayVector::trimVignetted() {
+    RayVector RayVector::trimVignetted() const {
         RayVector result;
         result.rays.reserve(rays.size());
         std::copy_if(
