@@ -80,6 +80,7 @@ def do_pickle(obj, reprable=True):
     assert obj == obj4
 
     if reprable:
+        from numpy import array, uint16, uint32, int16, int32, float32, float64, complex64, complex128, ndarray
         from batoid import Ray, RayVector
         from batoid import Plane, Paraboloid, Sphere, Quadric, Asphere, Zernike, Sum
         from batoid import Table

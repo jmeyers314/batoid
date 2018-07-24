@@ -1,5 +1,6 @@
 from ._batoid import Ray, RayVector
-from ._batoid import Surface, Plane, Paraboloid, Sphere, Quadric, Asphere, Zernike, Sum
+#from ._batoid import Surface, Plane, Paraboloid, Sphere, Quadric, Asphere, Zernike, Sum
+from .surface import Surface, Plane, Paraboloid, Sphere, Quadric, Asphere, Zernike, Sum
 from ._batoid import Table
 
 from ._batoid import Medium, ConstMedium, TableMedium, SellmeierMedium, Air

@@ -72,12 +72,12 @@ def test_sag():
     jmaxmax=200
     for _ in range(100):
         jmax = np.random.randint(1, jmaxmax)
-        coefs = np.random.normal(size=jmax+1)*1e-3
+        coef = np.random.normal(size=jmax+1)*1e-3
         R_outer = np.random.uniform(0.5, 5.0)
         R_inner = np.random.uniform(0.0, 0.65*R_outer)
 
-        gz = galsim.zernike.Zernike(coefs, R_outer=R_outer, R_inner=R_inner)
-        bz = batoid.Zernike(coefs, R_outer=R_outer, R_inner=R_inner)
+        gz = galsim.zernike.Zernike(coef, R_outer=R_outer, R_inner=R_inner)
+        bz = batoid.Zernike(coef, R_outer=R_outer, R_inner=R_inner)
 
         x = np.random.uniform(-R_outer, R_outer, size=5000)
         y = np.random.uniform(-R_outer, R_outer, size=5000)
@@ -100,33 +100,35 @@ def test_sag():
         )
 
 
+@pytest.mark.skipif(not hasGalSim, reason="galsim not found")
 @timer
 def test_properties():
     np.random.seed(57721)
     jmaxmax=200
     for _ in range(100):
         jmax = np.random.randint(1, jmaxmax)
-        coefs = np.random.normal(size=jmax+1)*1e-3
+        coef = np.random.normal(size=jmax+1)*1e-3
         R_outer = np.random.uniform(0.5, 5.0)
         R_inner = np.random.uniform(0.0, 0.8*R_outer)
-        zernike = batoid.Zernike(coefs, R_outer=R_outer, R_inner=R_inner)
+        zernike = batoid.Zernike(coef, R_outer=R_outer, R_inner=R_inner)
 
-        assert np.all(zernike.coefs == coefs)
+        assert np.all(zernike.coef == coef)
         assert zernike.R_outer == R_outer
         assert zernike.R_inner == R_inner
         do_pickle(zernike)
 
 
+@pytest.mark.skipif(not hasGalSim, reason="galsim not found")
 @timer
 def test_intersect():
     np.random.seed(577215)
     jmaxmax=50
     for i in range(100):
         jmax = np.random.randint(1, jmaxmax)
-        coefs = np.random.normal(size=jmax+1)*1e-6
+        coef = np.random.normal(size=jmax+1)*1e-6
         R_outer = np.random.uniform(0.5, 5.0)
         R_inner = np.random.uniform(0.0, 0.8*R_outer)
-        zernike = batoid.Zernike(coefs, R_outer=R_outer, R_inner=R_inner)
+        zernike = batoid.Zernike(coef, R_outer=R_outer, R_inner=R_inner)
         for j in range(100):
             x = np.random.normal(0.0, 1.0)
             y = np.random.normal(0.0, 1.0)
@@ -140,6 +142,7 @@ def test_intersect():
             np.testing.assert_allclose(r.r[2], zernike.sag(x, y), rtol=0, atol=1e-9)
 
 
+@pytest.mark.skipif(not hasGalSim, reason="galsim not found")
 @timer
 def test_intersect_vectorized():
     np.random.seed(5772156)
@@ -156,10 +159,10 @@ def test_intersect_vectorized():
 
     for i in range(100):
         jmax = np.random.randint(1, jmaxmax)
-        coefs = np.random.normal(size=jmax+1)*1e-3
+        coef = np.random.normal(size=jmax+1)*1e-3
         R_outer = np.random.uniform(0.5, 5.0)
         R_inner = np.random.uniform(0.0, 0.8*R_outer)
-        zernike = batoid.Zernike(coefs, R_outer=R_outer, R_inner=R_inner)
+        zernike = batoid.Zernike(coef, R_outer=R_outer, R_inner=R_inner)
 
         r1s = zernike.intersect(r0s)
         r2s = batoid.RayVector([zernike.intersect(r0) for r0 in r0s])
@@ -173,28 +176,29 @@ def test_grad():
     jmaxmax = 100
     for i in range(100):
         jmax = np.random.randint(1, jmaxmax)
-        coefs = np.random.normal(size=jmax+1)*1e-3
+        coef = np.random.normal(size=jmax+1)*1e-3
         R_outer = np.random.uniform(0.5, 5.0)
         R_inner = np.random.uniform(0.0, 0.8*R_outer)
 
-        zernike = batoid.Zernike(coefs, R_outer=R_outer, R_inner=R_inner)
-        gz = galsim.zernike.Zernike(coefs, R_outer=R_outer, R_inner=R_inner)
+        zernike = batoid.Zernike(coef, R_outer=R_outer, R_inner=R_inner)
+        gz = galsim.zernike.Zernike(coef, R_outer=R_outer, R_inner=R_inner)
 
-        np.testing.assert_allclose(zernike.gradX.coefs, gz.gradX.coef, rtol=1e-9, atol=1e-9)
-        np.testing.assert_allclose(zernike.gradY.coefs, gz.gradY.coef, rtol=1e-9, atol=1e-9)
+        np.testing.assert_allclose(zernike.gradX.coef, gz.gradX.coef, rtol=1e-9, atol=1e-9)
+        np.testing.assert_allclose(zernike.gradY.coef, gz.gradY.coef, rtol=1e-9, atol=1e-9)
 
 
+@pytest.mark.skipif(not hasGalSim, reason="galsim not found")
 @timer
 def test_normal():
     np.random.seed(577215664)
-    jmaxmax = 200
+    jmaxmax = 100
     for i in range(100):
         jmax = np.random.randint(1, jmaxmax)
-        coefs = np.random.normal(size=jmax+1)*1e-3
+        coef = np.random.normal(size=jmax+1)*1e-3
         R_outer = np.random.uniform(0.5, 5.0)
         R_inner = np.random.uniform(0.0, 0.8*R_outer)
 
-        zernike = batoid.Zernike(coefs, R_outer=R_outer, R_inner=R_inner)
+        zernike = batoid.Zernike(coef, R_outer=R_outer, R_inner=R_inner)
         gradx = zernike.gradX
         grady = zernike.gradY
 
@@ -205,14 +209,16 @@ def test_normal():
         y = y[w]
 
         for _x, _y in zip(x, y):
+            n1 = zernike.normal(_x, _y)
+            n2 = normalized(np.array([-gradx.sag(_x, _y), -grady.sag(_x, _y), 1]))
             np.testing.assert_allclose(
                 zernike.normal(_x, _y),
                 normalized(np.array([-gradx.sag(_x, _y), -grady.sag(_x, _y), 1])),
-                rtol=0,
-                atol=1e-12
+                atol=1e-9
             )
 
 
+@pytest.mark.skipif(not hasGalSim, reason="galsim not found")
 @timer
 def test_ne():
     objs = [
@@ -226,6 +232,7 @@ def test_ne():
     all_obj_diff(objs)
 
 
+@pytest.mark.skipif(not hasGalSim, reason="galsim not found")
 @timer
 def test_fail():
     zernike = batoid.Zernike([0,0,0,0,1])
