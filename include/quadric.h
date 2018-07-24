@@ -16,9 +16,8 @@ namespace batoid {
         Quadric(double R, double conic);
         virtual double sag(double, double) const override;
         virtual Vector3d normal(double, double) const override;
-        Ray intersect(const Ray&) const override;
-        virtual void intersectInPlace(Ray&) const override;
         virtual bool operator==(const Surface& rhs) const override;
+        bool timeToIntersect(const Ray& r, double& t) const override;
 
         double getR() const {return _R;}
         double getConic() const {return _conic;}
@@ -29,7 +28,6 @@ namespace batoid {
         const double _R;  // Radius of curvature
         const double _conic;  // Conic constant
 
-        bool timeToIntersect(const Ray& r, double& t) const;
         double dzdr(double r) const;
 
     private:

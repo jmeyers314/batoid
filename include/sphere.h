@@ -16,9 +16,8 @@ namespace batoid {
         Sphere(double R);
         virtual double sag(double, double) const override;
         virtual Vector3d normal(double, double) const override;
-        virtual Ray intersect(const Ray&) const override;
-        virtual void intersectInPlace(Ray&) const override;
         virtual bool operator==(const Surface& rhs) const override;
+        bool timeToIntersect(const Ray& r, double& t) const override;
 
         double getR() const { return _R; }
         std::string repr() const override;
@@ -29,7 +28,6 @@ namespace batoid {
         const double _Rinv; // 1/R
         const double _Rinvsq; // 1/R/R
 
-        bool timeToIntersect(const Ray& r, double& t) const;
         double dzdr(double r) const;
     };
 

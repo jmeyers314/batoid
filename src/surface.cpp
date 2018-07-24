@@ -6,6 +6,27 @@ namespace batoid {
         return os << s.repr();
     }
 
+    Ray Surface::intersect(const Ray& r) const {
+        if (r.failed) return r;
+        double t;
+        if (!timeToIntersect(r, t))
+            return Ray(true);
+        Vector3d point = r.positionAtTime(t);
+        return Ray(point, r.v, t, r.wavelength, r.vignetted);
+    }
+
+    void Surface::intersectInPlace(Ray& r) const {
+        if (r.failed) return;
+        double t;
+        if (!timeToIntersect(r, t)) {
+            r.failed=true;
+            return;
+        }
+        r.r = r.positionAtTime(t);
+        r.t = t;
+        return;
+    }
+
     RayVector Surface::intersect(const RayVector& rv) const {
         std::vector<Ray> rays(rv.rays.size());
 

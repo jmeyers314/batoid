@@ -69,27 +69,6 @@ namespace batoid {
         return true;
     }
 
-    Ray Asphere::intersect(const Ray& r) const {
-        if (r.failed) return r;
-        double t;
-        if (!timeToIntersect(r, t))
-            return Ray(true);
-        Vector3d point = r.positionAtTime(t);
-        return Ray(point, r.v, t, r.wavelength, r.vignetted);
-    }
-
-    void Asphere::intersectInPlace(Ray& r) const {
-        if (r.failed) return;
-        double t;
-        if (!timeToIntersect(r, t)) {
-            r.failed=true;
-            return;
-        }
-        r.r = r.positionAtTime(t);
-        r.t = t;
-        return;
-    }
-
     bool Asphere::operator==(const Surface& rhs) const {
         if (const Asphere* other = dynamic_cast<const Asphere*>(&rhs)) {
             return _R == other->_R &&

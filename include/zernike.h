@@ -21,9 +21,8 @@ namespace batoid {
 
         virtual double sag(double, double) const override;
         virtual Vector3d normal(double, double) const override;
-        virtual Ray intersect(const Ray&) const override;
-        virtual void intersectInPlace(Ray&) const override;
         virtual bool operator==(const Surface&) const override;
+        bool timeToIntersect(const Ray& r, double& t) const override;
 
         const std::vector<double>& getCoefs() const { return _coefs; }
         double getROuter() const { return _R_outer; }
@@ -47,7 +46,6 @@ namespace batoid {
 
         void computeCoefArray() const;
         void computeGradCoefs() const;
-        bool timeToIntersect(const Ray& r, double& t) const;
     };
 
     namespace zernike {

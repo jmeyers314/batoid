@@ -52,27 +52,6 @@ namespace batoid {
         return true;
     }
 
-    Ray Paraboloid::intersect(const Ray& r) const {
-        if (r.failed) return r;
-        double t;
-        if (!timeToIntersect(r, t))
-            return Ray(true);
-        Vector3d point = r.positionAtTime(t);
-        return Ray(point, r.v, t, r.wavelength, r.vignetted);
-    }
-
-    void Paraboloid::intersectInPlace(Ray& r) const {
-        if (r.failed) return;
-        double t;
-        if (!timeToIntersect(r, t)) {
-            r.failed=true;
-            return;
-        }
-        r.r = r.positionAtTime(t);
-        r.t = t;
-        return;
-    }
-
     bool Paraboloid::operator==(const Surface& rhs) const {
         if (const Paraboloid* other = dynamic_cast<const Paraboloid*>(&rhs)) {
             return _R == other->_R;

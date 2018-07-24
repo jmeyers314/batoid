@@ -56,15 +56,6 @@ namespace batoid {
         return true;
     }
 
-    Ray Sphere::intersect(const Ray& r) const {
-        if (r.failed) return r;
-        double t;
-        if (!timeToIntersect(r, t))
-            return Ray(true);
-        Vector3d point = r.positionAtTime(t);
-        return Ray(point, r.v, t, r.wavelength, r.vignetted);
-    }
-
     bool Sphere::operator==(const Surface& rhs) const {
         if (const Sphere* other = dynamic_cast<const Sphere*>(&rhs)) {
             return _R == other->_R;
@@ -75,18 +66,6 @@ namespace batoid {
         std::ostringstream oss(" ");
         oss << "Sphere(" << _R << ")";
         return oss.str();
-    }
-
-    void Sphere::intersectInPlace(Ray& r) const {
-        if (r.failed) return;
-        double t;
-        if (!timeToIntersect(r, t)) {
-            r.failed=true;
-            return;
-        }
-        r.r = r.positionAtTime(t);
-        r.t = t;
-        return;
     }
 
     double Sphere::dzdr(double r) const {
