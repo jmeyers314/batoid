@@ -1,4 +1,5 @@
 #include "quadric.h"
+#include <typeinfo>
 #include "utils.h"
 
 namespace batoid {
@@ -64,10 +65,16 @@ namespace batoid {
     }
 
     bool Quadric::operator==(const Surface& rhs) const {
-        if (const Quadric* other = dynamic_cast<const Quadric*>(&rhs)) {
+        if (typeid(rhs) == typeid(Quadric)) {
+            const Quadric* other = static_cast<const Quadric*>(&rhs);
             return _R == other->_R &&
-            _conic == other->_conic;
+                   _conic == other->_conic;
         } else return false;
+        // below fails b/c rhs could be an Asphere, which downcasts to Quadric.
+        // if (const Quadric* other = dynamic_cast<const Quadric*>(&rhs)) {
+        //     return _R == other->_R &&
+        //     _conic == other->_conic;
+        // } else return false;
     }
 
     std::string Quadric::repr() const {

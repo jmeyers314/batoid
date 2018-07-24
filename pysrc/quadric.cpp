@@ -14,8 +14,6 @@ namespace batoid {
             .def(py::init<double,double>(), "init", "R"_a, "conic"_a)
             .def_property_readonly("R", &Quadric::getR)
             .def_property_readonly("conic", &Quadric::getConic)
-            .def(py::self == py::self)
-            .def(py::self != py::self)
             .def(py::pickle(
                 [](const Quadric& q) { return py::make_tuple(q.getR(), q.getConic()); },
                 [](py::tuple t) {

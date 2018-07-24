@@ -21,8 +21,6 @@ namespace batoid {
             .def_property_readonly("R_inner", &Zernike::getRInner)
             .def_property_readonly("gradX", &Zernike::getGradX)
             .def_property_readonly("gradY", &Zernike::getGradY)
-            .def(py::self == py::self)
-            .def(py::self != py::self)
             .def(py::pickle(
                 [](const Zernike& z){ return py::make_tuple(z.getCoefs(), z.getROuter(), z.getRInner()); },
                 [](py::tuple t) {

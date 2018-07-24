@@ -16,8 +16,6 @@ namespace batoid {
             .def_property_readonly("R", &Asphere::getR)
             .def_property_readonly("conic", &Asphere::getConic)
             .def_property_readonly("coefs", &Asphere::getCoefs)
-            .def(py::self == py::self)
-            .def(py::self != py::self)
             .def(py::pickle(
                 [](const Asphere& a) {
                     return py::make_tuple(a.getR(), a.getConic(), a.getCoefs());
