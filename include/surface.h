@@ -37,11 +37,9 @@ namespace batoid {
         void refractInPlace(Ray&, const Medium&, const Medium&) const;
         void refractInPlace(RayVector&, const Medium&, const Medium&) const;
 
-        virtual std::string repr() const = 0;
     private:
         Ray refract(const Ray&, const double, const double) const;
         void refractInPlace(Ray&, const double, const double) const;
     };
-    std::ostream& operator<<(std::ostream& os, const Surface& s);
 }
 #endif

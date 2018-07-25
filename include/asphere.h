@@ -22,7 +22,6 @@ namespace batoid {
         bool timeToIntersect(const Ray& r, double& t) const override;
 
         const std::vector<double>& getCoefs() const { return _coefs; }
-        std::string repr() const override;
 
     private:
         const std::vector<double> _coefs;  // Aspheric even polynomial coefficients

@@ -2,10 +2,6 @@
 #include "utils.h"
 
 namespace batoid {
-    std::ostream& operator<<(std::ostream& os, const Surface& s) {
-        return os << s.repr();
-    }
-
     Ray Surface::intersect(const Ray& r) const {
         if (r.failed) return r;
         double t;

@@ -62,12 +62,6 @@ namespace batoid {
         } else return false;
     }
 
-    std::string Sphere::repr() const {
-        std::ostringstream oss(" ");
-        oss << "Sphere(" << _R << ")";
-        return oss.str();
-    }
-
     double Sphere::dzdr(double r) const {
         double rat = r*_Rinv;
         return rat/std::sqrt(1-rat*rat);

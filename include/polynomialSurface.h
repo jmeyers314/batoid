@@ -22,7 +22,6 @@ namespace batoid {
         bool timeToIntersect(const Ray& r, double & t) const override;
 
         MatrixXd getCoefs() const {return _coefs; }
-        std::string repr() const override;
 
         PolynomialSurface getGradX() const;
         PolynomialSurface getGradY() const;

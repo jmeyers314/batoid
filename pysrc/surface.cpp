@@ -28,8 +28,6 @@ namespace batoid {
             .def("refract", (Ray (Surface::*)(const Ray&, const Medium&, const Medium&) const) &Surface::refract)
             .def("refract", (RayVector (Surface::*)(const RayVector&, const Medium&, const Medium&) const) &Surface::refract)
             .def("refractInPlace", (void (Surface::*)(Ray&, const Medium&, const Medium&) const) &Surface::refractInPlace)
-            .def("refractInPlace", (void (Surface::*)(RayVector&, const Medium&, const Medium&) const) &Surface::refractInPlace)
-
-            .def("__repr__", &Surface::repr);
+            .def("refractInPlace", (void (Surface::*)(RayVector&, const Medium&, const Medium&) const) &Surface::refractInPlace);
     }
 }

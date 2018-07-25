@@ -20,7 +20,6 @@ namespace batoid {
         bool timeToIntersect(const Ray& r, double& t) const override;
 
         double getR() const { return _R; }
-        std::string repr() const override;
 
     private:
         const double _R;  // Radius of curvature

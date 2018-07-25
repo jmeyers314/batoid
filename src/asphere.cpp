@@ -77,20 +77,6 @@ namespace batoid {
         } else return false;
     }
 
-    std::string Asphere::repr() const {
-        std::ostringstream oss(" ");
-        oss << "Asphere(" << getR() << ", " << getConic() << ", [";
-        if (_coefs.size() == 0) {
-            oss << "])";
-            return oss.str();
-        }
-        size_t i=0;
-        for (; i<_coefs.size()-1; i++)
-            oss << _coefs[i] << ", ";
-        oss << _coefs[i] << "])";
-        return oss.str();
-    }
-
     double Asphere::dzdr(double r) const {
         double result = Quadric::dzdr(r);
         double rr = r*r;

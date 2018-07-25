@@ -52,22 +52,6 @@ namespace batoid {
         } else return false;
     }
 
-    std::string PolynomialSurface::repr() const {
-        std::ostringstream oss;
-        oss << "PolynomialSurface(np.array([";
-        size_t i=0;
-        for (; i<_coefs.rows(); i++) {
-            oss << "[";
-            size_t j=0;
-            for (; j<_coefs.cols()-1; j++) {
-                oss << _coefs(i,j) << ",";
-            }
-            oss << _coefs(i, j) << "]";
-        }
-        oss << "])";
-        return oss.str();
-    }
-
     void PolynomialSurface::computeGradCoefs() const {
         std::lock_guard<std::mutex> lock(_mtx);
         if (!_grad_ready) {

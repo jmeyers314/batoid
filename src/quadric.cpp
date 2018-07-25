@@ -77,12 +77,6 @@ namespace batoid {
         // } else return false;
     }
 
-    std::string Quadric::repr() const {
-        std::ostringstream oss(" ");
-        oss << "Quadric(" << _R << ", " << _conic << ")";
-        return oss.str();
-    }
-
     double Quadric::dzdr(double r) const {
         if (_R != 0.0)
             return r/(_R*std::sqrt(1-r*r*_cp1RR));

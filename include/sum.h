@@ -19,12 +19,9 @@ namespace batoid {
         bool timeToIntersect(const Ray& r, double& t) const override;
 
         const std::vector<std::shared_ptr<Surface>>& getSurfaces() const { return _surfaces; }
-        std::string repr() const override;
 
     private:
         const std::vector<std::shared_ptr<Surface>> _surfaces;
-
-        static std::vector<std::shared_ptr<Surface>> sortedSurfaces(const std::vector<std::shared_ptr<Surface>>);
     };
 
 }

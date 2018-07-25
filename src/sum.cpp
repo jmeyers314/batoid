@@ -5,17 +5,7 @@
 namespace batoid {
 
     Sum::Sum(const std::vector<std::shared_ptr<Surface>> surfaces) :
-        _surfaces(sortedSurfaces(surfaces)) {}
-
-    std::vector<std::shared_ptr<Surface>> Sum::sortedSurfaces(const std::vector<std::shared_ptr<Surface>> surfaces) {
-        std::vector<std::shared_ptr<Surface>> result(surfaces);
-        std::sort(
-            result.begin(), result.end(),
-            [](std::shared_ptr<Surface> a, std::shared_ptr<Surface> b)
-            { return a->repr() < b->repr(); }
-        );
-        return result;
-    }
+        _surfaces(surfaces) {}
 
     double Sum::sag(double x, double y) const {
         double result = 0.0;
@@ -74,16 +64,5 @@ namespace batoid {
                     return *a == *b;
                 });
         } else return false;
-    }
-
-    std::string Sum::repr() const {
-        std::ostringstream oss;
-        oss << "Sum([";
-        size_t i=0;
-        for(; i<_surfaces.size()-1; i++) {
-            oss << *_surfaces[i] << ", ";
-        }
-        oss << *_surfaces[i] << "])";
-        return oss.str();
     }
 }

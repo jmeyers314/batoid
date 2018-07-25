@@ -21,7 +21,6 @@ namespace batoid {
 
         double getR() const {return _R;}
         double getConic() const {return _conic;}
-        std::string repr() const override;
 
     protected:
         const double _R;  // Radius of curvature

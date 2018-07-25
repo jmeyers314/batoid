@@ -6,12 +6,6 @@ namespace batoid {
 
     Paraboloid::Paraboloid(double R) : _R(R), _Rinv(1./R), _2Rinv(1./2/R) {}
 
-    std::string Paraboloid::repr() const {
-        std::ostringstream oss(" ");
-        oss << "Paraboloid(" << _R << ")";
-        return oss.str();
-    }
-
     double Paraboloid::sag(double x, double y) const {
         if (_R != 0) {
             double r2 = x*x + y*y;
