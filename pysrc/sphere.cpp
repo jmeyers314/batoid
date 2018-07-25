@@ -12,12 +12,6 @@ namespace batoid {
     void pyExportSphere(py::module& m) {
         py::class_<Sphere, std::shared_ptr<Sphere>, Surface>(m, "Sphere")
             .def(py::init<double>(), "init", "R"_a)
-            .def_property_readonly("R", &Sphere::getR)
-            .def("__hash__", [](const Sphere& s) {
-                return py::hash(py::make_tuple(
-                    "Sphere",
-                    s.getR()
-                ));
-            });
+            .def_property_readonly("R", &Sphere::getR);
     }
 }

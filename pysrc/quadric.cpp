@@ -13,13 +13,6 @@ namespace batoid {
         py::class_<Quadric, std::shared_ptr<Quadric>, Surface>(m, "Quadric")
             .def(py::init<double,double>(), "init", "R"_a, "conic"_a)
             .def_property_readonly("R", &Quadric::getR)
-            .def_property_readonly("conic", &Quadric::getConic)
-            .def("__hash__", [](const Quadric& q) {
-                return py::hash(py::make_tuple(
-                    "Quadric",
-                    q.getR(),
-                    q.getConic()
-                ));
-            });
+            .def_property_readonly("conic", &Quadric::getConic);
     }
 }

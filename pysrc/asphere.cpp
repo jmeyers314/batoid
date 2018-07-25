@@ -15,14 +15,6 @@ namespace batoid {
             .def(py::init<double,double,std::vector<double>>(), "init", "R"_a, "conic"_a, "coefs"_a)
             .def_property_readonly("R", &Asphere::getR)
             .def_property_readonly("conic", &Asphere::getConic)
-            .def_property_readonly("coefs", &Asphere::getCoefs)
-            .def("__hash__", [](const Asphere& a) {
-                return py::hash(py::make_tuple(
-                    "Asphere",
-                    a.getR(),
-                    a.getConic(),
-                    py::tuple(py::cast(a.getCoefs()))
-                ));
-            });
+            .def_property_readonly("coefs", &Asphere::getCoefs);
     }
 }
