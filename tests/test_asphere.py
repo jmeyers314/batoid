@@ -82,6 +82,27 @@ def test_intersect():
     # Check normal for R=0 paraboloid (a plane)
     asphere = batoid.Asphere(0.0, 0.0, [])
     np.testing.assert_array_equal(asphere.normal(0.1, 0.1), [0,0,1])
+    # Check that normal parallelizes
+    xs = np.random.normal(size=20)
+    ys = np.random.normal(size=20)
+    np.testing.assert_array_equal(
+        asphere.normal(xs, ys),
+        np.array([asphere.normal(x, y) for x, y in zip(xs, ys)])
+    )
+    # Test shape vectorization
+    np.testing.assert_array_equal(
+        asphere.normal(xs.reshape((10, 2)), ys.reshape((10, 2))),
+        np.array([asphere.normal(x, y) for x, y in zip(xs, ys)]).reshape(10, 2, 3)
+    )
+    np.testing.assert_array_equal(
+        asphere.normal(xs.reshape((2, 5, 2)), ys.reshape((2, 5, 2))),
+        np.array([asphere.normal(x, y) for x, y in zip(xs, ys)]).reshape(2, 5, 2, 3)
+    )
+    # Also test non-unit strides on last index
+    np.testing.assert_array_equal(
+        asphere.normal(xs.reshape((10, 2))[::2], ys.reshape((10, 2))[::2]),
+        np.array([asphere.normal(x, y) for x, y in zip(xs, ys)]).reshape(10, 2, 3)[::2]
+    )
 
 
 @timer
