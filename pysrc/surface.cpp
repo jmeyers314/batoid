@@ -10,8 +10,6 @@ namespace py = pybind11;
 namespace batoid {
     void pyExportSurface(py::module& m) {
         py::class_<Surface, std::shared_ptr<Surface>>(m, "Surface")
-            .def(py::self == py::self)
-            .def(py::self != py::self)
             .def("sag", py::vectorize(&Surface::sag))
             .def("normal", &Surface::normal)
 

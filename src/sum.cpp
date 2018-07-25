@@ -54,15 +54,4 @@ namespace batoid {
         if (t < r.t) return false;
         return true;
     }
-
-    bool Sum::operator==(const Surface& rhs) const {
-        if (const Sum* other = dynamic_cast<const Sum*>(&rhs)) {
-            if (_surfaces.size() != other->_surfaces.size()) return false;
-            return std::equal(
-                _surfaces.begin(), _surfaces.end(), other->_surfaces.begin(),
-                [](std::shared_ptr<Surface> a, std::shared_ptr<Surface> b){
-                    return *a == *b;
-                });
-        } else return false;
-    }
 }

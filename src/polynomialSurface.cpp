@@ -46,12 +46,6 @@ namespace batoid {
         return true;
     }
 
-    bool PolynomialSurface::operator==(const Surface& rhs) const {
-        if (const PolynomialSurface* other = dynamic_cast<const PolynomialSurface*>(&rhs)) {
-            return _coefs == other->_coefs;
-        } else return false;
-    }
-
     void PolynomialSurface::computeGradCoefs() const {
         std::lock_guard<std::mutex> lock(_mtx);
         if (!_grad_ready) {

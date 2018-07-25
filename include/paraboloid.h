@@ -16,7 +16,6 @@ namespace batoid {
         Paraboloid(double R);
         virtual double sag(double, double) const override;
         virtual Vector3d normal(double, double) const override;
-        virtual bool operator==(const Surface& rhs) const override;
         bool timeToIntersect(const Ray& r, double& t) const override;
 
         double getR() const {return _R;}

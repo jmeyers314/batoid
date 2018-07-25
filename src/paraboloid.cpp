@@ -45,12 +45,4 @@ namespace batoid {
         t += r.t;
         return true;
     }
-
-    bool Paraboloid::operator==(const Surface& rhs) const {
-        if (const Paraboloid* other = dynamic_cast<const Paraboloid*>(&rhs)) {
-            return _R == other->_R;
-        } else return false;
-    }
-
-
 }

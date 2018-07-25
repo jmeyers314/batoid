@@ -18,7 +18,6 @@ namespace batoid {
 
         virtual double sag(double, double) const override;
         virtual Vector3d normal(double, double) const override;
-        virtual bool operator==(const Surface&) const override;
         bool timeToIntersect(const Ray& r, double & t) const override;
 
         MatrixXd getCoefs() const {return _coefs; }

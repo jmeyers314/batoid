@@ -16,10 +16,6 @@ namespace batoid {
     public:
         virtual double sag(double, double) const = 0;
         virtual Vector3d normal(double, double) const = 0;
-
-        virtual bool operator==(const Surface& rhs) const = 0;
-        bool operator!=(const Surface& rhs) const { return !operator==(rhs); }
-
         virtual bool timeToIntersect(const Ray& r, double& t) const = 0;
 
         Ray intersect(const Ray&) const;

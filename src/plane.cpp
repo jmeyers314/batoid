@@ -7,8 +7,4 @@ namespace batoid {
         if (t < r.t) return false;
         return true;
     }
-
-    bool Plane::operator==(const Surface& rhs) const {
-        return bool(dynamic_cast<const Plane*>(&rhs));
-    }
 }

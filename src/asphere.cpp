@@ -69,14 +69,6 @@ namespace batoid {
         return true;
     }
 
-    bool Asphere::operator==(const Surface& rhs) const {
-        if (const Asphere* other = dynamic_cast<const Asphere*>(&rhs)) {
-            return _R == other->_R &&
-            _conic == other->_conic &&
-            _coefs == other->_coefs;
-        } else return false;
-    }
-
     double Asphere::dzdr(double r) const {
         double result = Quadric::dzdr(r);
         double rr = r*r;

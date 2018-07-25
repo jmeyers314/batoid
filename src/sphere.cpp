@@ -56,12 +56,6 @@ namespace batoid {
         return true;
     }
 
-    bool Sphere::operator==(const Surface& rhs) const {
-        if (const Sphere* other = dynamic_cast<const Sphere*>(&rhs)) {
-            return _R == other->_R;
-        } else return false;
-    }
-
     double Sphere::dzdr(double r) const {
         double rat = r*_Rinv;
         return rat/std::sqrt(1-rat*rat);

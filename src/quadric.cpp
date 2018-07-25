@@ -64,19 +64,6 @@ namespace batoid {
         return true;
     }
 
-    bool Quadric::operator==(const Surface& rhs) const {
-        if (typeid(rhs) == typeid(Quadric)) {
-            const Quadric* other = static_cast<const Quadric*>(&rhs);
-            return _R == other->_R &&
-                   _conic == other->_conic;
-        } else return false;
-        // below fails b/c rhs could be an Asphere, which downcasts to Quadric.
-        // if (const Quadric* other = dynamic_cast<const Quadric*>(&rhs)) {
-        //     return _R == other->_R &&
-        //     _conic == other->_conic;
-        // } else return false;
-    }
-
     double Quadric::dzdr(double r) const {
         if (_R != 0.0)
             return r/(_R*std::sqrt(1-r*r*_cp1RR));
