@@ -18,7 +18,7 @@ def test_properties():
         assert s1 in sum.surfaces
         assert s2 in sum.surfaces
 
-        s3 = batoid.Zernike([0]*np.random.randint(1, 55)+[np.random.normal()])
+        s3 = batoid.Quadric(np.random.uniform(3, 5), np.random.uniform(-0.1, 0.1))
         sum2 = batoid.Sum([s1, s2, s3])
         do_pickle(sum2)
         # check commutativity
@@ -53,7 +53,7 @@ def test_sag():
             atol=1e-12
         )
 
-        s3 = batoid.Zernike([0]*np.random.randint(1, 55)+[np.random.normal()])
+        s3 = batoid.Quadric(np.random.uniform(3, 5), np.random.uniform(-0.1, 0.1))
         sum2 = batoid.Sum([s1, s2, s3])
 
         np.testing.assert_allclose(
@@ -175,7 +175,7 @@ def test_ne():
 
 @timer
 def test_fail():
-    sum = batoid.Sum([batoid.Zernike([0,0,0,0,1]), batoid.Sphere(1.0)])
+    sum = batoid.Sum([batoid.Plane(), batoid.Sphere(1.0)])
     ray = batoid.Ray([0,0,sum.sag(0,0)-1], [0,0,-1])
     ray = sum.intersect(ray)
     assert ray.failed
