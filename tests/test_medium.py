@@ -1,7 +1,7 @@
 import os
 import batoid
 import numpy as np
-from test_helpers import isclose, timer, do_pickle, all_obj_diff
+from test_helpers import timer, do_pickle, all_obj_diff
 
 
 @timer
@@ -80,7 +80,7 @@ def test_air():
     gsn = [ 1.00019563,  1.00018713,  1.00018498,  1.00018412,  1.00018369]
     air = batoid.Air()
     for w, n in zip(ws, gsn):
-        assert isclose(n, air.getN(w*1e-6), abs_tol=1e-8, rel_tol=0)
+        np.testing.assert_allclose(n, air.getN(w*1e-6), rtol=0, atol=1e-8)
     do_pickle(air)
 
 

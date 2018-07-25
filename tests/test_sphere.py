@@ -1,7 +1,7 @@
 import batoid
 import numpy as np
 import math
-from test_helpers import isclose, timer, do_pickle, all_obj_diff
+from test_helpers import timer, do_pickle, all_obj_diff
 
 
 @timer
@@ -26,7 +26,7 @@ def test_sag():
             x = random.uniform(-0.7*R, 0.7*R)
             y = random.uniform(-0.7*R, 0.7*R)
             result = sphere.sag(x, y)
-            assert isclose(result, R*(1-math.sqrt(1.0-(x*x + y*y)/R/R)))
+            np.testing.assert_allclose(result, R*(1-math.sqrt(1.0-(x*x + y*y)/R/R)))
             # Check that it returned a scalar float and not an array
             assert isinstance(result, float)
         # Check vectorization
@@ -55,9 +55,9 @@ def test_intersect():
             # intersection points.
             r0 = batoid.Ray(x, y, -1000, 0, 0, 1, 0)
             r = sphere.intersect(r0)
-            assert isclose(r.r[0], x)
-            assert isclose(r.r[1], y)
-            assert isclose(r.r[2], sphere.sag(x, y), rel_tol=0, abs_tol=1e-9)
+            np.testing.assert_allclose(r.r[0], x)
+            np.testing.assert_allclose(r.r[1], y)
+            np.testing.assert_allclose(r.r[2], sphere.sag(x, y), rtol=0, atol=1e-9)
 
     # Check normal for R=0 paraboloid (a plane)
     sphere = batoid.Sphere(0.0)

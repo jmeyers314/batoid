@@ -1,6 +1,6 @@
 import numpy as np
 import batoid
-from test_helpers import isclose, timer, do_pickle, all_obj_diff, vec3_isclose, rot3_isclose
+from test_helpers import timer, do_pickle, all_obj_diff
 
 
 def randomVec3():

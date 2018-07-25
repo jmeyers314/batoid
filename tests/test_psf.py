@@ -2,7 +2,7 @@ import os
 import numpy as np
 import batoid
 import yaml
-from test_helpers import timer, isclose
+from test_helpers import timer
 
 
 @timer
@@ -79,12 +79,12 @@ def test_huygens_psf():
         print("GalSim rho4: ", gs_mom.moments_rho4)
         print("batoid rho4: ", jt_mom.moments_rho4)
 
-        assert isclose(gs_mom.observed_shape.g1, jt_mom.observed_shape.g1, abs_tol=3e-3, rel_tol=0.0)
-        assert isclose(gs_mom.observed_shape.g2, jt_mom.observed_shape.g2, abs_tol=3e-3, rel_tol=0.0)
-        assert isclose(gs_mom.moments_centroid.x, jt_mom.moments_centroid.x, abs_tol=1e-9, rel_tol=0.0)
-        assert isclose(gs_mom.moments_centroid.y, jt_mom.moments_centroid.y, abs_tol=1e-9, rel_tol=0.0)
-        assert isclose(gs_mom.moments_sigma, jt_mom.moments_sigma, rel_tol=1e-2) # why not better?!
-        assert isclose(gs_mom.moments_rho4, jt_mom.moments_rho4, rel_tol=2e-2)
+        np.testing.assert_allclose(gs_mom.observed_shape.g1, jt_mom.observed_shape.g1, rtol=0.0, atol=3e-3)
+        np.testing.assert_allclose(gs_mom.observed_shape.g2, jt_mom.observed_shape.g2, rtol=0.0, atol=3e-3)
+        np.testing.assert_allclose(gs_mom.moments_centroid.x, jt_mom.moments_centroid.x, rtol=0.0, atol=1e-9)
+        np.testing.assert_allclose(gs_mom.moments_centroid.y, jt_mom.moments_centroid.y, rtol=0.0, atol=1e-9)
+        np.testing.assert_allclose(gs_mom.moments_sigma, jt_mom.moments_sigma, rtol=1e-2) # why not better?!
+        np.testing.assert_allclose(gs_mom.moments_rho4, jt_mom.moments_rho4, rtol=2e-2)
 
         if __name__ == '__main__':
             size = scale*npix

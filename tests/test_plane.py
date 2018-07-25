@@ -1,6 +1,6 @@
 import batoid
 import numpy as np
-from test_helpers import isclose, timer, do_pickle
+from test_helpers import timer, do_pickle
 
 
 @timer
@@ -13,7 +13,7 @@ def test_sag():
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
             result = plane.sag(x, y)
-            assert isclose(result, 0.0)
+            np.testing.assert_allclose(result, 0.0)
             # Check that it returned a scalar float and not an array
             assert isinstance(result, float)
         # Check vectorization
@@ -39,9 +39,9 @@ def test_intersect():
             # intersection points.
             r0 = batoid.Ray(x, y, -1000, 0, 0, 1, 0)
             r = plane.intersect(r0)
-            assert isclose(r.r[0], x)
-            assert isclose(r.r[1], y)
-            assert isclose(r.r[2], plane.sag(x, y), rel_tol=0, abs_tol=1e-9)
+            np.testing.assert_allclose(r.r[0], x)
+            np.testing.assert_allclose(r.r[1], y)
+            np.testing.assert_allclose(r.r[2], plane.sag(x, y), rtol=0, atol=1e-9)
 
 
 @timer

@@ -1,6 +1,6 @@
 import numpy as np
 import batoid
-from test_helpers import isclose, timer
+from test_helpers import timer
 
 
 @timer
@@ -21,15 +21,15 @@ def test_plane_reflection_plane():
         # ray.v, surfaceNormal, and rray.v should all be in the same plane, and
         # hence (ray.v x surfaceNormal) . rray.v should have zero magnitude.
         # magnitude zero.
-        assert isclose(
+        np.testing.assert_allclose(
             np.dot(np.cross(ray.v, plane.normal(rray.r[0], rray.r[1])), rray.v),
-            0.0, rel_tol=0, abs_tol=1e-15)
+            0.0, rtol=0, atol=1e-15)
 
         # Actually, reflection off a plane is pretty straigtforward to test
         # directly.
-        assert isclose(ray.v[0], rray.v[0])
-        assert isclose(ray.v[1], rray.v[1])
-        assert isclose(ray.v[2], -rray.v[2])
+        np.testing.assert_allclose(ray.v[0], rray.v[0])
+        np.testing.assert_allclose(ray.v[1], rray.v[1])
+        np.testing.assert_allclose(ray.v[2], -rray.v[2])
 
 
 @timer
@@ -54,15 +54,15 @@ def test_plane_reflection_reversal():
         turn_around = rray.positionAtTime(rray.t+0.1)
         return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t+0.1))
         riray = plane.intersect(return_ray)
-        assert isclose(rray.r[0], riray.r[0], rel_tol=0, abs_tol=1e-10)
-        assert isclose(rray.r[1], riray.r[1], rel_tol=0, abs_tol=1e-10)
-        assert isclose(rray.r[2], riray.r[2], rel_tol=0, abs_tol=1e-10)
+        np.testing.assert_allclose(rray.r[0], riray.r[0], rtol=0, atol=1e-10)
+        np.testing.assert_allclose(rray.r[1], riray.r[1], rtol=0, atol=1e-10)
+        np.testing.assert_allclose(rray.r[2], riray.r[2], rtol=0, atol=1e-10)
         # Reflect and propagate back to t=0.
         cray = plane.reflect(return_ray)
         cray = cray.positionAtTime(0)
-        assert isclose(cray[0], x, rel_tol=0, abs_tol=1e-10)
-        assert isclose(cray[1], y, rel_tol=0, abs_tol=1e-10)
-        assert isclose(cray[2], -10, rel_tol=0, abs_tol=1e-10)
+        np.testing.assert_allclose(cray[0], x, rtol=0, atol=1e-10)
+        np.testing.assert_allclose(cray[1], y, rtol=0, atol=1e-10)
+        np.testing.assert_allclose(cray[2], -10, rtol=0, atol=1e-10)
 
 
 @timer
@@ -81,9 +81,9 @@ def test_paraboloid_reflection_plane():
         # ray.v, surfaceNormal, and rray.v should all be in the same plane, and
         # hence (ray.v x surfaceNormal) . rray.v should have zero magnitude.
         # magnitude zero.
-        assert isclose(
+        np.testing.assert_allclose(
             np.dot(np.cross(ray.v, para.normal(rray.r[0], rray.r[1])), rray.v),
-            0.0, rel_tol=0, abs_tol=1e-15)
+            0.0, rtol=0, atol=1e-15)
 
 
 @timer
@@ -110,15 +110,15 @@ def test_paraboloid_reflection_reversal():
         return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t+0.1))
         riray = para.intersect(return_ray)
         # First check that we intersected at the same point
-        assert isclose(rray.r[0], riray.r[0], rel_tol=0, abs_tol=1e-10)
-        assert isclose(rray.r[1], riray.r[1], rel_tol=0, abs_tol=1e-10)
-        assert isclose(rray.r[2], riray.r[2], rel_tol=0, abs_tol=1e-10)
+        np.testing.assert_allclose(rray.r[0], riray.r[0], rtol=0, atol=1e-10)
+        np.testing.assert_allclose(rray.r[1], riray.r[1], rtol=0, atol=1e-10)
+        np.testing.assert_allclose(rray.r[2], riray.r[2], rtol=0, atol=1e-10)
         # Reflect and propagate back to t=0.
         cray = para.reflect(return_ray)
         cray = cray.positionAtTime(0)
-        assert isclose(cray[0], x, rel_tol=0, abs_tol=1e-10)
-        assert isclose(cray[1], y, rel_tol=0, abs_tol=1e-10)
-        assert isclose(cray[2], -10, rel_tol=0, abs_tol=1e-10)
+        np.testing.assert_allclose(cray[0], x, rtol=0, atol=1e-10)
+        np.testing.assert_allclose(cray[1], y, rtol=0, atol=1e-10)
+        np.testing.assert_allclose(cray[2], -10, rtol=0, atol=1e-10)
 
 
 @timer
@@ -138,9 +138,9 @@ def test_paraboloid_reflection_to_focus():
             # t = t0 - p0[0]/vx
             t = rray.t - rray.r[0]/rray.v[0]
             focus = rray.positionAtTime(t)
-            assert isclose(focus[0], 0, abs_tol=1e-12)
-            assert isclose(focus[1], 0, abs_tol=1e-12)
-            assert isclose(focus[2], R/2.0, abs_tol=1e-12)
+            np.testing.assert_allclose(focus[0], 0, atol=1e-12)
+            np.testing.assert_allclose(focus[1], 0, atol=1e-12)
+            np.testing.assert_allclose(focus[2], R/2.0, atol=1e-12)
 
 
 @timer
@@ -159,9 +159,9 @@ def test_asphere_reflection_plane():
         # ray.v, surfaceNormal, and rray.v should all be in the same plane, and
         # hence (ray.v x surfaceNormal) . rray.v should have zero magnitude.
         # magnitude zero.
-        assert isclose(
+        np.testing.assert_allclose(
             np.dot(np.cross(ray.v, asphere.normal(rray.r[0], rray.r[1])), rray.v),
-            0.0, rel_tol=0, abs_tol=1e-15)
+            0.0, rtol=0, atol=1e-15)
 
 
 @timer
@@ -187,15 +187,15 @@ def test_asphere_reflection_reversal():
         return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t+0.1))
         riray = asphere.intersect(return_ray)
         # First check that we intersected at the same point
-        assert isclose(rray.r[0], riray.r[0], rel_tol=0, abs_tol=1e-9)
-        assert isclose(rray.r[1], riray.r[1], rel_tol=0, abs_tol=1e-9)
-        assert isclose(rray.r[2], riray.r[2], rel_tol=0, abs_tol=1e-9)
+        np.testing.assert_allclose(rray.r[0], riray.r[0], rtol=0, atol=1e-9)
+        np.testing.assert_allclose(rray.r[1], riray.r[1], rtol=0, atol=1e-9)
+        np.testing.assert_allclose(rray.r[2], riray.r[2], rtol=0, atol=1e-9)
         # Reflect and propagate back to t=0.
         cray = asphere.reflect(return_ray)
         cray = cray.positionAtTime(0)
-        assert isclose(cray[0], x, rel_tol=0, abs_tol=1e-9)
-        assert isclose(cray[1], y, rel_tol=0, abs_tol=1e-9)
-        assert isclose(cray[2], -0.1, rel_tol=0, abs_tol=1e-9)
+        np.testing.assert_allclose(cray[0], x, rtol=0, atol=1e-9)
+        np.testing.assert_allclose(cray[1], y, rtol=0, atol=1e-9)
+        np.testing.assert_allclose(cray[2], -0.1, rtol=0, atol=1e-9)
 
 
 if __name__ == '__main__':

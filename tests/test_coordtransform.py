@@ -1,6 +1,6 @@
 import numpy as np
 import batoid
-from test_helpers import vec3_isclose, ray_isclose, timer, rays_allclose, do_pickle
+from test_helpers import ray_isclose, rays_allclose, timer, do_pickle
 
 
 def randomVec3():

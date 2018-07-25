@@ -5,40 +5,26 @@ def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
     return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
 
 
-def vec3_isclose(v1, v2, abs_tol=1e-14):
-    return (isclose(v1.x, v2.x, rel_tol=0, abs_tol=abs_tol)
-            and isclose(v1.y, v2.y, rel_tol=0, abs_tol=abs_tol)
-            and isclose(v1.z, v2.z, rel_tol=0, abs_tol=abs_tol))
+def ray_isclose(ray1, ray2, atol=1e-14):
+    return (
+        np.allclose(ray1.r, ray2.r, rtol=0, atol=atol)
+        and np.allclose(ray1.v, ray2.v, rtol=0, atol=atol)
+        and np.allclose(ray1.t, ray2.t, rtol=0, atol=atol)
+        and np.allclose(ray1.wavelength, ray2.wavelength, rtol=0, atol=atol)
+        and ray1.vignetted == ray2.vignetted
+        and ray1.failed == ray2.failed
+    )
 
 
-def rot3_isclose(rot1, rot2, abs_tol=1e-14):
-    return np.allclose(rot1.euler, rot2.euler, atol=abs_tol)
-
-
-def ray_isclose(ray1, ray2, abs_tol=1e-14):
-    return (isclose(ray1.x, ray2.x, rel_tol=0, abs_tol=abs_tol)
-            and isclose(ray1.y, ray2.y, rel_tol=0, abs_tol=abs_tol)
-            and isclose(ray1.z, ray2.z, rel_tol=0, abs_tol=abs_tol)
-            and isclose(ray1.vx, ray2.vx, rel_tol=0, abs_tol=abs_tol)
-            and isclose(ray1.vy, ray2.vy, rel_tol=0, abs_tol=abs_tol)
-            and isclose(ray1.vz, ray2.vz, rel_tol=0, abs_tol=abs_tol)
-            and isclose(ray1.wavelength, ray2.wavelength, rel_tol=0, abs_tol=abs_tol)
-            and isclose(ray1.t, ray2.t, rel_tol=0, abs_tol=abs_tol)
-            and ray1.vignetted == ray2.vignetted
-            and ray1.failed == ray2.failed)
-
-
-def rays_allclose(rv1, rv2, abs_tol=1e-14):
-    return (np.allclose(rv1.x, rv2.x, rtol=0, atol=abs_tol)
-            and np.allclose(rv1.y, rv2.y, rtol=0, atol=abs_tol)
-            and np.allclose(rv1.z, rv2.z, rtol=0, atol=abs_tol)
-            and np.allclose(rv1.vx, rv2.vx, rtol=0, atol=abs_tol)
-            and np.allclose(rv1.vy, rv2.vy, rtol=0, atol=abs_tol)
-            and np.allclose(rv1.vz, rv2.vz, rtol=0, atol=abs_tol)
-            and np.allclose(rv1.t, rv2.t, rtol=0, atol=abs_tol)
-            and np.allclose(rv1.wavelength, rv2.wavelength, rtol=0, atol=abs_tol)
-            and np.all(rv1.vignetted == rv2.vignetted)
-            and np.all(rv1.failed == rv2.failed))
+def rays_allclose(rv1, rv2, atol=1e-14):
+    return (
+        np.allclose(rv1.r, rv2.r, rtol=0, atol=atol)
+        and np.allclose(rv1.v, rv2.v, rtol=0, atol=atol)
+        and np.allclose(rv1.t, rv2.t, rtol=0, atol=atol)
+        and np.allclose(rv1.wavelength, rv2.wavelength, rtol=0, atol=atol)
+        and np.all(rv1.vignetted == rv2.vignetted)
+        and np.all(rv1.failed == rv2.failed)
+    )
 
 
 def timer(f):

@@ -1,6 +1,6 @@
 import batoid
 import numpy as np
-from test_helpers import isclose, timer, do_pickle, all_obj_diff
+from test_helpers import timer, do_pickle, all_obj_diff
 
 
 @timer
@@ -82,31 +82,31 @@ def test_phase():
             # wavelength, but keep the time the same, the phase should still be
             # 0 (mod 2pi), which we can check for via the amplitude being 1.0
             r1 = ray.positionAtTime(t+5123456789*w)
-            assert isclose(ray.amplitude(r1, t).real, 1.0,
-                           rel_tol=0, abs_tol=1e-9)
+            np.testing.assert_allclose(ray.amplitude(r1, t).real, 1.0,
+                                       rtol=0, atol=1e-9)
             # Let's try a half integer
             r1 = ray.positionAtTime(t+6987654321.5*w)
-            assert isclose(ray.amplitude(r1, t).real, -1.0,
-                           rel_tol=0, abs_tol=1e-9)
+            np.testing.assert_allclose(ray.amplitude(r1, t).real, -1.0,
+                                       rtol=0, atol=1e-9)
             # And a quarter integer
             r1 = ray.positionAtTime(t+7192837465.25*w)
-            assert isclose(ray.amplitude(r1, t).imag, 1.0,
-                           rel_tol=0, abs_tol=1e-9)
+            np.testing.assert_allclose(ray.amplitude(r1, t).imag, 1.0,
+                                       rtol=0, atol=1e-9)
             # And a three-quarters integer
             r1 = ray.positionAtTime(t+7182738495.75*w)
-            assert isclose(ray.amplitude(r1, t).imag, -1.0,
-                           rel_tol=0, abs_tol=1e-9)
+            np.testing.assert_allclose(ray.amplitude(r1, t).imag, -1.0,
+                                       rtol=0, atol=1e-9)
 
             # We can also keep the position the same, and change the time in
             # (half/quarter) integer multiples of the period.
-            assert isclose(ray.amplitude(ray.r, t + 5e9*w).real, 1.0,
-                           rel_tol=0, abs_tol=1e-9)
-            assert isclose(ray.amplitude(ray.r, t + (5e9+5.5)*w).real, -1.0,
-                           rel_tol=0, abs_tol=1e-9)
-            assert isclose(ray.amplitude(ray.r, t + (5e9+2.25)*w).imag, -1.0,
-                           rel_tol=0, abs_tol=1e-9)
-            assert isclose(ray.amplitude(ray.r, t + (5e9+1.75)*w).imag, 1.0,
-                           rel_tol=0, abs_tol=1e-9)
+            np.testing.assert_allclose(ray.amplitude(ray.r, t + 5e9*w).real, 1.0,
+                                       rtol=0, atol=1e-9)
+            np.testing.assert_allclose(ray.amplitude(ray.r, t + (5e9+5.5)*w).real, -1.0,
+                                       rtol=0, atol=1e-9)
+            np.testing.assert_allclose(ray.amplitude(ray.r, t + (5e9+2.25)*w).imag, -1.0,
+                                       rtol=0, atol=1e-9)
+            np.testing.assert_allclose(ray.amplitude(ray.r, t + (5e9+1.75)*w).imag, 1.0,
+                                       rtol=0, atol=1e-9)
 
             # If we pick a point anywhere along a vector originating at the Ray
             # position, but orthogonal to its direction of propagation, then we
@@ -119,8 +119,8 @@ def test_phase():
                 ])
                 v1 = np.cross(v1, ray.v)
                 p1 = ray.r + v1
-                assert isclose(ray.amplitude(p1, t).real, 1.0,
-                               rel_tol=0, abs_tol=1e-9)
+                np.testing.assert_allclose(ray.amplitude(p1, t).real, 1.0,
+                                           rtol=0, atol=1e-9)
 
 
 @timer

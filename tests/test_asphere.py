@@ -1,6 +1,6 @@
 import batoid
 import numpy as np
-from test_helpers import isclose, timer, do_pickle, all_obj_diff
+from test_helpers import timer, do_pickle, all_obj_diff
 
 
 @timer
@@ -44,7 +44,7 @@ def test_sag():
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
             result = asphere.sag(x, y)
-            assert isclose(result, py_asphere(R, conic, coefs)(x, y))
+            np.testing.assert_allclose(result, py_asphere(R, conic, coefs)(x, y))
             # Check that it returned a scalar float and not an array
             assert isinstance(result, float)
         # Check vectorization
@@ -75,9 +75,9 @@ def test_intersect():
             # intersection points.
             r0 = batoid.Ray(x, y, -10, 0, 0, 1, 0)
             r = asphere.intersect(r0)
-            assert isclose(r.r[0], x)
-            assert isclose(r.r[1], y)
-            assert isclose(r.r[2], asphere.sag(x, y), rel_tol=0, abs_tol=1e-9)
+            np.testing.assert_allclose(r.r[0], x)
+            np.testing.assert_allclose(r.r[1], y)
+            np.testing.assert_allclose(r.r[2], asphere.sag(x, y), rtol=0, atol=1e-9)
 
     # Check normal for R=0 paraboloid (a plane)
     asphere = batoid.Asphere(0.0, 0.0, [])
@@ -135,7 +135,7 @@ def test_quad_plus_poly():
         for j in range(100):
             x = random.gauss(0.0, 1.0)
             y = random.gauss(0.0, 1.0)
-            assert isclose(asphere.sag(x, y), quad.sag(x, y)+poly(x, y))
+            np.testing.assert_allclose(asphere.sag(x, y), quad.sag(x, y)+poly(x, y))
 
 
 @timer
