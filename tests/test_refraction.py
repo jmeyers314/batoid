@@ -2,10 +2,7 @@ import os
 import numpy as np
 import batoid
 from test_helpers import timer
-
-
-def normalized(v):
-    return v/np.linalg.norm(v)
+from batoid.utils import normalized
 
 
 @timer

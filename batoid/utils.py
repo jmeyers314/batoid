@@ -1,6 +1,12 @@
 import numpy as np
 
 
+def normalized(*args):
+    if len(args) == 1:
+        args = np.array(*args)
+    return args/np.linalg.norm(args)
+
+
 def bilinear_fit(ux, uy, kx, ky):
     a = np.empty((len(ux), 3), dtype=float)
     a[:,0] = 1

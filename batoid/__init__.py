@@ -22,6 +22,8 @@ from .optic import drawTrace2d, drawTrace3d
 from .lattice import Lattice
 
 from . import parse
+from . import utils
+from .utils import normalized
 
 import os
 datadir = os.path.join(os.path.dirname(__file__), "data")

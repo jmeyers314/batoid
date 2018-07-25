@@ -3,6 +3,37 @@ from test_helpers import timer
 
 import numpy as np
 
+
+@timer
+def test_normalized():
+    for _ in range(1000):
+        x = np.random.uniform()
+        y = np.random.uniform()
+        z = np.random.uniform()
+        w = np.random.uniform()
+
+        np.testing.assert_allclose(
+            np.linalg.norm(batoid.utils.normalized([x])),
+            1.0,
+            rtol=0, atol=1e-10
+        )
+        np.testing.assert_allclose(
+            np.linalg.norm(batoid.utils.normalized([x, y])),
+            1.0,
+            rtol=0, atol=1e-10
+        )
+        np.testing.assert_allclose(
+            np.linalg.norm(batoid.utils.normalized([x, y, z])),
+            1.0,
+            rtol=0, atol=1e-10
+        )
+        np.testing.assert_allclose(
+            np.linalg.norm(batoid.utils.normalized([x, y, z, w])),
+            1.0,
+            rtol=0, atol=1e-10
+        )
+
+
 @timer
 def test_gnomicDirCos():
     np.random.seed(5)
@@ -224,6 +255,7 @@ def test_jacobian():
 
 
 if __name__ == '__main__':
+    test_normalized()
     test_gnomicDirCos()
     test_gnomicSpherical()
     test_sphericalToDirCos()

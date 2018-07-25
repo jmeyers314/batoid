@@ -2,6 +2,7 @@ import batoid
 import numpy as np
 from test_helpers import timer, do_pickle, all_obj_diff
 import pytest
+from batoid.utils import normalized
 
 
 hasGalSim = True
@@ -9,10 +10,6 @@ try:
     import galsim
 except ImportError:
     hasGalSim = False
-
-
-def normalized(v):
-    return v/np.linalg.norm(v)
 
 
 @pytest.mark.skipif(not hasGalSim, reason="galsim not found")
