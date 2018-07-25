@@ -17,39 +17,8 @@ def normalized(v):
 
 @pytest.mark.skipif(not hasGalSim, reason="galsim not found")
 @timer
-def test_nCr():
-    np.random.seed(5)
-    for _ in range(1000):
-        # 68 seems to be the limit.  Guessing that ulonglong limit is here.
-        n = np.random.randint(1, 68)
-        r = np.random.randint(0, n)
-        np.testing.assert_equal(
-            batoid._batoid.nCr(n, r),
-            galsim.utilities.nCr(n, r)
-        )
-
-
-@pytest.mark.skipif(not hasGalSim, reason="galsim not found")
-@timer
-def test_binomial():
-    np.random.seed(57)
-    for _ in range(1000):
-        a = np.random.normal()
-        b = np.random.normal()
-        n = np.random.randint(0, 100)
-
-        np.testing.assert_allclose(
-            batoid._batoid.binomial(a, b, n),
-            galsim.utilities.binomial(a, b, n),
-            atol=1e-14,
-            rtol=1e-14
-        )
-
-
-@pytest.mark.skipif(not hasGalSim, reason="galsim not found")
-@timer
 def test_horner2d():
-    np.random.seed(577)
+    np.random.seed(5)
     for _ in range(1000):
         nx = np.random.randint(1, 20)
         ny = np.random.randint(1, 20)
@@ -68,7 +37,7 @@ def test_horner2d():
 @pytest.mark.skipif(not hasGalSim, reason="galsim not found")
 @timer
 def test_sag():
-    np.random.seed(5772)
+    np.random.seed(57)
     jmaxmax=200
     for _ in range(100):
         jmax = np.random.randint(1, jmaxmax)
@@ -103,7 +72,7 @@ def test_sag():
 @pytest.mark.skipif(not hasGalSim, reason="galsim not found")
 @timer
 def test_properties():
-    np.random.seed(57721)
+    np.random.seed(577)
     jmaxmax=200
     for _ in range(100):
         jmax = np.random.randint(1, jmaxmax)
@@ -121,7 +90,7 @@ def test_properties():
 @pytest.mark.skipif(not hasGalSim, reason="galsim not found")
 @timer
 def test_intersect():
-    np.random.seed(577215)
+    np.random.seed(5772)
     jmaxmax=50
     for i in range(100):
         jmax = np.random.randint(1, jmaxmax)
@@ -145,7 +114,7 @@ def test_intersect():
 @pytest.mark.skipif(not hasGalSim, reason="galsim not found")
 @timer
 def test_intersect_vectorized():
-    np.random.seed(5772156)
+    np.random.seed(57721)
     jmaxmax=50
     r0s = [batoid.Ray([np.random.normal(0.0, 0.1),
                        np.random.normal(0.0, 0.1),
@@ -172,7 +141,7 @@ def test_intersect_vectorized():
 @pytest.mark.skipif(not hasGalSim, reason="galsim not found")
 @timer
 def test_grad():
-    np.random.seed(57721566)
+    np.random.seed(577215)
     jmaxmax = 100
     for i in range(100):
         jmax = np.random.randint(1, jmaxmax)
@@ -190,7 +159,7 @@ def test_grad():
 @pytest.mark.skipif(not hasGalSim, reason="galsim not found")
 @timer
 def test_normal():
-    np.random.seed(577215664)
+    np.random.seed(5772156)
     jmaxmax = 100
     for i in range(100):
         jmax = np.random.randint(1, jmaxmax)
@@ -246,8 +215,6 @@ def test_fail():
 
 
 if __name__ == '__main__':
-    test_nCr()
-    test_binomial()
     test_horner2d()
     test_sag()
     test_properties()

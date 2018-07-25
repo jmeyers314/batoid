@@ -11,5 +11,7 @@ namespace batoid {
         py::class_<PolynomialSurface, std::shared_ptr<PolynomialSurface>, Surface>(m, "PolynomialSurface")
             .def(py::init<MatrixXd>(), "init", "coefs"_a)
             .def_property_readonly("coefs", &PolynomialSurface::getCoefs);
+
+        m.def("horner2d", &poly::horner2d);
     }
 }

@@ -1,5 +1,4 @@
 from ._batoid import Ray, RayVector
-#from ._batoid import Surface, Plane, Paraboloid, Sphere, Quadric, Asphere, Zernike, Sum
 from .surface import Surface, Plane, Paraboloid, Sphere, Quadric, Asphere, Zernike, Sum
 from ._batoid import Table
 
@@ -29,7 +28,7 @@ datadir = os.path.join(os.path.dirname(__file__), "data")
 
 __all__ = []
 __all__ += ["Ray", "RayVector"]
-__all__ += ["Surface", "Plane", "Paraboloid", "Sphere", "Quadric", "Asphere"]
+__all__ += ["Surface", "Plane", "Paraboloid", "Sphere", "Quadric", "Asphere", "Zernike", "Sum"]
 __all__ += ["Table"]
 __all__ += ["Medium", "ConstMedium", "TableMedium", "SellmeierMedium", "Air"]
 __all__ += ["Obscuration", "ObscCircle", "ObscAnnulus", "ObscRectangle", "ObscRay"]
