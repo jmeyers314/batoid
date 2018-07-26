@@ -6,15 +6,6 @@ python:
   - 3.6
 
 env:
-  # These currently fail...
-  # -
-  #   - COMPILER=clang-3.3
-  #   - CC=/usr/bin/clang
-  #   - CXX=/usr/bin/clang++
-  # -
-  #   - COMPILER=clang-3.4
-  #   - CC=/usr/bin/clang
-  #   - CXX=/usr/bin/clang++
   -
     - COMPILER=clang
     - CC=clang
@@ -23,15 +14,6 @@ env:
     - COMPILER=gcc
     - CC=gcc
     - CXX=g++
-  # Following don't seem to actually exist on travis-ci...
-  # -
-  #   - COMPILER=gcc-5.3
-  #   - CC=gcc
-  #   - CXX=g++
-  # -
-  #   - COMPILER=gcc-6.2
-  #   - CC=gcc
-  #   - CXX=g++
 
 matrix:
   include:
@@ -43,30 +25,9 @@ matrix:
         - CXX=g++
         - CMAKE_COVER=1
 before_install:
-  - |
-    if [ "$COMPILER" == "clang-3.3" ];
-    then
-      sudo apt-get install clang-3.3 clang++-3.3
-    fi
-  - |
-    if [ "$COMPILER" == "clang-3.4" ];
-    then
-      sudo apt-get install clang-3.4 clang++-3.4
-    fi
-  - |
-    if [ "$COMPILER" == "gcc-5.3" ];
-    then
-      sudo apt-get install gcc-5.3
-    fi
-  - |
-    if [ "$COMPILER" == "gcc-6.2" ];
-    then
-      sudo apt-get install gcc-6.2
-    fi
   - pip install -r requirements.txt
   - pip install -r test_requirements.txt
   - export EIGEN_DIR=$PWD/eigen/
-  - echo $EIGEN_DIR
   - sudo apt-get install -y libfftw3-dev
   - pip install -U setuptools pip==9.0
   - pip install numpy astropy future pyyaml LSSTDESC.Coord pybind11
@@ -82,7 +43,8 @@ install:
   - python setup.py develop
 
 script:
-  pytest --cov=batoid --cov-report=xml
+  - echo $PWD
+  - pytest --cov=batoid --cov-report=xml --cov-config tests/.coveragerc
 
 after_success:
   - find ./build -iname "*.gcno" | grep /src/ | xargs -I{} gcov-4.8 {}
