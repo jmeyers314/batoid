@@ -150,11 +150,17 @@ def test_rotation():
     for item in telescope.itemDict:
         rotTel = telescope.withLocallyRotatedOptic(item, rot)
         rotTel = rotTel.withLocallyRotatedOptic(item, rotInv)
+        rotTel2 = telescope.withLocallyRotatedOptic(item, np.eye(3))
         theta_x = np.random.uniform(-0.005, 0.005)
         theta_y = np.random.uniform(-0.005, 0.005)
         np.testing.assert_allclose(
             batoid.psf.zernike(telescope, theta_x, theta_y, wavelength),
             batoid.psf.zernike(rotTel, theta_x, theta_y, wavelength),
+            atol=1e-5
+        )
+        np.testing.assert_allclose(
+            batoid.psf.zernike(telescope, theta_x, theta_y, wavelength),
+            batoid.psf.zernike(rotTel2, theta_x, theta_y, wavelength),
             atol=1e-5
         )
 
