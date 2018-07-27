@@ -32,25 +32,31 @@ namespace batoid {
         double b = 2*r.v[2]*z0term + 2*vrr0;
         double c = z0term*z0term - _Rsq + r02;
 
-        double r1, r2;
-        int n = solveQuadratic(a, b, c, r1, r2);
+        double t1, t2;
+        int n = solveQuadratic(a, b, c, t1, t2);
 
         // Should probably check the solutions here since we obtained the quadratic
         // formula above by squaring both sides of an equation.
         if (n == 0) {
             return false;
         } else if (n == 1) {
-            if (r1 < 0)
+            if (t1 < 0)
                 return false;
-            t = r1;
+            t = t1;
         } else {
-            if (r1 < 0) {
-                if (r2 < 0)
+            if (t1 < 0) {
+                if (t2 < 0)
                     return false;
                 else
-                    t = r2;
-            } else
-                t = std::min(r1, r2);
+                    t = t2;
+            } else {
+                // We need to pick whichever time is most consistent with the sag.
+                Ray r1 = r.propagatedToTime(r.t + t1);
+                Ray r2 = r.propagatedToTime(r.t + t2);
+                double d1 = std::abs(sag(r1.r[0], r1.r[1]) - r1.r[2]);
+                double d2 = std::abs(sag(r2.r[0], r2.r[1]) - r2.r[2]);
+                t = (d1 < d2) ? t1 : t2;
+            }
         }
         t += r.t;
         return true;
