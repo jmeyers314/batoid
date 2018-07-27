@@ -86,6 +86,42 @@ namespace batoid {
         { return sm1.getCoefs() != sm2.getCoefs(); }
 
 
+    SumitaMedium::SumitaMedium(
+        double A0, double A1, double A2,
+        double A3, double A4, double A5) :
+        _A0(A0), _A1(A1), _A2(A2), _A3(A3), _A4(A4), _A5(A5) {}
+
+    SumitaMedium::SumitaMedium(std::array<double,6> arr) :
+        _A0(arr[0]), _A1(arr[1]), _A2(arr[2]), _A3(arr[3]), _A4(arr[4]), _A5(arr[5]) {}
+
+    double SumitaMedium::getN(double wavelength) const {
+        //Sumita coefficients assume wavelength is in microns, so we have to multiply (1e6)**2
+        double x = wavelength*wavelength*1e12;
+        double y = 1./x;
+        return std::sqrt(_A0 + _A1*x + y*(_A2 + y*(_A3 + y*(_A4 + y*_A5))));
+    }
+
+    std::array<double,6> SumitaMedium::getCoefs() const {
+        return std::array<double,6>{{_A0, _A1, _A2, _A3, _A4, _A5}};
+    }
+
+    std::string SumitaMedium::repr() const {
+        std::ostringstream oss;
+        oss << "SumitaMedium("
+            << _A0 << ", "
+            << _A1 << ", "
+            << _A2 << ", "
+            << _A3 << ", "
+            << _A4 << ", "
+            << _A5 << ")";
+        return oss.str();
+    }
+
+    bool operator==(const SumitaMedium& sm1, const SumitaMedium& sm2)
+        { return sm1.getCoefs() == sm2.getCoefs(); }
+    bool operator!=(const SumitaMedium& sm1, const SumitaMedium& sm2)
+        { return sm1.getCoefs() != sm2.getCoefs(); }
+
     // Uses the formulae given in Filippenko (1982), which appear to come from Edlen (1953),
     // and Coleman, Bozman, and Meggers (1960).  The units of the original formula are non-SI,
     // being mmHg for pressure (and water vapor pressure), and degrees C for temperature.  This

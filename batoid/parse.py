@@ -162,5 +162,20 @@ def parse_medium(value):
                     batoid.Table.Interpolant.linear
                 )
             )
+        elif value == 'NLAK10':
+            return batoid.SellmeierMedium(
+                1.72878017, 0.169257825, 1.19386956,
+                0.00886014635, 0.0363416509, 82.9009069
+            )
+        elif value == 'PFK85':
+            return batoid.SumitaMedium(
+                2.1858326, -0.0050155632, 0.0075107775,
+                0.00017770562, -1.2164148e-05, 6.1341005e-07
+            )
+        elif value == 'BK7':
+            return batoid.SellmeierMedium(
+                1.03961212, 0.231792344, 1.01046945,
+                0.00600069867, 0.0200179144, 103.560653
+            )
         else:
             raise RuntimeError("Unknown medium {}".format(value))

@@ -2,7 +2,7 @@ from ._batoid import Ray, RayVector
 from .surface import Surface, Plane, Paraboloid, Sphere, Quadric, Asphere, Zernike, Sum
 from ._batoid import Table
 
-from ._batoid import Medium, ConstMedium, TableMedium, SellmeierMedium, Air
+from ._batoid import Medium, ConstMedium, TableMedium, SellmeierMedium, SumitaMedium, Air
 
 from ._batoid import Obscuration, ObscCircle, ObscAnnulus, ObscRectangle, ObscRay
 from ._batoid import ObscUnion, ObscIntersection, ObscNegation

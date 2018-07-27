@@ -25,7 +25,7 @@ namespace batoid {
             ))
             .def("__hash__", [](const ConstMedium& cm) {
                 return py::hash(py::make_tuple(
-                    "ConstMedium", 
+                    "ConstMedium",
                     cm.getN(0.0)
                 ));
             });
@@ -64,6 +64,27 @@ namespace batoid {
             .def("__hash__", [](const SellmeierMedium& sm) {
                 return py::hash(py::make_tuple(
                     "SellmeierMedium",
+                    py::tuple(py::cast(sm.getCoefs()))
+                ));
+            });
+
+
+        py::class_<SumitaMedium, std::shared_ptr<SumitaMedium>, Medium>(m, "SumitaMedium")
+            .def(py::init<double,double,double,double,double,double>())
+            .def(py::init<std::array<double,6>>())
+            .def_property_readonly("coefs", &SumitaMedium::getCoefs)
+            .def(py::self == py::self)
+            .def(py::self != py::self)
+            .def(py::pickle(
+                [](const SumitaMedium& sm) { return sm.getCoefs(); },
+                [](std::array<double,6> coefs) {
+                    return SumitaMedium(coefs);
+                }
+            ))
+            // See http://effbot.org/zone/python-hash.htm#tuples
+            .def("__hash__", [](const SumitaMedium& sm) {
+                return py::hash(py::make_tuple(
+                    "SumitaMedium",
                     py::tuple(py::cast(sm.getCoefs()))
                 ));
             });
