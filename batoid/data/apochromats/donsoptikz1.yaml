@@ -1,0 +1,100 @@
+opticalSystem:
+  type: CompoundOptic
+  name: apo1
+  inMedium: 1.0
+  medium: 1.0
+  dist: 1
+  pupilSize: 0.6
+  pupilObscuration: 0.0
+  items:
+    -
+      type: Lens
+      name: L1
+      medium: NLAK10
+      items:
+        -
+          type: RefractiveInterface
+          name: L1_entrance
+          surface:
+            type: Sphere
+            R: -0.241321
+          obscuration:
+            type: ClearCircle
+            radius: 0.042
+        -
+          type: RefractiveInterface
+          name: L1_exit
+          surface:
+            type: Sphere
+            R: -0.126269
+          coordSys:
+            z: -0.005
+          obscuration:
+            type: ClearCircle
+            radius: 0.04
+    -
+      type: Lens
+      name: L2
+      medium: PFK85
+      coordSys:
+        z: -0.013417
+      items:
+        -
+          type: RefractiveInterface
+          name: L2_entrance
+          surface:
+            type: Sphere
+            R: -0.126269
+          obscuration:
+            type: ClearCircle
+            radius: 0.041
+        -
+          type: RefractiveInterface
+          name: L2_exit
+          surface:
+            type: Sphere
+            R: 0.970519
+          coordSys:
+            z: -0.012
+          obscuration:
+            type: ClearCircle
+            radius: 0.041
+    -
+      type: Lens
+      name: L3
+      medium: BK7
+      coordSys:
+        z: -0.575115
+      items:
+        -
+          type: RefractiveInterface
+          name: L3_entrance
+          surface:
+            type: Sphere
+            R: 0.040884
+          obscuration:
+            type: ClearCircle
+            radius: 0.012
+        -
+          type: RefractiveInterface
+          name: L3_exit
+          surface:
+            type: Sphere
+            R: 0.043957
+          coordSys:
+            z: -0.003
+          obscuration:
+            type: ClearCircle
+            radius: 0.014
+    -
+      type: Detector
+      name: Detector
+      surface:
+        type: Plane
+      coordSys:
+        # z: -0.605115
+        z: -0.608115
+        # z: -0.608035  # found this empirically for on-axis rays
+      obscuration:
+        type: ClearCircle
+        radius: 0.012
