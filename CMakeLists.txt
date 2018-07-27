@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(_batoid)
+# set(CMAKE_VERBOSE_MAKEFILE True)
+cmake_policy(SET CMP0063 NEW)  # Compile the static lib with hidden visibility.
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_MACOSX_RPATH 1)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -47,6 +50,7 @@ set(SRC_FILES
   src/table.cpp
   src/utils.cpp
 )
-add_library(batoid SHARED ${SRC_FILES})
+set(CMAKE_POSITION_INDEPENDENT_CODE True)
+add_library(batoid STATIC ${SRC_FILES})
 pybind11_add_module(_batoid ${PYSRC_FILES})
 target_link_libraries(_batoid PUBLIC batoid)
