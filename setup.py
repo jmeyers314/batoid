@@ -1,14 +1,20 @@
 import os
 import re
 import sys
-import platform
 import subprocess
 
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 from distutils.version import LooseVersion
 
-__version__ = '0.0.2rc3'
+VERSIONFILE="batoid/_version.py"
+verstrline = open(VERSIONFILE, "rt").read()
+VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
+mo = re.search(VSRE, verstrline, re.M)
+if mo:
+    version = mo.group(1)
+else:
+    raise RuntimeError("Unable to find version string in %s." % (VERSIONFILE,))
 
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=''):
@@ -53,7 +59,7 @@ with open("README.md", 'r') as fh:
 
 setup(
     name='batoid',
-    version=__version__,
+    version=version,
     author='Josh Meyers',
     author_email='jmeyers314@gmail.com',
     url='https://github.com/jmeyers314/batoid',
