@@ -5,6 +5,8 @@ recursive-include batoid/data/ *
 recursive-include pybind11/include/ *
 include pybind11/CMakeLists.txt
 include pybind11/CMakeFiles/*
+include pybind11/LICENSE
+include eigen/COPYING.*
 recursive-include pybind11/tools *
 recursive-include eigen/Eigen/ *
 include CMakeLists.txt
