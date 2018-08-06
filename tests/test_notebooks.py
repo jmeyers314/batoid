@@ -53,7 +53,7 @@ notebooks = [
 # "FFT vs Huygens.ipynb"
 
 
-@pytest.mark.timeout(300)
+@pytest.mark.timeout(600)
 @pytest.mark.parametrize("notebook_name", notebooks)
 def test_notebook(notebook_name):
     nb, errors = _notebook_run(os.path.join(notebook_dir, notebook_name))
