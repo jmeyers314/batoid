@@ -25,6 +25,12 @@ namespace batoid {
         RayVector(std::vector<Ray>&& _rays, double _wavelength)
             : rays(std::move(_rays)), wavelength(_wavelength) {}
 
+        RayVector(
+            const std::vector<double>& x, const std::vector<double>& y, const std::vector<double>& z,
+            const std::vector<double>& vx, const std::vector<double>& vy, const std::vector<double>& vz,
+            const std::vector<double>& t, const std::vector<double>& w, const std::vector<bool>& vignetted
+        );
+
         // std::vector forwarding
         typename std::vector<Ray>::const_reference operator[](std::vector<Ray>::size_type i) const
             { return rays[i]; }

@@ -16,6 +16,9 @@ namespace batoid {
             .def(py::init<>())
             .def(py::init<RayVector>())
             .def(py::init<std::vector<Ray>>())
+            .def(py::init<std::vector<double>, std::vector<double>, std::vector<double>,
+                          std::vector<double>, std::vector<double>, std::vector<double>,
+                          std::vector<double>, std::vector<double>, std::vector<bool>>())
             .def("__repr__", &RayVector::repr)
             .def("amplitude", &RayVector::amplitude)
             .def("sumAmplitude", &RayVector::sumAmplitude)
@@ -34,6 +37,9 @@ namespace batoid {
             .def("propagateInPlace", &RayVector::propagateInPlace)
             .def("trimVignetted", &RayVector::trimVignetted)
             .def("trimVignettedInPlace", &RayVector::trimVignettedInPlace)
+            // Note, monochromatic == True guarantees monochromaticity, but monochromatic == False,
+            // doesn't guarantee polychromaticity.
+            .def_property_readonly("monochromatic", [](const RayVector& rv){ return !std::isnan(rv.wavelength); })
             .def(py::pickle(
                 [](const RayVector& rv) {  // __getstate__
                     return py::make_tuple(rv.rays, rv.wavelength);

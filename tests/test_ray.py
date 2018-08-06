@@ -143,6 +143,7 @@ def test_RayVector():
             )
         )
     rayVector = batoid.RayVector(rayList)
+    assert rayVector.monochromatic == False
     do_pickle(rayVector)
     np.testing.assert_equal(rayVector.x, np.array([ray.x for ray in rayVector]))
     np.testing.assert_equal(rayVector.y, np.array([ray.y for ray in rayVector]))
@@ -168,6 +169,35 @@ def test_RayVector():
     np.testing.assert_equal(rayVector.ky, np.array([ray.ky for ray in rayVector]))
     np.testing.assert_equal(rayVector.kz, np.array([ray.kz for ray in rayVector]))
 
+    # Try the other ctor
+    rayVector2 = batoid.RayVector(
+        np.array([ray.x for ray in rayList]),
+        np.array([ray.y for ray in rayList]),
+        np.array([ray.z for ray in rayList]),
+        np.array([ray.vx for ray in rayList]),
+        np.array([ray.vy for ray in rayList]),
+        np.array([ray.vz for ray in rayList]),
+        np.array([ray.t for ray in rayList]),
+        np.array([ray.wavelength for ray in rayList]),
+        np.array([ray.vignetted for ray in rayList])
+    )
+    assert rayVector == rayVector2
+    assert rayVector2.monochromatic == False
+
+    # See if we can make monochromatic True
+    rayVector3 = batoid.RayVector(
+        np.array([ray.x for ray in rayList]),
+        np.array([ray.y for ray in rayList]),
+        np.array([ray.z for ray in rayList]),
+        np.array([ray.vx for ray in rayList]),
+        np.array([ray.vy for ray in rayList]),
+        np.array([ray.vz for ray in rayList]),
+        np.array([ray.t for ray in rayList]),
+        np.array([1.0 for ray in rayList]),
+        np.array([ray.vignetted for ray in rayList])
+    )
+    assert rayVector3.monochromatic == True
+
     # Make sure we really got a view and not a copy
     x = rayVector.x
     x[0] += 1
@@ -178,7 +208,7 @@ def test_RayVector():
     x2 = np.copy(x)
     assert x is not x2
     del rayVector
-    assert np.all(x == x2)
+    assert np.all(x == x2)  # it survives!
 
 
 @timer
@@ -193,6 +223,7 @@ def test_rayGrid():
     medium = batoid.ConstMedium(1.2)
 
     rays = batoid.rayGrid(dist, length, xcos, ycos, zcos, nside, wavelength, medium)
+    assert rays.monochromatic == True
     # Check that all rays are perpendicular to v
     ray0 = rays[0]
     for ray in rays:
@@ -224,6 +255,7 @@ def test_circularGrid():
     medium = batoid.ConstMedium(1.2)
 
     rays = batoid.circularGrid(dist, outer, inner, xcos, ycos, zcos, nradii, naz, wavelength, medium)
+    assert rays.monochromatic == True
     # Check that all rays are perpendicular to v
     ray0 = rays[0]
     for ray in rays:

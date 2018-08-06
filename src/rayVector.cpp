@@ -9,6 +9,21 @@
 using Eigen::Vector3d;
 
 namespace batoid {
+    RayVector::RayVector(
+        const std::vector<double>& x, const std::vector<double>& y, const std::vector<double>& z,
+        const std::vector<double>& vx, const std::vector<double>& vy, const std::vector<double>& vz,
+        const std::vector<double>& t, const std::vector<double>& w, const std::vector<bool>& vignetted
+    ) {
+        rays.reserve(x.size());
+        bool wSame{true};
+        double w0{w[0]};
+        for(int i=0; i<x.size(); i++) {
+            rays.push_back(Ray(x[i], y[i], z[i], vx[i], vy[i], vz[i], t[i], w[i], vignetted[i]));
+            if (w[i] != w0) wSame = false;
+        }
+        if (wSame) wavelength=w0;
+    }
+
     std::string RayVector::repr() const {
         std::ostringstream oss("RayVector([", std::ios_base::ate);
         oss << rays[0];
