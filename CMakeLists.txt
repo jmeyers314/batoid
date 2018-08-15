@@ -18,6 +18,7 @@ add_subdirectory(pybind11)
 set(PYSRC_FILES
   pysrc/asphere.cpp
   pysrc/batoid.cpp
+  pysrc/bicubic.cpp
   pysrc/coordsys.cpp
   pysrc/medium.cpp
   pysrc/obscuration.cpp
@@ -35,6 +36,7 @@ set(PYSRC_FILES
 set(SRC_FILES
   src/asphere.cpp
   src/batoid.cpp
+  src/bicubic.cpp
   src/coordsys.cpp
   src/medium.cpp
   src/obscuration.cpp

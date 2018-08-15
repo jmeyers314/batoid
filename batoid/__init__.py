@@ -1,7 +1,8 @@
 from ._version import __version__, __version_info__
 
 from ._batoid import Ray, RayVector
-from .surface import Surface, Plane, Paraboloid, Sphere, Quadric, Asphere, Zernike, Sum
+from .surface import Surface, Plane, Paraboloid, Sphere, Quadric, Asphere
+from .surface import Bicubic, Zernike, Sum
 from ._batoid import Table
 
 from ._batoid import Medium, ConstMedium, TableMedium, SellmeierMedium, SumitaMedium, Air

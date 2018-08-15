@@ -1,0 +1,17 @@
+#include "bicubic.h"
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#include <pybind11/stl_bind.h>
+#include <pybind11/numpy.h>
+#include <pybind11/eigen.h>
+
+namespace py = pybind11;
+using namespace pybind11::literals;
+using Eigen::MatrixXd;
+
+namespace batoid {
+    void pyExportBicubic(py::module& m) {
+        py::class_<Bicubic, std::shared_ptr<Bicubic>, Surface>(m, "Bicubic")
+            .def(py::init<std::vector<double>, std::vector<double>, MatrixXd>(), "init", "xs"_a, "ys"_a, "zs"_a);
+    }
+}
