@@ -146,6 +146,37 @@ def test_intersect():
 
 
 @timer
+def test_approximate_asphere():
+    np.random.seed(57721)
+
+    xs = np.linspace(-1, 1, 1000)
+    ys = np.linspace(-1, 1, 1000)
+    xtest = np.random.uniform(-0.9, 0.9, size=1000)
+    ytest = np.random.uniform(-0.9, 0.9, size=1000)
+
+    for i in range(100):
+        R = np.random.normal(20.0, 1.0)
+        conic = np.random.uniform(-2.0, 1.0)
+        ncoef = np.random.randint(0, 4)
+        coefs = [np.random.normal(0, 1e-10) for i in range(ncoef)]
+        asphere = batoid.Asphere(R, conic, coefs)
+        zs = asphere.sag(*np.meshgrid(xs, ys))
+        bc = batoid.Bicubic(xs, ys, zs)
+
+        np.testing.assert_allclose(
+            asphere.sag(xtest, ytest),
+            bc.sag(xtest, ytest),
+            atol=1e-9, rtol=0.0
+        )
+
+        np.testing.assert_allclose(
+            asphere.normal(xtest, ytest),
+            bc.normal(xtest, ytest),
+            atol=1e-8, rtol=0
+        )
+
+
+@timer
 def test_ne():
     xs1 = np.linspace(0, 1, 10)
     xs2 = np.linspace(0, 1, 11)
@@ -174,4 +205,5 @@ if __name__ == '__main__':
     test_sag()
     test_normal()
     test_intersect()
+    test_approximate_asphere()
     test_ne()
