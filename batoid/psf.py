@@ -51,6 +51,8 @@ def huygensPSF(optic, theta_x=None, theta_y=None, wavelength=None, nx=None,
             reciprocalLatticeVectors(primitiveK[0], primitiveK[1], pad_factor*nx)
         )
     elif isinstance(dx, Real):
+        if dy is None:
+            dy = dx
         primitiveX = np.vstack([[dx, 0], [0, dy]])
         pad_factor = 1
     else:
@@ -324,7 +326,7 @@ def fftPSF(optic, theta_x, theta_y, wavelength, nx=32, pad_factor=2):
     return batoid.Lattice(psf, primitiveX)
 
 
-def zernike(optic, theta_x, theta_y, wavelength, nx=32, jmax=22, eps=0.0):
+def zernike(optic, theta_x, theta_y, wavelength, nx=32, jmax=22, eps=0.0, sphereRadius=None):
     import galsim
 
     dirCos = gnomicToDirCos(theta_x, theta_y)
@@ -334,13 +336,13 @@ def zernike(optic, theta_x, theta_y, wavelength, nx=32, jmax=22, eps=0.0):
         nx, wavelength, optic.inMedium
     )
 
-    # Propagate to t=0 where rays are in the entrance pupil.
-    rays.propagateInPlace(0.0)
+    # Propagate to t=optic.dist where rays are close to being
+    # in the entrance pupil.  (TODO: actually intersect EP here?)
+    rays.propagateInPlace(optic.dist)
 
     orig_x = np.array(rays.x).reshape(nx,nx)
     orig_y = np.array(rays.y).reshape(nx,nx)
-
-    wf = wavefront(optic, theta_x, theta_y, wavelength, nx=nx)
+    wf = wavefront(optic, theta_x, theta_y, wavelength, nx=nx, sphereRadius=sphereRadius)
     wfarr = wf.array
     w = ~wfarr.mask
 
