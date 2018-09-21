@@ -16,6 +16,7 @@ namespace batoid {
         double t;
         if (!timeToIntersect(r, t)) {
             r.failed=true;
+            r.vignetted=true; // All failed rays are considered vignetted
             return;
         }
         r.r = r.positionAtTime(t);
