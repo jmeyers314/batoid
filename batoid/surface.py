@@ -468,11 +468,10 @@ class Bicubic(Surface):
         2d array indicating the surface.
     """
     def __init__(self, xs, ys, zs):
-        # For now, just copy the arrays down to c++
-        self._xs = xs
-        self._ys = ys
-        self._zs = zs
-        self._surface = _batoid.Bicubic(xs, ys, zs)
+        self._xs = np.ascontiguousarray(xs)
+        self._ys = np.ascontiguousarray(ys)
+        self._zs = np.ascontiguousarray(zs)
+        self._surface = _batoid.Bicubic(self._xs, self._ys, self._zs)
 
     @property
     def xs(self):

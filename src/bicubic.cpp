@@ -62,7 +62,9 @@ namespace batoid {
         return Vector2d(dzdx, dzdy);
     }
 
-    Bicubic::Bicubic(const std::vector<double> xs, const std::vector<double> ys, const MatrixXd zs) :
+    // Bicubic::Bicubic(const std::vector<double> xs, const std::vector<double> ys, const MatrixXd zs) :
+    //     _xargs(xs), _yargs(ys), _zs(zs) {}
+    Bicubic::Bicubic(const std::vector<double> xs, const std::vector<double> ys, const DRef<MatrixXd> zs) :
         _xargs(xs), _yargs(ys), _zs(zs) {}
 
     double Bicubic::sag(double x, double y) const {

@@ -10,6 +10,8 @@
 
 using Eigen::MatrixXd;
 using Eigen::Vector3d;
+template<class T>
+using DRef = Eigen::Ref<T, 0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>>;
 
 namespace batoid {
 
@@ -32,7 +34,8 @@ namespace batoid {
         const double& front() const {return vec.front();}
         const double& back() const {return vec.back();}
         const double& operator[](int i) const {return vec[i];}
-        typename std::vector<double>::iterator insert(typename std::vector<double>::iterator it, const double a);
+        typename std::vector<double>::iterator insert(
+            typename std::vector<double>::iterator it, const double a);
         size_t size() const {return vec.size();}
 
         const std::vector<double>& getArgs() const { return vec; }
@@ -46,7 +49,8 @@ namespace batoid {
 
     class Bicubic : public Surface {
     public:
-        Bicubic(std::vector<double> xs, std::vector<double> ys, MatrixXd zs);
+        // Bicubic(std::vector<double> xs, std::vector<double> ys, MatrixXd zs);
+        Bicubic(std::vector<double> xs, std::vector<double> ys, DRef<MatrixXd> zs);
         virtual double sag(double, double) const override;
         virtual Vector3d normal(double, double) const override;
         bool timeToIntersect(const Ray& r, double& t) const override;
@@ -54,7 +58,8 @@ namespace batoid {
     private:
         const EqArgVec _xargs;
         const EqArgVec _yargs;
-        const MatrixXd _zs;
+        // const MatrixXd _zs;
+        const DRef<MatrixXd> _zs;
     };
 
 }

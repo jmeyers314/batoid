@@ -12,6 +12,7 @@ using Eigen::MatrixXd;
 namespace batoid {
     void pyExportBicubic(py::module& m) {
         py::class_<Bicubic, std::shared_ptr<Bicubic>, Surface>(m, "Bicubic")
-            .def(py::init<std::vector<double>, std::vector<double>, MatrixXd>(), "init", "xs"_a, "ys"_a, "zs"_a);
+            .def(py::init<std::vector<double>, std::vector<double>, DRef<MatrixXd>>(),
+                 "init", "xs"_a, "ys"_a, "zs"_a);
     }
 }
