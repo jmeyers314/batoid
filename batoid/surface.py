@@ -466,12 +466,58 @@ class Bicubic(Surface):
         1d uniform-spaced arrays indicating the grid points.
     zs : array_like
         2d array indicating the surface.
+    dzdxs : array_like, optional
+        2d array indicating derivatives dz/dx at grid points.
+    dzdys : array_like, optional
+        2d array indicating derivatives dz/dx at grid points.
+    d2zdxdys : array_like, optional
+        2d array indicating mixed derivatives d^2 z / (dx dy) at grid points.
     """
-    def __init__(self, xs, ys, zs):
+    def __init__(self, xs, ys, zs, dzdxs=None, dzdys=None, d2zdxdys=None):
         self._xs = np.ascontiguousarray(xs)
         self._ys = np.ascontiguousarray(ys)
         self._zs = np.ascontiguousarray(zs)
-        self._surface = _batoid.Bicubic(self._xs, self._ys, self._zs)
+        dx = (self._xs[-1] - self._xs[0])/(len(self._xs)-1)
+        dy = (self._ys[-1] - self._ys[0])/(len(self._ys)-1)
+
+        if dzdxs is None:
+            dzdys = np.empty_like(self._zs)
+            dzdys[1:-1, :] = (self._zs[2:, :] - self._zs[:-2, :])/(2*dy)
+            dzdys[0, :] = (self._zs[1, :] - self._zs[0, :])/dy
+            dzdys[-1, :] = (self._zs[-1, :] - self._zs[-2, :])/dy
+
+            dzdxs = np.empty_like(self._zs)
+            dzdxs[:, 1:-1] = (self._zs[:, 2:] - self._zs[:, :-2])/(2*dx)
+            dzdxs[:, 0] = (self._zs[:, 1] - self._zs[:, 0])/dx
+            dzdxs[:, -1] = (self._zs[:, -1] - self._zs[:, -2])/dx
+
+            d2zdxdys = np.empty_like(self._zs)
+            d2zdxdys[:, 1:-1] = (dzdys[:, 2:] - dzdys[:, :-2])/(2*dx)
+            d2zdxdys[:, 0] = (dzdys[:, 1] - dzdys[:, 0])/dx
+            d2zdxdys[:, -1] = (dzdys[:, -1] - dzdys[:, -2])/dx
+
+        # if dzdxs is None:
+        #     dzdxs = np.empty_like(self._zs)
+        #     dzdxs[1:-1, :] = (self._zs[2:, :] - self._zs[:-2, :])/(2*dx)
+        #     dzdxs[0, :] = (self._zs[1, :] - self._zs[0, :])/dx
+        #     dzdxs[-1, :] = (self._zs[-1, :] - self._zs[-2, :])/dx
+        #
+        #     dzdys = np.empty_like(self._zs)
+        #     dzdys[:, 1:-1] = (self._zs[:, 2:] - self._zs[:, :-2])/(2*dy)
+        #     dzdys[:, 0] = (self._zs[:, 1] - self._zs[:, 0])/dy
+        #     dzdys[:, -1] = (self._zs[:, -1] - self._zs[:, -2])/dy
+        #
+        #     d2zdxdys = np.empty_like(self._zs)
+        #     d2zdxdys[1:-1, :] = (dzdys[2:, :] - dzdys[:-2, :])/(2*dx)
+        #     d2zdxdys[0, :] = (dzdys[1, :] - dzdys[0, :])/dx
+        #     d2zdxdys[-1, :] = (dzdys[-1, :] - dzdys[-2, :])/dx
+
+        self._dzdxs = np.ascontiguousarray(dzdxs)
+        self._dzdys = np.ascontiguousarray(dzdys)
+        self._d2zdxdys = np.ascontiguousarray(d2zdxdys)
+
+        self._surface = _batoid.Bicubic(self._xs, self._ys, self._zs,
+                                        self._dzdxs, self._dzdys, self._d2zdxdys)
 
     @property
     def xs(self):
@@ -485,24 +531,43 @@ class Bicubic(Surface):
     def zs(self):
         return self._zs
 
+    @property
+    def dzdxs(self):
+        return self._dzdxs
+
+    @property
+    def dzdys(self):
+        return self._dzdys
+
+    @property
+    def d2zdxdys(self):
+        return self._d2zdxdys
+
     def __hash__(self):
-        return hash(("Bicubic", tuple(self.xs), tuple(self.ys), tuple(self.zs.ravel())))
+        return hash(("Bicubic", tuple(self.xs), tuple(self.ys), tuple(self.zs.ravel()),
+                     tuple(self.dzdxs.ravel()), tuple(self.dzdys.ravel()),
+                     tuple(self.d2zdxdys.ravel())))
 
     def __setstate__(self, args):
-        self._xs, self._ys, self._zs = args
-        self._surface = _batoid.Bicubic(self.xs, self.ys, self.zs)
+        self._xs, self._ys, self._zs, self._dzdxs, self._dzdys, self._d2zdxdys = args
+        self._surface = _batoid.Bicubic(self.xs, self.ys, self.zs,
+                                        self.dzdxs, self.dzdys, self.d2zdxdys)
 
     def __getstate__(self):
-        return self.xs, self.ys, self.zs
+        return self.xs, self.ys, self.zs, self.dzdxs, self.dzdys, self.d2zdxdys
 
     def __eq__(self, rhs):
         if not isinstance(rhs, Bicubic): return False
         return (np.array_equal(self.xs, rhs.xs)
                 and np.array_equal(self.ys, rhs.ys)
-                and np.array_equal(self.zs, rhs.zs))
+                and np.array_equal(self.zs, rhs.zs)
+                and np.array_equal(self.dzdxs, rhs.dzdxs)
+                and np.array_equal(self.dzdys, rhs.dzdys)
+                and np.array_equal(self.d2zdxdys, rhs.d2zdxdys))
 
     def __repr__(self):
-        return "Bicubic({!r}, {!r}, {!r})".format(self.xs, self.ys, self.zs)
+        return "Bicubic({!r}, {!r}, {!r}, {!r}, {!r}, {!r})".format(
+            self.xs, self.ys, self.zs, self.dzdxs, self.dzdys, self.d2zdxdys)
 
 
 class Sum(Surface):

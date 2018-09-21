@@ -27,9 +27,7 @@ namespace batoid {
         int upperIndex(const double a) const;
 
         // pass through a few std::vector methods.
-        // typename std::vector<double>::iterator begin() {return vec.cbegin();}
         citer begin() {return vec.cbegin();}
-        // typename std::vector<double>::iterator end() {return vec.cend();}
         citer end() {return vec.cend();}
         const double& front() const {return vec.front();}
         const double& back() const {return vec.back();}
@@ -49,17 +47,27 @@ namespace batoid {
 
     class Bicubic : public Surface {
     public:
-        // Bicubic(std::vector<double> xs, std::vector<double> ys, MatrixXd zs);
-        Bicubic(std::vector<double> xs, std::vector<double> ys, DRef<MatrixXd> zs);
+        Bicubic(
+            const std::vector<double> xs,
+            const std::vector<double> ys,
+            const DRef<MatrixXd> zs,
+            const DRef<MatrixXd> dzdxs,
+            const DRef<MatrixXd> dzdys,
+            const DRef<MatrixXd> d2zdxdys);
         virtual double sag(double, double) const override;
         virtual Vector3d normal(double, double) const override;
         bool timeToIntersect(const Ray& r, double& t) const override;
 
     private:
+        double oneDSpline(double x, double val0, double val1, double der0, double der1) const;
+        double oneDGrad(double x, double val0, double val1, double der0, double der1) const;
+
         const EqArgVec _xargs;
         const EqArgVec _yargs;
-        // const MatrixXd _zs;
         const DRef<MatrixXd> _zs;
+        const DRef<MatrixXd> _dzdxs;
+        const DRef<MatrixXd> _dzdys;
+        const DRef<MatrixXd> _d2zdxdys;
     };
 
 }
