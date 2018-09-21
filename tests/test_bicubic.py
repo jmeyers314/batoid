@@ -61,6 +61,8 @@ def test_normal():
         return np.ones_like(x)
     def df1dy(x, y):
         return np.ones_like(x)
+    def d2f1dxdy(x, y):
+        return np.zeros_like(x)
 
     def f2(x, y):
         return x-y
@@ -68,12 +70,16 @@ def test_normal():
         return np.ones_like(x)
     def df2dy(x, y):
         return -np.ones_like(x)
+    def d2f2dxdy(x, y):
+        return np.zeros_like(x)
 
     def f3(x, y):
         return x**2
     def df3dx(x, y):
         return 2*x
     def df3dy(x, y):
+        return np.zeros_like(x)
+    def d2f3dxdy(x, y):
         return np.zeros_like(x)
 
     def f4(x, y):
@@ -82,6 +88,8 @@ def test_normal():
         return 2*x*y
     def df4dy(x, y):
         return x**2 + 2
+    def d2f4dxdy(x, y):
+        return 2*x
 
     def f5(x, y):
         return x**2*y - y**2*x + 3*x - 2
@@ -89,6 +97,8 @@ def test_normal():
         return 2*x*y - y**2 + 3
     def df5dy(x, y):
         return x**2 - 2*y*x
+    def d2f5dxdy(x, y):
+        return 2*x - 2*y
 
     xs = np.linspace(0, 10, 1000)
     ys = np.linspace(0, 10, 1000)
@@ -103,6 +113,42 @@ def test_normal():
 
         zs = f(*np.meshgrid(xs, ys))
         bc = batoid.Bicubic(xs, ys, zs)
+        bcn = bc.normal(xtest, ytest)
+
+        arr = np.vstack([
+            -dfdx(xtest, ytest),
+            -dfdy(xtest, ytest),
+            np.ones(len(xtest))
+        ]).T
+        arr /= np.sqrt(np.sum(arr**2, axis=1))[:,None]
+
+        np.testing.assert_allclose(
+            bcn,
+            arr,
+            atol=1e-12, rtol=0
+        )
+
+    # Ought to be able to interpolate cubics if asserting derivatives
+    def f6(x, y):
+        return x**3*y - y**3*x + 3*x - 2
+    def df6dx(x, y):
+        return 3*x**2*y - y**3 + 3
+    def df6dy(x, y):
+        return x**3 - 3*y**2*x
+    def d2f6dxdy(x, y):
+        return 3*x**2 - 3*y**2
+
+    for f, dfdx, dfdy, d2fdxdy in zip(
+        [f1, f2, f3, f4, f5, f6],
+        [df1dx, df2dx, df3dx, df4dx, df5dx, df6dx],
+        [df1dy, df2dy, df3dy, df4dy, df5dy, df6dy],
+        [d2f1dxdy, d2f2dxdy, d2f3dxdy, d2f4dxdy, d2f5dxdy, d2f6dxdy]):
+
+        zs = f(*np.meshgrid(xs, ys))
+        dzdxs = dfdx(*np.meshgrid(xs, ys))
+        dzdys = dfdy(*np.meshgrid(xs, ys))
+        d2zdxdys = d2fdxdy(*np.meshgrid(xs, ys))
+        bc = batoid.Bicubic(xs, ys, zs, dzdxs=dzdxs, dzdys=dzdys, d2zdxdys=d2zdxdys)
         bcn = bc.normal(xtest, ytest)
 
         arr = np.vstack([
@@ -154,7 +200,7 @@ def test_approximate_asphere():
     xtest = np.random.uniform(-0.9, 0.9, size=1000)
     ytest = np.random.uniform(-0.9, 0.9, size=1000)
 
-    for i in range(100):
+    for i in range(50):
         R = np.random.normal(20.0, 1.0)
         conic = np.random.uniform(-2.0, 1.0)
         ncoef = np.random.randint(0, 4)
@@ -196,6 +242,10 @@ def test_ne():
         batoid.Bicubic(xs1, ys1, zs2),
         batoid.Bicubic(xs2, ys1, zs1),
         batoid.Bicubic(xs1, ys2, zs1),
+        batoid.Bicubic(xs1, ys2, zs1, zs1, zs1, zs1),
+        batoid.Bicubic(xs1, ys2, zs1, zs1, zs1, zs2),
+        batoid.Bicubic(xs1, ys2, zs1, zs1, zs2, zs2),
+        batoid.Bicubic(xs1, ys2, zs1, zs2, zs2, zs2)
     ]
     all_obj_diff(objs)
 
