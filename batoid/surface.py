@@ -496,22 +496,6 @@ class Bicubic(Surface):
             d2zdxdys[:, 0] = (dzdys[:, 1] - dzdys[:, 0])/dx
             d2zdxdys[:, -1] = (dzdys[:, -1] - dzdys[:, -2])/dx
 
-        # if dzdxs is None:
-        #     dzdxs = np.empty_like(self._zs)
-        #     dzdxs[1:-1, :] = (self._zs[2:, :] - self._zs[:-2, :])/(2*dx)
-        #     dzdxs[0, :] = (self._zs[1, :] - self._zs[0, :])/dx
-        #     dzdxs[-1, :] = (self._zs[-1, :] - self._zs[-2, :])/dx
-        #
-        #     dzdys = np.empty_like(self._zs)
-        #     dzdys[:, 1:-1] = (self._zs[:, 2:] - self._zs[:, :-2])/(2*dy)
-        #     dzdys[:, 0] = (self._zs[:, 1] - self._zs[:, 0])/dy
-        #     dzdys[:, -1] = (self._zs[:, -1] - self._zs[:, -2])/dy
-        #
-        #     d2zdxdys = np.empty_like(self._zs)
-        #     d2zdxdys[1:-1, :] = (dzdys[2:, :] - dzdys[:-2, :])/(2*dx)
-        #     d2zdxdys[0, :] = (dzdys[1, :] - dzdys[0, :])/dx
-        #     d2zdxdys[-1, :] = (dzdys[-1, :] - dzdys[-2, :])/dx
-
         self._dzdxs = np.ascontiguousarray(dzdxs)
         self._dzdys = np.ascontiguousarray(dzdys)
         self._d2zdxdys = np.ascontiguousarray(d2zdxdys)
