@@ -247,5 +247,6 @@ namespace batoid {
             .def("__len__", &RayVector::size)
             .def("__eq__", [](const RayVector& lhs, const RayVector& rhs) { return lhs.rays == rhs.rays; }, py::is_operator())
             .def("__ne__", [](const RayVector& lhs, const RayVector& rhs) { return lhs.rays != rhs.rays; }, py::is_operator());
+        m.def("concatenateRayVectors", &concatenateRayVectors);
     }
 }

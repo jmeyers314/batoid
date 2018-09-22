@@ -210,6 +210,15 @@ def test_RayVector():
     del rayVector
     assert np.all(x == x2)  # it survives!
 
+    # Test concatenateRayVectors
+    rv1 = batoid.RayVector(rayList[0:5])
+    rv2 = batoid.RayVector(rayList[5:10])
+    rv3 = batoid.RayVector(rayList[10:12])
+    rv4 = batoid.RayVector(rayList[12:40])
+    rvA = batoid.concatenateRayVectors([rv1, rv2, rv3, rv4])
+    rvB = batoid.RayVector(rayList[0:40])
+    assert rvA == rvB
+
 
 @timer
 def test_rayGrid():

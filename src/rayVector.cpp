@@ -112,4 +112,20 @@ namespace batoid {
         );
     }
 
+    RayVector concatenateRayVectors(const std::vector<RayVector>& rvs) {
+        int n = std::accumulate(
+            rvs.begin(), rvs.end(), 0,
+            [](int s, const RayVector& rv){ return s + rv.size(); }
+        );
+        std::vector<Ray> out;
+        out.reserve(n);
+
+        double wavelength = rvs[0].wavelength;
+        for (const auto& rv: rvs) {
+            if (wavelength != rv.wavelength)
+                wavelength = NAN;
+            out.insert(out.end(), rv.rays.cbegin(), rv.rays.cend());
+        }
+        return RayVector(out, wavelength);
+    }
 }

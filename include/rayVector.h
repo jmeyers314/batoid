@@ -58,6 +58,8 @@ namespace batoid {
     inline std::ostream& operator<<(std::ostream& os, const RayVector& rv) {
         return os << rv.repr();
     }
+
+    RayVector concatenateRayVectors(const std::vector<RayVector>& rvs);
 }
 
 #endif
