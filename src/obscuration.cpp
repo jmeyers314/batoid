@@ -31,8 +31,8 @@ namespace batoid {
     }
 
     RayVector Obscuration::obscure(const RayVector& rv) const {
-        std::vector<Ray> result(rv.rays.size());
-        parallelTransform(rv.rays.cbegin(), rv.rays.cend(), result.begin(),
+        std::vector<Ray> result(rv.size());
+        parallelTransform(rv.cbegin(), rv.cend(), result.begin(),
             [this](const Ray& ray)
             {
                 if (ray.failed) return ray;
@@ -47,7 +47,7 @@ namespace batoid {
 
     void Obscuration::obscureInPlace(RayVector& rv) const {
         parallel_for_each(
-            rv.rays.begin(), rv.rays.end(),
+            rv.begin(), rv.end(),
             [this](Ray& r){ obscureInPlace(r); }
         );
     }

@@ -2,6 +2,7 @@
 #define batoid_rayVector_h
 
 #include "ray.h"
+#include <memory>
 #include <cmath>
 #include <complex>
 #include <vector>
@@ -36,6 +37,8 @@ namespace batoid {
             { return rays[i]; }
         typename std::vector<Ray>::iterator begin() noexcept { return rays.begin(); }
         typename std::vector<Ray>::iterator end() noexcept { return rays.end(); }
+        typename std::vector<Ray>::const_iterator cbegin() const noexcept { return rays.cbegin(); }
+        typename std::vector<Ray>::const_iterator cend() const noexcept { return rays.cend(); }
         typename std::vector<Ray>::size_type size() const noexcept { return rays.size(); }
 
         // methods
@@ -50,7 +53,7 @@ namespace batoid {
         void trimVignettedInPlace();
         std::string repr() const;
 
-        // data
+    // private:
         std::vector<Ray> rays;
         double wavelength{NAN};  // If not NAN, then all wavelengths are this wavelength
     };

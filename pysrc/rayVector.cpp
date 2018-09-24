@@ -239,7 +239,7 @@ namespace batoid {
                         py::return_value_policy::reference_internal,
                         typename std::vector<Ray>::iterator,
                         typename std::vector<Ray>::iterator,
-                        Ray&>(rv.rays.begin(), rv.rays.end());
+                        Ray&>(rv.begin(), rv.end());
                 },
                 py::keep_alive<0, 1>()
             )

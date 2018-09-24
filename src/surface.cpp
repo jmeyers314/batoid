@@ -25,9 +25,9 @@ namespace batoid {
     }
 
     RayVector Surface::intersect(const RayVector& rv) const {
-        std::vector<Ray> rays(rv.rays.size());
+        std::vector<Ray> rays(rv.size());
 
-        parallelTransform(rv.rays.cbegin(), rv.rays.cend(), rays.begin(),
+        parallelTransform(rv.cbegin(), rv.cend(), rays.begin(),
             [this](const Ray& ray)
             { return intersect(ray); }
         );
@@ -36,7 +36,7 @@ namespace batoid {
 
     void Surface::intersectInPlace(RayVector& rv) const {
         parallel_for_each(
-            rv.rays.begin(), rv.rays.end(),
+            rv.begin(), rv.end(),
             [this](Ray& r) { intersectInPlace(r); }
         );
     }
@@ -54,9 +54,9 @@ namespace batoid {
     }
 
     RayVector Surface::reflect(const RayVector& rv) const {
-        std::vector<Ray> rv2(rv.rays.size());
+        std::vector<Ray> rv2(rv.size());
         parallelTransform(
-            rv.rays.cbegin(), rv.rays.cend(), rv2.begin(),
+            rv.cbegin(), rv.cend(), rv2.begin(),
             [this](const Ray& r){ return reflect(r); }
         );
         return RayVector(std::move(rv2), rv.wavelength);
@@ -75,7 +75,7 @@ namespace batoid {
 
     void Surface::reflectInPlace(RayVector& rv) const {
         parallel_for_each(
-            rv.rays.begin(), rv.rays.end(),
+            rv.begin(), rv.end(),
             [this](Ray& r) { reflectInPlace(r); }
         );
     }
@@ -106,19 +106,19 @@ namespace batoid {
     }
 
     RayVector Surface::refract(const RayVector& rv, const Medium& m1, const Medium& m2) const {
-        std::vector<Ray> rays(rv.rays.size());
+        std::vector<Ray> rays(rv.size());
 
         // use double version of refract if possible
         if (std::isnan(rv.wavelength)) {
             parallelTransform(
-                rv.rays.cbegin(), rv.rays.cend(), rays.begin(),
+                rv.cbegin(), rv.cend(), rays.begin(),
                 [this,&m1,&m2](const Ray& r){ return refract(r, m1, m2); }
             );
         } else {
             double n1 = m1.getN(rv.wavelength);
             double n2 = m2.getN(rv.wavelength);
             parallelTransform(
-                rv.rays.cbegin(), rv.rays.cend(), rays.begin(),
+                rv.cbegin(), rv.cend(), rays.begin(),
                 [this,n1,n2](const Ray& r){ return refract(r, n1, n2); }
             );
         }
@@ -156,14 +156,14 @@ namespace batoid {
         // Use double version of refractInPlace if possible
         if (std::isnan(rv.wavelength)) {
             parallel_for_each(
-                rv.rays.begin(), rv.rays.end(),
+                rv.begin(), rv.end(),
                 [this, &m1, &m2](Ray& r){ refractInPlace(r, m1, m2); }
             );
         } else {
             double n1 = m1.getN(rv.wavelength);
             double n2 = m2.getN(rv.wavelength);
             parallel_for_each(
-                rv.rays.begin(), rv.rays.end(),
+                rv.begin(), rv.end(),
                 [this, n1, n2](Ray& r){ refractInPlace(r, n1, n2); }
             );
         }
