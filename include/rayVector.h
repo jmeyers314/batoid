@@ -47,12 +47,12 @@ namespace batoid {
         void push_back(const Ray& r) { _rays.push_back(r); }
         void push_back(Ray&& r) { _rays.push_back(r); }
 
+        // note: no test on _wavelength.
         bool operator==(const RayVector& rhs) const {
-            // DEBUG 
-            return _rays == rhs._rays && _wavelength == rhs._wavelength;
+            return _rays == rhs._rays;
         }
         bool operator!=(const RayVector& rhs) const {
-            return _rays != rhs._rays || _wavelength != rhs._wavelength;
+            return _rays != rhs._rays;
         }
 
         // methods
