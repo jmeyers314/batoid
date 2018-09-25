@@ -31,7 +31,7 @@ namespace batoid {
             [this](const Ray& ray)
             { return intersect(ray); }
         );
-        return RayVector(std::move(rays), rv.wavelength);
+        return RayVector(std::move(rays), rv.getWavelength());
     }
 
     void Surface::intersectInPlace(RayVector& rv) const {
@@ -59,7 +59,7 @@ namespace batoid {
             rv.cbegin(), rv.cend(), rv2.begin(),
             [this](const Ray& r){ return reflect(r); }
         );
-        return RayVector(std::move(rv2), rv.wavelength);
+        return RayVector(std::move(rv2), rv.getWavelength());
     }
 
     void Surface::reflectInPlace(Ray& r) const {
@@ -109,20 +109,20 @@ namespace batoid {
         std::vector<Ray> rays(rv.size());
 
         // use double version of refract if possible
-        if (std::isnan(rv.wavelength)) {
+        if (std::isnan(rv.getWavelength())) {
             parallelTransform(
                 rv.cbegin(), rv.cend(), rays.begin(),
                 [this,&m1,&m2](const Ray& r){ return refract(r, m1, m2); }
             );
         } else {
-            double n1 = m1.getN(rv.wavelength);
-            double n2 = m2.getN(rv.wavelength);
+            double n1 = m1.getN(rv.getWavelength());
+            double n2 = m2.getN(rv.getWavelength());
             parallelTransform(
                 rv.cbegin(), rv.cend(), rays.begin(),
                 [this,n1,n2](const Ray& r){ return refract(r, n1, n2); }
             );
         }
-        return RayVector(std::move(rays), rv.wavelength);
+        return RayVector(std::move(rays), rv.getWavelength());
     }
 
     void Surface::refractInPlace(Ray& r, const double n1, const double n2) const {
@@ -154,14 +154,14 @@ namespace batoid {
 
     void Surface::refractInPlace(RayVector& rv, const Medium& m1, const Medium& m2) const {
         // Use double version of refractInPlace if possible
-        if (std::isnan(rv.wavelength)) {
+        if (std::isnan(rv.getWavelength())) {
             parallel_for_each(
                 rv.begin(), rv.end(),
                 [this, &m1, &m2](Ray& r){ refractInPlace(r, m1, m2); }
             );
         } else {
-            double n1 = m1.getN(rv.wavelength);
-            double n2 = m2.getN(rv.wavelength);
+            double n1 = m1.getN(rv.getWavelength());
+            double n2 = m2.getN(rv.getWavelength());
             parallel_for_each(
                 rv.begin(), rv.end(),
                 [this, n1, n2](Ray& r){ refractInPlace(r, n1, n2); }

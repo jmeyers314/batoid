@@ -128,6 +128,7 @@ def test_intersect_vectorized():
 
         r1s = asphere.intersect(r0s)
         r2s = batoid.RayVector([asphere.intersect(r0) for r0 in r0s])
+        import ipdb; ipdb.set_trace()
         assert r1s == r2s
 
 
