@@ -17,7 +17,7 @@ def parallel_trace_timing(nside=1024, nthread=None):
     theta_y = np.deg2rad(0.3)
     dirCos = np.array([theta_x, theta_y, -1.0])
     dirCos = batoid.utils.normalized(dirCos)
-    rays = batoid.circularGrid(20, 4.2, 0.5, dirCos[0], dirCos[1], dirCos[2], nside, nside, 700e-9, batoid.ConstMedium(1.0))
+    rays = batoid.circularGrid(20, 4.2, 0.5, dirCos[0], dirCos[1], dirCos[2], nside, nside, 700e-9, 1.0, batoid.ConstMedium(1.0))
 
     nrays = len(rays)
     print("Tracing {} rays.".format(nrays))
@@ -30,7 +30,7 @@ def parallel_trace_timing(nside=1024, nthread=None):
     # Optionally perturb the primary mirror using Zernike polynomial
     if args.perturbZ != 0:
         orig = telescope.itemDict['SubaruHSC.PM'].surface
-        coefs = np.random.normal(size=args.perturbN+1)*1e-6 # micron perturbations
+        coefs = np.random.normal(size=args.perturbZ+1)*1e-6 # micron perturbations
         perturbation = batoid.Zernike(coefs, R_outer=8.2)
         telescope.itemDict['SubaruHSC.PM'].surface = batoid.Sum([orig, perturbation])
 
@@ -69,7 +69,7 @@ def parallel_trace_timing(nside=1024, nthread=None):
         y -= np.mean(y)
         x *= 1e6
         y *= 1e6
-        plt.scatter(x, y, s=1, alpha=0.1)
+        plt.scatter(x, y, s=1, alpha=0.01)
         plt.xlim(np.std(x)*np.r_[-3,3])
         plt.ylim(np.std(y)*np.r_[-3,3])
         plt.xlabel("x (microns)")

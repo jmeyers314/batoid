@@ -41,6 +41,11 @@ namespace batoid {
             Vacuum wavelength in meters.
         )pbdoc");
 
+        std::string docRayFlux(R"pbdoc(
+            float
+            Flux in arbitrary units.
+        )pbdoc");
+
         std::string docRayVignetted(R"pbdoc(
             bool
             Whether Ray has been vignetted or not.
@@ -204,12 +209,12 @@ namespace batoid {
         options.disable_function_signatures();
 
         py::class_<Ray>(m, "Ray", docRay.c_str())
-            .def(py::init<double,double,double,double,double,double,double,double,bool>(),
+            .def(py::init<double,double,double,double,double,double,double,double,double,bool>(),
                  "x"_a, "y"_a, "z"_a, "vx"_a, "vy"_a, "vz"_a, "t"_a=0.0,
-                 "wavelength"_a=0.0, "vignetted"_a=false,
+                 "wavelength"_a=0.0, "flux"_a=1.0, "vignetted"_a=false,
                  docRayInit1.c_str())
-            .def(py::init<Vector3d,Vector3d,double,double,bool>(),
-                 "r"_a, "v"_a, "t"_a=0.0, "wavelength"_a=0.0, "vignetted"_a=false,
+            .def(py::init<Vector3d,Vector3d,double,double,double,bool>(),
+                 "r"_a, "v"_a, "t"_a=0.0, "wavelength"_a=0.0, "flux"_a=1.0, "vignetted"_a=false,
                  docRayInit2.c_str())
             .def(py::init<bool>(), "failed"_a)
             .def(py::init<Ray>())
@@ -217,6 +222,7 @@ namespace batoid {
             .def_readonly("v", &Ray::v, docRayV.c_str())
             .def_readonly("t", &Ray::t, docRayT.c_str())
             .def_readonly("wavelength", &Ray::wavelength, docRayWavelength.c_str())
+            .def_readonly("flux", &Ray::flux, docRayFlux.c_str())
             .def_readonly("vignetted", &Ray::vignetted, docRayVignetted.c_str())
             .def_readonly("failed", &Ray::failed, docRayFailed.c_str())
             .def_property_readonly("x", [](const Ray& r){ return r.r[0]; }, docRayX.c_str())
@@ -242,7 +248,9 @@ namespace batoid {
 
             .def(py::pickle(
                 [](const Ray& r) { // __getstate__
-                    return py::make_tuple(r.r, r.v, r.t, r.wavelength, r.vignetted, r.failed);
+                    return py::make_tuple(
+                        r.r, r.v, r.t, r.wavelength, r.flux, r.vignetted, r.failed
+                    );
                 },
                 [](py::tuple t) { // __setstate__
                     Ray r(
@@ -250,9 +258,10 @@ namespace batoid {
                         t[1].cast<Vector3d>(),
                         t[2].cast<double>(),
                         t[3].cast<double>(),
-                        t[4].cast<bool>()
+                        t[4].cast<double>(),
+                        t[5].cast<bool>()
                     );
-                    if (t[5].cast<bool>())
+                    if (t[6].cast<bool>())
                         r.setFail();
                     return r;
                 }
@@ -264,6 +273,7 @@ namespace batoid {
                     py::tuple(py::cast(r.v)),
                     r.t,
                     r.wavelength,
+                    r.flux,
                     r.vignetted,
                     r.failed
                 ));

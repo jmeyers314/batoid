@@ -13,7 +13,7 @@ def test_optic():
     else:
         nside = 32
 
-    rays = batoid.rayGrid(20, 12.0, 0.005, 0.005, -1.0, nside, 500e-9, batoid.ConstMedium(1.0))
+    rays = batoid.rayGrid(20, 12.0, 0.005, 0.005, -1.0, nside, 500e-9, 1.0, batoid.ConstMedium(1.0))
 
     nrays = len(rays)
     print("Tracing {} rays.".format(nrays))
@@ -48,7 +48,7 @@ def test_traceFull():
     else:
         nside = 32
 
-    rays = batoid.rayGrid(20, 12.0, 0.005, 0.005, -1.0, nside, 500e-9, batoid.ConstMedium(1.0))
+    rays = batoid.rayGrid(20, 12.0, 0.005, 0.005, -1.0, nside, 500e-9, 1.0, batoid.ConstMedium(1.0))
 
     nrays = len(rays)
     print("Tracing {} rays.".format(nrays))
@@ -74,7 +74,7 @@ def test_traceReverse():
     config = yaml.load(open(fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
 
-    init_rays = batoid.rayGrid(20, 12.0, 0.005, 0.005, -1.0, nside, 500e-9, batoid.ConstMedium(1.0))
+    init_rays = batoid.rayGrid(20, 12.0, 0.005, 0.005, -1.0, nside, 500e-9, 1.0, batoid.ConstMedium(1.0))
     forward_rays, _ = telescope.trace(init_rays, outCoordSys=batoid.CoordSys())
 
     # Now, turn the result rays around and trace backwards
@@ -174,7 +174,7 @@ def test_thread():
     rayGrid = batoid.rayGrid(
         telescope.dist, telescope.pupilSize,
         0.0, 0.0, -1.0,
-        32, 750e-9, telescope.inMedium)
+        32, 750e-9, 1.0, telescope.inMedium)
 
     batoid._batoid.setNThread(4)
     assert batoid._batoid.getNThread() == 4

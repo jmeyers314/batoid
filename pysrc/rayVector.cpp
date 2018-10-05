@@ -18,7 +18,8 @@ namespace batoid {
             .def(py::init<std::vector<Ray>>())
             .def(py::init<std::vector<double>, std::vector<double>, std::vector<double>,
                           std::vector<double>, std::vector<double>, std::vector<double>,
-                          std::vector<double>, std::vector<double>, std::vector<bool>>())
+                          std::vector<double>, std::vector<double>, std::vector<double>,
+                          std::vector<bool>>())
             .def("__repr__", &RayVector::repr)
             .def("amplitude", &RayVector::amplitude)
             .def("sumAmplitude", &RayVector::sumAmplitude)
@@ -120,6 +121,14 @@ namespace batoid {
                     return {{rv.size()},
                         {sizeof(Ray)},
                         &(rv.front()).wavelength,
+                        py::cast(rv)};
+                }
+            )
+            .def_property_readonly("flux",
+                [](RayVector& rv) -> py::array_t<double> {
+                    return {{rv.size()},
+                        {sizeof(Ray)},
+                        &(rv.front()).flux,
                         py::cast(rv)};
                 }
             )

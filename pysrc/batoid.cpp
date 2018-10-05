@@ -53,12 +53,12 @@ namespace batoid {
         m.def("rayGrid",
              &rayGrid,
              "Make a RayVector in a grid",
-             "zdist"_a, "length"_a, "xcos"_a, "ycos"_a, "zcos"_a, "nside"_a, "wavelength"_a, "medium"_a
+             "zdist"_a, "length"_a, "xcos"_a, "ycos"_a, "zcos"_a, "nside"_a, "wavelength"_a, "flux"_a, "medium"_a
          )
          .def("circularGrid",
              &circularGrid,
              "Make a RayVector on a circle",
-             "zdist"_a, "outer"_a, "inner"_a, "xcos"_a, "ycos"_a, "zcos"_a, "nradii"_a, "naz"_a, "wavelength"_a, "medium"_a
+             "zdist"_a, "outer"_a, "inner"_a, "xcos"_a, "ycos"_a, "zcos"_a, "nradii"_a, "naz"_a, "wavelength"_a, "flux"_a, "medium"_a
          )
          .def("getNThread", &getNThread)
          .def("setNThread", &setNThread);

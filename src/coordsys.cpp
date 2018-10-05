@@ -123,13 +123,13 @@ namespace batoid {
     Ray CoordTransform::applyForward(const Ray& r) const {
         if (r.failed) return r;
         return Ray(_rot.transpose()*(r.r-_dr), _rot.transpose()*r.v,
-                r.t, r.wavelength, r.vignetted);
+                r.t, r.wavelength, r.flux, r.vignetted);
     }
 
     Ray CoordTransform::applyReverse(const Ray& r) const {
         if (r.failed) return r;
         return Ray(_rot*r.r + _dr, _rot*r.v,
-            r.t, r.wavelength, r.vignetted);
+            r.t, r.wavelength, r.flux, r.vignetted);
     }
 
     void CoordTransform::applyForwardInPlace(Ray& r) const {

@@ -19,7 +19,7 @@ namespace batoid {
     Ray Obscuration::obscure(const Ray& ray) const {
         if (ray.failed || ray.vignetted) return ray;
         if (contains(ray.r[0], ray.r[1]))
-            return Ray(ray.r, ray.v, ray.t, ray.wavelength, true);
+            return Ray(ray.r, ray.v, ray.t, ray.wavelength, ray.flux, true);
         else
             return ray;
     }
@@ -37,9 +37,9 @@ namespace batoid {
             {
                 if (ray.failed) return ray;
                 if (contains(ray.r[0], ray.r[1]))
-                    return Ray(ray.r, ray.v, ray.t, ray.wavelength, true);
+                    return Ray(ray.r, ray.v, ray.t, ray.wavelength, ray.flux, true);
                 else
-                    return Ray(ray.r, ray.v, ray.t, ray.wavelength, ray.vignetted);
+                    return Ray(ray.r, ray.v, ray.t, ray.wavelength, ray.flux, ray.vignetted);
             }
         );
         return RayVector(std::move(result), rv.getWavelength());

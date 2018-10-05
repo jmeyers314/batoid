@@ -13,8 +13,8 @@ namespace batoid {
     const double PI = 3.14159265358979323846;
     struct Ray {
         Ray(double x, double y, double z, double vx, double vy, double vz,
-            double t, double w, bool vignetted);
-        Ray(Vector3d _r, Vector3d _v, double _t, double w, bool vignetted);
+            double t, double w, double f, bool vignetted);
+        Ray(Vector3d _r, Vector3d _v, double _t, double w, double f, bool vignetted);
         Ray(const Ray& _ray) = default;
         Ray(bool failed);
         Ray() = default;
@@ -23,6 +23,7 @@ namespace batoid {
         Vector3d v;  // "velocity" Vector3d, really v/c
         double t; // reference time, really c*t0
         double wavelength; // in vacuum, in meters
+        double flux;
         bool vignetted;
         bool failed;
 

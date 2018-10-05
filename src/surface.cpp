@@ -8,7 +8,7 @@ namespace batoid {
         if (!timeToIntersect(r, t))
             return Ray(true);
         Vector3d point = r.positionAtTime(t);
-        return Ray(point, r.v, t, r.wavelength, r.vignetted);
+        return Ray(point, r.v, t, r.wavelength, r.flux, r.vignetted);
     }
 
     void Surface::intersectInPlace(Ray& r) const {
@@ -50,7 +50,7 @@ namespace batoid {
         Vector3d nv = r2.v * n;
         Vector3d normVec(normal(r2.r[0], r2.r[1]));
         double c1 = nv.dot(normVec);
-        return Ray(r2.r, (nv - 2*c1*normVec).normalized()/n, r2.t, r2.wavelength, r2.vignetted);
+        return Ray(r2.r, (nv - 2*c1*normVec).normalized()/n, r2.t, r2.wavelength, r2.flux, r2.vignetted);
     }
 
     RayVector Surface::reflect(const RayVector& rv) const {
@@ -95,9 +95,9 @@ namespace batoid {
         Vector3d f1 = (nv+k1*normVec).normalized();
         Vector3d f2 = (nv+k2*normVec).normalized();
         if (f1.dot(nv) > f2.dot(nv))
-            return Ray(r2.r, f1/n2, r2.t, r2.wavelength, r2.vignetted);
+            return Ray(r2.r, f1/n2, r2.t, r2.wavelength, r2.flux, r2.vignetted);
         else
-            return Ray(r2.r, f2/n2, r2.t, r2.wavelength, r2.vignetted);
+            return Ray(r2.r, f2/n2, r2.t, r2.wavelength, r2.flux, r2.vignetted);
     }
 
     Ray Surface::refract(const Ray& r, const Medium& m1, const Medium& m2) const {

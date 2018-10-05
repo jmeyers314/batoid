@@ -137,7 +137,7 @@ def test_lsst_psf():
         dirCos = batoid.utils.gnomicToDirCos(0.0, theta/206265)
         rays = batoid.circularGrid(10.0, 4.2, 2.55,
                                    dirCos[0], dirCos[1], -dirCos[2],
-                                   10, 100, 620e-9, batoid.Air())
+                                   10, 100, 620e-9, 1.0, batoid.Air())
         telescope.traceInPlace(rays)
         rays.trimVignettedInPlace()
         xs = rays.x - np.mean(rays.x)
@@ -188,7 +188,7 @@ def test_hsc_psf():
         dirCos = batoid.utils.gnomicToDirCos(0.0, theta/206265)
         rays = batoid.circularGrid(20.0, 4.1, 0.9,
                                    dirCos[0], dirCos[1], -dirCos[2],
-                                   10, 100, 620e-9, batoid.ConstMedium(1.0))
+                                   10, 100, 620e-9, 1.0, batoid.ConstMedium(1.0))
         telescope.traceInPlace(rays)
         rays.trimVignettedInPlace()
         xs = rays.x - np.mean(rays.x)
@@ -239,7 +239,7 @@ def test_decam_psf():
         dirCos = batoid.utils.gnomicToDirCos(0.0, theta/206265)
         rays = batoid.circularGrid(10.0, 1.95, 0.5,
                                    dirCos[0], dirCos[1], -dirCos[2],
-                                   10, 100, 620e-9, batoid.Air())
+                                   10, 100, 620e-9, 1.0, batoid.Air())
         telescope.traceInPlace(rays)
         rays.trimVignettedInPlace()
         xs = rays.x - np.mean(rays.x)

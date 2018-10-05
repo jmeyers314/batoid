@@ -29,7 +29,8 @@ namespace batoid {
         RayVector(
             const std::vector<double>& x, const std::vector<double>& y, const std::vector<double>& z,
             const std::vector<double>& vx, const std::vector<double>& vy, const std::vector<double>& vz,
-            const std::vector<double>& t, const std::vector<double>& w, const std::vector<bool>& vignetted
+            const std::vector<double>& t, const std::vector<double>& w,
+            const std::vector<double>& flux, const std::vector<bool>& vignetted
         );
 
         // std::vector forwarding

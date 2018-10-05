@@ -9,17 +9,18 @@ using Eigen::Vector3d;
 
 namespace batoid {
     Ray::Ray(double x, double y, double z, double vx, double vy, double vz, double _t=0.0,
-             double _wavelength=0.0, bool _vignetted=false) :
+             double _wavelength=0.0, double _flux=1.0, bool _vignetted=false) :
         r(Vector3d(x, y, z)), v(Vector3d(vx, vy, vz)), t(_t),
-        wavelength(_wavelength), vignetted(_vignetted), failed(false) {}
+        wavelength(_wavelength), flux(_flux), vignetted(_vignetted), failed(false) {}
 
     Ray::Ray(Vector3d _r, Vector3d _v, double _t=0.0, double _wavelength=0.0,
-             bool _vignetted=false) :
-        r(_r), v(_v), t(_t), wavelength(_wavelength), vignetted(_vignetted), failed(false) {}
+             double _flux=1.0, bool _vignetted=false) :
+        r(_r), v(_v), t(_t), wavelength(_wavelength), flux(_flux), vignetted(_vignetted),
+        failed(false) {}
 
     Ray::Ray(const bool failed) :
-        r(Vector3d::Zero()), v(Vector3d::Zero()), t(0.0), wavelength(0.0), vignetted(true),
-        failed(true) {}
+        r(Vector3d::Zero()), v(Vector3d::Zero()), t(0.0), wavelength(0.0), flux(0.0),
+        vignetted(true), failed(true) {}
 
     std::string Ray::repr() const {
         std::ostringstream oss("Ray(", std::ios_base::ate);
@@ -30,6 +31,7 @@ namespace batoid {
                 << v[0] << "," << v[1] << "," << v[2] << "]";
             if (t != 0.0) oss << ", t=" << t;
             if (wavelength != 0.0) oss << ", wavelength=" << wavelength;
+            if (flux != 1.0) oss << ", flux=" << flux;
             if (vignetted) oss << ", vignetted=True";
             oss << ")";
         }
@@ -41,7 +43,7 @@ namespace batoid {
     }
 
     Ray Ray::propagatedToTime(const double _t) const {
-        return Ray(positionAtTime(_t), v, _t, wavelength, vignetted);
+        return Ray(positionAtTime(_t), v, _t, wavelength, flux, vignetted);
     }
 
     void Ray::propagateInPlace(const double _t) {
@@ -59,6 +61,7 @@ namespace batoid {
                (v == other.v) &&
                (t == other.t) &&
                (wavelength == other.wavelength) &&
+               (flux == other.flux) &&
                (vignetted == other.vignetted);
     }
 

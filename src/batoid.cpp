@@ -12,7 +12,7 @@ using Eigen::Vector3d;
 namespace batoid{
     RayVector rayGrid(double dist, double length,
                       double xcos, double ycos, double zcos,
-                      int nside, double wavelength,
+                      int nside, double wavelength, double flux,
                       const Medium& m) {
         double n = m.getN(wavelength);
     // `dist` is the distance from the center of the pupil to the center of the rayGrid.
@@ -52,7 +52,7 @@ namespace batoid{
                 //      = (r + v n d) . v n^2
                 // => r0 = r - v t
                 double t = (r + v*n*dist).dot(v) * n * n;
-                result.emplace_back(r-v*t, v, 0, wavelength, false);
+                result.emplace_back(r-v*t, v, 0, wavelength, flux, false);
                 x += dy;
             }
             y += dy;
@@ -62,7 +62,7 @@ namespace batoid{
 
     RayVector circularGrid(double dist, double outer, double inner,
                            double xcos, double ycos, double zcos,
-                           int nradii, int naz, double wavelength, const Medium& m) {
+                           int nradii, int naz, double wavelength, double flux, const Medium& m) {
         double n = m.getN(wavelength);
 
         // Determine number of rays at each radius
@@ -90,7 +90,7 @@ namespace batoid{
             for (int j=0; j<nphis[i]; j++) {
                 Vector3d r(radius*std::cos(az), radius*std::sin(az), 0);
                 double t = (r + v*n*dist).dot(v) * n * n;
-                result.emplace_back(r-v*t, v, 0, wavelength, false);
+                result.emplace_back(r-v*t, v, 0, wavelength, flux, false);
                 az += daz;
             }
             rfrac -= drfrac;
