@@ -3,9 +3,11 @@
 
 #include <vector>
 #include <memory>
+#include <utility>
 #include "ray.h"
 #include "rayVector.h"
 #include "medium.h"
+#include "coating.h"
 
 #include <Eigen/Dense>
 
@@ -33,9 +35,14 @@ namespace batoid {
         void refractInPlace(Ray&, const Medium&, const Medium&) const;
         void refractInPlace(RayVector&, const Medium&, const Medium&) const;
 
+        std::pair<Ray, Ray> rSplit(const Ray&, const Medium&, const Medium&, const Coating&) const;
+        std::pair<RayVector, RayVector> rSplit(const RayVector&, const Medium&, const Medium&, const Coating&) const;
+
     private:
         Ray refract(const Ray&, const double, const double) const;
         void refractInPlace(Ray&, const double, const double) const;
+
+        std::pair<Ray, Ray> rSplit(const Ray&, const double, const double, const Coating&) const;
     };
 }
 #endif

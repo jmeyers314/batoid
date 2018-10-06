@@ -19,6 +19,7 @@ set(PYSRC_FILES
   pysrc/asphere.cpp
   pysrc/batoid.cpp
   pysrc/bicubic.cpp
+  pysrc/coating.cpp
   pysrc/coordsys.cpp
   pysrc/medium.cpp
   pysrc/obscuration.cpp
@@ -37,6 +38,7 @@ set(SRC_FILES
   src/asphere.cpp
   src/batoid.cpp
   src/bicubic.cpp
+  src/coating.cpp
   src/coordsys.cpp
   src/medium.cpp
   src/obscuration.cpp

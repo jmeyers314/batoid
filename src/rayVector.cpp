@@ -28,7 +28,8 @@ namespace batoid {
 
     std::string RayVector::repr() const {
         std::ostringstream oss("RayVector([", std::ios_base::ate);
-        oss << _rays[0];
+        if (_rays.size() > 0)
+            oss << _rays[0];
         for(int i=1; i<_rays.size(); i++) {
             oss << ", " << _rays[i];
         }
@@ -91,30 +92,33 @@ namespace batoid {
         );
     }
 
-    RayVector RayVector::trimVignetted() const {
+    RayVector RayVector::trimVignetted(double minFlux) const {
         RayVector result;
         result._rays.reserve(_rays.size());
         std::copy_if(
             _rays.begin(),
             _rays.end(),
             std::back_inserter(result._rays),
-            [](const Ray& r){return !r.vignetted;}
+            [=](const Ray& r){return !r.vignetted && r.flux>minFlux;}
         );
         return result;
     }
 
-    void RayVector::trimVignettedInPlace() {
+    void RayVector::trimVignettedInPlace(double minFlux) {
         _rays.erase(
             std::remove_if(
                 _rays.begin(),
                 _rays.end(),
-                [](const Ray& r){ return r.failed || r.vignetted; }
+                [=](const Ray& r){ return r.failed || r.vignetted || r.flux<minFlux; }
             ),
             _rays.end()
         );
     }
 
     RayVector concatenateRayVectors(const std::vector<RayVector>& rvs) {
+        if (rvs.size() == 0)
+            return RayVector();
+
         int n = std::accumulate(
             rvs.begin(), rvs.end(), 0,
             [](int s, const RayVector& rv){ return s + rv.size(); }

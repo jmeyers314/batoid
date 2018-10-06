@@ -36,8 +36,8 @@ namespace batoid {
             )
             .def("propagatedToTime", &RayVector::propagatedToTime)
             .def("propagateInPlace", &RayVector::propagateInPlace)
-            .def("trimVignetted", &RayVector::trimVignetted)
-            .def("trimVignettedInPlace", &RayVector::trimVignettedInPlace)
+            .def("trimVignetted", &RayVector::trimVignetted, "", "minFlux"_a=0.0)
+            .def("trimVignettedInPlace", &RayVector::trimVignettedInPlace, "", "minFlux"_a=0.0)
             // Note, monochromatic == True guarantees monochromaticity, but monochromatic == False,
             // doesn't guarantee polychromaticity.
             .def_property_readonly("monochromatic", [](const RayVector& rv){ return !std::isnan(rv.getWavelength()); })
@@ -63,7 +63,6 @@ namespace batoid {
                 [](RayVector& rv) -> py::array_t<double> {
                     return {{rv.size()},
                         {sizeof(Ray)},
-                        // &rv.rays[0].r[0],
                         &(rv.front()).r[0],
                         py::cast(rv)};
                 }

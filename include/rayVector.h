@@ -64,8 +64,8 @@ namespace batoid {
         std::vector<double> phase(const Vector3d& r, double t) const;
         std::vector<std::complex<double>> amplitude(const Vector3d& r, double t) const;
         std::complex<double> sumAmplitude(const Vector3d& r, double t) const;
-        RayVector trimVignetted() const;
-        void trimVignettedInPlace();
+        RayVector trimVignetted(double minFlux) const;
+        void trimVignettedInPlace(double minFlux);
         std::string repr() const;
 
         double getWavelength() const { return _wavelength; }

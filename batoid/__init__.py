@@ -14,6 +14,8 @@ from ._batoid import CoordSys, CoordTransform
 
 from ._batoid import rayGrid, circularGrid
 
+from ._batoid import SimpleCoating
+
 from .psf import huygensPSF, wavefront, fftPSF, zernike
 
 from .coordsys import RotX, RotY, RotZ
@@ -27,6 +29,8 @@ from .lattice import Lattice
 from . import parse
 from . import utils
 from .utils import normalized
+
+from .constants import globalCoordSys, vacuum
 
 import os
 datadir = os.path.join(os.path.dirname(__file__), "data")

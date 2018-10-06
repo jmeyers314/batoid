@@ -168,4 +168,58 @@ namespace batoid {
             );
         }
     }
+
+    std::pair<Ray, Ray> Surface::rSplit(const Ray& r, const double n1, const double n2, const Coating& coating) const {
+        if (r.failed) return std::make_pair(r, r);
+        Ray r2 = intersect(r);
+        if (r2.failed) return std::make_pair(r2, r2);
+
+        // Common calculations
+        Vector3d nv = r.v * n1;  // Makes this a unit vector...
+        Vector3d normVec(normal(r2.r[0], r2.r[1]));
+        double alpha = nv.dot(normVec);
+
+        // Flux coefficients
+        double reflect, transmit;
+        coating.getCoefs(r.wavelength, alpha, reflect, transmit);
+
+        // Reflection calculation
+        Ray reflectedRay(
+            r2.r, (nv - 2*alpha*normVec).normalized()/n1,
+            r2.t, r2.wavelength, reflect*r2.flux, r2.vignetted
+        );
+
+        // Refraction calculation
+        double a = 1.;
+        double b = 2*alpha;
+        double c = (1. - (n2*n2)/(n1*n1));
+        double k1, k2;
+        solveQuadratic(a, b, c, k1, k2);
+        Vector3d f1 = (nv+k1*normVec).normalized();
+        Vector3d f2 = (nv+k2*normVec).normalized();
+        Ray refractedRay(
+            r2.r,
+            f1.dot(nv)>f2.dot(nv) ? f1/n2 : f2/n2,
+            r2.t, r2.wavelength, transmit*r2.flux, r2.vignetted
+        );
+
+        return std::make_pair(reflectedRay, refractedRay);
+    }
+
+    std::pair<Ray, Ray> Surface::rSplit(const Ray& r, const Medium& m1, const Medium& m2, const Coating& coating) const {
+        return rSplit(r, m1.getN(r.wavelength), m2.getN(r.wavelength), coating);
+    }
+
+    std::pair<RayVector, RayVector> Surface::rSplit(const RayVector& rv, const Medium& m1, const Medium& m2, const Coating& coating) const {
+        std::vector<Ray> rv1, rv2;
+        rv1.reserve(rv.size());
+        rv2.reserve(rv.size());
+
+        for (int i=0; i<rv.size(); i++) {
+            auto result = rSplit(rv[i], m1, m2, coating);
+            rv1.push_back(result.first);
+            rv2.push_back(result.second);
+        }
+        return std::make_pair(rv1, rv2);
+    }
 }

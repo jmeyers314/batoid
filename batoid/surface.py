@@ -127,6 +127,9 @@ class Surface(ABC):
         """
         self._surface.refractInPlace(r, inMedium, outMedium)
 
+    def rSplit(self, r, m1, m2, coating):
+        return self._surface.rSplit(r, m1, m2, coating)
+
     @abstractmethod
     def __hash__(self):
         raise NotImplementedError
