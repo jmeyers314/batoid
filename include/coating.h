@@ -4,6 +4,7 @@
 namespace batoid {
     class Coating {
     public:
+        virtual ~Coating() {}
         virtual void getCoefs(double wavelength, double cosIncidenceAngle, double& reflect, double&transmit) const = 0;
     };
 

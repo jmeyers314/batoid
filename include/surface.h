@@ -16,6 +16,8 @@ using Eigen::Vector3d;
 namespace batoid {
     class Surface {
     public:
+        virtual ~Surface() {}
+
         virtual double sag(double, double) const = 0;
         virtual Vector3d normal(double, double) const = 0;
         virtual bool timeToIntersect(const Ray& r, double& t) const = 0;
