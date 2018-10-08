@@ -12,6 +12,21 @@ namespace batoid {
             .def("getCoefs", &Coating::getCoefs);
 
         py::class_<SimpleCoating, std::shared_ptr<SimpleCoating>, Coating>(m, "SimpleCoating")
-            .def(py::init<double,double>(), "init", "reflectivity"_a, "transmissivity"_a);
+            .def(py::init<double,double>(), "init", "reflectivity"_a, "transmissivity"_a)
+            .def(py::pickle(
+                [](const SimpleCoating& sc){
+                    return py::make_tuple(sc._reflectivity, sc._transmissivity);
+                },
+                [](py::tuple t) {
+                    return SimpleCoating(t[0].cast<double>(), t[1].cast<double>());
+                }
+            ))
+            .def("__hash__", [](const SimpleCoating& sc) {
+                return py::hash(py::make_tuple(
+                    "SimpleCoating",
+                    sc._reflectivity,
+                    sc._transmissivity
+                ));
+            });
     }
 }

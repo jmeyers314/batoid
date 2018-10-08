@@ -1,5 +1,5 @@
 #include "coating.h"
-
+#include <sstream>
 
 namespace batoid {
     SimpleCoating::SimpleCoating(double reflectivity, double transmissivity) :
@@ -9,4 +9,15 @@ namespace batoid {
         reflect = _reflectivity;
         transmit = _transmissivity;
     }
+
+    std::string SimpleCoating::repr() const {
+        std::ostringstream oss;
+        oss << "SimpleCoating("
+            << _reflectivity
+            << ", "
+            << _transmissivity
+            << ")";
+        return oss.str();
+    }
+
 }
