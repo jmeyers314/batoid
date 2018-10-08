@@ -10,6 +10,9 @@ namespace batoid {
 
         virtual void getCoefs(double wavelength, double cosIncidenceAngle, double& reflect, double&transmit) const = 0;
 
+        virtual bool operator==(const Coating& rhs) const = 0;
+        bool operator!=(const Coating& rhs) const { return !operator==(rhs); }
+
         virtual std::string repr() const = 0;
     };
 
@@ -17,6 +20,8 @@ namespace batoid {
     public:
         SimpleCoating(double reflectivity, double transmissivity);
         void getCoefs(double wavelength, double cosIncidenceAngle, double& reflect, double& transmit) const override;
+
+        bool operator==(const Coating& rhs) const override;
 
         std::string repr() const override;
 

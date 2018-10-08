@@ -77,6 +77,7 @@ def do_pickle(obj, reprable=True):
         from batoid import CoordSys, CoordTransform
         from batoid import CompoundOptic, Lens
         from batoid import RefractiveInterface, Mirror, Detector, Baffle
+        from batoid import SimpleCoating
         # While eval(repr(obj)) == obj is the python repr gold standard, it can be pretty ugly for
         # exact reproduction of doubles.  Here, we strive for a lesser goal:
         #      repr(eval(repr(obj))) == repr(obj).

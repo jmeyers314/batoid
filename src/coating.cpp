@@ -10,6 +10,14 @@ namespace batoid {
         transmit = _transmissivity;
     }
 
+    bool SimpleCoating::operator==(const Coating& rhs) const {
+        if (const SimpleCoating* other = dynamic_cast<const SimpleCoating*>(&rhs)) {
+            return _reflectivity == other->_reflectivity &&
+                   _reflectivity == other->_reflectivity &&
+                   _transmissivity == other->_transmissivity;
+        } else return false;
+    }
+
     std::string SimpleCoating::repr() const {
         std::ostringstream oss;
         oss << "SimpleCoating("
