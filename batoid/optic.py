@@ -264,7 +264,8 @@ class Interface(Optic):
         """Assume Rays are coming in from the forward direction.
         returns forwardRays, forwardCoordSys, reverseRays, reverseCoordSys
         """
-        print("traceSplit {} flux = {}".format(self.name, np.sum(r.flux)))
+        strtemplate = "traceSplit        {:15s} flux = {:18.8f}   nphot = {:10d}"
+        print(strtemplate.format(self.name, np.sum(r.flux), len(r)))
         if self.skip:
             return r, None, inCoordSys, None
         transform = batoid.CoordTransform(inCoordSys, self.coordSys)
@@ -295,7 +296,8 @@ class Interface(Optic):
         """Assume Rays are coming in from the reverse direction.
         returns forwardRays, forwardCoordSys, reverseRays, reverseCoordSys
         """
-        print("traceSplitReverse {} flux = {}".format(self.name, np.sum(r.flux)))
+        strtemplate = "traceSplitReverse {:15s} flux = {:18.8f}   nphot = {:10d}"
+        print(strtemplate.format(self.name, np.sum(r.flux), len(r)))
         if self.skip:
             return r, None, inCoordSys, None
         transform = batoid.CoordTransform(inCoordSys, self.coordSys)
@@ -432,7 +434,7 @@ class Detector(Interface):
     """
     def __init__(self, *args, **kwargs):
         Interface.__init__(self, *args, **kwargs)
-        self.forwardCoating = batoid.SimpleCoating(reflectivity=0.0, transmissivity=1.0)
+        self.forwardCoating = batoid.SimpleCoating(reflectivity=0.02, transmissivity=0.98)
         self.reverseCoating = None
 
     def interact(self, r):
@@ -556,7 +558,8 @@ class CompoundOptic(Optic):
         return self.items[0].traceReverse(r, inCoordSys=coordSys, outCoordSys=outCoordSys)
 
     def traceSplit(self, r, inCoordSys=globalCoordSys, forwardCoordSys=None, reverseCoordSys=None, minFlux=1e-3):
-        print("traceSplit {} flux = {}".format(self.name, np.sum(r.flux)))
+        strtemplate = "traceSplit        {:15s} flux = {:18.8f}   nphot = {:10d}"
+        print(strtemplate.format(self.name, np.sum(r.flux), len(r)))
         if self.skip:
             return r, None, inCoordSys, None
 
@@ -608,7 +611,8 @@ class CompoundOptic(Optic):
         return rForward, rReverse, forwardCoordSys, reverseCoordSys
 
     def traceSplitReverse(self, r, inCoordSys=globalCoordSys, forwardCoordSys=None, reverseCoordSys=None, minFlux=1e-3):
-        print("traceSplitReverse {} flux = {}".format(self.name, np.sum(r.flux)))
+        strtemplate = "traceSplitReverse {:15s} flux = {:18.8f}   nphot = {:10d}"
+        print(strtemplate.format(self.name, np.sum(r.flux), len(r)))
         if self.skip:
             return r, None, inCoordSys, None
 
