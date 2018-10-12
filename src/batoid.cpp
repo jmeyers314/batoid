@@ -70,10 +70,14 @@ namespace batoid{
         double drfrac = (outer-inner)/(nradii-1)/outer;
         double rfrac = 1.0;
         for (int i=0; i<nradii; i++) {
-            nphis[i] = int(std::ceil(naz*rfrac));
+            nphis[i] = int(std::ceil(naz*rfrac/6.))*6;
             rfrac -= drfrac;
         }
         int nray = std::accumulate(nphis.begin(), nphis.end(), 0);
+        // Point in the center is a special case
+        if (inner == 0.0)
+            nphis[nradii-1] = 1;
+
         std::vector<Ray> result;
         result.reserve(nray);
 
