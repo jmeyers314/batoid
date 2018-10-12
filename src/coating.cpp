@@ -10,6 +10,14 @@ namespace batoid {
         transmit = _transmissivity;
     }
 
+    double SimpleCoating::getReflect(double wavelength, double cosIncidenceAngle) const {
+        return _reflectivity;
+    }
+
+    double SimpleCoating::getTransmit(double wavelength, double cosIncidenceAngle) const {
+        return _transmissivity;
+    }
+
     bool SimpleCoating::operator==(const Coating& rhs) const {
         if (const SimpleCoating* other = dynamic_cast<const SimpleCoating*>(&rhs)) {
             return _reflectivity == other->_reflectivity &&

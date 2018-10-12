@@ -10,8 +10,8 @@ def test_SimpleCoating():
         reflectivity = np.random.uniform(0, 1)
         transmissivity = np.random.uniform(0, 1)
         sc = batoid.SimpleCoating(reflectivity, transmissivity)
-        assert sc.reflectivity == reflectivity
-        assert sc.transmissivity == transmissivity
+        assert sc.reflectivity == reflectivity == sc.getReflect(0.1, 0.2) == sc.getReflect(0.3, 0.4)
+        assert sc.transmissivity == transmissivity == sc.getTransmit(0.1, 0.2) == sc.getTransmit(0.3, 0.4)
         do_pickle(sc)
 
 

@@ -51,13 +51,10 @@ namespace batoid {
         Vector3d normVec(normal(r2.r[0], r2.r[1]));
         double alpha = nv.dot(normVec);
 
-        double flux = r2.flux;
-        if (coating) {
-            double reflect, transmit;
-            coating->getCoefs(r.wavelength, alpha, reflect, transmit);
-            flux *= reflect;
-        }
-        return Ray(r2.r, (nv - 2*alpha*normVec).normalized()/n, r2.t, r2.wavelength, flux, r2.vignetted);
+        if (coating)
+            r2.flux *= coating->getReflect(r.wavelength, alpha);
+        r2.v = (nv - 2*alpha*normVec).normalized()/n;
+        return r2;
     }
 
     RayVector Surface::reflect(const RayVector& rv, const Coating* coating) const {
@@ -77,11 +74,8 @@ namespace batoid {
         Vector3d nv = r.v * n;
         Vector3d normVec(normal(r.r[0], r.r[1]));
         double alpha = nv.dot(normVec);
-        if (coating) {
-            double reflect, transmit;
-            coating->getCoefs(r.wavelength, alpha, reflect, transmit);
-            r.flux *= reflect;
-        }
+        if (coating)
+            r.flux *= coating->getReflect(r.wavelength, alpha);
         r.v = (nv - 2*alpha*normVec).normalized()/n;
     }
 
@@ -99,12 +93,8 @@ namespace batoid {
         Vector3d nv = r2.v * n1;
         Vector3d normVec(normal(r2.r[0], r2.r[1]));
         double alpha = nv.dot(normVec);
-        double flux = r2.flux;
-        if (coating) {
-            double reflect, transmit;
-            coating->getCoefs(r.wavelength, alpha, reflect, transmit);
-            flux *= transmit;
-        }
+        if (coating)
+            r2.flux *= coating->getTransmit(r.wavelength, alpha);
         double a = 1.;
         double b = 2*alpha;
         double c = (1. - (n2*n2)/(n1*n1));
@@ -112,10 +102,8 @@ namespace batoid {
         solveQuadratic(a, b, c, k1, k2);
         Vector3d f1 = (nv+k1*normVec).normalized();
         Vector3d f2 = (nv+k2*normVec).normalized();
-        if (f1.dot(nv) > f2.dot(nv))
-            return Ray(r2.r, f1/n2, r2.t, r2.wavelength, flux, r2.vignetted);
-        else
-            return Ray(r2.r, f2/n2, r2.t, r2.wavelength, flux, r2.vignetted);
+        r2.v = (f1.dot(nv) > f2.dot(nv)) ? f1/n2 : f2/n2;
+        return r2;
     }
 
     Ray Surface::refract(const Ray& r, const Medium& m1, const Medium& m2, const Coating* coating) const {
@@ -150,11 +138,8 @@ namespace batoid {
         Vector3d nv = r.v * n1;
         Vector3d normVec(normal(r.r[0], r.r[1]));
         double alpha = nv.dot(normVec);
-        if (coating) {
-            double reflect, transmit;
-            coating->getCoefs(r.wavelength, alpha, reflect, transmit);
-            r.flux *= transmit;
-        }
+        if (coating)
+            r.flux *= coating->getTransmit(r.wavelength, alpha);
         double a = 1.;
         double b = 2*alpha;
         double c = (1. - (n2*n2)/(n1*n1));
@@ -162,10 +147,7 @@ namespace batoid {
         solveQuadratic(a, b, c, k1, k2);
         Vector3d f1 = (nv+k1*normVec).normalized();
         Vector3d f2 = (nv+k2*normVec).normalized();
-        if (f1.dot(nv) > f2.dot(nv))
-            r.v = f1/n2;
-        else
-            r.v = f2/n2;
+        r.v = (f1.dot(nv) > f2.dot(nv)) ? f1/n2 : f2/n2;
     }
 
     void Surface::refractInPlace(Ray& r, const Medium& m1, const Medium& m2, const Coating* coating) const {
@@ -220,13 +202,10 @@ namespace batoid {
         solveQuadratic(a, b, c, k1, k2);
         Vector3d f1 = (nv+k1*normVec).normalized();
         Vector3d f2 = (nv+k2*normVec).normalized();
-        Ray refractedRay(
-            r2.r,
-            f1.dot(nv)>f2.dot(nv) ? f1/n2 : f2/n2,
-            r2.t, r2.wavelength, transmit*r2.flux, r2.vignetted
-        );
-
-        return std::make_pair(reflectedRay, refractedRay);
+        // Use r2 instead of creating a new Ray
+        r2.v = f1.dot(nv)>f2.dot(nv) ? f1/n2 : f2/n2;
+        r2.flux = transmit*r2.flux;
+        return std::make_pair(reflectedRay, r2);
     }
 
     std::pair<Ray, Ray> Surface::rSplit(const Ray& r, const Medium& m1, const Medium& m2, const Coating& coating) const {
