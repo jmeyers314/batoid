@@ -42,51 +42,69 @@ namespace batoid {
     }
 
     // Note that I'm combining intersection and reflection/refraction here.
-    Ray Surface::reflect(const Ray& r) const {
+    Ray Surface::reflect(const Ray& r, const Coating* coating) const {
         if (r.failed) return r;
         Ray r2 = intersect(r);
         if (r2.failed) return r2;
         double n = 1.0 / r2.v.norm();
         Vector3d nv = r2.v * n;
         Vector3d normVec(normal(r2.r[0], r2.r[1]));
-        double c1 = nv.dot(normVec);
-        return Ray(r2.r, (nv - 2*c1*normVec).normalized()/n, r2.t, r2.wavelength, r2.flux, r2.vignetted);
+        double alpha = nv.dot(normVec);
+
+        double flux = r2.flux;
+        if (coating) {
+            double reflect, transmit;
+            coating->getCoefs(r.wavelength, alpha, reflect, transmit);
+            flux *= reflect;
+        }
+        return Ray(r2.r, (nv - 2*alpha*normVec).normalized()/n, r2.t, r2.wavelength, flux, r2.vignetted);
     }
 
-    RayVector Surface::reflect(const RayVector& rv) const {
+    RayVector Surface::reflect(const RayVector& rv, const Coating* coating) const {
         std::vector<Ray> rv2(rv.size());
         parallelTransform(
             rv.cbegin(), rv.cend(), rv2.begin(),
-            [this](const Ray& r){ return reflect(r); }
+            [this,coating](const Ray& r){ return reflect(r, coating); }
         );
         return RayVector(std::move(rv2), rv.getWavelength());
     }
 
-    void Surface::reflectInPlace(Ray& r) const {
+    void Surface::reflectInPlace(Ray& r, const Coating* coating) const {
         if (r.failed) return;
         intersectInPlace(r);
         if (r.failed) return;
         double n = 1.0 / r.v.norm();
         Vector3d nv = r.v * n;
         Vector3d normVec(normal(r.r[0], r.r[1]));
-        double c1 = nv.dot(normVec);
-        r.v = (nv - 2*c1*normVec).normalized()/n;
+        double alpha = nv.dot(normVec);
+        if (coating) {
+            double reflect, transmit;
+            coating->getCoefs(r.wavelength, alpha, reflect, transmit);
+            r.flux *= reflect;
+        }
+        r.v = (nv - 2*alpha*normVec).normalized()/n;
     }
 
-    void Surface::reflectInPlace(RayVector& rv) const {
+    void Surface::reflectInPlace(RayVector& rv, const Coating* coating) const {
         parallel_for_each(
             rv.begin(), rv.end(),
-            [this](Ray& r) { reflectInPlace(r); }
+            [this,coating](Ray& r) { reflectInPlace(r, coating); }
         );
     }
 
-    Ray Surface::refract(const Ray& r, const double n1, const double n2) const {
+    Ray Surface::refract(const Ray& r, const double n1, const double n2, const Coating* coating) const {
         if (r.failed) return r;
         Ray r2 = intersect(r);
         if (r2.failed) return r2;
         Vector3d nv = r2.v * n1;
         Vector3d normVec(normal(r2.r[0], r2.r[1]));
         double alpha = nv.dot(normVec);
+        double flux = r2.flux;
+        if (coating) {
+            double reflect, transmit;
+            coating->getCoefs(r.wavelength, alpha, reflect, transmit);
+            flux *= transmit;
+        }
         double a = 1.;
         double b = 2*alpha;
         double c = (1. - (n2*n2)/(n1*n1));
@@ -95,43 +113,48 @@ namespace batoid {
         Vector3d f1 = (nv+k1*normVec).normalized();
         Vector3d f2 = (nv+k2*normVec).normalized();
         if (f1.dot(nv) > f2.dot(nv))
-            return Ray(r2.r, f1/n2, r2.t, r2.wavelength, r2.flux, r2.vignetted);
+            return Ray(r2.r, f1/n2, r2.t, r2.wavelength, flux, r2.vignetted);
         else
-            return Ray(r2.r, f2/n2, r2.t, r2.wavelength, r2.flux, r2.vignetted);
+            return Ray(r2.r, f2/n2, r2.t, r2.wavelength, flux, r2.vignetted);
     }
 
-    Ray Surface::refract(const Ray& r, const Medium& m1, const Medium& m2) const {
+    Ray Surface::refract(const Ray& r, const Medium& m1, const Medium& m2, const Coating* coating) const {
         if (r.failed) return r;
-        return refract(r, m1.getN(r.wavelength), m2.getN(r.wavelength));
+        return refract(r, m1.getN(r.wavelength), m2.getN(r.wavelength), coating);
     }
 
-    RayVector Surface::refract(const RayVector& rv, const Medium& m1, const Medium& m2) const {
+    RayVector Surface::refract(const RayVector& rv, const Medium& m1, const Medium& m2, const Coating* coating) const {
         std::vector<Ray> rays(rv.size());
 
         // use double version of refract if possible
         if (std::isnan(rv.getWavelength())) {
             parallelTransform(
                 rv.cbegin(), rv.cend(), rays.begin(),
-                [this,&m1,&m2](const Ray& r){ return refract(r, m1, m2); }
+                [this,&m1,&m2,coating](const Ray& r){ return refract(r, m1, m2, coating); }
             );
         } else {
             double n1 = m1.getN(rv.getWavelength());
             double n2 = m2.getN(rv.getWavelength());
             parallelTransform(
                 rv.cbegin(), rv.cend(), rays.begin(),
-                [this,n1,n2](const Ray& r){ return refract(r, n1, n2); }
+                [this,n1,n2,coating](const Ray& r){ return refract(r, n1, n2, coating); }
             );
         }
         return RayVector(std::move(rays), rv.getWavelength());
     }
 
-    void Surface::refractInPlace(Ray& r, const double n1, const double n2) const {
+    void Surface::refractInPlace(Ray& r, const double n1, const double n2, const Coating* coating) const {
         if (r.failed) return;
         intersectInPlace(r);
         if (r.failed) return;
         Vector3d nv = r.v * n1;
         Vector3d normVec(normal(r.r[0], r.r[1]));
         double alpha = nv.dot(normVec);
+        if (coating) {
+            double reflect, transmit;
+            coating->getCoefs(r.wavelength, alpha, reflect, transmit);
+            r.flux *= transmit;
+        }
         double a = 1.;
         double b = 2*alpha;
         double c = (1. - (n2*n2)/(n1*n1));
@@ -145,26 +168,26 @@ namespace batoid {
             r.v = f2/n2;
     }
 
-    void Surface::refractInPlace(Ray& r, const Medium& m1, const Medium& m2) const {
+    void Surface::refractInPlace(Ray& r, const Medium& m1, const Medium& m2, const Coating* coating) const {
         if (r.failed) return;
         double n1 = m1.getN(r.wavelength);
         double n2 = m2.getN(r.wavelength);
-        refractInPlace(r, n1, n2);
+        refractInPlace(r, n1, n2, coating);
     }
 
-    void Surface::refractInPlace(RayVector& rv, const Medium& m1, const Medium& m2) const {
+    void Surface::refractInPlace(RayVector& rv, const Medium& m1, const Medium& m2, const Coating* coating) const {
         // Use double version of refractInPlace if possible
         if (std::isnan(rv.getWavelength())) {
             parallel_for_each(
                 rv.begin(), rv.end(),
-                [this, &m1, &m2](Ray& r){ refractInPlace(r, m1, m2); }
+                [this,&m1,&m2,coating](Ray& r){ refractInPlace(r, m1, m2, coating); }
             );
         } else {
             double n1 = m1.getN(rv.getWavelength());
             double n2 = m2.getN(rv.getWavelength());
             parallel_for_each(
                 rv.begin(), rv.end(),
-                [this, n1, n2](Ray& r){ refractInPlace(r, n1, n2); }
+                [this,n1,n2,coating](Ray& r){ refractInPlace(r, n1, n2, coating); }
             );
         }
     }
@@ -211,15 +234,12 @@ namespace batoid {
     }
 
     std::pair<RayVector, RayVector> Surface::rSplit(const RayVector& rv, const Medium& m1, const Medium& m2, const Coating& coating) const {
-        std::vector<Ray> rv1, rv2;
-        rv1.reserve(rv.size());
-        rv2.reserve(rv.size());
+        RayVector reflected(rv);
+        RayVector refracted(rv);
 
-        for (int i=0; i<rv.size(); i++) {
-            auto result = rSplit(rv[i], m1, m2, coating);
-            rv1.push_back(result.first);
-            rv2.push_back(result.second);
-        }
-        return std::make_pair(rv1, rv2);
+        reflectInPlace(reflected, &coating);
+        refractInPlace(refracted, m1, m2, &coating);
+
+        return std::make_pair(reflected, refracted);
     }
 }

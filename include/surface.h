@@ -27,22 +27,22 @@ namespace batoid {
         void intersectInPlace(Ray&) const;
         void intersectInPlace(RayVector&) const;
 
-        Ray reflect(const Ray&) const;
-        RayVector reflect(const RayVector&) const;
-        void reflectInPlace(Ray&) const;
-        void reflectInPlace(RayVector&) const;
+        Ray reflect(const Ray&, const Coating* coating=nullptr) const;
+        RayVector reflect(const RayVector&, const Coating* coating=nullptr) const;
+        void reflectInPlace(Ray&, const Coating* coating=nullptr) const;
+        void reflectInPlace(RayVector&, const Coating* coating=nullptr) const;
 
-        Ray refract(const Ray&, const Medium&, const Medium&) const;
-        RayVector refract(const RayVector&, const Medium&, const Medium&) const;
-        void refractInPlace(Ray&, const Medium&, const Medium&) const;
-        void refractInPlace(RayVector&, const Medium&, const Medium&) const;
+        Ray refract(const Ray&, const Medium&, const Medium&, const Coating* coating=nullptr) const;
+        RayVector refract(const RayVector&, const Medium&, const Medium&, const Coating* coating=nullptr) const;
+        void refractInPlace(Ray&, const Medium&, const Medium&, const Coating* coating=nullptr) const;
+        void refractInPlace(RayVector&, const Medium&, const Medium&, const Coating* coating=nullptr) const;
 
         std::pair<Ray, Ray> rSplit(const Ray&, const Medium&, const Medium&, const Coating&) const;
         std::pair<RayVector, RayVector> rSplit(const RayVector&, const Medium&, const Medium&, const Coating&) const;
 
     private:
-        Ray refract(const Ray&, const double, const double) const;
-        void refractInPlace(Ray&, const double, const double) const;
+        Ray refract(const Ray&, const double, const double, const Coating* coating=nullptr) const;
+        void refractInPlace(Ray&, const double, const double, const Coating* coating=nullptr) const;
 
         std::pair<Ray, Ray> rSplit(const Ray&, const double, const double, const Coating&) const;
     };

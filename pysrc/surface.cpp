@@ -67,15 +67,15 @@ namespace batoid {
             .def("intersectInPlace", (void (Surface::*)(Ray&) const) &Surface::intersectInPlace)
             .def("intersectInPlace", (void (Surface::*)(RayVector&) const) &Surface::intersectInPlace)
 
-            .def("reflect", (Ray (Surface::*)(const Ray&) const) &Surface::reflect)
-            .def("reflect", (RayVector (Surface::*)(const RayVector&) const) &Surface::reflect)
-            .def("reflectInPlace", (void (Surface::*)(Ray&) const) &Surface::reflectInPlace)
-            .def("reflectInPlace", (void (Surface::*)(RayVector&) const) &Surface::reflectInPlace)
+            .def("reflect", (Ray (Surface::*)(const Ray&, const Coating*) const) &Surface::reflect, py::arg(), py::arg()=nullptr)
+            .def("reflect", (RayVector (Surface::*)(const RayVector&, const Coating*) const) &Surface::reflect, py::arg(), py::arg()=nullptr)
+            .def("reflectInPlace", (void (Surface::*)(Ray&, const Coating*) const) &Surface::reflectInPlace, py::arg(), py::arg()=nullptr)
+            .def("reflectInPlace", (void (Surface::*)(RayVector&, const Coating*) const) &Surface::reflectInPlace, py::arg(), py::arg()=nullptr)
 
-            .def("refract", (Ray (Surface::*)(const Ray&, const Medium&, const Medium&) const) &Surface::refract)
-            .def("refract", (RayVector (Surface::*)(const RayVector&, const Medium&, const Medium&) const) &Surface::refract)
-            .def("refractInPlace", (void (Surface::*)(Ray&, const Medium&, const Medium&) const) &Surface::refractInPlace)
-            .def("refractInPlace", (void (Surface::*)(RayVector&, const Medium&, const Medium&) const) &Surface::refractInPlace)
+            .def("refract", (Ray (Surface::*)(const Ray&, const Medium&, const Medium&, const Coating*) const) &Surface::refract, py::arg(), py::arg(), py::arg(), py::arg()=nullptr)
+            .def("refract", (RayVector (Surface::*)(const RayVector&, const Medium&, const Medium&, const Coating*) const) &Surface::refract, py::arg(), py::arg(), py::arg(), py::arg()=nullptr)
+            .def("refractInPlace", (void (Surface::*)(Ray&, const Medium&, const Medium&, const Coating*) const) &Surface::refractInPlace, py::arg(), py::arg(), py::arg(), py::arg()=nullptr)
+            .def("refractInPlace", (void (Surface::*)(RayVector&, const Medium&, const Medium&, const Coating*) const) &Surface::refractInPlace, py::arg(), py::arg(), py::arg(), py::arg()=nullptr)
 
             .def("rSplit", (std::pair<Ray,Ray> (Surface::*)(const Ray&, const Medium&, const Medium&, const Coating&) const) &Surface::rSplit)
             .def("rSplit", (std::pair<RayVector,RayVector> (Surface::*)(const RayVector&, const Medium&, const Medium&, const Coating&) const) &Surface::rSplit);
