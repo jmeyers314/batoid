@@ -64,7 +64,7 @@ class Surface(ABC):
         """
         return self._surface.intersectInPlace(r)
 
-    def reflect(self, r):
+    def reflect(self, r, coating=None):
         """Calculate intersection of ray(s) with this surface, and immediately reflect the ray(s) at
         the point(s) of intersection.
 
@@ -72,15 +72,17 @@ class Surface(ABC):
         ----------
         r : Ray or RayVector
             Ray(s) to reflect.
+        coating : Coating (optional)
+            Coating object to control reflection coefficient.
 
         Returns
         -------
         outRays : Ray or RayVector
             New object corresponding to original ray(s) propagated and reflected.
         """
-        return self._surface.reflect(r)
+        return self._surface.reflect(r, coating)
 
-    def reflectInPlace(self, r):
+    def reflectInPlace(self, r, coating=None):
         """Calculate intersection of ray(s) with this surface, and immediately reflect the ray(s) at
         the point(s) of intersection.  Same as `reflect`, but manipulates the input ray(s) in place.
 
@@ -88,10 +90,12 @@ class Surface(ABC):
         ----------
         r : Ray or RayVector
             Ray(s) to reflect in place.
+        coating : Coating (optional)
+            Coating object to control reflection coefficient.
         """
-        self._surface.reflectInPlace(r)
+        self._surface.reflectInPlace(r, coating)
 
-    def refract(self, r, inMedium, outMedium):
+    def refract(self, r, inMedium, outMedium, coating=None):
         """Calculate intersection of ray(s) with this surface, and immediately refract the ray(s)
         through the surface at the point(s) of intersection.
 
@@ -103,15 +107,17 @@ class Surface(ABC):
             Refractive medium on the incoming side of the surface.
         outMedium : Medium
             Refractive medium on the outgoing side of the surface.
+        coating : Coating (optional)
+            Coating object to control transmission coefficient.
 
         Returns
         -------
         outRays : Ray or RayVector
             New object corresponding to original ray(s) propagated and refracted.
         """
-        return self._surface.refract(r, inMedium, outMedium)
+        return self._surface.refract(r, inMedium, outMedium, coating)
 
-    def refractInPlace(self, r, inMedium, outMedium):
+    def refractInPlace(self, r, inMedium, outMedium, coating=None):
         """Calculate intersection of ray(s) with this surface, and immediately refract the ray(s)
         through the surface at the point(s) of intersection.  Same as `refract`, but manipulates the
         input ray(s) in place.
@@ -124,11 +130,32 @@ class Surface(ABC):
             Refractive medium on the incoming side of the surface.
         outMedium : Medium
             Refractive medium on the outgoing side of the surface.
+        coating : Coating (optional)
+            Coating object to control transmission coefficient.
         """
-        self._surface.refractInPlace(r, inMedium, outMedium)
+        self._surface.refractInPlace(r, inMedium, outMedium, coating)
 
-    def rSplit(self, r, m1, m2, coating):
-        return self._surface.rSplit(r, m1, m2, coating)
+    def rSplit(self, r, inMedium, outMedium, coating):
+        """Calculate intersection of rays with this surface, and immediately split the rays into
+        reflected and refracted rays, with appropriate fluxes.
+
+        Parameters
+        ----------
+        r : RayVector
+            Rays to refract.
+        inMedium : Medium
+            Refractive medium on the incoming side of the surface.
+        outMedium : Medium
+            Refractive medium on the outgoing side of the surface.
+        coating : Coating
+            Coating object to control transmission coefficient.
+
+        Returns
+        -------
+        reflectedRays, refractedRays : RayVector
+            New objects corresponding to original rays propagated and reflected/refracted.
+        """
+        return self._surface.rSplit(r, inMedium, outMedium, coating)
 
     @abstractmethod
     def __hash__(self):

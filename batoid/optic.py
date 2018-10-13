@@ -3,6 +3,7 @@ import numpy as np
 
 from .constants import globalCoordSys, vacuum
 
+
 class Optic:
     """This is the most general category of batoid optical system.  It can include
     a single reflective or refractive surface, a lens consisting of two surfaces, or
