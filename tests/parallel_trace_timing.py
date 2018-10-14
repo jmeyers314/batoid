@@ -7,11 +7,16 @@ import yaml
 
 
 @timer
-def parallel_trace_timing(nside=1024, nthread=None):
+def parallel_trace_timing(nside=1024, nthread=None, minChunk=None):
     if nthread is not None:
         print("setting to nthread to {}".format(nthread))
         batoid._batoid.setNThread(nthread)
     print("Using {} threads".format(batoid._batoid.getNThread()))
+
+    if minChunk is not None:
+        print("setting to minChunk to {}".format(minChunk))
+        batoid._batoid.setMinChunk(minChunk)
+    print("Using minChunk of {}".format(batoid._batoid.getMinChunk()))
 
     theta_x = np.deg2rad(0.3)
     theta_y = np.deg2rad(0.3)
@@ -82,9 +87,10 @@ if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument("--nside", type=int, default=1024)
     parser.add_argument("--nthread", type=int, default=None)
+    parser.add_argument("--minChunk", type=int, default=None)
     parser.add_argument("--perturbZ", type=int, default=0)
     parser.add_argument("--perturbBC", type=float, default=0.0)
     parser.add_argument("--plot", action='store_true')
     args = parser.parse_args()
 
-    parallel_trace_timing(args.nside, args.nthread)
+    parallel_trace_timing(args.nside, args.nthread, args.minChunk)
