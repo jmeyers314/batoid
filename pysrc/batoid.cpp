@@ -65,7 +65,8 @@ namespace batoid {
          .def("getNThread", &getNThread)
          .def("setNThread", &setNThread)
          .def("getMinChunk", &getMinChunk)
-         .def("setMinChunk", &setMinChunk);
+         .def("setMinChunk", &setMinChunk)
+         .def("setRNGSeed", &setRNGSeed);
 
 #if !((PYBIND11_VERSION_MAJOR >= 2) & (PYBIND11_VERSION_MINOR >= 2))
         return m.ptr();

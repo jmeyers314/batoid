@@ -53,6 +53,7 @@ namespace batoid {
 
     unsigned int nthread = std::thread::hardware_concurrency();
     unsigned int minChunk = 2000;
+    std::mt19937 rng;
 
     void setNThread(unsigned int _nthread) {
         nthread = _nthread;
@@ -68,5 +69,9 @@ namespace batoid {
 
     unsigned int getMinChunk() {
         return minChunk;
+    }
+
+    void setRNGSeed(unsigned int seed) {
+        rng.seed(seed);
     }
 }

@@ -39,6 +39,7 @@ namespace batoid {
 
         std::pair<Ray, Ray> rSplit(const Ray&, const Medium&, const Medium&, const Coating&) const;
         std::pair<RayVector, RayVector> rSplit(const RayVector&, const Medium&, const Medium&, const Coating&) const;
+        std::pair<RayVector, RayVector> rSplitProb(const RayVector&, const Medium&, const Medium&, const Coating&) const;
 
     private:
         Ray refract(const Ray&, const double, const double, const Coating* coating=nullptr) const;

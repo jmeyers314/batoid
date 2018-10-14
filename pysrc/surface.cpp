@@ -78,6 +78,7 @@ namespace batoid {
             .def("refractInPlace", (void (Surface::*)(RayVector&, const Medium&, const Medium&, const Coating*) const) &Surface::refractInPlace, py::arg(), py::arg(), py::arg(), py::arg()=nullptr)
 
             .def("rSplit", (std::pair<Ray,Ray> (Surface::*)(const Ray&, const Medium&, const Medium&, const Coating&) const) &Surface::rSplit)
-            .def("rSplit", (std::pair<RayVector,RayVector> (Surface::*)(const RayVector&, const Medium&, const Medium&, const Coating&) const) &Surface::rSplit);
+            .def("rSplit", (std::pair<RayVector,RayVector> (Surface::*)(const RayVector&, const Medium&, const Medium&, const Coating&) const) &Surface::rSplit)
+            .def("rSplitProb", &Surface::rSplitProb);
     }
 }

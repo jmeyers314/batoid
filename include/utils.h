@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <random>
+
 
 namespace batoid {
 
@@ -115,12 +117,15 @@ namespace batoid {
 
     extern unsigned int nthread;
     extern unsigned int minChunk;
+    extern std::mt19937 rng;
 
     void setNThread(unsigned int);
     unsigned int getNThread();
 
     void setMinChunk(unsigned int);
     unsigned int getMinChunk();
+
+    void setRNGSeed(unsigned int seed);
 
     template<typename InputIt, typename OutputIt, typename UnaryOperation>
     void parallelTransform(

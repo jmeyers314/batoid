@@ -221,4 +221,33 @@ namespace batoid {
 
         return std::make_pair(reflected, refracted);
     }
+
+    std::pair<RayVector, RayVector> Surface::rSplitProb(const RayVector& rv, const Medium& m1, const Medium& m2, const Coating& coating) const {
+        RayVector reflected(rv);
+        RayVector refracted(rv);
+
+        reflectInPlace(reflected);
+        refractInPlace(refracted, m1, m2);
+
+        // Go through and probabilistically accept/reject each ray?
+        double reflect, transmit, alpha, ran;
+        for(unsigned int i=0; i<rv.size(); i++) {
+            // Need to recompute the normal vector and alpha=cos(theta)...  for the third time...
+            Vector3d normVec(normal(rv[i].r[0], rv[i].r[1]));
+            alpha = rv[i].v.normalized().dot(normVec);
+            coating.getCoefs(rv[i].wavelength, alpha, reflect, transmit);
+            ran = std::uniform_real_distribution<>(0.0, 1.0)(rng);
+            if (ran < reflect) { //choose reflect
+                refracted[i].vignetted=true;
+            } else if (ran < reflect+transmit) { // choose refract
+                reflected[i].vignetted=true;
+            } else { // choose neither
+                refracted[i].vignetted=true;
+                reflected[i].vignetted=true;
+            }
+        }
+        reflected.trimVignettedInPlace(0.0);
+        refracted.trimVignettedInPlace(0.0);
+        return std::make_pair(reflected, refracted);
+    }
 }
