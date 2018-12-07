@@ -1,5 +1,3 @@
-# Note, obscurations come from private communication with Kawanomoto, Satoshi.
-# Obscurations do *not* include filter changer though.
 opticalSystem:
   type: CompoundOptic
   name: SubaruHSC
@@ -9,135 +7,90 @@ opticalSystem:
   medium: hsc_air # subitems will use this as their default inMedium/outMedium
   # By not specifying a coordSys, the vertex/orientation of this CompoundOptic is implicitly
   # the global coordSys.
-  dist: 18.0  # distance from global vertex to use to start tracing rays
+  dist: 15.0  # distance from global vertex to use to start tracing rays
   sphereRadius: 10.0  # reference sphere radius to use for wavefront calculation
   pupilSize: 8.2  # Pupil fits inside a square with this side length
   pupilObscuration: 0.1  # Fractional pupil central obscuration
   items:
     -
       type: Baffle
-      name: POPT2
-      surface:
-        type: Plane
-      coordSys:
-        z: 16.5 # meters above primary mirror
-      obscuration:
-        type: ObscCircle
-        radius: 0.96
-    -
-      type: Baffle
-      name: TopRing
+      name: TopRingStrutsAndCamera
       surface:
         type: Plane
       # We're going to place the vertex of the primary mirror at the global origin.
       # The top ring is ~14.5 meters above this
       coordSys:
-        z: 14.55
+        z: 14.5
+        # could also have used `shift: [0.0, 0.0, 14.5]`
+        # could also have specified Euler angles: `euler: [0.0, 0.0, 0.0]`
+        # or Euler angles individually: `rotX: 0.0`
+        # ambiguity: what order are Euler angles/shifts applied?  are they "local" or "global"?
       obscuration:
         type: ObscUnion
         items:
           -
             type: ClearAnnulus
-            inner: 0.65
-            outer: 4.3
+            inner: 0.9471 # camera shadow, Josh's approximate guess for radius
+            outer: 4.3 # Just something to define an aperture
+            # Note implicit `x: 0.0` and `y: 0.0`
           -
             type: ObscRay
-            x: 0.45
-            y: 0.45
-            width: 0.18
-            theta: 1.6880569547141775
+            x: 0.43  # Josh's approximate guess
+            y: 0.43
+            width: 0.22
+            theta: 1.688606
           -
             type: ObscRay
-            x: 0.45
-            y: 0.45
-            width: 0.18
-            theta: -0.11726062791928082
+            x: 0.43
+            y: 0.43
+            width: 0.22
+            theta: -0.117810
           -
             type: ObscRay
-            x: -0.45
-            y: -0.45
-            width: 0.18
-            theta: 3.024332025670512
+            x: -0.43
+            y: -0.43
+            width: 0.22
+            theta: 3.023783
           -
             type: ObscRay
-            x: -0.45
-            y: -0.45
-            width: 0.18
-            theta: 4.829649608303971
+            x: -0.43
+            y: -0.43
+            width: 0.22
+            theta: 4.830199
     -
       type: Baffle
-      name: BottomRing  # on the way down towards the PM
+      name: BottomRingStrutsFirstPass  # on the way down towards the PM
       surface:
         type: Plane
       coordSys:
-        z: 13.55
+        z: 1.0  # Josh's approximate guess for the height of the lower struts wrt PM.
       obscuration:
         type: ObscUnion
         items:
           -
-            type: ObscCircle
-            radius: 0.65
+            type: ObscRay
+            x: 0.43
+            y: 0.43
+            width: 0.22
+            theta: 1.688606
           -
             type: ObscRay
-            x: 0.45
-            y: 0.45
-            width: 0.18
-            theta: 1.6880569547141775
+            x: 0.43
+            y: 0.43
+            width: 0.22
+            theta: -0.117810
           -
             type: ObscRay
-            x: 0.45
-            y: 0.45
-            width: 0.18
-            theta: -0.11726062791928082
+            x: -0.43
+            y: -0.43
+            width: 0.22
+            theta: 3.023783
           -
             type: ObscRay
-            x: -0.45
-            y: -0.45
-            width: 0.18
-            theta: 3.024332025670512
-          -
-            type: ObscRay
-            x: -0.45
-            y: -0.45
-            width: 0.18
-            theta: 4.829649608303971
-    -
-      type: Baffle
-      name: TertiarySpiderFirstPass  # on the way down towards the PM
-      surface:
-        type: Plane
-      coordSys:
-        z: 1.86
-      obscuration:
-        type: ObscUnion
-        items:
-          -
-            type: ObscCircle
-            radius: 0.65
-          -
-            type: ObscRay
-            x: 0.45
-            y: 0.45
-            width: 0.18
-            theta: 1.6880569547141775
-          -
-            type: ObscRay
-            x: 0.45
-            y: 0.45
-            width: 0.18
-            theta: -0.11726062791928082
-          -
-            type: ObscRay
-            x: -0.45
-            y: -0.45
-            width: 0.18
-            theta: 3.024332025670512
-          -
-            type: ObscRay
-            x: -0.45
-            y: -0.45
-            width: 0.18
-            theta: 4.829649608303971
+            x: -0.43
+            y: -0.43
+            width: 0.22
+            theta: 4.830199
     -
       type: Mirror
       name: PM
@@ -149,46 +102,42 @@ opticalSystem:
       # is already what we want.
       # Naive outermost-allowed-radius parameterization
       obscuration:
-        type: ClearAnnulus
-        inner: 0.65
-        outer: 4.1
+        type: ClearCircle
+        radius: 4.1
     -
       type: Baffle
-      name: TertiarySpiderSecondPass  # on the way back up towards camera
+      name: BottomRingStrutsSecondPass  # on the way back towards the camera this time
       surface:
         type: Plane
       coordSys:
-        z: 1.86
+        z: 1.0
       obscuration:
         type: ObscUnion
         items:
           -
-            type: ObscCircle
-            radius: 0.65
+            type: ObscRay
+            x: 0.43
+            y: 0.43
+            width: 0.22
+            theta: 1.688606
           -
             type: ObscRay
-            x: 0.45
-            y: 0.45
-            width: 0.18
-            theta: 1.6880569547141775
+            x: 0.43
+            y: 0.43
+            width: 0.22
+            theta: -0.117810
           -
             type: ObscRay
-            x: 0.45
-            y: 0.45
-            width: 0.18
-            theta: -0.11726062791928082
+            x: -0.43
+            y: -0.43
+            width: 0.22
+            theta: 3.023783
           -
             type: ObscRay
-            x: -0.45
-            y: -0.45
-            width: 0.18
-            theta: 3.024332025670512
-          -
-            type: ObscRay
-            x: -0.45
-            y: -0.45
-            width: 0.18
-            theta: 4.829649608303971
+            x: -0.43
+            y: -0.43
+            width: 0.22
+            theta: 4.830199
     -
       type: CompoundOptic
       name: HSC
