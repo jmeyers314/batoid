@@ -18,37 +18,47 @@ def parallel_trace_timing(nside=1024, nthread=None, minChunk=None):
         batoid._batoid.setMinChunk(minChunk)
     print("Using minChunk of {}".format(batoid._batoid.getMinChunk()))
 
+    # 0.3, 0.3 should be in bounds for current wide-field telescopes
     theta_x = np.deg2rad(0.3)
     theta_y = np.deg2rad(0.3)
     dirCos = np.array([theta_x, theta_y, -1.0])
     dirCos = batoid.utils.normalized(dirCos)
-    rays = batoid.circularGrid(20, 4.2, 0.5, dirCos[0], dirCos[1], dirCos[2], nside, nside, 700e-9, 1.0, batoid.ConstMedium(1.0))
+    rays = batoid.circularGrid(
+        20, 4.2, 0.5,
+        dirCos[0], dirCos[1], dirCos[2],
+        nside, nside, 700e-9, 1.0, batoid.ConstMedium(1.0)
+    )
 
     nrays = len(rays)
     print("Tracing {} rays.".format(nrays))
     print()
 
-    fn = os.path.join(batoid.datadir, "HSC", "HSC.yaml")
+    if args.lsst:
+        fn = os.path.join(batoid.datadir, "LSST", "LSST_r.yaml")
+        pm = 'LSST.M1'
+    else:
+        fn = os.path.join(batoid.datadir, "HSC", "HSC.yaml")
+        pm = 'SubaruHSC.PM'
     config = yaml.load(open(fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
 
     # Optionally perturb the primary mirror using Zernike polynomial
     if args.perturbZ != 0:
-        orig = telescope.itemDict['SubaruHSC.PM'].surface
+        orig = telescope.itemDict[pm].surface
         coefs = np.random.normal(size=args.perturbZ+1)*1e-6 # micron perturbations
-        perturbation = batoid.Zernike(coefs, R_outer=8.2)
-        telescope.itemDict['SubaruHSC.PM'].surface = batoid.Sum([orig, perturbation])
+        perturbation = batoid.Zernike(coefs, R_outer=telescope.pupilSize)
+        telescope.itemDict[pm].surface = batoid.Sum([orig, perturbation])
 
     # Optionally perturb primary mirror using bicubic spline
     if args.perturbBC != 0:
-        orig = telescope.itemDict['SubaruHSC.PM'].surface
+        orig = telescope.itemDict[pm].surface
         xs = np.linspace(-5, 5, 100)
         ys = np.linspace(-5, 5, 100)
         def f(x, y):
             return args.perturbBC*(np.cos(x) + np.sin(y))
         zs = f(*np.meshgrid(xs, ys))
         bc = batoid.Bicubic(xs, ys, zs)
-        telescope.itemDict['SubaruHSC.PM'].surface = batoid.Sum([orig, bc])
+        telescope.itemDict[pm].surface = batoid.Sum([orig, bc])
 
     print("Immutable trace")
     t0 = time.time()
@@ -91,6 +101,7 @@ if __name__ == '__main__':
     parser.add_argument("--perturbZ", type=int, default=0)
     parser.add_argument("--perturbBC", type=float, default=0.0)
     parser.add_argument("--plot", action='store_true')
+    parser.add_argument("--lsst", action='store_true')
     args = parser.parse_args()
 
     parallel_trace_timing(args.nside, args.nthread, args.minChunk)
