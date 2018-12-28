@@ -30,7 +30,7 @@ namespace batoid{
         v.normalize();
         v /= n;
 
-        double dy = length/nside;
+        double dy = length/(nside-1);
         double y0 = -length/2;
         double y = y0;
         for(int iy=0; iy<nside; iy++) {

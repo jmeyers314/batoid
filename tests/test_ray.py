@@ -236,7 +236,7 @@ def test_rayGrid():
     xcos = 0.1
     ycos = 0.2
     zcos = -np.sqrt(1.0 - xcos**2 - ycos**2)
-    nside = 10
+    nside = 11
     wavelength = 500e-9
     flux = 1.2
     medium = batoid.ConstMedium(1.2)
