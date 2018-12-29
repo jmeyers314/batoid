@@ -7,6 +7,8 @@ set(CMAKE_MACOSX_RPATH 1)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+# for testing vectorization.
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-vectorize -fno-slp-vectorize")
 if (DEFINED ENV{CMAKE_COVER})
     set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
     include(CodeCoverage)
