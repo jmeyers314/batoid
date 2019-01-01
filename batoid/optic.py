@@ -261,12 +261,14 @@ class Interface(Optic):
             transform = batoid.CoordTransform(self.coordSys, outCoordSys)
             return transform.applyForward(r), outCoordSys
 
-    def traceSplit(self, r, inCoordSys=globalCoordSys, forwardCoordSys=None, reverseCoordSys=None, minFlux=1e-3):
+    def traceSplit(self, r, inCoordSys=globalCoordSys, forwardCoordSys=None, reverseCoordSys=None,
+                   minFlux=1e-3, verbose=False):
         """Assume Rays are coming in from the forward direction.
         returns forwardRays, forwardCoordSys, reverseRays, reverseCoordSys
         """
-        strtemplate = "traceSplit        {:15s} flux = {:18.8f}   nphot = {:10d}"
-        print(strtemplate.format(self.name, np.sum(r.flux), len(r)))
+        if verbose:
+            strtemplate = "traceSplit        {:15s} flux = {:18.8f}   nphot = {:10d}"
+            print(strtemplate.format(self.name, np.sum(r.flux), len(r)))
         if self.skip:
             return r, None, inCoordSys, None
         transform = batoid.CoordTransform(inCoordSys, self.coordSys)
@@ -293,12 +295,14 @@ class Interface(Optic):
 
         return rForward, rReverse, forwardCoordSys, reverseCoordSys
 
-    def traceSplitReverse(self, r, inCoordSys=globalCoordSys, forwardCoordSys=None, reverseCoordSys=None, minFlux=1e-3):
+    def traceSplitReverse(self, r, inCoordSys=globalCoordSys, forwardCoordSys=None,
+                          reverseCoordSys=None, minFlux=1e-3, verbose=False):
         """Assume Rays are coming in from the reverse direction.
         returns forwardRays, forwardCoordSys, reverseRays, reverseCoordSys
         """
-        strtemplate = "traceSplitReverse {:15s} flux = {:18.8f}   nphot = {:10d}"
-        print(strtemplate.format(self.name, np.sum(r.flux), len(r)))
+        if verbose:
+            strtemplate = "traceSplitReverse {:15s} flux = {:18.8f}   nphot = {:10d}"
+            print(strtemplate.format(self.name, np.sum(r.flux), len(r)))
         if self.skip:
             return r, None, inCoordSys, None
         transform = batoid.CoordTransform(inCoordSys, self.coordSys)
@@ -392,11 +396,13 @@ class RefractiveInterface(Interface):
         self.surface.refractInPlace(r, self.inMedium, self.outMedium)
 
     def rSplit(self, r):
-        reflectedR, refractedR = self.surface.rSplit(r, self.inMedium, self.outMedium, self.forwardCoating)
+        reflectedR, refractedR = self.surface.rSplit(r, self.inMedium, self.outMedium,
+                                                     self.forwardCoating)
         return refractedR, reflectedR
 
     def rSplitReverse(self, r):
-        reflectedR, refractedR = self.surface.rSplit(r, self.outMedium, self.inMedium, self.reverseCoating)
+        reflectedR, refractedR = self.surface.rSplit(r, self.outMedium, self.inMedium,
+                                                     self.reverseCoating)
         # rays coming into a refractive interface from reverse direction,
         # means that the refracted rays are going in the reverse direction,
         # and the reflected rays are going in the forward direction.
@@ -422,11 +428,13 @@ class Mirror(Interface):
         self.surface.reflectInPlace(r)
 
     def rSplit(self, r):
-        reflectedR, refractedR = self.surface.rSplit(r, self.inMedium, self.outMedium, self.forwardCoating)
+        reflectedR, refractedR = self.surface.rSplit(r, self.inMedium, self.outMedium,
+                                                     self.forwardCoating)
         return reflectedR, refractedR
 
     def rSplitReverse(self, r):
-        reflectedR, refractedR = self.surface.rSplit(r, self.outMedium, self.inMedium, self.reverseCoating)
+        reflectedR, refractedR = self.surface.rSplit(r, self.outMedium, self.inMedium,
+                                                     self.reverseCoating)
         return refractedR, reflectedR
 
 
@@ -448,11 +456,13 @@ class Detector(Interface):
         self.surface.intersectInPlace(r)
 
     def rSplit(self, r):
-        reflectedR, refractedR = self.surface.rSplit(r, self.inMedium, self.outMedium, self.forwardCoating)
+        reflectedR, refractedR = self.surface.rSplit(r, self.inMedium, self.outMedium,
+                                                     self.forwardCoating)
         return refractedR, reflectedR
 
     def rSplitReverse(self, r):
-        reflectedR, refractedR = self.surface.rSplit(r, self.outMedium, self.inMedium, self.reverseCoating)
+        reflectedR, refractedR = self.surface.rSplit(r, self.outMedium, self.inMedium,
+                                                     self.reverseCoating)
         return reflectedR, refractedR
 
 
@@ -475,11 +485,13 @@ class Baffle(Interface):
         self.surface.intersectInPlace(r)
 
     def rSplit(self, r):
-        reflectedR, refractedR = self.surface.rSplit(r, self.inMedium, self.outMedium, self.forwardCoating)
+        reflectedR, refractedR = self.surface.rSplit(r, self.inMedium, self.outMedium,
+                                                     self.forwardCoating)
         return refractedR, reflectedR
 
     def rSplitReverse(self, r):
-        reflectedR, refractedR = self.surface.rSplit(r, self.outMedium, self.inMedium, self.reverseCoating)
+        reflectedR, refractedR = self.surface.rSplit(r, self.outMedium, self.inMedium,
+                                                     self.reverseCoating)
         return reflectedR, refractedR
 
 
@@ -558,9 +570,11 @@ class CompoundOptic(Optic):
                 r, coordSys = item.traceReverse(r, inCoordSys=coordSys)
         return self.items[0].traceReverse(r, inCoordSys=coordSys, outCoordSys=outCoordSys)
 
-    def traceSplit(self, r, inCoordSys=globalCoordSys, forwardCoordSys=None, reverseCoordSys=None, minFlux=1e-3):
-        strtemplate = "traceSplit        {:15s} flux = {:18.8f}   nphot = {:10d}"
-        print(strtemplate.format(self.name, np.sum(r.flux), len(r)))
+    def traceSplit(self, r, inCoordSys=globalCoordSys, forwardCoordSys=None, reverseCoordSys=None,
+                   minFlux=1e-3, verbose=False):
+        if verbose:
+            strtemplate = "traceSplit        {:15s} flux = {:18.8f}   nphot = {:10d}"
+            print(strtemplate.format(self.name, np.sum(r.flux), len(r)))
         if self.skip:
             return r, None, inCoordSys, None
 
@@ -578,9 +592,11 @@ class CompoundOptic(Optic):
             rays, inCoordSys, direction, itemIndex = workQueue.pop()
             item = self.items[itemIndex]
             if direction == "forward":
-                rForward, rReverse, tmpForwardCoordSys, tmpReverseCoordSys = item.traceSplit(rays, inCoordSys, minFlux=minFlux)
+                rForward, rReverse, tmpForwardCoordSys, tmpReverseCoordSys = \
+                    item.traceSplit(rays, inCoordSys, minFlux=minFlux, verbose=verbose)
             elif direction == "reverse":
-                rForward, rReverse, tmpForwardCoordSys, tmpReverseCoordSys = item.traceSplitReverse(rays, inCoordSys, minFlux=minFlux)
+                rForward, rReverse, tmpForwardCoordSys, tmpReverseCoordSys = \
+                    item.traceSplitReverse(rays, inCoordSys, minFlux=minFlux, verbose=verbose)
             else:
                 raise RuntimeError("Shouldn't get here!")
 
@@ -611,9 +627,11 @@ class CompoundOptic(Optic):
         rReverse = batoid.concatenateRayVectors(outRReverse)
         return rForward, rReverse, forwardCoordSys, reverseCoordSys
 
-    def traceSplitReverse(self, r, inCoordSys=globalCoordSys, forwardCoordSys=None, reverseCoordSys=None, minFlux=1e-3):
-        strtemplate = "traceSplitReverse {:15s} flux = {:18.8f}   nphot = {:10d}"
-        print(strtemplate.format(self.name, np.sum(r.flux), len(r)))
+    def traceSplitReverse(self, r, inCoordSys=globalCoordSys, forwardCoordSys=None,
+                          reverseCoordSys=None, minFlux=1e-3, verbose=False):
+        if verbose:
+            strtemplate = "traceSplitReverse {:15s} flux = {:18.8f}   nphot = {:10d}"
+            print(strtemplate.format(self.name, np.sum(r.flux), len(r)))
         if self.skip:
             return r, None, inCoordSys, None
 
@@ -631,9 +649,11 @@ class CompoundOptic(Optic):
             rays, inCoordSys, direction, itemIndex = workQueue.pop()
             item = self.items[itemIndex]
             if direction == "forward":
-                rForward, rReverse, tmpForwardCoordSys, tmpReverseCoordSys = item.traceSplit(rays, inCoordSys, minFlux=minFlux)
+                rForward, rReverse, tmpForwardCoordSys, tmpReverseCoordSys = \
+                    item.traceSplit(rays, inCoordSys, minFlux=minFlux, verbose=verbose)
             elif direction == "reverse":
-                rForward, rReverse, tmpForwardCoordSys, tmpReverseCoordSys = item.traceSplitReverse(rays, inCoordSys, minFlux=minFlux)
+                rForward, rReverse, tmpForwardCoordSys, tmpReverseCoordSys = \
+                    item.traceSplitReverse(rays, inCoordSys, minFlux=minFlux, verbose=verbose)
             else:
                 raise RuntimeError("Shouldn't get here!")
 
@@ -726,7 +746,8 @@ class CompoundOptic(Optic):
         if name == self.name:
             return self.withGlobalShift(shift)
         # Clip off leading token
-        assert name[:len(self.name)+1] == self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
+        assert name[:len(self.name)+1] == \
+            self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
         name = name[len(self.name)+1:]
         newItems = []
         newDict = dict(self.__dict__)
@@ -776,7 +797,8 @@ class CompoundOptic(Optic):
             coordSys = self.itemDict[name].coordSys
             rotOrigin = [0,0,0]
         # Clip off leading token
-        assert name[:len(self.name)+1] == self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
+        assert name[:len(self.name)+1] == \
+            self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
         name = name[len(self.name)+1:]
         newItems = []
         newDict = dict(self.__dict__)
@@ -842,7 +864,8 @@ class Lens(CompoundOptic):
         if name == self.name:
             return self.withGlobalShift(shift)
         # Clip off leading token
-        assert name[:len(self.name)+1] == self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
+        assert name[:len(self.name)+1] == \
+            self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
         name = name[len(self.name)+1:]
         newItems = []
         newDict = dict(self.__dict__)
@@ -893,7 +916,8 @@ class Lens(CompoundOptic):
             coordSys = self.itemDict[name].coordSys
             rotOrigin = [0,0,0]
         # Clip off leading token
-        assert name[:len(self.name)+1] == self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
+        assert name[:len(self.name)+1] == \
+            self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
         name = name[len(self.name)+1:]
         newItems = []
         newDict = dict(self.__dict__)
