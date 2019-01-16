@@ -24,6 +24,16 @@ opticalSystem:
       obscuration:
         type: ObscCircle
         radius: 0.96
+    - type: Baffle # Josh's rough guess for the filter exchange unit
+      name: FEU
+      surface:
+        type: Plane
+      coordSys:
+        z: 15.3
+      obscuration:
+        type: ObscRectangle
+        width: 0.84
+        height: 2.28
     -
       type: Baffle
       name: TopRing
