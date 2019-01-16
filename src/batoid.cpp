@@ -73,10 +73,10 @@ namespace batoid{
             nphis[i] = int(std::ceil(naz*rfrac/6.))*6;
             rfrac -= drfrac;
         }
-        int nray = std::accumulate(nphis.begin(), nphis.end(), 0);
         // Point in the center is a special case
         if (inner == 0.0)
             nphis[nradii-1] = 1;
+        int nray = std::accumulate(nphis.begin(), nphis.end(), 0);
 
         std::vector<Ray> result;
         result.reserve(nray);
