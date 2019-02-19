@@ -36,6 +36,16 @@ namespace batoid {
         const double _radius, _x0, _y0;
     };
 
+    class ObscEllipse : public Obscuration {
+    public:
+      ObscEllipse(double dx, double dy, double x0=0.0, double y0=0.0);
+      bool contains(double x, double y) const override;
+      bool operator==(const Obscuration& rhs) const override;
+      std::string repr() const override;
+      
+      const double _dx, _dy, _x0, _y0;
+    };
+    
     class ObscAnnulus : public Obscuration {
     public:
         ObscAnnulus(double inner, double outer, double x0=0.0, double y0=0.0);

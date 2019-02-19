@@ -45,6 +45,35 @@ namespace batoid {
                 ));
             });
 
+        py::class_<ObscEllipse, std::shared_ptr<ObscEllipse>, Obscuration>(m, "ObscEllipse")
+      	  .def(py::init<double,double,double,double>(), "init", "dx"_a, "dy"_a, "x"_a=0.0, "y"_a=0.0)
+	  .def_readonly("dx", &ObscEllipse::_dx)
+	  .def_readonly("dy", &ObscEllipse::_dy)	  
+	  .def_readonly("x", &ObscEllipse::_x0)
+	  .def_readonly("y", &ObscEllipse::_y0)
+	  .def(py::self == py::self)
+	  .def(py::self != py::self)
+	  .def(py::pickle(
+		[](const ObscEllipse& oc){ return py::make_tuple(oc._dx, oc._dy, oc._x0, oc._y0); },
+                [](py::tuple t) {
+                    return ObscEllipse(
+                        t[0].cast<double>(),
+                        t[1].cast<double>(),
+                        t[2].cast<double>(),
+                        t[3].cast<double>()			
+                    );
+                }
+            ))
+            .def("__hash__", [](const ObscEllipse& oc) {
+                return py::hash(py::make_tuple(
+                    "ObscEllipse",
+                    oc._dx,
+                    oc._dy,
+                    oc._x0,
+                    oc._y0
+                ));
+            });
+	
 
         py::class_<ObscAnnulus, std::shared_ptr<ObscAnnulus>, Obscuration>(m, "ObscAnnulus")
             .def(py::init<double,double,double,double>(), "init", "inner"_a, "outer"_a, "x"_a=0.0, "y"_a=0.0)

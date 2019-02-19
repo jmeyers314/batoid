@@ -84,6 +84,35 @@ namespace batoid {
         return oss.str();
     }
 
+  ObscEllipse::ObscEllipse(double dx, double dy, double x0, double y0) :
+    _dx(dx), _dy(dy), _x0(x0), _y0(y0) {}
+
+  bool ObscEllipse::contains(double x, double y) const {
+    return std::hypot((x-_x0)/_dx, (y-_y0)/_dy) < 1.;
+  }
+
+  bool ObscEllipse::operator==(const Obscuration & rhs) const {
+    if(const ObscEllipse * other = dynamic_cast<const ObscEllipse*>(&rhs)) {
+      return _dx == other->_dx &&
+	_dy == other->_dy &&
+	_x0 == other->_x0 &&
+	_y0 == other->_y0;
+    }
+    else
+      return false;
+  }
+  
+  std::string ObscEllipse::repr() const {
+    std::ostringstream oss;
+    oss << "ObscEllipse("
+	<< _dx << " " << _dy;
+    if (_x0 != 0.0 || _y0 != 0.0) {
+      oss << ", " << _x0
+	  << ", " << _y0;
+    }
+    oss << ")";
+    return oss.str();
+  }
 
     ObscAnnulus::ObscAnnulus(double inner, double outer, double x0, double y0) :
         _inner(inner), _outer(outer), _x0(x0), _y0(y0) {}

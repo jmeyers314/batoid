@@ -83,6 +83,8 @@ class Interface(Optic):
             if isinstance(self.obscuration, batoid.ObscNegation):
                 if isinstance(self.obscuration.original, batoid.ObscCircle):
                     self.outRadius = self.obscuration.original.radius
+                elif isinstance(self.obscuration.original, batoid.ObscEllipse):
+                    self.outRadius = max(self.obscuration.original.dx, self.obscuration.original.dy)
                 elif isinstance(self.obscuration.original, batoid.ObscAnnulus):
                     self.outRadius = self.obscuration.original.outer
                     self.inRadius = self.obscuration.original.inner
