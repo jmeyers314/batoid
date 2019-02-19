@@ -267,6 +267,7 @@ def test_refraction_chromatic():
     random.seed(577215664)
     wavelength1 = 500e-9
     wavelength2 = 600e-9
+    flux = 1.0
 
     plane = batoid.Plane()
     filename = os.path.join(batoid.datadir, "media", "silica_dispersion.txt")
@@ -278,8 +279,8 @@ def test_refraction_chromatic():
 
     thx, thy = 0.001, 0.0001
     dirCos = batoid.utils.gnomicToDirCos(thx, thy)
-    rv1 = batoid.rayGrid(10.0, 1., dirCos[0], dirCos[1], -dirCos[2], 2, wavelength1, silica)
-    rv2 = batoid.rayGrid(10.0, 1., dirCos[0], dirCos[1], -dirCos[2], 2, wavelength2, silica)
+    rv1 = batoid.rayGrid(10.0, 1., dirCos[0], dirCos[1], -dirCos[2], 2, wavelength1, flux, silica)
+    rv2 = batoid.rayGrid(10.0, 1., dirCos[0], dirCos[1], -dirCos[2], 2, wavelength2, flux, silica)
     rays = []
     for ray in rv1:
         rays.append(ray)

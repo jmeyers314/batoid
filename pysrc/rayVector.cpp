@@ -18,7 +18,8 @@ namespace batoid {
             .def(py::init<std::vector<Ray>>())
             .def(py::init<std::vector<double>, std::vector<double>, std::vector<double>,
                           std::vector<double>, std::vector<double>, std::vector<double>,
-                          std::vector<double>, std::vector<double>, std::vector<bool>>())
+                          std::vector<double>, std::vector<double>, std::vector<double>,
+                          std::vector<bool>>())
             .def("__repr__", &RayVector::repr)
             .def("amplitude", &RayVector::amplitude)
             .def("sumAmplitude", &RayVector::sumAmplitude)
@@ -35,14 +36,14 @@ namespace batoid {
             )
             .def("propagatedToTime", &RayVector::propagatedToTime)
             .def("propagateInPlace", &RayVector::propagateInPlace)
-            .def("trimVignetted", &RayVector::trimVignetted)
-            .def("trimVignettedInPlace", &RayVector::trimVignettedInPlace)
+            .def("trimVignetted", &RayVector::trimVignetted, "", "minFlux"_a=0.0)
+            .def("trimVignettedInPlace", &RayVector::trimVignettedInPlace, "", "minFlux"_a=0.0)
             // Note, monochromatic == True guarantees monochromaticity, but monochromatic == False,
             // doesn't guarantee polychromaticity.
-            .def_property_readonly("monochromatic", [](const RayVector& rv){ return !std::isnan(rv.wavelength); })
+            .def_property_readonly("monochromatic", [](const RayVector& rv){ return !std::isnan(rv.getWavelength()); })
             .def(py::pickle(
                 [](const RayVector& rv) {  // __getstate__
-                    return py::make_tuple(rv.rays, rv.wavelength);
+                    return py::make_tuple(rv.getRays(), rv.getWavelength());
                 },
                 [](py::tuple t) {  // __setstate__
                     return RayVector(
@@ -54,15 +55,15 @@ namespace batoid {
             .def("__hash__", [](const RayVector& rv) {
                 return py::hash(py::make_tuple(
                     "RayVector",
-                    py::tuple(py::cast(rv.rays)),
-                    rv.wavelength
+                    py::tuple(py::cast(rv.getRays())),
+                    rv.getWavelength()
                 ));
             })
             .def_property_readonly("x",
                 [](RayVector& rv) -> py::array_t<double> {
                     return {{rv.size()},
                         {sizeof(Ray)},
-                        &rv.rays[0].r[0],
+                        &(rv.front()).r[0],
                         py::cast(rv)};
                 }
             )
@@ -70,7 +71,7 @@ namespace batoid {
                 [](RayVector& rv) -> py::array_t<double> {
                     return {{rv.size()},
                         {sizeof(Ray)},
-                        &rv.rays[0].r[1],
+                        &(rv.front()).r[1],
                         py::cast(rv)};
                 }
             )
@@ -78,7 +79,7 @@ namespace batoid {
                 [](RayVector& rv) -> py::array_t<double> {
                     return {{rv.size()},
                         {sizeof(Ray)},
-                        &rv.rays[0].r[2],
+                        &(rv.front()).r[2],
                         py::cast(rv)};
                 }
             )
@@ -86,7 +87,7 @@ namespace batoid {
                 [](RayVector& rv) -> py::array_t<double> {
                     return {{rv.size()},
                         {sizeof(Ray)},
-                        &rv.rays[0].v[0],
+                        &(rv.front()).v[0],
                         py::cast(rv)};
                 }
             )
@@ -94,7 +95,7 @@ namespace batoid {
                 [](RayVector& rv) -> py::array_t<double> {
                     return {{rv.size()},
                         {sizeof(Ray)},
-                        &rv.rays[0].v[1],
+                        &(rv.front()).v[1],
                         py::cast(rv)};
                 }
             )
@@ -102,7 +103,7 @@ namespace batoid {
                 [](RayVector& rv) -> py::array_t<double> {
                     return {{rv.size()},
                         {sizeof(Ray)},
-                        &rv.rays[0].v[2],
+                        &(rv.front()).v[2],
                         py::cast(rv)};
                 }
             )
@@ -110,7 +111,7 @@ namespace batoid {
                 [](RayVector& rv) -> py::array_t<double> {
                     return {{rv.size()},
                         {sizeof(Ray)},
-                        &rv.rays[0].t,
+                        &(rv.front()).t,
                         py::cast(rv)};
                 }
             )
@@ -118,7 +119,15 @@ namespace batoid {
                 [](RayVector& rv) -> py::array_t<double> {
                     return {{rv.size()},
                         {sizeof(Ray)},
-                        &rv.rays[0].wavelength,
+                        &(rv.front()).wavelength,
+                        py::cast(rv)};
+                }
+            )
+            .def_property_readonly("flux",
+                [](RayVector& rv) -> py::array_t<double> {
+                    return {{rv.size()},
+                        {sizeof(Ray)},
+                        &(rv.front()).flux,
                         py::cast(rv)};
                 }
             )
@@ -126,7 +135,7 @@ namespace batoid {
                 [](RayVector& rv) -> py::array_t<bool> {
                     return {{rv.size()},
                         {sizeof(Ray)},
-                        &rv.rays[0].vignetted,
+                        &(rv.front()).vignetted,
                         py::cast(rv)};
                 }
             )
@@ -134,7 +143,7 @@ namespace batoid {
                 [](RayVector& rv) -> py::array_t<bool> {
                     return {{rv.size()},
                         {sizeof(Ray)},
-                        &rv.rays[0].failed,
+                        &(rv.front()).failed,
                         py::cast(rv)};
                 }
             )
@@ -142,7 +151,7 @@ namespace batoid {
                 [](RayVector& rv) -> py::array_t<double> {
                     return {{rv.size(), 3ul},
                         {sizeof(Ray), sizeof(double)},
-                        &rv.rays[0].v[0],
+                        &(rv.front()).v[0],
                         py::cast(rv)};
                 }
             )
@@ -150,7 +159,7 @@ namespace batoid {
                 [](RayVector& rv) -> py::array_t<double> {
                     return {{rv.size(), 3ul},
                         {sizeof(Ray), sizeof(double)},
-                        &rv.rays[0].r[0],
+                        &(rv.front()).r[0],
                         py::cast(rv)};
                 }
             )
@@ -159,7 +168,7 @@ namespace batoid {
                     std::vector<Vector3d> result;
                     result.reserve(rv.size());
                     for (int i=0; i < rv.size(); i++) {
-                        result.push_back(rv.rays[i].k());
+                        result.push_back(rv[i].k());
                     }
                     return py::array_t<double>(
                         {rv.size(), 3ul},
@@ -173,7 +182,7 @@ namespace batoid {
                     std::vector<double> result;
                     result.reserve(rv.size());
                     for (int i=0; i < rv.size(); i++) {
-                        result.push_back(rv.rays[i].k()[0]);
+                        result.push_back(rv[i].k()[0]);
                     }
                     return py::array_t<double>(
                         {rv.size()},
@@ -187,7 +196,7 @@ namespace batoid {
                     std::vector<double> result;
                     result.reserve(rv.size());
                     for (int i=0; i < rv.size(); i++) {
-                        result.push_back(rv.rays[i].k()[1]);
+                        result.push_back(rv[i].k()[1]);
                     }
                     return py::array_t<double>(
                         {rv.size()},
@@ -201,7 +210,7 @@ namespace batoid {
                     std::vector<double> result;
                     result.reserve(rv.size());
                     for (int i=0; i < rv.size(); i++) {
-                        result.push_back(rv.rays[i].k()[2]);
+                        result.push_back(rv[i].k()[2]);
                     }
                     return py::array_t<double>(
                         {rv.size()},
@@ -215,7 +224,7 @@ namespace batoid {
                     std::vector<double> result;
                     result.reserve(rv.size());
                     for (int i=0; i < rv.size(); i++) {
-                        result.push_back(rv.rays[i].omega());
+                        result.push_back(rv[i].omega());
                     }
                     return py::array_t<double>(
                         {rv.size()},
@@ -229,7 +238,7 @@ namespace batoid {
                 [](RayVector &rv, typename std::vector<Ray>::size_type i) -> Ray& {
                     if (i >= rv.size())
                         throw py::index_error();
-                    return rv.rays[i];
+                    return rv[i];
                 },
                 py::return_value_policy::reference_internal
             )
@@ -239,14 +248,14 @@ namespace batoid {
                         py::return_value_policy::reference_internal,
                         typename std::vector<Ray>::iterator,
                         typename std::vector<Ray>::iterator,
-                        Ray&>(rv.rays.begin(), rv.rays.end());
+                        Ray&>(rv.begin(), rv.end());
                 },
                 py::keep_alive<0, 1>()
             )
-            .def("append", [](RayVector& rv, const Ray& r) { rv.rays.push_back(r); })
+            .def("append", [](RayVector& rv, const Ray& r) { rv.push_back(r); })
             .def("__len__", &RayVector::size)
-            .def("__eq__", [](const RayVector& lhs, const RayVector& rhs) { return lhs.rays == rhs.rays; }, py::is_operator())
-            .def("__ne__", [](const RayVector& lhs, const RayVector& rhs) { return lhs.rays != rhs.rays; }, py::is_operator());
+            .def("__eq__", [](const RayVector& lhs, const RayVector& rhs) { return lhs == rhs; }, py::is_operator())
+            .def("__ne__", [](const RayVector& lhs, const RayVector& rhs) { return lhs != rhs; }, py::is_operator());
         m.def("concatenateRayVectors", &concatenateRayVectors);
     }
 }

@@ -66,7 +66,7 @@ def huygensPSF(optic, theta_x=None, theta_y=None, wavelength=None, nx=None,
 
     rays = batoid.rayGrid(optic.dist, optic.pupilSize,
         dirCos[0], dirCos[1], -dirCos[2],
-        nx, wavelength=wavelength, medium=optic.inMedium)
+        nx, wavelength=wavelength, flux=1, medium=optic.inMedium)
 
     amplitudes = np.zeros((nxOut*pad_factor, nxOut*pad_factor), dtype=np.complex128)
     out = batoid.Lattice(np.zeros((nxOut*pad_factor, nxOut*pad_factor), dtype=float), primitiveX)
@@ -122,15 +122,15 @@ def drdth(optic, theta_x, theta_y, wavelength, nx=16):
     # Flip the dirCos z-components so rays are headed downwards
     rays = batoid.rayGrid(optic.dist, optic.pupilSize,
         nominalCos[0], nominalCos[1], -nominalCos[2],
-        nx, wavelength=wavelength, medium=optic.inMedium)
+        nx, wavelength=wavelength, flux=1, medium=optic.inMedium)
 
     rays_x = batoid.rayGrid(optic.dist, optic.pupilSize,
         dthxCos[0], dthxCos[1], -dthxCos[2],
-        nx, wavelength=wavelength, medium=optic.inMedium)
+        nx, wavelength=wavelength, flux=1, medium=optic.inMedium)
 
     rays_y = batoid.rayGrid(optic.dist, optic.pupilSize,
         dthyCos[0], dthyCos[1], -dthyCos[2],
-        nx, wavelength=wavelength, medium=optic.inMedium)
+        nx, wavelength=wavelength, flux=1, medium=optic.inMedium)
 
     optic.traceInPlace(rays)
     optic.traceInPlace(rays_x)
@@ -204,7 +204,7 @@ def dkdu(optic, theta_x, theta_y, wavelength, nx=16):
     rays = batoid.rayGrid(
         optic.dist, optic.pupilSize,
         dirCos[0], dirCos[1], -dirCos[2],
-        nx, wavelength, optic.inMedium
+        nx, wavelength, 1.0, optic.inMedium
     )
 
     pupilRays = rays.propagatedToTime(0.0)
@@ -249,7 +249,7 @@ def wavefront(optic, theta_x, theta_y, wavelength, nx=32, sphereRadius=None):
     rays = batoid.rayGrid(
         optic.dist, optic.pupilSize,
         dirCos[0], dirCos[1], -dirCos[2],
-        nx, wavelength, optic.inMedium
+        nx, wavelength, 1.0, optic.inMedium
     )
 
     if sphereRadius is None:
@@ -333,7 +333,7 @@ def zernike(optic, theta_x, theta_y, wavelength, nx=32, jmax=22, eps=0.0, sphere
     rays = batoid.rayGrid(
         optic.dist, optic.pupilSize,
         dirCos[0], dirCos[1], -dirCos[2],
-        nx, wavelength, optic.inMedium
+        nx, wavelength, 1.0, optic.inMedium
     )
 
     # Propagate to t=optic.dist where rays are close to being

@@ -4,7 +4,7 @@ from test_helpers import timer, do_pickle, all_obj_diff
 
 
 @timer
-def test_call():
+def test_positionAtTime():
     import random
     random.seed(5)
     for i in range(100):
@@ -42,9 +42,12 @@ def test_properties():
         vy = random.gauss(5.1, 24.3)
         vz = random.gauss(-1.13, 31.3)
         t = random.gauss(0.1, 1.1)
+        w = random.gauss(1000.0, 10.0)
+        f = random.gauss(1000.0, 10.0)
+        v = random.choice([True, False])
 
-        ray1 = batoid.Ray(x, y, z, vx, vy, vz, t)
-        ray2 = batoid.Ray([x, y, z], [vx, vy, vz], t)
+        ray1 = batoid.Ray(x, y, z, vx, vy, vz, t, w, f, v)
+        ray2 = batoid.Ray([x, y, z], [vx, vy, vz], t, w, f, v)
         for ray in [ray1, ray2]:
             assert ray.x == x
             assert ray.y == y
@@ -53,6 +56,8 @@ def test_properties():
             assert ray.vy == vy
             assert ray.vz == vz
             assert ray.t == t
+            assert ray.wavelength == w
+            assert ray.vignetted == v
         assert ray1 == ray2
 
 
@@ -131,15 +136,16 @@ def test_RayVector():
     for i in range(1000):
         rayList.append(
             batoid.Ray(
-                random.gauss(0.0, 1.0),
-                random.gauss(0.0, 1.0),
-                random.gauss(0.0, 1.0),
-                random.gauss(0.0, 1.0),
-                random.gauss(0.0, 1.0),
-                random.gauss(0.0, 1.0),
-                random.gauss(0.0, 1.0),
-                random.gauss(0.0, 1.0),
-                True if random.gauss(0.0, 1.0) < 0.0 else False
+                random.gauss(0.0, 1.0),  # x
+                random.gauss(0.0, 1.0),  # y
+                random.gauss(0.0, 1.0),  # z
+                random.gauss(0.0, 1.0),  # vx
+                random.gauss(0.0, 1.0),  # vy
+                random.gauss(0.0, 1.0),  # vz
+                random.gauss(0.0, 1.0),  # t0
+                random.gauss(1000.0, 1.0),  # wavelength
+                random.gauss(100.0, 1.0),  # flux
+                random.choice([True, False])  # vignetted
             )
         )
     rayVector = batoid.RayVector(rayList)
@@ -153,6 +159,7 @@ def test_RayVector():
     np.testing.assert_equal(rayVector.vz, np.array([ray.vz for ray in rayVector]))
     np.testing.assert_equal(rayVector.t, np.array([ray.t for ray in rayVector]))
     np.testing.assert_equal(rayVector.wavelength, np.array([ray.wavelength for ray in rayVector]))
+    np.testing.assert_equal(rayVector.flux, np.array([ray.flux for ray in rayVector]))
     np.testing.assert_equal(rayVector.vignetted, np.array([ray.vignetted for ray in rayVector]))
     np.testing.assert_equal(rayVector.failed, np.array([ray.failed for ray in rayVector]))
     np.testing.assert_equal(rayVector.phase([1, 2, 3], 4.0),
@@ -179,6 +186,7 @@ def test_RayVector():
         np.array([ray.vz for ray in rayList]),
         np.array([ray.t for ray in rayList]),
         np.array([ray.wavelength for ray in rayList]),
+        np.array([ray.flux for ray in rayList]),
         np.array([ray.vignetted for ray in rayList])
     )
     assert rayVector == rayVector2
@@ -194,6 +202,7 @@ def test_RayVector():
         np.array([ray.vz for ray in rayList]),
         np.array([ray.t for ray in rayList]),
         np.array([1.0 for ray in rayList]),
+        np.array([ray.flux for ray in rayList]),
         np.array([ray.vignetted for ray in rayList])
     )
     assert rayVector3.monochromatic == True
@@ -227,11 +236,12 @@ def test_rayGrid():
     xcos = 0.1
     ycos = 0.2
     zcos = -np.sqrt(1.0 - xcos**2 - ycos**2)
-    nside = 10
+    nside = 11
     wavelength = 500e-9
+    flux = 1.2
     medium = batoid.ConstMedium(1.2)
 
-    rays = batoid.rayGrid(dist, length, xcos, ycos, zcos, nside, wavelength, medium)
+    rays = batoid.rayGrid(dist, length, xcos, ycos, zcos, nside, wavelength, flux, medium)
     assert rays.monochromatic == True
     # Check that all rays are perpendicular to v
     ray0 = rays[0]
@@ -240,6 +250,7 @@ def test_rayGrid():
         dp = np.dot(dr, ray0.v)
         np.testing.assert_allclose(dp, 0.0, atol=1e-14, rtol=0.0)
         np.testing.assert_allclose(ray.wavelength, wavelength)
+        np.testing.assert_allclose(ray.flux, flux)
         np.testing.assert_allclose(np.linalg.norm(ray.v), 1./1.2)
         np.testing.assert_allclose(ray.v[0]*1.2, xcos)
         np.testing.assert_allclose(ray.v[1]*1.2, ycos)
@@ -261,9 +272,10 @@ def test_circularGrid():
     nradii = 5
     naz = 50
     wavelength = 500e-9
+    flux = 1.2
     medium = batoid.ConstMedium(1.2)
 
-    rays = batoid.circularGrid(dist, outer, inner, xcos, ycos, zcos, nradii, naz, wavelength, medium)
+    rays = batoid.circularGrid(dist, outer, inner, xcos, ycos, zcos, nradii, naz, wavelength, flux, medium)
     assert rays.monochromatic == True
     # Check that all rays are perpendicular to v
     ray0 = rays[0]
@@ -272,6 +284,7 @@ def test_circularGrid():
         dp = np.dot(dr, ray0.v)
         np.testing.assert_allclose(dp, 0.0, atol=1e-14, rtol=0.0)
         np.testing.assert_allclose(ray.wavelength, wavelength)
+        np.testing.assert_allclose(ray.flux, flux)
         np.testing.assert_allclose(np.linalg.norm(ray.v), 1./1.2)
         np.testing.assert_allclose(ray.v[0]*1.2, xcos)
         np.testing.assert_allclose(ray.v[1]*1.2, ycos)
@@ -284,6 +297,7 @@ def test_ne():
             batoid.Ray((0,1,0), (0,0,0)),
             batoid.Ray((0,0,0), (0,0,0), t=1),
             batoid.Ray((0,0,0), (0,0,0), wavelength=500e-9),
+            batoid.Ray((0,0,0), (0,0,0), wavelength=500e-9, flux=1.2),
             batoid.Ray((0,0,0), (0,0,0), vignetted=True),
             # Should really get a failed Ray to test here...
             (0,0,0),
@@ -312,7 +326,7 @@ def test_fail():
 
 
 if __name__ == '__main__':
-    test_call()
+    test_positionAtTime()
     test_properties()
     test_phase()
     test_RayVector()

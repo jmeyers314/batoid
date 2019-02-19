@@ -12,7 +12,7 @@ using Eigen::Vector3d;
 namespace batoid{
     RayVector rayGrid(double dist, double length,
                       double xcos, double ycos, double zcos,
-                      int nside, double wavelength,
+                      int nside, double wavelength, double flux,
                       const Medium& m) {
         double n = m.getN(wavelength);
     // `dist` is the distance from the center of the pupil to the center of the rayGrid.
@@ -30,7 +30,7 @@ namespace batoid{
         v.normalize();
         v /= n;
 
-        double dy = length/nside;
+        double dy = length/(nside-1);
         double y0 = -length/2;
         double y = y0;
         for(int iy=0; iy<nside; iy++) {
@@ -52,7 +52,7 @@ namespace batoid{
                 //      = (r + v n d) . v n^2
                 // => r0 = r - v t
                 double t = (r + v*n*dist).dot(v) * n * n;
-                result.emplace_back(r-v*t, v, 0, wavelength, false);
+                result.emplace_back(r-v*t, v, 0, wavelength, flux, false);
                 x += dy;
             }
             y += dy;
@@ -62,7 +62,7 @@ namespace batoid{
 
     RayVector circularGrid(double dist, double outer, double inner,
                            double xcos, double ycos, double zcos,
-                           int nradii, int naz, double wavelength, const Medium& m) {
+                           int nradii, int naz, double wavelength, double flux, const Medium& m) {
         double n = m.getN(wavelength);
 
         // Determine number of rays at each radius
@@ -70,10 +70,14 @@ namespace batoid{
         double drfrac = (outer-inner)/(nradii-1)/outer;
         double rfrac = 1.0;
         for (int i=0; i<nradii; i++) {
-            nphis[i] = int(std::ceil(naz*rfrac));
+            nphis[i] = int(std::ceil(naz*rfrac/6.))*6;
             rfrac -= drfrac;
         }
+        // Point in the center is a special case
+        if (inner == 0.0)
+            nphis[nradii-1] = 1;
         int nray = std::accumulate(nphis.begin(), nphis.end(), 0);
+
         std::vector<Ray> result;
         result.reserve(nray);
 
@@ -90,7 +94,7 @@ namespace batoid{
             for (int j=0; j<nphis[i]; j++) {
                 Vector3d r(radius*std::cos(az), radius*std::sin(az), 0);
                 double t = (r + v*n*dist).dot(v) * n * n;
-                result.emplace_back(r-v*t, v, 0, wavelength, false);
+                result.emplace_back(r-v*t, v, 0, wavelength, flux, false);
                 az += daz;
             }
             rfrac -= drfrac;

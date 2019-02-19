@@ -10,11 +10,11 @@ directory = os.path.dirname(__file__)
 
 @timer
 def test_HSC_trace():
-    fn = os.path.join(batoid.datadir, "HSC", "HSC.yaml")
+    fn = os.path.join(batoid.datadir, "HSC", "HSC_old.yaml")
     config = yaml.load(open(fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
 
-    # Zemax has a number of virtual surfaces that we don't trace in batoid.  Also, the HSC3.yaml
+    # Zemax has a number of virtual surfaces that we don't trace in batoid.  Also, the HSC.yaml
     # above includes Baffle surfaces not in Zemax.  The following lists select out the surfaces in
     # common to both models.
     HSC_surfaces = [3, 6, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 24, 25, 28, 29, 31]
@@ -43,14 +43,14 @@ def test_HSC_trace():
 
             transform = batoid.CoordTransform(surface['outCoordSys'], batoid.CoordSys())
             s = transform.applyForward(s)
-            jt_isec = np.array([s.x, s.y, s.z-16.0])
+            bt_isec = np.array([s.x, s.y, s.z-16.0])
             zx_isec = arr[HSC_surfaces[i]-1][1:4]/1000
-            np.testing.assert_allclose(jt_isec, zx_isec, rtol=0, atol=1e-9) # nanometer agreement
+            np.testing.assert_allclose(bt_isec, zx_isec, rtol=0, atol=1e-9) # nanometer agreement
 
-            jt_angle = np.array([v[0], v[1], v[2]])
+            bt_angle = np.array([v[0], v[1], v[2]])
             zx_angle = arr[HSC_surfaces[i]-1][4:7]
             # direction cosines agree to 1e-9
-            np.testing.assert_allclose(jt_angle, zx_angle, rtol=0, atol=1e-9)
+            np.testing.assert_allclose(bt_angle, zx_angle, rtol=0, atol=1e-9)
 
             i += 1
 

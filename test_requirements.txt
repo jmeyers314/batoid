@@ -6,4 +6,3 @@ jupyter
 jupyter_contrib_nbextensions
 notebook
 matplotlib
-jupyter_contrib_nbextensions

@@ -88,10 +88,10 @@ namespace batoid {
         void applyForwardInPlace(Ray& r) const;
         void applyReverseInPlace(Ray& r) const;
 
-        std::vector<Ray> applyForward(const std::vector<Ray>& r) const;
-        std::vector<Ray> applyReverse(const std::vector<Ray>& r) const;
-        void applyForwardInPlace(std::vector<Ray>& rays) const;
-        void applyReverseInPlace(std::vector<Ray>& rays) const;
+        RayVector applyForward(const RayVector& rv) const;
+        RayVector applyReverse(const RayVector& rv) const;
+        void applyForwardInPlace(RayVector& rv) const;
+        void applyReverseInPlace(RayVector& rv) const;
 
         const Matrix3d& getRot() const { return _rot; }
         const Vector3d& getDr() const { return _dr; }

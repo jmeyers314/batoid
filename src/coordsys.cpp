@@ -123,13 +123,13 @@ namespace batoid {
     Ray CoordTransform::applyForward(const Ray& r) const {
         if (r.failed) return r;
         return Ray(_rot.transpose()*(r.r-_dr), _rot.transpose()*r.v,
-                r.t, r.wavelength, r.vignetted);
+                r.t, r.wavelength, r.flux, r.vignetted);
     }
 
     Ray CoordTransform::applyReverse(const Ray& r) const {
         if (r.failed) return r;
         return Ray(_rot*r.r + _dr, _rot*r.v,
-            r.t, r.wavelength, r.vignetted);
+            r.t, r.wavelength, r.flux, r.vignetted);
     }
 
     void CoordTransform::applyForwardInPlace(Ray& r) const {
@@ -144,30 +144,30 @@ namespace batoid {
         r.v = _rot*r.v;
     }
 
-    std::vector<Ray> CoordTransform::applyForward(const std::vector<Ray>& rs) const {
-        std::vector<Ray> result(rs.size());
-        parallelTransform(rs.cbegin(), rs.cend(), result.begin(),
+    RayVector CoordTransform::applyForward(const RayVector& rv) const {
+        std::vector<Ray> result(rv.size());
+        parallelTransform(rv.cbegin(), rv.cend(), result.begin(),
             [this](const Ray& r) { return applyForward(r); }
         );
-        return result;
+        return RayVector(std::move(result), rv.getWavelength());
     }
 
-    std::vector<Ray> CoordTransform::applyReverse(const std::vector<Ray>& rs) const {
-        std::vector<Ray> result(rs.size());
-        parallelTransform(rs.cbegin(), rs.cend(), result.begin(),
+    RayVector CoordTransform::applyReverse(const RayVector& rv) const {
+        std::vector<Ray> result(rv.size());
+        parallelTransform(rv.cbegin(), rv.cend(), result.begin(),
             [this](const Ray& r) { return applyReverse(r); }
         );
-        return result;
+        return RayVector(std::move(result), rv.getWavelength());
     }
 
-    void CoordTransform::applyForwardInPlace(std::vector<Ray>& rays) const {
-        parallel_for_each(rays.begin(), rays.end(),
+    void CoordTransform::applyForwardInPlace(RayVector& rv) const {
+        parallel_for_each(rv.begin(), rv.end(),
             [this](Ray& r) { applyForwardInPlace(r); }
         );
     }
 
-    void CoordTransform::applyReverseInPlace(std::vector<Ray>& rays) const {
-        parallel_for_each(rays.begin(), rays.end(),
+    void CoordTransform::applyReverseInPlace(RayVector& rv) const {
+        parallel_for_each(rv.begin(), rv.end(),
             [this](Ray& r) { applyReverseInPlace(r); }
         );
     }

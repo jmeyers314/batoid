@@ -13,14 +13,20 @@ using Eigen::Matrix2d;
 namespace batoid {
     class Obscuration {
     public:
+        virtual ~Obscuration() {}
+
         virtual bool contains(double x, double y) const = 0;
+
         virtual bool operator==(const Obscuration& rhs) const = 0;
         bool operator!=(const Obscuration& rhs) const { return !operator==(rhs); }
+
         Ray obscure(const Ray&) const;
-        void obscureInPlace(Ray&) const;
         RayVector obscure(const RayVector&) const;
+        void obscureInPlace(Ray&) const;
         void obscureInPlace(RayVector&) const;
+
         virtual std::string repr() const = 0;
+
     protected:
         static std::vector<std::shared_ptr<Obscuration>> sortedObscurations(const std::vector<std::shared_ptr<Obscuration>>);
     };

@@ -9,10 +9,10 @@
 
 namespace batoid {
     RayVector rayGrid(double dist, double length, double xcos, double ycos, double zcos,
-                      int nside, double wavelength, const Medium& m);
+                      int nside, double wavelength, double flux, const Medium& m);
     RayVector circularGrid(double dist, double outer, double inner,
                            double xcos, double ycos, double zcos,
-                           int nradii, int naz, double wavelength, const Medium& m);
+                           int nradii, int naz, double wavelength, double flux, const Medium& m);
 }
 
 #endif

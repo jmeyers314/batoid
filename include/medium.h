@@ -8,6 +8,7 @@
 namespace batoid {
     class Medium {
     public:
+        virtual ~Medium() {}
         virtual double getN(double wavelength) const = 0;
         virtual std::string repr() const = 0;
     };

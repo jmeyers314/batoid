@@ -174,24 +174,12 @@ namespace batoid {
             })
             .def("applyForward", (Ray (CoordTransform::*)(const Ray&) const) &CoordTransform::applyForward)
             .def("applyReverse", (Ray (CoordTransform::*)(const Ray&) const) &CoordTransform::applyReverse)
-            .def("applyForward", [](const CoordTransform& ct, const RayVector& rv){
-                RayVector result;
-                result.rays = std::move(ct.applyForward(rv.rays));
-                return result;
-            })
-            .def("applyReverse", [](const CoordTransform& ct, const RayVector& rv){
-                RayVector result;
-                result.rays = std::move(ct.applyReverse(rv.rays));
-                return result;
-            })
+            .def("applyForward", (RayVector (CoordTransform::*)(const RayVector&) const) &CoordTransform::applyForward)
+            .def("applyReverse", (RayVector (CoordTransform::*)(const RayVector&) const) &CoordTransform::applyReverse)
             .def("applyForwardInPlace", (void (CoordTransform::*)(Ray&) const) &CoordTransform::applyForwardInPlace)
-            .def("applyForwardInPlace", [](const CoordTransform& ct, RayVector& rv){
-                ct.applyForwardInPlace(rv.rays);
-            })
+            .def("applyForwardInPlace", (void (CoordTransform::*)(RayVector&) const) &CoordTransform::applyForwardInPlace)
             .def("applyReverseInPlace", (void (CoordTransform::*)(Ray&) const) &CoordTransform::applyReverseInPlace)
-            .def("applyReverseInPlace", [](const CoordTransform& ct, RayVector& rv){
-                ct.applyReverseInPlace(rv.rays);
-            })
+            .def("applyReverseInPlace", (void (CoordTransform::*)(RayVector&) const) &CoordTransform::applyReverseInPlace)
             .def(py::self == py::self)
             .def(py::self != py::self)
             .def(py::pickle(

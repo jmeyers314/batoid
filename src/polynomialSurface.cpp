@@ -51,6 +51,7 @@ namespace batoid {
         if (!_grad_ready) {
             _coefs_gradx = poly::gradx(_coefs);
             _coefs_grady = poly::grady(_coefs);
+            _grad_ready = true;
         }
     }
 

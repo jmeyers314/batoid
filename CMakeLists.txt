@@ -7,6 +7,8 @@ set(CMAKE_MACOSX_RPATH 1)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+# for testing vectorization.
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-vectorize -fno-slp-vectorize")
 if (DEFINED ENV{CMAKE_COVER})
     set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
     include(CodeCoverage)
@@ -19,6 +21,7 @@ set(PYSRC_FILES
   pysrc/asphere.cpp
   pysrc/batoid.cpp
   pysrc/bicubic.cpp
+  pysrc/coating.cpp
   pysrc/coordsys.cpp
   pysrc/medium.cpp
   pysrc/obscuration.cpp
@@ -37,6 +40,7 @@ set(SRC_FILES
   src/asphere.cpp
   src/batoid.cpp
   src/bicubic.cpp
+  src/coating.cpp
   src/coordsys.cpp
   src/medium.cpp
   src/obscuration.cpp
