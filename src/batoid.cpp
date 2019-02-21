@@ -6,8 +6,11 @@
 #include <cmath>
 #include <numeric>
 #include <Eigen/Dense>
+#include <Eigen/Geometry>
 
 using Eigen::Vector3d;
+using Eigen::Matrix3d;
+using Eigen::AngleAxisd;
 
 namespace batoid{
     RayVector rayGrid(double dist, double length,
@@ -98,6 +101,56 @@ namespace batoid{
                 az += daz;
             }
             rfrac -= drfrac;
+        }
+        return RayVector(std::move(result), wavelength);
+    }
+
+    RayVector pointSourceCircularGrid(const Vector3d& source, double outer, double inner,
+                                      int nradii, int naz, double wavelength, double flux,
+                                      const Medium& m) {
+        double n = m.getN(wavelength);
+
+        // Determine largest and smallest axial angle.
+        double dist = source.norm();
+        double thetaMax = std::atan(outer/dist);
+        double thetaMin = std::atan(inner/dist);
+
+        // Determine number of rays at each angle
+        std::vector<int> nphis(nradii);
+        double dthetaFrac = (thetaMax-thetaMin)/(nradii-1)/thetaMax;
+        double thetaFrac = 1.0;
+        for (int i=0; i<nradii; i++) {
+            nphis[i] = int(std::ceil(naz*thetaFrac/6.))*6;
+            thetaFrac -= dthetaFrac;
+        }
+        // Point in the center is a special case
+        if (inner == 0.0)
+            nphis[nradii-1] = 1;
+        int nray = std::accumulate(nphis.begin(), nphis.end(), 0);
+
+        std::vector<Ray> result;
+        result.reserve(nray);
+
+        // Rotation matrix from z-axis aligned to actual source axis.
+        Vector3d axis = -source.cross(Vector3d::UnitZ()).normalized();
+        double angle = std::acos(source.normalized().dot(Vector3d::UnitZ()));
+        Matrix3d rot2 = AngleAxisd(angle, axis).toRotationMatrix();
+
+        thetaFrac = 1.0;
+        for (int i=0; i<nradii; i++) {
+            double az = 0.0;
+            double daz = 2*M_PI/nphis[i];
+            double theta = thetaFrac*thetaMax;
+            Vector3d vref(std::sin(theta), 0, -std::cos(theta));
+            vref /= n;
+            for (int j=0; j<nphis[i]; j++) {
+                // Rotate vref around the z axis.
+                Matrix3d rot1 = AngleAxisd(az, Vector3d::UnitZ()).toRotationMatrix();
+                Vector3d v = rot2*rot1*vref;
+                result.emplace_back(source, v, 0, wavelength, flux, false);
+                az += daz;
+            }
+            thetaFrac -= dthetaFrac;
         }
         return RayVector(std::move(result), wavelength);
     }

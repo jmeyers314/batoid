@@ -1,5 +1,7 @@
 #include "batoid.h"
 #include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
+#include <pybind11/eigen.h>
 
 namespace py = pybind11;
 
@@ -61,6 +63,11 @@ namespace batoid {
              &circularGrid,
              "Make a RayVector on a circle",
              "zdist"_a, "outer"_a, "inner"_a, "xcos"_a, "ycos"_a, "zcos"_a, "nradii"_a, "naz"_a, "wavelength"_a, "flux"_a, "medium"_a
+         )
+         .def("pointSourceCircularGrid",
+             &pointSourceCircularGrid,
+             "Make a spherically expanding RayVector from a point",
+             "source"_a, "outer"_a, "inner"_a, "nradii"_a, "naz"_a, "wavelength"_a, "flux"_a, "medium"_a
          )
          .def("getNThread", &getNThread)
          .def("setNThread", &setNThread)

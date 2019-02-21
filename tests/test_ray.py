@@ -291,6 +291,25 @@ def test_circularGrid():
 
 
 @timer
+def test_pointSourceCircularGrid():
+    source = [0, 1, 10]
+    outer = 0.1
+    inner = 0.0
+    nradii = 2
+    naz = 6
+    wavelength = 500e-9
+    flux = 1.0
+    medium = batoid.ConstMedium(1)
+    rays = batoid.pointSourceCircularGrid(
+        source, outer, inner, nradii, naz, wavelength, flux, medium)
+    # Verify that the central ray is pointed at the origin
+    # (last ray is central if inner==0.0)
+    centerRay = rays[len(rays)-1]
+    centerRay.propagateInPlace(np.sqrt(101))
+    np.testing.assert_allclose(centerRay.r, [0,0,0], rtol=0, atol=1e-10)
+
+
+@timer
 def test_ne():
     objs = [batoid.Ray((0,0,0), (0,0,0)),
             batoid.Ray((0,0,1), (0,0,0)),
@@ -332,5 +351,6 @@ if __name__ == '__main__':
     test_RayVector()
     test_rayGrid()
     test_circularGrid()
+    test_pointSourceCircularGrid()
     test_ne()
     test_fail()
