@@ -148,8 +148,8 @@ def test_HSC_wf():
     x, y = np.meshgrid(x, x)
     w = ~Zwf.mask  # Use the same mask for both Zemax and batoid
     basis = galsim.zernike.zernikeBasis(37, x[w], y[w])
-    Zcoefs, _, _, _ = np.linalg.lstsq(basis.T, Zwf[w], rcond=None)
-    Bcoefs, _, _, _ = np.linalg.lstsq(basis.T, bwf.array[w], rcond=None)
+    Zcoefs, _, _, _ = np.linalg.lstsq(basis.T, Zwf[w], rcond=-1)
+    Bcoefs, _, _, _ = np.linalg.lstsq(basis.T, bwf.array[w], rcond=-1)
     np.testing.assert_allclose(Zcoefs[4:], Bcoefs[4:], rtol=0, atol=0.01)
     # higher order Zernikes match even better
     np.testing.assert_allclose(Zcoefs[11:], Bcoefs[11:], rtol=0, atol=0.01)
