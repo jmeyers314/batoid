@@ -339,9 +339,9 @@ def zernike(optic, theta_x, theta_y, wavelength, nx=32, jmax=22, eps=0.0, sphere
     # Propagate to t=optic.dist where rays are close to being
     # in the entrance pupil.  (TODO: actually intersect EP here?)
     rays.propagateInPlace(optic.dist)
-
     orig_x = np.array(rays.x).reshape(nx,nx)
     orig_y = np.array(rays.y).reshape(nx,nx)
+
     wf = wavefront(optic, theta_x, theta_y, wavelength, nx=nx, sphereRadius=sphereRadius)
     wfarr = wf.array
     w = ~wfarr.mask

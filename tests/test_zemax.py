@@ -1,9 +1,24 @@
 # Compare ray by ray tracing to Zemax
 import os
+
+import pytest
 import numpy as np
 import batoid
 from test_helpers import timer
 import yaml
+
+hasGalSim = True
+try:
+    import galsim
+except ImportError:
+    hasGalSim = False
+
+hasLMFit = True
+try:
+    import lmfit
+except ImportError:
+    hasLMFit = False
+
 
 directory = os.path.dirname(__file__)
 
@@ -24,7 +39,7 @@ def test_HSC_trace():
                      'G5_entrance', 'G5_exit', 'F_entrance', 'F_exit',
                      'W_entrance', 'W_exit', 'D']
 
-    for fn in ["rt1.txt", "rt2.txt", "rt3.txt"]:
+    for fn in ["HSC_raytrace_1.txt", "HSC_raytrace_2.txt", "HSC_raytrace_3.txt"]:
         filename = os.path.join(directory, "testdata", fn)
         with open(filename) as f:
             arr = np.loadtxt(f, skiprows=22, usecols=list(range(0, 12)))
@@ -54,5 +69,121 @@ def test_HSC_trace():
 
             i += 1
 
+
+@pytest.mark.skipif(not hasGalSim, reason="galsim not found")
+@pytest.mark.skipif(not hasLMFit, reason="lmfit not found")
+@timer
+def test_HSC_huygenPSF():
+    fn = os.path.join(directory, "testdata", "HSC_huygensPSF.txt")
+    with open(fn) as f:
+        Zarr = np.loadtxt(f, skiprows=21)
+    Zarr = Zarr[::-1]  # Need to invert, probably just a Zemax convention...
+
+    HSC_fn = os.path.join(batoid.datadir, "HSC", "HSC_no_obsc.yaml")
+    config = yaml.load(open(HSC_fn))
+    telescope = batoid.parse.parse_optic(config['opticalSystem'])
+
+    thx = np.deg2rad(0.0)
+    thy = np.deg2rad(0.75)
+    wavelength = 750e-9
+    nx = 512
+    dx = 0.25e-6
+    hPSF = batoid.huygensPSF(telescope, thx, thy, wavelength, nx=nx, dx=dx, nxOut=256)
+
+    # Normalize images
+    Zarr /= np.sum(Zarr)
+    hPSF.array /= np.sum(hPSF.array)
+    Zmax = np.max(Zarr)
+    Zarr /= Zmax
+    hPSF.array /= Zmax
+
+    # Use GalSim InterpolateImage to align and subtract
+    ii = galsim.InterpolatedImage(galsim.Image(hPSF.array, scale=0.25), normalization='sb')
+
+    # Now setup an optimizer to fit for x/y shift
+    def resid(params):
+        model = ii.shift(params['dx'], params['dy'])*np.exp(params['dlogflux'])
+        img = model.drawImage(method='sb', scale=0.25, nx=256, ny=256)
+        return (img.array - Zarr).ravel()
+    params = lmfit.Parameters()
+    params.add('dx', value=0.0)
+    params.add('dy', value=0.0)
+    params.add('dlogflux', value=0.0)
+    opt = lmfit.minimize(resid, params)
+
+    model = ii.shift(opt.params['dx'], opt.params['dy'])*np.exp(opt.params['dlogflux'])
+    optImg = model.drawImage(method='sb', scale=0.25, nx=256, ny=256)
+
+    np.testing.assert_allclose(Zarr, optImg.array, rtol=0, atol=3e-2)
+    Zmom = galsim.hsm.FindAdaptiveMom(galsim.Image(Zarr, scale=0.25))
+    bmom = galsim.hsm.FindAdaptiveMom(optImg)
+    np.testing.assert_allclose(Zmom.observed_shape.g1, bmom.observed_shape.g1, rtol=0, atol=0.01)
+    np.testing.assert_allclose(Zmom.observed_shape.g2, bmom.observed_shape.g2, rtol=0, atol=1e-7)
+    np.testing.assert_allclose(Zmom.moments_sigma, bmom.moments_sigma, rtol=0, atol=0.1)
+
+
+@pytest.mark.skipif(not hasGalSim, reason="galsim not found")
+@timer
+def test_HSC_wf():
+    fn = os.path.join(directory, "testdata", "HSC_wavefront.txt")
+    with open(fn) as f:
+        Zwf = np.loadtxt(f, skiprows=17)
+    Zwf = Zwf[::-1]  # Need to invert, probably just a Zemax convention...
+
+    HSC_fn = os.path.join(batoid.datadir, "HSC", "HSC_no_obsc.yaml")
+    config = yaml.load(open(HSC_fn))
+    telescope = batoid.parse.parse_optic(config['opticalSystem'])
+
+    thx = np.deg2rad(0.0)
+    thy = np.deg2rad(0.75)
+    wavelength = 750e-9
+    nx = 512
+    bwf = batoid.wavefront(telescope, thx, thy, wavelength, nx=nx)
+
+    Zwf = np.ma.MaskedArray(data=Zwf, mask=Zwf==0)  # Turn Zwf into masked array
+
+    # There are unimportant differences in piston, tip, and tilt terms.  So instead of comparing
+    # the wavefront directly, we'll compare Zernike coefficients for j >= 4.
+    x = np.linspace(-1, 1, nx, endpoint=False)
+    x, y = np.meshgrid(x, x)
+    w = ~Zwf.mask  # Use the same mask for both Zemax and batoid
+    basis = galsim.zernike.zernikeBasis(37, x[w], y[w])
+    Zcoefs, _, _, _ = np.linalg.lstsq(basis.T, Zwf[w], rcond=None)
+    Bcoefs, _, _, _ = np.linalg.lstsq(basis.T, bwf.array[w], rcond=None)
+    np.testing.assert_allclose(Zcoefs[4:], Bcoefs[4:], rtol=0, atol=0.01)
+    # higher order Zernikes match even better
+    np.testing.assert_allclose(Zcoefs[11:], Bcoefs[11:], rtol=0, atol=0.01)
+
+
+@pytest.mark.skipif(not hasGalSim, reason="galsim not found")
+@timer
+def test_HSC_zernike():
+    ZZernike = [0]
+    with open(os.path.join(directory, "testdata", "HSC_Zernike.txt")) as f:
+        for i, line in enumerate(f):
+            if i > 38:
+                ZZernike.append(float(line[9:20]))
+    ZZernike = np.array(ZZernike)
+
+    HSC_fn = os.path.join(batoid.datadir, "HSC", "HSC_no_obsc.yaml")
+    config = yaml.load(open(HSC_fn))
+    telescope = batoid.parse.parse_optic(config['opticalSystem'])
+
+    thx = np.deg2rad(0.0)
+    thy = np.deg2rad(0.75)
+    wavelength = 750e-9
+    nx = 256
+
+    bZernike = batoid.zernike(telescope, thx, thy, wavelength, jmax=37, nx=nx)
+    print(bZernike - ZZernike)
+
+    # Don't care about piston, tip, or tilt.
+    np.testing.assert_allclose(ZZernike[4:], bZernike[4:], rtol=0, atol=1e-3)
+    np.testing.assert_allclose(ZZernike[11:], bZernike[11:], rtol=0, atol=2e-4)
+
+
 if __name__ == '__main__':
     test_HSC_trace()
+    test_HSC_huygenPSF()
+    test_HSC_wf()
+    test_HSC_zernike()
