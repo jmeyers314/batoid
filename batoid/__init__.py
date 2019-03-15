@@ -16,7 +16,7 @@ from ._batoid import rayGrid, circularGrid, pointSourceCircularGrid
 
 from ._batoid import SimpleCoating
 
-from .psf import huygensPSF, wavefront, fftPSF, zernike
+from .psf import huygensPSF, wavefront, fftPSF, zernike, fpPosition
 
 from .coordsys import RotX, RotY, RotZ
 

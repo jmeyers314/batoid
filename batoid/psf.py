@@ -353,3 +353,15 @@ def zernike(optic, theta_x, theta_y, wavelength, nx=32, jmax=22, eps=0.0, sphere
     coefs, _, _, _ = np.linalg.lstsq(basis.T, wfarr[w], rcond=-1)
 
     return np.array(coefs)
+
+
+def fpPosition(optic, theta_x, theta_y, wavelength, nx=32):
+    dirCos = gnomicToDirCos(theta_x, theta_y)
+    rays = batoid.rayGrid(
+        optic.dist, optic.pupilSize,
+        dirCos[0], dirCos[1], -dirCos[2],
+        nx, wavelength, 1.0, optic.inMedium
+    )
+    optic.traceInPlace(rays)
+    rays.trimVignettedInPlace()
+    return np.mean(rays.x), np.mean(rays.y)
