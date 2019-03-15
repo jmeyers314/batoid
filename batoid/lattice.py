@@ -30,6 +30,14 @@ class Lattice:
         coordinate index and the primitive lattice vectors.  E.g., in 2-dimensions,
 
         lattice.coord[i, j] == (i - N1/2) * primitiveVector[0] + (j - N2/2) * primitiveVector[1]
+
+        Note, this convention places
+            lattice.coord[0,0] = (-N1/2) * primitiveVector[0] + (-N2/2) * primitiveVector[1]
+        and
+            lattice.coord[-1,-1] = (N1/2 - 1) * primitiveVector[0] + (N2/2 - 1) * primitiveVector[1]
+        The implication is that the lattice is slightly decentered; this is to better accomodate
+        typical Fourier conventions.
+        Also note that for N/2 to be unambiguous, N should be even.
     """
     def __init__(self, array, primitiveVectors):
         primitiveVectors = np.atleast_2d(primitiveVectors)

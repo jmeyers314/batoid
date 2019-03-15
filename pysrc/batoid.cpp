@@ -57,7 +57,8 @@ namespace batoid {
         m.def("rayGrid",
              &rayGrid,
              "Make a RayVector in a grid",
-             "zdist"_a, "length"_a, "xcos"_a, "ycos"_a, "zcos"_a, "nside"_a, "wavelength"_a, "flux"_a, "medium"_a
+             "zdist"_a, "length"_a, "xcos"_a, "ycos"_a, "zcos"_a, "nside"_a, "wavelength"_a, "flux"_a, "medium"_a,
+             "lattice"_a=false
          )
          .def("circularGrid",
              &circularGrid,

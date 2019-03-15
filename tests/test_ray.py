@@ -236,12 +236,15 @@ def test_rayGrid():
     xcos = 0.1
     ycos = 0.2
     zcos = -np.sqrt(1.0 - xcos**2 - ycos**2)
-    nside = 11
+    nside = 10
     wavelength = 500e-9
     flux = 1.2
     medium = batoid.ConstMedium(1.2)
 
-    rays = batoid.rayGrid(dist, length, xcos, ycos, zcos, nside, wavelength, flux, medium)
+    rays = batoid.rayGrid(
+        dist, length, xcos, ycos, zcos, nside, wavelength, flux, medium,
+        lattice=True
+    )
     assert rays.monochromatic == True
     # Check that all rays are perpendicular to v
     ray0 = rays[0]
@@ -258,7 +261,33 @@ def test_rayGrid():
     # Check that ray that intersects at origin is initially dist away.
     # Need the ray that is in the middle in both dimensions...
     idx = np.ravel_multi_index((nside//2, nside//2), (nside, nside))
-    np.testing.assert_allclose(np.linalg.norm(rays[idx].r), dist)
+    rays.propagateInPlace(dist*1.2)
+    np.testing.assert_equal(rays[idx].r, [0,0,0])
+    # but mean position won't be the origin, since lattice implies off-center
+    assert np.linalg.norm(np.mean(rays.r, axis=0)) > 0.5
+
+    # Now try again with lattice flag set to False
+    rays = batoid.rayGrid(
+        dist, length, xcos, ycos, zcos, nside, wavelength, flux, medium,
+        lattice=False
+    )
+    # "Central" ray will not intersect origin in this case, but average of
+    # all rays should be the origin
+    idx = np.ravel_multi_index((nside//2, nside//2), (nside, nside))
+    rays.propagateInPlace(dist*1.2)
+    assert np.linalg.norm(rays[idx].r) > 0.1
+    np.testing.assert_allclose(np.linalg.norm(np.mean(rays.r, axis=0)), 0.0, rtol=0, atol=1e-14)
+
+    # If we use an odd nside, then both the central point and the mean will be the origin.
+    nside = 11
+    rays = batoid.rayGrid(
+        dist, length, xcos, ycos, zcos, nside, wavelength, flux, medium,
+        lattice=False
+    )
+    idx = np.ravel_multi_index((nside//2, nside//2), (nside, nside))
+    rays.propagateInPlace(dist*1.2)
+    np.testing.assert_allclose(rays[idx].r, [0,0,0], rtol=0, atol=1e-14)
+    np.testing.assert_allclose(np.linalg.norm(np.mean(rays.r, axis=0)), 0.0, rtol=0, atol=1e-14)
 
 
 @timer

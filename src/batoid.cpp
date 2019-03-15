@@ -16,7 +16,7 @@ namespace batoid{
     RayVector rayGrid(double dist, double length,
                       double xcos, double ycos, double zcos,
                       int nside, double wavelength, double flux,
-                      const Medium& m) {
+                      const Medium& m, bool lattice=false) {
         double n = m.getN(wavelength);
     // `dist` is the distance from the center of the pupil to the center of the rayGrid.
     // `length` is the length of one side of the rayGrid square.
@@ -33,7 +33,11 @@ namespace batoid{
         v.normalize();
         v /= n;
 
-        double dy = length/(nside-1);
+        double dy;
+        if (lattice)
+            dy = length/nside;
+        else
+            dy = length/(nside-1);
         double y0 = -length/2;
         double y = y0;
         for(int iy=0; iy<nside; iy++) {

@@ -10,7 +10,8 @@
 namespace batoid {
     RayVector rayGrid(
             double dist, double length, double xcos, double ycos, double zcos,
-            int nside, double wavelength, double flux, const Medium& m);
+            int nside, double wavelength, double flux, const Medium& m,
+            bool lattice);
     RayVector circularGrid(
             double dist, double outer, double inner,
             double xcos, double ycos, double zcos,

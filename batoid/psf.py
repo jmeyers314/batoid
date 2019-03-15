@@ -66,7 +66,8 @@ def huygensPSF(optic, theta_x=None, theta_y=None, wavelength=None, nx=None,
 
     rays = batoid.rayGrid(optic.dist, optic.pupilSize,
         dirCos[0], dirCos[1], -dirCos[2],
-        nx, wavelength=wavelength, flux=1, medium=optic.inMedium)
+        nx, wavelength=wavelength, flux=1, medium=optic.inMedium,
+        lattice=True)
 
     amplitudes = np.zeros((nxOut*pad_factor, nxOut*pad_factor), dtype=np.complex128)
     out = batoid.Lattice(np.zeros((nxOut*pad_factor, nxOut*pad_factor), dtype=float), primitiveX)
@@ -182,7 +183,6 @@ def dkdu(optic, theta_x, theta_y, wavelength, nx=16):
     """Calculate derivative of outgoing ray k-vector with respect to incoming ray
     pupil coordinate.
 
-
     Parameters
     ----------
     optic : batoid.Optic
@@ -223,7 +223,7 @@ def dkdu(optic, theta_x, theta_y, wavelength, nx=16):
     return soln[1:]
 
 
-def wavefront(optic, theta_x, theta_y, wavelength, nx=32, sphereRadius=None):
+def wavefront(optic, theta_x, theta_y, wavelength, nx=32, sphereRadius=None, lattice=False):
     """Compute wavefront.
 
     Parameters
@@ -238,6 +238,9 @@ def wavefront(optic, theta_x, theta_y, wavelength, nx=32, sphereRadius=None):
         Size of ray grid to generate to compute wavefront.  Default: 32
     sphereRadius : float, optional
         Radius of reference sphere in meters.  If None, then use optic.sphereRadius.
+    lattice : bool, optional
+        If true, then decenter the grid so it spans (-N/2, N/2+1), as appropriate
+        for Fourier transforms.
 
     Returns
     -------
@@ -249,7 +252,8 @@ def wavefront(optic, theta_x, theta_y, wavelength, nx=32, sphereRadius=None):
     rays = batoid.rayGrid(
         optic.dist, optic.pupilSize,
         dirCos[0], dirCos[1], -dirCos[2],
-        nx, wavelength, 1.0, optic.inMedium
+        nx, wavelength, 1.0, optic.inMedium,
+        lattice=lattice
     )
 
     if sphereRadius is None:
@@ -310,7 +314,7 @@ def fftPSF(optic, theta_x, theta_y, wavelength, nx=32, pad_factor=2):
     """
     L = optic.pupilSize*pad_factor
     # im_dtheta = wavelength / L
-    wf = wavefront(optic, theta_x, theta_y, wavelength, nx)
+    wf = wavefront(optic, theta_x, theta_y, wavelength, nx, lattice=True)
     wfarr = wf.array
     pad_size = nx*pad_factor
     expwf = np.zeros((pad_size, pad_size), dtype=np.complex128)
