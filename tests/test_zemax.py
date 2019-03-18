@@ -150,6 +150,10 @@ def test_HSC_wf():
     basis = galsim.zernike.zernikeBasis(37, x[w], y[w])
     Zcoefs, _, _, _ = np.linalg.lstsq(basis.T, Zwf[w], rcond=-1)
     Bcoefs, _, _, _ = np.linalg.lstsq(basis.T, bwf.array[w], rcond=-1)
+
+    for j in range(1, 38):
+        print("{:<4d} {:8.4f} {:8.4f}".format(j, Zcoefs[j], Bcoefs[j]))
+
     np.testing.assert_allclose(Zcoefs[4:], Bcoefs[4:], rtol=0, atol=0.01)
     # higher order Zernikes match even better
     np.testing.assert_allclose(Zcoefs[11:], Bcoefs[11:], rtol=0, atol=0.01)
@@ -175,7 +179,13 @@ def test_HSC_zernike():
     nx = 256
 
     bZernike = batoid.zernike(telescope, thx, thy, wavelength, jmax=37, nx=nx)
-    print(bZernike - ZZernike)
+
+
+    print()
+    print("j      Zemax    batoid")
+    print("----------------------")
+    for j in range(1, 38):
+        print("{:<4d} {:8.4f} {:8.4f}".format(j, ZZernike[j], bZernike[j]))
 
     # Don't care about piston, tip, or tilt.
     np.testing.assert_allclose(ZZernike[4:], bZernike[4:], rtol=0, atol=1e-3)
