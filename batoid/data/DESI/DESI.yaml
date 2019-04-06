@@ -1,0 +1,96 @@
+opticalSystem:
+  type: CompoundOptic
+  name: DESI
+  inMedium: air
+  medium: air
+  dist: 13.0  # distance from global vertex to use to start tracing rays
+  sphereRadius: 10.0  # reference sphere radius to use for wavefront calculation
+  pupilSize: 4.4  # Pupil fits inside a square with this side length
+  pupilObscuration: 0.167355372  # Fractional pupil central obscuration = (1.8/4.4) ** 2
+  items:
+    -
+      type: Mirror
+      name: PM
+      # We can omit coordSys here, since it defaults to be the same as the parent coordSys, which
+      # is already what we want.
+      surface:
+        type: Quadric
+        R: 21.336  # 1 / 4.68691413573E-05
+        conic: -1.09763
+      obscuration:
+        type: ClearAnnulus
+        outer: 3.799
+        inner: 1.600
+    -
+      type: CompoundOptic
+      name: Corrector
+      # Reference corrector from the C1 front face.
+      # Reference each lens from its front face.
+      coordSys:
+        z: 8.700
+      items:
+        -
+          type: Lens
+          name: C1
+          medium: silica
+          items:
+            -
+              type: RefractiveInterface
+              name: C1f
+              surface:
+                type: Sphere
+                R: 1.1847985664351173  # 1e-3 / 8.4402532914E-04
+              obscuration:
+                type: ClearCircle
+                radius: 0.555  # 1.110 / 2
+            -
+              type: RefractiveInterface
+              name: C1b
+              coordSys:
+                z: 0.136355  # 8.836355 - 8.700
+              surface:
+                type: Sphere
+                R: 0.71187
+              obscuration:
+                type: ClearCircle
+                radius: 0.543  # 1.086 / 2
+        -
+          type: Lens
+          name: C2
+          medium: silica
+          coordSys:
+            z: 0.611632  # 9.311632 - 8.700
+          items:
+            -
+              type: RefractiveInterface
+              name: C2f
+              surface:
+                type: Asphere
+                R: 12.626632299986785  # 1e-3 / 7.91976812377E-05
+                conic: 0.0
+                # [-1.73045521E-10, 1.53525682E-16, 3.67541019E-22, -9.73764148E-28] * 1e3 ** [3, 5, 7, 9]
+                coefs: [-0.17304552,  0.15352568,  0.36754102, -0.97376415]
+              obscuration:
+                type: ClearCircle
+                radius: 0.410  # 0.820 / 2
+            -
+              type: RefractiveInterface
+              name: C2b
+              coordSys:
+                z: 0.0450 # 9.356632 - 9.311632
+              surface:
+                type: Sphere
+                R: 0.6124156785349778  # 1e-3 / 1.63287785576E-03
+              obscuration:
+                type: ClearCircle
+                radius: 0.375  # 0.750 / 2
+        -
+          type: Detector
+          name: D
+          coordSys:
+            z: 2.424259  # 11.124259 - 8.700
+          surface:
+            type: Plane
+          obscuration:
+            type: ClearCircle
+            radius: 0.4165  # 0.833 / 2
