@@ -189,7 +189,8 @@ opticalSystem:
           medium: silica
           coordSys:
             # C4 front face to C1 front face
-            # ZEEMAX (C1_1 + Dummy C1_2 + C2_1 + Dummy C2_2 + ADC1_1 + Surf#22 + ADC2_1 + Surf#28 + C3_1 + Dummy C3_2) Thickness
+            # ZEEMAX (C1_1 + Dummy C1_2 + C2_1 + Dummy C2_2 + ADC1_1 + Surf#22 + ADC2_1 +
+            # Surf#28 + C3_1 + Dummy C3_2) Thickness
             z: 1.808141  # 1e-3 * (136.3546 + 475.2708 + 45 + 190 + 60 + 25 + 60 + 199.9965 + 80 + 536.5191)
           items:
             -
@@ -214,11 +215,18 @@ opticalSystem:
                 radius: 0.502  # ZEEMAX Dummy C3_2 Maximum Radius
         -
           type: Detector
-          name: D
+          name: FocalPlane
           coordSys:
-            z: 2.424259  # 11.124259 - 8.700
+            # Distance from C1 front face
+            # ZEEMAX (C1_1 + Dummy C1_2 + C2_1 + Dummy C2_2 + ADC1_1 + Surf#22 + ADC2_1 +
+            # Surf#28 + C3_1 + Dummy C3_2 + C4_1 + Surf#35) Thickness
+            z: 2.4242314  # 1e-3 * (136.3546 + 475.2708 + 45 + 190 + 60 + 25 + 60 + 199.9965 + 80 + 536.5191 + 216.8525 + 399.2379)
           surface:
-            type: Plane
+            type: Asphere
+            R: 4.977994  # ZEEMAX IMA Radius
+            conic: 0
+            # [-2.9648197e-010, 3.4523087e-015, -1.8041979e-020, 3.2570782e-026] * 1e3 ** [3, 5, 7, 9]
+            coefs: [-0.29648197, 3.4523087, -18.041979, 32.570782]
           obscuration:
             type: ClearCircle
-            radius: 0.4165  # 0.833 / 2
+            radius: 0.4165  # ZEEMAX IMA Diameter / 2
