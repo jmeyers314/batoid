@@ -96,7 +96,9 @@ opticalSystem:
         -
           type: Lens
           name: ADC1
-          medium: silica
+          # ADC lenses use Schott N-BK7 (n ~ 1.52) for chromatic correction relative to fused silica (n ~ 1.46)
+          # https://refractiveindex.info/?shelf=glass&book=BK7&page=SCHOTT
+          medium: BK7
           coordSys:
             # ADC1 front face to C1 front face
             # ZEEMAX (C1_1 + Dummy C1_2 + C2_1 + Dummy C2_2) Thickness
@@ -116,6 +118,7 @@ opticalSystem:
               name: ADC1_2
               coordSys:
                 z: 0.060  # ZEEMAX ADC1_1 thickness
+                # tilt: 0.24651502 deg about y
               surface:
                 type: Sphere
                 R: 1.37096  # ZEEMAX ADC1_2 Radius
@@ -125,7 +128,9 @@ opticalSystem:
         -
           type: Lens
           name: ADC2
-          medium: silica
+          # ADC lenses use Schott N-BK7 (n ~ 1.52) for chromatic correction relative to fused silica (n ~ 1.46)
+          # https://refractiveindex.info/?shelf=glass&book=BK7&page=SCHOTT
+          medium: BK7
           coordSys:
             # ADC2 front face to C1 front face
             # ZEEMAX (C1_1 + Dummy C1_2 + C2_1 + Dummy C2_2 + ADC1_1 + Surf#22) Thickness
@@ -134,6 +139,9 @@ opticalSystem:
             -
               type: RefractiveInterface
               name: ADC2_1
+              coordSys:
+                z: 0
+                # tilt: 0.25012287 deg about y
               surface:
                 type: Sphere
                 R: 1.392097  # ZEEMAX ADC2_1 Radius
