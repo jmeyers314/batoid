@@ -1,5 +1,7 @@
 import batoid
 
+import numpy as np
+
 
 def parse_obscuration(config):
     typ = config.pop('type')
@@ -30,6 +32,7 @@ def parse_coordSys(config, coordSys=batoid.CoordSys()):
     @param config  configuration dictionary
     @param coordSys  sys to which transformations in config are added
     """
+    shift = [0.0, 0.0, 0.0]
     if any(x in config for x in ['x', 'y', 'z']):
         if 'shift' in config:
             raise ValueError("Cannot specify both shift and x/y/z")
@@ -39,9 +42,17 @@ def parse_coordSys(config, coordSys=batoid.CoordSys()):
         shift = [x, y, z]
     elif 'shift' in config:
         shift = config.pop('shift')
-    # Leaving rotation out for the moment...
     if shift != [0.0, 0.0, 0.0]:
         coordSys = coordSys.shiftLocal(shift)
+    # At most one (nonzero) rotation can be included and is applied after the shift.
+    rotXYZ = np.deg2rad([config.pop('rot' + axis, 0.0) for axis in 'XYZ'])
+    axes = np.where(rotXYZ != 0)[0]
+    if len(axes) > 1:
+        raise ValueError('Cannot specify rotation about more than one axis.')
+    elif len(axes) == 1:
+        axis, angle = axes[0], rotXYZ[axes[0]]
+        rotator = (batoid.RotX, batoid.RotY, batoid.RotZ)[axis](angle)
+        coordSys = coordSys.rotateLocal(rotator)
     return coordSys
 
 
