@@ -11,14 +11,16 @@ opticalSystem:
   # equals ZEEMAX entrance pupil diameter
   pupilSize: 3.797
   # Fractional pupil central obscuration (is this redundant with obscuration elements below?)
-  pupilObscuration:   # (1.8/3.797) ** 2
+  pupilObscuration: 0.22473143  # (1.8/3.797) ** 2  How is this used?
   sphereRadius: 10.0  # reference sphere radius to use for wavefront calculation
   items:
     -
       type: Mirror
       name: M1
-      # We can omit coordSys here, since it defaults to be the same as the parent coordSys, which
-      # is already what we want.
+      # The mirror center defines the nominal origin.
+      coordSys:
+        # Empirical offset to get reasonable focus. Why is this necessary?
+        z: -0.04
       surface:
         type: Quadric
         R: 21.336
@@ -118,7 +120,7 @@ opticalSystem:
               name: ADC1_2
               coordSys:
                 z: 0.060  # ZEEMAX ADC1_1 thickness
-                # tilt: 0.24651502 deg about y
+                rotY: 0.24651502  # deg
               surface:
                 type: Sphere
                 R: 1.37096  # ZEEMAX ADC1_2 Radius
@@ -141,7 +143,7 @@ opticalSystem:
               name: ADC2_1
               coordSys:
                 z: 0
-                # tilt: 0.25012287 deg about y
+                rotY: 0.25012287  # deg
               surface:
                 type: Sphere
                 R: 1.392097  # ZEEMAX ADC2_1 Radius
