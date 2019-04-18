@@ -1,34 +1,40 @@
-# Based on the ECHO-22 design in DESI-0329-v18
+# Based on the ECHO-22 design in DESI-4037-v6 with the following changes:
+# - M1 diameter changed from 4.0m to 3.7973m, to match the circular edge mask diameter (149.5").
+# Notes:
+# - Corrector is shifted by -9.01mm to position of best hexapod focus based on
+#   [desi-commiss 841] https://desi.lbl.gov/trac/tracmailman/browser/private/desi-commiss/2019-April/000840.html
+# - Uses tabulated indices of refraction defined via new "desi_*" materials, based on
+#   melt data in DESI-2880-v2 https://desi.lbl.gov/DocDB/cgi-bin/private/ShowDocument?docid=2880
+
 opticalSystem:
   type: CompoundOptic
   name: DESI
-  inMedium: air
-  medium: air
+  inMedium: hsc_air
+  medium: hsc_air
   # distance from global vertex to use to start tracing rays
-  # equals ZEEMAX entrance pupil position
-  dist: 13.556
+  # equals ZEMAX entrance pupil position
+  #dist: 13.556
   # Pupil fits inside a square with this side length
-  # equals ZEEMAX entrance pupil diameter
-  pupilSize: 3.797
+  # equals ZEMAX entrance pupil diameter
+  #pupilSize: 3.797
   # Fractional pupil central obscuration (is this redundant with obscuration elements below?)
-  pupilObscuration: 0.22473143  # (1.8/3.797) ** 2  How is this used?
-  sphereRadius: 10.0  # reference sphere radius to use for wavefront calculation
+  #pupilObscuration: 0.22473143  # (1.8/3.797) ** 2  How is this used?
+  #sphereRadius: 10.0  # reference sphere radius to use for wavefront calculation
   items:
     -
       type: Mirror
       name: M1
       # The mirror center defines the nominal origin.
       coordSys:
-        # Empirical offset to get reasonable focus. Why is this necessary?
-        z: -0.04
+        z: 0.0
       surface:
         type: Quadric
-        R: 21.336
+        R: 21.318
         conic: -1.09763
       obscuration:
         type: ClearAnnulus
-        outer: 3.80173
-        inner: 1.696452
+        outer: 1.89865  # 3.7973 / 2
+        inner: 0.848226  # 1.696452 / 2
     -
       type: CompoundOptic
       name: Corrector
@@ -36,207 +42,207 @@ opticalSystem:
       # Reference each lens from its front face.
       coordSys:
         # Position of C1 front face relative to M1.
-        z: 8.700  # split into 7200 + 1500 in ZEEMAX
+        z: 8.690802  # includes -9.01mm hexapod shift to best focus
       items:
         -
           type: Lens
           name: C1
-          medium: silica
+          medium: desi_C1
           items:
             -
               type: RefractiveInterface
               name: C1_1
               surface:
                 type: Sphere
-                R: 1.184799  # ZEEMAX C1_1 Radius
+                R: 1.18499  # ZEMAX C1_1 Radius
               obscuration:
                 type: ClearCircle
-                radius: 0.555  # ZEEMAX Dummy C1_1 Maximum Radius
+                radius: 0.555  # ZEMAX Dummy C1_1 Maximum Radius
             -
               type: RefractiveInterface
               name: C1_2
               coordSys:
-                z: 0.1363546  # ZEEMAX C1_1 Thickness
+                z: 0.13659  # ZEMAX C1_1 Thickness
               surface:
                 type: Sphere
-                R: 3.29557  # ZEEMAX C1_2 Radius
+                R: 3.29697  # ZEMAX C1_2 Radius
               obscuration:
                 type: ClearCircle
-                radius: 0.543  # ZEEMAX Dummy C1_2 Maximum Radius
+                radius: 0.543  # ZEMAX Dummy C1_2 Maximum Radius
         -
           type: Lens
           name: C2
-          medium: silica
+          medium: desi_C2
           coordSys:
             # C2 front face to C1 front face
-            # ZEEMAX (C1_1 + Dummy C1_2) Thickness
-            z: 0.6116254  # 1e-3 * (136.3546 + 475.2708)
+            # ZEMAX (C1_1 + Dummy C1_2) Thickness
+            z: 0.611807
           items:
             -
               type: RefractiveInterface
               name: C2_1
               surface:
                 type: Asphere
-                R: 12.62663  # ZEEMAX C2_1 Radius
+                R: 12.61596  # ZEMAX C2_1 Radius
                 conic: 0.0
                 # [-1.73045521E-10, 1.53525682E-16, 3.67541019E-22, -9.73764148E-28] * 1e3 ** [3, 5, 7, 9]
-                coefs: [-0.17304552,  0.15352568,  0.36754102, -0.97376415]
+                coefs: [+0.17304552,  -0.15352565,  -0.36754102, +0.97376415]
               obscuration:
                 type: ClearCircle
-                radius: 0.410  # ZEEMAX Dummy C2_1 Maximum Radius
+                radius: 0.410  # ZEMAX Dummy C2_1 Maximum Radius
             -
               type: RefractiveInterface
               name: C2_2
               coordSys:
-                z: 0.045  # ZEEMAX C2_1 Thickness
+                z: 0.04472  # ZEMAX C2_1 Thickness
               surface:
                 type: Sphere
-                R: 0.6124157  # ZEEMAX C2_1 Radius
+                R: 0.612426  # ZEMAX C2_1 Radius
               obscuration:
                 type: ClearCircle
-                radius: 0.375  # ZEEMAX Dummy C2_2 Maximum Radius
+                radius: 0.375  # ZEMAX Dummy C2_2 Maximum Radius
         -
           type: Lens
           name: ADC1
           # ADC lenses use Schott N-BK7 (n ~ 1.52) for chromatic correction relative to fused silica (n ~ 1.46)
           # https://refractiveindex.info/?shelf=glass&book=BK7&page=SCHOTT
-          medium: BK7
+          medium: desi_ADC1
           coordSys:
             # ADC1 front face to C1 front face
-            # ZEEMAX (C1_1 + Dummy C1_2 + C2_1 + Dummy C2_2) Thickness
-            z: 0.8466254  # 1e-3 * (136.3546 + 475.2708 + 45 + 190)
+            # ZEMAX (C1_1 + Dummy C1_2 + C2_1 + Dummy C2_2) Thickness
+            z: 0.847401
           items:
             -
               type: RefractiveInterface
               name: ADC1_1
               surface:
                 type: Sphere
-                R: 4.589203  # ZEEMAX ADC1_1 Radius
+                R: 4.5901  # ZEMAX ADC1_1 Radius
               obscuration:
                 type: ClearCircle
-                radius: 0.375  # ZEEMAX Dummy ADC1_1 Maximum Radius
+                radius: 0.375  # ZEMAX Dummy ADC1_1 Maximum Radius
             -
               type: RefractiveInterface
               name: ADC1_2
               coordSys:
-                z: 0.060  # ZEEMAX ADC1_1 thickness
-                rotY: 0.24651502  # deg
+                z: 0.06015  # ZEMAX ADC1_1 thickness
+                rotY: -0.2465  # deg
               surface:
                 type: Sphere
-                R: 1.37096  # ZEEMAX ADC1_2 Radius
+                R: 1.371  # ZEMAX ADC1_2 Radius
               obscuration:
                 type: ClearCircle
-                radius: 0.373  # ZEEMAX Dummy ADC1_2 Maximum Radius
+                radius: 0.373  # ZEMAX Dummy ADC1_2 Maximum Radius
         -
           type: Lens
           name: ADC2
           # ADC lenses use Schott N-BK7 (n ~ 1.52) for chromatic correction relative to fused silica (n ~ 1.46)
           # https://refractiveindex.info/?shelf=glass&book=BK7&page=SCHOTT
-          medium: BK7
+          medium: desi_ADC2
           coordSys:
             # ADC2 front face to C1 front face
-            # ZEEMAX (C1_1 + Dummy C1_2 + C2_1 + Dummy C2_2 + ADC1_1 + Surf#22) Thickness
-            z: 0.9316254  # 1e-3 * (136.3546 + 475.2708 + 45 + 190 + 60 + 25)
+            # ZEMAX (C1_1 + Dummy C1_2 + C2_1 + Dummy C2_2 + ADC1_1 + Surf#22) Thickness
+            z: 0.932401
           items:
             -
               type: RefractiveInterface
               name: ADC2_1
               coordSys:
                 z: 0
-                rotY: 0.25012287  # deg
+                rotY: -0.2501  # deg
               surface:
                 type: Sphere
-                R: 1.392097  # ZEEMAX ADC2_1 Radius
+                R: 1.39212  # ZEMAX ADC2_1 Radius
               obscuration:
                 type: ClearCircle
-                radius: 0.375  # ZEEMAX Dummy ADC2_1 Maximum Radius
+                radius: 0.375  # ZEMAX Dummy ADC2_1 Maximum Radius
             -
               type: RefractiveInterface
               name: ADC2_2
               coordSys:
-                z: 0.060  # ZEEMAX ADC2_1 thickness
+                z: 0.06015  # ZEMAX ADC2_1 thickness
               surface:
                 type: Sphere
-                R: 1.049477  # ZEEMAX ADC2_2 Radius
+                R: 1.04958  # ZEMAX ADC2_2 Radius
               obscuration:
                 type: ClearCircle
-                radius: 0.375  # ZEEMAX Dummy ADC2_2 Maximum Radius
+                radius: 0.375  # ZEMAX Dummy ADC2_2 Maximum Radius
         -
           type: Lens
           name: C3
-          medium: silica
+          medium: desi_C3
           coordSys:
             # C3 front face to C1 front face
-            # ZEEMAX (C1_1 + Dummy C1_2 + C2_1 + Dummy C2_2 + ADC1_1 + Surf#22 + ADC2_1 + Surf#28) Thickness
-            z: 1.1916219  # 1e-3 * (136.3546 + 475.2708 + 45 + 190 + 60 + 25 + 60 + 199.9965)
+            # ZEMAX (C1_1 + Dummy C1_2 + C2_1 + Dummy C2_2 + ADC1_1 + Surf#22 + ADC2_1 + Surf#28) Thickness
+            z: 1.191808
           items:
             -
               type: RefractiveInterface
               name: C3_1
               surface:
                 type: Asphere
-                R: -1.340699  # ZEEMAX C3_1 Radius
+                R: -1.339997  # ZEMAX C3_1 Radius
                 conic: 0.0
                 # [1.2876124E-10, -2.4723966E-16, 4.4388319E-22, -7.3773076E-27] * 1e3 ** [3, 5, 7, 9]
-                coefs: [ 0.12876124, -0.24723966, 0.44388319, -7.3773076 ]
+                coefs: [-0.12876124, +0.24723966, -0.44388319, +7.3773076]
               obscuration:
                 type: ClearCircle
-                radius: 0.390  # ZEEMAX Dummy C3_1 Maximum Radius
+                radius: 0.390  # ZEMAX Dummy C3_1 Maximum Radius
             -
               type: RefractiveInterface
               name: C3_2
               coordSys:
-                z: 0.080  # ZEEMAX C3_1 thickness
+                z: 0.080086  # ZEMAX C3_1 thickness
               surface:
                 type: Sphere
-                R: -1.026987  # ZEEMAX C3_2 Radius
+                R: -1.026278  # ZEMAX C3_2 Radius
               obscuration:
                 type: ClearCircle
-                radius: 0.402  # ZEEMAX Dummy C3_2 Maximum Radius
+                radius: 0.402  # ZEMAX Dummy C3_2 Maximum Radius
         -
           type: Lens
           name: C4
-          medium: silica
+          medium: desi_C4
           coordSys:
             # C4 front face to C1 front face
-            # ZEEMAX (C1_1 + Dummy C1_2 + C2_1 + Dummy C2_2 + ADC1_1 + Surf#22 + ADC2_1 +
+            # ZEMAX (C1_1 + Dummy C1_2 + C2_1 + Dummy C2_2 + ADC1_1 + Surf#22 + ADC2_1 +
             # Surf#28 + C3_1 + Dummy C3_2) Thickness
-            z: 1.808141  # 1e-3 * (136.3546 + 475.2708 + 45 + 190 + 60 + 25 + 60 + 199.9965 + 80 + 536.5191)
+            z: 1.80908
           items:
             -
               type: RefractiveInterface
               name: C4_1
               surface:
                 type: Sphere
-                R: 0.9340756  # ZEEMAX C3_1 Radius
+                R: 0.9342  # ZEMAX C3_1 Radius
               obscuration:
                 type: ClearCircle
-                radius: 0.502  # ZEEMAX Dummy C3_1 Maximum Radius
+                radius: 0.502  # ZEMAX Dummy C3_1 Maximum Radius
             -
               type: RefractiveInterface
               name: C4_2
               coordSys:
-                z: 0.2168525  # ZEEMAX C4_1 thickness
+                z: 0.21692  # ZEMAX C4_1 thickness
               surface:
                 type: Sphere
-                R: -5.187212  # ZEEMAX C4_2 Radius (Surf #35)
+                R: -5.18579  # ZEMAX C4_2 Radius (Surf #35)
               obscuration:
                 type: ClearCircle
-                radius: 0.502  # ZEEMAX Dummy C3_2 Maximum Radius
+                radius: 0.502  # ZEMAX Dummy C3_2 Maximum Radius
         -
           type: Detector
           name: FocalPlane
           coordSys:
             # Distance from C1 front face
-            # ZEEMAX (C1_1 + Dummy C1_2 + C2_1 + Dummy C2_2 + ADC1_1 + Surf#22 + ADC2_1 +
+            # ZEMAX (C1_1 + Dummy C1_2 + C2_1 + Dummy C2_2 + ADC1_1 + Surf#22 + ADC2_1 +
             # Surf#28 + C3_1 + Dummy C3_2 + C4_1 + Surf#35) Thickness
-            z: 2.4242314  # 1e-3 * (136.3546 + 475.2708 + 45 + 190 + 60 + 25 + 60 + 199.9965 + 80 + 536.5191 + 216.8525 + 399.2379)
+            z: 2.425007
           surface:
             type: Asphere
-            R: 4.977994  # ZEEMAX IMA Radius
+            R: 4.977994  # ZEMAX IMA Radius
             conic: 0
             # [-2.9648197e-010, 3.4523087e-015, -1.8041979e-020, 3.2570782e-026] * 1e3 ** [3, 5, 7, 9]
-            coefs: [-0.29648197, 3.4523087, -18.041979, 32.570782]
+            coefs: [+0.29648197, -3.4523087, +18.041979, -32.570782]
           obscuration:
             type: ClearCircle
-            radius: 0.4165  # ZEEMAX IMA Diameter / 2
+            radius: 0.4165  # ZEMAX IMA Diameter / 2
