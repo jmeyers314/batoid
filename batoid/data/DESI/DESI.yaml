@@ -36,201 +36,208 @@ opticalSystem:
         inner: 0.75  # 1.5 / 2
     -
       type: CompoundOptic
-      name: Corrector
-      # Reference corrector from the C1 front face.
-      # Reference each lens from its front face.
+      name: Hexapod
+      # Locate the position of best focus relative to M1, which is currently
+      # displaeced in z by 9.01mm relative to the nominal hexapod center of
+      # action by -9.01mm.
       coordSys:
-        # Position of C1 front face relative to M1.
-        z: -8.690802  # includes -9.01mm hexapod shift to best focus
+        z: -11.115809
       items:
-        -
-          type: Lens
-          name: C1
-          medium: desi_C1
-          items:
-            -
-              type: RefractiveInterface
-              name: C1_1
-              surface:
-                type: Sphere
-                R: -1.18499
-              obscuration:
-                type: ClearCircle
-                radius: 0.555
-            -
-              type: RefractiveInterface
-              name: C1_2
-              coordSys:
-                z: -0.13659
-              surface:
-                type: Sphere
-                R: -3.29697
-              obscuration:
-                type: ClearCircle
-                radius: 0.543
-        -
-          type: Lens
-          name: C2
-          medium: desi_C2
-          coordSys:
-            # C2 front face to C1 front face
-            z: -0.611807
-          items:
-            -
-              type: RefractiveInterface
-              name: C2_1
-              surface:
-                type: Asphere
-                R: -12.61596
-                conic: 0.0
-                coefs: [-0.17304552, +0.15352565, +0.36754102, -0.97376415]
-              obscuration:
-                type: ClearCircle
-                radius: 0.410
-            -
-              type: RefractiveInterface
-              name: C2_2
-              coordSys:
-                z: -0.04472
-              surface:
-                type: Sphere
-                R: -0.612426
-              obscuration:
-                type: ClearCircle
-                radius: 0.375
-        -
-          type: Lens
-          name: ADC1
-          # ADC lenses use Schott N-BK7 (n ~ 1.52) for chromatic correction relative to fused silica (n ~ 1.46)
-          # https://refractiveindex.info/?shelf=glass&book=BK7&page=SCHOTT
-          medium: desi_ADC1
-          coordSys:
-            # ADC1 front face to C1 front face
-            z: -0.847401
-          items:
-            -
-              type: RefractiveInterface
-              name: ADC1_1
-              surface:
-                type: Sphere
-                R: -4.5901
-              obscuration:
-                type: ClearCircle
-                radius: 0.375
-            -
-              type: RefractiveInterface
-              name: ADC1_2
-              coordSys:
-                z: -0.06015
-                rotY: 0.2465  # deg
-              surface:
-                type: Sphere
-                R: -1.371
-              obscuration:
-                type: ClearCircle
-                radius: 0.373
-        -
-          type: Lens
-          name: ADC2
-          # ADC lenses use Schott N-BK7 (n ~ 1.52) for chromatic correction relative to fused silica (n ~ 1.46)
-          # https://refractiveindex.info/?shelf=glass&book=BK7&page=SCHOTT
-          medium: desi_ADC2
-          coordSys:
-            # ADC2 front face to C1 front face
-            z: -0.932401
-          items:
-            -
-              type: RefractiveInterface
-              name: ADC2_1
-              coordSys:
-                z: 0
-                rotY: 0.2501  # deg
-              surface:
-                type: Sphere
-                R: -1.39212
-              obscuration:
-                type: ClearCircle
-                radius: 0.375
-            -
-              type: RefractiveInterface
-              name: ADC2_2
-              coordSys:
-                z: -0.06015
-              surface:
-                type: Sphere
-                R: -1.04958
-              obscuration:
-                type: ClearCircle
-                radius: 0.375
-        -
-          type: Lens
-          name: C3
-          medium: desi_C3
-          coordSys:
-            # C3 front face to C1 front face
-            z: -1.191808
-          items:
-            -
-              type: RefractiveInterface
-              name: C3_1
-              surface:
-                type: Asphere
-                R: 1.339997
-                conic: 0.0
-                coefs: [+0.12876124, -0.24723966, +0.44388319, -7.3773076]
-              obscuration:
-                type: ClearCircle
-                radius: 0.390
-            -
-              type: RefractiveInterface
-              name: C3_2
-              coordSys:
-                z: -0.080086
-              surface:
-                type: Sphere
-                R: 1.026278
-              obscuration:
-                type: ClearCircle
-                radius: 0.402
-        -
-          type: Lens
-          name: C4
-          medium: desi_C4
-          coordSys:
-            # C4 front face to C1 front face
-            z: -1.80908
-          items:
-            -
-              type: RefractiveInterface
-              name: C4_1
-              surface:
-                type: Sphere
-                R: -0.9342
-              obscuration:
-                type: ClearCircle
-                radius: 0.502
-            -
-              type: RefractiveInterface
-              name: C4_2
-              coordSys:
-                z: -0.21692
-              surface:
-                type: Sphere
-                R: 5.18579
-              obscuration:
-                type: ClearCircle
-                radius: 0.502
-        -
-          type: Detector
-          name: FocalPlane
-          coordSys:
-            # Distance from C1 front face
-            z: -2.425007
-          surface:
-            type: Asphere
-            R: -4.977994
-            conic: 0
-            coefs: [-0.29648197, +3.4523087, -18.041979, +32.570782]
-          obscuration:
-            type: ClearCircle
-            radius: 0.4165
+      -
+        type: CompoundOptic
+        name: Corrector
+        coordSys:
+          # Position of C1 front face relative to the hexapod origin.
+          z: 2.425007
+        items:
+          -
+            type: Lens
+            name: C1
+            medium: desi_C1
+            items:
+              -
+                type: RefractiveInterface
+                name: C1_1
+                surface:
+                  type: Sphere
+                  R: -1.18499
+                obscuration:
+                  type: ClearCircle
+                  radius: 0.555
+              -
+                type: RefractiveInterface
+                name: C1_2
+                coordSys:
+                  z: -0.13659
+                surface:
+                  type: Sphere
+                  R: -3.29697
+                obscuration:
+                  type: ClearCircle
+                  radius: 0.543
+          -
+            type: Lens
+            name: C2
+            medium: desi_C2
+            coordSys:
+              # C2 front face to C1 front face
+              z: -0.611807
+            items:
+              -
+                type: RefractiveInterface
+                name: C2_1
+                surface:
+                  type: Asphere
+                  R: -12.61596
+                  conic: 0.0
+                  coefs: [-0.17304552, +0.15352565, +0.36754102, -0.97376415]
+                obscuration:
+                  type: ClearCircle
+                  radius: 0.410
+              -
+                type: RefractiveInterface
+                name: C2_2
+                coordSys:
+                  z: -0.04472
+                surface:
+                  type: Sphere
+                  R: -0.612426
+                obscuration:
+                  type: ClearCircle
+                  radius: 0.375
+          -
+            type: Lens
+            name: ADC1
+            # ADC lenses use Schott N-BK7 (n ~ 1.52) for chromatic correction relative to fused silica (n ~ 1.46)
+            # https://refractiveindex.info/?shelf=glass&book=BK7&page=SCHOTT
+            medium: desi_ADC1
+            coordSys:
+              # ADC1 front face to C1 front face
+              z: -0.847401
+            items:
+              -
+                type: RefractiveInterface
+                name: ADC1_1
+                surface:
+                  type: Sphere
+                  R: -4.5901
+                obscuration:
+                  type: ClearCircle
+                  radius: 0.375
+              -
+                type: RefractiveInterface
+                name: ADC1_2
+                coordSys:
+                  z: -0.06015
+                  rotY: 0.2465  # deg
+                surface:
+                  type: Sphere
+                  R: -1.371
+                obscuration:
+                  type: ClearCircle
+                  radius: 0.373
+          -
+            type: Lens
+            name: ADC2
+            # ADC lenses use Schott N-BK7 (n ~ 1.52) for chromatic correction relative to fused silica (n ~ 1.46)
+            # https://refractiveindex.info/?shelf=glass&book=BK7&page=SCHOTT
+            medium: desi_ADC2
+            coordSys:
+              # ADC2 front face to C1 front face
+              z: -0.932401
+            items:
+              -
+                type: RefractiveInterface
+                name: ADC2_1
+                coordSys:
+                  z: 0
+                  rotY: 0.2501  # deg
+                surface:
+                  type: Sphere
+                  R: -1.39212
+                obscuration:
+                  type: ClearCircle
+                  radius: 0.375
+              -
+                type: RefractiveInterface
+                name: ADC2_2
+                coordSys:
+                  z: -0.06015
+                surface:
+                  type: Sphere
+                  R: -1.04958
+                obscuration:
+                  type: ClearCircle
+                  radius: 0.375
+          -
+            type: Lens
+            name: C3
+            medium: desi_C3
+            coordSys:
+              # C3 front face to C1 front face
+              z: -1.191808
+            items:
+              -
+                type: RefractiveInterface
+                name: C3_1
+                surface:
+                  type: Asphere
+                  R: 1.339997
+                  conic: 0.0
+                  coefs: [+0.12876124, -0.24723966, +0.44388319, -7.3773076]
+                obscuration:
+                  type: ClearCircle
+                  radius: 0.390
+              -
+                type: RefractiveInterface
+                name: C3_2
+                coordSys:
+                  z: -0.080086
+                surface:
+                  type: Sphere
+                  R: 1.026278
+                obscuration:
+                  type: ClearCircle
+                  radius: 0.402
+          -
+            type: Lens
+            name: C4
+            medium: desi_C4
+            coordSys:
+              # C4 front face to C1 front face
+              z: -1.80908
+            items:
+              -
+                type: RefractiveInterface
+                name: C4_1
+                surface:
+                  type: Sphere
+                  R: -0.9342
+                obscuration:
+                  type: ClearCircle
+                  radius: 0.502
+              -
+                type: RefractiveInterface
+                name: C4_2
+                coordSys:
+                  z: -0.21692
+                surface:
+                  type: Sphere
+                  R: 5.18579
+                obscuration:
+                  type: ClearCircle
+                  radius: 0.502
+          -
+            type: Detector
+            name: FocalPlane
+            coordSys:
+              # Distance from C1 front face
+              z: -2.425007
+            surface:
+              type: Asphere
+              R: -4.977994
+              conic: 0
+              coefs: [-0.29648197, +3.4523087, -18.041979, +32.570782]
+            obscuration:
+              type: ClearCircle
+              radius: 0.4165
