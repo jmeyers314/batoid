@@ -106,69 +106,81 @@ opticalSystem:
                   type: ClearCircle
                   radius: 0.375
           -
-            type: Lens
-            name: ADC1
-            # ADC lenses use Schott N-BK7 (n ~ 1.52) for chromatic correction relative to fused silica (n ~ 1.46)
-            # https://refractiveindex.info/?shelf=glass&book=BK7&page=SCHOTT
-            medium: desi_ADC1
+            type: CompoundOptic
+            name: ADC1rotator
             coordSys:
-              # ADC1 front face to C1 front face
-              z: -0.847401
+              rotZ: 0.  # deg
             items:
-              -
-                type: RefractiveInterface
-                name: ADC1_1
-                surface:
-                  type: Sphere
-                  R: -4.5901
-                obscuration:
-                  type: ClearCircle
-                  radius: 0.375
-              -
-                type: RefractiveInterface
-                name: ADC1_2
-                coordSys:
-                  z: -0.06015
-                  rotY: 0.2465  # deg
-                surface:
-                  type: Sphere
-                  R: -1.371
-                obscuration:
-                  type: ClearCircle
-                  radius: 0.373
+            -
+              type: Lens
+              name: ADC1
+              # ADC lenses use Schott N-BK7 (n ~ 1.52) for chromatic correction relative to fused silica (n ~ 1.46)
+              # https://refractiveindex.info/?shelf=glass&book=BK7&page=SCHOTT
+              medium: desi_ADC1
+              coordSys:
+                # ADC1 front face to C1 front face
+                z: -0.847401
+              items:
+                -
+                  type: RefractiveInterface
+                  name: ADC1_1
+                  surface:
+                    type: Sphere
+                    R: -4.5901
+                  obscuration:
+                    type: ClearCircle
+                    radius: 0.375
+                -
+                  type: RefractiveInterface
+                  name: ADC1_2
+                  coordSys:
+                    z: -0.06015
+                    rotY: 0.2465  # deg
+                  surface:
+                    type: Sphere
+                    R: -1.371
+                  obscuration:
+                    type: ClearCircle
+                    radius: 0.373
           -
-            type: Lens
-            name: ADC2
-            # ADC lenses use Schott N-BK7 (n ~ 1.52) for chromatic correction relative to fused silica (n ~ 1.46)
-            # https://refractiveindex.info/?shelf=glass&book=BK7&page=SCHOTT
-            medium: desi_ADC2
+            type: CompoundOptic
+            name: ADC2rotator
             coordSys:
-              # ADC2 front face to C1 front face
-              z: -0.932401
+              rotZ: 0.  # deg
             items:
-              -
-                type: RefractiveInterface
-                name: ADC2_1
-                coordSys:
-                  z: 0
-                  rotY: 0.2501  # deg
-                surface:
-                  type: Sphere
-                  R: -1.39212
-                obscuration:
-                  type: ClearCircle
-                  radius: 0.375
-              -
-                type: RefractiveInterface
-                name: ADC2_2
-                coordSys:
-                  z: -0.06015
-                surface:
-                  type: Sphere
-                  R: -1.04958
-                obscuration:
-                  type: ClearCircle
-                  radius: 0.375
+            -
+              type: Lens
+              name: ADC2
+              # ADC lenses use Schott N-BK7 (n ~ 1.52) for chromatic correction relative to fused silica (n ~ 1.46)
+              # https://refractiveindex.info/?shelf=glass&book=BK7&page=SCHOTT
+              medium: desi_ADC2
+              coordSys:
+                # ADC2 front face to C1 front face
+                z: -0.932401
+              items:
+                -
+                  type: RefractiveInterface
+                  name: ADC2_1
+                  coordSys:
+                    z: 0
+                    rotY: 0.2501  # deg
+                  surface:
+                    type: Sphere
+                    R: -1.39212
+                  obscuration:
+                    type: ClearCircle
+                    radius: 0.375
+                -
+                  type: RefractiveInterface
+                  name: ADC2_2
+                  coordSys:
+                    z: -0.06015
+                  surface:
+                    type: Sphere
+                    R: -1.04958
+                  obscuration:
+                    type: ClearCircle
+                    radius: 0.375
           -
             type: Lens
             name: C3
