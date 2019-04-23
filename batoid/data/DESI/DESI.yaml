@@ -21,6 +21,87 @@ opticalSystem:
   sphereRadius: 10.0
   items:
     -
+      type: Baffle
+      name: TopCage
+      coordSys:
+        z: -12.4396  # FP - 1323.76mm from DESI-4110-v1
+      surface:
+        type: Plane
+      obscuration:
+        #type: ObscCircle
+        #radius: 1.0
+        type: ClearAnnulus
+        outer: 2.75
+        inner: 0.881
+    -
+      type: Baffle
+      name: OuterRingVanes
+      coordSys:
+        z: -9.73598  # FP + 1379.83 from DESI-4110-v1
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscUnion
+        items:
+          -
+            type: ClearAnnulus
+            inner: 0.881
+            outer: 2.47015
+          -
+            type: ObscRectangle
+            x: 1.21807
+            y: 1.14755
+            width: 0.0285
+            height: 1.62643
+            theta: -0.72294
+          -
+            type: ObscRectangle
+            x: -1.21807
+            y: 1.14755
+            width: 0.0285
+            height: 1.62643
+            theta: 0.72294
+          -
+            type: ObscRectangle
+            x: -1.21807
+            y: -1.14755
+            width: 0.06
+            height: 1.65793
+            theta: 2.41865
+          -
+            type: ObscRectangle
+            x: 1.21807
+            y: -1.14755
+            width: 0.0191
+            height: 1.61703
+            theta: -2.41865
+    -
+      type: Baffle
+      name: BottomCage
+      coordSys:
+        z: -8.05534  # FP + 3060.47mm from DESI-4110-v1
+      surface:
+        type: Plane
+      obscuration:
+        #type: ObscCircle
+        #radius: 1.0
+        type: ClearAnnulus
+        outer: 2.75
+        inner: 0.881
+    -
+      type: Baffle
+      name: MirrorMask
+      coordSys:
+        z: -0.323489
+      surface:
+        type: Plane
+      obscuration:
+        type: ClearCircle
+        radius: 1.89865  # 3.7973 / 2
+        #type: ObscAnnulus
+        #inner: 1.89865  # 3.7973 / 2
+        #outer: 2.5
+    -
       type: Mirror
       name: M1
       # The mirror center defines the nominal origin.
@@ -32,8 +113,8 @@ opticalSystem:
         conic: -1.09763
       obscuration:
         type: ClearAnnulus
-        outer: 1.89865  # 3.7973 / 2
-        inner: 0.75  # 1.5 / 2
+        outer: 2.0
+        inner: 0.6731
     -
       type: CompoundOptic
       name: Hexapod
