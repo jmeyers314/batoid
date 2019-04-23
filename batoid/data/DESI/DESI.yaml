@@ -49,32 +49,32 @@ opticalSystem:
             outer: 2.47015
           -
             type: ObscRectangle
-            x: 1.21807
-            y: 1.14755
+            x: 0.87333
+            y: 1.05198
             width: 0.0285
-            height: 1.62643
-            theta: -0.72294
+            height: 2.26034
+            theta: -0.89884
           -
             type: ObscRectangle
-            x: -1.21807
-            y: 1.14755
+            x: -0.87333
+            y: 1.05198
             width: 0.0285
-            height: 1.62643
-            theta: 0.72294
+            height: 2.26034
+            theta: 0.89884
           -
             type: ObscRectangle
-            x: -1.21807
-            y: -1.14755
+            x: -0.87333
+            y: -1.05198
             width: 0.06
-            height: 1.65793
-            theta: 2.41865
+            height: 2.29184
+            theta: 2.24275
           -
             type: ObscRectangle
-            x: 1.21807
-            y: -1.14755
+            x: 0.87333
+            y: -1.05198
             width: 0.0191
-            height: 1.61703
-            theta: -2.41865
+            height: 2.25094
+            theta: -2.24275
     -
       type: Baffle
       name: BottomCage
