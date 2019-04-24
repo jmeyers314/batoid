@@ -271,6 +271,16 @@ opticalSystem:
               radius: 0.37600
               type: ClearCircle
           -
+            type: Baffle
+            name: B6
+            coordSys:
+              z: 0.83825
+            surface:
+              type: Plane
+            obscuration:
+              radius: 0.37600
+              type: ClearCircle
+          -
             type: CompoundOptic
             name: ADC1rotator
             coordSys:
@@ -294,7 +304,7 @@ opticalSystem:
                     R: +4.5901
                   obscuration:
                     type: ClearCircle
-                    radius: 0.375
+                    radius: 0.400 # 0.375
                 -
                   type: RefractiveInterface
                   name: ADC1_2
@@ -306,7 +316,19 @@ opticalSystem:
                     R: +1.371
                   obscuration:
                     type: ClearCircle
-                    radius: 0.373
+                    radius: 0.388 # 0.373
+          # Move B7 in front of ADC2 and make spherical to keep model sequential.
+          -
+            type: Baffle
+            name: B7
+            coordSys:
+              z: 0.91483
+            surface:
+              R: 1.39212
+              type: Sphere
+            obscuration:
+              radius: 0.37800
+              type: ClearCircle
           -
             type: CompoundOptic
             name: ADC2rotator
@@ -334,7 +356,7 @@ opticalSystem:
                     R: +1.39212
                   obscuration:
                     type: ClearCircle
-                    radius: 0.375
+                    radius: 0.402 # 0.375
                 -
                   type: RefractiveInterface
                   name: ADC2_2
@@ -345,7 +367,17 @@ opticalSystem:
                     R: +1.04958
                   obscuration:
                     type: ClearCircle
-                    radius: 0.375
+                    radius: 0.390 # 0.375
+          -
+            type: Baffle
+            name: B8
+            coordSys:
+              z: 1.07556
+            surface:
+              type: Plane
+            obscuration:
+              radius: 0.37800
+              type: ClearCircle
           -
             type: Lens
             name: C3
