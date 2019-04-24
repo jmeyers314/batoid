@@ -1,9 +1,13 @@
 # Based on the ECHO-22 design in DESI-4037-v6, including obscurations.
 # Notes:
-# - Corrector is shifted by -9.01mm to position of best hexapod focus based on
-#   [desi-commiss 841] https://desi.lbl.gov/trac/tracmailman/browser/private/desi-commiss/2019-April/000840.html
-# - Uses tabulated indices of refraction defined via new "desi_*" materials, based on
-#   melt data in DESI-2880-v2 https://desi.lbl.gov/DocDB/cgi-bin/private/ShowDocument?docid=2880
+# - Global origin at center of primary mirror (M1), with -z pointing towards the sky.
+# - Distance from C1 front to FP front is 2425.007mm.
+# - M1 radius changed from 21336mm to 21318mm after laser survey, based on [desi-commiss 841].
+# - Corrector is shifted by -9.01mm to position of best hexapod focus with new M1 radius,
+#   resulting in M1-FP distance of 11115.809mm.
+# - Uses tabulated indices of refraction defined via new "desi_*" materials, based on melt data in DESI-2880-v2
+# - Barrel and spider bscurations from DESI-4110-v1.
+# - Corrector internal baffle blades and scrapers from DESI-4103-v1.
 
 opticalSystem:
   type: CompoundOptic
