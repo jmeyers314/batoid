@@ -32,11 +32,8 @@ opticalSystem:
       surface:
         type: Plane
       obscuration:
-        #type: ObscCircle
-        #radius: 1.0
-        type: ClearAnnulus
-        outer: 2.75
-        inner: 0.881
+        type: ObscCircle
+        radius: 0.881
     -
       type: Baffle
       name: WartFront
@@ -115,11 +112,8 @@ opticalSystem:
       surface:
         type: Plane
       obscuration:
-        #type: ObscCircle
-        #radius: 1.0
-        type: ClearAnnulus
-        outer: 2.75
-        inner: 0.881
+        type: ObscCircle
+        radius: 0.881
     -
       type: Baffle
       name: MirrorMask
