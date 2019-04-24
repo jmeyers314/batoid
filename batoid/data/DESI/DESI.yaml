@@ -24,7 +24,7 @@ opticalSystem:
       type: Baffle
       name: TopCage
       coordSys:
-        z: -12.4396  # FP - 1323.76mm from DESI-4110-v1
+        z: -12.439569  # FP - 1323.76mm from DESI-4110-v1
       surface:
         type: Plane
       obscuration:
@@ -35,9 +35,37 @@ opticalSystem:
         inner: 0.881
     -
       type: Baffle
+      name: WartFront
+      coordSys:
+        z: -11.442949 # FP - 327.14mm from DESI-4110-v1
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscRectangle
+        x: -0.09209
+        y: 0.87617
+        width: 0.3
+        height: 0.154
+        theta: 0.10472
+    -
+      type: Baffle
+      name: WartBack
+      coordSys:
+        z: -10.798149  # FP + 317.66mm from DESI-4110-v1
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscRectangle
+        x: -0.09209
+        y: 0.87617
+        width: 0.3
+        height: 0.154
+        theta: 0.10472
+    -
+      type: Baffle
       name: OuterRingVanes
       coordSys:
-        z: -9.73598  # FP + 1379.83 from DESI-4110-v1
+        z: -9.735979  # FP + 1379.83 from DESI-4110-v1
       surface:
         type: Plane
       obscuration:
@@ -49,32 +77,32 @@ opticalSystem:
             outer: 2.47015
           -
             type: ObscRectangle
-            x: 0.87333
-            y: 1.05198
+            x: 1.05198
+            y: -0.87333
             width: 0.0285
-            height: 2.26034
-            theta: -0.89884
+            height: 2.23184
+            theta: -2.46964
           -
             type: ObscRectangle
-            x: -0.87333
-            y: 1.05198
+            x: 1.05198
+            y: 0.87333
             width: 0.0285
-            height: 2.26034
-            theta: 0.89884
+            height: 2.23184
+            theta: -0.67195
           -
             type: ObscRectangle
-            x: -0.87333
-            y: -1.05198
+            x: -1.05198
+            y: 0.87333
             width: 0.06
-            height: 2.29184
-            theta: 2.24275
+            height: 2.23184
+            theta: 0.67195
           -
             type: ObscRectangle
-            x: 0.87333
-            y: -1.05198
+            x: -1.05198
+            y: -0.87333
             width: 0.0191
-            height: 2.25094
-            theta: -2.24275
+            height: 2.23184
+            theta: 2.46964
     -
       type: Baffle
       name: BottomCage
