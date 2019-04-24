@@ -1,5 +1,4 @@
-# Based on the ECHO-22 design in DESI-4037-v6 with the following changes:
-# - M1 diameter changed from 4.0m to 3.7973m, to match the circular edge mask diameter (149.5").
+# Based on the ECHO-22 design in DESI-4037-v6, including obscurations.
 # Notes:
 # - Corrector is shifted by -9.01mm to position of best hexapod focus based on
 #   [desi-commiss 841] https://desi.lbl.gov/trac/tracmailman/browser/private/desi-commiss/2019-April/000840.html
