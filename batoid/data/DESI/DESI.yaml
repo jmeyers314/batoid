@@ -15,8 +15,8 @@ opticalSystem:
   inMedium: hsc_air
   medium: hsc_air
   # distance from global vertex to use to start tracing rays
-  # Matches Surf#2 in the ZEMAX model (Surf#1 is the atmosphere).
-  dist: 12.448609
+  # Matches Surf#1 in the ZEMAX model.
+  dist: 14.448609
   # Pupil fits inside a square with this side length
   pupilSize: 4.0
   # Fractional pupil central obscuration (approximately)
