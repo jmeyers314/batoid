@@ -304,7 +304,7 @@ opticalSystem:
                     R: +4.5901
                   obscuration:
                     type: ClearCircle
-                    radius: 0.400 # 0.375
+                    radius: 0.400
                 -
                   type: RefractiveInterface
                   name: ADC1_2
@@ -316,7 +316,7 @@ opticalSystem:
                     R: +1.371
                   obscuration:
                     type: ClearCircle
-                    radius: 0.388 # 0.373
+                    radius: 0.388
           # Move B7 in front of ADC2 and make spherical to keep model sequential.
           -
             type: Baffle
@@ -356,7 +356,7 @@ opticalSystem:
                     R: +1.39212
                   obscuration:
                     type: ClearCircle
-                    radius: 0.402 # 0.375
+                    radius: 0.402
                 -
                   type: RefractiveInterface
                   name: ADC2_2
@@ -367,7 +367,7 @@ opticalSystem:
                     R: +1.04958
                   obscuration:
                     type: ClearCircle
-                    radius: 0.390 # 0.375
+                    radius: 0.390
           -
             type: Baffle
             name: B8
@@ -377,6 +377,16 @@ opticalSystem:
               type: Plane
             obscuration:
               radius: 0.37800
+              type: ClearCircle
+          -
+            type: Baffle
+            name: B9
+            coordSys:
+              z: 1.11033
+            surface:
+              type: Plane
+            obscuration:
+              radius: 0.39500
               type: ClearCircle
           -
             type: Lens
@@ -396,7 +406,7 @@ opticalSystem:
                   coefs: [-0.12876124, +0.24723966, -0.44388319, +7.3773076]
                 obscuration:
                   type: ClearCircle
-                  radius: 0.390
+                  radius: 0.417
               -
                 type: RefractiveInterface
                 name: C3_2
@@ -407,7 +417,19 @@ opticalSystem:
                   R: -1.026278
                 obscuration:
                   type: ClearCircle
-                  radius: 0.402
+                  radius: 0.417
+          # Move B10 behind C3 and make spherical to keep model sequential.
+          -
+            type: Baffle
+            name: B10
+            coordSys:
+              z: 1.27538
+            surface:
+              R: -1.02628
+              type: Sphere
+            obscuration:
+              radius: 0.40300
+              type: ClearCircle
           -
             type: Lens
             name: C4
