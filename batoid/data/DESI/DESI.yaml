@@ -431,6 +431,50 @@ opticalSystem:
               radius: 0.40300
               type: ClearCircle
           -
+            type: Baffle
+            name: B11
+            coordSys:
+              z: 1.52534
+            surface:
+              type: Plane
+            obscuration:
+              radius: 0.44880
+              type: ClearCircle
+          -
+            type: Baffle
+            name: B12
+            coordSys:
+              z: 1.56293
+            surface:
+              type: Plane
+            obscuration:
+              radius: 0.45370
+              type: ClearCircle
+          # Move B13 in front of C4 and make spherical to keep model sequential.
+          -
+            type: Baffle
+            name: B13
+            coordSys:
+              z: 1.71614
+            surface:
+              R: 0.93420
+              type: Sphere
+            obscuration:
+              radius: 0.49200
+              type: ClearCircle
+          # Move B14 in front of C4 and make spherical to keep model sequential.
+          -
+            type: Baffle
+            name: B14
+            coordSys:
+              z: 1.79546
+            surface:
+              R: 0.93420
+              type: Sphere
+            obscuration:
+              radius: 0.50100
+              type: ClearCircle
+          -
             type: Lens
             name: C4
             medium: desi_C4
@@ -446,7 +490,7 @@ opticalSystem:
                   R: +0.9342
                 obscuration:
                   type: ClearCircle
-                  radius: 0.502
+                  radius: 0.517
               -
                 type: RefractiveInterface
                 name: C4_2
@@ -457,7 +501,18 @@ opticalSystem:
                   R: -5.18579
                 obscuration:
                   type: ClearCircle
-                  radius: 0.502
+                  radius: 0.517
+          # Move B15 behind C4 and make spherical to keep model sequential.
+          - type: Baffle
+            name: B15
+            coordSys:
+              z: 2.03356
+            surface:
+              R: -5.18579
+              type: Sphere
+            obscuration:
+              radius: 0.49600
+              type: ClearCircle
           -
             type: Detector
             name: FocalPlane
