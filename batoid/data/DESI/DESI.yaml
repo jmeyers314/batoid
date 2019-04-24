@@ -1,6 +1,6 @@
 # Based on the ECHO-22 design in DESI-4037-v6, including obscurations.
 # Notes:
-# - Global origin at center of primary mirror (M1), with -z pointing towards the sky.
+# - Global origin at center of primary mirror (M1), with +z pointing towards the sky.
 # - Distance from C1 front to FP front is 2425.007mm.
 # - M1 radius changed from 21336mm to 21318mm after laser survey, based on [desi-commiss 841].
 # - Corrector is shifted by -9.01mm to position of best hexapod focus with new M1 radius,
@@ -28,7 +28,7 @@ opticalSystem:
       type: Baffle
       name: TopCage
       coordSys:
-        z: -12.439569  # FP - 1323.76mm from DESI-4110-v1
+        z: +12.439569  # FP - 1323.76mm from DESI-4110-v1
       surface:
         type: Plane
       obscuration:
@@ -41,7 +41,7 @@ opticalSystem:
       type: Baffle
       name: WartFront
       coordSys:
-        z: -11.442949 # FP - 327.14mm from DESI-4110-v1
+        z: +11.442949 # FP - 327.14mm from DESI-4110-v1
       surface:
         type: Plane
       obscuration:
@@ -55,7 +55,7 @@ opticalSystem:
       type: Baffle
       name: WartBack
       coordSys:
-        z: -10.798149  # FP + 317.66mm from DESI-4110-v1
+        z: +10.798149  # FP + 317.66mm from DESI-4110-v1
       surface:
         type: Plane
       obscuration:
@@ -69,7 +69,7 @@ opticalSystem:
       type: Baffle
       name: OuterRingVanes
       coordSys:
-        z: -9.735979  # FP + 1379.83 from DESI-4110-v1
+        z: +9.735979  # FP + 1379.83 from DESI-4110-v1
       surface:
         type: Plane
       obscuration:
@@ -111,7 +111,7 @@ opticalSystem:
       type: Baffle
       name: BottomCage
       coordSys:
-        z: -8.05534  # FP + 3060.47mm from DESI-4110-v1
+        z: +8.05534  # FP + 3060.47mm from DESI-4110-v1
       surface:
         type: Plane
       obscuration:
@@ -124,7 +124,7 @@ opticalSystem:
       type: Baffle
       name: MirrorMask
       coordSys:
-        z: -0.323489
+        z: +0.323489
       surface:
         type: Plane
       obscuration:
@@ -141,7 +141,7 @@ opticalSystem:
         z: 0.0
       surface:
         type: Quadric
-        R: -21.318
+        R: +21.318
         conic: -1.09763
       obscuration:
         type: ClearAnnulus
@@ -154,14 +154,14 @@ opticalSystem:
       # displaeced in z by 9.01mm relative to the nominal hexapod center of
       # action by -9.01mm.
       coordSys:
-        z: -11.115809
+        z: +11.115809
       items:
       -
         type: CompoundOptic
         name: Corrector
         coordSys:
           # Position of C1 front face relative to the hexapod origin.
-          z: 2.425007
+          z: -2.425007
         items:
           -
             type: Lens
@@ -173,7 +173,7 @@ opticalSystem:
                 name: C1_1
                 surface:
                   type: Sphere
-                  R: -1.18499
+                  R: +1.18499
                 obscuration:
                   type: ClearCircle
                   radius: 0.555
@@ -181,10 +181,10 @@ opticalSystem:
                 type: RefractiveInterface
                 name: C1_2
                 coordSys:
-                  z: -0.13659
+                  z: +0.13659
                 surface:
                   type: Sphere
-                  R: -3.29697
+                  R: +3.29697
                 obscuration:
                   type: ClearCircle
                   radius: 0.543
@@ -194,16 +194,16 @@ opticalSystem:
             medium: desi_C2
             coordSys:
               # C2 front face to C1 front face
-              z: -0.611807
+              z: +0.611807
             items:
               -
                 type: RefractiveInterface
                 name: C2_1
                 surface:
                   type: Asphere
-                  R: -12.61596
+                  R: +12.61596
                   conic: 0.0
-                  coefs: [-0.17304552, +0.15352565, +0.36754102, -0.97376415]
+                  coefs: [+0.17304552, -0.15352565, -0.36754102, +0.97376415]
                 obscuration:
                   type: ClearCircle
                   radius: 0.410
@@ -211,10 +211,10 @@ opticalSystem:
                 type: RefractiveInterface
                 name: C2_2
                 coordSys:
-                  z: -0.04472
+                  z: +0.04472
                 surface:
                   type: Sphere
-                  R: -0.612426
+                  R: +0.612426
                 obscuration:
                   type: ClearCircle
                   radius: 0.375
@@ -232,14 +232,14 @@ opticalSystem:
               medium: desi_ADC1
               coordSys:
                 # ADC1 front face to C1 front face
-                z: -0.847401
+                z: +0.847401
               items:
                 -
                   type: RefractiveInterface
                   name: ADC1_1
                   surface:
                     type: Sphere
-                    R: -4.5901
+                    R: +4.5901
                   obscuration:
                     type: ClearCircle
                     radius: 0.375
@@ -247,11 +247,11 @@ opticalSystem:
                   type: RefractiveInterface
                   name: ADC1_2
                   coordSys:
-                    z: -0.06015
+                    z: +0.06015
                     rotY: 0.2465  # deg
                   surface:
                     type: Sphere
-                    R: -1.371
+                    R: +1.371
                   obscuration:
                     type: ClearCircle
                     radius: 0.373
@@ -269,7 +269,7 @@ opticalSystem:
               medium: desi_ADC2
               coordSys:
                 # ADC2 front face to C1 front face
-                z: -0.932401
+                z: +0.932401
               items:
                 -
                   type: RefractiveInterface
@@ -279,7 +279,7 @@ opticalSystem:
                     rotY: 0.2501  # deg
                   surface:
                     type: Sphere
-                    R: -1.39212
+                    R: +1.39212
                   obscuration:
                     type: ClearCircle
                     radius: 0.375
@@ -287,10 +287,10 @@ opticalSystem:
                   type: RefractiveInterface
                   name: ADC2_2
                   coordSys:
-                    z: -0.06015
+                    z: +0.06015
                   surface:
                     type: Sphere
-                    R: -1.04958
+                    R: +1.04958
                   obscuration:
                     type: ClearCircle
                     radius: 0.375
@@ -300,16 +300,16 @@ opticalSystem:
             medium: desi_C3
             coordSys:
               # C3 front face to C1 front face
-              z: -1.191808
+              z: +1.191808
             items:
               -
                 type: RefractiveInterface
                 name: C3_1
                 surface:
                   type: Asphere
-                  R: 1.339997
+                  R: -1.339997
                   conic: 0.0
-                  coefs: [+0.12876124, -0.24723966, +0.44388319, -7.3773076]
+                  coefs: [-0.12876124, +0.24723966, -0.44388319, +7.3773076]
                 obscuration:
                   type: ClearCircle
                   radius: 0.390
@@ -317,10 +317,10 @@ opticalSystem:
                 type: RefractiveInterface
                 name: C3_2
                 coordSys:
-                  z: -0.080086
+                  z: +0.080086
                 surface:
                   type: Sphere
-                  R: 1.026278
+                  R: -1.026278
                 obscuration:
                   type: ClearCircle
                   radius: 0.402
@@ -330,14 +330,14 @@ opticalSystem:
             medium: desi_C4
             coordSys:
               # C4 front face to C1 front face
-              z: -1.80908
+              z: +1.80908
             items:
               -
                 type: RefractiveInterface
                 name: C4_1
                 surface:
                   type: Sphere
-                  R: -0.9342
+                  R: +0.9342
                 obscuration:
                   type: ClearCircle
                   radius: 0.502
@@ -345,10 +345,10 @@ opticalSystem:
                 type: RefractiveInterface
                 name: C4_2
                 coordSys:
-                  z: -0.21692
+                  z: +0.21692
                 surface:
                   type: Sphere
-                  R: 5.18579
+                  R: -5.18579
                 obscuration:
                   type: ClearCircle
                   radius: 0.502
@@ -357,12 +357,12 @@ opticalSystem:
             name: FocalPlane
             coordSys:
               # Distance from C1 front face
-              z: -2.425007
+              z: +2.425007
             surface:
               type: Asphere
-              R: -4.977994
+              R: +4.977994
               conic: 0
-              coefs: [-0.29648197, +3.4523087, -18.041979, +32.570782]
+              coefs: [+0.29648197, -3.4523087, +18.041979, -32.570782]
             obscuration:
               type: ClearCircle
               radius: 0.4165
