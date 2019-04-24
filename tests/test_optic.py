@@ -1,6 +1,7 @@
 import batoid
 import numpy as np
 import os
+import pytest
 from test_helpers import timer, do_pickle, all_obj_diff
 import time
 import yaml
@@ -112,6 +113,22 @@ def test_shift():
         shifted = telescope.withGloballyShiftedOptic(item, shift)
         shifted = shifted.withGloballyShiftedOptic(item, -shift)
         assert telescope == shifted
+
+
+@timer
+def test_rotXYZ_parsing():
+    np.random.seed(5)
+    fn = os.path.join(batoid.datadir, "DESI", "DESI.yaml")
+    config = yaml.safe_load(open(fn))
+    # Verify that we can parse the DESI model, which has some rotated lens surfaces.
+    telescope = batoid.parse.parse_optic(config['opticalSystem'])
+    # Verify that only a single rotation is allowed.
+    config = yaml.safe_load(open(fn))
+    coordSys = config['opticalSystem']['items'][0]['coordSys']
+    coordSys['rotX'] = 1.
+    coordSys['rotY'] = 1.
+    with pytest.raises(ValueError) as excinfo:
+        telescope = batoid.parse.parse_optic(config['opticalSystem'])
 
 
 @timer
@@ -231,6 +248,7 @@ if __name__ == '__main__':
     test_traceFull()
     test_traceReverse()
     test_shift()
+    test_rotXYZ_parsing()
     test_rotation()
     test_thread()
     test_ne()

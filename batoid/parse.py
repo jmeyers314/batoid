@@ -1,5 +1,7 @@
 import batoid
 
+import numpy as np
+
 
 def parse_obscuration(config):
     typ = config.pop('type')
@@ -30,6 +32,7 @@ def parse_coordSys(config, coordSys=batoid.CoordSys()):
     @param config  configuration dictionary
     @param coordSys  sys to which transformations in config are added
     """
+    shift = [0.0, 0.0, 0.0]
     if any(x in config for x in ['x', 'y', 'z']):
         if 'shift' in config:
             raise ValueError("Cannot specify both shift and x/y/z")
@@ -39,9 +42,17 @@ def parse_coordSys(config, coordSys=batoid.CoordSys()):
         shift = [x, y, z]
     elif 'shift' in config:
         shift = config.pop('shift')
-    # Leaving rotation out for the moment...
     if shift != [0.0, 0.0, 0.0]:
         coordSys = coordSys.shiftLocal(shift)
+    # At most one (nonzero) rotation can be included and is applied after the shift.
+    rotXYZ = np.array([config.pop('rot' + axis, 0.0) for axis in 'XYZ'])
+    axes = np.where(rotXYZ != 0)[0]
+    if len(axes) > 1:
+        raise ValueError('Cannot specify rotation about more than one axis.')
+    elif len(axes) == 1:
+        axis, angle = axes[0], rotXYZ[axes[0]]
+        rotator = (batoid.RotX, batoid.RotY, batoid.RotZ)[axis](angle)
+        coordSys = coordSys.rotateLocal(rotator)
     return coordSys
 
 
@@ -138,6 +149,8 @@ def parse_medium(value):
             return batoid.ConstMedium(1.0)
         w = [0.4, 0.6, 0.75, 0.9, 1.1]
         w = [w_*1e-6 for w_ in w]
+        w_desi = [365.015, 435.835, 486.133, 587.562, 656.273, 852.110, 1013.98]
+        w_desi = [w_*1e-9 for w_ in w_desi]
         if value == 'hsc_silica':
             return batoid.TableMedium(
                 batoid.Table(
@@ -159,6 +172,60 @@ def parse_medium(value):
                 batoid.Table(
                     w,
                     [1.57046066, 1.54784671, 1.54157395, 1.53789058, 1.53457169],
+                    batoid.Table.Interpolant.linear
+                )
+            )
+        elif value == 'desi_C1':
+            # Use melt data from DESI-2880-v2
+            return batoid.TableMedium(
+                batoid.Table(
+                    w_desi,
+                    [1.474580, 1.466730, 1.463162, 1.458499, 1.456402, 1.452500, 1.450278],
+                    batoid.Table.Interpolant.linear
+                )
+            )
+        elif value == 'desi_C2':
+            # Use melt data from DESI-2880-v2
+            return batoid.TableMedium(
+                batoid.Table(
+                    w_desi,
+                    [1.474641, 1.466791, 1.463223, 1.458561, 1.45646, 1.452563, 1.450342],
+                    batoid.Table.Interpolant.linear
+                )
+            )
+        elif value == 'desi_ADC1':
+            # Use melt data from DESI-2880-v2
+            return batoid.TableMedium(
+                batoid.Table(
+                    w_desi,
+                    [1.536945, 1.527374, 1.523070, 1.517498, 1.515022, 1.510508, 1.508023],
+                    batoid.Table.Interpolant.linear
+                )
+            )
+        elif value == 'desi_ADC2':
+            # Use melt data from DESI-2880-v2
+            return batoid.TableMedium(
+                batoid.Table(
+                    w_desi,
+                    [1.536225, 1.526635, 1.522325, 1.516746, 1.514267, 1.509743, 1.507246],
+                    batoid.Table.Interpolant.linear
+                )
+            )
+        elif value == 'desi_C3':
+            # Use generic fused silica until melt data is available.
+            return batoid.TableMedium(
+                batoid.Table(
+                    w_desi,
+                    [1.474555, 1.466701, 1.463132, 1.458467, 1.45637, 1.452469, 1.450245],
+                    batoid.Table.Interpolant.linear
+                )
+            )
+        elif value == 'desi_C4':
+            # Use generic fused silica until melt data is available.
+            return batoid.TableMedium(
+                batoid.Table(
+                    w_desi,
+                    [1.474555, 1.466701, 1.463132, 1.458467, 1.45637, 1.452469, 1.450245],
                     batoid.Table.Interpolant.linear
                 )
             )
