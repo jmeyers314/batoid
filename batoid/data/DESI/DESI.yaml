@@ -163,6 +163,18 @@ opticalSystem:
           # Position of C1 front face relative to the hexapod origin.
           z: -2.425007
         items:
+          # Move B1 in front of C1 and make spherical to keep model sequential.
+          -
+            type: Baffle
+            name: B1
+            coordSys:
+              z: -0.01793
+            surface:
+              R: 1.18499
+              type: Sphere
+            obscuration:
+              radius: 0.55880
+              type: ClearCircle
           -
             type: Lens
             name: C1
@@ -176,7 +188,7 @@ opticalSystem:
                   R: +1.18499
                 obscuration:
                   type: ClearCircle
-                  radius: 0.555
+                  radius: 0.570
               -
                 type: RefractiveInterface
                 name: C1_2
@@ -187,7 +199,17 @@ opticalSystem:
                   R: +3.29697
                 obscuration:
                   type: ClearCircle
-                  radius: 0.543
+                  radius: 0.570
+          -
+            type: Baffle
+            name: B2
+            coordSys:
+              z: 0.19472
+            surface:
+              type: Plane
+            obscuration:
+              radius: 0.54400
+              type: ClearCircle
           -
             type: Lens
             name: C2
