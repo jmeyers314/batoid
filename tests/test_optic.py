@@ -248,6 +248,7 @@ if __name__ == '__main__':
     test_traceFull()
     test_traceReverse()
     test_shift()
+    test_rotXYZ_parsing()
     test_rotation()
     test_thread()
     test_ne()
