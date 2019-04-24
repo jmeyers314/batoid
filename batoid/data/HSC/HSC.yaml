@@ -201,296 +201,304 @@ opticalSystem:
             theta: 4.829649608303971
     -
       type: CompoundOptic
-      name: HSC
+      name: HSC  # wide field corrector and camera considered together.
       coordSys:
         z: 13.4564
       # inherits medium from parent
       items:
         -
-          type: Lens
-          name: G1
-          # For a Lens, `medium` is the internal medium between the two refractive surfaces.  Note
-          # that a Lens must have exactly two surfaces.
-          medium: hsc_silica
+          type: CompoundOptic
+          name: WFC  # wide field corrector
           items:
             -
-              type: RefractiveInterface
-              name: G1_entrance
-              surface:
-                type: Sphere
-                R: 0.76
-              obscuration:
-                type: ClearCircle
-                radius: 0.41
+              type: Lens
+              name: G1
+              # For a Lens, `medium` is the internal medium between the two refractive surfaces.  Note
+              # that a Lens must have exactly two surfaces.
+              medium: hsc_silica
+              items:
+                -
+                  type: RefractiveInterface
+                  name: G1_entrance
+                  surface:
+                    type: Sphere
+                    R: 0.76
+                  obscuration:
+                    type: ClearCircle
+                    radius: 0.41
+                -
+                  type: RefractiveInterface
+                  name: G1_exit
+                  surface:
+                    type: Asphere
+                    R: 1.3755
+                    conic: 0.0
+                    coefs: [-0.14974887830730002, -0.07579068214673, -0.7705293869522001, 10.26626319251,
+                      -70.78826218129001, 255.96006178059997, -376.1551480577999]
+                  obscuration:
+                    type: ClearCircle
+                    # radius: 0.40220143728
+                    radius: 0.5707715
+                  coordSys:
+                    z: 0.09718
             -
-              type: RefractiveInterface
-              name: G1_exit
-              surface:
-                type: Asphere
-                R: 1.3755
-                conic: 0.0
-                coefs: [-0.14974887830730002, -0.07579068214673, -0.7705293869522001, 10.26626319251,
-                  -70.78826218129001, 255.96006178059997, -376.1551480577999]
-              obscuration:
-                type: ClearCircle
-                # radius: 0.40220143728
-                radius: 0.5707715
+              type: Lens
+              name: G2
+              medium: hsc_bsl7y
+              # Note that this coordSys is wrt the parent.  I.e., not wrt the global coords, and also
+              # not wrt the G1_exit coords given above, since those are at the same level in the
+              # hierarchy.
               coordSys:
-                z: 0.09718
-        -
-          type: Lens
-          name: G2
-          medium: hsc_bsl7y
-          # Note that this coordSys is wrt the parent.  I.e., not wrt the global coords, and also
-          # not wrt the G1_exit coords given above, since those are at the same level in the
-          # hierarchy.
-          coordSys:
-            z: 0.47003
-          items:
+                z: 0.47003
+              items:
+                -
+                  type: RefractiveInterface
+                  name: G2_entrance
+                  surface:
+                    type: Asphere
+                    R: -3.53
+                    conic: 0.0
+                    coefs: [0.06914718060975, 0.603728126364, -15.326231734619999, 361.8110894954,
+                      -4741.677881169, 32173.090716919996, -88598.78091629999]
+                  obscuration:
+                    type: ClearCircle
+                    # radius: 0.3075181146466
+                    radius: 0.41625255
+                -
+                  type: RefractiveInterface
+                  name: G2_exit
+                  coordSys:
+                    z: 0.046
+                  surface:
+                    type: Sphere
+                    R: 0.6562498974113357
+                  obscuration:
+                    type: ClearCircle
+                    # radius: 0.2865165285897
+                    radius: 0.3760524
             -
-              type: RefractiveInterface
-              name: G2_entrance
-              surface:
-                type: Asphere
-                R: -3.53
-                conic: 0.0
-                coefs: [0.06914718060975, 0.603728126364, -15.326231734619999, 361.8110894954,
-                  -4741.677881169, 32173.090716919996, -88598.78091629999]
-              obscuration:
-                type: ClearCircle
-                # radius: 0.3075181146466
-                radius: 0.41625255
-            -
-              type: RefractiveInterface
-              name: G2_exit
+              type: CompoundOptic
+              name: ADC
               coordSys:
-                z: 0.046
-              surface:
-                type: Sphere
-                R: 0.6562498974113357
-              obscuration:
-                type: ClearCircle
-                # radius: 0.2865165285897
-                radius: 0.3760524
+                z: 0.83403
+              items:
+              -
+                type: Lens
+                name: ADC1
+                medium: hsc_bsl7y
+                items:
+                  -
+                    type: RefractiveInterface
+                    name: ADC1_entrance
+                    surface:
+                      type: Plane
+                    obscuration:
+                      type: ClearCircle
+                      # radius: 0.282794660157
+                      radius: 0.38018925
+                  -
+                    type: RefractiveInterface
+                    name: ADC1_exit
+                    coordSys:
+                      z: 0.04
+                    surface:
+                      type: Sphere
+                      R: 1.058
+                    obscuration:
+                      type: ClearCircle
+                      # radius: 0.2820282677958
+                      radius: 0.3817199
+              -
+                type: Lens
+                name: ADC2
+                coordSys:
+                  z: 0.043
+                medium: hsc_pbl1y
+                items:
+                  -
+                    type: RefractiveInterface
+                    name: ADC2_entrance
+                    surface:
+                      type: Sphere
+                      R: 1.04
+                    obscuration:
+                      type: ClearCircle
+                      # radius: 0.2825217682803
+                      radius: 0.38282855
+                  -
+                    type: RefractiveInterface
+                    name: ADC2_exit
+                    coordSys:
+                      z: 0.082
+                    surface:
+                      type: Plane
+                    obscuration:
+                      type: ClearCircle
+                      # radius: 0.2818065578377
+                      radius: 0.38285635
+            -
+              type: Lens
+              name: G3
+              coordSys:
+                z: 1.23333
+              medium: hsc_pbl1y
+              items:
+                -
+                  type: RefractiveInterface
+                  name: G3_entrance
+                  surface:
+                    type: Asphere
+                    R: -0.840000170144847
+                    conic: 0.0
+                    coefs: [2.768476102307, -48.556420092589995, 717.6113272765999, -10763.702614520002,
+                      118744.32178099999, -798382.1197395, 2393556.961408]
+                  obscuration:
+                    type: ClearCircle
+                    # radius: 0.2758409560694
+                    radius: 0.38390185
+                -
+                  type: RefractiveInterface
+                  name: G3_exit
+                  coordSys:
+                    z: 0.04
+                  surface:
+                    type: Sphere
+                    R: 9.8
+                  obscuration:
+                    type: ClearCircle
+                    # radius: 0.2838358237172
+                    radius: 0.35778
+            -
+              type: Lens
+              name: G4
+              coordSys:
+                z: 1.36333
+              medium: hsc_bsl7y
+              items:
+                -
+                  type: RefractiveInterface
+                  name: G4_entrance
+                  surface:
+                    type: Asphere
+                    R: 0.48
+                    conic: 0.0
+                    coefs: [-4.355533915492, 36.358679149130005, -595.1267151922, 7658.839741989, -71941.20343205,
+                      394282.0924898, -954342.843455]
+                  obscuration:
+                    type: ClearCircle
+                    radius: 0.314
+                -
+                  type: RefractiveInterface
+                  name: G4_exit
+                  coordSys:
+                    z: 0.102
+                  surface:
+                    type: Sphere
+                    R: 4.021759021137413
+                  obscuration:
+                    type: ClearCircle
+                    radius: 0.314
+            -
+              type: Lens
+              name: G5
+              coordSys:
+                z: 1.56553
+              medium: hsc_silica
+              items:
+                -
+                  type: RefractiveInterface
+                  name: G5_entrance
+                  surface:
+                    type: Sphere
+                    R: 4.176748363640779
+                  obscuration:
+                    type: ClearCircle
+                    radius: 0.308
+                -
+                  type: RefractiveInterface
+                  name: G5_exit
+                  coordSys:
+                    z: 0.088
+                  surface:
+                    type: Asphere
+                    R: -1.2728222984309576
+                    conic: 0.0
+                    coefs: [-1.064687616564, 3.377750239208, -110.26471335, 2282.368582236, -27430.39658171,
+                      175577.1152898, -482194.9608578]
+                  obscuration:
+                    type: ClearCircle
+                    radius: 0.308
         -
           type: CompoundOptic
-          name: ADC
-          coordSys:
-            z: 0.83403
-          items:
-          -
-            type: Lens
-            name: ADC1
-            medium: hsc_bsl7y
-            items:
-              -
-                type: RefractiveInterface
-                name: ADC1_entrance
-                surface:
-                  type: Plane
-                obscuration:
-                  type: ClearCircle
-                  # radius: 0.282794660157
-                  radius: 0.38018925
-              -
-                type: RefractiveInterface
-                name: ADC1_exit
-                coordSys:
-                  z: 0.04
-                surface:
-                  type: Sphere
-                  R: 1.058
-                obscuration:
-                  type: ClearCircle
-                  # radius: 0.2820282677958
-                  radius: 0.3817199
-          -
-            type: Lens
-            name: ADC2
-            coordSys:
-              z: 0.043
-            medium: hsc_pbl1y
-            items:
-              -
-                type: RefractiveInterface
-                name: ADC2_entrance
-                surface:
-                  type: Sphere
-                  R: 1.04
-                obscuration:
-                  type: ClearCircle
-                  # radius: 0.2825217682803
-                  radius: 0.38282855
-              -
-                type: RefractiveInterface
-                name: ADC2_exit
-                coordSys:
-                  z: 0.082
-                surface:
-                  type: Plane
-                obscuration:
-                  type: ClearCircle
-                  # radius: 0.2818065578377
-                  radius: 0.38285635
-        -
-          type: Lens
-          name: G3
-          coordSys:
-            z: 1.23333
-          medium: hsc_pbl1y
-          items:
-            -
-              type: RefractiveInterface
-              name: G3_entrance
-              surface:
-                type: Asphere
-                R: -0.840000170144847
-                conic: 0.0
-                coefs: [2.768476102307, -48.556420092589995, 717.6113272765999, -10763.702614520002,
-                  118744.32178099999, -798382.1197395, 2393556.961408]
-              obscuration:
-                type: ClearCircle
-                # radius: 0.2758409560694
-                radius: 0.38390185
-            -
-              type: RefractiveInterface
-              name: G3_exit
-              coordSys:
-                z: 0.04
-              surface:
-                type: Sphere
-                R: 9.8
-              obscuration:
-                type: ClearCircle
-                # radius: 0.2838358237172
-                radius: 0.35778
-        -
-          type: Lens
-          name: G4
-          coordSys:
-            z: 1.36333
-          medium: hsc_bsl7y
-          items:
-            -
-              type: RefractiveInterface
-              name: G4_entrance
-              surface:
-                type: Asphere
-                R: 0.48
-                conic: 0.0
-                coefs: [-4.355533915492, 36.358679149130005, -595.1267151922, 7658.839741989, -71941.20343205,
-                  394282.0924898, -954342.843455]
-              obscuration:
-                type: ClearCircle
-                radius: 0.314
-            -
-              type: RefractiveInterface
-              name: G4_exit
-              coordSys:
-                z: 0.102
-              surface:
-                type: Sphere
-                R: 4.021759021137413
-              obscuration:
-                type: ClearCircle
-                radius: 0.314
-        -
-          type: Lens
-          name: G5
-          coordSys:
-            z: 1.56553
-          medium: hsc_silica
-          items:
-            -
-              type: RefractiveInterface
-              name: G5_entrance
-              surface:
-                type: Sphere
-                R: 4.176748363640779
-              obscuration:
-                type: ClearCircle
-                radius: 0.308
-            -
-              type: RefractiveInterface
-              name: G5_exit
-              coordSys:
-                z: 0.088
-              surface:
-                type: Asphere
-                R: -1.2728222984309576
-                conic: 0.0
-                coefs: [-1.064687616564, 3.377750239208, -110.26471335, 2282.368582236, -27430.39658171,
-                  175577.1152898, -482194.9608578]
-              obscuration:
-                type: ClearCircle
-                radius: 0.308
-        -
-          type: Lens
-          name: F
+          name: CAM  # wide field corrector
           coordSys:
             z: 1.7435712564515065
-          medium: hsc_silica
           items:
             -
-              type: RefractiveInterface
-              name: F_entrance
-              surface:
-                type: Plane
-              obscuration:
-                type: ClearCircle
-                # radius: 0.2695068874933
-                # radius: 0.309773
-                radius: 0.32
+              type: Lens
+              name: F
+              medium: hsc_silica
+              items:
+                -
+                  type: RefractiveInterface
+                  name: F_entrance
+                  surface:
+                    type: Plane
+                  obscuration:
+                    type: ClearCircle
+                    # radius: 0.2695068874933
+                    # radius: 0.309773
+                    radius: 0.32
+                -
+                  type: RefractiveInterface
+                  name: F_exit
+                  coordSys:
+                    z: 0.015
+                  surface:
+                    type: Plane
+                  obscuration:
+                    type: ClearCircle
+                    # radius: 0.2668394944827
+                    # radius: 0.306234
+                    radius: 0.32
             -
-              type: RefractiveInterface
-              name: F_exit
+              type: Lens
+              name: W
               coordSys:
-                z: 0.015
-              surface:
-                type: Plane
-              obscuration:
-                type: ClearCircle
-                # radius: 0.2668394944827
-                # radius: 0.306234
-                radius: 0.32
-        -
-          type: Lens
-          name: W
-          coordSys:
-            z: 1.7910712564515077
-          medium: hsc_silica
-          items:
+                z: 0.0475
+              medium: hsc_silica
+              items:
+                -
+                  type: RefractiveInterface
+                  name: W_entrance
+                  surface:
+                    type: Plane
+                  obscuration:
+                    type: ClearCircle
+                    # radius: 0.2582205358629
+                    # radius: 0.29475375
+                    radius: 0.32
+                -
+                  type: RefractiveInterface
+                  name: W_exit
+                  coordSys:
+                    z: 0.037
+                  surface:
+                    type: Plane
+                  obscuration:
+                    type: ClearCircle
+                    # radius: 0.2516409664366
+                    # radius: 0.28609975
+                    radius: 0.32
             -
-              type: RefractiveInterface
-              name: W_entrance
-              surface:
-                type: Plane
-              obscuration:
-                type: ClearCircle
-                # radius: 0.2582205358629
-                # radius: 0.29475375
-                radius: 0.32
-            -
-              type: RefractiveInterface
-              name: W_exit
+              type: Detector
+              name: D
               coordSys:
-                z: 0.037
+                z: 0.0995
               surface:
                 type: Plane
               obscuration:
                 type: ClearCircle
-                # radius: 0.2516409664366
-                # radius: 0.28609975
+                # radius: 0.2476837392465
+                # radius: 0.28084915
                 radius: 0.32
-        -
-          type: Detector
-          name: D
-          coordSys:
-            z: 1.843071256451509
-          surface:
-            type: Plane
-          obscuration:
-            type: ClearCircle
-            # radius: 0.2476837392465
-            # radius: 0.28084915
-            radius: 0.32
