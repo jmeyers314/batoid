@@ -304,7 +304,7 @@ opticalSystem:
                   name: ADC1_2
                   coordSys:
                     z: +0.06015
-                    rotY: 0.2465  # deg
+                    rotY: 0.00430224  # 0.2465 deg
                   surface:
                     type: Sphere
                     R: +1.371
@@ -344,7 +344,7 @@ opticalSystem:
                   name: ADC2_1
                   coordSys:
                     z: 0
-                    rotY: 0.2501  # deg
+                    rotY: 0.00436507  # 0.2501 deg
                   surface:
                     type: Sphere
                     R: +1.39212

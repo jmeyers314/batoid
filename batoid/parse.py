@@ -45,7 +45,7 @@ def parse_coordSys(config, coordSys=batoid.CoordSys()):
     if shift != [0.0, 0.0, 0.0]:
         coordSys = coordSys.shiftLocal(shift)
     # At most one (nonzero) rotation can be included and is applied after the shift.
-    rotXYZ = np.deg2rad([config.pop('rot' + axis, 0.0) for axis in 'XYZ'])
+    rotXYZ = np.array([config.pop('rot' + axis, 0.0) for axis in 'XYZ'])
     axes = np.where(rotXYZ != 0)[0]
     if len(axes) > 1:
         raise ValueError('Cannot specify rotation about more than one axis.')
