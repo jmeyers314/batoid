@@ -938,6 +938,60 @@ class Lens(CompoundOptic):
         raise RuntimeError("Error in withLocallyRotatedOptic!, Shouldn't get here!")
 
 
+def getGlobalRays(traceFull, start=None, end=None, globalSys=batoid.globalCoordSys):
+    """Calculate an array of ray vertices in global coordinates.
+
+    Parameters
+    ----------
+    traceFull : array
+        Array of per-surface ray-tracing output from traceFull()
+    start : str or None
+        Name of the first surface to include in the output, or use the first
+        surface in the model when None.
+    end : str or None
+        Name of the last surface to include in the output, or use the last
+        surface in the model when None.
+    globalSys : batoid.CoordSys
+        Global coordinate system to use.
+    
+    Returns
+    -------
+    tuple
+        Tuple (xyz, raylen) of arrays with shapes (nray, 3, nsurf + 1) and
+        (nray,).  The xyz array contains the global coordinates of each
+        ray vertex, with raylen giving the number of visible (not vignetted)
+        vertices for each ray.
+    """
+    names = [trace['name'] for trace in traceFull]
+    try:
+        start = 0 if start is None else names.index(start)
+    except ValueError:
+        raise ValueError('No such start surface "{0}".'.format(start))
+    try:
+        end = len(names) if end is None else names.index(end)
+    except ValueError:
+        raise ValueError('No such end surface "{0}".'.format(end))
+    nsurf = end - start
+    if nsurf <= 0:
+        raise ValueError('Expected start < end.')
+    nray = len(traceFull[start]['in'])
+    # Allocate an array for all ray vertices in global coords.
+    xyz = np.empty((nray, 3, nsurf + 1))
+    # First point on each ray is where it enters the start surface.
+    transform = batoid.CoordTransform(traceFull[start]['inCoordSys'], globalSys)
+    xyz[:, :, 0] = np.stack(transform.applyForward(*traceFull[start]['in'].r.T), axis=1)
+    # Keep track of the number of visible points on each ray.
+    raylen = np.ones(nray, dtype=int)
+    for i, surface in enumerate(traceFull[start:end]):
+        # Add a point for where each ray leaves this surface.
+        transform = batoid.CoordTransform(surface['outCoordSys'], globalSys)
+        xyz[:, :, i + 1] = np.stack(transform.applyForward(*surface['out'].r.T), axis=1)
+        # Keep track of rays which are still visible.
+        visible = ~surface['out'].vignetted
+        raylen[visible] += 1
+    return xyz, raylen
+
+
 def drawTrace3d(ax, traceFull, start=None, end=None, **kwargs):
     if start is None:
         start = traceFull[0]['name']
@@ -965,37 +1019,10 @@ def drawTrace3d(ax, traceFull, start=None, end=None, **kwargs):
 
 
 def drawTrace2d(ax, traceFull, start=None, end=None, **kwargs):
-    names = [trace['name'] for trace in traceFull]
-    try:
-        start = 0 if start is None else names.index(start)
-    except ValueError:
-        raise ValueError('No such start surface "{0}".'.format(start))
-    try:
-        end = len(names) if end is None else names.index(end)
-    except ValueError:
-        raise ValueError('No such end surface "{0}".'.format(end))
-    nsurf = end - start
-    if nsurf <= 0:
-        raise ValueError('Expected start < end.')
-    nray = len(traceFull[start]['in'])
-    # Allocate an array for all ray vertices in global coords.
-    xyz = np.empty((nray, 3, nsurf + 1))
-    # First point on each ray is where it enters the start surface.
-    transform = batoid.CoordTransform(traceFull[start]['inCoordSys'], globalCoordSys)
-    xyz[:, :, 0] = np.stack(transform.applyForward(*traceFull[start]['in'].r.T), axis=1)
-    # Keep track of the number of visible points on each ray.
-    raylen = np.ones(nray, dtype=int)
-    for i, surface in enumerate(traceFull[start:end]):
-        # Add a point for where each ray leaves this surface.
-        transform = batoid.CoordTransform(surface['outCoordSys'], globalCoordSys)
-        xyz[:, :, i + 1] = np.stack(transform.applyForward(*surface['out'].r.T), axis=1)
-        # Keep track of rays which are still visible.
-        visible = ~surface['out'].vignetted
-        raylen[visible] += 1
-    # Do plotting after the xyz array is filled. Packing the coords into a single
-    # plot() call is faster than calling plot() for each ray.
+    """Draw rays in global coordinates on the specified axis.
+    """
+    xyz, raylen = getGlobalRays(traceFull, start, end)
     lines = []
-    for j in range(nray):
-        #ax.plot(xyz[j, 0, :raylen[j]], xyz[j, 2, :raylen[j]], **kwargs)
-        lines.extend([xyz[j, 0, :raylen[j]], xyz[j, 2, :raylen[j]]])
+    for line, nline in zip(xyz, raylen):
+        lines.extend([line[0, :nline], line[2, :nline]])
     ax.plot(*lines, **kwargs)
