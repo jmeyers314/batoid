@@ -78,7 +78,7 @@ class Interface(Optic):
         self.obscuration = obscuration
 
         # Stealing inRadius and outRadius from self.obscuration.  These are required for the draw
-        # methods.  Only works at the moment if obscuration is a negated circle or negated annulus.
+        # methods.
         self.inRadius = 0.0
         self.outRadius = None
         if self.obscuration is not None:
@@ -88,6 +88,11 @@ class Interface(Optic):
                 elif isinstance(self.obscuration.original, batoid.ObscAnnulus):
                     self.outRadius = self.obscuration.original.outer
                     self.inRadius = self.obscuration.original.inner
+            elif isinstance(self.obscuration, batoid.ObscCircle):
+                self.outRadius = self.obscuration.radius
+            elif isinstance(self.obscuration, batoid.ObscAnnulus):
+                self.outRadius = self.obscuration.outer
+                self.inRadius = self.obscuration.inner
 
     def __hash__(self):
         return hash((self.__class__.__name__, self.surface, self.obscuration, self.name,
