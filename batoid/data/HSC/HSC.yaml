@@ -1,5 +1,6 @@
 # Note, obscurations come from private communication with Kawanomoto, Satoshi.
-# Obscurations do *not* include filter changer though.
+# These do *not* include filter exchange unit though, which instead come from
+# Josh's estimates based on published drawings of the camera.
 opticalSystem:
   type: CompoundOptic
   name: SubaruHSC
@@ -225,7 +226,7 @@ opticalSystem:
                     R: 0.76
                   obscuration:
                     type: ClearCircle
-                    radius: 0.41
+                    radius: 0.410
                 -
                   type: RefractiveInterface
                   name: G1_exit
@@ -237,8 +238,7 @@ opticalSystem:
                       -70.78826218129001, 255.96006178059997, -376.1551480577999]
                   obscuration:
                     type: ClearCircle
-                    # radius: 0.40220143728
-                    radius: 0.5707715
+                    radius: 0.410
                   coordSys:
                     z: 0.09718
             -
@@ -262,8 +262,7 @@ opticalSystem:
                       -4741.677881169, 32173.090716919996, -88598.78091629999]
                   obscuration:
                     type: ClearCircle
-                    # radius: 0.3075181146466
-                    radius: 0.41625255
+                    radius: 0.320
                 -
                   type: RefractiveInterface
                   name: G2_exit
@@ -274,8 +273,7 @@ opticalSystem:
                     R: 0.6562498974113357
                   obscuration:
                     type: ClearCircle
-                    # radius: 0.2865165285897
-                    radius: 0.3760524
+                    radius: 0.320
             -
               type: CompoundOptic
               name: ADC
@@ -294,8 +292,7 @@ opticalSystem:
                       type: Plane
                     obscuration:
                       type: ClearCircle
-                      # radius: 0.282794660157
-                      radius: 0.38018925
+                      radius: 0.310
                   -
                     type: RefractiveInterface
                     name: ADC1_exit
@@ -306,8 +303,7 @@ opticalSystem:
                       R: 1.058
                     obscuration:
                       type: ClearCircle
-                      # radius: 0.2820282677958
-                      radius: 0.3817199
+                      radius: 0.310
               -
                 type: Lens
                 name: ADC2
@@ -323,8 +319,7 @@ opticalSystem:
                       R: 1.04
                     obscuration:
                       type: ClearCircle
-                      # radius: 0.2825217682803
-                      radius: 0.38282855
+                      radius: 0.310
                   -
                     type: RefractiveInterface
                     name: ADC2_exit
@@ -334,8 +329,7 @@ opticalSystem:
                       type: Plane
                     obscuration:
                       type: ClearCircle
-                      # radius: 0.2818065578377
-                      radius: 0.38285635
+                      radius: 0.310
             -
               type: Lens
               name: G3
@@ -354,8 +348,7 @@ opticalSystem:
                       118744.32178099999, -798382.1197395, 2393556.961408]
                   obscuration:
                     type: ClearCircle
-                    # radius: 0.2758409560694
-                    radius: 0.38390185
+                    radius: 0.320
                 -
                   type: RefractiveInterface
                   name: G3_exit
@@ -366,8 +359,7 @@ opticalSystem:
                     R: 9.8
                   obscuration:
                     type: ClearCircle
-                    # radius: 0.2838358237172
-                    radius: 0.35778
+                    radius: 0.320
             -
               type: Lens
               name: G4
@@ -446,9 +438,7 @@ opticalSystem:
                     type: Plane
                   obscuration:
                     type: ClearCircle
-                    # radius: 0.2695068874933
-                    # radius: 0.309773
-                    radius: 0.32
+                    radius: 0.320
                 -
                   type: RefractiveInterface
                   name: F_exit
@@ -458,9 +448,7 @@ opticalSystem:
                     type: Plane
                   obscuration:
                     type: ClearCircle
-                    # radius: 0.2668394944827
-                    # radius: 0.306234
-                    radius: 0.32
+                    radius: 0.320
             -
               type: Lens
               name: W
@@ -475,9 +463,7 @@ opticalSystem:
                     type: Plane
                   obscuration:
                     type: ClearCircle
-                    # radius: 0.2582205358629
-                    # radius: 0.29475375
-                    radius: 0.32
+                    radius: 0.310
                 -
                   type: RefractiveInterface
                   name: W_exit
@@ -487,9 +473,7 @@ opticalSystem:
                     type: Plane
                   obscuration:
                     type: ClearCircle
-                    # radius: 0.2516409664366
-                    # radius: 0.28609975
-                    radius: 0.32
+                    radius: 0.310
             -
               type: Detector
               name: D
@@ -499,6 +483,4 @@ opticalSystem:
                 type: Plane
               obscuration:
                 type: ClearCircle
-                # radius: 0.2476837392465
-                # radius: 0.28084915
-                radius: 0.32
+                radius: 0.310
