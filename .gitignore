@@ -90,3 +90,7 @@ ENV/
 
 .clang_complete
 .pytest_cache
+
+# Temporary outputs
+*.png
+*.pdf
