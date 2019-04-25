@@ -19,13 +19,13 @@ def bilinear_fit(ux, uy, kx, ky):
     return x
 
 
-def gnomicToDirCos(u, v):
-    """Convert gnomic tangent plane projection u,v to direction cosines.
+def gnomonicToDirCos(u, v):
+    """Convert gnomonic tangent plane projection u,v to direction cosines.
 
     Parameters
     ----------
     u, v : float
-        Gnomic tangent plane coordinates in radians.
+        Gnomonic tangent plane coordinates in radians.
 
     Returns
     -------
@@ -44,8 +44,8 @@ def gnomicToDirCos(u, v):
     return alpha, beta, gamma
 
 
-def dirCosToGnomic(alpha, beta, gamma):
-    """Convert direction cosines to gnomic tangent plane projection.
+def dirCosToGnomonic(alpha, beta, gamma):
+    """Convert direction cosines to gnomonic tangent plane projection.
 
     Parameters
     ----------
@@ -55,7 +55,7 @@ def dirCosToGnomic(alpha, beta, gamma):
     Returns
     -------
     u, v : float
-        Gnomic tangent plane coordinates in radians.
+        Gnomonic tangent plane coordinates in radians.
 
     Notes
     -----
@@ -68,13 +68,64 @@ def dirCosToGnomic(alpha, beta, gamma):
     return u, v
 
 
-def gnomicToSpherical(u, v):
-    """Convert gnomic tangent plane projection u, v to spherical coordinates.
+def postelToDirCos(u, v):
+    """Convert Postel azimuthal equidistant tangent plane projection u,v to direction cosines.
 
     Parameters
     ----------
     u, v : float
-        Gnomic tangent plane coordinates in radians.
+        Postel tangent plane coordinates in radians.
+
+    Returns
+    -------
+    alpha, beta, gamma : float
+        Direction cosines (unit vector projected onto x, y, z in order)
+
+    Notes
+    -----
+    The tangent plane reference is at (u,v) = (0,0) and (alpha, beta, gamma) = (0,0,1),
+    and u.x > 0, u.y=0, v.x=0, v.y > 0.
+    """
+    rho = np.sqrt(u*u + v*v)
+    srho = np.sin(rho)
+    alpha = u/rho*srho
+    beta = v/rho*srho
+    gamma = np.cos(rho)
+    return alpha, beta, gamma
+
+
+def dirCosToPostel(alpha, beta, gamma):
+    """Convert direction cosines to Postel azimuthal equidistant tangent plane projection.
+
+    Parameters
+    ----------
+    alpha, beta, gamma : float
+        Direction cosines (unit vector projected onto x, y, z in order)
+
+    Returns
+    -------
+    u, v : float
+        Postel tangent plane coordinates in radians.
+
+    Notes
+    -----
+    The tangent plane reference is at (u,v) = (0,0) and (alpha, beta, gamma) = (0,0,1)
+    and u.x > 0, u.y=0, v.x=0, v.y > 0.
+    """
+    rho = np.arccos(gamma)
+    srho = np.sin(rho)
+    u = alpha*rho/srho
+    v = beta*rho/srho
+    return u, v
+
+
+def gnomonicToSpherical(u, v):
+    """Convert gnomonic tangent plane projection u, v to spherical coordinates.
+
+    Parameters
+    ----------
+    u, v : float
+        Gnomonic tangent plane coordinates in radians.
 
     Returns
     -------
@@ -93,8 +144,8 @@ def gnomicToSpherical(u, v):
     return phi, theta
 
 
-def sphericalToGnomic(phi, theta):
-    """Convert spherical coordiantes to gnomic tangent plane projection.
+def sphericalToGnomonic(phi, theta):
+    """Convert spherical coordiantes to gnomonic tangent plane projection.
 
     Parameters
     ----------
@@ -106,7 +157,7 @@ def sphericalToGnomic(phi, theta):
     Returns
     -------
     u, v : float
-        Gnomic tangent plane coordinates in radians.
+        Gnomonic tangent plane coordinates in radians.
 
     Notes
     -----
@@ -171,14 +222,14 @@ def sphericalToDirCos(phi, theta):
     return alpha, beta, gamma
 
 
-def dSphericalDGnomic(u, v):
-    """Compute Jacobian of transformation from gnomic tangent plane coordinates to spherical
+def dSphericalDGnomonic(u, v):
+    """Compute Jacobian of transformation from gnomonic tangent plane coordinates to spherical
     coordinates.
 
     Parameters
     ----------
     u, v : float
-        Gnomic tangent plane coordinates in radians.
+        Gnomonic tangent plane coordinates in radians.
 
     Returns
     -------
@@ -200,8 +251,8 @@ def dSphericalDGnomic(u, v):
     return np.array([[dphdu, dphdv], [sph*dthdu, sph*dthdv]])
 
 
-def dGnomicDSpherical(phi, theta):
-    """Compute Jacobian of transformation from spherical coordinates to gnomic tangent plane
+def dGnomonicDSpherical(phi, theta):
+    """Compute Jacobian of transformation from spherical coordinates to gnomonic tangent plane
     coordinates.
 
     Parameters

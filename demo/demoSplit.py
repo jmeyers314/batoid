@@ -20,7 +20,7 @@ telescope = batoid.parse.parse_optic(config['opticalSystem'])
 angles = np.linspace(0.0, 1.0, 21, endpoint=True)
 angles = [0.3]
 for angle in angles:
-    dirCos = batoid.utils.gnomicToDirCos(0.0, np.deg2rad(angle))
+    dirCos = batoid.utils.gnomonicToDirCos(0.0, np.deg2rad(angle))
 
     rays = batoid.circularGrid(
         telescope.dist,

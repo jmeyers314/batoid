@@ -278,7 +278,7 @@ def test_refraction_chromatic():
     air = batoid.Air()
 
     thx, thy = 0.001, 0.0001
-    dirCos = batoid.utils.gnomicToDirCos(thx, thy)
+    dirCos = batoid.utils.gnomonicToDirCos(thx, thy)
     rv1 = batoid.rayGrid(10.0, 1., dirCos[0], dirCos[1], -dirCos[2], 2, wavelength1, flux, silica)
     rv2 = batoid.rayGrid(10.0, 1., dirCos[0], dirCos[1], -dirCos[2], 2, wavelength2, flux, silica)
     rays = []

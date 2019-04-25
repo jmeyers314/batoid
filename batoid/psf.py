@@ -1,6 +1,6 @@
 import numpy as np
 import batoid
-from .utils import bilinear_fit, gnomicToDirCos, dirCosToGnomic
+from .utils import bilinear_fit, gnomonicToDirCos
 
 
 def huygensPSF(optic, theta_x=None, theta_y=None, wavelength=None, nx=None,
@@ -12,7 +12,7 @@ def huygensPSF(optic, theta_x=None, theta_y=None, wavelength=None, nx=None,
     optic : batoid.Optic
         Optical system
     theta_x, theta_y : float, optional
-        Field angle in radians (gnomic tangent plane projection)
+        Field angle in radians (gnomonic tangent plane projection)
     wavelength : float, optional
         Wavelength in meters
     nx : int, optional
@@ -62,7 +62,7 @@ def huygensPSF(optic, theta_x=None, theta_y=None, wavelength=None, nx=None,
     if nxOut is None:
         nxOut = nx
 
-    dirCos = gnomicToDirCos(theta_x, theta_y)
+    dirCos = gnomonicToDirCos(theta_x, theta_y)
 
     rays = batoid.rayGrid(optic.dist, optic.pupilSize,
         dirCos[0], dirCos[1], -dirCos[2],
@@ -94,7 +94,7 @@ def drdth(optic, theta_x, theta_y, wavelength, nx=16):
     optic : batoid.Optic
         Optical system
     theta_x, theta_y : float
-        Field angle in radians (gnomic tangent plane projection)
+        Field angle in radians (gnomonic tangent plane projection)
     wavelength : float
         Wavelength in meters
     nx : int, optional
@@ -116,9 +116,9 @@ def drdth(optic, theta_x, theta_y, wavelength, nx=16):
     dth = 1e-5
 
     # Make direction cosine vectors
-    nominalCos = gnomicToDirCos(theta_x, theta_y)
-    dthxCos = gnomicToDirCos(theta_x + dth, theta_y)
-    dthyCos = gnomicToDirCos(theta_x, theta_y+ dth)
+    nominalCos = gnomonicToDirCos(theta_x, theta_y)
+    dthxCos = gnomonicToDirCos(theta_x + dth, theta_y)
+    dthyCos = gnomonicToDirCos(theta_x, theta_y+ dth)
 
     # Flip the dirCos z-components so rays are headed downwards
     rays = batoid.rayGrid(optic.dist, optic.pupilSize,
@@ -158,7 +158,7 @@ def dthdr(optic, theta_x, theta_y, wavelength, nx=16):
     optic : batoid.Optic
         Optical system
     theta_x, theta_y : float
-        Field angle in radians (gnomic tangent plane projection)
+        Field angle in radians (gnomonic tangent plane projection)
     wavelength : float
         Wavelength in meters
     nx : int, optional
@@ -188,7 +188,7 @@ def dkdu(optic, theta_x, theta_y, wavelength, nx=16):
     optic : batoid.Optic
         Optical system
     theta_x, theta_y : float
-        Field angle in radians (gnomic tangent plane projection)
+        Field angle in radians (gnomonic tangent plane projection)
     wavelength : float
         Wavelength in meters
     nx : int, optional
@@ -198,9 +198,9 @@ def dkdu(optic, theta_x, theta_y, wavelength, nx=16):
     -------
     dkdu : (2, 2), ndarray
         Jacobian transformation matrix for converting between (kx, ky) of rays impacting the focal
-        plane and initial field angle (gnomic tangent plane projection).
+        plane and initial field angle (gnomonic tangent plane projection).
     """
-    dirCos = gnomicToDirCos(theta_x, theta_y)
+    dirCos = gnomonicToDirCos(theta_x, theta_y)
     rays = batoid.rayGrid(
         optic.dist, optic.pupilSize,
         dirCos[0], dirCos[1], -dirCos[2],
@@ -231,7 +231,7 @@ def wavefront(optic, theta_x, theta_y, wavelength, nx=32, sphereRadius=None, lat
     optic : batoid.Optic
         Optic for which to compute wavefront.
     theta_x, theta_y : float
-        Field of incoming rays (gnomic projection)
+        Field of incoming rays (gnomonic projection)
     wavelength : float
         Wavelength of incoming rays
     nx : int, optional
@@ -248,7 +248,7 @@ def wavefront(optic, theta_x, theta_y, wavelength, nx=32, sphereRadius=None, lat
         A batoid.Lattice object containing the wavefront values in waves and
         the primitive lattice vectors of the entrance pupil grid in meters.
     """
-    dirCos = gnomicToDirCos(theta_x, theta_y)
+    dirCos = gnomonicToDirCos(theta_x, theta_y)
     rays = batoid.rayGrid(
         optic.dist, optic.pupilSize,
         dirCos[0], dirCos[1], -dirCos[2],
@@ -298,7 +298,7 @@ def fftPSF(optic, theta_x, theta_y, wavelength, nx=32, pad_factor=2):
     optic : batoid.Optic
         Optic for which to compute wavefront.
     theta_x, theta_y : float
-        Field of incoming rays (gnomic projection)
+        Field of incoming rays (gnomonic projection)
     wavelength : float
         Wavelength of incoming rays
     nx : int, optional
@@ -333,7 +333,7 @@ def fftPSF(optic, theta_x, theta_y, wavelength, nx=32, pad_factor=2):
 def zernike(optic, theta_x, theta_y, wavelength, nx=32, jmax=22, eps=0.0, sphereRadius=None):
     import galsim
 
-    dirCos = gnomicToDirCos(theta_x, theta_y)
+    dirCos = gnomonicToDirCos(theta_x, theta_y)
     rays = batoid.rayGrid(
         optic.dist, optic.pupilSize,
         dirCos[0], dirCos[1], -dirCos[2],
@@ -360,7 +360,7 @@ def zernike(optic, theta_x, theta_y, wavelength, nx=32, jmax=22, eps=0.0, sphere
 
 
 def fpPosition(optic, theta_x, theta_y, wavelength, nx=32):
-    dirCos = gnomicToDirCos(theta_x, theta_y)
+    dirCos = gnomonicToDirCos(theta_x, theta_y)
     rays = batoid.rayGrid(
         optic.dist, optic.pupilSize,
         dirCos[0], dirCos[1], -dirCos[2],

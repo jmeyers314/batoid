@@ -19,7 +19,7 @@ def parallel_trace_timing(nside=1024, nthread=None, minChunk=None):
     print("Using minChunk of {}".format(batoid._batoid.getMinChunk()))
 
     # 0.3, 0.3 should be in bounds for current wide-field telescopes
-    dirCos = batoid.utils.gnomicToDirCos(np.deg2rad(0.3), np.deg2rad(0.3))
+    dirCos = batoid.utils.gnomonicToDirCos(np.deg2rad(0.3), np.deg2rad(0.3))
 
     if args.lsst:
         fn = os.path.join(batoid.datadir, "LSST", "LSST_i.yaml")
