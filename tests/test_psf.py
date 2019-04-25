@@ -121,7 +121,7 @@ def test_huygens_psf():
 def test_lsst_psf():
     # Just testing that doesn't crash for the moment
     fn = os.path.join(batoid.datadir, "LSST", "LSST_r.yaml")
-    config = yaml.load(open(fn))
+    config = yaml.safe_load(open(fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
 
     stampSize = 0.5 # arcsec
@@ -172,7 +172,7 @@ def test_lsst_psf():
 def test_hsc_psf():
     # Just testing that doesn't crash for the moment
     fn = os.path.join(batoid.datadir, "HSC", "HSC.yaml")
-    config = yaml.load(open(fn))
+    config = yaml.safe_load(open(fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
 
     stampSize = 0.75  # arcsec
@@ -223,7 +223,7 @@ def test_hsc_psf():
 def test_decam_psf():
     # Just testing that doesn't crash for the moment
     fn = os.path.join(batoid.datadir, "DECam", "DECam.yaml")
-    config = yaml.load(open(fn))
+    config = yaml.safe_load(open(fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
 
     stampSize = 1.0  # arcsec
