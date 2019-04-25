@@ -1,0 +1,523 @@
+# Based on the ECHO-22 design in DESI-4037-v6, including obscurations.
+# Notes:
+# - Global origin at center of primary mirror (M1), with +z pointing towards the sky.
+# - Distance from C1 front to FP front is 2425.007mm.
+# - M1 radius changed from 21336mm to 21318mm after laser survey, based on [desi-commiss 841].
+# - Corrector is shifted by -9.01mm to position of best hexapod focus with new M1 radius,
+#   resulting in M1-FP distance of 11115.809mm.
+# - Uses tabulated indices of refraction defined via new "desi_*" materials, based on melt data in DESI-2880-v2
+# - Barrel and spider bscurations from DESI-4110-v1.
+# - Corrector internal baffle blades and scrapers from DESI-4103-v1.
+
+opticalSystem:
+  type: CompoundOptic
+  name: DESI
+  inMedium: hsc_air
+  medium: hsc_air
+  # distance from global vertex to use to start tracing rays
+  # Matches Surf#1 in the ZEMAX model.
+  dist: 14.448609
+  # Pupil fits inside a square with this side length
+  pupilSize: 4.0
+  # Fractional pupil central obscuration (approximately)
+  pupilObscuration: 0.140625  # (1.5/4.0) ** 2
+  # Reference sphere radius to use for wavefront calculation
+  sphereRadius: 10.0
+  items:
+    -
+      type: Baffle
+      name: TopCage
+      coordSys:
+        z: +12.439569  # FP - 1323.76mm from DESI-4110-v1
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscCircle
+        radius: 0.881
+    -
+      type: Baffle
+      name: WartFront
+      coordSys:
+        z: +11.442949 # FP - 327.14mm from DESI-4110-v1
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscRectangle
+        x: -0.09209
+        y: 0.87617
+        width: 0.3
+        height: 0.154
+        theta: 0.10472
+    -
+      type: Baffle
+      name: WartBack
+      coordSys:
+        z: +10.798149  # FP + 317.66mm from DESI-4110-v1
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscRectangle
+        x: -0.09209
+        y: 0.87617
+        width: 0.3
+        height: 0.154
+        theta: 0.10472
+    -
+      type: Baffle
+      name: OuterRingVanes
+      coordSys:
+        z: +9.735979  # FP + 1379.83 from DESI-4110-v1
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscUnion
+        items:
+          -
+            type: ClearAnnulus
+            inner: 0.881
+            outer: 2.47015
+          -
+            type: ObscRectangle
+            x: 1.05198
+            y: -0.87333
+            width: 0.0285
+            height: 2.23184
+            theta: -2.46964
+          -
+            type: ObscRectangle
+            x: 1.05198
+            y: 0.87333
+            width: 0.0285
+            height: 2.23184
+            theta: -0.67195
+          -
+            type: ObscRectangle
+            x: -1.05198
+            y: 0.87333
+            width: 0.06
+            height: 2.23184
+            theta: 0.67195
+          -
+            type: ObscRectangle
+            x: -1.05198
+            y: -0.87333
+            width: 0.0191
+            height: 2.23184
+            theta: 2.46964
+    -
+      type: Baffle
+      name: BottomCage
+      coordSys:
+        z: +8.05534  # FP + 3060.47mm from DESI-4110-v1
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscCircle
+        radius: 0.881
+    -
+      type: Baffle
+      name: MirrorMask
+      coordSys:
+        z: +0.323489
+      surface:
+        type: Plane
+      obscuration:
+        type: ClearCircle
+        radius: 1.89865  # 3.7973 / 2
+        #type: ObscAnnulus
+        #inner: 1.89865  # 3.7973 / 2
+        #outer: 2.5
+    -
+      type: Mirror
+      name: M1
+      # The mirror center defines the nominal origin.
+      coordSys:
+        z: 0.0
+      surface:
+        type: Quadric
+        R: +21.318
+        conic: -1.09763
+      obscuration:
+        type: ClearAnnulus
+        outer: 2.0
+        inner: 0.6731
+    -
+      type: CompoundOptic
+      name: Hexapod
+      # Locate the position of best focus relative to M1, which is currently
+      # displaeced in z by 9.01mm relative to the nominal hexapod center of
+      # action by -9.01mm.
+      coordSys:
+        z: +11.115809
+      items:
+      -
+        type: CompoundOptic
+        name: Corrector
+        coordSys:
+          # Position of C1 front face relative to the hexapod origin.
+          z: -2.425007
+        items:
+          # Move B1 in front of C1 and make spherical to keep model sequential.
+          -
+            type: Baffle
+            name: B1
+            coordSys:
+              z: -0.01793
+            surface:
+              R: 1.18499
+              type: Sphere
+            obscuration:
+              radius: 0.55880
+              type: ClearCircle
+          -
+            type: Lens
+            name: C1
+            medium: desi_C1
+            items:
+              -
+                type: RefractiveInterface
+                name: C1_1
+                surface:
+                  type: Sphere
+                  R: +1.18499
+                obscuration:
+                  type: ClearCircle
+                  radius: 0.570
+              -
+                type: RefractiveInterface
+                name: C1_2
+                coordSys:
+                  z: +0.13659
+                surface:
+                  type: Sphere
+                  R: +3.29697
+                obscuration:
+                  type: ClearCircle
+                  radius: 0.558
+          -
+            type: Baffle
+            name: B2
+            coordSys:
+              z: 0.19472
+            surface:
+              type: Plane
+            obscuration:
+              radius: 0.54400
+              type: ClearCircle
+          -
+            type: Baffle
+            name: B3
+            coordSys:
+              z: 0.50815
+            surface:
+              type: Plane
+            obscuration:
+              radius: 0.44775
+              type: ClearCircle
+          -
+            type: Baffle
+            name: B4
+            coordSys:
+              z: 0.60144
+            surface:
+              type: Plane
+            obscuration:
+              radius: 0.41700
+              type: ClearCircle
+          -
+            type: Lens
+            name: C2
+            medium: desi_C2
+            coordSys:
+              # C2 front face to C1 front face
+              z: +0.611807
+            items:
+              -
+                type: RefractiveInterface
+                name: C2_1
+                surface:
+                  type: Asphere
+                  R: +12.61596
+                  conic: 0.0
+                  coefs: [+0.17304552, -0.15352565, -0.36754102, +0.97376415]
+                obscuration:
+                  type: ClearCircle
+                  radius: 0.425
+              -
+                type: RefractiveInterface
+                name: C2_2
+                coordSys:
+                  z: +0.04472
+                surface:
+                  type: Sphere
+                  R: +0.612426
+                obscuration:
+                  type: ClearCircle
+                  radius: 0.390
+          -
+            type: Baffle
+            name: B5
+            coordSys:
+              z: 0.80764
+            surface:
+              type: Plane
+            obscuration:
+              radius: 0.37600
+              type: ClearCircle
+          -
+            type: Baffle
+            name: B6
+            coordSys:
+              z: 0.83825
+            surface:
+              type: Plane
+            obscuration:
+              radius: 0.37600
+              type: ClearCircle
+          -
+            type: CompoundOptic
+            name: ADC1rotator
+            coordSys:
+              rotZ: 0.  # deg
+            items:
+            -
+              type: Lens
+              name: ADC1
+              # ADC lenses use Schott N-BK7 (n ~ 1.52) for chromatic correction relative to fused silica (n ~ 1.46)
+              # https://refractiveindex.info/?shelf=glass&book=BK7&page=SCHOTT
+              medium: desi_ADC1
+              coordSys:
+                # ADC1 front face to C1 front face
+                z: +0.847401
+              items:
+                -
+                  type: RefractiveInterface
+                  name: ADC1_1
+                  surface:
+                    type: Sphere
+                    R: +4.5901
+                  obscuration:
+                    type: ClearCircle
+                    radius: 0.400
+                -
+                  type: RefractiveInterface
+                  name: ADC1_2
+                  coordSys:
+                    z: +0.06015
+                    rotY: 0.00430224  # 0.2465 deg
+                  surface:
+                    type: Sphere
+                    R: +1.371
+                  obscuration:
+                    type: ClearCircle
+                    radius: 0.388
+          # Move B7 in front of ADC2 and make spherical to keep model sequential.
+          -
+            type: Baffle
+            name: B7
+            coordSys:
+              z: 0.91483
+            surface:
+              R: 1.39212
+              type: Sphere
+            obscuration:
+              radius: 0.37800
+              type: ClearCircle
+          -
+            type: CompoundOptic
+            name: ADC2rotator
+            coordSys:
+              rotZ: 0.  # deg
+            items:
+            -
+              type: Lens
+              name: ADC2
+              # ADC lenses use Schott N-BK7 (n ~ 1.52) for chromatic correction relative to fused silica (n ~ 1.46)
+              # https://refractiveindex.info/?shelf=glass&book=BK7&page=SCHOTT
+              medium: desi_ADC2
+              coordSys:
+                # ADC2 front face to C1 front face
+                z: +0.932401
+              items:
+                -
+                  type: RefractiveInterface
+                  name: ADC2_1
+                  coordSys:
+                    z: 0
+                    rotY: 0.00436507  # 0.2501 deg
+                  surface:
+                    type: Sphere
+                    R: +1.39212
+                  obscuration:
+                    type: ClearCircle
+                    radius: 0.402
+                -
+                  type: RefractiveInterface
+                  name: ADC2_2
+                  coordSys:
+                    z: +0.06015
+                  surface:
+                    type: Sphere
+                    R: +1.04958
+                  obscuration:
+                    type: ClearCircle
+                    radius: 0.390
+          -
+            type: Baffle
+            name: B8
+            coordSys:
+              z: 1.07556
+            surface:
+              type: Plane
+            obscuration:
+              radius: 0.37800
+              type: ClearCircle
+          -
+            type: Baffle
+            name: B9
+            coordSys:
+              z: 1.11033
+            surface:
+              type: Plane
+            obscuration:
+              radius: 0.39500
+              type: ClearCircle
+          -
+            type: Lens
+            name: C3
+            medium: desi_C3
+            coordSys:
+              # C3 front face to C1 front face
+              z: +1.191808
+            items:
+              -
+                type: RefractiveInterface
+                name: C3_1
+                surface:
+                  type: Asphere
+                  R: -1.339997
+                  conic: 0.0
+                  coefs: [-0.12876124, +0.24723966, -0.44388319, +7.3773076]
+                obscuration:
+                  type: ClearCircle
+                  radius: 0.417
+              -
+                type: RefractiveInterface
+                name: C3_2
+                coordSys:
+                  z: +0.080086
+                surface:
+                  type: Sphere
+                  R: -1.026278
+                obscuration:
+                  type: ClearCircle
+                  radius: 0.417
+          # Move B10 behind C3 and make spherical to keep model sequential.
+          -
+            type: Baffle
+            name: B10
+            coordSys:
+              z: 1.27538
+            surface:
+              R: -1.02628
+              type: Sphere
+            obscuration:
+              radius: 0.40300
+              type: ClearCircle
+          -
+            type: Baffle
+            name: B11
+            coordSys:
+              z: 1.52534
+            surface:
+              type: Plane
+            obscuration:
+              radius: 0.44880
+              type: ClearCircle
+          -
+            type: Baffle
+            name: B12
+            coordSys:
+              z: 1.56293
+            surface:
+              type: Plane
+            obscuration:
+              radius: 0.45370
+              type: ClearCircle
+          # Move B13 in front of C4 and make spherical to keep model sequential.
+          -
+            type: Baffle
+            name: B13
+            coordSys:
+              z: 1.71614
+            surface:
+              R: 0.93420
+              type: Sphere
+            obscuration:
+              radius: 0.49200
+              type: ClearCircle
+          # Move B14 in front of C4 and make spherical to keep model sequential.
+          -
+            type: Baffle
+            name: B14
+            coordSys:
+              z: 1.79546
+            surface:
+              R: 0.93420
+              type: Sphere
+            obscuration:
+              radius: 0.50100
+              type: ClearCircle
+          -
+            type: Lens
+            name: C4
+            medium: desi_C4
+            coordSys:
+              # C4 front face to C1 front face
+              z: +1.80908
+            items:
+              -
+                type: RefractiveInterface
+                name: C4_1
+                surface:
+                  type: Sphere
+                  R: +0.9342
+                obscuration:
+                  type: ClearCircle
+                  radius: 0.517
+              -
+                type: RefractiveInterface
+                name: C4_2
+                coordSys:
+                  z: +0.21692
+                surface:
+                  type: Sphere
+                  R: -5.18579
+                obscuration:
+                  type: ClearCircle
+                  radius: 0.517
+          # Move B15 behind C4 and make spherical to keep model sequential.
+          - type: Baffle
+            name: B15
+            coordSys:
+              z: 2.03356
+            surface:
+              R: -5.18579
+              type: Sphere
+            obscuration:
+              radius: 0.49600
+              type: ClearCircle
+          -
+            type: Detector
+            name: FocalPlane
+            coordSys:
+              # Distance from C1 front face
+              z: +2.425007
+            surface:
+              type: Asphere
+              R: +4.977994
+              conic: 0
+              coefs: [+0.29648197, -3.4523087, +18.041979, -32.570782]
+            obscuration:
+              type: ClearCircle
+              radius: 0.4165

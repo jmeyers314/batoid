@@ -40,6 +40,7 @@ notebooks = [
     "HSC 3D.ipynb",
     "HSC perturbations.ipynb",
     "HSC trace.ipynb",
+    "DESI trace.ipynb",
     "LSST donuts.ipynb",
     "LSST perturbations.ipynb",
     "LSST trace.ipynb",
