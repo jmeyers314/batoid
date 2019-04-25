@@ -696,8 +696,13 @@ class CompoundOptic(Optic):
             item.draw3d(ax, **kwargs)
 
     def draw2d(self, ax, **kwargs):
+        only = kwargs.pop('only', None)
         for item in self.items:
-            item.draw2d(ax, **kwargs)
+            item_class = item.__class__
+            if issubclass(item_class, batoid.optic.CompoundOptic):
+                item.draw2d(ax, only=only, **kwargs)
+            elif only is None or issubclass(item_class, only):
+                item.draw2d(ax, **kwargs)
 
     def __eq__(self, other):
         if not self.__class__ == other.__class__:
