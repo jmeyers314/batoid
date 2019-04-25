@@ -54,7 +54,7 @@ def do_pickle(obj, reprable=True):
 
     assert obj == obj2, "{} != {}".format(obj, obj2)
 
-    from collections import Hashable
+    from collections.abc import Hashable
     if isinstance(obj, Hashable):
         assert hash(obj) == hash(obj2)
 
@@ -93,7 +93,7 @@ def all_obj_diff(objs):
     """ Helper function that verifies that each element in `objs` is unique and, if hashable,
     produces a unique hash."""
 
-    from collections import Hashable
+    from collections.abc import Hashable
     # Check that all objects are unique.
     # Would like to use `assert len(objs) == len(set(objs))` here, but this requires that the
     # elements of objs are hashable (and that they have unique hashes!, which is what we're trying
@@ -116,7 +116,7 @@ def all_obj_diff(objs):
     except AssertionError as e:
         try:
             # Only valid in 2.7, but only needed if we have an error to provide more information.
-            from collections import Counter
+            from collections.abc import Counter
         except ImportError:
             raise e
         for k, v in Counter(hashes).items():
