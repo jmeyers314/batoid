@@ -938,7 +938,7 @@ class Lens(CompoundOptic):
         raise RuntimeError("Error in withLocallyRotatedOptic!, Shouldn't get here!")
 
 
-def getGlobalRays(traceFull, start=None, end=None, globalSys=batoid.globalCoordSys):
+def getGlobalRays(traceFull, start=None, end=None, globalSys=globalCoordSys):
     """Calculate an array of ray vertices in global coordinates.
 
     Parameters
@@ -993,33 +993,16 @@ def getGlobalRays(traceFull, start=None, end=None, globalSys=batoid.globalCoordS
 
 
 def drawTrace3d(ax, traceFull, start=None, end=None, **kwargs):
-    if start is None:
-        start = traceFull[0]['name']
-    if end is None:
-        end = traceFull[-1]['name']
-    doPlot = False
-    for surface in traceFull:
-        if surface['name'] == start:
-            doPlot = True
-        if doPlot:
-            inTransform = batoid.CoordTransform(surface['inCoordSys'], globalCoordSys)
-            outTransform = batoid.CoordTransform(surface['outCoordSys'], globalCoordSys)
-            for inray, outray in zip(surface['in'], surface['out']):
-                if not outray.vignetted:
-                    inray = inTransform.applyForward(inray)
-                    outray = outTransform.applyForward(outray)
-                    ax.plot(
-                        [inray.x, outray.x],
-                        [inray.y, outray.y],
-                        [inray.z, outray.z],
-                        **kwargs
-                    )
-        if surface['name'] == end:
-            break
+    """Draw 3D rays in global coordinates on the specified axis.
+    """
+    xyz, raylen = getGlobalRays(traceFull, start, end)
+    lines = []
+    for line, nline in zip(xyz, raylen):
+        ax.plot(line[0, :nline], line[1, :nline], line[2, :nline], **kwargs)
 
 
 def drawTrace2d(ax, traceFull, start=None, end=None, **kwargs):
-    """Draw rays in global coordinates on the specified axis.
+    """Draw 2D rays in global coordinates on the specified axis.
     """
     xyz, raylen = getGlobalRays(traceFull, start, end)
     lines = []
