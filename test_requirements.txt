@@ -1,7 +1,7 @@
 pytest>=4.4
-pytest-xdist>=1.19
 pytest-timeout
 pytest-cov
+pytest-xdist>=1.19
 jupyter
 jupyter_contrib_nbextensions
 notebook
