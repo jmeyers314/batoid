@@ -159,12 +159,38 @@ class Interface(Optic):
         x, y, z = transform.applyForward(x, y, z)
         ax.plot(x, y, z, **kwargs)
 
-    def getXZSlice(self):
+    def getXZSlice(self, nslice=0):
+        """Calculate global coordinates for an (x,z) slice through this interface.
+
+        The calculation is split into two half slices: xlocal <= 0 and xlocal >= 0.
+
+        If the local coordinate system involves a rotX or rotY, the resulting
+        slice will not be calculated correctly since we are really slicing in
+        (xlocal, zlocal).
+
+        Parameters
+        ----------
+        nslice : int
+            Use the specified number of points on each half slice. When zero,
+            the value will be calculated automatically (and will be 2 for
+            planar surfaces).
+
+        Returns
+        -------
+        tuple
+            Tuple (x1, z1, x2, z2) of 1D arrays where (x1, z1) is the xlocal <= 0
+            half slice and (x2, z2) is the xlocal >= 0 half slice.
+        """
         slice = []
         if self.outRadius is None:
             return slice
+        if nslice <= 0:
+            if isinstance(self.surface, batoid.surface.Plane):
+                nslice = 2
+            else:
+                nslice = 50
         # Calculate (x,z) slice in local coordinates for x <= 0.
-        x = np.linspace(-self.outRadius, -self.inRadius)
+        x = np.linspace(-self.outRadius, -self.inRadius, nslice)
         y = np.zeros_like(x)
         z = self.surface.sag(x, y)
         # Transform slice to global coordinates.
