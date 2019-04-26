@@ -225,6 +225,55 @@ def dirCosToStereographic(alpha, beta, gamma):
     return u, v
 
 
+def orthographicToDirCos(u, v):
+    """Convert orthographic tangent plane projection u,v to direction cosines.
+
+    Parameters
+    ----------
+    u, v : float
+        Orthographic tangent plane coordinates in radians.
+
+    Returns
+    -------
+    alpha, beta, gamma : float
+        Direction cosines (unit vector projected onto x, y, z in order)
+
+    Notes
+    -----
+    The tangent plane reference is at (u,v) = (0,0) and (alpha, beta, gamma) = (0,0,1),
+    and u.x > 0, u.y=0, v.x=0, v.y > 0.
+    """
+    rho = np.sqrt(u*u + v*v)
+    theta = np.arcsin(rho)
+    gamma = np.cos(theta)
+    alpha = u
+    beta = v
+    return alpha, beta, gamma
+
+
+def dirCosToOrthographic(alpha, beta, gamma):
+    """Convert direction cosines to orthographic tangent plane projection.
+
+    Parameters
+    ----------
+    alpha, beta, gamma : float
+        Direction cosines (unit vector projected onto x, y, z in order)
+
+    Returns
+    -------
+    u, v : float
+        Orthographic tangent plane coordinates in radians.
+
+    Notes
+    -----
+    The tangent plane reference is at (u,v) = (0,0) and (alpha, beta, gamma) = (0,0,1)
+    and u.x > 0, u.y=0, v.x=0, v.y > 0.
+    """
+    u = alpha
+    v = beta
+    return u, v
+
+
 def gnomonicToSpherical(u, v):
     """Convert gnomonic tangent plane projection u, v to spherical coordinates.
 
