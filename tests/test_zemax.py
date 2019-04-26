@@ -73,7 +73,7 @@ def test_HSC_trace():
 @pytest.mark.skipif(not hasGalSim, reason="galsim not found")
 @pytest.mark.skipif(not hasLMFit, reason="lmfit not found")
 @timer
-def test_HSC_huygenPSF():
+def test_HSC_huygensPSF():
     fn = os.path.join(directory, "testdata", "HSC_huygensPSF.txt")
     with open(fn) as f:
         Zarr = np.loadtxt(f, skiprows=21)
@@ -88,7 +88,10 @@ def test_HSC_huygenPSF():
     wavelength = 750e-9
     nx = 512
     dx = 0.25e-6
-    hPSF = batoid.huygensPSF(telescope, thx, thy, wavelength, nx=nx, dx=dx, nxOut=256)
+    print("computing Huygens PSF")
+    hPSF = batoid.huygensPSF(telescope, thx, thy, wavelength, nx=nx, projection='zemax',
+                             dx=dx, nxOut=256)
+    print("Done")
 
     # Normalize images
     Zarr /= np.sum(Zarr)
@@ -104,12 +107,15 @@ def test_HSC_huygenPSF():
     def resid(params):
         model = ii.shift(params['dx'], params['dy'])*np.exp(params['dlogflux'])
         img = model.drawImage(method='sb', scale=0.25, nx=256, ny=256)
-        return (img.array - Zarr).ravel()
+        r = (img.array - Zarr).ravel()
+        return r
     params = lmfit.Parameters()
     params.add('dx', value=0.0)
     params.add('dy', value=0.0)
     params.add('dlogflux', value=0.0)
+    print("Aligning")
     opt = lmfit.minimize(resid, params)
+    print("Done")
 
     model = ii.shift(opt.params['dx'], opt.params['dy'])*np.exp(opt.params['dlogflux'])
     optImg = model.drawImage(method='sb', scale=0.25, nx=256, ny=256)
@@ -178,7 +184,11 @@ def test_HSC_zernike():
     wavelength = 750e-9
     nx = 256
 
-    bZernike = batoid.zernike(telescope, thx, thy, wavelength, jmax=37, nx=nx)
+    bZernike = batoid.zernike(
+        telescope, thx, thy, wavelength, jmax=37, nx=nx,
+        projection='gnomonic')
+    # revisit this with projection='zemax' once we're referencing the wavefront
+    # to the chief ray...
 
 
     print()
@@ -194,6 +204,6 @@ def test_HSC_zernike():
 
 if __name__ == '__main__':
     test_HSC_trace()
-    test_HSC_huygenPSF()
+    test_HSC_huygensPSF()
     test_HSC_wf()
     test_HSC_zernike()

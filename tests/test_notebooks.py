@@ -2,6 +2,7 @@ import pytest
 import os
 import subprocess
 import tempfile
+from test_helpers import timer
 
 import nbformat
 
@@ -56,6 +57,7 @@ notebooks = [
 
 @pytest.mark.timeout(600)
 @pytest.mark.parametrize("notebook_name", notebooks)
+@timer
 def test_notebook(notebook_name):
     nb, errors = _notebook_run(os.path.join(notebook_dir, notebook_name))
     assert errors == []
