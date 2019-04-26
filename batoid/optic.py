@@ -159,25 +159,37 @@ class Interface(Optic):
         x, y, z = transform.applyForward(x, y, z)
         ax.plot(x, y, z, **kwargs)
 
+    def getXZSlice(self):
+        slice = []
+        if self.outRadius is None:
+            return slice
+        # Calculate (x,z) slice in local coordinates for x <= 0.
+        x = np.linspace(-self.outRadius, -self.inRadius)
+        y = np.zeros_like(x)
+        z = self.surface.sag(x, y)
+        # Transform slice to global coordinates.
+        transform = batoid.CoordTransform(self.coordSys, batoid.globalCoordSys)
+        xneg, yneg, zneg = transform.applyForward(x, y, z)
+        if np.any(yneg != 0):
+            print('WARNING: getXZSlice used for rotated surface "{0}".'.format(self.name))
+        slice.append(np.stack((xneg, zneg), axis=0))
+        # Calculate (x,z) slice in local coordinates for x >= 0.
+        x *= -1
+        x = np.flip(x)
+        z[:] = self.surface.sag(x, y)
+        # Transform slice to global coordinates.
+        xpos, ypos, zpos = transform.applyForward(x, y, z)
+        if np.any(ypos != 0):
+            print('WARNING: getXZSlice used for rotated surface "{0}".'.format(self.name))
+        slice.append(np.stack((xpos, zpos), axis=0))
+        return slice
+
     def draw2d(self, ax, **kwargs):
         """ Draw this interface on a 2d matplotlib axis.
         May not work if elements are non-circular or not axis-aligned.
         """
-        if self.outRadius is None:
-            return
-        # Drawing in the x-z plane.
-        x = np.linspace(-self.outRadius, -self.inRadius)
-        y = np.zeros_like(x)
-        z = self.surface.sag(x, y)
-        transform = batoid.CoordTransform(self.coordSys, globalCoordSys)
-        x, y, z = transform.applyForward(x, y, z)
-        ax.plot(x, z, **kwargs)
-
-        x = np.linspace(self.inRadius, self.outRadius)
-        y = np.zeros_like(x)
-        z = self.surface.sag(x, y)
-        transform = batoid.CoordTransform(self.coordSys, globalCoordSys)
-        x, y, z = transform.applyForward(x, y, z)
+        slice = self.getXZSlice()
+        for x, z in slice:
         ax.plot(x, z, **kwargs)
 
     def trace(self, r, inCoordSys=globalCoordSys, outCoordSys=None):
