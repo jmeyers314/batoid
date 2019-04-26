@@ -2,10 +2,12 @@ import batoid
 from test_helpers import timer
 
 import numpy as np
+import pytest
 
 
 @timer
 def test_normalized():
+    np.random.seed(5)
     for _ in range(1000):
         x = np.random.uniform()
         y = np.random.uniform()
@@ -36,9 +38,9 @@ def test_normalized():
 
 @timer
 def test_gnomonicDirCos():
-    np.random.seed(5)
-    u = np.random.uniform(-0.1, 0.1, size=1000)
-    v = np.random.uniform(-0.1, 0.1, size=1000)
+    np.random.seed(57)
+    u = np.random.uniform(-0.5, 0.5, size=10000)
+    v = np.random.uniform(-0.5, 0.5, size=10000)
 
     # Test round trip
     u1, v1 = batoid.utils.dirCosToGnomonic(*batoid.utils.gnomonicToDirCos(u, v))
@@ -46,8 +48,8 @@ def test_gnomonicDirCos():
     np.testing.assert_allclose(v, v1, rtol=1e-10, atol=1e-12)
 
     # Test round trip in the other direction
-    alpha = np.random.uniform(-0.1, 0.1, size=1000)
-    beta = np.random.uniform(-0.1, 0.1, size=1000)
+    alpha = np.random.uniform(-0.1, 0.1, size=10000)
+    beta = np.random.uniform(-0.1, 0.1, size=10000)
     gamma = np.sqrt(1 - alpha**2 - beta**2)
     alpha1, beta1, gamma1 = batoid.utils.gnomonicToDirCos(
         *batoid.utils.dirCosToGnomonic(alpha, beta, gamma)
@@ -57,8 +59,8 @@ def test_gnomonicDirCos():
     np.testing.assert_allclose(gamma, gamma1, rtol=1e-10, atol=1e-12)
 
     # For really tiny angles, u/v should be basically the same as alpha/beta
-    u = np.random.uniform(-1e-6, 1e-6, size=1000)
-    v = np.random.uniform(-1e-6, 1e-6, size=1000)
+    u = np.random.uniform(-1e-6, 1e-6, size=10000)
+    v = np.random.uniform(-1e-6, 1e-6, size=10000)
     alpha, beta, gamma = batoid.utils.gnomonicToDirCos(u, v)
     np.testing.assert_allclose(alpha, u, rtol=0, atol=1e-8)
     np.testing.assert_allclose(beta, v, rtol=0, atol=1e-8)
@@ -69,9 +71,9 @@ def test_gnomonicDirCos():
 
 @timer
 def test_postelDirCos():
-    np.random.seed(5)
-    u = np.random.uniform(-0.1, 0.1, size=1000)
-    v = np.random.uniform(-0.1, 0.1, size=1000)
+    np.random.seed(577)
+    u = np.random.uniform(-0.5, 0.5, size=10000)
+    v = np.random.uniform(-0.5, 0.5, size=10000)
 
     # Test round trip
     u1, v1 = batoid.utils.dirCosToPostel(*batoid.utils.postelToDirCos(u, v))
@@ -79,8 +81,8 @@ def test_postelDirCos():
     np.testing.assert_allclose(v, v1, rtol=1e-10, atol=1e-12)
 
     # Test round trip in the other direction
-    alpha = np.random.uniform(-0.1, 0.1, size=1000)
-    beta = np.random.uniform(-0.1, 0.1, size=1000)
+    alpha = np.random.uniform(-0.1, 0.1, size=10000)
+    beta = np.random.uniform(-0.1, 0.1, size=10000)
     gamma = np.sqrt(1 - alpha**2 - beta**2)
     alpha1, beta1, gamma1 = batoid.utils.postelToDirCos(
         *batoid.utils.dirCosToPostel(alpha, beta, gamma)
@@ -90,8 +92,8 @@ def test_postelDirCos():
     np.testing.assert_allclose(gamma, gamma1, rtol=1e-10, atol=1e-12)
 
     # For really tiny angles, u/v should be basically the same as alpha/beta
-    u = np.random.uniform(-1e-6, 1e-6, size=1000)
-    v = np.random.uniform(-1e-6, 1e-6, size=1000)
+    u = np.random.uniform(-1e-6, 1e-6, size=10000)
+    v = np.random.uniform(-1e-6, 1e-6, size=10000)
     alpha, beta, gamma = batoid.utils.postelToDirCos(u, v)
     np.testing.assert_allclose(alpha, u, rtol=0, atol=1e-8)
     np.testing.assert_allclose(beta, v, rtol=0, atol=1e-8)
@@ -102,9 +104,9 @@ def test_postelDirCos():
 
 @timer
 def test_zemaxDirCos():
-    np.random.seed(5)
-    u = np.random.uniform(-0.1, 0.1, size=1000)
-    v = np.random.uniform(-0.1, 0.1, size=1000)
+    np.random.seed(5772)
+    u = np.random.uniform(-0.5, 0.5, size=10000)
+    v = np.random.uniform(-0.5, 0.5, size=10000)
 
     # Test round trip
     u1, v1 = batoid.utils.dirCosToZemax(*batoid.utils.zemaxToDirCos(u, v))
@@ -112,8 +114,8 @@ def test_zemaxDirCos():
     np.testing.assert_allclose(v, v1, rtol=1e-10, atol=1e-12)
 
     # Test round trip in the other direction
-    alpha = np.random.uniform(-0.1, 0.1, size=1000)
-    beta = np.random.uniform(-0.1, 0.1, size=1000)
+    alpha = np.random.uniform(-0.1, 0.1, size=10000)
+    beta = np.random.uniform(-0.1, 0.1, size=10000)
     gamma = np.sqrt(1 - alpha**2 - beta**2)
     alpha1, beta1, gamma1 = batoid.utils.zemaxToDirCos(
         *batoid.utils.dirCosToZemax(alpha, beta, gamma)
@@ -123,8 +125,8 @@ def test_zemaxDirCos():
     np.testing.assert_allclose(gamma, gamma1, rtol=1e-10, atol=1e-12)
 
     # For really tiny angles, u/v should be basically the same as alpha/beta
-    u = np.random.uniform(-1e-6, 1e-6, size=1000)
-    v = np.random.uniform(-1e-6, 1e-6, size=1000)
+    u = np.random.uniform(-1e-6, 1e-6, size=10000)
+    v = np.random.uniform(-1e-6, 1e-6, size=10000)
     alpha, beta, gamma = batoid.utils.zemaxToDirCos(u, v)
     np.testing.assert_allclose(alpha, u, rtol=0, atol=1e-8)
     np.testing.assert_allclose(beta, v, rtol=0, atol=1e-8)
@@ -135,9 +137,9 @@ def test_zemaxDirCos():
 
 @timer
 def test_stereographicDirCos():
-    np.random.seed(5)
-    u = np.random.uniform(-0.1, 0.1, size=1000)
-    v = np.random.uniform(-0.1, 0.1, size=1000)
+    np.random.seed(57721)
+    u = np.random.uniform(-0.5, 0.5, size=10000)
+    v = np.random.uniform(-0.5, 0.5, size=10000)
 
     # Test round trip
     u1, v1 = batoid.utils.dirCosToStereographic(*batoid.utils.stereographicToDirCos(u, v))
@@ -145,8 +147,8 @@ def test_stereographicDirCos():
     np.testing.assert_allclose(v, v1, rtol=1e-10, atol=1e-12)
 
     # Test round trip in the other direction
-    alpha = np.random.uniform(-0.1, 0.1, size=1000)
-    beta = np.random.uniform(-0.1, 0.1, size=1000)
+    alpha = np.random.uniform(-0.1, 0.1, size=10000)
+    beta = np.random.uniform(-0.1, 0.1, size=10000)
     gamma = np.sqrt(1 - alpha**2 - beta**2)
     alpha1, beta1, gamma1 = batoid.utils.stereographicToDirCos(
         *batoid.utils.dirCosToStereographic(alpha, beta, gamma)
@@ -156,8 +158,8 @@ def test_stereographicDirCos():
     np.testing.assert_allclose(gamma, gamma1, rtol=1e-10, atol=1e-12)
 
     # For really tiny angles, u/v should be basically the same as alpha/beta
-    u = np.random.uniform(-1e-6, 1e-6, size=1000)
-    v = np.random.uniform(-1e-6, 1e-6, size=1000)
+    u = np.random.uniform(-1e-6, 1e-6, size=10000)
+    v = np.random.uniform(-1e-6, 1e-6, size=10000)
     alpha, beta, gamma = batoid.utils.stereographicToDirCos(u, v)
     np.testing.assert_allclose(alpha, u, rtol=0, atol=1e-8)
     np.testing.assert_allclose(beta, v, rtol=0, atol=1e-8)
@@ -168,9 +170,9 @@ def test_stereographicDirCos():
 
 @timer
 def test_orthographicDirCos():
-    np.random.seed(5)
-    u = np.random.uniform(-0.1, 0.1, size=1000)
-    v = np.random.uniform(-0.1, 0.1, size=1000)
+    np.random.seed(577215)
+    u = np.random.uniform(-0.5, 0.5, size=10000)
+    v = np.random.uniform(-0.5, 0.5, size=10000)
 
     # Test round trip
     u1, v1 = batoid.utils.dirCosToOrthographic(*batoid.utils.orthographicToDirCos(u, v))
@@ -178,8 +180,8 @@ def test_orthographicDirCos():
     np.testing.assert_allclose(v, v1, rtol=1e-10, atol=1e-12)
 
     # Test round trip in the other direction
-    alpha = np.random.uniform(-0.1, 0.1, size=1000)
-    beta = np.random.uniform(-0.1, 0.1, size=1000)
+    alpha = np.random.uniform(-0.1, 0.1, size=10000)
+    beta = np.random.uniform(-0.1, 0.1, size=10000)
     gamma = np.sqrt(1 - alpha**2 - beta**2)
     alpha1, beta1, gamma1 = batoid.utils.orthographicToDirCos(
         *batoid.utils.dirCosToOrthographic(alpha, beta, gamma)
@@ -189,8 +191,8 @@ def test_orthographicDirCos():
     np.testing.assert_allclose(gamma, gamma1, rtol=1e-10, atol=1e-12)
 
     # For really tiny angles, u/v should be basically the same as alpha/beta
-    u = np.random.uniform(-1e-6, 1e-6, size=1000)
-    v = np.random.uniform(-1e-6, 1e-6, size=1000)
+    u = np.random.uniform(-1e-6, 1e-6, size=10000)
+    v = np.random.uniform(-1e-6, 1e-6, size=10000)
     alpha, beta, gamma = batoid.utils.orthographicToDirCos(u, v)
     np.testing.assert_allclose(alpha, u, rtol=0, atol=1e-8)
     np.testing.assert_allclose(beta, v, rtol=0, atol=1e-8)
@@ -201,9 +203,9 @@ def test_orthographicDirCos():
 
 @timer
 def test_gnomonicSpherical():
-    np.random.seed(57)
-    u = np.random.uniform(-0.1, 0.1, size=1000)
-    v = np.random.uniform(-0.1, 0.1, size=1000)
+    np.random.seed(5772156)
+    u = np.random.uniform(-0.5, 0.5, size=10000)
+    v = np.random.uniform(-0.5, 0.5, size=10000)
 
     # Test round trip
     u1, v1 = batoid.utils.sphericalToGnomonic(*batoid.utils.gnomonicToSpherical(u, v))
@@ -211,15 +213,15 @@ def test_gnomonicSpherical():
     np.testing.assert_allclose(v, v1, rtol=1e-10, atol=1e-12)
 
     # Test round trip in other direction
-    phi = np.random.uniform(0.0, 0.1, size=1000)
-    theta = np.random.uniform(-np.pi, np.pi, size=1000)
+    phi = np.random.uniform(0.0, 0.5, size=10000)
+    theta = np.random.uniform(-np.pi, np.pi, size=10000)
     phi1, theta1 = batoid.utils.gnomonicToSpherical(*batoid.utils.sphericalToGnomonic(phi, theta))
     np.testing.assert_allclose(phi, phi1, rtol=1e-10, atol=1e-12)
     np.testing.assert_allclose(theta, theta1, rtol=1e-10, atol=1e-12)
 
     # Check u**2 + v**2 = tan(phi)**2
     u, v = batoid.utils.sphericalToGnomonic(phi, theta)
-    np.testing.assert_allclose(np.tan(phi)**2, u**2+v**2, rtol=0, atol=1e-17)
+    np.testing.assert_allclose(np.tan(phi)**2, u**2+v**2, rtol=0, atol=1e-15)
 
     # Check v/u = tan(theta)
     np.testing.assert_allclose(np.tan(theta), v/u, rtol=1e-15, atol=0)
@@ -227,18 +229,18 @@ def test_gnomonicSpherical():
 
 @timer
 def test_sphericalToDirCos():
-    np.random.seed(577)
-    phi = np.random.uniform(0.0, 0.1, size=1000)
-    theta = np.random.uniform(-np.pi, np.pi, size=1000)
+    np.random.seed(57721566)
+    phi = np.random.uniform(0.0, 0.5, size=10000)
+    theta = np.random.uniform(-np.pi, np.pi, size=10000)
 
     # Test round trip
     phi1, theta1 = batoid.utils.dirCosToSpherical(*batoid.utils.sphericalToDirCos(phi, theta))
-    np.testing.assert_allclose(phi, phi1, rtol=1e-10, atol=1e-12)
-    np.testing.assert_allclose(theta, theta1, rtol=1e-10, atol=1e-12)
+    np.testing.assert_allclose(phi, phi1, rtol=1e-10, atol=1e-11)
+    np.testing.assert_allclose(theta, theta1, rtol=1e-10, atol=1e-11)
 
     # Test round trip in other direction
-    alpha = np.random.uniform(-0.1, 0.1, size=1000)
-    beta = np.random.uniform(-0.1, 0.1, size=1000)
+    alpha = np.random.uniform(-0.3, 0.3, size=10000)
+    beta = np.random.uniform(-0.3, 0.3, size=10000)
     gamma = np.sqrt(1 - alpha**2 - beta**2)
     alpha1, beta1, gamma1 = batoid.utils.sphericalToDirCos(
         *batoid.utils.dirCosToSpherical(alpha, beta, gamma)
@@ -253,11 +255,11 @@ def test_sphericalToDirCos():
 
 @timer
 def test_composition():
-    np.random.seed(5772)
+    np.random.seed(577215664)
 
     # Let's try spherical -> dirCos -> gnomonic = spherical -> gnomonic
-    phi = np.random.uniform(0.0, 0.1, size=1000)
-    theta = np.random.uniform(-np.pi, np.pi, size=1000)
+    phi = np.random.uniform(0.0, 0.5, size=10000)
+    theta = np.random.uniform(-np.pi, np.pi, size=10000)
 
     u1, v1 = batoid.utils.dirCosToGnomonic(*batoid.utils.sphericalToDirCos(phi, theta))
     u2, v2 = batoid.utils.sphericalToGnomonic(phi, theta)
@@ -265,8 +267,8 @@ def test_composition():
     np.testing.assert_allclose(v1, v2, rtol=1e-10, atol=1e-10)
 
     # And cycle: gnomonic -> spherical -> dirCos = gnomonic -> dirCos
-    u = np.random.uniform(-0.1, 0.1, size=1000)
-    v = np.random.uniform(-0.1, 0.1, size=1000)
+    u = np.random.uniform(-0.3, 0.3, size=10000)
+    v = np.random.uniform(-0.3, 0.3, size=10000)
     a1, b1, c1 = batoid.utils.sphericalToDirCos(*batoid.utils.gnomonicToSpherical(u, v))
     a2, b2, c2 = batoid.utils.gnomonicToDirCos(u, v)
     np.testing.assert_allclose(a1, a2, rtol=1e-10, atol=1e-10)
@@ -274,8 +276,8 @@ def test_composition():
     np.testing.assert_allclose(c1, c2, rtol=1e-10, atol=1e-10)
 
     # And cycle: dirCos -> gnomonic -> spherical = dirCos -> spherical
-    a = np.random.uniform(-0.1, 0.1, size=1000)
-    b = np.random.uniform(-0.1, 0.1, size=1000)
+    a = np.random.uniform(-0.3, 0.3, size=10000)
+    b = np.random.uniform(-0.3, 0.3, size=10000)
     c = np.sqrt(1 - a*a - b*b)
     ph1, th1 = batoid.utils.gnomonicToSpherical(*batoid.utils.dirCosToGnomonic(a, b, c))
     ph2, th2 = batoid.utils.dirCosToSpherical(a, b, c)
@@ -283,16 +285,16 @@ def test_composition():
     np.testing.assert_allclose(th1, th2, rtol=1e-10, atol=1e-10)
 
     # And reverse direction: gnomonic -> dirCos -> spherical = gnomonic -> spherical
-    u = np.random.uniform(-0.1, 0.1, size=1000)
-    v = np.random.uniform(-0.1, 0.1, size=1000)
+    u = np.random.uniform(-0.3, 0.3, size=10000)
+    v = np.random.uniform(-0.3, 0.3, size=10000)
     ph1, th1 = batoid.utils.dirCosToSpherical(*batoid.utils.gnomonicToDirCos(u, v))
     ph2, th2 = batoid.utils.gnomonicToSpherical(u, v)
     np.testing.assert_allclose(ph1, ph2, rtol=1e-10, atol=1e-10)
     np.testing.assert_allclose(th1, th2, rtol=1e-10, atol=1e-10)
 
     # and cycle: spherical -> gnomonic -> dirCos = spherical -> dirCos
-    phi = np.random.uniform(0.0, 0.1, size=1000)
-    theta = np.random.uniform(-np.pi, np.pi, size=1000)
+    phi = np.random.uniform(0.0, 0.3, size=10000)
+    theta = np.random.uniform(-np.pi, np.pi, size=10000)
     a1, b1, c1 = batoid.utils.gnomonicToDirCos(*batoid.utils.sphericalToGnomonic(phi, theta))
     a2, b2, c2 = batoid.utils.sphericalToDirCos(phi, theta)
     np.testing.assert_allclose(a1, a2, rtol=1e-10, atol=1e-10)
@@ -300,8 +302,8 @@ def test_composition():
     np.testing.assert_allclose(c1, c2, rtol=1e-10, atol=1e-10)
 
     # and cycle: dirCos -> spherical -> gnomonic = dirCos -> gnomonic
-    a = np.random.uniform(-0.1, 0.1, size=1000)
-    b = np.random.uniform(-0.1, 0.1, size=1000)
+    a = np.random.uniform(-0.3, 0.3, size=10000)
+    b = np.random.uniform(-0.3, 0.3, size=10000)
     c = np.sqrt(1 - a*a - b*b)
     u1, v1 = batoid.utils.sphericalToGnomonic(*batoid.utils.dirCosToSpherical(a, b, c))
     u2, v2 = batoid.utils.dirCosToGnomonic(a, b, c)
@@ -311,10 +313,10 @@ def test_composition():
 
 @timer
 def test_jacobian():
-    np.random.seed(57721)
+    np.random.seed(5772156649%(2**32))
 
-    u = np.random.uniform(-0.1, 0.1, size=1000)
-    v = np.random.uniform(-0.1, 0.1, size=1000)
+    u = np.random.uniform(-0.5, 0.5, size=10000)
+    v = np.random.uniform(-0.5, 0.5, size=10000)
     phi, theta = batoid.utils.gnomonicToSpherical(u, v)
 
     jac1 = batoid.utils.dSphericalDGnomonic(u, v)
@@ -323,12 +325,12 @@ def test_jacobian():
     # Check that the product of the jacobian and its inverse is the identity matrix
     np.testing.assert_allclose(
         np.matmul(np.transpose(jac1, (2,0,1)), np.transpose(jac2, (2,0,1))),
-        np.transpose(np.tile(np.eye(2)[:,:,None], 1000), (2,0,1)),
+        np.transpose(np.tile(np.eye(2)[:,:,None], 10000), (2,0,1)),
         rtol=0, atol=1e-15
     )
     np.testing.assert_allclose(
         np.matmul(np.transpose(jac2, (2,0,1)), np.transpose(jac1, (2,0,1))),
-        np.transpose(np.tile(np.eye(2)[:,:,None], 1000), (2,0,1)),
+        np.transpose(np.tile(np.eye(2)[:,:,None], 10000), (2,0,1)),
         rtol=0, atol=1e-15
     )
 
@@ -386,6 +388,34 @@ def test_jacobian():
     )
 
 
+hasCoord = True
+try:
+    import coord
+except ImportError:
+    hasCoord = False
+
+
+@pytest.mark.skipif(not hasCoord, reason="LSSTDESC.coord not found")
+@timer
+def test_coord():
+    # gnomonic
+    pole = coord.CelestialCoord(0.*coord.degrees, 90.*coord.degrees)
+    u = np.random.uniform(-0.5, 0.5, size=10000)
+    v = np.random.uniform(-0.5, 0.5, size=10000)
+
+    _, dec = pole.deproject_rad(u, v, projection='gnomonic')
+    _, _, zcos = batoid.utils.gnomonicToDirCos(u, v)
+    np.testing.assert_allclose(np.sin(dec), zcos, rtol=0, atol=1e-13)
+
+    _, dec = pole.deproject_rad(u, v, projection='stereographic')
+    _, _, zcos = batoid.utils.stereographicToDirCos(u, v)
+    np.testing.assert_allclose(np.sin(dec), zcos, rtol=0, atol=1e-13)
+
+    _, dec = pole.deproject_rad(u, v, projection='postel')
+    _, _, zcos = batoid.utils.postelToDirCos(u, v)
+    np.testing.assert_allclose(np.sin(dec), zcos, rtol=0, atol=1e-13)
+
+
 if __name__ == '__main__':
     test_normalized()
     test_gnomonicDirCos()
@@ -397,3 +427,4 @@ if __name__ == '__main__':
     test_sphericalToDirCos()
     test_composition()
     test_jacobian()
+    test_coord()
