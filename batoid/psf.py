@@ -5,7 +5,7 @@ from .utils import bilinear_fit, fieldToDirCos
 
 def huygensPSF(optic, theta_x=None, theta_y=None, wavelength=None, nx=None,
                projection='postel', dx=None, dy=None, nxOut=None):
-    """Compute a PSF via the Huygens construction.
+    r"""Compute a PSF via the Huygens construction.
 
     Parameters
     ----------
