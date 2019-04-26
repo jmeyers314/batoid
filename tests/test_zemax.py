@@ -26,7 +26,7 @@ directory = os.path.dirname(__file__)
 @timer
 def test_HSC_trace():
     fn = os.path.join(batoid.datadir, "HSC", "HSC_old.yaml")
-    config = yaml.load(open(fn))
+    config = yaml.safe_load(open(fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
 
     # Zemax has a number of virtual surfaces that we don't trace in batoid.  Also, the HSC.yaml
@@ -80,7 +80,7 @@ def test_HSC_huygenPSF():
     Zarr = Zarr[::-1]  # Need to invert, probably just a Zemax convention...
 
     HSC_fn = os.path.join(batoid.datadir, "HSC", "HSC_no_obsc.yaml")
-    config = yaml.load(open(HSC_fn))
+    config = yaml.safe_load(open(HSC_fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
 
     thx = np.deg2rad(0.0)
@@ -131,7 +131,7 @@ def test_HSC_wf():
     Zwf = Zwf[::-1]  # Need to invert, probably just a Zemax convention...
 
     HSC_fn = os.path.join(batoid.datadir, "HSC", "HSC_no_obsc.yaml")
-    config = yaml.load(open(HSC_fn))
+    config = yaml.safe_load(open(HSC_fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
 
     thx = np.deg2rad(0.0)
@@ -170,7 +170,7 @@ def test_HSC_zernike():
     ZZernike = np.array(ZZernike)
 
     HSC_fn = os.path.join(batoid.datadir, "HSC", "HSC_no_obsc.yaml")
-    config = yaml.load(open(HSC_fn))
+    config = yaml.safe_load(open(HSC_fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
 
     thx = np.deg2rad(0.0)
