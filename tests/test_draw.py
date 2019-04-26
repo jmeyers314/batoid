@@ -40,6 +40,13 @@ def test_draw2d(ngrid=25):
     draw2dtelescope(ax, telescope)
     draw2drays(ax, rays)
 
+def test_draw2d_only():
+    telescope, rays = initialize(3)
+    fig = plt.figure(figsize=(20, 20))
+    ax = fig.add_subplot(111)
+    telescope.draw2d(ax, only=batoid.optic.Lens, fc='c', alpha=0.2)
+    telescope.draw2d(ax, only=batoid.optic.Detector, c='b', lw=1)
+
 @timer
 def draw3dtelescope(ax, telescope):
     telescope.draw3d(ax, c='k')
@@ -60,3 +67,4 @@ if __name__ == '__main__':
     plt.savefig('draw3d.png')
     test_draw2d()
     plt.savefig('draw2d.png')
+    test_draw2d_only()
