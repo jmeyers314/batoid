@@ -190,7 +190,7 @@ class Interface(Optic):
         """
         slice = self.getXZSlice()
         for x, z in slice:
-        ax.plot(x, z, **kwargs)
+            ax.plot(x, z, **kwargs)
 
     def trace(self, r, inCoordSys=globalCoordSys, outCoordSys=None):
         """ Trace a ray through this optical element.
@@ -860,6 +860,22 @@ class Lens(CompoundOptic):
 
     def __hash__(self):
         return hash((self.medium, CompoundOptic.__hash__(self)))
+
+    def draw2d(self, ax, **kwargs):
+        only = kwargs.pop('only', None)
+        if only == batoid.optic.Lens:
+            if len(self.items) != 2:
+                raise RuntimeError(
+                    'Cannot draw lens "{0}" with {1} surfaces.'.format(self.name, len(self.items)))
+            slice1 = self.items[0].getXZSlice()
+            slice2 = self.items[1].getXZSlice()
+            assert len(slice1) == len(slice2)
+            for (x1, z1), (x2, z2) in zip(slice1, slice2):
+                x = np.hstack((x1, x2[::-1], x1[:1]))
+                z = np.hstack((z1, z2[::-1], z1[:1]))
+                ax.fill(x, z, **kwargs)
+        else:
+            super(Lens, self).draw2d(ax, only=only, **kwargs)
 
     def withGlobalShift(self, shift):
         newItems = [item.withGlobalShift(shift) for item in self.items]
