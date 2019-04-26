@@ -1075,7 +1075,7 @@ def getGlobalRays(traceFull, start=None, end=None, globalSys=globalCoordSys):
     except ValueError:
         raise ValueError('No such start surface "{0}".'.format(start))
     try:
-        end = len(names) if end is None else names.index(end)
+        end = len(names) if end is None else names.index(end) + 1
     except ValueError:
         raise ValueError('No such end surface "{0}".'.format(end))
     nsurf = end - start
