@@ -41,13 +41,13 @@ matrix:
         - CXX=clang++
 
 before_install:
-  - pip install -r requirements.txt
-  - pip install -r test_requirements.txt
   - export EIGEN_DIR=$PWD/eigen/
   - sudo apt-get install -y libfftw3-dev
   - pip install -U setuptools pip==9.0
   - pip install numpy astropy future pyyaml LSSTDESC.Coord pybind11
   - pip install galsim
+  - pip install -r requirements.txt
+  - pip install -r test_requirements.txt
 
 cache:
   directories:

@@ -92,7 +92,7 @@ def test_huygens_psf():
             fig = plt.figure(figsize=(15, 4))
             ax1 = fig.add_subplot(131)
             im1 = ax1.imshow(np.log10(arr), extent=np.r_[-1,1,-1,1]*size/2, vmin=-7, vmax=0)
-            plt.colorbar(im1, ax=ax1, label='$\log_{10}$ flux')
+            plt.colorbar(im1, ax=ax1, label=r'$\log_{10}$ flux')
             ax1.set_title('GalSim')
             ax1.set_xlabel("arcsec")
             ax1.set_ylabel("arcsec")
@@ -100,17 +100,17 @@ def test_huygens_psf():
             sizeX = dsize_X * npix * 1e6  # microns
             ax2 = fig.add_subplot(132)
             im2 = ax2.imshow(np.log10(psf.array), extent=np.r_[-1,1,-1,1]*sizeX/2, vmin=-7, vmax=0)
-            plt.colorbar(im2, ax=ax2, label='$\log_{10}$ flux')
+            plt.colorbar(im2, ax=ax2, label=r'$\log_{10}$ flux')
             ax2.set_title('batoid')
-            ax2.set_xlabel("$\mu m$")
-            ax2.set_ylabel("$\mu m$")
+            ax2.set_xlabel(r"$\mu m$")
+            ax2.set_ylabel(r"$\mu m$")
 
             ax3 = fig.add_subplot(133)
             im3 = ax3.imshow((psf.array-arr)/np.max(arr), vmin=-0.01, vmax=0.01, cmap='seismic')
             plt.colorbar(im3, ax=ax3, label="(batoid-GalSim)/max(GalSim)")
             ax3.set_title('resid')
-            ax3.set_xlabel("$\mu m$")
-            ax3.set_ylabel("$\mu m$")
+            ax3.set_xlabel(r"$\mu m$")
+            ax3.set_ylabel(r"$\mu m$")
 
             fig.tight_layout()
 
@@ -121,7 +121,7 @@ def test_huygens_psf():
 def test_lsst_psf():
     # Just testing that doesn't crash for the moment
     fn = os.path.join(batoid.datadir, "LSST", "LSST_r.yaml")
-    config = yaml.load(open(fn))
+    config = yaml.safe_load(open(fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
 
     stampSize = 0.5 # arcsec
@@ -172,7 +172,7 @@ def test_lsst_psf():
 def test_hsc_psf():
     # Just testing that doesn't crash for the moment
     fn = os.path.join(batoid.datadir, "HSC", "HSC.yaml")
-    config = yaml.load(open(fn))
+    config = yaml.safe_load(open(fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
 
     stampSize = 0.75  # arcsec
@@ -223,7 +223,7 @@ def test_hsc_psf():
 def test_decam_psf():
     # Just testing that doesn't crash for the moment
     fn = os.path.join(batoid.datadir, "DECam", "DECam.yaml")
-    config = yaml.load(open(fn))
+    config = yaml.safe_load(open(fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
 
     stampSize = 1.0  # arcsec
