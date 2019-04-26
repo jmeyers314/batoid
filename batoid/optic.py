@@ -202,7 +202,7 @@ class Interface(Optic):
             print('WARNING: getXZSlice used for rotated surface "{0}".'.format(self.name))
         # Calculate (x,z) slice in local coordinates for x >= 0.
         x *= -1
-        x = np.flip(x)
+        x = x[::-1]
         z[:] = self.surface.sag(x, y)
         # Transform slice to global coordinates.
         xpos, ypos, zpos = transform.applyForward(x, y, z)
