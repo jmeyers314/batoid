@@ -163,10 +163,12 @@ class Interface(Optic):
         """Calculate global coordinates for an (x,z) slice through this interface.
 
         The calculation is split into two half slices: xlocal <= 0 and xlocal >= 0.
+        When the inner radius is zero, these half slices are merged into one.
+        Otherwise, the two half slices are returned separately.
 
-        If the local coordinate system involves a rotX or rotY, the resulting
-        slice will not be calculated correctly since we are really slicing in
-        (xlocal, zlocal).
+        If the local coordinate system involves any rotation the resulting
+        slice may not be calculated correctly since we are really slicing in
+        (xlocal, zlocal) then transforming these to (xglobal, zglobal).
 
         Parameters
         ----------
@@ -178,8 +180,8 @@ class Interface(Optic):
         Returns
         -------
         tuple
-            Tuple (x1, z1, x2, z2) of 1D arrays where (x1, z1) is the xlocal <= 0
-            half slice and (x2, z2) is the xlocal >= 0 half slice.
+            Tuple (xz1, xz2) of 1D arrays where xz1=[x1, z1] is the xlocal <= 0
+            half slice and xz2=[x2, z2] is the xlocal >= 0 half slice.
         """
         slice = []
         if self.outRadius is None:
@@ -198,7 +200,6 @@ class Interface(Optic):
         xneg, yneg, zneg = transform.applyForward(x, y, z)
         if np.any(yneg != 0):
             print('WARNING: getXZSlice used for rotated surface "{0}".'.format(self.name))
-        slice.append(np.stack((xneg, zneg), axis=0))
         # Calculate (x,z) slice in local coordinates for x >= 0.
         x *= -1
         x = np.flip(x)
@@ -208,7 +209,17 @@ class Interface(Optic):
         if np.any(ypos != 0):
             print('WARNING: getXZSlice used for rotated surface "{0}".'.format(self.name))
         slice.append(np.stack((xpos, zpos), axis=0))
-        return slice
+        # Combine x <= 0 and x >= 0 half slices when inner = 0.
+        if self.inRadius == 0:
+            assert xneg[-1] == xpos[0] and zneg[-1] == zpos[0]
+            return (
+                np.stack((
+                    np.hstack((xneg, xpos[1:])),
+                    np.hstack((zneg, zpos[1:]))
+                ), axis=0),
+            )
+        else:
+            return (np.stack((xneg, zneg), axis=0), np.stack((xpos, zpos), axis=0))
 
     def draw2d(self, ax, **kwargs):
         """ Draw this interface on a 2d matplotlib axis.
