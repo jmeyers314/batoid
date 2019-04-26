@@ -172,6 +172,59 @@ def dirCosToZemax(alpha, beta, gamma):
     return np.arctan(alpha/gamma), np.arctan(beta/gamma)
 
 
+def stereographicToDirCos(u, v):
+    """Convert stereographic tangent plane projection u,v to direction cosines.
+
+    Parameters
+    ----------
+    u, v : float
+        Stereographic tangent plane coordinates in radians.
+
+    Returns
+    -------
+    alpha, beta, gamma : float
+        Direction cosines (unit vector projected onto x, y, z in order)
+
+    Notes
+    -----
+    The tangent plane reference is at (u,v) = (0,0) and (alpha, beta, gamma) = (0,0,1),
+    and u.x > 0, u.y=0, v.x=0, v.y > 0.
+    """
+    rho = np.sqrt(u*u + v*v)
+    theta = 2*np.arctan(rho/2)
+    stheta = np.sin(theta)
+    gamma = np.cos(theta)
+    alpha = u/rho*stheta
+    beta = v/rho*stheta
+    return alpha, beta, gamma
+
+
+def dirCosToStereographic(alpha, beta, gamma):
+    """Convert direction cosines to stereographic tangent plane projection.
+
+    Parameters
+    ----------
+    alpha, beta, gamma : float
+        Direction cosines (unit vector projected onto x, y, z in order)
+
+    Returns
+    -------
+    u, v : float
+        Stereographic tangent plane coordinates in radians.
+
+    Notes
+    -----
+    The tangent plane reference is at (u,v) = (0,0) and (alpha, beta, gamma) = (0,0,1)
+    and u.x > 0, u.y=0, v.x=0, v.y > 0.
+    """
+    theta = np.arccos(gamma)
+    rho = 2*np.tan(theta/2)
+    stheta = np.sin(theta)
+    u = alpha*rho/stheta
+    v = beta*rho/stheta
+    return u, v
+
+
 def gnomonicToSpherical(u, v):
     """Convert gnomonic tangent plane projection u, v to spherical coordinates.
 
