@@ -708,6 +708,15 @@ class CompoundOptic(Optic):
             item.draw3d(ax, **kwargs)
 
     def draw2d(self, ax, **kwargs):
+        """Draw a 2D slice of this compound optic in the (x,z) plane.
+
+        Calls draw2d recursively on each of our items, with the actual
+        drawing taking place in Interface and (optionally) Lens instances.
+
+        The kwargs are passed to the drawing commands, except for the
+        optional keyword 'only' which restricts drawing to only instances
+        that are subclasses of a specified type or types.
+        """
         only = kwargs.pop('only', None)
         for item in self.items:
             item_class = item.__class__
@@ -862,6 +871,14 @@ class Lens(CompoundOptic):
         return hash((self.medium, CompoundOptic.__hash__(self)))
 
     def draw2d(self, ax, **kwargs):
+        """Specialized draw2d for Lens instances.
+
+        If the optional keyword 'only' equals batoid.optic.Lens,
+        then fill the area between the lens refractive interfaces
+        using the specified kwargs (fc, ec, alpha, ...)
+
+        Otherwise, call draw2d on each of our refractive interfaces.
+        """
         only = kwargs.pop('only', None)
         if only == batoid.optic.Lens:
             if len(self.items) != 2:
