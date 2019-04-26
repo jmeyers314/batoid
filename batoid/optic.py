@@ -912,22 +912,37 @@ class Lens(CompoundOptic):
 
         If the optional keyword 'only' equals batoid.optic.Lens,
         then fill the area between the lens refractive interfaces
-        using the specified kwargs (fc, ec, alpha, ...)
+        using the remaining specified kwargs (fc, ec, alpha, ...)
 
         Otherwise, call draw2d on each of our refractive interfaces.
+
+        The optional labelpos and fontdict kwargs are used to
+        draw a label at the specified x position (in global coords),
+        using the specified font properties.
         """
         only = kwargs.pop('only', None)
         if only == batoid.optic.Lens:
+            labelpos = kwargs.pop('labelpos', None)
+            fontdict = kwargs.pop('fontdict', None)
             if len(self.items) != 2:
                 raise RuntimeError(
                     'Cannot draw lens "{0}" with {1} surfaces.'.format(self.name, len(self.items)))
+            # Calculate the global coordinates of slices through our two interfaces.
             slice1 = self.items[0].getXZSlice()
             slice2 = self.items[1].getXZSlice()
-            assert len(slice1) == len(slice2)
+            # Fill the area between these slices.
+            all_z = []
             for (x1, z1), (x2, z2) in zip(slice1, slice2):
                 x = np.hstack((x1, x2[::-1], x1[:1]))
                 z = np.hstack((z1, z2[::-1], z1[:1]))
+                all_z.append(z)
                 ax.fill(x, z, **kwargs)
+            # Draw an optional label for this lens.
+            if labelpos is not None:
+                zlabel = np.mean(all_z)
+                ax.text(
+                    labelpos, zlabel, self.name, fontdict=fontdict,
+                    horizontalalignment='center', verticalalignment='center')
         else:
             super(Lens, self).draw2d(ax, only=only, **kwargs)
 
