@@ -202,6 +202,40 @@ def test_orthographicDirCos():
 
 
 @timer
+def test_lambertDirCos():
+    np.random.seed(5772156)
+    u = np.random.uniform(-0.5, 0.5, size=10000)
+    v = np.random.uniform(-0.5, 0.5, size=10000)
+
+    # Test round trip
+    u1, v1 = batoid.utils.dirCosToLambert(*batoid.utils.lambertToDirCos(u, v))
+    np.testing.assert_allclose(u, u1, rtol=1e-10, atol=1e-12)
+    np.testing.assert_allclose(v, v1, rtol=1e-10, atol=1e-12)
+
+    # Test round trip in the other direction
+    alpha = np.random.uniform(-0.5, 0.5, size=10000)
+    beta = np.random.uniform(-0.5, 0.5, size=10000)
+    gamma = np.sqrt(1 - alpha**2 - beta**2)
+    alpha1, beta1, gamma1 = batoid.utils.lambertToDirCos(
+        *batoid.utils.dirCosToLambert(alpha, beta, gamma)
+    )
+    # Not sure why Lambert isn't as good as other projections in this test.
+    np.testing.assert_allclose(alpha, alpha1, rtol=1e-10, atol=1e-12)
+    np.testing.assert_allclose(beta, beta1, rtol=1e-10, atol=1e-12)
+    np.testing.assert_allclose(gamma, gamma1, rtol=1e-10, atol=1e-12)
+
+    # For really tiny angles, u/v should be basically the same as alpha/beta
+    u = np.random.uniform(-1e-6, 1e-6, size=10000)
+    v = np.random.uniform(-1e-6, 1e-6, size=10000)
+    alpha, beta, gamma = batoid.utils.lambertToDirCos(u, v)
+    np.testing.assert_allclose(alpha, u, rtol=0, atol=1e-8)
+    np.testing.assert_allclose(beta, v, rtol=0, atol=1e-8)
+
+    # Check normalization of direction cosines
+    np.testing.assert_allclose(np.sqrt(alpha*alpha+beta*beta+gamma*gamma), 1, rtol=0, atol=1e-15)
+
+
+@timer
 def test_gnomonicSpherical():
     np.random.seed(5772156)
     u = np.random.uniform(-0.5, 0.5, size=10000)
@@ -415,6 +449,10 @@ def test_coord():
     _, _, zcos = batoid.utils.postelToDirCos(u, v)
     np.testing.assert_allclose(np.sin(dec), zcos, rtol=0, atol=1e-13)
 
+    _, dec = pole.deproject_rad(u, v, projection='lambert')
+    _, _, zcos = batoid.utils.lambertToDirCos(u, v)
+    np.testing.assert_allclose(np.sin(dec), zcos, rtol=0, atol=1e-10)
+
 
 if __name__ == '__main__':
     test_normalized()
@@ -423,6 +461,7 @@ if __name__ == '__main__':
     test_zemaxDirCos()
     test_stereographicDirCos()
     test_orthographicDirCos()
+    test_lambertDirCos()
     test_gnomonicSpherical()
     test_sphericalToDirCos()
     test_composition()

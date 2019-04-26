@@ -274,6 +274,58 @@ def dirCosToOrthographic(alpha, beta, gamma):
     return u, v
 
 
+def lambertToDirCos(u, v):
+    """Convert Lambert azimuthal equal-area tangent plane projection u,v to direction cosines.
+
+    Parameters
+    ----------
+    u, v : float
+        Lambert tangent plane coordinates in radians.
+
+    Returns
+    -------
+    alpha, beta, gamma : float
+        Direction cosines (unit vector projected onto x, y, z in order)
+
+    Notes
+    -----
+    The tangent plane reference is at (u,v) = (0,0) and (alpha, beta, gamma) = (0,0,1),
+    and u.x > 0, u.y=0, v.x=0, v.y > 0.
+    """
+    rhosqr = u*u + v*v
+    rho = np.sqrt(rhosqr)
+    gamma = (2-rhosqr)/2
+    r = np.sqrt(1-gamma*gamma)
+    alpha = u * r/rho
+    beta = v * r/rho
+    return alpha, beta, gamma
+
+
+def dirCosToLambert(alpha, beta, gamma):
+    """Convert direction cosines to Lambert azimuthal equal-area tangent plane projection.
+
+    Parameters
+    ----------
+    alpha, beta, gamma : float
+        Direction cosines (unit vector projected onto x, y, z in order)
+
+    Returns
+    -------
+    u, v : float
+        Lambert tangent plane coordinates in radians.
+
+    Notes
+    -----
+    The tangent plane reference is at (u,v) = (0,0) and (alpha, beta, gamma) = (0,0,1)
+    and u.x > 0, u.y=0, v.x=0, v.y > 0.
+    """
+    rho = np.sqrt(2-2*gamma)
+    norm = np.sqrt(1-gamma*gamma)
+    u = alpha*rho/norm
+    v = beta*rho/norm
+    return u, v
+
+
 def gnomonicToSpherical(u, v):
     """Convert gnomonic tangent plane projection u, v to spherical coordinates.
 
