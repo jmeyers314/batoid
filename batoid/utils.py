@@ -119,6 +119,59 @@ def dirCosToPostel(alpha, beta, gamma):
     return u, v
 
 
+def zemaxToDirCos(u, v):
+    """Convert Zemax field angles u,v to direction cosines.
+
+    Parameters
+    ----------
+    u, v : float
+        Zemax field angles in radians.
+
+    Returns
+    -------
+    alpha, beta, gamma : float
+        Direction cosines (unit vector projected onto x, y, z in order)
+
+    Notes
+    -----
+    The tangent plane reference is at (u,v) = (0,0) and (alpha, beta, gamma) = (0,0,1),
+    and u.x > 0, u.y=0, v.x=0, v.y > 0.
+
+    The Zemax field angle convention is not rotationally invariant.  The z-direction cosine
+    for (u, v) = (0, 1) does not equal the z-direction cosine for (u, v) = (0.6, 0.8).
+    """
+    tanu = np.tan(u)
+    tanv = np.tan(v)
+    norm = np.sqrt(1 + tanu*tanu + tanv*tanv)
+    return tanu/norm, tanv/norm, 1/norm
+
+
+def dirCosToZemax(alpha, beta, gamma):
+    """Convert direction cosines to Postel azimuthal equidistant tangent plane projection.
+
+    Parameters
+    ----------
+    alpha, beta, gamma : float
+        Direction cosines (unit vector projected onto x, y, z in order)
+
+    Returns
+    -------
+    u, v : float
+        Postel tangent plane coordinates in radians.
+
+    Notes
+    -----
+    The tangent plane reference is at (u,v) = (0,0) and (alpha, beta, gamma) = (0,0,1)
+    and u.x > 0, u.y=0, v.x=0, v.y > 0.
+
+    The Zemax field angle convention is not rotationally invariant.  The z-direction cosine
+    for (u, v) = (0, 1) does not equal the z-direction cosine for (u, v) = (0.6, 0.8).
+    """
+    norm = 1/gamma
+    tanu = alpha*norm
+    return np.arctan(alpha/gamma), np.arctan(beta/gamma)
+
+
 def gnomonicToSpherical(u, v):
     """Convert gnomonic tangent plane projection u, v to spherical coordinates.
 
