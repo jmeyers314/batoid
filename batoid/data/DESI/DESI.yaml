@@ -440,8 +440,9 @@ opticalSystem:
             surface:
               type: Plane
             obscuration:
-              radius: 0.44880
-              type: ClearCircle
+              inner: 0.44880
+              outer: 0.881
+              type: ObscAnnulus
           -
             type: Baffle
             name: B12
