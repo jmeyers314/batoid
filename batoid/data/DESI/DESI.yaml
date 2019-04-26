@@ -122,11 +122,9 @@ opticalSystem:
       surface:
         type: Plane
       obscuration:
-        type: ClearCircle
-        radius: 1.89865  # 3.7973 / 2
-        #type: ObscAnnulus
-        #inner: 1.89865  # 3.7973 / 2
-        #outer: 2.5
+        type: ObscAnnulus
+        inner: 1.89865  # 3.7973 / 2
+        outer: 2.1
     -
       type: Mirror
       name: M1
@@ -167,8 +165,9 @@ opticalSystem:
               R: 1.18499
               type: Sphere
             obscuration:
-              radius: 0.55880
-              type: ClearCircle
+              inner: 0.55880
+              outer: 0.6
+              type: ObscAnnulus
           -
             type: Lens
             name: C1
@@ -202,8 +201,9 @@ opticalSystem:
             surface:
               type: Plane
             obscuration:
-              radius: 0.54400
-              type: ClearCircle
+              inner: 0.54400
+              outer: 0.881
+              type: ObscAnnulus
           -
             type: Baffle
             name: B3
@@ -212,8 +212,9 @@ opticalSystem:
             surface:
               type: Plane
             obscuration:
-              radius: 0.44775
-              type: ClearCircle
+              inner: 0.44775
+              outer: 0.881
+              type: ObscAnnulus
           -
             type: Baffle
             name: B4
@@ -222,8 +223,9 @@ opticalSystem:
             surface:
               type: Plane
             obscuration:
-              radius: 0.41700
-              type: ClearCircle
+              inner: 0.41700
+              outer: 0.881
+              type: ObscAnnulus
           -
             type: Lens
             name: C2
@@ -262,8 +264,9 @@ opticalSystem:
             surface:
               type: Plane
             obscuration:
-              radius: 0.37600
-              type: ClearCircle
+              inner: 0.37600
+              outer: 0.881
+              type: ObscAnnulus
           -
             type: Baffle
             name: B6
@@ -272,8 +275,9 @@ opticalSystem:
             surface:
               type: Plane
             obscuration:
-              radius: 0.37600
-              type: ClearCircle
+              inner: 0.37600
+              outer: 0.881
+              type: ObscAnnulus
           -
             type: CompoundOptic
             name: ADC1rotator
@@ -321,8 +325,9 @@ opticalSystem:
               R: 1.39212
               type: Sphere
             obscuration:
-              radius: 0.37800
-              type: ClearCircle
+              inner: 0.37800
+              outer: 0.42
+              type: ObscAnnulus
           -
             type: CompoundOptic
             name: ADC2rotator
@@ -370,8 +375,9 @@ opticalSystem:
             surface:
               type: Plane
             obscuration:
-              radius: 0.37800
-              type: ClearCircle
+              inner: 0.37800
+              outer: 0.881
+              type: ObscAnnulus
           -
             type: Baffle
             name: B9
@@ -380,8 +386,9 @@ opticalSystem:
             surface:
               type: Plane
             obscuration:
-              radius: 0.39500
-              type: ClearCircle
+              inner: 0.39500
+              outer: 0.881
+              type: ObscAnnulus
           -
             type: Lens
             name: C3
@@ -422,8 +429,9 @@ opticalSystem:
               R: -1.02628
               type: Sphere
             obscuration:
-              radius: 0.40300
-              type: ClearCircle
+              inner: 0.40300
+              outer: 0.45
+              type: ObscAnnulus
           -
             type: Baffle
             name: B11
@@ -432,8 +440,9 @@ opticalSystem:
             surface:
               type: Plane
             obscuration:
-              radius: 0.44880
-              type: ClearCircle
+              inner: 0.44880
+              outer: 0.881
+              type: ObscAnnulus
           -
             type: Baffle
             name: B12
@@ -442,8 +451,9 @@ opticalSystem:
             surface:
               type: Plane
             obscuration:
-              radius: 0.45370
-              type: ClearCircle
+              inner: 0.45370
+              outer: 0.881
+              type: ObscAnnulus
           # Move B13 in front of C4 and make spherical to keep model sequential.
           -
             type: Baffle
@@ -454,8 +464,9 @@ opticalSystem:
               R: 0.93420
               type: Sphere
             obscuration:
-              radius: 0.49200
-              type: ClearCircle
+              inner: 0.49200
+              outer: 0.55
+              type: ObscAnnulus
           # Move B14 in front of C4 and make spherical to keep model sequential.
           -
             type: Baffle
@@ -466,8 +477,9 @@ opticalSystem:
               R: 0.93420
               type: Sphere
             obscuration:
-              radius: 0.50100
-              type: ClearCircle
+              inner: 0.50100
+              outer: 0.55
+              type: ObscAnnulus
           -
             type: Lens
             name: C4
@@ -505,8 +517,9 @@ opticalSystem:
               R: -5.18579
               type: Sphere
             obscuration:
-              radius: 0.49600
-              type: ClearCircle
+              inner: 0.49600
+              outer: 0.55
+              type: ObscAnnulus
           -
             type: Detector
             name: FocalPlane
