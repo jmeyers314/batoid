@@ -78,7 +78,7 @@ class Interface(Optic):
         self.obscuration = obscuration
 
         # Stealing inRadius and outRadius from self.obscuration.  These are required for the draw
-        # methods.  Only works at the moment if obscuration is a negated circle or negated annulus.
+        # methods.
         self.inRadius = 0.0
         self.outRadius = None
         if self.obscuration is not None:
@@ -88,6 +88,11 @@ class Interface(Optic):
                 elif isinstance(self.obscuration.original, batoid.ObscAnnulus):
                     self.outRadius = self.obscuration.original.outer
                     self.inRadius = self.obscuration.original.inner
+            elif isinstance(self.obscuration, batoid.ObscCircle):
+                self.outRadius = self.obscuration.radius
+            elif isinstance(self.obscuration, batoid.ObscAnnulus):
+                self.outRadius = self.obscuration.outer
+                self.inRadius = self.obscuration.inner
 
     def __hash__(self):
         return hash((self.__class__.__name__, self.surface, self.obscuration, self.name,
@@ -154,26 +159,75 @@ class Interface(Optic):
         x, y, z = transform.applyForward(x, y, z)
         ax.plot(x, y, z, **kwargs)
 
+    def getXZSlice(self, nslice=0):
+        """Calculate global coordinates for an (x,z) slice through this interface.
+
+        The calculation is split into two half slices: xlocal <= 0 and xlocal >= 0.
+        When the inner radius is zero, these half slices are merged into one.
+        Otherwise, the two half slices are returned separately.
+
+        If the local coordinate system involves any rotation the resulting
+        slice may not be calculated correctly since we are really slicing in
+        (xlocal, zlocal) then transforming these to (xglobal, zglobal).
+
+        Parameters
+        ----------
+        nslice : int
+            Use the specified number of points on each half slice. When zero,
+            the value will be calculated automatically (and will be 2 for
+            planar surfaces).
+
+        Returns
+        -------
+        tuple
+            Tuple (xz1, xz2) of 1D arrays where xz1=[x1, z1] is the xlocal <= 0
+            half slice and xz2=[x2, z2] is the xlocal >= 0 half slice.
+        """
+        slice = []
+        if self.outRadius is None:
+            return slice
+        if nslice <= 0:
+            if isinstance(self.surface, batoid.surface.Plane):
+                nslice = 2
+            else:
+                nslice = 50
+        # Calculate (x,z) slice in local coordinates for x <= 0.
+        x = np.linspace(-self.outRadius, -self.inRadius, nslice)
+        y = np.zeros_like(x)
+        z = self.surface.sag(x, y)
+        # Transform slice to global coordinates.
+        transform = batoid.CoordTransform(self.coordSys, batoid.globalCoordSys)
+        xneg, yneg, zneg = transform.applyForward(x, y, z)
+        if np.any(yneg != 0):
+            print('WARNING: getXZSlice used for rotated surface "{0}".'.format(self.name))
+        # Calculate (x,z) slice in local coordinates for x >= 0.
+        x *= -1
+        x = x[::-1]
+        z[:] = self.surface.sag(x, y)
+        # Transform slice to global coordinates.
+        xpos, ypos, zpos = transform.applyForward(x, y, z)
+        if np.any(ypos != 0):
+            print('WARNING: getXZSlice used for rotated surface "{0}".'.format(self.name))
+        slice.append(np.stack((xpos, zpos), axis=0))
+        # Combine x <= 0 and x >= 0 half slices when inner = 0.
+        if self.inRadius == 0:
+            assert xneg[-1] == xpos[0] and zneg[-1] == zpos[0]
+            return (
+                np.stack((
+                    np.hstack((xneg, xpos[1:])),
+                    np.hstack((zneg, zpos[1:]))
+                ), axis=0),
+            )
+        else:
+            return (np.stack((xneg, zneg), axis=0), np.stack((xpos, zpos), axis=0))
+
     def draw2d(self, ax, **kwargs):
         """ Draw this interface on a 2d matplotlib axis.
         May not work if elements are non-circular or not axis-aligned.
         """
-        if self.outRadius is None:
-            return
-        # Drawing in the x-z plane.
-        x = np.linspace(-self.outRadius, -self.inRadius)
-        y = np.zeros_like(x)
-        z = self.surface.sag(x, y)
-        transform = batoid.CoordTransform(self.coordSys, globalCoordSys)
-        x, y, z = transform.applyForward(x, y, z)
-        ax.plot(x, z, **kwargs)
-
-        x = np.linspace(self.inRadius, self.outRadius)
-        y = np.zeros_like(x)
-        z = self.surface.sag(x, y)
-        transform = batoid.CoordTransform(self.coordSys, globalCoordSys)
-        x, y, z = transform.applyForward(x, y, z)
-        ax.plot(x, z, **kwargs)
+        slice = self.getXZSlice()
+        for x, z in slice:
+            ax.plot(x, z, **kwargs)
 
     def trace(self, r, inCoordSys=globalCoordSys, outCoordSys=None):
         """ Trace a ray through this optical element.
@@ -691,8 +745,22 @@ class CompoundOptic(Optic):
             item.draw3d(ax, **kwargs)
 
     def draw2d(self, ax, **kwargs):
+        """Draw a 2D slice of this compound optic in the (x,z) plane.
+
+        Calls draw2d recursively on each of our items, with the actual
+        drawing taking place in Interface and (optionally) Lens instances.
+
+        The kwargs are passed to the drawing commands, except for the
+        optional keyword 'only' which restricts drawing to only instances
+        that are subclasses of a specified type or types.
+        """
+        only = kwargs.pop('only', None)
         for item in self.items:
-            item.draw2d(ax, **kwargs)
+            item_class = item.__class__
+            if issubclass(item_class, batoid.optic.CompoundOptic):
+                item.draw2d(ax, only=only, **kwargs)
+            elif only is None or issubclass(item_class, only):
+                item.draw2d(ax, **kwargs)
 
     def __eq__(self, other):
         if not self.__class__ == other.__class__:
@@ -839,6 +907,45 @@ class Lens(CompoundOptic):
     def __hash__(self):
         return hash((self.medium, CompoundOptic.__hash__(self)))
 
+    def draw2d(self, ax, **kwargs):
+        """Specialized draw2d for Lens instances.
+
+        If the optional keyword 'only' equals batoid.optic.Lens,
+        then fill the area between the lens refractive interfaces
+        using the remaining specified kwargs (fc, ec, alpha, ...)
+
+        Otherwise, call draw2d on each of our refractive interfaces.
+
+        The optional labelpos and fontdict kwargs are used to
+        draw a label at the specified x position (in global coords),
+        using the specified font properties.
+        """
+        only = kwargs.pop('only', None)
+        if only == batoid.optic.Lens:
+            labelpos = kwargs.pop('labelpos', None)
+            fontdict = kwargs.pop('fontdict', None)
+            if len(self.items) != 2:
+                raise RuntimeError(
+                    'Cannot draw lens "{0}" with {1} surfaces.'.format(self.name, len(self.items)))
+            # Calculate the global coordinates of slices through our two interfaces.
+            slice1 = self.items[0].getXZSlice()
+            slice2 = self.items[1].getXZSlice()
+            # Fill the area between these slices.
+            all_z = []
+            for (x1, z1), (x2, z2) in zip(slice1, slice2):
+                x = np.hstack((x1, x2[::-1], x1[:1]))
+                z = np.hstack((z1, z2[::-1], z1[:1]))
+                all_z.append(z)
+                ax.fill(x, z, **kwargs)
+            # Draw an optional label for this lens.
+            if labelpos is not None:
+                zlabel = np.mean(all_z)
+                ax.text(
+                    labelpos, zlabel, self.name, fontdict=fontdict,
+                    horizontalalignment='center', verticalalignment='center')
+        else:
+            super(Lens, self).draw2d(ax, only=only, **kwargs)
+
     def withGlobalShift(self, shift):
         newItems = [item.withGlobalShift(shift) for item in self.items]
         ret = self.__class__.__new__(self.__class__)
@@ -938,52 +1045,74 @@ class Lens(CompoundOptic):
         raise RuntimeError("Error in withLocallyRotatedOptic!, Shouldn't get here!")
 
 
+def getGlobalRays(traceFull, start=None, end=None, globalSys=globalCoordSys):
+    """Calculate an array of ray vertices in global coordinates.
+
+    Parameters
+    ----------
+    traceFull : array
+        Array of per-surface ray-tracing output from traceFull()
+    start : str or None
+        Name of the first surface to include in the output, or use the first
+        surface in the model when None.
+    end : str or None
+        Name of the last surface to include in the output, or use the last
+        surface in the model when None.
+    globalSys : batoid.CoordSys
+        Global coordinate system to use.
+    
+    Returns
+    -------
+    tuple
+        Tuple (xyz, raylen) of arrays with shapes (nray, 3, nsurf + 1) and
+        (nray,).  The xyz array contains the global coordinates of each
+        ray vertex, with raylen giving the number of visible (not vignetted)
+        vertices for each ray.
+    """
+    names = [trace['name'] for trace in traceFull]
+    try:
+        start = 0 if start is None else names.index(start)
+    except ValueError:
+        raise ValueError('No such start surface "{0}".'.format(start))
+    try:
+        end = len(names) if end is None else names.index(end) + 1
+    except ValueError:
+        raise ValueError('No such end surface "{0}".'.format(end))
+    nsurf = end - start
+    if nsurf <= 0:
+        raise ValueError('Expected start < end.')
+    nray = len(traceFull[start]['in'])
+    # Allocate an array for all ray vertices in global coords.
+    xyz = np.empty((nray, 3, nsurf + 1))
+    # First point on each ray is where it enters the start surface.
+    transform = batoid.CoordTransform(traceFull[start]['inCoordSys'], globalSys)
+    xyz[:, :, 0] = np.stack(transform.applyForward(*traceFull[start]['in'].r.T), axis=1)
+    # Keep track of the number of visible points on each ray.
+    raylen = np.ones(nray, dtype=int)
+    for i, surface in enumerate(traceFull[start:end]):
+        # Add a point for where each ray leaves this surface.
+        transform = batoid.CoordTransform(surface['outCoordSys'], globalSys)
+        xyz[:, :, i + 1] = np.stack(transform.applyForward(*surface['out'].r.T), axis=1)
+        # Keep track of rays which are still visible.
+        visible = ~surface['out'].vignetted
+        raylen[visible] += 1
+    return xyz, raylen
+
+
 def drawTrace3d(ax, traceFull, start=None, end=None, **kwargs):
-    if start is None:
-        start = traceFull[0]['name']
-    if end is None:
-        end = traceFull[-1]['name']
-    doPlot = False
-    for surface in traceFull:
-        if surface['name'] == start:
-            doPlot = True
-        if doPlot:
-            inTransform = batoid.CoordTransform(surface['inCoordSys'], globalCoordSys)
-            outTransform = batoid.CoordTransform(surface['outCoordSys'], globalCoordSys)
-            for inray, outray in zip(surface['in'], surface['out']):
-                if not outray.vignetted:
-                    inray = inTransform.applyForward(inray)
-                    outray = outTransform.applyForward(outray)
-                    ax.plot(
-                        [inray.x, outray.x],
-                        [inray.y, outray.y],
-                        [inray.z, outray.z],
-                        **kwargs
-                    )
-        if surface['name'] == end:
-            break
+    """Draw 3D rays in global coordinates on the specified axis.
+    """
+    xyz, raylen = getGlobalRays(traceFull, start, end)
+    lines = []
+    for line, nline in zip(xyz, raylen):
+        ax.plot(line[0, :nline], line[1, :nline], line[2, :nline], **kwargs)
 
 
 def drawTrace2d(ax, traceFull, start=None, end=None, **kwargs):
-    if start is None:
-        start = traceFull[0]['name']
-    if end is None:
-        end = traceFull[-1]['name']
-    doPlot = False
-    for surface in traceFull:
-        if surface['name'] == start:
-            doPlot = True
-        if doPlot:
-            inTransform = batoid.CoordTransform(surface['inCoordSys'], globalCoordSys)
-            outTransform = batoid.CoordTransform(surface['outCoordSys'], globalCoordSys)
-            for inray, outray in zip(surface['in'], surface['out']):
-                if not outray.vignetted:
-                    inray = inTransform.applyForward(inray)
-                    outray = outTransform.applyForward(outray)
-                    ax.plot(
-                        [inray.x, outray.x],
-                        [inray.z, outray.z],
-                        **kwargs
-                    )
-        if surface['name'] == end:
-            break
+    """Draw 2D rays in global coordinates on the specified axis.
+    """
+    xyz, raylen = getGlobalRays(traceFull, start, end)
+    lines = []
+    for line, nline in zip(xyz, raylen):
+        lines.extend([line[0, :nline], line[2, :nline]])
+    ax.plot(*lines, **kwargs)
