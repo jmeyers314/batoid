@@ -437,21 +437,15 @@ def test_coord():
     u = np.random.uniform(-0.5, 0.5, size=10000)
     v = np.random.uniform(-0.5, 0.5, size=10000)
 
-    _, dec = pole.deproject_rad(u, v, projection='gnomonic')
-    _, _, zcos = batoid.utils.gnomonicToDirCos(u, v)
-    np.testing.assert_allclose(np.sin(dec), zcos, rtol=0, atol=1e-13)
-
-    _, dec = pole.deproject_rad(u, v, projection='stereographic')
-    _, _, zcos = batoid.utils.stereographicToDirCos(u, v)
-    np.testing.assert_allclose(np.sin(dec), zcos, rtol=0, atol=1e-13)
-
-    _, dec = pole.deproject_rad(u, v, projection='postel')
-    _, _, zcos = batoid.utils.postelToDirCos(u, v)
-    np.testing.assert_allclose(np.sin(dec), zcos, rtol=0, atol=1e-13)
-
-    _, dec = pole.deproject_rad(u, v, projection='lambert')
-    _, _, zcos = batoid.utils.lambertToDirCos(u, v)
-    np.testing.assert_allclose(np.sin(dec), zcos, rtol=0, atol=1e-10)
+    for projection in ['gnomonic', 'stereographic', 'postel', 'lambert']:
+        ra, dec = pole.deproject_rad(u, v, projection=projection)
+        xcos, ycos, zcos = batoid.utils.fieldToDirCos(u, v, projection=projection)
+        np.testing.assert_allclose(np.sin(dec), zcos, rtol=0, atol=1e-13)
+        np.testing.assert_allclose(
+            np.abs((np.pi/2-ra)-np.arctan2(ycos, xcos)),
+            np.pi,
+            rtol=0, atol=1e-13
+        )
 
 
 if __name__ == '__main__':

@@ -1,10 +1,10 @@
 import numpy as np
 import batoid
-from .utils import bilinear_fit, gnomonicToDirCos
+from .utils import bilinear_fit, fieldToDirCos
 
 
 def huygensPSF(optic, theta_x=None, theta_y=None, wavelength=None, nx=None,
-               dx=None, dy=None, nxOut=None):
+               projection='postel', dx=None, dy=None, nxOut=None):
     """Compute a PSF via the Huygens construction.
 
     Parameters
@@ -17,6 +17,8 @@ def huygensPSF(optic, theta_x=None, theta_y=None, wavelength=None, nx=None,
         Wavelength in meters
     nx : int, optional
         Size of ray grid to use.
+    projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}
+        Projection used to convert field angle to direction cosines.
     dx, dy : float, optional
         Lattice scales to use for PSF evaluation locations.  Default, use fftPSF lattice.
 
@@ -45,7 +47,7 @@ def huygensPSF(optic, theta_x=None, theta_y=None, wavelength=None, nx=None,
 
     if dx is None:
         primitiveU = np.array([[optic.pupilSize/nx,0], [0, optic.pupilSize/nx]])
-        primitiveK = dkdu(optic, theta_x, theta_y, wavelength).dot(primitiveU)
+        primitiveK = dkdu(optic, theta_x, theta_y, wavelength, projection=projection).dot(primitiveU)
         pad_factor = 2
         primitiveX = np.vstack(
             reciprocalLatticeVectors(primitiveK[0], primitiveK[1], pad_factor*nx)
@@ -62,7 +64,7 @@ def huygensPSF(optic, theta_x=None, theta_y=None, wavelength=None, nx=None,
     if nxOut is None:
         nxOut = nx
 
-    dirCos = gnomonicToDirCos(theta_x, theta_y)
+    dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
 
     rays = batoid.rayGrid(optic.dist, optic.pupilSize,
         dirCos[0], dirCos[1], -dirCos[2],
@@ -86,7 +88,7 @@ def huygensPSF(optic, theta_x=None, theta_y=None, wavelength=None, nx=None,
     return batoid.Lattice(np.abs(amplitudes)**2, primitiveX)
 
 
-def drdth(optic, theta_x, theta_y, wavelength, nx=16):
+def drdth(optic, theta_x, theta_y, wavelength, nx=16, projection='postel'):
     """Calculate derivative of focal plane coord with respect to field angle.
 
     Parameters
@@ -99,6 +101,8 @@ def drdth(optic, theta_x, theta_y, wavelength, nx=16):
         Wavelength in meters
     nx : int, optional
         Size of ray grid to use.
+    projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}
+        Projection used to convert field angle to direction cosines.
 
     Returns
     -------
@@ -116,9 +120,9 @@ def drdth(optic, theta_x, theta_y, wavelength, nx=16):
     dth = 1e-5
 
     # Make direction cosine vectors
-    nominalCos = gnomonicToDirCos(theta_x, theta_y)
-    dthxCos = gnomonicToDirCos(theta_x + dth, theta_y)
-    dthyCos = gnomonicToDirCos(theta_x, theta_y+ dth)
+    nominalCos = fieldToDirCos(theta_x, theta_y, projection=projection)
+    dthxCos = fieldToDirCos(theta_x + dth, theta_y, projection=projection)
+    dthyCos = fieldToDirCos(theta_x, theta_y + dth, projection=projection)
 
     # Flip the dirCos z-components so rays are headed downwards
     rays = batoid.rayGrid(optic.dist, optic.pupilSize,
@@ -150,7 +154,7 @@ def drdth(optic, theta_x, theta_y, wavelength, nx=16):
     return np.array([[drx_dthx, dry_dthx], [drx_dthy, dry_dthy]])
 
 
-def dthdr(optic, theta_x, theta_y, wavelength, nx=16):
+def dthdr(optic, theta_x, theta_y, wavelength, nx=16, projection='postel'):
     """Calculate derivative of field angle with respect to focal plane coordinate.
 
     Parameters
@@ -163,6 +167,8 @@ def dthdr(optic, theta_x, theta_y, wavelength, nx=16):
         Wavelength in meters
     nx : int, optional
         Size of ray grid to use.
+    projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}
+        Projection used to convert field angle to direction cosines.
 
     Returns
     -------
@@ -176,10 +182,10 @@ def dthdr(optic, theta_x, theta_y, wavelength, nx=16):
         It should be *close* to the plate scale though, especially near the center of the tangent
         plane projection.
     """
-    return np.linalg.inv(drdth(optic, theta_x, theta_y, wavelength, nx=nx))
+    return np.linalg.inv(drdth(optic, theta_x, theta_y, wavelength, nx=nx, projection=projection))
 
 
-def dkdu(optic, theta_x, theta_y, wavelength, nx=16):
+def dkdu(optic, theta_x, theta_y, wavelength, nx=16, projection='postel'):
     """Calculate derivative of outgoing ray k-vector with respect to incoming ray
     pupil coordinate.
 
@@ -193,6 +199,8 @@ def dkdu(optic, theta_x, theta_y, wavelength, nx=16):
         Wavelength in meters
     nx : int, optional
         Size of ray grid to use.
+    projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}
+        Projection used to convert field angle to direction cosines.
 
     Returns
     -------
@@ -200,7 +208,7 @@ def dkdu(optic, theta_x, theta_y, wavelength, nx=16):
         Jacobian transformation matrix for converting between (kx, ky) of rays impacting the focal
         plane and initial field angle (gnomonic tangent plane projection).
     """
-    dirCos = gnomonicToDirCos(theta_x, theta_y)
+    dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
     rays = batoid.rayGrid(
         optic.dist, optic.pupilSize,
         dirCos[0], dirCos[1], -dirCos[2],
@@ -223,7 +231,8 @@ def dkdu(optic, theta_x, theta_y, wavelength, nx=16):
     return soln[1:]
 
 
-def wavefront(optic, theta_x, theta_y, wavelength, nx=32, sphereRadius=None, lattice=False):
+def wavefront(optic, theta_x, theta_y, wavelength, nx=32, projection='postel', sphereRadius=None,
+              lattice=False):
     """Compute wavefront.
 
     Parameters
@@ -236,6 +245,8 @@ def wavefront(optic, theta_x, theta_y, wavelength, nx=32, sphereRadius=None, lat
         Wavelength of incoming rays
     nx : int, optional
         Size of ray grid to generate to compute wavefront.  Default: 32
+    projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}
+        Projection used to convert field angle to direction cosines.
     sphereRadius : float, optional
         Radius of reference sphere in meters.  If None, then use optic.sphereRadius.
     lattice : bool, optional
@@ -248,7 +259,7 @@ def wavefront(optic, theta_x, theta_y, wavelength, nx=32, sphereRadius=None, lat
         A batoid.Lattice object containing the wavefront values in waves and
         the primitive lattice vectors of the entrance pupil grid in meters.
     """
-    dirCos = gnomonicToDirCos(theta_x, theta_y)
+    dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
     rays = batoid.rayGrid(
         optic.dist, optic.pupilSize,
         dirCos[0], dirCos[1], -dirCos[2],
@@ -290,7 +301,7 @@ def reciprocalLatticeVectors(a1, a2, N):
     return b1, b2
 
 
-def fftPSF(optic, theta_x, theta_y, wavelength, nx=32, pad_factor=2):
+def fftPSF(optic, theta_x, theta_y, wavelength, nx=32, projection='postel', pad_factor=2):
     """Compute PSF using FFT.
 
     Parameters
@@ -303,6 +314,8 @@ def fftPSF(optic, theta_x, theta_y, wavelength, nx=32, pad_factor=2):
         Wavelength of incoming rays
     nx : int, optional
         Size of ray grid to generate to compute wavefront.  Default: 32
+    projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}
+        Projection used to convert field angle to direction cosines.
     pad_factor : int, optional
         Factor by which to pad pupil array.  Default: 2
 
@@ -314,7 +327,7 @@ def fftPSF(optic, theta_x, theta_y, wavelength, nx=32, pad_factor=2):
     """
     L = optic.pupilSize*pad_factor
     # im_dtheta = wavelength / L
-    wf = wavefront(optic, theta_x, theta_y, wavelength, nx, lattice=True)
+    wf = wavefront(optic, theta_x, theta_y, wavelength, nx, projection=projection, lattice=True)
     wfarr = wf.array
     pad_size = nx*pad_factor
     expwf = np.zeros((pad_size, pad_size), dtype=np.complex128)
@@ -324,16 +337,17 @@ def fftPSF(optic, theta_x, theta_y, wavelength, nx=32, pad_factor=2):
     psf = np.abs(np.fft.fftshift(np.fft.fft2(expwf)))**2
 
     primitiveU = wf.primitiveVectors
-    primitiveK = dkdu(optic, theta_x, theta_y, wavelength).dot(primitiveU)
+    primitiveK = dkdu(optic, theta_x, theta_y, wavelength, projection=projection).dot(primitiveU)
     primitiveX = np.vstack(reciprocalLatticeVectors(primitiveK[0], primitiveK[1], pad_size))
 
     return batoid.Lattice(psf, primitiveX)
 
 
-def zernike(optic, theta_x, theta_y, wavelength, nx=32, jmax=22, eps=0.0, sphereRadius=None):
+def zernike(optic, theta_x, theta_y, wavelength, nx=32, projection='postel', jmax=22, eps=0.0,
+            sphereRadius=None):
     import galsim
 
-    dirCos = gnomonicToDirCos(theta_x, theta_y)
+    dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
     rays = batoid.rayGrid(
         optic.dist, optic.pupilSize,
         dirCos[0], dirCos[1], -dirCos[2],
@@ -346,7 +360,8 @@ def zernike(optic, theta_x, theta_y, wavelength, nx=32, jmax=22, eps=0.0, sphere
     orig_x = np.array(rays.x).reshape(nx,nx)
     orig_y = np.array(rays.y).reshape(nx,nx)
 
-    wf = wavefront(optic, theta_x, theta_y, wavelength, nx=nx, sphereRadius=sphereRadius)
+    wf = wavefront(optic, theta_x, theta_y, wavelength, nx=nx, projection=projection,
+                   sphereRadius=sphereRadius)
     wfarr = wf.array
     w = ~wfarr.mask
 
@@ -359,8 +374,8 @@ def zernike(optic, theta_x, theta_y, wavelength, nx=32, jmax=22, eps=0.0, sphere
     return np.array(coefs)
 
 
-def fpPosition(optic, theta_x, theta_y, wavelength, nx=32):
-    dirCos = gnomonicToDirCos(theta_x, theta_y)
+def fpPosition(optic, theta_x, theta_y, wavelength, nx=32, projection='postel'):
+    dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
     rays = batoid.rayGrid(
         optic.dist, optic.pupilSize,
         dirCos[0], dirCos[1], -dirCos[2],
