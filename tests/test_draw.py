@@ -18,7 +18,7 @@ def initialize(ngrid=25, theta_x=1.):
     DESI_fn = os.path.join(batoid.datadir, 'DESI', 'DESI.yaml')
     config = yaml.safe_load(open(DESI_fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
-    dirCos = batoid.utils.gnomicToDirCos(np.deg2rad(theta_x), 0.)
+    dirCos = batoid.utils.gnomonicToDirCos(np.deg2rad(theta_x), 0.)
     rays = batoid.rayGrid(
         telescope.dist, telescope.pupilSize, dirCos[0], dirCos[1], -dirCos[2],
         ngrid, 500e-9, 1.0, telescope.inMedium
