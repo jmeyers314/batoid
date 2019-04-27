@@ -499,7 +499,7 @@ class Bicubic(Surface):
     dzdxs : array_like, optional
         2d array indicating derivatives dz/dx at grid points.
     dzdys : array_like, optional
-        2d array indicating derivatives dz/dx at grid points.
+        2d array indicating derivatives dz/dy at grid points.
     d2zdxdys : array_like, optional
         2d array indicating mixed derivatives d^2 z / (dx dy) at grid points.
     """
