@@ -87,22 +87,17 @@ def postelToDirCos(u, v):
     The tangent plane reference is at (u,v) = (0,0) and (alpha, beta, gamma) = (0,0,1),
     and u.x > 0, u.y=0, v.x=0, v.y > 0.
     """
+    output_shape = np.broadcast(u, v).shape
+    u, v = np.atleast_1d(u), np.atleast_1d(v)
     rho = np.sqrt(u*u + v*v)
-    wZero = rho == 0.0
-    try:
-        if wZero:
-            return 0.0, 0.0, 1.0
-    except ValueError:
-        pass
+    rhoinv = np.zeros_like(rho)
+    nonzero = rho > 0
+    rhoinv[nonzero] = 1 / rho[nonzero]
     srho = np.sin(rho)
-    alpha = u/rho*srho
-    beta = v/rho*srho
+    alpha = u * rhoinv * srho
+    beta = v * rhoinv *srho
     gamma = np.cos(rho)
-    if np.any(wZero):
-        alpha[wZero] = 0.0
-        beta[wZero] = 0.0
-        gamma[wZero] = 1.0
-    return alpha, beta, gamma
+    return alpha.reshape(output_shape), beta.reshape(output_shape), gamma.reshape(output_shape)
 
 
 def dirCosToPostel(alpha, beta, gamma):
