@@ -103,6 +103,19 @@ def test_postelDirCos():
 
 
 @timer
+def test_projections_at_origin():
+    for proj in 'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic':
+        # Scalar args.
+        dirCos = batoid.utils.fieldToDirCos(0., 0., projection=proj)
+        np.testing.assert_equal(dirCos, [0., 0., 1.])
+        # Broadcasting over array args.
+        dirCos = batoid.utils.fieldToDirCos(np.zeros(3), 0., projection=proj)
+        np.testing.assert_equal(dirCos[0], [0., 0., 0.])
+        np.testing.assert_equal(dirCos[1], [0., 0., 0.])
+        np.testing.assert_equal(dirCos[2], [1., 1., 1.])
+
+
+@timer
 def test_zemaxDirCos():
     np.random.seed(5772)
     u = np.random.uniform(-0.5, 0.5, size=10000)
