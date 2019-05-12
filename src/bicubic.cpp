@@ -1,5 +1,7 @@
 #include "bicubic.h"
 #include "solve.h"
+#include "table.h"
+#include <cmath>
 
 using Eigen::Vector2d;
 using Eigen::Vector4d;
@@ -47,8 +49,13 @@ namespace batoid {
 
     double Bicubic::sag(double x, double y) const {
         // Determine cell to use and offset
-        int ix = _xargs.upperIndex(x);
-        int iy = _yargs.upperIndex(y);
+        int ix, iy;
+        try {
+            ix = _xargs.upperIndex(x);
+            iy = _yargs.upperIndex(y);
+        } catch (const TableOutOfRange&) {
+            return NAN;
+        }
         double dx = _xargs.getDa();
         double dy = _yargs.getDa();
         double xfrac = (x-_xargs[ix-1])/dx;
@@ -68,8 +75,13 @@ namespace batoid {
 
     Vector3d Bicubic::normal(double x, double y) const {
         // Determine cell to use and offset
-        int ix = _xargs.upperIndex(x);
-        int iy = _yargs.upperIndex(y);
+        int ix, iy;
+        try {
+            ix = _xargs.upperIndex(x);
+            iy = _yargs.upperIndex(y);
+        } catch (const TableOutOfRange&) {
+            return Vector3d(NAN, NAN, NAN);
+        }
         double dx = _xargs.getDa();
         double dy = _yargs.getDa();
         double xfrac = (x-_xargs[ix-1])/dx;
@@ -123,6 +135,8 @@ namespace batoid {
             solve.bracket();
             t = solve.root();
         } catch (const SolveError&) {
+            return false;
+        } catch (const TableOutOfRange&) {
             return false;
         }
         if (t < r.t) return false;

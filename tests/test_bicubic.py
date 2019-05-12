@@ -50,6 +50,9 @@ def test_sag():
             atol=0, rtol=1e-10
         )
 
+    # sag returns nan outside of grid domain
+    assert np.isnan(bc.sag(-1, -1))
+
 
 @timer
 def test_normal():
@@ -164,6 +167,10 @@ def test_normal():
             atol=1e-12, rtol=0
         )
 
+    # normal returns (nan, nan, nan) outside of grid domain
+    out = bc.normal(-1, -1)
+    assert all(np.isnan(o) for o in out)
+
 
 @timer
 def test_intersect():
@@ -189,6 +196,10 @@ def test_intersect():
         np.testing.assert_allclose(r.r[0], x)
         np.testing.assert_allclose(r.r[1], y)
         np.testing.assert_allclose(r.r[2], bc.sag(x, y), rtol=0, atol=1e-9)
+
+    # intersect should fail, but gracefully, outside of grid domain
+    r0 = batoid.Ray(-1, -1, -10, 0, 0, 1, 0)
+    assert bc.intersect(r0).failed
 
 
 @timer
