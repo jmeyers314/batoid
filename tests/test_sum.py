@@ -163,6 +163,40 @@ def test_intersect():
 
 
 @timer
+def test_sum_bicubic():
+    import os
+    import yaml
+
+    fn = os.path.join(batoid.datadir, "LSST", "LSST_i.yaml")
+    config = yaml.safe_load(open(fn))
+    telescope = batoid.parse.parse_optic(config['opticalSystem'])
+    xcos, ycos, zcos = batoid.utils.gnomonicToDirCos(
+        np.deg2rad(0.8), np.deg2rad(0.8)
+    )
+    rays = batoid.circularGrid(
+        telescope.dist,
+        telescope.pupilSize/2,
+        telescope.pupilSize*telescope.pupilObscuration/2,
+        xcos, ycos, -zcos,
+        50, 50, 750e-9, 1.0, telescope.inMedium
+    )
+    out, _ = telescope.trace(rays)
+
+    m2 = telescope.itemDict['LSST.M2']
+
+    xs = np.linspace(-m2.outRadius, m2.outRadius, 200)
+    ys = xs
+    zs = np.zeros((200, 200), dtype=float)
+    bicubic = batoid.Bicubic(xs, ys, zs)
+
+    m2.surface = batoid.Sum([m2.surface, bicubic])
+    out2, _ = telescope.trace(rays)
+
+    # Don't expect exact equality, but should be very similar
+    assert rays_allclose(out, out2, atol=1e-13)
+
+
+@timer
 def test_ne():
     objs = [
         batoid.Sum([batoid.Plane(), batoid.Plane()]),
@@ -191,5 +225,6 @@ if __name__ == '__main__':
     test_add_plane()
     test_sum_paraboloid()
     test_intersect()
+    test_sum_bicubic()
     test_ne()
     test_fail()
