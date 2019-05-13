@@ -38,8 +38,9 @@ namespace batoid {
     };
 
     bool Sum::timeToIntersect(const Ray& r, double& t) const {
-        // better guess?
-        t = 0.0;
+        // Use first surface as an initial guess
+        if (!_surfaces[0]->timeToIntersect(r, t))
+            return false;
         SumResidual resid(*this, r);
         Solve<SumResidual> solve(resid, t, t+1e-2);
         solve.setMethod(Method::Brent);

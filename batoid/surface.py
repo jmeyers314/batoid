@@ -598,7 +598,7 @@ class Sum(Surface):
         `Surface`s to add together.
     """
     def __init__(self, surfaces):
-        self._surfaces = sorted(surfaces, key=repr)
+        self._surfaces = surfaces
         self._surface = _batoid.Sum([s._surface for s in surfaces])
 
     @property
