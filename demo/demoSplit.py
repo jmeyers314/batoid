@@ -29,7 +29,7 @@ for angle in angles:
         dirCos[0], dirCos[1], -dirCos[2],
         300, 900, 500e-9, 1.0, telescope.inMedium)
 
-    rForward, rReverse, _, _ = telescope.traceSplit(rays, minFlux=1e-4, verbose=True)
+    rForward, rReverse, _, _ = telescope.traceSplit(rays, minFlux=1e-4, _verbose=True)
 
     print(len(rays))
     print(np.sum(rays.flux))

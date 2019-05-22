@@ -5,32 +5,28 @@ from .constants import globalCoordSys, vacuum
 
 
 class Optic:
-    """This is the most general category of batoid optical system.  It can include
+    """
+    This is the most general category of batoid optical system.  It can include
     a single reflective or refractive surface, a lens consisting of two surfaces, or
     an entire telescope including multiple mirrors and/or surfaces.
 
     Parameters
     ----------
-        name : str or None
-            An optional name for this optic
-
-        inMedium : batoid.Medium
-            Medium in which approaching rays reside
-
-        outMedium : batoid.Medium
-            Medium in which rays will leave this optic
-
-        coordSys : batoid.CoordSys
-            Coordinate system indicating the position and orientation of this optic's vertex
-            with respect to it's parent's coordinate system.  Optics can be nested, i.e., a camera
-            Optic may contain several lens Optics, and may itself be part of a larger telescope
-            Optic.
-
-        skip : bool
-            Whether or not to skip this optic when tracing.
-
-        **kwargs : other
-            Other attributes to add as object attributes.
+    name : str or None
+        An optional name for this optic
+    inMedium : batoid.Medium
+        Medium in which approaching rays reside
+    outMedium : batoid.Medium
+        Medium in which rays will leave this optic
+    coordSys : batoid.CoordSys
+        Coordinate system indicating the position and orientation of this optic's vertex
+        with respect to it's parent's coordinate system.  Optics can be nested, i.e., a camera
+        Optic may contain several lens Optics, and may itself be part of a larger telescope
+        Optic.
+    skip : bool
+        Whether or not to skip this optic when tracing.
+    **kwargs : other
+        Other attributes to add as object attributes.
     """
     def __init__(self, name=None, coordSys=globalCoordSys, inMedium=vacuum,
                  outMedium=vacuum, skip=False, **kwargs):
@@ -55,21 +51,20 @@ class Optic:
 
 
 class Interface(Optic):
-    """The most basic category of Optic representing a single surface.  Almost always one of the
+    """
+    The most basic category of Optic representing a single surface.  Almost always one of the
     concrete subclasses should be instantiated, depending on whether rays should reflect, refract,
     or simply pass through this surface.
 
     Parameters
     ----------
-        surface : batoid.Surface
-            The surface instance for this Interface.
-
-        obscuration : batoid.Obscuration or None
-            Batoid.Obscuration instance indicating which x,y coordinates are obscured/unobscured
-            for rays intersecting this optic.
-
-        **kwargs :
-            Other parameters to forward to Optic.__init__.
+    surface : batoid.Surface
+        The surface instance for this Interface.
+    obscuration : batoid.Obscuration or None
+        Batoid.Obscuration instance indicating which x,y coordinates are obscured/unobscured
+        for rays intersecting this optic.
+    **kwargs :
+        Other parameters to forward to Optic.__init__
     """
     def __init__(self, surface, obscuration=None, **kwargs):
         Optic.__init__(self, **kwargs)
@@ -99,13 +94,13 @@ class Interface(Optic):
                      self.inMedium, self.outMedium, self.coordSys))
 
     def draw3d(self, ax, **kwargs):
-        """ Draw this interface on a mplot3d axis.
+        """
+        Draw this interface on a mplot3d axis.
 
         Parameters
         ----------
-
-            ax : mplot3d.Axis
-                Axis on which to draw this optic.
+        ax : mplot3d.Axis
+            Axis on which to draw this optic.
         """
         if self.outRadius is None:
             return
@@ -160,7 +155,8 @@ class Interface(Optic):
         ax.plot(x, y, z, **kwargs)
 
     def getXZSlice(self, nslice=0):
-        """Calculate global coordinates for an (x,z) slice through this interface.
+        """
+        Calculate global coordinates for an (x,z) slice through this interface.
 
         The calculation is split into two half slices: xlocal <= 0 and xlocal >= 0.
         When the inner radius is zero, these half slices are merged into one.
@@ -222,33 +218,39 @@ class Interface(Optic):
             return (np.stack((xneg, zneg), axis=0), np.stack((xpos, zpos), axis=0))
 
     def draw2d(self, ax, **kwargs):
-        """ Draw this interface on a 2d matplotlib axis.
+        """
+        Draw this interface on a 2d matplotlib axis.
         May not work if elements are non-circular or not axis-aligned.
+
+        Parameters
+        ----------
+        ax : matplotlib.axes.Axes
+            Axis on which to draw this optic.
         """
         slice = self.getXZSlice()
         for x, z in slice:
             ax.plot(x, z, **kwargs)
 
     def trace(self, r, inCoordSys=globalCoordSys, outCoordSys=None):
-        """ Trace a ray through this optical element.
+        """
+        Trace ray(s) through this optical element.
 
         Parameters
         ----------
-
         r : batoid.Ray or batoid.RayVector
-            input ray to trace
-
+            Input ray(s) to trace
         inCoordSys : batoid.CoordSys
             Coordinate system of incoming ray(s).  Default: the global coordinate system.
-
         outCoordSys : batoid.CoordSys
             Coordinate system into which to project the output ray(s).  Default: None,
             which means use the coordinate system of the optic.
 
         Returns
         -------
-            Ray or RayVector, output CoordSys.
-
+        batoid.Ray or batoid.RayVector
+            Output ray(s)
+        batoid.CoordSys
+            Coordinate system of output rays.
         """
         if self.skip:
             return r, inCoordSys
@@ -268,6 +270,30 @@ class Interface(Optic):
             return transform.applyForward(r), outCoordSys
 
     def traceFull(self, r, inCoordSys=globalCoordSys, outCoordSys=None):
+        """
+        Trace ray(s) through this optical element, returning a full history of all surface
+        intersections.
+
+        Parameters
+        ----------
+        r : batoid.Ray or batoid.RayVector
+            Input ray(s) to trace
+        inCoordSys : batoid.CoordSys
+            Coordinate system of incoming ray(s).  Default: the global coordinate system.
+        outCoordSys : batoid.CoordSys
+            Coordinate system into which to project the output ray(s).  Default: None,
+            which means use the coordinate system of the optic.
+
+        Returns
+        -------
+        List of dict
+            Each dict contains fields:
+                'name' : name of Interface
+                'in' : the incoming Ray or RayVector to that Interface
+                'inCoordSys' : coordinate system for incoming ray(s)
+                'out' : the outgoing Ray or RayVector to that Interface
+                'outCoordSys' : coordinate system for outgoing ray(s)
+        """
         if self.skip:
             return []
         result = [{'name':self.name, 'in':r, 'inCoordSys':inCoordSys}]
@@ -277,6 +303,28 @@ class Interface(Optic):
         return result
 
     def traceInPlace(self, r, inCoordSys=globalCoordSys, outCoordSys=None):
+        """
+        Trace ray(s) through this optical element in place (result replaces input Ray or RayVector)
+
+        Parameters
+        ----------
+        r : batoid.Ray or batoid.RayVector
+            Input ray(s) to trace
+        inCoordSys : batoid.CoordSys
+            Coordinate system of incoming ray(s).  Default: the global coordinate system.
+        outCoordSys : batoid.CoordSys
+            Coordinate system into which to project the output ray(s).  Default: None,
+            which means use the coordinate system of the optic.
+
+        Returns
+        -------
+        Ray or RayVector, output CoordSys.
+
+        Notes
+        -----
+        The return Ray or RayVector is present for convenience, but is actually an alias for the
+        input Ray or RayVector that has had its values replaced.
+        """
         if self.skip:
             return r, inCoordSys
         transform = batoid.CoordTransform(inCoordSys, self.coordSys)
@@ -296,8 +344,26 @@ class Interface(Optic):
             return r, outCoordSys
 
     def traceReverse(self, r, inCoordSys=globalCoordSys, outCoordSys=None):
-        """Trace through optic(s) in reverse.  Note, you may need to reverse the direction
-        of rays for this to work.
+        """
+        Trace ray(s) through this optical element in reverse.
+
+        Parameters
+        ----------
+        r : batoid.Ray or batoid.RayVector
+            Input ray(s) to trace
+        inCoordSys : batoid.CoordSys
+            Coordinate system of incoming ray(s).  Default: the global coordinate system.
+        outCoordSys : batoid.CoordSys
+            Coordinate system into which to project the output ray(s).  Default: None,
+            which means use the coordinate system of the optic.
+
+        Returns
+        -------
+        Ray or RayVector, output CoordSys.
+
+        Notes
+        -----
+        You may need to reverse the directions of rays before using this method!
         """
         if self.skip:
             return r, inCoordSys
@@ -316,11 +382,40 @@ class Interface(Optic):
             return transform.applyForward(r), outCoordSys
 
     def traceSplit(self, r, inCoordSys=globalCoordSys, forwardCoordSys=None, reverseCoordSys=None,
-                   minFlux=1e-3, verbose=False):
-        """Assume Rays are coming in from the forward direction.
-        returns forwardRays, forwardCoordSys, reverseRays, reverseCoordSys
+                   minFlux=1e-3, _verbose=False):
         """
-        if verbose:
+        Trace ray(s) through this optical element, splitting the return values into rays that
+        continue propagating in the "forward" direction, and those that were reflected into the
+        "reverse" direction.  Fluxes of output rays are proportional to reflection/transmission
+        coefficients of the interface (which may depend on wavelength and incidence angle).
+
+        Parameters
+        ----------
+        r : batoid.Ray or batoid.RayVector
+            Input ray(s) to trace
+        inCoordSys : batoid.CoordSys
+            Coordinate system of incoming ray(s).  Default: the global coordinate system.
+        forwardCoordSys : batoid.CoordSys
+            Coordinate system into which to project the output forward direction rays.
+            Default: None, which means use the coordinate system of the optic.
+        reverseCoordSys : batoid.CoordSys
+            Coordinate system into which to project the output reverse direction rays.
+            Default: None, which means use the coordinate system of the optic.
+        minFlux : float
+            Minimum flux value of ray(s) to continue propagating.  Default: 1e-3.
+
+        Returns
+        -------
+        forwardRays : batoid.Ray or batoid.RayVector
+            Ray(s) propagating in the forward direction.
+        forwardCoordSys : batoid.CoordSys
+            Coordinate system of forward ray(s).
+        reverseRays : batoid.Ray or batoid.RayVector
+            Ray(s) propagating in the reverse direction.
+        reverseCoordSys : batoid.CoordSys
+            Coordinate system of reverse ray(s).
+        """
+        if _verbose:
             strtemplate = "traceSplit        {:15s} flux = {:18.8f}   nphot = {:10d}"
             print(strtemplate.format(self.name, np.sum(r.flux), len(r)))
         if self.skip:
@@ -350,11 +445,41 @@ class Interface(Optic):
         return rForward, rReverse, forwardCoordSys, reverseCoordSys
 
     def traceSplitReverse(self, r, inCoordSys=globalCoordSys, forwardCoordSys=None,
-                          reverseCoordSys=None, minFlux=1e-3, verbose=False):
-        """Assume Rays are coming in from the reverse direction.
-        returns forwardRays, forwardCoordSys, reverseRays, reverseCoordSys
+                          reverseCoordSys=None, minFlux=1e-3, _verbose=False):
         """
-        if verbose:
+        Trace ray(s) through this optical element, splitting the return values into rays that
+        propagate in the "forward" direction, and those that propagate in the "reverse" direction.
+        Incoming rays are assumed to be propagating in the reverse direction. Fluxes of output rays
+        are proportional to reflection/transmission coefficients of the  interface (which may depend
+        on wavelength and incidence angle).
+
+        Parameters
+        ----------
+        r : batoid.Ray or batoid.RayVector
+            Input ray(s) to trace
+        inCoordSys : batoid.CoordSys
+            Coordinate system of incoming ray(s).  Default: the global coordinate system.
+        forwardCoordSys : batoid.CoordSys
+            Coordinate system into which to project the output forward direction rays.
+            Default: None, which means use the coordinate system of the optic.
+        reverseCoordSys : batoid.CoordSys
+            Coordinate system into which to project the output reverse direction rays.
+            Default: None, which means use the coordinate system of the optic.
+        minFlux : float
+            Minimum flux value of ray(s) to continue propagating.  Default: 1e-3.
+
+        Returns
+        -------
+        forwardRays : batoid.Ray or batoid.RayVector
+            Ray(s) propagating in the forward direction.
+        forwardCoordSys : batoid.CoordSys
+            Coordinate system of forward ray(s).
+        reverseRays : batoid.Ray or batoid.RayVector
+            Ray(s) propagating in the reverse direction.
+        reverseCoordSys : batoid.CoordSys
+            Coordinate system of reverse ray(s).
+        """
+        if _verbose:
             strtemplate = "traceSplitReverse {:15s} flux = {:18.8f}   nphot = {:10d}"
             print(strtemplate.format(self.name, np.sum(r.flux), len(r)))
         if self.skip:
@@ -405,6 +530,20 @@ class Interface(Optic):
         return out
 
     def withGlobalShift(self, shift):
+        """
+        Return a new Interface with its coordinate system shifted.
+
+        Parameters
+        ----------
+        shift : array (3,)
+            The coordinate shift, relative to the global coordinate system, to apply to
+            self.coordSys
+
+        Returns
+        -------
+        Interface
+            Shifted interface.
+        """
         ret = self.__class__.__new__(self.__class__)
         newDict = dict(self.__dict__)
         newDict['coordSys'] = self.coordSys.shiftGlobal(shift)
@@ -416,6 +555,23 @@ class Interface(Optic):
         return ret
 
     def withLocalRotation(self, rot, rotOrigin=None, coordSys=None):
+        """
+        Return a new Interface with its coordinate system rotated.
+
+        Parameters
+        ----------
+        rot : array (3,3)
+            Rotation matrix wrt to the local coordinate system to apply.
+        rotOrigin : array (3,)
+            Origin of rotation.  Default: None means use [0,0,0]
+        coordSys : batoid.CoordSys
+            Coordinate system of rotOrigin above.  Default: None means use self.coordSys.
+
+        Returns
+        -------
+        batoid.Interface
+            Rotated interface.
+        """
         if rotOrigin is None and coordSys is None:
             coordSys = self.coordSys
             rotOrigin = [0,0,0]
@@ -550,7 +706,15 @@ class Baffle(Interface):
 
 
 class CompoundOptic(Optic):
-    """A Optic containing two or more Optics as subitems.
+    """
+    An Optic containing two or more Optics as subitems.
+
+    Parameters
+    ----------
+    items : list of batoid.Optic
+        Subitems making up this compound optic.
+    **kwargs :
+        Other parameters to forward to Optic.__init__
     """
     def __init__(self, items, **kwargs):
         Optic.__init__(self, **kwargs)
@@ -558,7 +722,8 @@ class CompoundOptic(Optic):
 
     @property
     def itemDict(self):
-        """A dictionary providing convenient access to the entire hierarchy of this CompoundOptic's
+        """
+        A dictionary providing convenient access to the entire hierarchy of this CompoundOptic's
         constituent components.  The key for the first level is just the name of the CompoundOptic,
         e.g., `optic.itemDict['SubaruHSC']`.  The next level is accessed by appending a `.`, e.g.,
         `optic.itemDict['SubaruHSC.HSC']` and so on:
@@ -577,7 +742,25 @@ class CompoundOptic(Optic):
         return self._itemDict
 
     def trace(self, r, inCoordSys=globalCoordSys, outCoordSys=None):
-        """ Recursively trace through this Optic by successively tracing through all subitems.
+        """
+        Recursively trace through all subitems of this CompoundOptic.
+
+        Parameters
+        ----------
+        r : batoid.Ray or batoid.RayVector
+            Input ray(s) to trace
+        inCoordSys : batoid.CoordSys
+            Coordinate system of incoming ray(s).  Default: the global coordinate system.
+        outCoordSys : batoid.CoordSys
+            Coordinate system into which to project the output ray(s).  Default: None,
+            which means use the coordinate system of the last subitem.
+
+        Returns
+        -------
+        batoid.Ray or batoid.RayVector
+            Output ray(s)
+        batoid.CoordSys
+            Coordinate system of output rays.
         """
         if self.skip:
             return r, inCoordSys # should maybe make a copy of r here?
@@ -587,18 +770,30 @@ class CompoundOptic(Optic):
                 r, coordSys = item.trace(r, inCoordSys=coordSys)
         return self.items[-1].trace(r, inCoordSys=coordSys, outCoordSys=outCoordSys)
 
-    def traceInPlace(self, r, inCoordSys= globalCoordSys, outCoordSys=None):
-        if self.skip:
-            return r, inCoordSys
-        coordSys = inCoordSys
-        for item in self.items[:-1]:
-            r, coordSys = item.traceInPlace(r, inCoordSys=coordSys)
-        return self.items[-1].traceInPlace(r, inCoordSys=coordSys, outCoordSys=outCoordSys)
-
     def traceFull(self, r, inCoordSys=globalCoordSys, outCoordSys=None):
-        """ Recursively trace through this Optic by successively tracing through all subitems.
+        """
+        Recursively trace ray(s) through this CompoundOptic, returning a full history of all surface
+        intersections.
 
-        The return value will contain the incoming and outgoing rays for each Interface.
+        Parameters
+        ----------
+        r : batoid.Ray or batoid.RayVector
+            Input ray(s) to trace
+        inCoordSys : batoid.CoordSys
+            Coordinate system of incoming ray(s).  Default: the global coordinate system.
+        outCoordSys : batoid.CoordSys
+            Coordinate system into which to project the output ray(s).  Default: None,
+            which means use the coordinate system of the last subitem.
+
+        Returns
+        -------
+        List of dict
+            Each dict contains fields:
+                'name' : name of Interface
+                'in' : the incoming Ray or RayVector to that Interface
+                'inCoordSys' : coordinate system for incoming ray(s)
+                'out' : the outgoing Ray or RayVector to that Interface
+                'outCoordSys' : coordinate system for outgoing ray(s)
         """
         if self.skip:
             return []
@@ -612,9 +807,59 @@ class CompoundOptic(Optic):
         result.extend(self.items[-1].traceFull(r_in, inCoordSys=coordSys, outCoordSys=outCoordSys))
         return result
 
+    def traceInPlace(self, r, inCoordSys= globalCoordSys, outCoordSys=None):
+        """
+        Recursively trace ray(s) through this CompoundOptic in place (result replaces input Ray or
+        RayVector)
+
+        Parameters
+        ----------
+        r : batoid.Ray or batoid.RayVector
+            Input ray(s) to trace
+        inCoordSys : batoid.CoordSys
+            Coordinate system of incoming ray(s).  Default: the global coordinate system.
+        outCoordSys : batoid.CoordSys
+            Coordinate system into which to project the output ray(s).  Default: None,
+            which means use the coordinate system of the last subitem.
+
+        Returns
+        -------
+        Ray or RayVector, output CoordSys.
+
+        Notes
+        -----
+        The return Ray or RayVector is present for convenience, but is actually an alias for the
+        input Ray or RayVector that has had its values replaced.
+        """
+        if self.skip:
+            return r, inCoordSys
+        coordSys = inCoordSys
+        for item in self.items[:-1]:
+            r, coordSys = item.traceInPlace(r, inCoordSys=coordSys)
+        return self.items[-1].traceInPlace(r, inCoordSys=coordSys, outCoordSys=outCoordSys)
+
+
     def traceReverse(self, r, inCoordSys=globalCoordSys, outCoordSys=None):
-        """Trace through optic(s) in reverse.  Note, you may need to reverse the direction
-        of rays for this to work.
+        """
+        Recursively trace ray(s) through this CompoundOptic in reverse.
+
+        Parameters
+        ----------
+        r : batoid.Ray or batoid.RayVector
+            Input ray(s) to trace
+        inCoordSys : batoid.CoordSys
+            Coordinate system of incoming ray(s).  Default: the global coordinate system.
+        outCoordSys : batoid.CoordSys
+            Coordinate system into which to project the output ray(s).  Default: None,
+            which means use the coordinate system of the last subitem.
+
+        Returns
+        -------
+        Ray or RayVector, output CoordSys.
+
+        Notes
+        -----
+        You may need to reverse the directions of rays before using this method!
         """
         if self.skip:
             return r, inCoordSys
@@ -625,8 +870,43 @@ class CompoundOptic(Optic):
         return self.items[0].traceReverse(r, inCoordSys=coordSys, outCoordSys=outCoordSys)
 
     def traceSplit(self, r, inCoordSys=globalCoordSys, forwardCoordSys=None, reverseCoordSys=None,
-                   minFlux=1e-3, verbose=False):
-        if verbose:
+                   minFlux=1e-3, _verbose=False):
+        """
+        Recursively trace ray(s) through this CompoundOptic, splitting the return values into rays
+        that continue propagating in the "forward" direction, and those that were reflected into the
+        "reverse" direction.  Fluxes of output rays are proportional to reflection/transmission
+        coefficients of the interface (which may depend on wavelength and incidence angle).  Note
+        that traceSplit is applied recursively, so a single call on a CompoundOptic may result in
+        many combinations of reflections/refractions being applied internally before Rays are either
+        deleted by falling below the minFlux or reach the entrace/exit of the CompoundOptic.
+
+        Parameters
+        ----------
+        r : batoid.Ray or batoid.RayVector
+            Input ray(s) to trace
+        inCoordSys : batoid.CoordSys
+            Coordinate system of incoming ray(s).  Default: the global coordinate system.
+        forwardCoordSys : batoid.CoordSys
+            Coordinate system into which to project the output forward direction rays.
+            Default: None, which means use the coordinate system of the optic.
+        reverseCoordSys : batoid.CoordSys
+            Coordinate system into which to project the output reverse direction rays.
+            Default: None, which means use the coordinate system of the last subitem.
+        minFlux : float
+            Minimum flux value of ray(s) to continue propagating.  Default: 1e-3.
+
+        Returns
+        -------
+        forwardRays : batoid.Ray or batoid.RayVector
+            Ray(s) propagating in the forward direction.
+        forwardCoordSys : batoid.CoordSys
+            Coordinate system of forward ray(s).
+        reverseRays : batoid.Ray or batoid.RayVector
+            Ray(s) propagating in the reverse direction.
+        reverseCoordSys : batoid.CoordSys
+            Coordinate system of reverse ray(s).
+        """
+        if _verbose:
             strtemplate = "traceSplit        {:15s} flux = {:18.8f}   nphot = {:10d}"
             print(strtemplate.format(self.name, np.sum(r.flux), len(r)))
         if self.skip:
@@ -647,10 +927,10 @@ class CompoundOptic(Optic):
             item = self.items[itemIndex]
             if direction == "forward":
                 rForward, rReverse, tmpForwardCoordSys, tmpReverseCoordSys = \
-                    item.traceSplit(rays, inCoordSys, minFlux=minFlux, verbose=verbose)
+                    item.traceSplit(rays, inCoordSys, minFlux=minFlux, _verbose=_verbose)
             elif direction == "reverse":
                 rForward, rReverse, tmpForwardCoordSys, tmpReverseCoordSys = \
-                    item.traceSplitReverse(rays, inCoordSys, minFlux=minFlux, verbose=verbose)
+                    item.traceSplitReverse(rays, inCoordSys, minFlux=minFlux, _verbose=_verbose)
             else:
                 raise RuntimeError("Shouldn't get here!")
 
@@ -682,8 +962,44 @@ class CompoundOptic(Optic):
         return rForward, rReverse, forwardCoordSys, reverseCoordSys
 
     def traceSplitReverse(self, r, inCoordSys=globalCoordSys, forwardCoordSys=None,
-                          reverseCoordSys=None, minFlux=1e-3, verbose=False):
-        if verbose:
+                          reverseCoordSys=None, minFlux=1e-3, _verbose=False):
+        """
+        Recursively trace ray(s) through this optical element, splitting the return values into rays
+        that propagate in the "forward" direction, and those that propagate in the "reverse"
+        direction.  Incoming rays are assumed to be propagating in the reverse direction. Fluxes of
+        output rays are proportional to reflection/transmission coefficients of the  interface
+        (which may depend on wavelength and incidence angle).  Note that traceSplitReverse is
+        applied recursively, so a single call on a CompoundOptic may result in many combinations of
+        reflections/refractions being applied internally before Rays are either deleted by falling
+        below the minFlux or reach the entrace/exit of the CompoundOptic.
+
+        Parameters
+        ----------
+        r : batoid.Ray or batoid.RayVector
+            Input ray(s) to trace
+        inCoordSys : batoid.CoordSys
+            Coordinate system of incoming ray(s).  Default: the global coordinate system.
+        forwardCoordSys : batoid.CoordSys
+            Coordinate system into which to project the output forward direction rays.
+            Default: None, which means use the coordinate system of the optic.
+        reverseCoordSys : batoid.CoordSys
+            Coordinate system into which to project the output reverse direction rays.
+            Default: None, which means use the coordinate system of the optic.
+        minFlux : float
+            Minimum flux value of ray(s) to continue propagating.  Default: 1e-3.
+
+        Returns
+        -------
+        forwardRays : batoid.Ray or batoid.RayVector
+            Ray(s) propagating in the forward direction.
+        forwardCoordSys : batoid.CoordSys
+            Coordinate system of forward ray(s).
+        reverseRays : batoid.Ray or batoid.RayVector
+            Ray(s) propagating in the reverse direction.
+        reverseCoordSys : batoid.CoordSys
+            Coordinate system of reverse ray(s).
+        """
+        if _verbose:
             strtemplate = "traceSplitReverse {:15s} flux = {:18.8f}   nphot = {:10d}"
             print(strtemplate.format(self.name, np.sum(r.flux), len(r)))
         if self.skip:
@@ -704,10 +1020,10 @@ class CompoundOptic(Optic):
             item = self.items[itemIndex]
             if direction == "forward":
                 rForward, rReverse, tmpForwardCoordSys, tmpReverseCoordSys = \
-                    item.traceSplit(rays, inCoordSys, minFlux=minFlux, verbose=verbose)
+                    item.traceSplit(rays, inCoordSys, minFlux=minFlux, _verbose=_verbose)
             elif direction == "reverse":
                 rForward, rReverse, tmpForwardCoordSys, tmpReverseCoordSys = \
-                    item.traceSplitReverse(rays, inCoordSys, minFlux=minFlux, verbose=verbose)
+                    item.traceSplitReverse(rays, inCoordSys, minFlux=minFlux, _verbose=_verbose)
             else:
                 raise RuntimeError("Shouldn't get here!")
 
@@ -739,7 +1055,13 @@ class CompoundOptic(Optic):
         return rForward, rReverse, forwardCoordSys, reverseCoordSys
 
     def draw3d(self, ax, **kwargs):
-        """ Recursively draw this Optic by successively drawing all subitems.
+        """
+        Recursively draw this CompoundOptic on a mplot3d axis by drawing all subitems.
+
+        Parameters
+        ----------
+        ax : mplot3d.Axis
+            Axis on which to draw this optic.
         """
         for item in self.items:
             item.draw3d(ax, **kwargs)
@@ -753,6 +1075,14 @@ class CompoundOptic(Optic):
         The kwargs are passed to the drawing commands, except for the
         optional keyword 'only' which restricts drawing to only instances
         that are subclasses of a specified type or types.
+
+        Parameters
+        ----------
+        ax : matplotlib.axes.Axes
+            Axis on which to draw this optic.
+        only : list
+            A list of types to draw, e.g., batoid.Mirror, or batoid.Lens.  Default: None means to
+            draw all types.
         """
         only = kwargs.pop('only', None)
         for item in self.items:
@@ -788,7 +1118,20 @@ class CompoundOptic(Optic):
                      self.name, self.inMedium, self.outMedium, self.coordSys))
 
     def withGlobalShift(self, shift):
-        """Shift the origin of this optic by `shift`.
+        """
+        Return a new CompoundOptic with its coordinate system shifted (and the coordinate systems of
+        all subitems)
+
+        Parameters
+        ----------
+        shift : array (3,)
+            The coordinate shift, relative to the global coordinate system, to apply to
+            self.coordSys
+
+        Returns
+        -------
+        CompoundOptic
+            Shifted optic.
         """
         newItems = [item.withGlobalShift(shift) for item in self.items]
         ret = self.__class__.__new__(self.__class__)
@@ -803,8 +1146,21 @@ class CompoundOptic(Optic):
         return ret
 
     def withGloballyShiftedOptic(self, name, shift):
-        """Shift the origin of a subitem given by name (see itemDict docstring for the name format)
-        by `shift`.
+        """
+        Return a new CompoundOptic with the coordinate system of one of its subitems shifted.
+
+        Parameters
+        ----------
+        name : str
+            The subitem to shift.
+        shift : array (3,)
+            The coordinate shift, relative to the global coordinate system, to apply to the
+            subitem's coordSys.
+
+        Returns
+        -------
+        batoid.CompoundOptic
+            Optic with shifted subitem.
         """
         # If name is one of items.names, the we use withGlobalShift, and we're done.
         # If not, then we need to recurse down to whichever item contains name.
@@ -835,7 +1191,22 @@ class CompoundOptic(Optic):
         raise RuntimeError("Error in withGloballyShiftedOptic!, Shouldn't get here!")
 
     def withLocalRotation(self, rot, rotOrigin=None, coordSys=None):
-        """Rotate optic by `rot`.
+        """
+        Return a new CompoundOptic with its coordinate system rotated.
+
+        Parameters
+        ----------
+        rot : array (3,3)
+            Rotation matrix wrt to the local coordinate system to apply.
+        rotOrigin : array (3,)
+            Origin of rotation.  Default: None means use [0,0,0]
+        coordSys : batoid.CoordSys
+            Coordinate system of rotOrigin above.  Default: None means use self.coordSys.
+
+        Returns
+        -------
+        batoid.CompoundOptic
+            Rotated optic.
         """
         if rotOrigin is None and coordSys is None:
             coordSys = self.coordSys
@@ -852,7 +1223,25 @@ class CompoundOptic(Optic):
         return ret
 
     def withLocallyRotatedOptic(self, name, rot, rotOrigin=None, coordSys=None):
-        """Rotate the subitem by `rot`.
+        """
+        Return a new CompoundOptic with the coordinate system of one of its subitems rotated.
+
+        Parameters
+        ----------
+        name : str
+            The subitem to rotate.
+        rot : array (3,3)
+            Rotation matrix wrt to the subitem's local coordinate system to apply.
+        rotOrigin : array (3,)
+            Origin of rotation.  Default: None means use [0,0,0]
+        coordSys : batoid.CoordSys
+            Coordinate system of rotOrigin above.  Default: None means use the coordinate system
+            of the subitem being rotated.
+
+        Returns
+        -------
+        batoid.CompoundOptic
+            Optic with rotated subitem.
         """
         # If name is one of items.names, the we use withLocalRotation, and we're done.
         # If not, then we need to recurse down to whichever item contains name.
@@ -887,6 +1276,18 @@ class CompoundOptic(Optic):
 
 
 class Lens(CompoundOptic):
+    """
+    An lens with two Interfaces as front and back surfaces.
+
+    Parameters
+    ----------
+    items : list of batoid.Optic
+        Subitems making up this compound optic.
+    medium : batoid.Medium
+        The refractive index medium internal to the lens.
+    **kwargs :
+        Other parameters to forward to Optic.__init__
+    """
     def __init__(self, items, medium, **kwargs):
         Optic.__init__(self, **kwargs)
         self.items = tuple(items)
@@ -947,6 +1348,21 @@ class Lens(CompoundOptic):
             super(Lens, self).draw2d(ax, only=only, **kwargs)
 
     def withGlobalShift(self, shift):
+        """
+        Return a new Lens with its coordinate system shifted (and the coordinate systems of all
+        subitems)
+
+        Parameters
+        ----------
+        shift : array (3,)
+            The coordinate shift, relative to the global coordinate system, to apply to
+            self.coordSys
+
+        Returns
+        -------
+        Lens
+            Shifted optic.
+        """
         newItems = [item.withGlobalShift(shift) for item in self.items]
         ret = self.__class__.__new__(self.__class__)
         newDict = dict(self.__dict__)
@@ -960,8 +1376,21 @@ class Lens(CompoundOptic):
         return ret
 
     def withGloballyShiftedOptic(self, name, shift):
-        """Shift the origin of a subitem given by name (see itemDict docstring for the name format)
-        by `shift`.
+        """
+        Return a new CompoundOptic with the coordinate system of one of its subitems shifted.
+
+        Parameters
+        ----------
+        name : str
+            The subitem to shift.
+        shift : array (3,)
+            The coordinate shift, relative to the global coordinate system, to apply to the
+            subitem's coordSys.
+
+        Returns
+        -------
+        batoid.Lens
+            Lens with shifted surface.
         """
         # If name is one of items.names, the we use withGlobalShift, and we're done.
         # If not, then we need to recurse down to whicever item contains name.
@@ -993,7 +1422,22 @@ class Lens(CompoundOptic):
         raise RuntimeError("Error in withGloballyShiftedOptic!, Shouldn't get here!")
 
     def withLocalRotation(self, rot, rotOrigin=None, coordSys=None):
-        """Rotate optic by `rot`.
+        """
+        Return a new CompoundOptic with its coordinate system rotated.
+
+        Parameters
+        ----------
+        rot : array (3,3)
+            Rotation matrix wrt to the local coordinate system to apply.
+        rotOrigin : array (3,)
+            Origin of rotation.  Default: None means use [0,0,0]
+        coordSys : batoid.CoordSys
+            Coordinate system of rotOrigin above.  Default: None means use self.coordSys.
+
+        Returns
+        -------
+        batoid.Lens
+            Rotated lens.
         """
         if rotOrigin is None and coordSys is None:
             coordSys = self.coordSys
@@ -1010,7 +1454,25 @@ class Lens(CompoundOptic):
         return ret
 
     def withLocallyRotatedOptic(self, name, rot, rotOrigin=None, coordSys=None):
-        """Rotate the subitem by `rot`.
+        """
+        Return a new Lens with the coordinate system of one of its surfaces rotated.
+
+        Parameters
+        ----------
+        name : str
+            The subitem to rotate.
+        rot : array (3,3)
+            Rotation matrix wrt to the subitem's local coordinate system to apply.
+        rotOrigin : array (3,)
+            Origin of rotation.  Default: None means use [0,0,0]
+        coordSys : batoid.CoordSys
+            Coordinate system of rotOrigin above.  Default: None means use the coordinate system
+            of the subitem being rotated.
+
+        Returns
+        -------
+        batoid.Lens
+            Lens with rotated surface.
         """
         # If name is one of items.names, the we use withLocalRotation, and we're done.
         # If not, then we need to recurse down to whichever item contains name.
@@ -1060,7 +1522,7 @@ def getGlobalRays(traceFull, start=None, end=None, globalSys=globalCoordSys):
         surface in the model when None.
     globalSys : batoid.CoordSys
         Global coordinate system to use.
-    
+
     Returns
     -------
     tuple
@@ -1100,7 +1562,23 @@ def getGlobalRays(traceFull, start=None, end=None, globalSys=globalCoordSys):
 
 
 def drawTrace3d(ax, traceFull, start=None, end=None, **kwargs):
-    """Draw 3D rays in global coordinates on the specified axis.
+    """
+    Draw 3D rays in global coordinates on the specified axis.
+
+    Parameters
+    ----------
+    ax : mplot3d.Axis
+        Axis on which to draw rays.
+    traceFull : array
+        Array of per-surface ray-tracing output from traceFull()
+    start : str or None
+        Name of the first surface to include in the output, or use the first
+        surface in the model when None.
+    end : str or None
+        Name of the last surface to include in the output, or use the last
+        surface in the model when None.
+    globalSys : batoid.CoordSys
+        Global coordinate system to use.
     """
     xyz, raylen = getGlobalRays(traceFull, start, end)
     lines = []
@@ -1109,7 +1587,23 @@ def drawTrace3d(ax, traceFull, start=None, end=None, **kwargs):
 
 
 def drawTrace2d(ax, traceFull, start=None, end=None, **kwargs):
-    """Draw 2D rays in global coordinates on the specified axis.
+    """
+    Draw 2D rays in global coordinates on the specified axis.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes
+        Axis on which to draw rays.
+    traceFull : array
+        Array of per-surface ray-tracing output from traceFull()
+    start : str or None
+        Name of the first surface to include in the output, or use the first
+        surface in the model when None.
+    end : str or None
+        Name of the last surface to include in the output, or use the last
+        surface in the model when None.
+    globalSys : batoid.CoordSys
+        Global coordinate system to use.
     """
     xyz, raylen = getGlobalRays(traceFull, start, end)
     lines = []
