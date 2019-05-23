@@ -508,6 +508,10 @@ class Interface(Optic):
 
         return rForward, rReverse, forwardCoordSys, reverseCoordSys
 
+    def clearObscuration(self, unless=()):
+        if self.name not in unless:
+            self.obscuration = None
+
     def __eq__(self, other):
         if not self.__class__ == other.__class__:
             return False
@@ -1091,6 +1095,10 @@ class CompoundOptic(Optic):
                 item.draw2d(ax, only=only, **kwargs)
             elif only is None or issubclass(item_class, only):
                 item.draw2d(ax, **kwargs)
+
+    def clearObscuration(self, unless=()):
+        for item in self.items:
+            item.clearObscuration(unless=unless)
 
     def __eq__(self, other):
         if not self.__class__ == other.__class__:
