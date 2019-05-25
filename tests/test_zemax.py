@@ -105,7 +105,8 @@ def test_HSC_huygensPSF():
 
     # Now setup an optimizer to fit for x/y shift
     def resid(params):
-        model = ii.shift(params['dx'], params['dy'])*np.exp(params['dlogflux'])
+        p = params.valuesdict()
+        model = ii.shift(p['dx'], p['dy'])*np.exp(p['dlogflux'])
         img = model.drawImage(method='sb', scale=0.25, nx=256, ny=256)
         r = (img.array - Zarr).ravel()
         return r
@@ -117,7 +118,8 @@ def test_HSC_huygensPSF():
     opt = lmfit.minimize(resid, params)
     print("Done")
 
-    model = ii.shift(opt.params['dx'], opt.params['dy'])*np.exp(opt.params['dlogflux'])
+    p = opt.params.valuesdict()
+    model = ii.shift(p['dx'], p['dy'])*np.exp(p['dlogflux'])
     optImg = model.drawImage(method='sb', scale=0.25, nx=256, ny=256)
 
     np.testing.assert_allclose(Zarr, optImg.array, rtol=0, atol=3e-2)
