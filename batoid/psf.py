@@ -232,7 +232,7 @@ def dkdu(optic, theta_x, theta_y, wavelength, nx=16, projection='postel'):
 
 
 def wavefront(optic, theta_x, theta_y, wavelength, nx=32, projection='postel', sphereRadius=None,
-              lattice=False):
+              lattice=False, _addedWF=None):
     """Compute wavefront.
 
     Parameters
@@ -290,6 +290,8 @@ def wavefront(optic, theta_x, theta_y, wavelength, nx=32, projection='postel', s
     t0 = np.mean(rays.t[w])
 
     arr = np.ma.masked_array((t0-rays.t)/wavelength, mask=rays.vignetted).reshape(nx, nx)
+    if _addedWF is not None:
+        arr += _addedWF
     primitiveVectors = np.vstack([[optic.pupilSize/nx, 0], [0, optic.pupilSize/nx]])
     return batoid.Lattice(arr, primitiveVectors)
 
@@ -301,7 +303,8 @@ def reciprocalLatticeVectors(a1, a2, N):
     return b1, b2
 
 
-def fftPSF(optic, theta_x, theta_y, wavelength, nx=32, projection='postel', pad_factor=2):
+def fftPSF(optic, theta_x, theta_y, wavelength, nx=32, projection='postel', pad_factor=2,
+           _addedWF=None):
     """Compute PSF using FFT.
 
     Parameters
@@ -327,7 +330,8 @@ def fftPSF(optic, theta_x, theta_y, wavelength, nx=32, projection='postel', pad_
     """
     L = optic.pupilSize*pad_factor
     # im_dtheta = wavelength / L
-    wf = wavefront(optic, theta_x, theta_y, wavelength, nx, projection=projection, lattice=True)
+    wf = wavefront(optic, theta_x, theta_y, wavelength, nx, projection=projection, lattice=True,
+                   _addedWF=_addedWF)
     wfarr = wf.array
     pad_size = nx*pad_factor
     expwf = np.zeros((pad_size, pad_size), dtype=np.complex128)
@@ -344,7 +348,7 @@ def fftPSF(optic, theta_x, theta_y, wavelength, nx=32, projection='postel', pad_
 
 
 def zernike(optic, theta_x, theta_y, wavelength, nx=32, projection='postel', jmax=22, eps=0.0,
-            sphereRadius=None):
+            sphereRadius=None, _addedWF=None):
     import galsim
 
     dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
@@ -361,7 +365,7 @@ def zernike(optic, theta_x, theta_y, wavelength, nx=32, projection='postel', jma
     orig_y = np.array(rays.y).reshape(nx,nx)
 
     wf = wavefront(optic, theta_x, theta_y, wavelength, nx=nx, projection=projection,
-                   sphereRadius=sphereRadius)
+                   sphereRadius=sphereRadius, _addedWF=_addedWF)
     wfarr = wf.array
     w = ~wfarr.mask
 
