@@ -178,8 +178,6 @@ def dirCosToZemax(alpha, beta, gamma):
     The Zemax field angle convention is not rotationally invariant.  The z-direction cosine
     for (u, v) = (0, 1) does not equal the z-direction cosine for (u, v) = (0.6, 0.8).
     """
-    norm = 1/gamma
-    tanu = alpha*norm
     return np.arctan(alpha/gamma), np.arctan(beta/gamma)
 
 
