@@ -16,6 +16,10 @@ namespace batoid {
             double dist, double outer, double inner,
             double xcos, double ycos, double zcos,
             int nradii, int naz, double wavelength, double flux, const Medium& m);
+    RayVector uniformCircularGrid(
+            double dist, double outer, double inner,
+            double xcos, double ycos, double zcos,
+            int nrays, double wavelength, double flux, const Medium& m, int seed);
     RayVector pointSourceCircularGrid(
             const Vector3d& source, double outer, double inner,
             int nradii, int naz, double wavelength, double flux, const Medium& m);

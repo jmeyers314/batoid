@@ -65,6 +65,12 @@ namespace batoid {
              "Make a RayVector on a circle",
              "zdist"_a, "outer"_a, "inner"_a, "xcos"_a, "ycos"_a, "zcos"_a, "nradii"_a, "naz"_a, "wavelength"_a, "flux"_a, "medium"_a
          )
+         .def("uniformCircularGrid",
+             &uniformCircularGrid,
+             "Make a RayVector with photon positions drawn uniformly from a circle",
+             "zdist"_a, "outer"_a, "inner"_a, "xcos"_a, "ycos"_a, "zcos"_a, "nrays"_a,
+             "wavelength"_a, "flux"_a, "medium"_a, "seed"_a=0
+         )
          .def("pointSourceCircularGrid",
              &pointSourceCircularGrid,
              "Make a spherically expanding RayVector from a point",

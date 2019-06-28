@@ -4,6 +4,7 @@
 #include "medium.h"
 #include "utils.h"
 #include <cmath>
+#include <random>
 #include <numeric>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
@@ -63,6 +64,36 @@ namespace batoid{
                 x += dy;
             }
             y += dy;
+        }
+        return RayVector(std::move(result), wavelength);
+    }
+
+    RayVector uniformCircularGrid(double dist, double outer, double inner,
+                           double xcos, double ycos, double zcos,
+                           int nrays, double wavelength, double flux, const Medium& m, int seed) {
+        double n = m.getN(wavelength);
+
+        std::vector<Ray> result;
+        result.reserve(nrays);
+
+        // The "velocities" of all the rays in the grid are the same.
+        Vector3d v(xcos, ycos, zcos);
+        v.normalize();
+        v /= n;
+
+        // Instantiate uniform distribution.
+        std::default_random_engine generator(seed);
+        std::uniform_real_distribution<double> distribution(0.0, 1.0);
+
+        for (int i=0; i<nrays; i++) {
+            // Draw radius, azimuth angle uniformly over annulus.
+            double mu = distribution(generator);
+            double nu = distribution(generator);
+            double radius = sqrt(mu * outer * outer + (1 - mu) * inner * inner);
+            double az = 2 * M_PI * nu;
+            Vector3d r(radius * std::cos(az), radius * std::sin(az), 0);
+            double t = (r + v * n * dist).dot(v) * n * n;
+            result.emplace_back(r - v * t, v, 0, wavelength, flux, false);
         }
         return RayVector(std::move(result), wavelength);
     }

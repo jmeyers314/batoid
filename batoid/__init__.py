@@ -12,7 +12,7 @@ from ._batoid import ObscUnion, ObscIntersection, ObscNegation
 
 from ._batoid import CoordSys, CoordTransform
 
-from ._batoid import rayGrid, circularGrid, pointSourceCircularGrid
+from ._batoid import rayGrid, circularGrid, uniformCircularGrid, pointSourceCircularGrid
 
 from ._batoid import SimpleCoating
 

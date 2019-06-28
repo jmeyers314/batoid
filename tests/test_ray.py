@@ -320,6 +320,49 @@ def test_circularGrid():
 
 
 @timer
+def test_uniformCircularGrid():
+    dist = 10.0
+    outer = 4.1
+    inner = 0.5
+    xcos = 0
+    ycos = 0
+    zcos = -1
+    nray = 100000
+    wavelength = 500e-9
+    flux = 1.
+    medium = batoid.ConstMedium(1.)
+    seed = 0
+
+    rays = batoid.uniformCircularGrid(dist, outer, inner, xcos, ycos, zcos, nray, wavelength, flux,
+                                      medium, seed=seed)
+    radius = np.hypot(rays.x, rays.y)
+    angle = np.arctan2(rays.y, rays.x)
+
+    np.testing.assert_almost_equal(radius.max(), outer, decimal=4)
+    np.testing.assert_almost_equal(radius.min(), inner, decimal=4)
+    np.testing.assert_almost_equal(rays.x.mean(), 0, decimal=2)
+    np.testing.assert_almost_equal(rays.y.mean(), 0, decimal=2)
+    np.testing.assert_almost_equal(angle.mean(), 0, decimal=2)
+
+    # test radial distribution
+    for cutoff in np.linspace(inner, outer, 5):
+        frac = np.sum(radius < cutoff) / nray
+        expected = (cutoff ** 2 - inner ** 2) / (outer ** 2 - inner ** 2)
+        np.testing.assert_almost_equal(frac, expected, decimal=1)
+
+
+    # test seed, reproducibility
+    rays2 = batoid.uniformCircularGrid(dist, outer, inner, xcos, ycos, zcos, nray, wavelength, flux,
+                                       medium, seed=seed)
+    newseed = 666
+    rays3 = batoid.uniformCircularGrid(dist, outer, inner, xcos, ycos, zcos, nray, wavelength, flux,
+                                       medium, seed=newseed)
+
+    assert np.all(rays.r == rays2.r)
+    assert not np.all(rays2.r == rays3.r)
+
+
+@timer
 def test_pointSourceCircularGrid():
     source = [0, 1, 10]
     outer = 0.1
@@ -380,6 +423,7 @@ if __name__ == '__main__':
     test_RayVector()
     test_rayGrid()
     test_circularGrid()
+    test_uniformCircularGrid()
     test_pointSourceCircularGrid()
     test_ne()
     test_fail()
