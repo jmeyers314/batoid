@@ -1,6 +1,14 @@
 import batoid
 import numpy as np
+import pytest
 from test_helpers import timer, do_pickle, all_obj_diff
+
+
+hasGalSim = True
+try:
+    import galsim
+except ImportError:
+    hasGalSim = False
 
 
 @timer
@@ -223,14 +231,101 @@ def test_approximate_asphere():
         np.testing.assert_allclose(
             asphere.sag(xtest, ytest),
             bc.sag(xtest, ytest),
-            atol=1e-9, rtol=0.0
+            atol=1e-12, rtol=0.0
         )
 
         np.testing.assert_allclose(
             asphere.normal(xtest, ytest),
             bc.normal(xtest, ytest),
-            atol=1e-8, rtol=0
+            atol=1e-9, rtol=0
         )
+
+
+@pytest.mark.skipif(not hasGalSim, reason="galsim not found")
+@timer
+def test_approximate_zernike():
+    np.random.seed(577215)
+
+    xs = np.linspace(-1, 1, 1000)
+    ys = np.linspace(-1, 1, 1000)
+    xtest = np.random.uniform(-0.9, 0.9, size=1000)
+    ytest = np.random.uniform(-0.9, 0.9, size=1000)
+
+    jmaxmax=22
+    for _ in range(10):
+        jmax = np.random.randint(1, jmaxmax)
+        coef = np.random.normal(size=jmax+1)*1e-5
+        R_inner = np.random.uniform(0.0, 0.65)
+
+        zsurf = batoid.Zernike(coef, R_inner=R_inner)
+        zs = zsurf.sag(*np.meshgrid(xs, ys))
+        bc = batoid.Bicubic(xs, ys, zs)
+
+        np.testing.assert_allclose(
+            zsurf.sag(xtest, ytest),
+            bc.sag(xtest, ytest),
+            atol=1e-10, rtol=0.0
+        )
+
+        np.testing.assert_allclose(
+            zsurf.normal(xtest, ytest),
+            bc.normal(xtest, ytest),
+            atol=1e-7, rtol=0
+        )
+
+
+@pytest.mark.skipif(not hasGalSim, reason="galsim not found")
+@timer
+def test_LSST_M1_zernike():
+    """See how much a ~100 nm zernike perturbation to M1 affects wavefront zernikes
+    """
+    import os
+    import yaml
+    np.random.seed(5772156)
+
+    fn = os.path.join(batoid.datadir, "LSST", "LSST_r.yaml")
+    config = yaml.safe_load(open(fn))
+    telescope = batoid.parse.parse_optic(config['opticalSystem'])
+    theta_x = np.deg2rad(1.185)
+    theta_y = np.deg2rad(0.45)
+    fiducialZernikes = batoid.psf.zernike(telescope, theta_x, theta_y, 750e-9)
+
+    N = 256
+    xs = np.linspace(-8.36/2, 8.36/2, N)
+    ys = np.linspace(-8.36/2, 8.36/2, N)
+
+    jmax = 22
+    for _ in range(10):
+        coef = np.random.normal(size=jmax+1)*1e-7/np.sqrt(jmax)  # aim for ~100 nm rms
+        R_inner = np.random.uniform(0.0, 0.65)
+
+        zsurf = batoid.Zernike(coef, R_outer=8.36/2, R_inner=0.61*8.36/2)
+        zs = zsurf.sag(*np.meshgrid(xs, ys))
+        bc = batoid.Bicubic(xs, ys, zs)
+
+        # Add Zernike perturbation to M1
+        fn = os.path.join(batoid.datadir, "LSST", "LSST_r.yaml")
+        config = yaml.safe_load(open(fn))
+        zTelescope = batoid.parse.parse_optic(config['opticalSystem'])
+        zPerturbedM1 = batoid.Sum([
+            zTelescope.itemDict['LSST.M1'].surface,
+            zsurf
+        ])
+        zTelescope.itemDict['LSST.M1'].surface = zPerturbedM1
+        zZernikes = batoid.psf.zernike(zTelescope, theta_x, theta_y, 750e-9)
+
+        # Repeat with bicubic perturbation
+        fn = os.path.join(batoid.datadir, "LSST", "LSST_r.yaml")
+        config = yaml.safe_load(open(fn))
+        bcTelescope = batoid.parse.parse_optic(config['opticalSystem'])
+        bcPerturbedM1 = batoid.Sum([
+            bcTelescope.itemDict['LSST.M1'].surface,
+            bc
+        ])
+        bcTelescope.itemDict['LSST.M1'].surface = bcPerturbedM1
+        bcZernikes = batoid.psf.zernike(bcTelescope, theta_x, theta_y, 750e-9)
+
+        np.testing.assert_allclose(zZernikes, bcZernikes, rtol=0, atol=1e-3)
 
 
 @timer
@@ -267,4 +362,6 @@ if __name__ == '__main__':
     test_normal()
     test_intersect()
     test_approximate_asphere()
+    test_approximate_zernike()
+    test_LSST_M1_zernike()
     test_ne()
