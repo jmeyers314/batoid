@@ -1,6 +1,8 @@
 from ._version import __version__, __version_info__
 
-from ._batoid import Ray, RayVector, concatenateRayVectors
+from .ray import Ray
+from .rayVector import RayVector, concatenateRayVectors, rayGrid, circularGrid
+from .rayVector import uniformCircularGrid, pointSourceCircularGrid
 from .surface import Surface, Plane, Paraboloid, Sphere, Quadric, Asphere
 from .surface import Bicubic, Zernike, Sum
 from ._batoid import Table
@@ -10,9 +12,7 @@ from ._batoid import Medium, ConstMedium, TableMedium, SellmeierMedium, SumitaMe
 from ._batoid import Obscuration, ObscCircle, ObscAnnulus, ObscRectangle, ObscRay
 from ._batoid import ObscUnion, ObscIntersection, ObscNegation
 
-from ._batoid import CoordSys, CoordTransform
-
-from ._batoid import rayGrid, circularGrid, uniformCircularGrid, pointSourceCircularGrid
+from .coordsys import CoordSys, CoordTransform
 
 from ._batoid import SimpleCoating
 

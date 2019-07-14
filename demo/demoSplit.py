@@ -14,7 +14,7 @@ factor = 0.168/1.5e-5/3600
 # fn = os.path.join(batoid.datadir, "DECam", "DECam.yaml")
 # factor = 0.27/1.5e-5/3600
 
-config = yaml.load(open(fn))
+config = yaml.safe_load(open(fn))
 telescope = batoid.parse.parse_optic(config['opticalSystem'])
 
 angles = np.linspace(0.0, 1.0, 21, endpoint=True)

@@ -94,7 +94,7 @@ def test_paraboloid_refraction_plane():
         vx = random.gauss(0, 1e-1)
         vy = random.gauss(0, 1e-1)
         v = normalized(np.array([vx, vy, 1]))/m1.getN(wavelength)
-        ray = batoid.Ray(x, y, -10, v[0], v[1], v[2], 0)
+        ray = batoid.Ray((x, y, -10), (v[0], v[1], v[2]), 0)
         rray = para.refract(ray, m1, m2)
         np.testing.assert_allclose(np.linalg.norm(rray.v), 1./m2.getN(wavelength), rtol=1e-15)
         # also check refractInPlace
@@ -170,7 +170,7 @@ def test_asphere_refraction_plane():
         vx = random.gauss(0, 1e-1)
         vy = random.gauss(0, 1e-1)
         v = normalized(np.array([vx, vy, 1]))/m1.getN(wavelength)
-        ray = batoid.Ray(x, y, -0.1, v[0], v[1], v[2], 0)
+        ray = batoid.Ray((x, y, -0.1), (v[0], v[1], v[2]), 0)
         rray = asphere.refract(ray, m1, m2)
         np.testing.assert_allclose(np.linalg.norm(rray.v), 1./m2.getN(wavelength), rtol=1e-15)
         # also check refractInPlace
@@ -250,7 +250,7 @@ def test_table_medium_refraction():
         vx = random.gauss(0, 1e-1)
         vy = random.gauss(0, 1e-1)
         wavelength = random.uniform(0.3, 1.2)
-        ray = batoid.Ray(x, y, -0.1, vx, vy, 1, 0, wavelength)
+        ray = batoid.Ray((x, y, -0.1), (vx, vy, 1), 0, wavelength)
 
         cm1 = batoid.ConstMedium(silica.getN(wavelength))
         cm2 = batoid.ConstMedium(air.getN(wavelength))

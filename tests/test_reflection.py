@@ -75,7 +75,7 @@ def test_paraboloid_reflection_plane():
         y = random.gauss(0, 1)
         vx = random.gauss(0, 1e-1)
         vy = random.gauss(0, 1e-1)
-        ray = batoid.Ray(x, y, -10, vx, vy, 1, 0)
+        ray = batoid.Ray((x, y, -10), (vx, vy, 1), 0)
         rray = para.reflect(ray)
 
         # ray.v, surfaceNormal, and rray.v should all be in the same plane, and
@@ -131,7 +131,7 @@ def test_paraboloid_reflection_to_focus():
         for j in range(100):
             x = random.gauss(0, 1)
             y = random.gauss(0, 1)
-            ray = batoid.Ray(x,y,-1000, 0,0,1, 0)
+            ray = batoid.Ray((x,y,-1000), (0,0,1), 0)
             rray = para.reflect(ray)
             # Now see if rray goes through (0,0,R/2)
             # Solve the x equation: 0 = rray.r[0] + rray.v[0]*(t-t0) for t:
@@ -153,7 +153,7 @@ def test_asphere_reflection_plane():
         y = random.gauss(0, 1)
         vx = random.gauss(0, 1e-1)
         vy = random.gauss(0, 1e-1)
-        ray = batoid.Ray(x, y, -0.1, vx, vy, 1, 0)
+        ray = batoid.Ray((x, y, -0.1), (vx, vy, 1), 0)
         rray = asphere.reflect(ray)
 
         # ray.v, surfaceNormal, and rray.v should all be in the same plane, and

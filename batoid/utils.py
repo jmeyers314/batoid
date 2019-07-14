@@ -1,5 +1,8 @@
 import numpy as np
 from numbers import Real
+from . import _batoid
+from .ray import Ray
+from .rayVector import RayVector
 
 
 def normalized(*args):
@@ -597,3 +600,12 @@ class lazy_property(object):
         value = self.fget(obj)
         setattr(obj, self.func_name, value)
         return value
+
+
+def _rayify(r):
+    if isinstance(r, _batoid.Ray):
+        return Ray._fromRay(r)
+    elif isinstance(r, _batoid.RayVector):
+        return RayVector._fromRayVector(r)
+    else:
+        raise ValueError("Unknown type in _rayify")

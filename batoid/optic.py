@@ -2,7 +2,7 @@ import batoid
 import numpy as np
 
 from .constants import globalCoordSys, vacuum
-
+from .utils import _rayify
 
 class Optic:
     """
@@ -192,7 +192,7 @@ class Interface(Optic):
         y = np.zeros_like(x)
         z = self.surface.sag(x, y)
         # Transform slice to global coordinates.
-        transform = batoid.CoordTransform(self.coordSys, batoid.globalCoordSys)
+        transform = batoid.CoordTransform(self.coordSys, globalCoordSys)
         xneg, yneg, zneg = transform.applyForward(x, y, z)
         if np.any(yneg != 0):
             print('WARNING: getXZSlice used for rotated surface "{0}".'.format(self.name))
@@ -261,7 +261,7 @@ class Interface(Optic):
         r = self.interact(r)
 
         if self.obscuration is not None:
-            r = self.obscuration.obscure(r)
+            r = _rayify(self.obscuration.obscure(r._r))
 
         if outCoordSys is None:
             return r, self.coordSys
@@ -334,7 +334,7 @@ class Interface(Optic):
         self.interactInPlace(r)
 
         if self.obscuration is not None:
-            self.obscuration.obscureInPlace(r)
+            self.obscuration.obscureInPlace(r._r)
 
         if outCoordSys is None:
             return r, self.coordSys
@@ -373,7 +373,7 @@ class Interface(Optic):
         r = self.interactReverse(r)
 
         if self.obscuration is not None:
-            r = self.obscuration.obscure(r)
+            r = _rayify(self.obscuration.obscure(r._r))
 
         if outCoordSys is None:
             return r, self.coordSys
@@ -427,8 +427,8 @@ class Interface(Optic):
 
         # For now, apply obscuration equally forwards and backwards
         if self.obscuration is not None:
-            rForward = self.obscuration.obscure(rForward)
-            rReverse = self.obscuration.obscure(rReverse)
+            rForward = _rayify(self.obscuration.obscure(rForward._r))
+            rReverse = _rayify(self.obscuration.obscure(rReverse._r))
 
         if forwardCoordSys is None:
             forwardCoordSys = self.coordSys
@@ -491,8 +491,8 @@ class Interface(Optic):
 
         # For now, apply obscuration equally forwards and backwards
         if self.obscuration is not None:
-            rForward = self.obscuration.obscure(rForward)
-            rReverse = self.obscuration.obscure(rReverse)
+            rForward = _rayify(self.obscuration.obscure(rForward._r))
+            rReverse = _rayify(self.obscuration.obscure(rReverse._r))
 
         if forwardCoordSys is None:
             forwardCoordSys = self.coordSys
@@ -811,7 +811,7 @@ class CompoundOptic(Optic):
         result.extend(self.items[-1].traceFull(r_in, inCoordSys=coordSys, outCoordSys=outCoordSys))
         return result
 
-    def traceInPlace(self, r, inCoordSys= globalCoordSys, outCoordSys=None):
+    def traceInPlace(self, r, inCoordSys=globalCoordSys, outCoordSys=None):
         """
         Recursively trace ray(s) through this CompoundOptic in place (result replaces input Ray or
         RayVector)

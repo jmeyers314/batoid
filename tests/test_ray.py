@@ -17,16 +17,15 @@ def test_positionAtTime():
         t0 = random.gauss(0.1, 1.1)
         t = random.gauss(5.5, 1.3)
 
-        # Test both ways of constructing a Ray
-        ray1 = batoid.Ray(x, y, z, vx, vy, vz, t0)
-        ray2 = batoid.Ray([x, y, z], [vx, vy, vz], t0)
-        ray3 = batoid.Ray((x, y, z), (vx, vy, vz), t0)
-        ray4 = batoid.Ray(np.array([x, y, z]), np.array([vx, vy, vz]), t0)
-        for ray in [ray1, ray2, ray3, ray4]:
+        # Test different ways of constructing a Ray
+        ray1 = batoid.Ray([x, y, z], [vx, vy, vz], t0)
+        ray2 = batoid.Ray((x, y, z), (vx, vy, vz), t0)
+        ray3 = batoid.Ray(np.array([x, y, z]), np.array([vx, vy, vz]), t0)
+        for ray in [ray1, ray2, ray3]:
             np.testing.assert_allclose(ray.positionAtTime(t)[0], x+vx*(t-t0))
             np.testing.assert_allclose(ray.positionAtTime(t)[1], y+vy*(t-t0))
             np.testing.assert_allclose(ray.positionAtTime(t)[2], z+vz*(t-t0))
-        assert ray1 == ray2 == ray3 == ray4
+        assert ray1 == ray2 == ray3
         do_pickle(ray1)
 
 
@@ -46,19 +45,16 @@ def test_properties():
         f = random.gauss(1000.0, 10.0)
         v = random.choice([True, False])
 
-        ray1 = batoid.Ray(x, y, z, vx, vy, vz, t, w, f, v)
-        ray2 = batoid.Ray([x, y, z], [vx, vy, vz], t, w, f, v)
-        for ray in [ray1, ray2]:
-            assert ray.x == x
-            assert ray.y == y
-            assert ray.z == z
-            assert ray.vx == vx
-            assert ray.vy == vy
-            assert ray.vz == vz
-            assert ray.t == t
-            assert ray.wavelength == w
-            assert ray.vignetted == v
-        assert ray1 == ray2
+        ray = batoid.Ray([x, y, z], [vx, vy, vz], t, w, f, v)
+        assert ray.x == x
+        assert ray.y == y
+        assert ray.z == z
+        assert ray.vx == vx
+        assert ray.vy == vy
+        assert ray.vz == vz
+        assert ray.t == t
+        assert ray.wavelength == w
+        assert ray.vignetted == v
 
 
 @timer
@@ -136,12 +132,12 @@ def test_RayVector():
     for i in range(1000):
         rayList.append(
             batoid.Ray(
-                random.gauss(0.0, 1.0),  # x
-                random.gauss(0.0, 1.0),  # y
-                random.gauss(0.0, 1.0),  # z
-                random.gauss(0.0, 1.0),  # vx
-                random.gauss(0.0, 1.0),  # vy
-                random.gauss(0.0, 1.0),  # vz
+                [random.gauss(0.0, 1.0),  # x
+                 random.gauss(0.0, 1.0),  # y
+                 random.gauss(0.0, 1.0)],  # z
+                [random.gauss(0.0, 1.0),  # vx
+                 random.gauss(0.0, 1.0),  # vy
+                 random.gauss(0.0, 1.0)],  # vz
                 random.gauss(0.0, 1.0),  # t0
                 random.gauss(1000.0, 1.0),  # wavelength
                 random.gauss(100.0, 1.0),  # flux
@@ -201,7 +197,7 @@ def test_RayVector():
         np.array([ray.vy for ray in rayList]),
         np.array([ray.vz for ray in rayList]),
         np.array([ray.t for ray in rayList]),
-        np.array([1.0 for ray in rayList]),
+        np.array([1.0 for ray in rayList]),  # wavelength
         np.array([ray.flux for ray in rayList]),
         np.array([ray.vignetted for ray in rayList])
     )
