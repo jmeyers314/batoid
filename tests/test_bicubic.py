@@ -198,7 +198,7 @@ def test_intersect():
         x = np.random.uniform(0.1, 0.9)
         y = np.random.uniform(0.1, 0.9)
 
-        r0 = batoid.Ray(x, y, -10, 0, 0, 1, 0)
+        r0 = batoid.Ray((x, y, -10), (0, 0, 1), 0)
         r = bc.intersect(r0)
 
         np.testing.assert_allclose(r.r[0], x)
@@ -206,7 +206,7 @@ def test_intersect():
         np.testing.assert_allclose(r.r[2], bc.sag(x, y), rtol=0, atol=1e-9)
 
     # intersect should fail, but gracefully, outside of grid domain
-    r0 = batoid.Ray(-1, -1, -10, 0, 0, 1, 0)
+    r0 = batoid.Ray((-1, -1, -10), (0, 0, 1), 0)
     assert bc.intersect(r0).failed
 
 

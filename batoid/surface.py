@@ -1,4 +1,7 @@
 from . import _batoid
+from .ray import Ray
+from .rayVector import RayVector
+from .utils import _rayify
 import numpy as np
 from abc import ABC, abstractmethod
 
@@ -51,7 +54,7 @@ class Surface(ABC):
         outRays : Ray or RayVector
             New object corresponding to original ray(s) propagated to the intersection point.
         """
-        return self._surface.intersect(r)
+        return _rayify(self._surface.intersect(r._r))
 
     def intersectInPlace(self, r):
         """Calculate intersection of ray or rays with this surface.  Same as `intersect`, but
@@ -62,7 +65,7 @@ class Surface(ABC):
         r : Ray or RayVector
             Ray(s) to manipulate in place.
         """
-        return self._surface.intersectInPlace(r)
+        return self._surface.intersectInPlace(r._r)
 
     def reflect(self, r, coating=None):
         """Calculate intersection of ray(s) with this surface, and immediately reflect the ray(s) at
@@ -80,7 +83,7 @@ class Surface(ABC):
         outRays : Ray or RayVector
             New object corresponding to original ray(s) propagated and reflected.
         """
-        return self._surface.reflect(r, coating)
+        return _rayify(self._surface.reflect(r._r, coating))
 
     def reflectInPlace(self, r, coating=None):
         """Calculate intersection of ray(s) with this surface, and immediately reflect the ray(s) at
@@ -93,7 +96,7 @@ class Surface(ABC):
         coating : Coating (optional)
             Coating object to control reflection coefficient.
         """
-        self._surface.reflectInPlace(r, coating)
+        self._surface.reflectInPlace(r._r, coating)
 
     def refract(self, r, inMedium, outMedium, coating=None):
         """Calculate intersection of ray(s) with this surface, and immediately refract the ray(s)
@@ -115,7 +118,7 @@ class Surface(ABC):
         outRays : Ray or RayVector
             New object corresponding to original ray(s) propagated and refracted.
         """
-        return self._surface.refract(r, inMedium, outMedium, coating)
+        return _rayify(self._surface.refract(r._r, inMedium, outMedium, coating))
 
     def refractInPlace(self, r, inMedium, outMedium, coating=None):
         """Calculate intersection of ray(s) with this surface, and immediately refract the ray(s)
@@ -133,7 +136,7 @@ class Surface(ABC):
         coating : Coating (optional)
             Coating object to control transmission coefficient.
         """
-        self._surface.refractInPlace(r, inMedium, outMedium, coating)
+        self._surface.refractInPlace(r._r, inMedium, outMedium, coating)
 
     def rSplit(self, r, inMedium, outMedium, coating):
         """Calculate intersection of rays with this surface, and immediately split the rays into
@@ -155,7 +158,8 @@ class Surface(ABC):
         reflectedRays, refractedRays : RayVector
             New objects corresponding to original rays propagated and reflected/refracted.
         """
-        return self._surface.rSplit(r, inMedium, outMedium, coating)
+        reflectedRays, refractedRays = self._surface.rSplit(r._r, inMedium, outMedium, coating)
+        return _rayify(reflectedRays), _rayify(refractedRays)
 
     @abstractmethod
     def __hash__(self):

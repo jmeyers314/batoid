@@ -1,4 +1,4 @@
-from ._batoid import CoordSys
+from .coordsys import CoordSys
 from ._batoid import ConstMedium
 
 globalCoordSys = CoordSys()

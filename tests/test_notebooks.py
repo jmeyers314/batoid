@@ -34,14 +34,16 @@ def _notebook_run(path):
 
 
 notebooks = [
+    "Analytic despace aberration.ipynb",
+    "Apochromat.ipynb",
     "Aspheric Newtonian Telescope.ipynb",
     "DECam perturbations.ipynb",
     "DECam trace.ipynb",
+    "DESI trace.ipynb",
     "Distortion.ipynb",
     "HSC 3D.ipynb",
     "HSC perturbations.ipynb",
     "HSC trace.ipynb",
-    "DESI trace.ipynb",
     "LSST donuts.ipynb",
     "LSST perturbations.ipynb",
     "LSST trace.ipynb",

@@ -30,7 +30,7 @@ def parallel_trace_timing(nside=1024, nthread=None, minChunk=None):
     else:
         fn = os.path.join(batoid.datadir, "HSC", "HSC.yaml")
         pm = 'SubaruHSC.PM'
-    config = yaml.load(open(fn))
+    config = yaml.safe_load(open(fn))
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
 
     rays = batoid.circularGrid(
