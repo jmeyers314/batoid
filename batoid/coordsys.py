@@ -17,6 +17,42 @@ def RotZ(th):
 
 
 class CoordSys:
+    """A coordinate system against which to measure Surfaces or Rays.
+
+    Coordinate systems consist of an origin and a rotation.  The `origin`
+    attribute specifies where in 3D space the current coordinate system's origin
+    lands in the global coordinate system.  The rotation `rot` specifies the
+    3D rotation matrix to apply to the global coordinate axes to yield the
+    axes of the this coordinate system.
+
+
+    Parameters
+    ----------
+    origin : (3,) array of float
+        Origin of coordinate system in global coordinates.
+    rot : (3, 3) array of float
+        Rotation matrix taking global axes into current system axes.
+
+
+    Attributes
+    ----------
+    origin
+    rot
+    xhat, yhat, zhat : (3,) array of float
+        Orientation of local x, y, z vector in global coordinates.
+
+
+    Methods
+    -------
+    shiftGlobal(dr)
+        Return new CoordSys with origin shifted along global axes.
+    shiftLocal(dr)
+        Return new CoordSys with origin shifted along local axes.
+    rotateGlobal(rot, rotCenter, coordSys)
+        Return new CoordSys with axes rotated wrt global coordinates.
+    rotateLocal(rot, rotCenter, coordSys)
+        Return new CoordSys with axes rotated wrt local coordinates.
+    """
     def __init__(self, origin=None, rot=None):
         if origin is None:
             if rot is None:
@@ -59,17 +95,69 @@ class CoordSys:
         return repr(self._coordSys)
 
     def shiftGlobal(self, dr):
+        """Return new CoordSys with origin shifted along global axes.
+
+        Parameters
+        ----------
+        dr : (3,) array of float
+            Amount to shift.
+
+        Returns
+        -------
+        newCoordSys : CoordSys
+        """
         return CoordSys._fromCoordSys(self._coordSys.shiftGlobal(dr))
 
     def shiftLocal(self, dr):
+        """Return new CoordSys with origin shifted along local axes.
+
+        Parameters
+        ----------
+        dr : (3,) array of float
+            Amount to shift.
+
+        Returns
+        -------
+        newCoordSys : CoordSys
+        """
         return CoordSys._fromCoordSys(self._coordSys.shiftLocal(dr))
 
     def rotateGlobal(self, rot, rotCenter=(0,0,0), coordSys=None):
+        """Return new CoordSys rotated with respect to global axes.
+
+        Parameters
+        ----------
+        rot : (3, 3) array of float
+            Rotation matrix to apply.
+        rotCenter : (3,) array of float
+            Point about which to rotate.
+        coordSys : CoordSys
+            Coordinate system in which rotCenter is specified.
+
+        Returns
+        -------
+        newCoordSys : CoordSys
+        """
         if coordSys is None:
             coordSys = self
         return CoordSys._fromCoordSys(self._coordSys.rotateGlobal(rot, rotCenter, coordSys._coordSys))
 
     def rotateLocal(self, rot, rotCenter=(0,0,0), coordSys=None):
+        """Return new CoordSys rotated with respect to local axes.
+
+        Parameters
+        ----------
+        rot : (3, 3) array of float
+            Rotation matrix to apply.
+        rotCenter : (3,) array of float
+            Point about which to rotate.
+        coordSys : CoordSys
+            Coordinate system in which rotCenter is specified.
+
+        Returns
+        -------
+        newCoordSys : CoordSys
+        """
         if coordSys is None:
             coordSys = self
         return CoordSys._fromCoordSys(self._coordSys.rotateLocal(rot, rotCenter, coordSys._coordSys))
@@ -86,10 +174,36 @@ class CoordSys:
 
 
 class CoordTransform:
+    """Transformation between two coordinate systems.
+
+    Parameters
+    ----------
+    fromSys, toSys : CoordSys
+        Origin and destination coordinate systems.
+
+    Methods
+    -------
+    applyForward(*args)
+        Apply forward-direction transformation.
+    applyReverse(*args)
+        Apply reverse-direction transformation.
+    """
     def __init__(self, fromSys, toSys):
         self._coordTransform = _batoid.CoordTransform(fromSys._coordSys, toSys._coordSys)
 
     def applyForward(self, arg1, arg2=None, arg3=None):
+        """Apply forward-direction transformation.
+
+        Parameters
+        ----------
+        arg : Ray or RayVector or array
+            Object to transform.  Return type is the same as the input type.
+
+        Returns
+        -------
+        transformed : Ray or RayVector or array
+            Result of transformation.  Type is the same as the input type.
+        """
         if arg2 is not None:
             return self._coordTransform.applyForward(arg1, arg2, arg3)
         elif isinstance(arg1, Ray):
@@ -100,6 +214,18 @@ class CoordTransform:
             return self._coordTransform.applyForward(arg1)
 
     def applyReverse(self, arg1, arg2=None, arg3=None):
+        """Apply reverse-direction transformation.
+
+        Parameters
+        ----------
+        arg : Ray or RayVector or array
+            Object to transform.  Return type is the same as the input type.
+
+        Returns
+        -------
+        transformed : Ray or RayVector or array
+            Result of transformation.  Type is the same as the input type.
+        """
         if arg2 is not None:
             return self._coordTransform.applyReverse(arg1, arg2, arg3)
         elif isinstance(arg1, Ray):
@@ -110,9 +236,33 @@ class CoordTransform:
             return self._coordTransform.applyReverse(arg1)
 
     def applyForwardInPlace(self, r):
+        """Apply forward-direction transformation in place.
+
+        Parameters
+        ----------
+        arg : Ray or RayVector
+            Object to transform.  Return type is the same as the input type.
+
+        Returns
+        -------
+        transformed : Ray or RayVector
+            Result of transformation.  Type is the same as the input type.
+        """
         self._coordTransform.applyForwardInPlace(r._r)
 
     def applyReverseInPlace(self, r):
+        """Apply reverse-direction transformation in place.
+
+        Parameters
+        ----------
+        arg : Ray or RayVector
+            Object to transform.  Return type is the same as the input type.
+
+        Returns
+        -------
+        transformed : Ray or RayVector
+            Result of transformation.  Type is the same as the input type.
+        """
         self._coordTransform.applyReverseInPlace(r._r)
 
     def __eq__(self, rhs):
