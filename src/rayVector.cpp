@@ -19,7 +19,6 @@ namespace batoid {
         bool wSame{true};
         double w0{w[0]};
         for(int i=0; i<x.size(); i++) {
-            // _rays.push_back(Ray(x[i], y[i], z[i], vx[i], vy[i], vz[i], t[i], w[i], flux[i], vignetted[i]));
             _rays.emplace_back(x[i], y[i], z[i], vx[i], vy[i], vz[i], t[i], w[i], flux[i], vignetted[i]);
             if (w[i] != w0) wSame = false;
         }

@@ -16,6 +16,7 @@ namespace batoid {
             .def(py::init<>())
             .def(py::init<RayVector>())
             .def(py::init<std::vector<Ray>>())
+            .def(py::init<std::vector<Ray>, double>())
             .def(py::init<std::vector<double>, std::vector<double>, std::vector<double>,
                           std::vector<double>, std::vector<double>, std::vector<double>,
                           std::vector<double>, std::vector<double>, std::vector<double>,

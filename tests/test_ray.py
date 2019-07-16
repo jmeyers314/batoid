@@ -173,7 +173,7 @@ def test_RayVector():
     np.testing.assert_equal(rayVector.kz, np.array([ray.kz for ray in rayVector]))
 
     # Try the other ctor
-    rayVector2 = batoid.RayVector(
+    rayVector2 = batoid.RayVector.fromArrays(
         np.array([ray.x for ray in rayList]),
         np.array([ray.y for ray in rayList]),
         np.array([ray.z for ray in rayList]),
@@ -189,7 +189,7 @@ def test_RayVector():
     assert rayVector2.monochromatic == False
 
     # See if we can make monochromatic True
-    rayVector3 = batoid.RayVector(
+    rayVector3 = batoid.RayVector.fromArrays(
         np.array([ray.x for ray in rayList]),
         np.array([ray.y for ray in rayList]),
         np.array([ray.z for ray in rayList]),
@@ -388,7 +388,6 @@ def test_ne():
             batoid.Ray((0,0,0), (0,0,0), vignetted=True),
             # Should really get a failed Ray to test here...
             (0,0,0),
-            batoid.RayVector(),
             batoid.RayVector([
                 batoid.Ray((0,0,1), (0,0,0)),
                 batoid.Ray((0,0,0), (0,0,0))
