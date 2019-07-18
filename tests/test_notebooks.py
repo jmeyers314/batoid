@@ -44,11 +44,9 @@ notebooks = [
     "HSC 3D.ipynb",
     "HSC perturbations.ipynb",
     "HSC trace.ipynb",
-    "LSST donuts.ipynb",
     "LSST perturbations.ipynb",
     "LSST trace.ipynb",
     "Newtonian Telescope.ipynb",
-    "PH != Pupil.ipynb",
     "Rays.ipynb",
     "Thin Lens.ipynb"
 ]
@@ -66,5 +64,9 @@ def test_notebook(notebook_name):
 
 
 if __name__ == '__main__':
+    notebooks.append([
+        "PH != Pupil.ipynb",
+        "LSST donuts.ipynb",
+    ])
     for notebook in notebooks:
         test_notebook(notebook)
