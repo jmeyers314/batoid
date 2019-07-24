@@ -1,8 +1,6 @@
 import numpy as np
 from numbers import Real
 from . import _batoid
-from .ray import Ray
-from .rayVector import RayVector
 
 
 def normalized(*args):
@@ -603,6 +601,8 @@ class lazy_property(object):
 
 
 def _rayify(r):
+    from .ray import Ray
+    from .rayVector import RayVector
     if isinstance(r, _batoid.Ray):
         return Ray._fromRay(r)
     elif isinstance(r, _batoid.RayVector):

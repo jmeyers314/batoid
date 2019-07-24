@@ -1,6 +1,4 @@
 from . import _batoid
-from .ray import Ray
-from .rayVector import RayVector
 from .utils import _rayify
 import numpy as np
 from abc import ABC, abstractmethod

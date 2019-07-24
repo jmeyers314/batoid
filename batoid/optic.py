@@ -1,8 +1,12 @@
-import batoid
 import numpy as np
 
+from ._batoid import SimpleCoating
+from ._batoid import ObscNegation, ObscCircle, ObscAnnulus
 from .constants import globalCoordSys, vacuum
+from .coordsys import CoordTransform
+from .rayVector import concatenateRayVectors
 from .utils import _rayify
+
 
 class Optic:
     """
@@ -77,15 +81,15 @@ class Interface(Optic):
         self.inRadius = 0.0
         self.outRadius = None
         if self.obscuration is not None:
-            if isinstance(self.obscuration, batoid.ObscNegation):
-                if isinstance(self.obscuration.original, batoid.ObscCircle):
+            if isinstance(self.obscuration, ObscNegation):
+                if isinstance(self.obscuration.original, ObscCircle):
                     self.outRadius = self.obscuration.original.radius
-                elif isinstance(self.obscuration.original, batoid.ObscAnnulus):
+                elif isinstance(self.obscuration.original, ObscAnnulus):
                     self.outRadius = self.obscuration.original.outer
                     self.inRadius = self.obscuration.original.inner
-            elif isinstance(self.obscuration, batoid.ObscCircle):
+            elif isinstance(self.obscuration, ObscCircle):
                 self.outRadius = self.obscuration.radius
-            elif isinstance(self.obscuration, batoid.ObscAnnulus):
+            elif isinstance(self.obscuration, ObscAnnulus):
                 self.outRadius = self.obscuration.outer
                 self.inRadius = self.obscuration.inner
 
@@ -112,7 +116,7 @@ class Interface(Optic):
             x = self.inRadius * cth
             y = self.inRadius * sth
             z = self.surface.sag(x, y)
-            transform = batoid.CoordTransform(self.coordSys, globalCoordSys)
+            transform = CoordTransform(self.coordSys, globalCoordSys)
             x, y, z = transform.applyForward(x, y, z)
             ax.plot(x, y, z, **kwargs)
 
@@ -122,7 +126,7 @@ class Interface(Optic):
         x = self.outRadius * cth
         y = self.outRadius * sth
         z = self.surface.sag(x, y)
-        transform = batoid.CoordTransform(self.coordSys, globalCoordSys)
+        transform = CoordTransform(self.coordSys, globalCoordSys)
         x, y, z = transform.applyForward(x, y, z)
         ax.plot(x, y, z, **kwargs)
 
@@ -130,13 +134,13 @@ class Interface(Optic):
         y = np.linspace(-self.outRadius, -self.inRadius)
         x = np.zeros_like(y)
         z = self.surface.sag(x, y)
-        transform = batoid.CoordTransform(self.coordSys, globalCoordSys)
+        transform = CoordTransform(self.coordSys, globalCoordSys)
         x, y, z = transform.applyForward(x, y, z)
         ax.plot(x, y, z, **kwargs)
         y = np.linspace(self.inRadius, self.outRadius)
         x = np.zeros_like(y)
         z = self.surface.sag(x, y)
-        transform = batoid.CoordTransform(self.coordSys, globalCoordSys)
+        transform = CoordTransform(self.coordSys, globalCoordSys)
         x, y, z = transform.applyForward(x, y, z)
         ax.plot(x, y, z, **kwargs)
 
@@ -144,13 +148,13 @@ class Interface(Optic):
         x = np.linspace(-self.outRadius, -self.inRadius)
         y = np.zeros_like(x)
         z = self.surface.sag(x, y)
-        transform = batoid.CoordTransform(self.coordSys, globalCoordSys)
+        transform = CoordTransform(self.coordSys, globalCoordSys)
         x, y, z = transform.applyForward(x, y, z)
         ax.plot(x, y, z, **kwargs)
         x = np.linspace(self.inRadius, self.outRadius)
         y = np.zeros_like(x)
         z = self.surface.sag(x, y)
-        transform = batoid.CoordTransform(self.coordSys, globalCoordSys)
+        transform = CoordTransform(self.coordSys, globalCoordSys)
         x, y, z = transform.applyForward(x, y, z)
         ax.plot(x, y, z, **kwargs)
 
@@ -179,11 +183,12 @@ class Interface(Optic):
             Tuple (xz1, xz2) of 1D arrays where xz1=[x1, z1] is the xlocal <= 0
             half slice and xz2=[x2, z2] is the xlocal >= 0 half slice.
         """
+        from .surface import Plane
         slice = []
         if self.outRadius is None:
             return slice
         if nslice <= 0:
-            if isinstance(self.surface, batoid.surface.Plane):
+            if isinstance(self.surface, Plane):
                 nslice = 2
             else:
                 nslice = 50
@@ -192,7 +197,7 @@ class Interface(Optic):
         y = np.zeros_like(x)
         z = self.surface.sag(x, y)
         # Transform slice to global coordinates.
-        transform = batoid.CoordTransform(self.coordSys, globalCoordSys)
+        transform = CoordTransform(self.coordSys, globalCoordSys)
         xneg, yneg, zneg = transform.applyForward(x, y, z)
         if np.any(yneg != 0):
             print('WARNING: getXZSlice used for rotated surface "{0}".'.format(self.name))
@@ -254,7 +259,7 @@ class Interface(Optic):
         """
         if self.skip:
             return r, inCoordSys
-        transform = batoid.CoordTransform(inCoordSys, self.coordSys)
+        transform = CoordTransform(inCoordSys, self.coordSys)
         r = transform.applyForward(r)
 
         # refract, reflect, pass-through - depending on subclass
@@ -266,7 +271,7 @@ class Interface(Optic):
         if outCoordSys is None:
             return r, self.coordSys
         else:
-            transform = batoid.CoordTransform(self.coordSys, outCoordSys)
+            transform = CoordTransform(self.coordSys, outCoordSys)
             return transform.applyForward(r), outCoordSys
 
     def traceFull(self, r, inCoordSys=globalCoordSys, outCoordSys=None):
@@ -327,7 +332,7 @@ class Interface(Optic):
         """
         if self.skip:
             return r, inCoordSys
-        transform = batoid.CoordTransform(inCoordSys, self.coordSys)
+        transform = CoordTransform(inCoordSys, self.coordSys)
         transform.applyForwardInPlace(r)
 
         # refract, reflect, pass-through - depending on subclass
@@ -339,7 +344,7 @@ class Interface(Optic):
         if outCoordSys is None:
             return r, self.coordSys
         else:
-            transform = batoid.CoordTransform(self.coordSys, outCoordSys)
+            transform = CoordTransform(self.coordSys, outCoordSys)
             transform.applyForwardInPlace(r)
             return r, outCoordSys
 
@@ -367,7 +372,7 @@ class Interface(Optic):
         """
         if self.skip:
             return r, inCoordSys
-        transform = batoid.CoordTransform(inCoordSys, self.coordSys)
+        transform = CoordTransform(inCoordSys, self.coordSys)
         r = transform.applyForward(r)
 
         r = self.interactReverse(r)
@@ -378,7 +383,7 @@ class Interface(Optic):
         if outCoordSys is None:
             return r, self.coordSys
         else:
-            transform = batoid.CoordTransform(self.coordSys, outCoordSys)
+            transform = CoordTransform(self.coordSys, outCoordSys)
             return transform.applyForward(r), outCoordSys
 
     def traceSplit(self, r, inCoordSys=globalCoordSys, forwardCoordSys=None, reverseCoordSys=None,
@@ -420,7 +425,7 @@ class Interface(Optic):
             print(strtemplate.format(self.name, np.sum(r.flux), len(r)))
         if self.skip:
             return r, None, inCoordSys, None
-        transform = batoid.CoordTransform(inCoordSys, self.coordSys)
+        transform = CoordTransform(inCoordSys, self.coordSys)
         r = transform.applyForward(r)
 
         rForward, rReverse = self.rSplit(r)
@@ -433,13 +438,13 @@ class Interface(Optic):
         if forwardCoordSys is None:
             forwardCoordSys = self.coordSys
         else:
-            transform = batoid.CoordTransform(self.coordSys, forwardCoordSys)
+            transform = CoordTransform(self.coordSys, forwardCoordSys)
             rForward = transform.applyForward(rForward)
 
         if reverseCoordSys is None:
             reverseCoordSys = self.coordSys
         else:
-            transform = batoid.CoordTransform(self.coordSys, reverseCoordSys)
+            transform = CoordTransform(self.coordSys, reverseCoordSys)
             rReverse = transform.applyForward(rReverse)
 
         return rForward, rReverse, forwardCoordSys, reverseCoordSys
@@ -484,7 +489,7 @@ class Interface(Optic):
             print(strtemplate.format(self.name, np.sum(r.flux), len(r)))
         if self.skip:
             return r, None, inCoordSys, None
-        transform = batoid.CoordTransform(inCoordSys, self.coordSys)
+        transform = CoordTransform(inCoordSys, self.coordSys)
         r = transform.applyForward(r)
 
         rForward, rReverse = self.rSplitReverse(r)
@@ -497,13 +502,13 @@ class Interface(Optic):
         if forwardCoordSys is None:
             forwardCoordSys = self.coordSys
         else:
-            transform = batoid.CoordTransform(self.coordSys, forwardCoordSys)
+            transform = CoordTransform(self.coordSys, forwardCoordSys)
             rForward = transform.applyForward(rForward)
 
         if reverseCoordSys is None:
             reverseCoordSys = self.coordSys
         else:
-            transform = batoid.CoordTransform(self.coordSys, reverseCoordSys)
+            transform = CoordTransform(self.coordSys, reverseCoordSys)
             rReverse = transform.applyForward(rReverse)
 
         return rForward, rReverse, forwardCoordSys, reverseCoordSys
@@ -595,10 +600,10 @@ class RefractiveInterface(Interface):
     """
     def __init__(self, *args, **kwargs):
         Interface.__init__(self, *args, **kwargs)
-        # self.forwardCoating = batoid.SimpleCoating(reflectivity=0.0, transmissivity=1.0)
-        # self.reverseCoating = batoid.SimpleCoating(reflectivity=0.0, transmissivity=1.0)
-        self.forwardCoating = batoid.SimpleCoating(reflectivity=0.02, transmissivity=0.98)
-        self.reverseCoating = batoid.SimpleCoating(reflectivity=0.02, transmissivity=0.98)
+        # self.forwardCoating = SimpleCoating(reflectivity=0.0, transmissivity=1.0)
+        # self.reverseCoating = SimpleCoating(reflectivity=0.0, transmissivity=1.0)
+        self.forwardCoating = SimpleCoating(reflectivity=0.02, transmissivity=0.98)
+        self.reverseCoating = SimpleCoating(reflectivity=0.02, transmissivity=0.98)
 
     def interact(self, r):
         return self.surface.refract(r, self.inMedium, self.outMedium)
@@ -629,8 +634,8 @@ class Mirror(Interface):
     """
     def __init__(self, *args, **kwargs):
         Interface.__init__(self, *args, **kwargs)
-        self.forwardCoating = batoid.SimpleCoating(reflectivity=1.0, transmissivity=0.0)
-        self.reverseCoating = batoid.SimpleCoating(reflectivity=1.0, transmissivity=0.0)
+        self.forwardCoating = SimpleCoating(reflectivity=1.0, transmissivity=0.0)
+        self.reverseCoating = SimpleCoating(reflectivity=1.0, transmissivity=0.0)
 
     def interact(self, r):
         return self.surface.reflect(r)
@@ -657,7 +662,7 @@ class Detector(Interface):
     """
     def __init__(self, *args, **kwargs):
         Interface.__init__(self, *args, **kwargs)
-        self.forwardCoating = batoid.SimpleCoating(reflectivity=0.02, transmissivity=0.98)
+        self.forwardCoating = SimpleCoating(reflectivity=0.02, transmissivity=0.98)
         self.reverseCoating = None
 
     def interact(self, r):
@@ -686,8 +691,8 @@ class Baffle(Interface):
     """
     def __init__(self, *args, **kwargs):
         Interface.__init__(self, *args, **kwargs)
-        self.forwardCoating = batoid.SimpleCoating(reflectivity=0.0, transmissivity=1.0)
-        self.reverseCoating = batoid.SimpleCoating(reflectivity=0.0, transmissivity=1.0)
+        self.forwardCoating = SimpleCoating(reflectivity=0.0, transmissivity=1.0)
+        self.reverseCoating = SimpleCoating(reflectivity=0.0, transmissivity=1.0)
 
     def interact(self, r):
         return self.surface.intersect(r)
@@ -944,7 +949,7 @@ class CompoundOptic(Optic):
             if itemIndex == 0:
                 if len(rReverse) > 0:
                     if tmpReverseCoordSys != reverseCoordSys:
-                        transform = batoid.CoordTransform(tmpReverseCoordSys, reverseCoordSys)
+                        transform = CoordTransform(tmpReverseCoordSys, reverseCoordSys)
                         transform.applyForwardInPlace(rReverse)
                     outRReverse.append(rReverse)
             else:
@@ -954,15 +959,15 @@ class CompoundOptic(Optic):
             if itemIndex == len(self.items)-1:
                 if len(rForward) > 0:
                     if tmpForwardCoordSys != forwardCoordSys:
-                        transform = batoid.CoordTransform(tmpForwardCoordSys, forwardCoordSys)
+                        transform = CoordTransform(tmpForwardCoordSys, forwardCoordSys)
                         transform.applyForwardInPlace(rForward)
                     outRForward.append(rForward)
             else:
                 if len(rForward) > 1:
                     workQueue.append((rForward, tmpForwardCoordSys, "forward", itemIndex+1))
 
-        rForward = batoid.concatenateRayVectors(outRForward)
-        rReverse = batoid.concatenateRayVectors(outRReverse)
+        rForward = concatenateRayVectors(outRForward)
+        rReverse = concatenateRayVectors(outRReverse)
         return rForward, rReverse, forwardCoordSys, reverseCoordSys
 
     def traceSplitReverse(self, r, inCoordSys=globalCoordSys, forwardCoordSys=None,
@@ -1037,7 +1042,7 @@ class CompoundOptic(Optic):
             if itemIndex == 0:
                 if len(rReverse) > 0:
                     if tmpReverseCoordSys != reverseCoordSys:
-                        transform = batoid.CoordTransform(tmpReverseCoordSys, reverseCoordSys)
+                        transform = CoordTransform(tmpReverseCoordSys, reverseCoordSys)
                         transform.applyForwardInPlace(rReverse)
                     outRReverse.append(rReverse)
             else:
@@ -1047,15 +1052,15 @@ class CompoundOptic(Optic):
             if itemIndex == len(self.items)-1:
                 if len(rForward) > 0:
                     if tmpForwardCoordSys != forwardCoordSys:
-                        transform = batoid.CoordTransform(tmpForwardCoordSys, forwardCoordSys)
+                        transform = CoordTransform(tmpForwardCoordSys, forwardCoordSys)
                         transform.applyForwardInPlace(rForward)
                     outRForward.append(rForward)
             else:
                 if len(rForward) > 1:
                     workQueue.append((rForward, tmpForwardCoordSys, "forward", itemIndex+1))
 
-        rForward = batoid.concatenateRayVectors(outRForward)
-        rReverse = batoid.concatenateRayVectors(outRReverse)
+        rForward = concatenateRayVectors(outRForward)
+        rReverse = concatenateRayVectors(outRReverse)
         return rForward, rReverse, forwardCoordSys, reverseCoordSys
 
     def draw3d(self, ax, **kwargs):
@@ -1091,7 +1096,7 @@ class CompoundOptic(Optic):
         only = kwargs.pop('only', None)
         for item in self.items:
             item_class = item.__class__
-            if issubclass(item_class, batoid.optic.CompoundOptic):
+            if issubclass(item_class, CompoundOptic):
                 item.draw2d(ax, only=only, **kwargs)
             elif only is None or issubclass(item_class, only):
                 item.draw2d(ax, **kwargs)
@@ -1330,7 +1335,7 @@ class Lens(CompoundOptic):
         using the specified font properties.
         """
         only = kwargs.pop('only', None)
-        if only == batoid.optic.Lens:
+        if only == Lens:
             labelpos = kwargs.pop('labelpos', None)
             fontdict = kwargs.pop('fontdict', None)
             if len(self.items) != 2:
@@ -1555,13 +1560,13 @@ def getGlobalRays(traceFull, start=None, end=None, globalSys=globalCoordSys):
     # Allocate an array for all ray vertices in global coords.
     xyz = np.empty((nray, 3, nsurf + 1))
     # First point on each ray is where it enters the start surface.
-    transform = batoid.CoordTransform(traceFull[start]['inCoordSys'], globalSys)
+    transform = CoordTransform(traceFull[start]['inCoordSys'], globalSys)
     xyz[:, :, 0] = np.stack(transform.applyForward(*traceFull[start]['in'].r.T), axis=1)
     # Keep track of the number of visible points on each ray.
     raylen = np.ones(nray, dtype=int)
     for i, surface in enumerate(traceFull[start:end]):
         # Add a point for where each ray leaves this surface.
-        transform = batoid.CoordTransform(surface['outCoordSys'], globalSys)
+        transform = CoordTransform(surface['outCoordSys'], globalSys)
         xyz[:, :, i + 1] = np.stack(transform.applyForward(*surface['out'].r.T), axis=1)
         # Keep track of rays which are still visible.
         visible = ~surface['out'].vignetted
