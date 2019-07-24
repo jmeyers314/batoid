@@ -1,17 +1,17 @@
-batoid documentation
-====================
+.. batoid documentation master file
 
-Contents:
+batoid: c++ backed python optical raytracer
 
 .. toctree::
    :maxdepth: 2
 
+   overview
    intro
 
-Modules API Reference
----------------------
+==================
+Indices and tables
+==================
 
-.. toctree::
-   :maxdepth: 3
-
-   batoid
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

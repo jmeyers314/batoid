@@ -89,9 +89,9 @@ class Ray:
 
         Parameters
         ----------
-        position : (3,), array of float
+        r : (3,), array of float
             Position in meters at which to compute phase.
-        time : float
+        t : float
             Time (over the speed of light; in meters) at which to compute
             phase.
 
@@ -106,7 +106,7 @@ class Ray:
 
         Parameters
         ----------
-        time : float
+        t : float
             Time (over the speed of light; in meters) at which to compute
             position.
 
@@ -122,7 +122,7 @@ class Ray:
 
         Parameters
         ----------
-        time : float
+        t : float
             Time (over the speed of light; in meters) to which to propagate
             ray.
 
@@ -148,9 +148,9 @@ class Ray:
 
         Parameters
         ----------
-        position : (3,), array of float
+        r : (3,), array of float
             Position at which to compute phase
-        time : float
+        t : float
             Time (over the speed of light; in meters) at which to compute
             phase.
 
