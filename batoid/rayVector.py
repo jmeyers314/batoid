@@ -1,7 +1,8 @@
-from . import _batoid
-from .ray import Ray
-from collections.abc import Sequence
 from numbers import Real
+from collections.abc import Sequence
+
+from . import _batoid
+from .constants import vacuum
 
 class RayVector:
     """A sequence of `Ray`s.
@@ -310,6 +311,7 @@ class RayVector:
         return self._r.omega
 
     def __getitem__(self, idx):
+        from .ray import Ray
         return Ray._fromRay(self._r[idx])
 
     def __iter__(self):
@@ -317,6 +319,7 @@ class RayVector:
         return self
 
     def __next__(self):
+        from .ray import Ray
         return Ray._fromRay(next(self._iter))
 
     def __len__(self):

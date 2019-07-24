@@ -1,6 +1,4 @@
 from . import _batoid
-from .ray import Ray
-from .rayVector import RayVector
 import numpy as np
 
 def RotX(th):
@@ -204,6 +202,8 @@ class CoordTransform:
         transformed : Ray or RayVector or array
             Result of transformation.  Type is the same as the input type.
         """
+        from .ray import Ray
+        from .rayVector import RayVector
         if arg2 is not None:
             return self._coordTransform.applyForward(arg1, arg2, arg3)
         elif isinstance(arg1, Ray):
@@ -226,6 +226,8 @@ class CoordTransform:
         transformed : Ray or RayVector or array
             Result of transformation.  Type is the same as the input type.
         """
+        from .ray import Ray
+        from .rayVector import RayVector
         if arg2 is not None:
             return self._coordTransform.applyReverse(arg1, arg2, arg3)
         elif isinstance(arg1, Ray):
