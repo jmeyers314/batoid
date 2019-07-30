@@ -204,8 +204,52 @@ def test_HSC_zernike():
     np.testing.assert_allclose(ZZernike[11:], bZernike[11:], rtol=0, atol=2e-4)
 
 
+@pytest.mark.skipif(not hasGalSim, reason="galsim not found")
+@timer
+def test_LSST_wf():
+    thxs = [0.0, 0.0, 0.0, 1.176]
+    thys = [0.0, 1.225, 1.75, 1.176]
+    fns = ["LSST_wf_0.0_0.0.txt",
+           "LSST_wf_0.0_1.225.txt",
+           "LSST_wf_0.0_1.75.txt",
+           "LSST_wf_1.176_1.176.txt"]
+    for thx, thy, fn in zip(thxs, thys, fns):
+        fn = os.path.join(directory, "testdata", fn)
+        with open(fn, encoding='utf-16-le') as f:
+            Zwf = np.loadtxt(f, skiprows=16)
+        Zwf = Zwf[::-1]  # Need to invert, probably just a Zemax convention...
+
+        LSST_fn = os.path.join(batoid.datadir, "LSST", "LSST_g_500.yaml")
+        config = yaml.safe_load(open(LSST_fn))
+        telescope = batoid.parse.parse_optic(config['opticalSystem'])
+
+        thx = np.deg2rad(thx)
+        thy = np.deg2rad(thy)
+        wavelength = 500e-9
+        nx = 32
+
+        bwf = batoid.psf.newWavefront(
+            telescope, thx, thy, wavelength, nx=nx,
+            reference='chief', projection='zemax'
+        )
+        Zwf = np.ma.MaskedArray(data=Zwf, mask=Zwf==0)  # Turn Zwf into masked array
+
+        # import matplotlib.pyplot as plt
+        # fig, axes = plt.subplots(ncols=3)
+        # i0 = axes[0].imshow(bwf.array)
+        # i1 = axes[1].imshow(Zwf)
+        # i2 = axes[2].imshow(bwf.array-Zwf)
+        # plt.colorbar(i0, ax=axes[0])
+        # plt.colorbar(i1, ax=axes[1])
+        # plt.colorbar(i2, ax=axes[2])
+        # plt.show()
+
+        np.testing.assert_allclose(Zwf, bwf.array, atol=2e-5, rtol=0)
+
+
 if __name__ == '__main__':
     test_HSC_trace()
     test_HSC_huygensPSF()
     test_HSC_wf()
     test_HSC_zernike()
+    test_LSST_wf()

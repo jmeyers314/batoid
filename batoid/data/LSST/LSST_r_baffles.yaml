@@ -7,6 +7,13 @@ opticalSystem:
   sphereRadius: 5.0  # reference sphere radius to use for wavefront calculation
   pupilSize: 8.36  # Pupil fits inside a square with this side length
   pupilObscuration: 0.612  # Fractional pupil central obscuration
+  entrancePupil:
+    type: Interface
+    name: entrancePupil
+    surface:
+      type: Plane
+    coordSys:
+      z: 0.4393899
   items:
     -
       type: Baffle

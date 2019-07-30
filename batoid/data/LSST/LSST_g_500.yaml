@@ -1,8 +1,8 @@
 opticalSystem:
   type: CompoundOptic
   name: LSST
-  inMedium: air
-  medium: air
+  inMedium: 1.0
+  medium: 1.0
   dist: 15.0  # distance from global vertex to use to start tracing rays
   sphereRadius: 5.0  # reference sphere radius to use for wavefront calculation
   pupilSize: 8.36  # Pupil fits inside a square with this side length
@@ -34,7 +34,7 @@ opticalSystem:
         type: Asphere
         R: 6.788
         conic: -0.222
-        coefs: [0.0, 1.274e-5, 9.68e-7]
+        coefs: [-0.0, 1.274e-5, 9.68e-7]
       obscuration:
         type: ClearAnnulus
         outer: 1.71
@@ -48,7 +48,7 @@ opticalSystem:
         type: Asphere
         R: 8.3445
         conic: 0.155
-        coefs: [0.0, 4.5e-7, 8.15e-9]
+        coefs: [-0.0, 4.5e-7, 8.15e-9]
       obscuration:
         type: ClearAnnulus
         outer: 2.508
@@ -59,12 +59,12 @@ opticalSystem:
       type: CompoundOptic
       name: LSSTCamera
       coordSys:
-        z: 3.3974725882045593
+        z: 3.3986166314330655
       items:
         -
           type: Lens
           name: L1
-          medium: silica
+          medium: 1.462326484507719
           items:
             -
               type: RefractiveInterface
@@ -89,7 +89,7 @@ opticalSystem:
         -
           type: Lens
           name: L2
-          medium: silica
+          medium: 1.462326484507719
           coordSys:
             z: 0.49487202
           items:
@@ -108,7 +108,7 @@ opticalSystem:
                 type: Asphere
                 R: 2.529
                 conic: -1.57
-                coefs: [0.0, -0.001656]
+                coefs: [-0.0, -0.001656]
               obscuration:
                 type: ClearCircle
                 radius: 0.551
@@ -117,7 +117,7 @@ opticalSystem:
         -
           type: Lens
           name: Filter
-          medium: silica
+          medium: 1.462326484507719
           coordSys:
             z: 0.87445202
           items:
@@ -135,16 +135,16 @@ opticalSystem:
               name: Filter_exit
               surface:
                 type: Sphere
-                R: 5.606
+                R: 5.576
               obscuration:
                 type: ClearCircle
                 radius: 0.375
               coordSys:
-                z: 0.0179
+                z: 0.0215
         -
           type: Lens
           name: L3
-          medium: silica
+          medium: 1.462326484507719
           coordSys:
             z: 0.94345202
           items:

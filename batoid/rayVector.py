@@ -1,8 +1,11 @@
-from numbers import Real
+from numbers import Real, Integral
 from collections.abc import Sequence
 
+import numpy as np
+
 from . import _batoid
-from .constants import vacuum
+from .constants import vacuum, globalCoordSys
+from .coordsys import CoordSys, CoordTransform
 
 class RayVector:
     """A sequence of `Ray`s.
@@ -74,7 +77,7 @@ class RayVector:
             raise ValueError("Wrong arguments to RayVector")
 
     @classmethod
-    def fromArrays(cls, x, y, z, vx, vy, vz, t, w, flux=1, vignetted=None):
+    def fromArrays(cls, x, y, z, vx, vy, vz, t, w, flux=1, vignetted=False):
         """Create RayVector from 1d parameter arrays.
 
         Parameters
@@ -104,6 +107,250 @@ class RayVector:
         ret = cls.__new__(cls)
         ret._r = _batoid.RayVector(x, y, z, vx, vy, vz, t, w, flux, vignetted)
         return ret
+
+    @classmethod
+    def asGrid(cls, source, wavelength,
+               nx=None, ny=None,
+               dx=None, dy=None,
+               lx=None, ly=None,
+               flux=1,
+               medium=vacuum,
+               dirCos=None,
+               nrandom=None,
+               interface=None,
+               doCenter=False):
+        """
+        Create RayVector on a parallelogram shaped region.
+
+        Parameters
+        ----------
+        source : float or (3,) array of float
+            If float, then distance of central Ray from (0,0,z(0,0)),
+            If array of float, then rays originate from this point.
+        wavelength : float
+            Vacuum wavelength of all rays in meters.
+        nx, ny : int, optional
+            Number of Rays on a side.
+        dx, dy : float or (2,) array of float, optional
+            Differential separation of ray intersections in x and y directions.
+        lx, ly : float, optional
+            Length of each side of ray grid.
+        flux : float
+            Flux to assign each Ray.
+        dirCos : (3,) array of float
+            If source is float, then direction cosines of ray velocities.
+            If source is array of float, then unused.
+        medium : batoid.Medium
+            Initial medium of each Ray.
+        nrandom : int
+            If not None, then uniformly sample this many rays from
+            parallelogram region instead of sampling on a regular grid.
+        interface : batoid.Interface, optional
+            Interface from which grid is projected.
+        doCenter : bool
+            If True, then center the returned RayVector around (0,0).  If
+            False, then follow Fourier conventions for centering.
+        """
+        from .optic import Interface
+        from .surface import Plane
+
+        # To determine the parallelogram, exactly 2 of nx, dx, lx must be set.
+        if sum(a is not None for a in [nx, dx, lx]) != 2:
+            raise ValueError("Exactly 2 of nx, dx, lx must be specified")
+
+        if interface is None:
+            interface = Interface(Plane())
+
+        if nx is not None and ny is None:
+            ny = nx
+        if dx is not None and dy is None:
+            dy = dx
+        if lx is not None and ly is None:
+            if isinstance(lx, Real):
+                ly = lx
+            else:
+                ly = np.dot(np.array([[0, -1], [1, 0]]), lx)
+
+        if nx is not None and dx is not None:
+            if (nx%2) == 0:
+                lx = dx*(nx-2)
+            else:
+                lx = dx*(nx-1)
+            if (ny%2) == 0:
+                ly = dy*(ny-2)
+            else:
+                ly = dy*(ny-1)
+        elif lx is not None and dx is not None:
+            # adjust dx in this case
+            # always infer an even n (since even and odd are degenerate given
+            # only lx, dx)
+            nx = int(lx/dx//2)*2+2
+            ny = int(ly/dy//2)*2+2
+            dx = lx/(nx-2)
+            dy = ly/(ny-2)
+
+        if isinstance(lx, Real):
+            lx = (lx, 0.0)
+        if isinstance(ly, Real):
+            ly = (0.0, ly)
+
+        if nrandom is not None:
+            x = np.random.uniform(-0.5, 0.5, size=nrandom)
+            y = np.random.uniform(-0.5, 0.5, size=nrandom)
+        else:
+            x_d = (nx-(2 if (nx%2) == 0 else 1))/nx
+            y_d = (ny-(2 if (ny%2) == 0 else 1))/ny
+            x = np.fft.fftshift(np.fft.fftfreq(nx, x_d))
+            y = np.fft.fftshift(np.fft.fftfreq(ny, y_d))
+            x, y = np.meshgrid(x, y)
+            x = x.ravel()
+            y = y.ravel()
+        stack = np.stack([x, y])
+        x = np.dot(lx, stack)
+        y = np.dot(ly, stack)
+        z = interface.surface.sag(x, y)
+        transform = CoordTransform(interface.coordSys, globalCoordSys)
+        x, y, z = transform.applyForward(x, y, z)
+
+        t = np.zeros_like(x)
+        w = np.empty_like(x)
+        w.fill(wavelength)
+        n = medium.getN(wavelength)
+
+        return cls._finish(source, dirCos, n, x, y, z, t, w, flux)
+
+    @classmethod
+    def asPolar(cls, source, wavelength,
+                outer, inner=0.0,
+                nrad=None, naz=None,
+                flux=1,
+                medium=vacuum,
+                dirCos=None,
+                nrandom=None,
+                interface=None):
+        """
+        """
+        from .optic import Interface
+        from .surface import Plane
+
+        if interface is None:
+            interface = Interface(Plane())
+
+        if nrandom is None:
+            ths = []
+            rs = []
+            for r in np.linspace(outer, inner, nrad):
+                nphi = int(naz*r/outer//6)*6
+                ths.append(np.linspace(0, 2*np.pi, nphi, endpoint=False))
+                rs.append(np.ones(nphi)*r)
+            # Point in center is a special case
+            if inner == 0.0:
+                ths[-1] = np.array([0.0])
+                rs[-1] = np.array([0.0])
+            r = np.concatenate(rs)
+            th = np.concatenate(ths)
+        else:
+            r = np.sqrt(np.random.uniform(inner**2, outer**2, size=nrandom))
+            th = np.random.uniform(0, 2*np.pi, size=nrandom)
+        x = r*np.cos(th)
+        y = r*np.sin(th)
+        z = interface.surface.sag(x, y)
+        transform = CoordTransform(interface.coordSys, globalCoordSys)
+        x, y, z = transform.applyForward(x, y, z)
+        t = np.zeros_like(x)
+        w = np.empty_like(x)
+        w.fill(wavelength)
+        n = medium.getN(wavelength)
+
+        return cls._finish(source, dirCos, n, x, y, z, t, w, flux)
+
+    @classmethod
+    def asSpokes(cls, source, wavelength,
+                 outer=None,
+                 inner=0.0,
+                 spokes=None,
+                 rings=None,
+                 spacing='uniform',
+                 flux=1,
+                 medium=vacuum,
+                 dirCos=None,
+                 interface=None):
+        """
+        """
+        from .optic import Interface
+        from .surface import Plane
+
+        if interface is None:
+            interface = Interface(Plane())
+
+        if isinstance(rings, Integral):
+            if spacing == 'uniform':
+                rings = np.linspace(inner, outer, rings)
+            elif spacing == 'GQ':
+                if spokes is None:
+                    spokes = 2*rings+1
+                Li, w = np.polynomial.legendre.leggauss(rings)
+                rings = np.sqrt((1+Li)/2)
+                flux = w*(2*np.pi)/(4*spokes)
+            if isinstance(spokes, Integral):
+                spokes = np.linspace(0, 2*np.pi, spokes, endpoint=False)
+        rings, spokes = np.meshgrid(rings, spokes)
+        flux = np.broadcast_to(flux, rings.shape)
+        rings = rings.ravel()
+        spokes = spokes.ravel()
+        flux = flux.ravel()
+
+        x = rings*np.cos(spokes)
+        y = rings*np.sin(spokes)
+        z = interface.surface.sag(x, y)
+        transform = CoordTransform(interface.coordSys, globalCoordSys)
+        x, y, z = transform.applyForward(x, y, z)
+        t = np.zeros_like(x)
+        w = np.empty_like(x)
+        w.fill(wavelength)
+        n = medium.getN(wavelength)
+
+        return cls._finish(source, dirCos, n, x, y, z, t, w, flux)
+
+    @classmethod
+    def _finish(cls, source, dirCos, n, x, y, z, t, w, flux):
+        """Map rays backwards to their source position.
+        """
+        from .surface import Plane
+        if dirCos is not None:
+            v = np.array(dirCos, dtype=float)
+            v /= n*np.sqrt(np.dot(v, v))
+            vx = np.empty_like(x)
+            vx.fill(v[0])
+            vy = np.empty_like(x)
+            vy.fill(v[1])
+            vz = np.empty_like(x)
+            vz.fill(v[2])
+            # Now need to raytrace backwards to the plane source units away.
+            rays = RayVector.fromArrays(x, y, z, -vx, -vy, -vz, t, w, flux=flux)
+
+            zhat = -n*v
+            xhat = np.cross(np.array([1.0, 0.0, 0.0]), zhat)
+            xhat /= np.sqrt(np.dot(xhat, xhat))
+            yhat = np.cross(xhat, zhat)
+            origin = zhat*source
+            coordSys = CoordSys(origin, np.stack([xhat, yhat, zhat]).T)
+            transform = CoordTransform(globalCoordSys, coordSys)
+            transform.applyForwardInPlace(rays)
+            plane = Plane()
+            plane.intersectInPlace(rays)
+            transform.applyReverseInPlace(rays)
+            return RayVector.fromArrays(rays.x, rays.y, rays.z, vx, vy, vz, t, w, flux=flux)
+        else:
+            vx = x - source[0]
+            vy = y - source[1]
+            vz = z - source[2]
+            v = np.stack([vx, vy, vz])
+            v /= n*np.einsum('ab,ab->b', v, v)
+            x.fill(source[0])
+            y.fill(source[1])
+            z.fill(source[2])
+            return RayVector.fromArrays(x, y, z, v[0], v[1], v[2], t, w, flux=flux)
 
     @classmethod
     def _fromRayVector(cls, _r):

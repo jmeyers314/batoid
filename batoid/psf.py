@@ -296,6 +296,49 @@ def wavefront(optic, theta_x, theta_y, wavelength, nx=32, projection='postel', s
     return batoid.Lattice(arr, primitiveVectors)
 
 
+def newWavefront(optic, theta_x, theta_y, wavelength, nx=32, projection='postel',
+                 sphereRadius=None, reference='mean'):
+    dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
+    dirCos = dirCos[0:2]+(-dirCos[2],)
+    rays = batoid.RayVector.asGrid(
+        optic.dist, wavelength,
+        nx=nx, lx=optic.pupilSize,
+        dirCos=dirCos,
+        medium=optic.inMedium,
+        interface=optic.entrancePupil
+    )
+
+    if sphereRadius is None:
+        sphereRadius = optic.sphereRadius
+
+    optic.traceInPlace(rays, outCoordSys=batoid.globalCoordSys)
+    if reference == 'mean':
+        w = np.where(1-rays.vignetted)[0]
+        point = np.mean(rays.r[w], axis=0)
+    elif reference == 'chief':
+        cridx = (nx//2)*nx+nx//2 if (nx%2)==0 else (nx*nx-1)//2
+        point = rays[cridx].r
+
+    # Place vertex of reference sphere one radius length away from the intersection point.
+    # So transform our rays into that coordinate system.
+    transform = batoid.CoordTransform(
+        batoid.globalCoordSys, batoid.CoordSys(point+np.array([0,0,sphereRadius]))
+    )
+    transform.applyForwardInPlace(rays)
+
+    sphere = batoid.Sphere(-sphereRadius)
+    sphere.intersectInPlace(rays)
+
+    if reference == 'mean':
+        w = np.where(1-rays.vignetted)[0]
+        t0 = np.mean(rays.t[w])
+    elif reference == 'chief':
+        t0 = rays[cridx].t
+    arr = np.ma.masked_array((t0-rays.t)/wavelength, mask=rays.vignetted).reshape(nx, nx)
+    primitiveVectors = np.vstack([[optic.pupilSize/nx, 0], [0, optic.pupilSize/nx]])
+    return batoid.Lattice(arr, primitiveVectors)
+
+
 def reciprocalLatticeVectors(a1, a2, N):
     norm = 2*np.pi/(a1[0]*a2[1] - a1[1]*a2[0])/N
     b1 = norm*np.array([a2[1], a2[0]])
