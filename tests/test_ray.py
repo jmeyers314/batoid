@@ -1,6 +1,6 @@
 import batoid
 import numpy as np
-from test_helpers import timer, do_pickle, all_obj_diff
+from test_helpers import timer, do_pickle, all_obj_diff, rays_allclose
 
 
 @timer
@@ -411,6 +411,152 @@ def test_fail():
     do_pickle(ray)
 
 
+@timer
+def test_RVasGrid():
+    source = 10.
+    wavelength = 500e-9
+    nx = 10
+    dirCos = np.array([0.011, 0.0, -1.0])
+    dirCos /= np.sqrt(np.dot(dirCos, dirCos))
+
+    # Some things that should be equivalent
+    grid1 = batoid.RayVector.asGrid(
+        source, wavelength,
+        nx=nx, lx=1.0, dirCos=dirCos
+    )
+    grid2 = batoid.RayVector.asGrid(
+        source, wavelength,
+        nx=nx, dx=1/8, dirCos=dirCos
+    )
+    grid3 = batoid.RayVector.asGrid(
+        source, wavelength,
+        dx=1/8, lx=1.0, dirCos=dirCos
+    )
+    grid4 = batoid.RayVector.asGrid(
+        source, wavelength,
+        nx=nx, lx=(1.0, 0.0), dirCos=dirCos
+    )
+    assert rays_allclose(grid1, grid2)
+    assert rays_allclose(grid1, grid3)
+    assert rays_allclose(grid1, grid4)
+
+    # Check distance to chief ray
+    cridx = (nx//2)*nx+nx//2
+    dist = np.sqrt(np.dot(grid1[cridx].r, grid1[cridx].r))
+    np.testing.assert_allclose(dist, source)
+
+    # Another set, but with odd nx
+    nx = 9
+    grid1 = batoid.RayVector.asGrid(
+        source, wavelength,
+        nx=nx, lx=1.0, dirCos=dirCos
+    )
+    grid2 = batoid.RayVector.asGrid(
+        source, wavelength,
+        nx=nx, dx=1/8, dirCos=dirCos
+    )
+    grid3 = batoid.RayVector.asGrid(
+        source, wavelength,
+        nx=nx, lx=(1.0, 0), dirCos=dirCos
+    )
+    # ... but the following is not equivalent, since default is to always
+    # infer an even nx and ny
+    # grid4 = batoid.RayVector.asGrid(
+    #     source, wavelength,
+    #     dx=1/9, lx=1.0, dirCos=dirCos
+    # )
+
+    assert rays_allclose(grid1, grid2)
+    assert rays_allclose(grid1, grid3)
+
+    cridx = (nx*nx-1)//2
+    dist = np.sqrt(np.dot(grid1[cridx].r, grid1[cridx].r))
+    np.testing.assert_allclose(dist, source)
+
+    # Other things to test:
+    #   trivially get the right input values, e.g. wavelength, flux
+    #   should programmatically check nx, lx, dx consistency
+    #   check x vs y cloning
+    #   check that interface intersection works, for nontrivial interfaces.
+    #   medium works
+    #   dirCos works, e.g., when random is on
+    #   nrandom works
+
+
+@timer
+def test_RVasPolar():
+    source = 10.0
+    wavelength = 500e-9
+    outer = 8.36/2
+    inner = 0.61*8.36/2
+    nrad = 10
+    naz = 100
+    dirCos = [0,0,-1]
+
+    grid = batoid.RayVector.asPolar(
+        source, wavelength,
+        outer, inner,
+        nrad=nrad, naz=naz,
+        dirCos=dirCos,
+        nrandom=1000
+    )
+
+
+@timer
+def test_RVasSpokes():
+    source = 10.0
+    wavelength = 500e-9
+    outer = 10.0
+    inner = 5.0
+    spokes = 6
+    rings = 6
+    dirCos = [0,0,-1]
+
+    rays = batoid.RayVector.asSpokes(
+        source, wavelength,
+        outer=outer, inner=inner,
+        spokes=spokes, rings=rings,
+        dirCos=dirCos
+    )
+
+    rays = batoid.RayVector.asSpokes(
+        source, wavelength,
+        outer=outer, inner=inner,
+        spokes=[0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0], rings=rings,
+        dirCos=dirCos
+    )
+
+    rays = batoid.RayVector.asSpokes(
+        source, wavelength,
+        outer=outer, inner=inner,
+        spokes=6, rings=[0, 1, 2],
+        dirCos=dirCos
+    )
+
+    rays = batoid.RayVector.asSpokes(
+        source, wavelength,
+        outer=outer, inner=inner,
+        spokes=[0,1,2], rings=[0, 1, 2],
+        dirCos=dirCos
+    )
+
+    # Gaussian Quadrature rays
+    rays = batoid.RayVector.asSpokes(
+        source, wavelength,
+        spacing='GQ',
+        rings=6,
+        dirCos=[0,0,-1]
+    )
+
+    # Point source
+    source = [0., 1.0, 1.0]
+    rays = batoid.RayVector.asSpokes(
+        source, wavelength,
+        outer=outer, inner=inner,
+        spokes=[0,1,2], rings=[0, 1, 2],
+    )
+
+
 if __name__ == '__main__':
     test_positionAtTime()
     test_properties()
@@ -422,3 +568,6 @@ if __name__ == '__main__':
     test_pointSourceCircularGrid()
     test_ne()
     test_fail()
+    test_RVasGrid()
+    test_RVasPolar()
+    test_RVasSpokes()

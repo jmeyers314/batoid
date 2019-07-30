@@ -125,9 +125,17 @@ def parse_optic(config,
         for k in ['dist', 'sphereRadius', 'pupilSize', 'pupilObscuration']:
             if k in config:
                 kwargs[k] = config[k]
+        if 'entrancePupil' in config:
+            kwargs['entrancePupil'] = parse_optic(config['entrancePupil'])
         return batoid.optic.CompoundOptic(
                 items, inMedium=inMedium, outMedium=outMedium,
                 name=name, coordSys=coordSys, **kwargs)
+    elif typ == 'Interface':
+        surface = parse_surface(config.pop('surface'))
+        return batoid.optic.Interface(
+            surface, name=name,
+            coordSys=coordSys
+        )
     else:
         raise ValueError("Unknown optic type")
 
