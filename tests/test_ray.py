@@ -1,6 +1,6 @@
 import batoid
 import numpy as np
-from test_helpers import timer, do_pickle, all_obj_diff, rays_allclose
+from test_helpers import timer, do_pickle, all_obj_diff, rays_allclose, checkAngle
 
 
 @timer
@@ -413,161 +413,299 @@ def test_fail():
 
 @timer
 def test_RVasGrid():
-    source = 10.
-    wavelength = 500e-9
-    nx = 10
-    dirCos = np.array([0.011, 0.0, -1.0])
-    dirCos /= np.sqrt(np.dot(dirCos, dirCos))
+    for _ in range(10):
+        dist = np.random.uniform(9.0, 11.0)
+        wavelength = np.random.uniform(300e-9, 1100e-9)
+        nx = 1
+        while (nx%2) == 1:
+            nx = np.random.randint(10, 20)
+        lx = np.random.uniform(1.0, 10.0)
+        dx = lx/(nx-2)
+        dirCos = np.array([
+            np.random.uniform(-0.1, 0.1),
+            np.random.uniform(-0.1, 0.1),
+            np.random.uniform(-1.2, -0.8),
+        ])
+        dirCos /= np.sqrt(np.dot(dirCos, dirCos))
 
-    # Some things that should be equivalent
-    grid1 = batoid.RayVector.asGrid(
-        source, wavelength,
-        nx=nx, lx=1.0, dirCos=dirCos
-    )
-    grid2 = batoid.RayVector.asGrid(
-        source, wavelength,
-        nx=nx, dx=1/8, dirCos=dirCos
-    )
-    grid3 = batoid.RayVector.asGrid(
-        source, wavelength,
-        dx=1/8, lx=1.0, dirCos=dirCos
-    )
-    grid4 = batoid.RayVector.asGrid(
-        source, wavelength,
-        nx=nx, lx=(1.0, 0.0), dirCos=dirCos
-    )
-    assert rays_allclose(grid1, grid2)
-    assert rays_allclose(grid1, grid3)
-    assert rays_allclose(grid1, grid4)
+        # Some things that should be equivalent
+        grid1 = batoid.RayVector.asGrid(
+            dist, wavelength,
+            nx=nx, lx=lx, dirCos=dirCos
+        )
+        grid2 = batoid.RayVector.asGrid(
+            dist, wavelength,
+            nx=nx, dx=dx, dirCos=dirCos
+        )
+        grid3 = batoid.RayVector.asGrid(
+            dist, wavelength,
+            dx=dx, lx=lx, dirCos=dirCos
+        )
+        grid4 = batoid.RayVector.asGrid(
+            dist, wavelength,
+            nx=nx, lx=(lx, 0.0), dirCos=dirCos
+        )
+        assert rays_allclose(grid1, grid2)
+        assert rays_allclose(grid1, grid3)
+        assert rays_allclose(grid1, grid4)
 
-    # Check distance to chief ray
-    cridx = (nx//2)*nx+nx//2
-    dist = np.sqrt(np.dot(grid1[cridx].r, grid1[cridx].r))
-    np.testing.assert_allclose(dist, source)
+        # Check distance to chief ray
+        cridx = (nx//2)*nx+nx//2
+        obs_dist = np.sqrt(np.dot(grid1[cridx].r, grid1[cridx].r))
+        np.testing.assert_allclose(obs_dist, dist)
 
-    # Another set, but with odd nx
-    nx = 9
-    grid1 = batoid.RayVector.asGrid(
-        source, wavelength,
-        nx=nx, lx=1.0, dirCos=dirCos
-    )
-    grid2 = batoid.RayVector.asGrid(
-        source, wavelength,
-        nx=nx, dx=1/8, dirCos=dirCos
-    )
-    grid3 = batoid.RayVector.asGrid(
-        source, wavelength,
-        nx=nx, lx=(1.0, 0), dirCos=dirCos
-    )
-    # ... but the following is not equivalent, since default is to always
-    # infer an even nx and ny
-    # grid4 = batoid.RayVector.asGrid(
-    #     source, wavelength,
-    #     dx=1/9, lx=1.0, dirCos=dirCos
-    # )
+        np.testing.assert_allclose(grid1.t, 0)
+        np.testing.assert_allclose(grid1.wavelength, wavelength)
+        np.testing.assert_allclose(grid1.vignetted, False)
+        np.testing.assert_allclose(grid1.failed, False)
+        np.testing.assert_allclose(grid1.vx, dirCos[0])
+        np.testing.assert_allclose(grid1.vy, dirCos[1])
+        np.testing.assert_allclose(grid1.vz, dirCos[2])
 
-    assert rays_allclose(grid1, grid2)
-    assert rays_allclose(grid1, grid3)
+        # Check distribution of points propagated to entrance pupil
+        pupil = batoid.Plane()
+        pupil.intersectInPlace(grid1)
+        np.testing.assert_allclose(np.diff(grid1.x)[0], dx)
+        np.testing.assert_allclose(np.diff(grid1.y)[0], 0, atol=1e-14)
+        np.testing.assert_allclose(np.diff(grid1.x)[nx-1], -dx*(nx-1))
+        np.testing.assert_allclose(np.diff(grid1.y)[nx-1], dx)
 
-    cridx = (nx*nx-1)//2
-    dist = np.sqrt(np.dot(grid1[cridx].r, grid1[cridx].r))
-    np.testing.assert_allclose(dist, source)
+        # Another set, but with odd nx
+    for _ in range(10):
+        dist = np.random.uniform(9.0, 11.0)
+        wavelength = np.random.uniform(300e-9, 1100e-9)
+        while (nx%2) == 0:
+            nx = np.random.randint(10, 20)
+        lx = np.random.uniform(1.0, 10.0)
+        dx = lx/(nx-1)
+        dirCos = np.array([
+            np.random.uniform(-0.1, 0.1),
+            np.random.uniform(-0.1, 0.1),
+            np.random.uniform(-1.2, -0.8),
+        ])
+        dirCos /= np.sqrt(np.dot(dirCos, dirCos))
 
-    # Other things to test:
-    #   trivially get the right input values, e.g. wavelength, flux
-    #   should programmatically check nx, lx, dx consistency
-    #   check x vs y cloning
-    #   check that interface intersection works, for nontrivial interfaces.
-    #   medium works
-    #   dirCos works, e.g., when random is on
-    #   nrandom works
+        grid1 = batoid.RayVector.asGrid(
+            dist, wavelength,
+            nx=nx, lx=lx, dirCos=dirCos
+        )
+        grid2 = batoid.RayVector.asGrid(
+            dist, wavelength,
+            nx=nx, dx=dx, dirCos=dirCos
+        )
+        grid3 = batoid.RayVector.asGrid(
+            dist, wavelength,
+            nx=nx, lx=(lx, 0), dirCos=dirCos
+        )
+        # ... but the following is not equivalent, since default is to always
+        # infer an even nx and ny
+        # grid4 = batoid.RayVector.asGrid(
+        #     dist, wavelength,
+        #     dx=1/9, lx=1.0, dirCos=dirCos
+        # )
 
+        assert rays_allclose(grid1, grid2)
+        assert rays_allclose(grid1, grid3)
+
+        cridx = (nx*nx-1)//2
+        obs_dist = np.sqrt(np.dot(grid1[cridx].r, grid1[cridx].r))
+        np.testing.assert_allclose(obs_dist, dist)
+
+        np.testing.assert_allclose(grid1.t, 0)
+        np.testing.assert_allclose(grid1.wavelength, wavelength)
+        np.testing.assert_allclose(grid1.vignetted, False)
+        np.testing.assert_allclose(grid1.failed, False)
+        np.testing.assert_allclose(grid1.vx, dirCos[0])
+        np.testing.assert_allclose(grid1.vy, dirCos[1])
+        np.testing.assert_allclose(grid1.vz, dirCos[2])
+
+        # Check distribution of points propagated to entrance pupil
+        pupil = batoid.Plane()
+        pupil.intersectInPlace(grid1)
+        np.testing.assert_allclose(np.diff(grid1.x)[0], dx)
+        np.testing.assert_allclose(np.diff(grid1.y)[0], 0, atol=1e-14)
+        np.testing.assert_allclose(np.diff(grid1.x)[nx-1], -dx*(nx-1))
+        np.testing.assert_allclose(np.diff(grid1.y)[nx-1], dx)
+
+    for _ in range(10):
+        # Check nrandom
+        rays = batoid.RayVector.asGrid(
+            dist, wavelength,
+            lx=1.0, nx=1,
+            nrandom=1000, dirCos=dirCos
+        )
+
+        np.testing.assert_allclose(rays.t, 0)
+        np.testing.assert_allclose(rays.wavelength, wavelength)
+        np.testing.assert_allclose(rays.vignetted, False)
+        np.testing.assert_allclose(rays.failed, False)
+        np.testing.assert_allclose(rays.vx, dirCos[0])
+        np.testing.assert_allclose(rays.vy, dirCos[1])
+        np.testing.assert_allclose(rays.vz, dirCos[2])
+
+        # Check that projected points are inside region
+        pupil = batoid.Plane()
+        pupil.intersectInPlace(rays)
+        np.testing.assert_allclose(rays.z, 0.0)
+        np.testing.assert_array_less(rays.x, 0.5)
+        np.testing.assert_array_less(rays.y, 0.5)
+        np.testing.assert_array_less(-0.5, rays.x)
+        np.testing.assert_array_less(-0.5, rays.y)
+        assert len(rays) == 1000
+
+    # # Other things to test:
+    # #   check x vs y cloning
+    # #   check that interface intersection works, for nontrivial interfaces.
+    # #   medium works
 
 @timer
 def test_RVasPolar():
-    source = 10.0
-    wavelength = 500e-9
-    outer = 8.36/2
-    inner = 0.61*8.36/2
-    nrad = 10
-    naz = 100
-    dirCos = [0,0,-1]
+    for _ in range(10):
+        dist = np.random.uniform(9.0, 11.0)
+        wavelength = np.random.uniform(300e-9, 1100e-9)
+        inner = np.random.uniform(1.0, 3.0)
+        outer = inner + np.random.uniform(1.0, 3.0)
+        nrad = np.random.randint(1, 10)
+        naz = np.random.randint(10, 20)
+        dirCos = np.array([
+            np.random.uniform(-0.1, 0.1),
+            np.random.uniform(-0.1, 0.1),
+            np.random.uniform(-1.2, -0.8),
+        ])
+        dirCos /= np.sqrt(np.dot(dirCos, dirCos))
 
-    grid = batoid.RayVector.asPolar(
-        source, wavelength,
-        outer, inner,
-        nrad=nrad, naz=naz,
-        dirCos=dirCos,
-        nrandom=1000
-    )
+        rays = batoid.RayVector.asPolar(
+            dist, wavelength,
+            outer, inner,
+            nrad=nrad, naz=naz,
+            dirCos=dirCos
+        )
+
+        np.testing.assert_allclose(rays.t, 0)
+        np.testing.assert_allclose(rays.wavelength, wavelength)
+        np.testing.assert_allclose(rays.vignetted, False)
+        np.testing.assert_allclose(rays.failed, False)
+        np.testing.assert_allclose(rays.vx, dirCos[0])
+        np.testing.assert_allclose(rays.vy, dirCos[1])
+        np.testing.assert_allclose(rays.vz, dirCos[2])
+
+        assert len(rays)%6 == 0
+
+        # If we set inner=0, then last ray should
+        # intersect the center of the pupil
+
+        inner = 0.0
+        rays = batoid.RayVector.asPolar(
+            dist, wavelength,
+            outer, inner,
+            nrad=nrad, naz=naz,
+            dirCos=dirCos
+        )
+        assert len(rays)%6 == 1
+
+        # Check distribution of points propagated to entrance pupil
+        pupil = batoid.Plane()
+        pupil.intersectInPlace(rays)
+        np.testing.assert_allclose(rays[len(rays)-1].x, 0, atol=1e-14)
+        np.testing.assert_allclose(rays[len(rays)-1].y, 0, atol=1e-14)
+        np.testing.assert_allclose(rays[len(rays)-1].z, 0, atol=1e-14)
 
 
 @timer
 def test_RVasSpokes():
-    source = 10.0
-    wavelength = 500e-9
-    outer = 10.0
-    inner = 5.0
-    spokes = 6
-    rings = 6
-    dirCos = [0,0,-1]
+    for _ in range(10):
+        dist = np.random.uniform(9.0, 11.0)
+        wavelength = np.random.uniform(300e-9, 1100e-9)
+        inner = np.random.uniform(1.0, 3.0)
+        outer = inner + np.random.uniform(1.0, 3.0)
+        rings = np.random.randint(1, 10)
+        spokes = np.random.randint(10, 20)
+        dirCos = np.array([
+            np.random.uniform(-0.1, 0.1),
+            np.random.uniform(-0.1, 0.1),
+            np.random.uniform(-1.2, -0.8),
+        ])
+        dirCos /= np.sqrt(np.dot(dirCos, dirCos))
 
-    rays = batoid.RayVector.asSpokes(
-        source, wavelength,
-        outer=outer, inner=inner,
-        spokes=spokes, rings=rings,
-        dirCos=dirCos
-    )
+        rays = batoid.RayVector.asSpokes(
+            dist, wavelength,
+            outer=outer, inner=inner,
+            spokes=spokes, rings=rings,
+            dirCos=dirCos
+        )
 
-    rays = batoid.RayVector.asSpokes(
-        source, wavelength,
-        outer=outer, inner=inner,
-        spokes=[0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0], rings=rings,
-        dirCos=dirCos
-    )
+        np.testing.assert_allclose(rays.t, 0)
+        np.testing.assert_allclose(rays.wavelength, wavelength)
+        np.testing.assert_allclose(rays.vignetted, False)
+        np.testing.assert_allclose(rays.failed, False)
+        np.testing.assert_allclose(rays.vx, dirCos[0])
+        np.testing.assert_allclose(rays.vy, dirCos[1])
+        np.testing.assert_allclose(rays.vz, dirCos[2])
 
-    rays = batoid.RayVector.asSpokes(
-        source, wavelength,
-        outer=outer, inner=inner,
-        spokes=6, rings=[0, 1, 2],
-        dirCos=dirCos
-    )
+        assert len(rays) == spokes*rings
 
-    rays = batoid.RayVector.asSpokes(
-        source, wavelength,
-        outer=outer, inner=inner,
-        spokes=[0,1,2], rings=[0, 1, 2],
-        dirCos=dirCos
-    )
+        pupil = batoid.Plane()
+        pupil.intersectInPlace(rays)
+        radii = np.hypot(rays.x, rays.y)
 
-    # Gaussian Quadrature rays
-    rays = batoid.RayVector.asSpokes(
-        source, wavelength,
-        spacing='GQ',
-        rings=6,
-        dirCos=[0,0,-1]
-    )
+        for i in range(spokes):
+            np.testing.assert_allclose(
+                radii[rings*i:rings*(i+1)],
+                np.linspace(inner, outer, rings, endpoint=True)
+            )
+        ths = np.arctan2(rays.y, rays.x)
 
-    # Point source
-    source = [0., 1.0, 1.0]
-    rays = batoid.RayVector.asSpokes(
-        source, wavelength,
-        outer=outer, inner=inner,
-        spokes=[0,1,2], rings=[0, 1, 2],
-    )
+        checkAngle(ths[::rings], np.linspace(0, 2*np.pi, spokes, endpoint=False))
+
+    # rays = batoid.RayVector.asSpokes(
+    #     dist, wavelength,
+    #     outer=outer, inner=inner,
+    #     spokes=[0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0], rings=rings,
+    #     dirCos=dirCos
+    # )
+    #
+    # rays = batoid.RayVector.asSpokes(
+    #     dist, wavelength,
+    #     outer=outer, inner=inner,
+    #     spokes=6, rings=[0, 1, 2],
+    #     dirCos=dirCos
+    # )
+    #
+    # rays = batoid.RayVector.asSpokes(
+    #     dist, wavelength,
+    #     outer=outer, inner=inner,
+    #     spokes=[0,1,2], rings=[0, 1, 2],
+    #     dirCos=dirCos
+    # )
+    #
+    # # Gaussian Quadrature rays
+    # rays = batoid.RayVector.asSpokes(
+    #     dist, wavelength,
+    #     spacing='GQ',
+    #     rings=6,
+    #     dirCos=[0,0,-1]
+    # )
+    #
+    # # Point source
+    # source = [0., 1.0, 1.0]
+    # rays = batoid.RayVector.asSpokes(
+    #     dist, wavelength, source=source,
+    #     outer=outer, inner=inner,
+    #     spokes=[0,1,2], rings=[0, 1, 2],
+    # )
 
 
 if __name__ == '__main__':
-    test_positionAtTime()
-    test_properties()
-    test_phase()
-    test_RayVector()
-    test_rayGrid()
-    test_circularGrid()
-    test_uniformCircularGrid()
-    test_pointSourceCircularGrid()
-    test_ne()
-    test_fail()
-    test_RVasGrid()
-    test_RVasPolar()
+    # test_positionAtTime()
+    # test_properties()
+    # test_phase()
+    # test_RayVector()
+    # test_rayGrid()
+    # test_circularGrid()
+    # test_uniformCircularGrid()
+    # test_pointSourceCircularGrid()
+    # test_ne()
+    # test_fail()
+    # test_RVasGrid()
+    # test_RVasPolar()
     test_RVasSpokes()

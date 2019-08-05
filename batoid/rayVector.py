@@ -109,37 +109,53 @@ class RayVector:
         return ret
 
     @classmethod
-    def asGrid(cls, source, wavelength,
+    def asGrid(cls, dist, wavelength,
+               source=None, dirCos=None,
                nx=None, ny=None,
                dx=None, dy=None,
                lx=None, ly=None,
                flux=1,
                medium=vacuum,
-               dirCos=None,
                nrandom=None,
-               interface=None,
-               doCenter=False):
+               interface=None):
         """
         Create RayVector on a parallelogram shaped region.
 
         Parameters
         ----------
-        source : float or (3,) array of float
-            If float, then distance of central Ray from (0,0,z(0,0)),
-            If array of float, then rays originate from this point.
+        dist: float
+            Map rays backwards from entrance pupil such that the central ray
+            is this distance from the point (0, 0, z(0,0)) on the entrance
+            pupil surface.
         wavelength : float
-            Vacuum wavelength of all rays in meters.
+            Vacuum wavelength of rays in meters.
+        source : (3,) array of float or None, optional
+            Where rays originate.  If None, then rays originate an infinite
+            distance away, in which case the `dirCos` kwarg must also be
+            specified to set the direction of ray propagation.  If an array,
+            then the rays originate from this point in global coordinates and
+            the `dirCos` kwarg is ignored.
         nx, ny : int, optional
-            Number of Rays on a side.
+            Number of rays on a side.
         dx, dy : float or (2,) array of float, optional
-            Differential separation of ray intersections in x and y directions.
-        lx, ly : float, optional
-            Length of each side of ray grid.
+            Separation in meters between adjacent rays in grid.  If scalars,
+            then the separations are exactly along the x and y directions.  If
+            arrays, then these are interpretted as the primitive vectors for
+            the first and second dimensions of the grid.  If only dx is
+            explicitly specified, then dy will be inferred as a 90-degree
+            rotation from dx with the same length as dx.
+        lx, ly : float or (2,) array of float, optional
+            Length of each side of ray grid.  If scalars, then these are
+            measured along the x and y directions.  If arrays, then these also
+            indicate the primitive vectors orientation of the grid.  If only
+            lx is specified, then ly will be inferred as a 90-degree rotation
+            from lx with the same length as lx.
         flux : float
-            Flux to assign each Ray.
-        dirCos : (3,) array of float
-            If source is float, then direction cosines of ray velocities.
-            If source is array of float, then unused.
+            Flux to assign each ray.
+        dirCos : (3,) array
+            If source is None, then this indicates the initial direction of
+            propagation of the rays.  If source is not None, then this is
+            ignored.
         medium : batoid.Medium
             Initial medium of each Ray.
         nrandom : int
@@ -147,9 +163,6 @@ class RayVector:
             parallelogram region instead of sampling on a regular grid.
         interface : batoid.Interface, optional
             Interface from which grid is projected.
-        doCenter : bool
-            If True, then center the returned RayVector around (0,0).  If
-            False, then follow Fourier conventions for centering.
         """
         from .optic import Interface
         from .surface import Plane
@@ -183,9 +196,10 @@ class RayVector:
         elif lx is not None and dx is not None:
             # adjust dx in this case
             # always infer an even n (since even and odd are degenerate given
-            # only lx, dx)
-            nx = int(lx/dx//2)*2+2
-            ny = int(ly/dy//2)*2+2
+            # only lx, dx).
+            slop = 0.1  # prevent 3.9999 -> 3, e.g.
+            nx = int((lx/dx+slop)//2)*2+2
+            ny = int((ly/dy+slop)//2)*2+2
             dx = lx/(nx-2)
             dy = ly/(ny-2)
 
@@ -217,18 +231,61 @@ class RayVector:
         w.fill(wavelength)
         n = medium.getN(wavelength)
 
-        return cls._finish(source, dirCos, n, x, y, z, t, w, flux)
+        return cls._finish(dist, source, dirCos, n, x, y, z, t, w, flux)
 
     @classmethod
-    def asPolar(cls, source, wavelength,
+    def asPolar(cls, dist, wavelength,
                 outer, inner=0.0,
+                source=None, dirCos=None,
                 nrad=None, naz=None,
                 flux=1,
                 medium=vacuum,
-                dirCos=None,
                 nrandom=None,
                 interface=None):
         """
+        Create RayVector on an annular region using a hexapolar grid.
+
+        Parameters
+        ----------
+        dist: float
+            Map rays backwards from entrance pupil such that the central ray
+            is this distance from the point (0, 0, z(0,0)) on the entrance
+            pupil surface.
+        wavelength : float
+            Vacuum wavelength of rays in meters.
+        outer : float
+            Outer radius of annulus in meters.
+        inner : float, optional
+            Inner radius of annulus in meters.
+        source : (3,) array of float or None, optional
+            Where rays originate.  If None, then rays originate an infinite
+            distance away, in which case the `dirCos` kwarg must also be
+            specified to set the direction of ray propagation.  If an array,
+            then the rays originate from this point in global coordinates and
+            the `dirCos` kwarg is ignored.
+        dirCos : (3,) array
+            If source is None, then this indicates the initial direction of
+            propagation of the rays.  If source is not None, then this is
+            ignored.
+        nrad : int
+            Number of radii on which create rays.
+        naz : int
+            Approximate number of azimuthal angles uniformly spaced along the
+            outermost ring.  Each ring is constrained to have a multiple of 6
+            azimuths, so the realized value may be slightly different than
+            the input value here.  Inner rings will have fewer azimuths in
+            proportion to their radius, but will still be constrained to a
+            multiple of 6.  (If the innermost ring has radius 0, then exactly
+            1 ray, with azimuth undefined, will be used on that ring.)
+        flux : float
+            Flux to assign each ray.
+        medium : batoid.Medium
+            Initial medium of each Ray.
+        nrandom : int
+            If not None, then uniformly sample this many rays from annular
+            region instead of sampling on a hexapolar grid.
+        interface : batoid.Interface, optional
+            Interface from which grid is projected.
         """
         from .optic import Interface
         from .surface import Plane
@@ -262,20 +319,62 @@ class RayVector:
         w.fill(wavelength)
         n = medium.getN(wavelength)
 
-        return cls._finish(source, dirCos, n, x, y, z, t, w, flux)
+        return cls._finish(dist, source, dirCos, n, x, y, z, t, w, flux)
 
     @classmethod
-    def asSpokes(cls, source, wavelength,
-                 outer=None,
-                 inner=0.0,
-                 spokes=None,
-                 rings=None,
+    def asSpokes(cls, dist, wavelength,
+                 outer=None, inner=0.0,
+                 source=None, dirCos=None,
+                 spokes=None, rings=None,
                  spacing='uniform',
                  flux=1,
                  medium=vacuum,
-                 dirCos=None,
                  interface=None):
         """
+        Create RayVector on an annular region using a spokes pattern.
+
+        Parameters
+        ----------
+        dist: float
+            Map rays backwards from entrance pupil such that the central ray
+            is this distance from the point (0, 0, z(0,0)) on the entrance
+            pupil surface.
+        wavelength : float
+            Vacuum wavelength of rays in meters.
+        outer : float
+            Outer radius of annulus in meters.
+        inner : float, optional
+            Inner radius of annulus in meters.
+        source : (3,) array of float or None, optional
+            Where rays originate.  If None, then rays originate an infinite
+            distance away, in which case the `dirCos` kwarg must also be
+            specified to set the direction of ray propagation.  If an array,
+            then the rays originate from this point in global coordinates and
+            the `dirCos` kwarg is ignored.
+        dirCos : (3,) array
+            If source is None, then this indicates the initial direction of
+            propagation of the rays.  If source is not None, then this is
+            ignored.
+        spokes : int or array of float
+            If int, then number of spokes to use.
+            If array, then the values of the spokes azimuthal angles in
+            radians.
+        rings : int or array of float
+            If int, then number of rings to use.
+            If array, then the values of the ring radii to use in meters.
+        spacing: {'uniform', 'GQ'}
+            If uniform, assign ring radii uniformly between `inner` and
+            `outer`.
+            If GQ, then assign ring radii as the Gaussian Quadrature points
+            for integration on a circle.  In this case, the ray fluxes will
+            be set to the Gaussian Quadrature weights (ignoring the `flux`
+            kwarg).
+        flux : float
+            Flux to assign each ray.
+        medium : batoid.Medium
+            Initial medium of each Ray.
+        interface : batoid.Interface, optional
+            Interface from which grid is projected.
         """
         from .optic import Interface
         from .surface import Plane
@@ -310,14 +409,14 @@ class RayVector:
         w.fill(wavelength)
         n = medium.getN(wavelength)
 
-        return cls._finish(source, dirCos, n, x, y, z, t, w, flux)
+        return cls._finish(dist, source, dirCos, n, x, y, z, t, w, flux)
 
     @classmethod
-    def _finish(cls, source, dirCos, n, x, y, z, t, w, flux):
+    def _finish(cls, dist, source, dirCos, n, x, y, z, t, w, flux):
         """Map rays backwards to their source position.
         """
         from .surface import Plane
-        if dirCos is not None:
+        if source is None:
             v = np.array(dirCos, dtype=float)
             v /= n*np.sqrt(np.dot(v, v))
             vx = np.empty_like(x)
@@ -326,14 +425,14 @@ class RayVector:
             vy.fill(v[1])
             vz = np.empty_like(x)
             vz.fill(v[2])
-            # Now need to raytrace backwards to the plane source units away.
+            # Now need to raytrace backwards to the plane dist units away.
             rays = RayVector.fromArrays(x, y, z, -vx, -vy, -vz, t, w, flux=flux)
 
             zhat = -n*v
             xhat = np.cross(np.array([1.0, 0.0, 0.0]), zhat)
             xhat /= np.sqrt(np.dot(xhat, xhat))
             yhat = np.cross(xhat, zhat)
-            origin = zhat*source
+            origin = zhat*dist
             coordSys = CoordSys(origin, np.stack([xhat, yhat, zhat]).T)
             transform = CoordTransform(globalCoordSys, coordSys)
             transform.applyForwardInPlace(rays)
