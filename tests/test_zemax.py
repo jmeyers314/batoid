@@ -72,6 +72,7 @@ def test_HSC_trace():
 
 @pytest.mark.skipif(not hasGalSim, reason="galsim not found")
 @pytest.mark.skipif(not hasLMFit, reason="lmfit not found")
+@pytest.mark.skipif(__name__ != '__main__', reason="slow test")
 @timer
 def test_HSC_huygensPSF():
     fn = os.path.join(directory, "testdata", "HSC_huygensPSF.txt")
@@ -244,7 +245,10 @@ def test_LSST_wf():
         # plt.colorbar(i2, ax=axes[2])
         # plt.show()
 
-        np.testing.assert_allclose(Zwf, bwf.array, atol=2e-5, rtol=0)
+        np.testing.assert_allclose(
+            Zwf*wavelength,
+            bwf.array*wavelength,
+            atol=1e-11, rtol=0)  # 10 picometer tolerance!
 
 
 if __name__ == '__main__':
