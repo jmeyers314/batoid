@@ -27,6 +27,12 @@ def rays_allclose(rv1, rv2, atol=1e-14):
     )
 
 
+def checkAngle(a, b, rtol=0, atol=1e-14):
+    diff = (a-b)%(2*np.pi)
+    absdiff = np.min([np.abs(diff), np.abs(2*np.pi-diff)], axis=0)
+    np.testing.assert_allclose(absdiff, 0, rtol=0, atol=atol)
+
+
 def timer(f):
     import functools
 
