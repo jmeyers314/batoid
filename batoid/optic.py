@@ -517,6 +517,15 @@ class Interface(Optic):
         if self.name not in unless:
             self.obscuration = None
 
+    def interact(self, r):
+        return self.surface.intersect(r)
+
+    def interactReverse(self, r):
+        return self.surface.intersect(r)
+
+    def interactInPlace(self, r):
+        self.surface.intersectInPlace(r)
+
     def __eq__(self, other):
         if not self.__class__ == other.__class__:
             return False
@@ -665,15 +674,6 @@ class Detector(Interface):
         self.forwardCoating = SimpleCoating(reflectivity=0.02, transmissivity=0.98)
         self.reverseCoating = None
 
-    def interact(self, r):
-        return self.surface.intersect(r)
-
-    def interactReverse(self, r):
-        return self.surface.intersect(r)
-
-    def interactInPlace(self, r):
-        self.surface.intersectInPlace(r)
-
     def rSplit(self, r):
         reflectedR, refractedR = self.surface.rSplit(r, self.inMedium, self.outMedium,
                                                      self.forwardCoating)
@@ -693,15 +693,6 @@ class Baffle(Interface):
         Interface.__init__(self, *args, **kwargs)
         self.forwardCoating = SimpleCoating(reflectivity=0.0, transmissivity=1.0)
         self.reverseCoating = SimpleCoating(reflectivity=0.0, transmissivity=1.0)
-
-    def interact(self, r):
-        return self.surface.intersect(r)
-
-    def interactReverse(self, r):
-        return self.surface.intersect(r)
-
-    def interactInPlace(self, r):
-        self.surface.intersectInPlace(r)
 
     def rSplit(self, r):
         reflectedR, refractedR = self.surface.rSplit(r, self.inMedium, self.outMedium,
