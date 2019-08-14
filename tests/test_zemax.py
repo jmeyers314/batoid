@@ -207,7 +207,7 @@ def test_HSC_zernike():
 
 @pytest.mark.skipif(not hasGalSim, reason="galsim not found")
 @timer
-def test_LSST_wf():
+def test_LSST_wf(plot=False):
     thxs = [0.0, 0.0, 0.0, 1.176]
     thys = [0.0, 1.225, 1.75, 1.176]
     fns = ["LSST_wf_0.0_0.0.txt",
@@ -229,25 +229,26 @@ def test_LSST_wf():
         wavelength = 500e-9
         nx = 32
 
-        bwf = batoid.psf.newWavefront(
+        bwf = batoid.analysis.wavefront(
             telescope, thx, thy, wavelength, nx=nx,
             reference='chief', projection='zemax'
         )
         Zwf = np.ma.MaskedArray(data=Zwf, mask=Zwf==0)  # Turn Zwf into masked array
 
-        # import matplotlib.pyplot as plt
-        # fig, axes = plt.subplots(ncols=3, figsize=(10,3))
-        # i0 = axes[0].imshow(bwf.array)
-        # i1 = axes[1].imshow(Zwf)
-        # i2 = axes[2].imshow(bwf.array-Zwf)
-        # axes[0].set_title("batoid")
-        # axes[1].set_title("Zemax")
-        # axes[2].set_title("difference")
-        # plt.colorbar(i0, ax=axes[0], label='waves')
-        # plt.colorbar(i1, ax=axes[1], label='waves')
-        # plt.colorbar(i2, ax=axes[2], label='waves')
-        # plt.tight_layout()
-        # plt.show()
+        if plot:
+            import matplotlib.pyplot as plt
+            fig, axes = plt.subplots(ncols=3, figsize=(10,3))
+            i0 = axes[0].imshow(bwf.array)
+            i1 = axes[1].imshow(Zwf)
+            i2 = axes[2].imshow(bwf.array-Zwf)
+            axes[0].set_title("batoid")
+            axes[1].set_title("Zemax")
+            axes[2].set_title("difference")
+            plt.colorbar(i0, ax=axes[0], label='waves')
+            plt.colorbar(i1, ax=axes[1], label='waves')
+            plt.colorbar(i2, ax=axes[2], label='waves')
+            plt.tight_layout()
+            plt.show()
 
         np.testing.assert_allclose(
             Zwf*wavelength,
@@ -256,7 +257,7 @@ def test_LSST_wf():
 
 
 @timer
-def test_LSST_fftPSF():
+def test_LSST_fftPSF(plot=False):
     thxs = [0.0, 0.0, 0.0, 1.176]
     thys = [0.0, 1.225, 1.75, 1.176]
     fns = ["LSST_fftpsf_0.0_0.0.txt",
@@ -279,7 +280,7 @@ def test_LSST_fftPSF():
         wavelength = 500e-9
         nx = 32
 
-        bpsf = batoid.psf.newFFTPSF(
+        bpsf = batoid.analysis.fftPSF(
             telescope, thx, thy, wavelength, nx=nx,
             reference='chief', projection='zemax'
         )
@@ -311,20 +312,21 @@ def test_LSST_fftPSF():
         model = ii.shift(p['dx'], p['dy'])*np.exp(p['dlogflux'])
         optImg = model.drawImage(method='sb', scale=1.0, nx=64, ny=64)
 
-        # import matplotlib.pyplot as plt
-        # fig, axes = plt.subplots(ncols=3, figsize=(10,3))
-        # i0 = axes[0].imshow(optImg.array)
-        # i1 = axes[1].imshow(Zpsf)
-        # i2 = axes[2].imshow(optImg.array-Zpsf)
-        # plt.colorbar(i0, ax=axes[0])
-        # plt.colorbar(i1, ax=axes[1])
-        # plt.colorbar(i2, ax=axes[2])
-        # plt.tight_layout()
-        # plt.show()
+        if plot:
+            import matplotlib.pyplot as plt
+            fig, axes = plt.subplots(ncols=3, figsize=(10,3))
+            i0 = axes[0].imshow(optImg.array)
+            i1 = axes[1].imshow(Zpsf)
+            i2 = axes[2].imshow(optImg.array-Zpsf)
+            plt.colorbar(i0, ax=axes[0])
+            plt.colorbar(i1, ax=axes[1])
+            plt.colorbar(i2, ax=axes[2])
+            plt.tight_layout()
+            plt.show()
 
 
 @timer
-def test_LSST_huygensPSF():
+def test_LSST_huygensPSF(plot=False):
     thxs = [0.0, 0.0, 0.0, 1.176]
     thys = [0.0, 1.225, 1.75, 1.176]
     fns = ["LSST_hpsf_0.0_0.0.txt",
@@ -350,7 +352,7 @@ def test_LSST_huygensPSF():
         thy = np.deg2rad(thy)
         wavelength = 500e-9
 
-        bpsf = batoid.psf.newHuygensPSF(
+        bpsf = batoid.analysis.huygensPSF(
             telescope, thx, thy, wavelength, nx=1024,
             reference='chief', projection='zemax',
             dx=0.289e-6, nxOut=64
@@ -383,30 +385,38 @@ def test_LSST_huygensPSF():
         model = ii.shift(p['dx'], p['dy'])*np.exp(p['dlogflux'])
         optImg = model.drawImage(method='sb', scale=1.0, nx=64, ny=64)
 
-        # import matplotlib.pyplot as plt
-        # fig, axes = plt.subplots(ncols=3, figsize=(10,3))
-        # i0 = axes[0].imshow(optImg.array)
-        # i1 = axes[1].imshow(Zpsf)
-        # i2 = axes[2].imshow(optImg.array-Zpsf)
-        # plt.colorbar(i0, ax=axes[0])
-        # plt.colorbar(i1, ax=axes[1])
-        # plt.colorbar(i2, ax=axes[2])
-        # plt.tight_layout()
-        # plt.show()
-        #
-        # if thy not in [0.0, 1.176]:
-        #     fig, ax = plt.subplots(figsize=(6, 4))
-        #     ax.plot(optImg.array[:,32], c='g')
-        #     ax.plot(Zpsf[:,32], c='b')
-        #     ax.plot((optImg.array-Zpsf)[:,32], c='r')
-        #     plt.show()
+        if plot:
+            import matplotlib.pyplot as plt
+            fig, axes = plt.subplots(ncols=3, figsize=(10,3))
+            i0 = axes[0].imshow(optImg.array)
+            i1 = axes[1].imshow(Zpsf)
+            i2 = axes[2].imshow(optImg.array-Zpsf)
+            plt.colorbar(i0, ax=axes[0])
+            plt.colorbar(i1, ax=axes[1])
+            plt.colorbar(i2, ax=axes[2])
+            plt.tight_layout()
+            plt.show()
+
+            if thy not in [0.0, 1.176]:
+                fig, ax = plt.subplots(figsize=(6, 4))
+                ax.plot(optImg.array[:,32], c='g')
+                ax.plot(Zpsf[:,32], c='b')
+                ax.plot((optImg.array-Zpsf)[:,32], c='r')
+                plt.show()
 
 
 if __name__ == '__main__':
+    from argparse import ArgumentParser
+    parser = ArgumentParser()
+    parser.add_argument("--plotWF", action='store_true')
+    parser.add_argument("--plotFFT", action='store_true')
+    parser.add_argument("--plotHuygens", action='store_true')
+    args = parser.parse_args()
+
     test_HSC_trace()
     test_HSC_huygensPSF()
     test_HSC_wf()
     test_HSC_zernike()
-    test_LSST_wf()
-    test_LSST_fftPSF()
-    test_LSST_huygensPSF()
+    test_LSST_wf(args.plotWF)
+    test_LSST_fftPSF(args.plotFFT)
+    test_LSST_huygensPSF(args.plotHuygens)
