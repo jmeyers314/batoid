@@ -256,6 +256,8 @@ def test_LSST_wf(plot=False):
             atol=1e-11, rtol=0)  # 10 picometer tolerance!
 
 
+@pytest.mark.skipif(not hasGalSim, reason="galsim not found")
+@pytest.mark.skipif(not hasLMFit, reason="lmfit not found")
 @timer
 def test_LSST_fftPSF(plot=False):
     thxs = [0.0, 0.0, 0.0, 1.176]
@@ -325,6 +327,8 @@ def test_LSST_fftPSF(plot=False):
             plt.show()
 
 
+@pytest.mark.skipif(not hasGalSim, reason="galsim not found")
+@pytest.mark.skipif(not hasLMFit, reason="lmfit not found")
 @timer
 def test_LSST_huygensPSF(plot=False):
     thxs = [0.0, 0.0, 0.0, 1.176]
