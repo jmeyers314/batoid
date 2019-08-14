@@ -28,6 +28,7 @@ from .lattice import Lattice
 
 from . import parse
 from . import utils
+from . import analysis
 from .utils import normalized
 
 from .constants import globalCoordSys, vacuum
