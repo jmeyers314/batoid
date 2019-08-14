@@ -44,6 +44,7 @@ notebooks = [
     "HSC 3D.ipynb",
     "HSC perturbations.ipynb",
     "HSC trace.ipynb",
+    "Huygens PSF.ipynb",
     "LSST perturbations.ipynb",
     "LSST trace.ipynb",
     "Newtonian Telescope.ipynb",

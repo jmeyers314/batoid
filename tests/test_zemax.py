@@ -236,13 +236,17 @@ def test_LSST_wf():
         Zwf = np.ma.MaskedArray(data=Zwf, mask=Zwf==0)  # Turn Zwf into masked array
 
         # import matplotlib.pyplot as plt
-        # fig, axes = plt.subplots(ncols=3)
+        # fig, axes = plt.subplots(ncols=3, figsize=(10,3))
         # i0 = axes[0].imshow(bwf.array)
         # i1 = axes[1].imshow(Zwf)
         # i2 = axes[2].imshow(bwf.array-Zwf)
-        # plt.colorbar(i0, ax=axes[0])
-        # plt.colorbar(i1, ax=axes[1])
-        # plt.colorbar(i2, ax=axes[2])
+        # axes[0].set_title("batoid")
+        # axes[1].set_title("Zemax")
+        # axes[2].set_title("difference")
+        # plt.colorbar(i0, ax=axes[0], label='waves')
+        # plt.colorbar(i1, ax=axes[1], label='waves')
+        # plt.colorbar(i2, ax=axes[2], label='waves')
+        # plt.tight_layout()
         # plt.show()
 
         np.testing.assert_allclose(
@@ -251,9 +255,158 @@ def test_LSST_wf():
             atol=1e-11, rtol=0)  # 10 picometer tolerance!
 
 
+@timer
+def test_LSST_fftPSF():
+    thxs = [0.0, 0.0, 0.0, 1.176]
+    thys = [0.0, 1.225, 1.75, 1.176]
+    fns = ["LSST_fftpsf_0.0_0.0.txt",
+           "LSST_fftpsf_0.0_1.225.txt",
+           "LSST_fftpsf_0.0_1.75.txt",
+           "LSST_fftpsf_1.176_1.176.txt"]
+    for thx, thy, fn in zip(thxs, thys, fns):
+        fn = os.path.join(directory, "testdata", fn)
+        with open(fn, encoding='utf-16-le') as f:
+            Zpsf = np.loadtxt(f, skiprows=18)
+        Zpsf = Zpsf[::-1]  # Need to invert, probably just a Zemax convention...
+        Zpsf /= np.max(Zpsf)
+
+        LSST_fn = os.path.join(batoid.datadir, "LSST", "LSST_g_500.yaml")
+        config = yaml.safe_load(open(LSST_fn))
+        telescope = batoid.parse.parse_optic(config['opticalSystem'])
+
+        thx = np.deg2rad(thx)
+        thy = np.deg2rad(thy)
+        wavelength = 500e-9
+        nx = 32
+
+        bpsf = batoid.psf.newFFTPSF(
+            telescope, thx, thy, wavelength, nx=nx,
+            reference='chief', projection='zemax'
+        )
+        bpsf.array = bpsf.array[::-1,::-1] # b/c primitives are negative
+        bpsf.array /= np.max(bpsf.array)
+
+        # Use GalSim InterpolateImage to align and subtract
+        ii = galsim.InterpolatedImage(
+            galsim.Image(bpsf.array, scale=1.0),
+            normalization='sb'
+        )
+
+        # Now setup an optimizer to fit for x/y shift
+        def resid(params):
+            p = params.valuesdict()
+            model = ii.shift(p['dx'], p['dy'])*np.exp(p['dlogflux'])
+            img = model.drawImage(method='sb', scale=1.0, nx=64, ny=64)
+            r = (img.array - Zpsf).ravel()
+            return r
+        params = lmfit.Parameters()
+        params.add('dx', value=0.0)
+        params.add('dy', value=0.0)
+        params.add('dlogflux', value=0.0)
+        print("Aligning")
+        opt = lmfit.minimize(resid, params)
+        print("Done")
+
+        p = opt.params.valuesdict()
+        model = ii.shift(p['dx'], p['dy'])*np.exp(p['dlogflux'])
+        optImg = model.drawImage(method='sb', scale=1.0, nx=64, ny=64)
+
+        # import matplotlib.pyplot as plt
+        # fig, axes = plt.subplots(ncols=3, figsize=(10,3))
+        # i0 = axes[0].imshow(optImg.array)
+        # i1 = axes[1].imshow(Zpsf)
+        # i2 = axes[2].imshow(optImg.array-Zpsf)
+        # plt.colorbar(i0, ax=axes[0])
+        # plt.colorbar(i1, ax=axes[1])
+        # plt.colorbar(i2, ax=axes[2])
+        # plt.tight_layout()
+        # plt.show()
+
+
+@timer
+def test_LSST_huygensPSF():
+    thxs = [0.0, 0.0, 0.0, 1.176]
+    thys = [0.0, 1.225, 1.75, 1.176]
+    fns = ["LSST_hpsf_0.0_0.0.txt",
+           "LSST_hpsf_0.0_1.225.txt",
+           "LSST_hpsf_0.0_1.75.txt",
+           "LSST_hpsf_1.176_1.176.txt"]
+    if __name__ != "__main__":
+        thxs = thxs[2:3]
+        thys = thys[2:3]
+        fns = fns[2:3]
+    for thx, thy, fn in zip(thxs, thys, fns):
+        fn = os.path.join(directory, "testdata", fn)
+        with open(fn, encoding='utf-16-le') as f:
+            Zpsf = np.loadtxt(f, skiprows=21)
+        Zpsf = Zpsf[::-1]  # Need to invert, probably just a Zemax convention...
+        Zpsf /= np.max(Zpsf)
+
+        LSST_fn = os.path.join(batoid.datadir, "LSST", "LSST_g_500.yaml")
+        config = yaml.safe_load(open(LSST_fn))
+        telescope = batoid.parse.parse_optic(config['opticalSystem'])
+
+        thx = np.deg2rad(thx)
+        thy = np.deg2rad(thy)
+        wavelength = 500e-9
+
+        bpsf = batoid.psf.newHuygensPSF(
+            telescope, thx, thy, wavelength, nx=1024,
+            reference='chief', projection='zemax',
+            dx=0.289e-6, nxOut=64
+        )
+        bpsf.array /= np.max(bpsf.array)
+
+        # Use GalSim InterpolateImage to align and subtract
+        ii = galsim.InterpolatedImage(
+            galsim.Image(bpsf.array, scale=1.0),
+            normalization='sb'
+        )
+
+        # Now setup an optimizer to fit for x/y shift
+        def resid(params):
+            p = params.valuesdict()
+            model = ii.shift(p['dx'], p['dy'])*np.exp(p['dlogflux'])
+            img = model.drawImage(method='sb', scale=1.0, nx=64, ny=64)
+            r = (img.array - Zpsf).ravel()
+            return r
+        params = lmfit.Parameters()
+        params.add('dx', value=0.0)
+        params.add('dy', value=0.0)
+        params.add('dlogflux', value=0.0)
+        print("Aligning")
+        opt = lmfit.minimize(resid, params)
+        print("Done")
+        print(opt.params)
+
+        p = opt.params.valuesdict()
+        model = ii.shift(p['dx'], p['dy'])*np.exp(p['dlogflux'])
+        optImg = model.drawImage(method='sb', scale=1.0, nx=64, ny=64)
+
+        # import matplotlib.pyplot as plt
+        # fig, axes = plt.subplots(ncols=3, figsize=(10,3))
+        # i0 = axes[0].imshow(optImg.array)
+        # i1 = axes[1].imshow(Zpsf)
+        # i2 = axes[2].imshow(optImg.array-Zpsf)
+        # plt.colorbar(i0, ax=axes[0])
+        # plt.colorbar(i1, ax=axes[1])
+        # plt.colorbar(i2, ax=axes[2])
+        # plt.tight_layout()
+        # plt.show()
+        #
+        # if thy not in [0.0, 1.176]:
+        #     fig, ax = plt.subplots(figsize=(6, 4))
+        #     ax.plot(optImg.array[:,32], c='g')
+        #     ax.plot(Zpsf[:,32], c='b')
+        #     ax.plot((optImg.array-Zpsf)[:,32], c='r')
+        #     plt.show()
+
+
 if __name__ == '__main__':
     test_HSC_trace()
     test_HSC_huygensPSF()
     test_HSC_wf()
     test_HSC_zernike()
     test_LSST_wf()
+    test_LSST_fftPSF()
+    test_LSST_huygensPSF()
