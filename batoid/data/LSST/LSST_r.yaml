@@ -22,7 +22,7 @@ opticalSystem:
         type: Asphere
         R: 19.835
         conic: -1.215
-        coefs: [-0.0, -1.381e-9]
+        coefs: [0.0, -1.381e-9]
       obscuration:
         type: ClearAnnulus
         outer: 4.18

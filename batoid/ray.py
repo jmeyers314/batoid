@@ -1,6 +1,10 @@
-from . import _batoid
 from collections.abc import Sequence
 
+import numpy as np
+
+from . import _batoid
+from .constants import vacuum, globalCoordSys
+from .coordsys import CoordSys, CoordTransform
 
 class Ray:
     r"""A geometric ray to trace through an optical system.  May also be
@@ -79,6 +83,48 @@ class Ray:
         ret = cls.__new__(cls)
         ret._r = _r
         return ret
+
+    @classmethod
+    def fromPupil(cls, x, y,
+                  dist, wavelength,
+                  source=None, dirCos=None,
+                  flux=1, medium=vacuum,
+                  interface=None):
+        from .optic import Interface
+        from .surface import Plane
+
+        if interface is None:
+            interface = Interface(Plane())
+
+        z = interface.surface.sag(x, y)
+        transform = CoordTransform(interface.coordSys, globalCoordSys)
+        x, y, z = transform.applyForward(x, y, z)
+
+        t = 0.0
+        n = medium.getN(wavelength)
+        if source is None:
+            v = np.array(dirCos, dtype=float)
+            v /= n*np.sqrt(np.dot(v, v))
+            ray = Ray((x, y, z), -v, t, wavelength, flux)
+            zhat = -n*v
+            xhat = np.cross(np.array([1.0, 0.0, 0.0]), zhat)
+            xhat /= np.sqrt(np.dot(xhat, xhat))
+            yhat = np.cross(xhat, zhat)
+            origin = zhat*dist
+            coordSys = CoordSys(origin, np.stack([xhat, yhat, zhat]).T)
+            transform = CoordTransform(globalCoordSys, coordSys)
+            transform.applyForwardInPlace(ray)
+            plane = Plane()
+            plane.intersectInPlace(ray)
+            transform.applyReverseInPlace(ray)
+            return Ray((ray.x, ray.y, ray.z), v, t, wavelength, flux)
+        else:
+            vx = x - source[0]
+            vy = y - source[1]
+            vz = z - source[2]
+            v = np.array([vx, vy, vz])
+            v /= n*np.sqrt(np.dot(v, v))
+            return Ray((x, y, z), v, t, w, flux)
 
     def __repr__(self):
         return repr(self._r)

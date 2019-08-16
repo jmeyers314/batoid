@@ -389,7 +389,8 @@ class RayVector:
                 if spokes is None:
                     spokes = 2*rings+1
                 Li, w = np.polynomial.legendre.leggauss(rings)
-                rings = np.sqrt((1+Li)/2)
+                eps = inner/outer
+                rings = np.sqrt(eps**2 + (1+Li)*(1-eps**2)/2)*outer
                 flux = w*(2*np.pi)/(4*spokes)
             if isinstance(spokes, Integral):
                 spokes = np.linspace(0, 2*np.pi, spokes, endpoint=False)
