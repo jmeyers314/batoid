@@ -14,6 +14,10 @@ opticalSystem:
       type: Plane
     coordSys:
       z: 0.4393899
+    obscuration:
+      type: ClearAnnulus
+      outer: 4.18
+      inner: 2.5  # smaller than 2.558 to account for 1.75 deg field of view
   items:
     -
       type: Mirror

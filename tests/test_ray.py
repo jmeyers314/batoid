@@ -629,7 +629,7 @@ def test_RVasSpokes():
 
         rays = batoid.RayVector.asSpokes(
             dist, wavelength,
-            outer=outer, inner=inner,
+            outer, inner=inner,
             spokes=spokes, rings=rings,
             dirCos=dirCos
         )
@@ -647,52 +647,119 @@ def test_RVasSpokes():
         pupil = batoid.Plane()
         pupil.intersectInPlace(rays)
         radii = np.hypot(rays.x, rays.y)
+        ths = np.arctan2(rays.y, rays.x)
 
         for i in range(spokes):
             np.testing.assert_allclose(
                 radii[rings*i:rings*(i+1)],
                 np.linspace(inner, outer, rings, endpoint=True)
             )
+        for i in range(rings):
+            checkAngle(ths[i::rings], np.linspace(0, 2*np.pi, spokes, endpoint=False))
+
+        # Check explicit rings and spokes
+        rings = np.random.uniform(inner, outer, rings)
+        spokes = np.random.uniform(0, 2*np.pi, spokes)
+
+        rays = batoid.RayVector.asSpokes(
+            dist, wavelength,
+            rings=rings, spokes=spokes,
+            dirCos=dirCos
+        )
+
+        pupil = batoid.Plane()
+        pupil.intersectInPlace(rays)
+        radii = np.hypot(rays.x, rays.y)
         ths = np.arctan2(rays.y, rays.x)
 
-        checkAngle(ths[::rings], np.linspace(0, 2*np.pi, spokes, endpoint=False))
+        for i in range(len(spokes)):
+            np.testing.assert_allclose(
+                radii[len(rings)*i:len(rings)*(i+1)],
+                rings
+            )
+        for i in range(len(rings)):
+            checkAngle(
+                ths[i::len(rings)],
+                spokes
+            )
 
-    # rays = batoid.RayVector.asSpokes(
-    #     dist, wavelength,
-    #     outer=outer, inner=inner,
-    #     spokes=[0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0], rings=rings,
-    #     dirCos=dirCos
-    # )
-    #
-    # rays = batoid.RayVector.asSpokes(
-    #     dist, wavelength,
-    #     outer=outer, inner=inner,
-    #     spokes=6, rings=[0, 1, 2],
-    #     dirCos=dirCos
-    # )
-    #
-    # rays = batoid.RayVector.asSpokes(
-    #     dist, wavelength,
-    #     outer=outer, inner=inner,
-    #     spokes=[0,1,2], rings=[0, 1, 2],
-    #     dirCos=dirCos
-    # )
-    #
-    # # Gaussian Quadrature rays
-    # rays = batoid.RayVector.asSpokes(
-    #     dist, wavelength,
-    #     spacing='GQ',
-    #     rings=6,
-    #     dirCos=[0,0,-1]
-    # )
-    #
-    # # Point source
-    # source = [0., 1.0, 1.0]
-    # rays = batoid.RayVector.asSpokes(
-    #     dist, wavelength, source=source,
-    #     outer=outer, inner=inner,
-    #     spokes=[0,1,2], rings=[0, 1, 2],
-    # )
+        # Check Gaussian Quadrature
+        rings = np.random.randint(5, 10)
+        spokes = 2*rings+1
+        rays = batoid.RayVector.asSpokes(
+            dist, wavelength,
+            outer=outer,
+            rings=rings,
+            spacing='GQ',
+            dirCos=dirCos
+        )
+        assert len(rays) == spokes*rings
+
+        pupil = batoid.Plane()
+        pupil.intersectInPlace(rays)
+        radii = np.hypot(rays.x, rays.y)
+        ths = np.arctan2(rays.y, rays.x)
+
+        Li, w = np.polynomial.legendre.leggauss(rings)
+        rings = np.sqrt((1+Li)/2)*outer
+        flux = w*(2*np.pi)/(4*spokes)
+        spokes = np.linspace(0, 2*np.pi, spokes, endpoint=False)
+
+        for i in range(len(spokes)):
+            np.testing.assert_allclose(
+                radii[len(rings)*i:len(rings)*(i+1)],
+                rings
+            )
+            np.testing.assert_allclose(
+                rays.flux[len(rings)*i:len(rings)*(i+1)],
+                flux
+            )
+
+        for i in range(len(rings)):
+            checkAngle(
+                ths[i::len(rings)],
+                spokes
+            )
+
+    # Sanity check GQ grids against literature
+    # Values from Forbes JOSA Vol. 5, No. 11 (1988) Table 1
+    rings = [1, 2, 3, 4, 5, 6]
+    rad = [
+        [0.70710678],
+        [0.45970084, 0.88807383],
+        [0.33571069, 0.70710678, 0.94196515],
+        [0.26349923, 0.57446451, 0.81852949, 0.96465961],
+        [0.21658734, 0.48038042, 0.70710678, 0.87706023, 0.97626324],
+        [0.18375321, 0.41157661, 0.61700114, 0.78696226, 0.91137517, 0.98297241]
+    ]
+    w = [
+        [0.5],
+        [0.25, 0.25],
+        [0.13888889, 0.22222222, 0.13888889],
+        [0.08696371, 0.16303629, 0.16303629, 0.08696371],
+        [0.05923172, 0.11965717, 0.14222222, 0.11965717, 0.05923172],
+        [0.04283112, 0.09019039, 0.11697848, 0.11697848, 0.09019039, 0.04283112]
+    ]
+
+    for rings_, rad_, w_ in zip(rings, rad, w):
+        rays = batoid.RayVector.asSpokes(
+            dist, wavelength, outer=1,
+            rings=rings_,
+            spacing='GQ',
+            dirCos=[0,0,-1]
+        )
+        spokes = rings_*2+1
+
+        radii = np.hypot(rays.x, rays.y)
+        for i in range(spokes):
+            np.testing.assert_allclose(
+                radii[rings_*i:rings_*(i+1)],
+                rad_
+            )
+            np.testing.assert_allclose(
+                rays.flux[rings_*i:rings_*(i+1)]/(2*np.pi/spokes),
+                w_
+            )
 
 
 if __name__ == '__main__':

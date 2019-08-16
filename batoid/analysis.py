@@ -133,3 +133,106 @@ def fftPSF(optic, theta_x, theta_y, wavelength, nx=32, projection='postel', pad_
     primitiveX = np.vstack(reciprocalLatticeVectors(primitiveK[0], primitiveK[1], pad_size))
 
     return batoid.Lattice(psf, primitiveX)
+
+
+def zernike(optic, theta_x, theta_y, wavelength, nx=32, projection='postel',
+            sphereRadius=None, lattice=False, reference='mean', jmax=22, eps=0.0):
+    import galsim
+
+    dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
+    dirCos = dirCos[0:2]+(-dirCos[2],)
+    rays = batoid.RayVector.asGrid(
+        optic.dist, wavelength,
+        nx=nx, lx=optic.pupilSize,
+        dirCos=dirCos,
+        medium=optic.inMedium,
+        interface=optic.entrancePupil
+    )
+
+    # Propagate to entrance pupil to get positions
+    transform = batoid.CoordTransform(batoid.globalCoordSys, optic.entrancePupil.coordSys)
+    epRays = transform.applyForward(rays)
+    optic.entrancePupil.surface.intersectInPlace(epRays)
+    orig_x = np.array(epRays.x).reshape(nx, nx)
+    orig_y = np.array(epRays.y).reshape(nx, nx)
+
+    wf = wavefront(optic, theta_x, theta_y, wavelength, nx=nx,
+                   projection=projection, sphereRadius=sphereRadius,
+                   reference=reference)
+    wfarr = wf.array
+    w = ~wfarr.mask
+
+    basis = galsim.zernike.zernikeBasis(
+        jmax, orig_x[w], orig_y[w],
+        R_outer=optic.pupilSize/2, R_inner=optic.pupilSize/2*eps
+    )
+    coefs, _, _, _ = np.linalg.lstsq(basis.T, wfarr[w], rcond=-1)
+
+    return np.array(coefs)
+
+
+def zernikeGQ(optic, theta_x, theta_y, wavelength, nrings=6, nspokes=None,
+              projection='postel', jmax=22, sphereRadius=None,
+              reference='mean'):
+    import galsim
+    dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
+    dirCos = (dirCos[0], dirCos[1], -dirCos[2])
+    rays = batoid.RayVector.asSpokes(
+        optic.dist, wavelength,
+        outer=optic.pupilSize/2,
+        dirCos=dirCos,
+        rings=nrings,
+        spokes=nspokes,
+        spacing='GQ',
+        medium=optic.inMedium,
+        interface=optic.entrancePupil
+    )
+
+    # Trace to entrancePupil to get points at which to evalue Zernikes
+    transform = batoid.CoordTransform(batoid.globalCoordSys, optic.entrancePupil.coordSys)
+    epRays = transform.applyForward(rays)
+    optic.entrancePupil.surface.intersectInPlace(epRays)
+
+    basis = galsim.zernike.zernikeBasis(
+        jmax, epRays.x, epRays.y,
+        R_outer=optic.pupilSize/2
+    )
+
+    if sphereRadius is None:
+        sphereRadius = optic.sphereRadius
+
+    optic.traceInPlace(rays, outCoordSys=batoid.globalCoordSys)
+    if reference == 'mean':
+        w = np.where(1-rays.vignetted)[0]
+        point = np.mean(rays.r[w], axis=0)
+    elif reference == 'chief':
+        chiefRay = batoid.Ray.fromPupil(
+            0.0, 0.0,
+            optic.dist, wavelength,
+            dirCos=dirCos,
+            medium=optic.inMedium,
+            interface=optic.entrancePupil
+        )
+        optic.traceInPlace(chiefRay, outCoordSys=batoid.globalCoordSys)
+        point = chiefRay.r
+
+    # Place vertex of reference sphere one radius length away from the intersection point.
+    # So transform our rays into that coordinate system.
+    transform = batoid.CoordTransform(
+        batoid.globalCoordSys, batoid.CoordSys(point+np.array([0,0,sphereRadius]))
+    )
+    transform.applyForwardInPlace(rays)
+
+    sphere = batoid.Sphere(-sphereRadius)
+    sphere.intersectInPlace(rays)
+
+    if reference == 'mean':
+        w = np.where(1-rays.vignetted)[0]
+        t0 = np.mean(rays.t[w])
+    elif reference == 'chief':
+        transform.applyForwardInPlace(chiefRay)
+        sphere.intersectInPlace(chiefRay)
+        t0 = chiefRay.t
+
+    # Zernike coefficients are flux-weighted dot products of relative phases with basis.
+    return np.dot(basis, (t0-rays.t)/wavelength*rays.flux)/np.pi
