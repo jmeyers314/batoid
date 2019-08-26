@@ -505,7 +505,7 @@ class Bicubic(Surface):
     d2zdxdys : array_like, optional
         2d array indicating mixed derivatives d^2 z / (dx dy) at grid points.
     """
-    def __init__(self, xs, ys, zs, dzdxs=None, dzdys=None, d2zdxdys=None):
+    def __init__(self, xs, ys, zs, dzdxs=None, dzdys=None, d2zdxdys=None, _slopFrac=1e-4):
         self._xs = np.ascontiguousarray(xs)
         self._ys = np.ascontiguousarray(ys)
         self._zs = np.ascontiguousarray(zs)
@@ -531,9 +531,11 @@ class Bicubic(Surface):
         self._dzdxs = np.ascontiguousarray(dzdxs)
         self._dzdys = np.ascontiguousarray(dzdys)
         self._d2zdxdys = np.ascontiguousarray(d2zdxdys)
+        self._slopFrac = _slopFrac
 
         self._surface = _batoid.Bicubic(self._xs, self._ys, self._zs,
-                                        self._dzdxs, self._dzdys, self._d2zdxdys)
+                                        self._dzdxs, self._dzdys, self._d2zdxdys,
+                                        self._slopFrac)
 
     @property
     def xs(self):

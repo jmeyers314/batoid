@@ -14,8 +14,10 @@ namespace batoid {
         py::class_<Bicubic, std::shared_ptr<Bicubic>, Surface>(m, "Bicubic")
             .def(py::init<std::vector<double>, std::vector<double>,
                           const DRef<MatrixXd>, const DRef<MatrixXd>,
-                          const DRef<MatrixXd>, const DRef<MatrixXd>>(),
+                          const DRef<MatrixXd>, const DRef<MatrixXd>, double>(),
                  "init", "xs"_a, "ys"_a, "zs"_a.noconvert(),
-                 "dzdxs"_a.noconvert(), "dzdys"_a.noconvert(), "d2zdxdys"_a.noconvert());
+                 "dzdxs"_a.noconvert(), "dzdys"_a.noconvert(), "d2zdxdys"_a.noconvert(),
+                 "slopFrac"_a
+             );
     }
 }
