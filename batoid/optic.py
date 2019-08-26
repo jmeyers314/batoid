@@ -603,6 +603,13 @@ class Interface(Optic):
         )
         return ret
 
+    def withSurface(self, surface):
+        ret = self.__class__.__new__(self.__class__)
+        newDict = dict(self.__dict__)
+        del newDict['surface']
+        ret.__init__(surface, **newDict)
+        return ret
+
 
 class RefractiveInterface(Interface):
     """Specialization for refractive interfaces.
@@ -1278,6 +1285,30 @@ class CompoundOptic(Optic):
             newItems.append(item)
         raise RuntimeError("Error in withLocallyRotatedOptic!, Shouldn't get here!")
 
+    def withSurface(self, name, surface):
+        if name not in self.itemDict:
+            raise ValueError("Optic {} not found".format(name))
+        # name is fully qualified, so clip off leading token
+        assert name[:len(self.name)+1] == \
+            self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
+        name = name[len(self.name)+1:]
+        newItems = []
+        newDict = dict(self.__dict__)
+        del newDict['items']
+        for i, item in enumerate(self.items):
+            if name.startswith(item.name):
+                if name == item.name:
+                    newItems.append(item.withSurface(surface))
+                else:
+                    newItems.append(item.withSurface(name, surface))
+                newItems.extend(self.items[i+1:])
+                return self.__class__(
+                    newItems,
+                    **newDict
+                )
+            newItems.append(item)
+        raise RuntimeError("Error in withSurface.  Shouldn't get here!")
+
 
 class Lens(CompoundOptic):
     """
@@ -1509,6 +1540,30 @@ class Lens(CompoundOptic):
                 )
             newItems.append(item)
         raise RuntimeError("Error in withLocallyRotatedOptic!, Shouldn't get here!")
+
+    def withSurface(self, name, surface):
+        if name not in self.itemDict:
+            raise ValueError("Optic {} not found".format(name))
+        # name is fully qualified, so clip off leading token
+        assert name[:len(self.name)+1] == \
+            self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
+        name = name[len(self.name)+1:]
+        newItems = []
+        newDict = dict(self.__dict__)
+        del newDict['items']
+        for i, item in enumerate(self.items):
+            if name.startswith(item.name):
+                if name == item.name:
+                    newItems.append(item.withSurface(surface))
+                else:
+                    newItems.append(item.withSurface(name, surface))
+                newItems.extend(self.items[i+1:])
+                return self.__class__(
+                    newItems,
+                    **newDict
+                )
+            newItems.append(item)
+        raise RuntimeError("Error in withSurface.  Shouldn't get here!")
 
 
 def getGlobalRays(traceFull, start=None, end=None, globalSys=globalCoordSys):
