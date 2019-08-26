@@ -202,6 +202,9 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength, nrings=6, nspokes=None,
         sphereRadius = optic.sphereRadius
 
     optic.traceInPlace(rays, outCoordSys=batoid.globalCoordSys)
+    # if np.any(rays.failed):
+    if np.any(rays.vignetted):
+        raise ValueError("Cannot compute zernike with Gaussian Quadrature with failed rays.")
     if reference == 'mean':
         w = np.where(1-rays.vignetted)[0]
         point = np.mean(rays.r[w], axis=0)
