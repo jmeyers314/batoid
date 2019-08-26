@@ -21,8 +21,8 @@ namespace batoid {
     private:
         typedef typename std::vector<double>::const_iterator citer;
     public:
-        EqArgVec(const std::vector<double>& args) :
-            vec(args), da(vec[1]-vec[0]), slop(da*1e-6) {}
+        EqArgVec(const std::vector<double>& args, const double slopFrac) :
+            vec(args), da(vec[1]-vec[0]), slop(da*slopFrac) {}
 
         int upperIndex(const double a) const;
 
@@ -53,7 +53,9 @@ namespace batoid {
             const DRef<MatrixXd> zs,
             const DRef<MatrixXd> dzdxs,
             const DRef<MatrixXd> dzdys,
-            const DRef<MatrixXd> d2zdxdys);
+            const DRef<MatrixXd> d2zdxdys,
+            const double slopFrac
+        );
         virtual double sag(double, double) const override;
         virtual Vector3d normal(double, double) const override;
         bool timeToIntersect(const Ray& r, double& t) const override;

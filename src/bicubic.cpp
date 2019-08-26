@@ -28,8 +28,11 @@ namespace batoid {
 
     Bicubic::Bicubic(
         const std::vector<double> xs, const std::vector<double> ys, const DRef<MatrixXd> zs,
-        const DRef<MatrixXd> dzdxs, const DRef<MatrixXd> dzdys, const DRef<MatrixXd> d2zdxdys) :
-            _xargs(xs), _yargs(ys), _zs(zs), _dzdxs(dzdxs), _dzdys(dzdys), _d2zdxdys(d2zdxdys) {}
+        const DRef<MatrixXd> dzdxs, const DRef<MatrixXd> dzdys, const DRef<MatrixXd> d2zdxdys,
+        const double slopFrac
+    ) :     _xargs(xs, slopFrac), _yargs(ys, slopFrac), _zs(zs),
+            _dzdxs(dzdxs), _dzdys(dzdys), _d2zdxdys(d2zdxdys)
+    {}
 
     double Bicubic::oneDSpline(double x, double val0, double val1, double der0, double der1) const {
         double a = 2*(val0-val1) + der0 + der1;
