@@ -567,12 +567,16 @@ class Bicubic(Surface):
                      tuple(self.d2zdxdys.ravel())))
 
     def __setstate__(self, args):
-        self._xs, self._ys, self._zs, self._dzdxs, self._dzdys, self._d2zdxdys = args
+        (self._xs, self._ys, self._zs,
+         self._dzdxs, self._dzdys, self._d2zdxdys,
+         self._slopFrac
+        ) = args
         self._surface = _batoid.Bicubic(self.xs, self.ys, self.zs,
-                                        self.dzdxs, self.dzdys, self.d2zdxdys)
+                                        self.dzdxs, self.dzdys, self.d2zdxdys,
+                                        self._slopFrac)
 
     def __getstate__(self):
-        return self.xs, self.ys, self.zs, self.dzdxs, self.dzdys, self.d2zdxdys
+        return self.xs, self.ys, self.zs, self.dzdxs, self.dzdys, self.d2zdxdys, self._slopFrac
 
     def __eq__(self, rhs):
         if not isinstance(rhs, Bicubic): return False
