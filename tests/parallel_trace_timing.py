@@ -43,14 +43,14 @@ def parallel_trace_timing(nside=1024, nthread=None, minChunk=None):
 
     # Optionally perturb the primary mirror using Zernike polynomial
     if args.perturbZ != 0:
-        orig = telescope.itemDict[pm].surface
+        orig = telescope[pm].surface
         coefs = np.random.normal(size=args.perturbZ+1)*1e-6 # micron perturbations
         perturbation = batoid.Zernike(coefs, R_outer=telescope.pupilSize)
-        telescope.itemDict[pm].surface = batoid.Sum([orig, perturbation])
+        telescope[pm].surface = batoid.Sum([orig, perturbation])
 
     # Optionally perturb primary mirror using bicubic spline
     if args.perturbBC != 0:
-        orig = telescope.itemDict[pm].surface
+        orig = telescope[pm].surface
         rad = telescope.pupilSize/2 * 1.1
         xs = np.linspace(-rad, rad, 100)
         ys = np.linspace(-rad, rad, 100)
@@ -58,7 +58,7 @@ def parallel_trace_timing(nside=1024, nthread=None, minChunk=None):
             return args.perturbBC*(np.cos(x) + np.sin(y))
         zs = f(*np.meshgrid(xs, ys))
         bc = batoid.Bicubic(xs, ys, zs)
-        telescope.itemDict[pm].surface = batoid.Sum([orig, bc])
+        telescope[pm].surface = batoid.Sum([orig, bc])
 
     if args.immutable:
         print("Immutable trace")

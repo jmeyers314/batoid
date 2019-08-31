@@ -783,6 +783,9 @@ class CompoundOptic(Optic):
                         self._itemDict[self.name+'.'+k] = v
         return self._itemDict
 
+    def __getitem__(self, key):
+        return self.itemDict[key]
+
     def trace(self, r, inCoordSys=globalCoordSys, outCoordSys=None):
         """
         Recursively trace through all subitems of this CompoundOptic.

@@ -302,19 +302,19 @@ def test_LSST_M1_zernike():
         # Add Zernike perturbation to M1
         zTelescope = batoid.Optic.fromYaml("LSST_r.yaml")
         zPerturbedM1 = batoid.Sum([
-            zTelescope.itemDict['LSST.M1'].surface,
+            zTelescope['LSST.M1'].surface,
             zsurf
         ])
-        zTelescope.itemDict['LSST.M1'].surface = zPerturbedM1
+        zTelescope['LSST.M1'].surface = zPerturbedM1
         zZernikes = batoid.psf.zernike(zTelescope, theta_x, theta_y, 750e-9)
 
         # Repeat with bicubic perturbation
         bcTelescope = batoid.Optic.fromYaml("LSST_r.yaml")
         bcPerturbedM1 = batoid.Sum([
-            bcTelescope.itemDict['LSST.M1'].surface,
+            bcTelescope['LSST.M1'].surface,
             bc
         ])
-        bcTelescope.itemDict['LSST.M1'].surface = bcPerturbedM1
+        bcTelescope['LSST.M1'].surface = bcPerturbedM1
         bcZernikes = batoid.psf.zernike(bcTelescope, theta_x, theta_y, 750e-9)
 
         np.testing.assert_allclose(zZernikes, bcZernikes, rtol=0, atol=1e-3)
