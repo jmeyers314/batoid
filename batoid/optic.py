@@ -53,6 +53,41 @@ class Optic:
             out += ", outMedium={!r}".format(self.outMedium)
         return out
 
+    @classmethod
+    def fromYaml(cls, filename):
+        """Load a telescope from the given yaml filename.  If the filename is not initially found,
+        then look in the batoid.datadir directory and subdirectories for the first matching filename
+        and use that.
+
+        Parameters
+        ----------
+        filename : str
+            Name of yaml file to load
+
+        Returns
+        -------
+        out : Optic
+            The yaml-parsed Optic.
+        """
+        import os
+        import yaml
+        try:
+            with open(filename) as f:
+                config = yaml.safe_load(f)
+        except FileNotFoundError:
+            import glob
+            from . import datadir
+            filenames = glob.glob(os.path.join(datadir, "**", "*.yaml"))
+            for candidate in filenames:
+                if os.path.basename(candidate) == filename:
+                    with open(candidate) as f:
+                        config = yaml.safe_load(f)
+                    break
+            else:
+                raise FileNotFoundError(filename)
+        from .parse import parse_optic
+        return parse_optic(config['opticalSystem'])
+
 
 class Interface(Optic):
     """

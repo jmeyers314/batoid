@@ -1,7 +1,5 @@
-import os
 import numpy as np
 import batoid
-import yaml
 from test_helpers import timer
 
 
@@ -120,9 +118,7 @@ def test_huygens_psf():
 @timer
 def test_lsst_psf():
     # Just testing that doesn't crash for the moment
-    fn = os.path.join(batoid.datadir, "LSST", "LSST_r.yaml")
-    config = yaml.safe_load(open(fn))
-    telescope = batoid.parse.parse_optic(config['opticalSystem'])
+    telescope = batoid.Optic.fromYaml("LSST_r.yaml")
 
     stampSize = 0.5 # arcsec
     nx = 64
@@ -171,9 +167,7 @@ def test_lsst_psf():
 @timer
 def test_hsc_psf():
     # Just testing that doesn't crash for the moment
-    fn = os.path.join(batoid.datadir, "HSC", "HSC.yaml")
-    config = yaml.safe_load(open(fn))
-    telescope = batoid.parse.parse_optic(config['opticalSystem'])
+    telescope = batoid.Optic.fromYaml("HSC.yaml")
 
     stampSize = 0.75  # arcsec
     nx = 64
@@ -222,9 +216,7 @@ def test_hsc_psf():
 @timer
 def test_decam_psf():
     # Just testing that doesn't crash for the moment
-    fn = os.path.join(batoid.datadir, "DECam", "DECam.yaml")
-    config = yaml.safe_load(open(fn))
-    telescope = batoid.parse.parse_optic(config['opticalSystem'])
+    telescope = batoid.Optic.fromYaml("DECam.yaml")
 
     stampSize = 1.0  # arcsec
     nx = 64

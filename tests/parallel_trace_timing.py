@@ -1,9 +1,7 @@
 import batoid
 import numpy as np
-import os
 from test_helpers import timer
 import time
-import yaml
 
 
 @timer
@@ -22,16 +20,14 @@ def parallel_trace_timing(nside=1024, nthread=None, minChunk=None):
     dirCos = batoid.utils.gnomonicToDirCos(np.deg2rad(0.3), np.deg2rad(0.3))
 
     if args.lsst:
-        fn = os.path.join(batoid.datadir, "LSST", "LSST_i.yaml")
+        telescope = batoid.Optic.fromYaml("LSST_i.yaml")
         pm = 'LSST.M1'
     elif args.decam:
-        fn = os.path.join(batoid.datadir, "DECam", "DECam.yaml")
+        telescope = batoid.Optic.fromYaml("DECam.yaml")
         pm = 'BlancoDECam.PM'
     else:
-        fn = os.path.join(batoid.datadir, "HSC", "HSC.yaml")
+        telescope = batoid.Optic.fromYaml("HSC.yaml")
         pm = 'SubaruHSC.PM'
-    config = yaml.safe_load(open(fn))
-    telescope = batoid.parse.parse_optic(config['opticalSystem'])
 
     rays = batoid.circularGrid(
         telescope.dist,

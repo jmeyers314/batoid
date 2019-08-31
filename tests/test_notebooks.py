@@ -52,9 +52,6 @@ notebooks = [
     "Thin Lens.ipynb"
 ]
 
-# We're purposely excluding the following for time:
-# "FFT vs Huygens.ipynb"
-
 
 @pytest.mark.timeout(600)
 @pytest.mark.parametrize("notebook_name", notebooks)
@@ -65,9 +62,10 @@ def test_notebook(notebook_name):
 
 
 if __name__ == '__main__':
-    notebooks.append([
-        "PH != Pupil.ipynb",
+    notebooks.extend([
+        "FFT vs Huygens.ipynb",
         "LSST donuts.ipynb",
+        "PH != Pupil.ipynb",
     ])
     for notebook in notebooks:
         test_notebook(notebook)

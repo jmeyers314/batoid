@@ -25,9 +25,7 @@ directory = os.path.dirname(__file__)
 
 @timer
 def test_HSC_trace():
-    fn = os.path.join(batoid.datadir, "HSC", "HSC_old.yaml")
-    config = yaml.safe_load(open(fn))
-    telescope = batoid.parse.parse_optic(config['opticalSystem'])
+    telescope = batoid.Optic.fromYaml("HSC_old.yaml")
 
     # Zemax has a number of virtual surfaces that we don't trace in batoid.  Also, the HSC.yaml
     # above includes Baffle surfaces not in Zemax.  The following lists select out the surfaces in
@@ -80,9 +78,7 @@ def test_HSC_huygensPSF():
         Zarr = np.loadtxt(f, skiprows=21)
     Zarr = Zarr[::-1]  # Need to invert, probably just a Zemax convention...
 
-    HSC_fn = os.path.join(batoid.datadir, "HSC", "HSC_no_obsc.yaml")
-    config = yaml.safe_load(open(HSC_fn))
-    telescope = batoid.parse.parse_optic(config['opticalSystem'])
+    telescope = batoid.Optic.fromYaml("HSC_no_obsc.yaml")
 
     thx = np.deg2rad(0.0)
     thy = np.deg2rad(0.75)
@@ -139,9 +135,7 @@ def test_HSC_wf():
         Zwf = np.loadtxt(f, skiprows=17)
     Zwf = Zwf[::-1]  # Need to invert, probably just a Zemax convention...
 
-    HSC_fn = os.path.join(batoid.datadir, "HSC", "HSC_no_obsc.yaml")
-    config = yaml.safe_load(open(HSC_fn))
-    telescope = batoid.parse.parse_optic(config['opticalSystem'])
+    telescope = batoid.Optic.fromYaml("HSC_no_obsc.yaml")
 
     thx = np.deg2rad(0.0)
     thy = np.deg2rad(0.75)
@@ -178,9 +172,7 @@ def test_HSC_zernike():
                 ZZernike.append(float(line[9:20]))
     ZZernike = np.array(ZZernike)
 
-    HSC_fn = os.path.join(batoid.datadir, "HSC", "HSC_no_obsc.yaml")
-    config = yaml.safe_load(open(HSC_fn))
-    telescope = batoid.parse.parse_optic(config['opticalSystem'])
+    telescope = batoid.Optic.fromYaml("HSC_no_obsc.yaml")
 
     thx = np.deg2rad(0.0)
     thy = np.deg2rad(0.75)
@@ -220,9 +212,7 @@ def test_LSST_wf(plot=False):
             Zwf = np.loadtxt(f, skiprows=16)
         Zwf = Zwf[::-1]  # Need to invert, probably just a Zemax convention...
 
-        LSST_fn = os.path.join(batoid.datadir, "LSST", "LSST_g_500.yaml")
-        config = yaml.safe_load(open(LSST_fn))
-        telescope = batoid.parse.parse_optic(config['opticalSystem'])
+        telescope = batoid.Optic.fromYaml("LSST_g_500.yaml")
 
         thx = np.deg2rad(thx)
         thy = np.deg2rad(thy)
@@ -273,9 +263,7 @@ def test_LSST_fftPSF(plot=False):
         Zpsf = Zpsf[::-1]  # Need to invert, probably just a Zemax convention...
         Zpsf /= np.max(Zpsf)
 
-        LSST_fn = os.path.join(batoid.datadir, "LSST", "LSST_g_500.yaml")
-        config = yaml.safe_load(open(LSST_fn))
-        telescope = batoid.parse.parse_optic(config['opticalSystem'])
+        telescope = batoid.Optic.fromYaml("LSST_g_500.yaml")
 
         thx = np.deg2rad(thx)
         thy = np.deg2rad(thy)
@@ -348,9 +336,7 @@ def test_LSST_huygensPSF(plot=False):
         Zpsf = Zpsf[::-1]  # Need to invert, probably just a Zemax convention...
         Zpsf /= np.max(Zpsf)
 
-        LSST_fn = os.path.join(batoid.datadir, "LSST", "LSST_g_500.yaml")
-        config = yaml.safe_load(open(LSST_fn))
-        telescope = batoid.parse.parse_optic(config['opticalSystem'])
+        telescope = batoid.Optic.fromYaml("LSST_g_500.yaml")
 
         thx = np.deg2rad(thx)
         thy = np.deg2rad(thy)
