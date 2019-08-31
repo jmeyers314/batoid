@@ -1,7 +1,5 @@
 import batoid
 import time
-import os
-import yaml
 import numpy as np
 import pytest
 from test_helpers import timer
@@ -15,9 +13,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 @timer
 def initialize(ngrid=25, theta_x=1.):
-    DESI_fn = os.path.join(batoid.datadir, 'DESI', 'DESI.yaml')
-    config = yaml.safe_load(open(DESI_fn))
-    telescope = batoid.parse.parse_optic(config['opticalSystem'])
+    telescope = batoid.Optic.fromYaml("DESI.yaml")
     dirCos = batoid.utils.gnomonicToDirCos(np.deg2rad(theta_x), 0.)
     rays = batoid.rayGrid(
         telescope.dist, telescope.pupilSize, dirCos[0], dirCos[1], -dirCos[2],

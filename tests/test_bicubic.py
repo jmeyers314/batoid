@@ -279,13 +279,9 @@ def test_approximate_zernike():
 def test_LSST_M1_zernike():
     """See how much a ~100 nm zernike perturbation to M1 affects wavefront zernikes
     """
-    import os
-    import yaml
     np.random.seed(5772156)
 
-    fn = os.path.join(batoid.datadir, "LSST", "LSST_r.yaml")
-    config = yaml.safe_load(open(fn))
-    telescope = batoid.parse.parse_optic(config['opticalSystem'])
+    telescope = batoid.Optic.fromYaml("LSST_r.yaml")
     theta_x = np.deg2rad(1.185)
     theta_y = np.deg2rad(0.45)
     fiducialZernikes = batoid.psf.zernike(telescope, theta_x, theta_y, 750e-9)
@@ -304,9 +300,7 @@ def test_LSST_M1_zernike():
         bc = batoid.Bicubic(xs, ys, zs)
 
         # Add Zernike perturbation to M1
-        fn = os.path.join(batoid.datadir, "LSST", "LSST_r.yaml")
-        config = yaml.safe_load(open(fn))
-        zTelescope = batoid.parse.parse_optic(config['opticalSystem'])
+        zTelescope = batoid.Optic.fromYaml("LSST_r.yaml")
         zPerturbedM1 = batoid.Sum([
             zTelescope.itemDict['LSST.M1'].surface,
             zsurf
@@ -315,9 +309,7 @@ def test_LSST_M1_zernike():
         zZernikes = batoid.psf.zernike(zTelescope, theta_x, theta_y, 750e-9)
 
         # Repeat with bicubic perturbation
-        fn = os.path.join(batoid.datadir, "LSST", "LSST_r.yaml")
-        config = yaml.safe_load(open(fn))
-        bcTelescope = batoid.parse.parse_optic(config['opticalSystem'])
+        bcTelescope = batoid.Optic.fromYaml("LSST_r.yaml")
         bcPerturbedM1 = batoid.Sum([
             bcTelescope.itemDict['LSST.M1'].surface,
             bc

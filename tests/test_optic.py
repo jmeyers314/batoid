@@ -1,10 +1,8 @@
 import batoid
 import numpy as np
-import os
 import pytest
 from test_helpers import timer, do_pickle, all_obj_diff
 import time
-import yaml
 
 
 @timer
@@ -21,9 +19,7 @@ def test_optic():
     t_fast = 0.0
     t_slow = 0.0
 
-    fn = os.path.join(batoid.datadir, "HSC", "HSC.yaml")
-    config = yaml.safe_load(open(fn))
-    telescope = batoid.parse.parse_optic(config['opticalSystem'])
+    telescope = batoid.Optic.fromYaml("HSC.yaml")
     do_pickle(telescope)
 
     t0 = time.time()
@@ -54,9 +50,7 @@ def test_traceFull():
     nrays = len(rays)
     print("Tracing {} rays.".format(nrays))
 
-    fn = os.path.join(batoid.datadir, "HSC", "HSC.yaml")
-    config = yaml.safe_load(open(fn))
-    telescope = batoid.parse.parse_optic(config['opticalSystem'])
+    telescope = batoid.Optic.fromYaml("HSC.yaml")
 
     tf = telescope.traceFull(rays)
     rays, _ = telescope.trace(rays)
@@ -71,9 +65,7 @@ def test_traceReverse():
     else:
         nside = 32
 
-    fn = os.path.join(batoid.datadir, "HSC", "HSC.yaml")
-    config = yaml.safe_load(open(fn))
-    telescope = batoid.parse.parse_optic(config['opticalSystem'])
+    telescope = batoid.Optic.fromYaml("HSC.yaml")
 
     init_rays = batoid.rayGrid(20, 12.0, 0.005, 0.005, -1.0, nside, 500e-9, 1.0, batoid.ConstMedium(1.0))
     forward_rays, _ = telescope.trace(init_rays, outCoordSys=batoid.CoordSys())
@@ -103,9 +95,7 @@ def test_traceReverse():
 def test_shift():
     np.random.seed(5)
 
-    fn = os.path.join(batoid.datadir, "HSC", "HSC.yaml")
-    config = yaml.safe_load(open(fn))
-    telescope = batoid.parse.parse_optic(config['opticalSystem'])
+    telescope = batoid.Optic.fromYaml("HSC.yaml")
 
     shift = np.random.uniform(low=-1, high=1, size=3)
     assert telescope.withGlobalShift(shift).withGlobalShift(-shift) == telescope
@@ -117,6 +107,8 @@ def test_shift():
 
 @timer
 def test_rotXYZ_parsing():
+    import os
+    import yaml
     np.random.seed(5)
     fn = os.path.join(batoid.datadir, "DESI", "DESI.yaml")
     config = yaml.safe_load(open(fn))
@@ -141,9 +133,7 @@ def test_rotation():
 
     np.random.seed(57)
 
-    fn = os.path.join(batoid.datadir, "HSC", "HSC.yaml")
-    config = yaml.safe_load(open(fn))
-    telescope = batoid.parse.parse_optic(config['opticalSystem'])
+    telescope = batoid.Optic.fromYaml("HSC.yaml")
 
     rot = batoid.RotX(np.random.uniform(low=0.0, high=2*np.pi))
     rot = rot.dot(batoid.RotY(np.random.uniform(low=0.0, high=2*np.pi)))
@@ -184,9 +174,7 @@ def test_rotation():
 
 @timer
 def test_thread():
-    fn = os.path.join(batoid.datadir, "HSC", "HSC.yaml")
-    config = yaml.safe_load(open(fn))
-    telescope = batoid.parse.parse_optic(config['opticalSystem'])
+    telescope = batoid.Optic.fromYaml("HSC.yaml")
 
     rayGrid = batoid.rayGrid(
         telescope.dist, telescope.pupilSize,

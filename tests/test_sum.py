@@ -155,12 +155,7 @@ def test_intersect():
 
 @timer
 def test_sum_bicubic():
-    import os
-    import yaml
-
-    fn = os.path.join(batoid.datadir, "LSST", "LSST_i.yaml")
-    config = yaml.safe_load(open(fn))
-    telescope = batoid.parse.parse_optic(config['opticalSystem'])
+    telescope = batoid.Optic.fromYaml("LSST_i.yaml")
     xcos, ycos, zcos = batoid.utils.gnomonicToDirCos(
         np.deg2rad(0.8), np.deg2rad(0.8)
     )
