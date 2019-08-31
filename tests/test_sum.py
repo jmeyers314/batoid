@@ -168,7 +168,7 @@ def test_sum_bicubic():
     )
     out, _ = telescope.trace(rays)
 
-    m2 = telescope.itemDict['LSST.M2']
+    m2 = telescope['LSST.M2']
 
     xs = np.linspace(-m2.outRadius, m2.outRadius, 200)
     ys = xs
