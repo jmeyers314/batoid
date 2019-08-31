@@ -171,7 +171,7 @@ def zernike(optic, theta_x, theta_y, wavelength, nx=32, projection='postel',
     return np.array(coefs)
 
 
-def zernikeGQ(optic, theta_x, theta_y, wavelength, nrings=6, nspokes=None,
+def zernikeGQ(optic, theta_x, theta_y, wavelength, rings=6, spokes=None,
               projection='postel', jmax=22, sphereRadius=None,
               reference='mean'):
     import galsim
@@ -181,8 +181,8 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength, nrings=6, nspokes=None,
         optic.dist, wavelength,
         outer=optic.pupilSize/2,
         dirCos=dirCos,
-        rings=nrings,
-        spokes=nspokes,
+        rings=rings,
+        spokes=spokes,
         spacing='GQ',
         medium=optic.inMedium,
         interface=optic.entrancePupil
