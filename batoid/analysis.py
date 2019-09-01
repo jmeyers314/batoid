@@ -61,7 +61,8 @@ def huygensPSF(optic, theta_x=None, theta_y=None, wavelength=None, nx=None,
     time = rays[0].t
     for idx in np.ndindex(amplitudes.shape):
         amplitudes[idx] = rays.sumAmplitude(points[idx], time)
-    return batoid.Lattice(np.abs(amplitudes)**2, primitiveX)
+    out.array = np.abs(amplitudes)**2
+    return out
 
 
 def wavefront(optic, theta_x, theta_y, wavelength, nx=32, projection='postel',
