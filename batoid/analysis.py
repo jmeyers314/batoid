@@ -5,8 +5,52 @@ from .utils import bilinear_fit, fieldToDirCos
 from .psf import dkdu, reciprocalLatticeVectors
 
 
-def huygensPSF(optic, theta_x=None, theta_y=None, wavelength=None, nx=None,
-               projection='postel', dx=None, dy=None, nxOut=None, reference='mean'):
+def huygensPSF(optic, theta_x, theta_y, wavelength,
+               projection='postel', nx=None, dx=None, dy=None,
+               nxOut=None, reference='mean'):
+    r"""Compute a PSF via the Huygens construction.
+
+    Parameters
+    ----------
+    optic : batoid.Optic
+        Optical system
+    theta_x, theta_y : float
+        Field angle in radians
+    wavelength : float
+        Wavelength in meters
+    projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}
+        Projection used to convert field angle to direction cosines.
+    nx : int, optional
+        Size of ray grid to use.
+    dx, dy : float, optional
+        Lattice scales to use for PSF evaluation locations.  Default, use fftPSF lattice.
+    nxOut : int, optional
+        Size of the output lattice.  Default is to use nx.
+    reference : {'chief', 'mean'}
+        If 'chief', then center the output lattice where the chief ray intersecs the focal plane.
+        If 'mean', then center at the mean non-vignetted ray intersection.
+
+    Returns
+    -------
+    psf : batoid.Lattice
+        The PSF.
+
+    Notes
+    -----
+    The Huygens construction is to evaluate the PSF as
+
+    I(x) \propto \Sum_u exp(i phi(u)) exp(i k(u).r)
+
+    The u are assumed to uniformly sample the entrance pupil, but not include any rays that get
+    vignetted before they reach the focal plane.  The phis are the phases of the exit rays evaluated
+    at a single arbitrary time.  The k(u) indicates the conversion of the uniform entrance pupil
+    samples into nearly (though not exactly) uniform samples in k-space of the output rays.
+
+    The output locations where the PSF is evaluated are governed by dx, dy and nx.  If dx and dy are
+    None, then the same lattice as in fftPSF will be used.  If dx and dy are scalars, then a lattice
+    with primitive vectors [dx, 0] and [0, dy] will be used.  If dx and dy are 2-vectors, then those
+    will be the primitive vectors of the output lattice.
+    """
     from numbers import Real
 
     if dx is None:
@@ -65,8 +109,38 @@ def huygensPSF(optic, theta_x=None, theta_y=None, wavelength=None, nx=None,
     return out
 
 
-def wavefront(optic, theta_x, theta_y, wavelength, nx=32, projection='postel',
+def wavefront(optic, theta_x, theta_y, wavelength,
+              projection='postel', nx=32,
               sphereRadius=None, reference='mean'):
+    """Compute wavefront.
+
+    Parameters
+    ----------
+    optic : batoid.Optic
+        Optical system
+    theta_x, theta_y : float
+        Field angle in radians
+    wavelength : float
+        Wavelength in meters
+    projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}
+        Projection used to convert field angle to direction cosines.
+    nx : int, optional
+        Size of ray grid to use.
+    sphereRadius : float, optional
+        The radius of the reference sphere.  Nominally this should be set to the distance to the
+        exit pupil, though the calculation is usually not very sensitive to this.  Many of the
+        telescopes that come with batoid have values for this set in their yaml files, which will
+        be used if this is None.
+    reference : {'chief', 'mean'}
+        If 'chief', then center the output lattice where the chief ray intersecs the focal plane.
+        If 'mean', then center at the mean non-vignetted ray intersection.
+
+    Returns
+    -------
+    wavefront : batoid.Lattice
+        A batoid.Lattice object containing the wavefront values in waves and
+        the primitive lattice vectors of the entrance pupil grid in meters.
+    """
     dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
     dirCos = dirCos[0:2]+(-dirCos[2],)
     rays = batoid.RayVector.asGrid(
@@ -117,8 +191,40 @@ def wavefront(optic, theta_x, theta_y, wavelength, nx=32, projection='postel',
     return batoid.Lattice(arr, primitiveVectors)
 
 
-def fftPSF(optic, theta_x, theta_y, wavelength, nx=32, projection='postel', pad_factor=2,
+def fftPSF(optic, theta_x, theta_y, wavelength,
+           projection='postel', nx=32, pad_factor=2,
            sphereRadius=None, reference='mean', _addedWF=None):
+    """Compute PSF using FFT.
+
+    Parameters
+    ----------
+    optic : batoid.Optic
+        Optical system
+    theta_x, theta_y : float
+        Field angle in radians
+    wavelength : float
+        Wavelength in meters
+    projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}
+        Projection used to convert field angle to direction cosines.
+    nx : int, optional
+        Size of ray grid to use.
+    pad_factor : int, optional
+        Factor by which to pad pupil array.  Default: 2
+    sphereRadius : float, optional
+        The radius of the reference sphere.  Nominally this should be set to the distance to the
+        exit pupil, though the calculation is usually not very sensitive to this.  Many of the
+        telescopes that come with batoid have values for this set in their yaml files, which will
+        be used if this is None.
+    reference : {'chief', 'mean'}
+        If 'chief', then center the output lattice where the chief ray intersecs the focal plane.
+        If 'mean', then center at the mean non-vignetted ray intersection.
+
+    Returns
+    -------
+    psf : batoid.Lattice
+        A batoid.Lattice object containing the relative PSF values and
+        the primitive lattice vectors of the focal plane grid.
+    """
     wf = wavefront(optic, theta_x, theta_y, wavelength, nx=nx, projection=projection,
                    sphereRadius=sphereRadius, reference=reference)
     wfarr = wf.array
@@ -136,8 +242,58 @@ def fftPSF(optic, theta_x, theta_y, wavelength, nx=32, projection='postel', pad_
     return batoid.Lattice(psf, primitiveX)
 
 
-def zernike(optic, theta_x, theta_y, wavelength, nx=32, projection='postel',
-            sphereRadius=None, lattice=False, reference='mean', jmax=22, eps=0.0):
+def zernike(optic, theta_x, theta_y, wavelength,
+            projection='postel', nx=32,
+            sphereRadius=None, reference='mean', jmax=22, eps=0.0):
+    """Compute Zernike polynomial decomposition of the wavefront.
+
+    This calculation propagates a square grid of rays to the exit pupil reference sphere where the
+    wavefront is computed.  The optical path differences of non-vignetted rays are then fit to
+    Zernike polynomial coefficients numerically.
+
+
+    Parameters
+    ----------
+    optic : batoid.Optic
+        Optical system
+    theta_x, theta_y : float
+        Field angle in radians
+    wavelength : float
+        Wavelength in meters
+    projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}
+        Projection used to convert field angle to direction cosines.
+    nx : int, optional
+        Size of ray grid to use.
+    sphereRadius : float, optional
+        The radius of the reference sphere.  Nominally this should be set to the distance to the
+        exit pupil, though the calculation is usually not very sensitive to this.  Many of the
+        telescopes that come with batoid have values for this set in their yaml files, which will
+        be used if this is None.
+    reference : {'chief', 'mean'}
+        If 'chief', then center the output lattice where the chief ray intersecs the focal plane.
+        If 'mean', then center at the mean non-vignetted ray intersection.
+    jmax : int, optional
+        Number of coefficients to compute.  Default: 12.
+    eps : float, optional
+        Use annular Zernike polynomials with this fractional inner radius.  Default: 0.0.
+
+    Returns
+    -------
+    zernikes : array
+        Zernike polynomial coefficients.
+
+    Notes
+    -----
+    Zernike coefficients are indexed following the Noll convention.  Additionally, since python
+    lists start at 0, but the Noll convention starts at 1, the 0-th index of the returned array is
+    meaningless.  I.e., zernikes[1] is piston, zernikes[4] is defocus, and so on...
+
+    Also, since Zernike polynomials are orthogonal over a circle or annulus, but vignetting may make
+    the actual wavefront region of support something different, the values of fit coefficients can
+    depend on the total number of coefficients being fit.  For example, the j=4 (defocus)
+    coefficient may depend on whether jmax=11 and jmax=21 (or some other value).  See the zernikeGQ
+    function for an alternative algorithm that is independent of jmax.
+    """
     import galsim
 
     dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
@@ -149,7 +305,6 @@ def zernike(optic, theta_x, theta_y, wavelength, nx=32, projection='postel',
         medium=optic.inMedium,
         interface=optic.entrancePupil
     )
-
     # Propagate to entrance pupil to get positions
     transform = batoid.CoordTransform(batoid.globalCoordSys, optic.entrancePupil.coordSys)
     epRays = transform.applyForward(rays)
@@ -168,13 +323,70 @@ def zernike(optic, theta_x, theta_y, wavelength, nx=32, projection='postel',
         R_outer=optic.pupilSize/2, R_inner=optic.pupilSize/2*eps
     )
     coefs, _, _, _ = np.linalg.lstsq(basis.T, wfarr[w], rcond=-1)
-
+    # coefs[0] is meaningless, so always set to 0.0 for comparison consistency
+    coefs[0] = 0.0
     return np.array(coefs)
 
 
-def zernikeGQ(optic, theta_x, theta_y, wavelength, rings=6, spokes=None,
-              projection='postel', jmax=22, sphereRadius=None,
-              reference='mean'):
+def zernikeGQ(optic, theta_x, theta_y, wavelength,
+              projection='postel', rings=6, spokes=None,
+              sphereRadius=None, reference='mean',
+              jmax=22, eps=None):
+    """Compute Zernike polynomial decomposition of the wavefront.
+
+    This calculation uses Gaussian Quadrature points and weights to compute the Zernike
+    decomposition of the wavefront.  The wavefront values at the GQ points are determined by tracing
+    from the entrance pupil to the exit pupil reference sphere, and evaluating the optical path
+    differences on this sphere.
+
+    Parameters
+    ----------
+    optic : batoid.Optic
+        Optical system
+    theta_x, theta_y : float
+        Field angle in radians
+    wavelength : float
+        Wavelength in meters
+    projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}
+        Projection used to convert field angle to direction cosines.
+    rings : int, optional
+        Number of Gaussian quadrature rings to use.  Default: 6.
+    spokes : int, optional
+        Number of Gaussian quadrature spokes to use.  Default: 2*rings + 1
+    sphereRadius : float, optional
+        The radius of the reference sphere.  Nominally this should be set to the distance to the
+        exit pupil, though the calculation is usually not very sensitive to this.  Many of the
+        telescopes that come with batoid have values for this set in their yaml files, which will
+        be used if this is None.
+    reference : {'chief', 'mean'}
+        If 'chief', then center the output lattice where the chief ray intersecs the focal plane.
+        If 'mean', then center at the mean non-vignetted ray intersection.
+    jmax : int, optional
+        Number of coefficients to compute.  Default: 12.
+    eps : float, optional
+        Use annular Zernike polynomials with this fractional inner radius.  Default: 0.0.
+
+    Returns
+    -------
+    zernikes : array
+        Zernike polynomial coefficients.
+
+    Notes
+    -----
+    Zernike coefficients are indexed following the Noll convention.  Additionally, since python
+    lists start at 0, but the Noll convention starts at 1, the 0-th index of the returned array is
+    meaningless.  I.e., zernikes[1] is piston, zernikes[4] is defocus, and so on...
+
+    This algorithm takes advantage of the fact that Zernike polynomials are orthogonal on a circle
+    or annulus to compute the value of individual coefficients via an integral:
+
+        a_j \propto \int Z_j W
+
+    This integral is approximated using Gaussian quadrature.  Since the above integral depends on
+    orthogonality, the wavefront must be decomposed over a circular or annular region of support.
+    As such, this algorithm is unaffected by vignetting.  It is required that no rays fail to be
+    traced, even in vignetted regions.
+    """
     import galsim
     dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
     dirCos = (dirCos[0], dirCos[1], -dirCos[2])

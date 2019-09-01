@@ -11,8 +11,8 @@ def huygensPSF(optic, theta_x=None, theta_y=None, wavelength=None, nx=None,
     ----------
     optic : batoid.Optic
         Optical system
-    theta_x, theta_y : float, optional
-        Field angle in radians (gnomonic tangent plane projection)
+    theta_x, theta_y : float
+        Field angle in radians
     wavelength : float, optional
         Wavelength in meters
     nx : int, optional
@@ -97,7 +97,7 @@ def drdth(optic, theta_x, theta_y, wavelength, nx=16, projection='postel'):
     optic : batoid.Optic
         Optical system
     theta_x, theta_y : float
-        Field angle in radians (gnomonic tangent plane projection)
+        Field angle in radians
     wavelength : float
         Wavelength in meters
     nx : int, optional
@@ -163,7 +163,7 @@ def dthdr(optic, theta_x, theta_y, wavelength, nx=16, projection='postel'):
     optic : batoid.Optic
         Optical system
     theta_x, theta_y : float
-        Field angle in radians (gnomonic tangent plane projection)
+        Field angle in radians
     wavelength : float
         Wavelength in meters
     nx : int, optional
@@ -195,7 +195,7 @@ def dkdu(optic, theta_x, theta_y, wavelength, nx=16, projection='postel'):
     optic : batoid.Optic
         Optical system
     theta_x, theta_y : float
-        Field angle in radians (gnomonic tangent plane projection)
+        Field angle in radians
     wavelength : float
         Wavelength in meters
     nx : int, optional
@@ -241,9 +241,9 @@ def wavefront(optic, theta_x, theta_y, wavelength, nx=32, projection='postel', s
     optic : batoid.Optic
         Optic for which to compute wavefront.
     theta_x, theta_y : float
-        Field of incoming rays (gnomonic projection)
-    wavelength : float
-        Wavelength of incoming rays
+        Field angle in radians
+    wavelength : float, optional
+        Wavelength in meters
     nx : int, optional
         Size of ray grid to generate to compute wavefront.  Default: 32
     projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}
@@ -313,9 +313,9 @@ def fftPSF(optic, theta_x, theta_y, wavelength, nx=32, projection='postel', pad_
     optic : batoid.Optic
         Optic for which to compute wavefront.
     theta_x, theta_y : float
-        Field of incoming rays (gnomonic projection)
-    wavelength : float
-        Wavelength of incoming rays
+        Field angle in radians
+    wavelength : float, optional
+        Wavelength in meters
     nx : int, optional
         Size of ray grid to generate to compute wavefront.  Default: 32
     projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}
