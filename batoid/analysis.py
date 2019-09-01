@@ -177,9 +177,12 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength, rings=6, spokes=None,
     import galsim
     dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
     dirCos = (dirCos[0], dirCos[1], -dirCos[2])
+
+    inner = 0.0 if eps is None else eps*optic.pupilSize/2
     rays = batoid.RayVector.asSpokes(
         optic.dist, wavelength,
         outer=optic.pupilSize/2,
+        inner=inner,
         dirCos=dirCos,
         rings=rings,
         spokes=spokes,
@@ -195,13 +198,15 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength, rings=6, spokes=None,
 
     basis = galsim.zernike.zernikeBasis(
         jmax, epRays.x, epRays.y,
-        R_outer=optic.pupilSize/2
+        R_outer=optic.pupilSize/2,
+        R_inner=inner
     )
 
     if sphereRadius is None:
         sphereRadius = optic.sphereRadius
 
     optic.traceInPlace(rays, outCoordSys=batoid.globalCoordSys)
+
     if np.any(rays.failed):
         raise ValueError("Cannot compute zernike with Gaussian Quadrature with failed rays.")
     if reference == 'mean':
