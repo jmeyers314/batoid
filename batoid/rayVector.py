@@ -13,58 +13,7 @@ class RayVector:
     Parameters
     ----------
     rays : list of Ray
-
-    Methods
-    -------
-    fromArrays(x, y, z, vx, vy, vz, t, w, flux=1, vignetted=None)
-        Factory function alternate constructor.
-    positionAtTime(t)
-        Calculate positions of rays at time `t`.
-    propagatedToTime(t)
-        Propagate ray to time `t`.
-    propagatedInPlace(t)
-        Propagate ray to time `t` in place.
-    phase(r, t)
-        Calculate ray phases at position `r` and time `t`.
-    amplitude(r, t)
-        Calculate ray amplitudes at position `r` and time `t`.
-    sumAmplitude(r, t)
-        Calculate sum of ray amplitudes at position `r` and time `t`.
-    trimVignetted(minFlux)
-        Remove vignetted rays or rays with flux below threshold.
-    trimVignettedInPlace(minFlux)
-        Remove vignetted rays or rays with flux below threshold in place.
-
-    Attributes
-    ----------
-    r : (n, 3), array of float
-        Ray positions in meters.
-    x, y, z : array of float
-        X, Y, Z coordinates of ray positions.
-    v : (n, 3), array of float
-        Ray velocities in meters per second.
-    vx, vy, vz : array of float
-        X, Y, Z coordinates of ray velocities.
-    t : array of float
-        Reference time (divided by the speed of light in vacuum) for rays in
-        units of meters.
-    wavelength : array of float
-        Vacuum wavelength of rays in meters.
-    flux : array of float
-        Flux of rays in arbitrary units.
-    vignetted : array of bool
-        Whether rays are vignetted or not.
-    failed : array of bool
-        Whether rays have failed or not.
-    k : (n, 3) array of float
-        Wavevectors of Rays in radians per meter.
-    kx, ky, kz : array of float
-        X, Y, Z components of wavevectors.
-    omega : array of float
-        Temporal frequency of plane waves (divided by the speed of light in
-        vacuum) in inverse meters.
-    monochromatic : bool
-        True only if all rays are same wavelength.
+        The Rays to assemble into a RayVector.
     """
     def __init__(self, rays, wavelength=float("nan")):
         if len(rays) < 1:
@@ -82,18 +31,19 @@ class RayVector:
 
         Parameters
         ----------
-        x, y, z : array of float
+        x, y, z : ndarray of float, shape (n,)
             Positions of rays in meters.
-        vx, vy, vz : array of float
+        vx, vy, vz : ndarray of float, shape (n,)
             Velocities of rays in units of the speed of light in vacuum.
-        t : Reference times (divided by the speed of light in vacuum) in units
+        t : ndarray of float, shape (n,)
+            Reference times (divided by the speed of light in vacuum) in units
             of meters.
-        wavelength : array of float
+        wavelength : ndarray of float, shape (n,)
             Vacuum wavelengths in meters.
-        flux : array of float
+        flux : ndarray of float, shape (n,)
             Fluxes in arbitrary units.
-        vignetted : array of bool
-            Which rays have been vignetted.
+        vignetted : ndarray of bool, shape (n,)
+            True where rays have been vignetted.
         """
         n = len(x)
         if isinstance(flux, Real):
@@ -118,25 +68,28 @@ class RayVector:
                medium=vacuum,
                nrandom=None,
                interface=None):
-        """
-        Create RayVector on a parallelogram shaped region.
+        """Create RayVector on a parallelogram shaped region.
 
         Parameters
         ----------
-        dist: float
+        dist : float
             Map rays backwards from entrance pupil such that the central ray
             is this distance from the point (0, 0, z(0,0)) on the entrance
             pupil surface.
         wavelength : float
             Vacuum wavelength of rays in meters.
-        source : (3,) array of float or None, optional
+        source : None or ndarray of float, shape (3,), optional
             Where rays originate.  If None, then rays originate an infinite
             distance away, in which case the `dirCos` kwarg must also be
             specified to set the direction of ray propagation.  If an array,
             then the rays originate from this point in global coordinates and
             the `dirCos` kwarg is ignored.
+        dirCos : ndarray of float, shape (3,), optional
+            If source is None, then this indicates the initial direction of
+            propagation of the rays.  If source is not None, then this is
+            ignored.
         nx, ny : int, optional
-            Number of rays on a side.
+            Number of rays on each side of grid.
         dx, dy : float or (2,) array of float, optional
             Separation in meters between adjacent rays in grid.  If scalars,
             then the separations are exactly along the x and y directions.  If
@@ -150,15 +103,11 @@ class RayVector:
             indicate the primitive vectors orientation of the grid.  If only
             lx is specified, then ly will be inferred as a 90-degree rotation
             from lx with the same length as lx.
-        flux : float
-            Flux to assign each ray.
-        dirCos : (3,) array
-            If source is None, then this indicates the initial direction of
-            propagation of the rays.  If source is not None, then this is
-            ignored.
-        medium : batoid.Medium
-            Initial medium of each Ray.
-        nrandom : int
+        flux : float, optional
+            Flux to assign each ray.  Default is 1.0.
+        medium : batoid.Medium, optional
+            Initial medium of each Ray.  Default is vacuum.
+        nrandom : None or int, optional
             If not None, then uniformly sample this many rays from
             parallelogram region instead of sampling on a regular grid.
         interface : batoid.Interface, optional
@@ -247,7 +196,7 @@ class RayVector:
 
         Parameters
         ----------
-        dist: float
+        dist : float
             Map rays backwards from entrance pupil such that the central ray
             is this distance from the point (0, 0, z(0,0)) on the entrance
             pupil surface.
@@ -256,14 +205,14 @@ class RayVector:
         outer : float
             Outer radius of annulus in meters.
         inner : float, optional
-            Inner radius of annulus in meters.
-        source : (3,) array of float or None, optional
+            Inner radius of annulus in meters.  Default is 0.0.
+        source : None or ndarray of float, shape (3,), optional
             Where rays originate.  If None, then rays originate an infinite
             distance away, in which case the `dirCos` kwarg must also be
             specified to set the direction of ray propagation.  If an array,
             then the rays originate from this point in global coordinates and
             the `dirCos` kwarg is ignored.
-        dirCos : (3,) array
+        dirCos : ndarray of float, shape (3,), optional
             If source is None, then this indicates the initial direction of
             propagation of the rays.  If source is not None, then this is
             ignored.
@@ -276,12 +225,12 @@ class RayVector:
             the input value here.  Inner rings will have fewer azimuths in
             proportion to their radius, but will still be constrained to a
             multiple of 6.  (If the innermost ring has radius 0, then exactly
-            1 ray, with azimuth undefined, will be used on that ring.)
-        flux : float
-            Flux to assign each ray.
-        medium : batoid.Medium
-            Initial medium of each Ray.
-        nrandom : int
+            1 ray, with azimuth undefined, will be used on that "ring".)
+        flux : float, optional
+            Flux to assign each ray.  Default is 1.0.
+        medium : batoid.Medium, optional
+            Initial medium of each Ray.  Default is vacuum.
+        nrandom : int, optional
             If not None, then uniformly sample this many rays from annular
             region instead of sampling on a hexapolar grid.
         interface : batoid.Interface, optional
@@ -335,7 +284,7 @@ class RayVector:
 
         Parameters
         ----------
-        dist: float
+        dist : float
             Map rays backwards from entrance pupil such that the central ray
             is this distance from the point (0, 0, z(0,0)) on the entrance
             pupil surface.
@@ -344,35 +293,35 @@ class RayVector:
         outer : float
             Outer radius of annulus in meters.
         inner : float, optional
-            Inner radius of annulus in meters.
-        source : (3,) array of float or None, optional
+            Inner radius of annulus in meters.  Default is 0.0.
+        source : None or ndarray of float, shape (3,), optional
             Where rays originate.  If None, then rays originate an infinite
             distance away, in which case the `dirCos` kwarg must also be
             specified to set the direction of ray propagation.  If an array,
             then the rays originate from this point in global coordinates and
             the `dirCos` kwarg is ignored.
-        dirCos : (3,) array
+        dirCos : ndarray of float, shape (3,), optional
             If source is None, then this indicates the initial direction of
             propagation of the rays.  If source is not None, then this is
             ignored.
-        spokes : int or array of float
+        spokes : int or ndarray of float
             If int, then number of spokes to use.
             If array, then the values of the spokes azimuthal angles in
             radians.
-        rings : int or array of float
+        rings : int or ndarray of float
             If int, then number of rings to use.
             If array, then the values of the ring radii to use in meters.
-        spacing: {'uniform', 'GQ'}
+        spacing : {'uniform', 'GQ'}
             If uniform, assign ring radii uniformly between `inner` and
             `outer`.
             If GQ, then assign ring radii as the Gaussian Quadrature points
-            for integration on a circle.  In this case, the ray fluxes will
-            be set to the Gaussian Quadrature weights (ignoring the `flux`
-            kwarg).
-        flux : float
-            Flux to assign each ray.
-        medium : batoid.Medium
-            Initial medium of each Ray.
+            for integration on an annulus.  In this case, the ray fluxes will
+            be set to the Gaussian Quadrature weights (and the `flux` kwarg
+            will be ignored).
+        flux : float, optional
+            Flux to assign each ray.  Default is 1.0.
+        medium : batoid.Medium, optional
+            Initial medium of each Ray.  Default is vacuum.
         interface : batoid.Interface, optional
             Interface from which grid is projected.
         """
@@ -454,6 +403,7 @@ class RayVector:
 
     @classmethod
     def _fromRayVector(cls, _r):
+        """Turn a c++ RayVector into a python RayVector."""
         ret = cls.__new__(cls)
         ret._r = _r
         return ret
@@ -467,15 +417,14 @@ class RayVector:
 
         Parameters
         ----------
-        position : (3,), array of float
-            Position in meters at which to compute phases.
-        time : float
-            Time (over the speed of light; in meters) at which to compute
-            phases.
+        r : ndarray of float, shape (3,)
+            Position in meters.
+        t : float
+            Time (over vacuum speed of light; in meters).
 
         Returns
         -------
-        amplitude : array of complex
+        ndarray of complex, shape (n,)
         """
         return self._r.amplitude(r, t)
 
@@ -485,15 +434,14 @@ class RayVector:
 
         Parameters
         ----------
-        position : (3,), array of float
-            Position in meters at which to compute phases.
-        time : float
-            Time (over the speed of light; in meters) at which to compute
-            phases.
+        r : ndarray of float, shape (3,)
+            Position in meters.
+        t : float
+            Time (over vacuum speed of light; in meters).
 
         Returns
         -------
-        amplitude : complex
+        complex
         """
         return self._r.sumAmplitude(r, t)
 
@@ -502,15 +450,14 @@ class RayVector:
 
         Parameters
         ----------
-        position : (3,), array of float
-            Position at which to compute phases
-        time : float
-            Time (over the speed of light; in meters) at which to compute
-            phases.
+        r : ndarray of float, shape (3,)
+            Position in meters at which to compute phase
+        t : float
+            Time (over vacuum speed of light; in meters).
 
         Returns
         -------
-        phases : array of float
+        ndarray of float, shape(n,)
         """
         return self._r.phase(r, t)
 
@@ -519,13 +466,12 @@ class RayVector:
 
         Parameters
         ----------
-        time : float
-            Time (over the speed of light; in meters) at which to compute
-            positions.
+        t : float
+            Time (over vacuum speed of light; in meters).
 
         Returns
         -------
-        position : (N,3), array of float
+        ndarray of float, shape (n, 3)
             Positions in meters.
         """
         return self._r.positionAtTime(t)
@@ -535,13 +481,12 @@ class RayVector:
 
         Parameters
         ----------
-        time : float
-            Time (over the speed of light; in meters) to which to propagate
-            rays.
+        t : float
+            Time (over vacuum speed of light; in meters).
 
         Returns
         -------
-        propagatedRays : RayVector
+        RayVector
         """
         return RayVector._fromRayVector(self._r.propagatedToTime(t))
 
@@ -551,8 +496,7 @@ class RayVector:
         Parameters
         ----------
         t : float
-            Time (over the speed of light; in meters) to which to propagate
-            rays.
+            Time (over vacuum speed of light; in meters).
         """
         self._r.propagateInPlace(t)
 
@@ -562,12 +506,12 @@ class RayVector:
 
         Parameters
         ----------
-        minFlux : float
+        minflux : float
             Minimum flux value to not remove.
 
         Returns
         -------
-        trimmedRays : RayVector
+        RayVector
         """
         return RayVector._fromRayVector(self._r.trimVignetted(minflux))
 
@@ -576,85 +520,115 @@ class RayVector:
 
         Parameters
         ----------
-        minFlux : float
+        minflux : float
             Minimum flux value to not remove.
         """
         self._r.trimVignettedInPlace(minflux)
 
     @property
     def monochromatic(self):
+        """True if all rays have same wavelength."""
         return self._r.monochromatic
 
     @property
     def x(self):
+        """The x components of ray positions in meters."""
         return self._r.x
 
     @property
     def y(self):
+        """The y components of ray positions in meters."""
         return self._r.y
 
     @property
     def z(self):
+        """The z components of ray positions in meters."""
         return self._r.z
 
     @property
     def vx(self):
+        """The x components of ray velocities units of the vacuum speed of light."""
         return self._r.vx
 
     @property
     def vy(self):
+        """The y components of ray velocities units of the vacuum speed of light."""
         return self._r.vy
 
     @property
     def vz(self):
+        """The z components of ray velocities units of the vacuum speed of light."""
         return self._r.vz
 
     @property
     def t(self):
+        """Reference times (divided by the speed of light in vacuum) in units of meters, also known
+        as the optical path lengths.
+        """
         return self._r.t
 
     @property
     def wavelength(self):
+        """Vacuum wavelengths in meters."""
         return self._r.wavelength
 
     @property
     def flux(self):
+        """Fluxes in arbitrary units."""
         return self._r.flux
 
     @property
     def vignetted(self):
+        """True for rays that have been vignetted."""
         return self._r.vignetted
 
     @property
     def failed(self):
+        """True for rays that have failed.  This may occur, for example, if batoid failed to find
+        the intersection of a ray wiht a surface.
+        """
         return self._r.failed
 
     @property
     def r(self):
+        """ndarray of float, shape (n, 3): Positions of rays in meters."""
         return self._r.r
 
     @property
     def v(self):
+        """ndarray of float, shape (n, 3): Velocities of rays in units of the speed of light in
+        vacuum.  Note that these may have magnitudes < 1 if the rays are inside a refractive medium.
+        """
         return self._r.v
 
     @property
     def k(self):
+        """ndarray of float, shape (n, 3): Wavevectors of plane waves in units of radians per meter.
+        The magnitude of each wavevector is equal to :math:`2 \pi n / \lambda`, where :math:`n` is
+        the refractive index and :math:`\lambda` is the wavelength.
+        """
         return self._r.k
 
     @property
     def kx(self):
+        """The x component of each ray wavevector in radians per meter."""
         return self._r.kx
 
     @property
     def ky(self):
+        """The y component of each ray wavevector in radians per meter."""
         return self._r.ky
 
     @property
     def kz(self):
+        """The z component of each ray wavevector in radians per meter."""
         return self._r.kz
 
     @property
     def omega(self):
+        """The temporal angular frequency of each plane wave divided by the vacuum speed of light in
+        units of radians per meter.  Equals :math:`2 \pi / \lambda`.
+        """
         return self._r.omega
 
     def __getitem__(self, idx):
