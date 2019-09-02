@@ -41,6 +41,12 @@ release = batoid.__version__
 # ones.
 extensions = [
     'sphinx.ext.napoleon',
+    'sphinx.ext.autodoc',
+    'sphinx.ext.autosummary',
+    'sphinx.ext.coverage',
+    'sphinx.ext.mathjax',
+    'sphinx.ext.viewcode',
+    'sphinx.ext.autosectionlabel',
 ]
 napoleon_google_docstring = False
 napoleon_numpy_docstring = True
@@ -52,8 +58,8 @@ napoleon_use_admonition_for_notes = False
 napoleon_use_admonition_for_references = False
 napoleon_use_ivar = False
 napoleon_use_param = True
-napoleon_use_rtype = True
-
+napoleon_use_rtype = False
+autodoc_member_order = 'bysource'
 # Add any paths that contain templates here, relative to this directory.
 #templates_path = ['_templates']
 
@@ -153,8 +159,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'GalSim', 'GalSim Documentation',
-     author, 'GalSim', 'One line description of project.',
+    (master_doc, 'Batoid', 'Batoid Documentation',
+     author, 'Batoid', 'One line description of project.',
      'Miscellaneous'),
 ]
 

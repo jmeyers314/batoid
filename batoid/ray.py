@@ -7,14 +7,14 @@ from .constants import vacuum, globalCoordSys
 from .coordsys import CoordSys, CoordTransform
 
 class Ray:
-    r"""A geometric ray to trace through an optical system.  May also be
+    """A geometric ray to trace through an optical system.  May also be
     thought of as a monochromatic propagating plane wave.
 
     Parameters
     ----------
-    r : (3,) array of float
+    r : ndarray of float, shape (3,)
         Position of ray in meters.
-    v : (3,) array of float
+    v : ndarray of float, shape (3,)
         Velocity vector in units of the speed of light in vacuum.  Note this
         may have magnitude < 1 if the Ray is inside a refractive medium.
     t : float
@@ -29,43 +29,6 @@ class Ray:
     failed : bool
         Whether Ray is in failed state or not, which may happen if an
         intersection with a surface is requested but cannot be found.
-
-    Attributes
-    ----------
-    r
-    v
-    t
-    wavelength
-    flux
-    vignetted
-    failed
-    x, y, z : float
-        Alternate access to ray position.
-    vx, vy, vz : float
-        Alternate access to ray velocity.
-    k : (3,) array of float
-        Wavevector of plane wave in units of radians per meter.  The magnitude
-        of the wavevector is equal to :math:`2 \pi n / \lambda`, where
-        :math:`n` is the refractive index and :math:`\lambda` is the
-        wavelength.
-    kx, ky, kz : float
-        Alternative access to wavevector.
-    omega : float
-        Temporal frequency of the plane wave over the speed of light.  Units
-        are inverse meters.  Equals :math:`2 \pi / \lambda`.
-
-    Methods
-    -------
-    positionAtTime(t)
-        Calculate position of ray at time `t`.
-    propagatedToTime(t)
-        Return new ray propagated to time `t`.
-    propagatedInPlace(t)
-        Propagated current ray to time `t`.
-    phase(r, t)
-        Return plane wave phase at position and time.
-    amplitude(r, t)
-        Return plane wave complex E-field amplitude at position and time.
     """
     def __init__(self, r=None, v=None, t=0.0, wavelength=0.0, flux=1.0,
                  vignetted=False, failed=False):
@@ -135,15 +98,14 @@ class Ray:
 
         Parameters
         ----------
-        r : (3,), array of float
-            Position in meters at which to compute phase.
+        r : ndarray of float, shape (3,)
+            Position in meters.
         t : float
-            Time (over the speed of light; in meters) at which to compute
-            phase.
+            Time (over vacuum speed of light; in meters).
 
         Returns
         -------
-        amplitude : complex
+        complex
         """
         return self._r.amplitude(r, t)
 
@@ -153,13 +115,12 @@ class Ray:
         Parameters
         ----------
         t : float
-            Time (over the speed of light; in meters) at which to compute
-            position.
+            Time (over vacuum speed of light; in meters).
 
         Returns
         -------
-        position : (3,), array of float
-           Position in meters.
+        ndarray of float, shape (3,)
+            Position in meters.
         """
         return self._r.positionAtTime(t)
 
@@ -169,12 +130,11 @@ class Ray:
         Parameters
         ----------
         t : float
-            Time (over the speed of light; in meters) to which to propagate
-            ray.
+            Time (over vacuum speed of light; in meters).
 
         Returns
         -------
-        propagatedRay : Ray
+        Ray
         """
         return self._r.propagatedToTime(t)
 
@@ -184,8 +144,7 @@ class Ray:
         Parameters
         ----------
         t : float
-            Time (over the speed of light; in meters) to which to propagate
-            ray.
+            Time (over vacuum speed of light; in meters).
         """
         self._r.propagateInPlace(t)
 
@@ -194,88 +153,116 @@ class Ray:
 
         Parameters
         ----------
-        r : (3,), array of float
-            Position at which to compute phase
+        r : ndarray of float, shape (3,)
+            Position in meters at which to compute phase
         t : float
-            Time (over the speed of light; in meters) at which to compute
-            phase.
+            Time (over vacuum speed of light; in meters).
 
         Returns
         -------
-        phase : float
+        float
         """
         return self._r.phase(r, t)
 
     @property
     def r(self):
+        """ndarray of float, shape (3,): Position of ray in meters."""
         return self._r.r
 
     @property
     def v(self):
+        """ndarray of float, shape (3,): Velocity of ray in units of the speed of light in vacuum.
+        Note that this may have magnitude < 1 if the ray is inside a refractive medium.
+        """
         return self._r.v
 
     @property
     def t(self):
+        """Reference time (divided by the speed of light in vacuum) in units of meters, also known
+        as the optical path length.
+        """
         return self._r.t
 
     @property
     def wavelength(self):
+        """Vacuum wavelength in meters."""
         return self._r.wavelength
 
     @property
     def flux(self):
+        """Ray flux in arbitrary units."""
         return self._r.flux
 
     @property
     def vignetted(self):
+        """True if ray has been vignetted."""
         return self._r.vignetted
 
     @property
     def failed(self):
+        """True if ray is in a failed state.  This may occur, for example, if batoid failed to find
+        the intersection of a ray with a surface.
+        """
         return self._r.failed
 
     @property
     def x(self):
+        """The x component of the ray position in meters."""
         return self._r.x
 
     @property
     def y(self):
+        """The y component of the ray position in meters."""
         return self._r.y
 
     @property
     def z(self):
+        """The z component of the ray position in meters."""
         return self._r.z
 
     @property
     def vx(self):
+        """The x component of the ray velocities in units of the vacuum speed of light."""
         return self._r.vx
 
     @property
     def vy(self):
+        """The y component of the ray velocities in units of the vacuum speed of light."""
         return self._r.vy
 
     @property
     def vz(self):
+        """The z component of the ray velocities in units of the vacuum speed of light."""
         return self._r.vz
 
     @property
     def k(self):
+        """ndarray of float, shape (3,): Wavevector of plane wave in units of radians per meter.
+        The magnitude of the wavevector is equal to :math:`2 \pi n / \lambda`, where :math:`n` is
+        the refractive index and :math:`\lambda` is the wavelength.
+        """
         return self._r.k
 
     @property
     def kx(self):
+        """The x component of the ray wave vector in radians per meter."""
         return self._r.kx
 
     @property
     def ky(self):
+        """The y component of the ray wave vector in radians per meter."""
         return self._r.ky
 
     @property
     def kz(self):
+        """The z component of the ray wave vector in radians per meter."""
         return self._r.kz
 
     @property
     def omega(self):
+        """The temporal angular frequency of the plane wave divided by the vacuum speed of light in
+        units of radians per meter.  Equals :math:`2 \pi / \lambda`.
+        """
         return self._r.omega
 
     def __eq__(self, rhs):
