@@ -189,23 +189,31 @@ class Plane(Surface):
     z(x, y) = 0.
 
     """
-    def __init__(self):
-        self._surface = _batoid.Plane()
+    def __init__(self, allowReverse=False):
+        self._surface = _batoid.Plane(allowReverse)
+
+    @property
+    def allowReverse(self):
+        return self._surface.allowReverse
 
     def __hash__(self):
-        return hash("batoid.Plane")
+        return hash(("batoid.Plane", self.allowReverse))
 
-    def __setstate__(self, state):
-        self._surface = _batoid.Plane()
+    def __setstate__(self, allowReverse):
+        self._surface = _batoid.Plane(allowReverse)
 
     def __getstate__(self):
-        pass
+        return self.allowReverse
 
     def __eq__(self, rhs):
-        return isinstance(rhs, Plane)
+        if not isinstance(rhs, Plane): return False
+        return self.allowReverse == rhs.allowReverse
 
     def __repr__(self):
-        return "Plane()"
+        if self.allowReverse:
+            return "Plane(allowReverse=True)"
+        else:
+            return "Plane()"
 
 
 class Paraboloid(Surface):

@@ -1,6 +1,6 @@
 import batoid
 import numpy as np
-from test_helpers import timer, do_pickle
+from test_helpers import timer, do_pickle, all_obj_diff
 
 
 @timer
@@ -66,8 +66,19 @@ def test_intersect_vectorized():
 
 
 @timer
+def test_ne():
+    objs = [
+        batoid.Plane(),
+        batoid.Plane(allowReverse=True),
+        batoid.Paraboloid(2.0),
+    ]
+    all_obj_diff(objs)
+
+
+@timer
 def test_fail():
     plane = batoid.Plane()
+    assert plane.allowReverse == False
     ray = batoid.Ray([0,0,-1], [0,0,-1])
     ray = plane.intersect(ray)
     assert ray.failed
@@ -76,9 +87,20 @@ def test_fail():
     plane.intersectInPlace(ray)
     assert ray.failed
 
+    # These should succeed though if allowReverse is True
+    plane = batoid.Plane(allowReverse=True)
+    assert plane.allowReverse == True
+    ray = batoid.Ray([0,0,-1], [0,0,-1])
+    ray = plane.intersect(ray)
+    assert not ray.failed
+
+    ray = batoid.Ray([0,0,-1], [0,0,-1])
+    plane.intersectInPlace(ray)
+    assert not ray.failed
 
 if __name__ == '__main__':
     test_sag()
     test_intersect()
     test_intersect_vectorized()
+    test_ne()
     test_fail()
