@@ -43,6 +43,7 @@ class Ray:
 
     @classmethod
     def _fromRay(cls, _r):
+        """Turn a c++ Ray into a python Ray."""
         ret = cls.__new__(cls)
         ret._r = _r
         return ret
@@ -222,17 +223,17 @@ class Ray:
 
     @property
     def vx(self):
-        """The x component of the ray velocities in units of the vacuum speed of light."""
+        """The x component of the ray velocity in units of the vacuum speed of light."""
         return self._r.vx
 
     @property
     def vy(self):
-        """The y component of the ray velocities in units of the vacuum speed of light."""
+        """The y component of the ray velocity in units of the vacuum speed of light."""
         return self._r.vy
 
     @property
     def vz(self):
-        """The z component of the ray velocities in units of the vacuum speed of light."""
+        """The z component of the ray velocity in units of the vacuum speed of light."""
         return self._r.vz
 
     @property

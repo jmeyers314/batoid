@@ -6,7 +6,8 @@ batoid: c++ backed python optical raytracer
    :maxdepth: 2
 
    overview
-   intro
+   rays
+   rayvectors
 
 ==================
 Indices and tables
