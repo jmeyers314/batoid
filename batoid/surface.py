@@ -1,7 +1,9 @@
+from abc import ABC, abstractmethod
+
+import numpy as np
+
 from . import _batoid
 from .utils import _rayify
-import numpy as np
-from abc import ABC, abstractmethod
 
 
 class Surface(ABC):
@@ -12,12 +14,12 @@ class Surface(ABC):
 
         Parameters
         ----------
-        x, y : array_like
-            Positions at which to evaluate the surface.
+        x, y : array_like, shape (n,)
+            Positions at which to evaluate the surface sag.
 
         Returns
         -------
-        z : array_like
+        z : array_like, shape (n,)
             Surface height.
         """
         return self._surface.sag(x, y)
@@ -27,20 +29,20 @@ class Surface(ABC):
 
         Parameters
         ----------
-        x, y : array_like
-            Positions at which to evaluate the surface.
+        x, y : array_like, shape (n,)
+            Positions at which to evaluate the surface normal.
 
         Returns
         -------
-        normal : array_like
+        normal : array_like, shape (n, 3)
             Surface normals.
         """
         return self._surface.normal(x, y)
 
     def intersect(self, r):
-        """Calculate intersection of a ray or rays with this surface.  If the intersection is in the
-        past, then set the ray.fail flag.  If the ray intersects at an obscured point, then set the
-        ray.vignetted flag.
+        """Calculate intersection of a ray or rays with this surface.  If the
+        intersection is in the past, then set the ray.fail flag.  If the ray
+        intersects at an obscured point, then set the ray.vignetted flag.
 
         Parameters
         ----------
@@ -50,13 +52,14 @@ class Surface(ABC):
         Returns
         -------
         outRays : Ray or RayVector
-            New object corresponding to original ray(s) propagated to the intersection point.
+            New object corresponding to original ray(s) propagated to the
+            intersection point.
         """
         return _rayify(self._surface.intersect(r._r))
 
     def intersectInPlace(self, r):
-        """Calculate intersection of ray or rays with this surface.  Same as `intersect`, but
-        operates on the input argument in place.
+        """Calculate intersection of ray or rays with this surface.  Same as
+        `intersect`, but operates on the input argument in place.
 
         Parameters
         ----------
@@ -66,39 +69,41 @@ class Surface(ABC):
         return self._surface.intersectInPlace(r._r)
 
     def reflect(self, r, coating=None):
-        """Calculate intersection of ray(s) with this surface, and immediately reflect the ray(s) at
-        the point(s) of intersection.
+        """Calculate intersection of ray(s) with this surface, and immediately
+        reflect the ray(s) at the point(s) of intersection.
 
         Parameters
         ----------
         r : Ray or RayVector
             Ray(s) to reflect.
-        coating : Coating (optional)
+        coating : Coating, optional
             Coating object to control reflection coefficient.
 
         Returns
         -------
         outRays : Ray or RayVector
-            New object corresponding to original ray(s) propagated and reflected.
+            New object corresponding to original ray(s) propagated and
+            reflected.
         """
         return _rayify(self._surface.reflect(r._r, coating))
 
     def reflectInPlace(self, r, coating=None):
-        """Calculate intersection of ray(s) with this surface, and immediately reflect the ray(s) at
-        the point(s) of intersection.  Same as `reflect`, but manipulates the input ray(s) in place.
+        """Calculate intersection of ray(s) with this surface, and immediately
+        reflect the ray(s) at the point(s) of intersection.  Same as `reflect`,
+        but manipulates the input ray(s) in place.
 
         Parameters
         ----------
         r : Ray or RayVector
             Ray(s) to reflect in place.
-        coating : Coating (optional)
+        coating : Coating, optional
             Coating object to control reflection coefficient.
         """
         self._surface.reflectInPlace(r._r, coating)
 
     def refract(self, r, inMedium, outMedium, coating=None):
-        """Calculate intersection of ray(s) with this surface, and immediately refract the ray(s)
-        through the surface at the point(s) of intersection.
+        """Calculate intersection of ray(s) with this surface, and immediately
+        refract the ray(s) through the surface at the point(s) of intersection.
 
         Parameters
         ----------
@@ -108,20 +113,23 @@ class Surface(ABC):
             Refractive medium on the incoming side of the surface.
         outMedium : Medium
             Refractive medium on the outgoing side of the surface.
-        coating : Coating (optional)
+        coating : Coating, optional
             Coating object to control transmission coefficient.
 
         Returns
         -------
         outRays : Ray or RayVector
-            New object corresponding to original ray(s) propagated and refracted.
+            New object corresponding to original ray(s) propagated and
+            refracted.
         """
-        return _rayify(self._surface.refract(r._r, inMedium, outMedium, coating))
+        return _rayify(self._surface.refract(
+            r._r, inMedium, outMedium, coating
+        ))
 
     def refractInPlace(self, r, inMedium, outMedium, coating=None):
-        """Calculate intersection of ray(s) with this surface, and immediately refract the ray(s)
-        through the surface at the point(s) of intersection.  Same as `refract`, but manipulates the
-        input ray(s) in place.
+        """Calculate intersection of ray(s) with this surface, and immediately
+        refract the ray(s) through the surface at the point(s) of intersection.
+        Same as `refract`, but manipulates the input ray(s) in place.
 
         Parameters
         ----------
@@ -131,14 +139,15 @@ class Surface(ABC):
             Refractive medium on the incoming side of the surface.
         outMedium : Medium
             Refractive medium on the outgoing side of the surface.
-        coating : Coating (optional)
+        coating : Coating, optional
             Coating object to control transmission coefficient.
         """
         self._surface.refractInPlace(r._r, inMedium, outMedium, coating)
 
     def rSplit(self, r, inMedium, outMedium, coating):
-        """Calculate intersection of rays with this surface, and immediately split the rays into
-        reflected and refracted rays, with appropriate fluxes.
+        """Calculate intersection of rays with this surface, and immediately
+        split the rays into reflected and refracted rays, with appropriate
+        fluxes.
 
         Parameters
         ----------
@@ -154,9 +163,12 @@ class Surface(ABC):
         Returns
         -------
         reflectedRays, refractedRays : RayVector
-            New objects corresponding to original rays propagated and reflected/refracted.
+            New objects corresponding to original rays propagated and
+            reflected/refracted.
         """
-        reflectedRays, refractedRays = self._surface.rSplit(r._r, inMedium, outMedium, coating)
+        reflectedRays, refractedRays = self._surface.rSplit(
+            r._r, inMedium, outMedium, coating
+        )
         return _rayify(reflectedRays), _rayify(refractedRays)
 
     @abstractmethod
@@ -184,10 +196,11 @@ class Surface(ABC):
 
 
 class Plane(Surface):
-    """Planar surface.  Represents the equation
+    """Planar surface.  The surface sag follows the equation:
 
-    z(x, y) = 0.
+    .. math::
 
+        z(x, y) = 0
     """
     def __init__(self, allowReverse=False):
         self._surface = _batoid.Plane(allowReverse)
@@ -217,26 +230,28 @@ class Plane(Surface):
 
 
 class Paraboloid(Surface):
-    """Surface of revolution with parabolic cross-section, and where the axis of revolution is along
-    the axis of the parabola.  Represents the equation
+    """Surface of revolution with parabolic cross-section, and where the axis
+    of revolution is along the axis of the parabola.  The surface sag follows
+    the equation
 
-    z(x, y) = z(r) = r^2 / (2 R)
+    .. math::
 
-    where r = sqrt(x^2 + y^2) and `R` is the radius of curvature at the paraboloid vertex.
+        z(x, y) = z(r) = \\frac{r^2}{2 R}
+
+    where :math:`r = \\sqrt{x^2 + y^2}` and `R` is the radius of curvature at
+    the paraboloid vertex.
 
     Parameters
     ----------
     R : float
         Radius of curvature at paraboloid vertex.
-
     """
     def __init__(self, R):
         self._surface = _batoid.Paraboloid(R)
 
     @property
     def R(self):
-        """Radius of curvature at paraboloid vertex.
-        """
+        """Radius of curvature at paraboloid vertex."""
         return self._surface.R
 
     def __hash__(self):
@@ -257,18 +272,19 @@ class Paraboloid(Surface):
 
 
 class Sphere(Surface):
-    """Spherical surface.  Represents the equation
+    """Spherical surface.  The surface sag follows the equation:
 
-    z(x, y) = z(r) = R (1 - sqrt(1-r^2/R^2))
+    .. math::
 
-    where r = sqrt(x^2 + y^2) and `R` is the radius the sphere.  Note that the center of the sphere
-    is a distance `R` above the vertex.
+        z(x, y) = z(r) = R \\left(1 - \\sqrt{1-\\frac{r^2}{R^2}}\\right)
+
+    where :math:`r = \\sqrt{x^2 + y^2}` and `R` is the radius the sphere.  Note
+    that the center of the sphere is a distance `R` above the vertex.
 
     Parameters
     ----------
     R : float
         Sphere radius.
-
     """
     def __init__(self, R):
         self._surface = _batoid.Sphere(R)
@@ -297,12 +313,16 @@ class Sphere(Surface):
 
 
 class Quadric(Surface):
-    """Surface of revolution where the cross section is a conic section.  Represents the equation
+    """Surface of revolution where the cross section is a conic section.
+    The surface sag follows the equation:
 
-    z(x, y) = z(r) = r^2 / (R (1 + sqrt(1 -r^2/R^2 (1 + conic))))
+    .. math::
 
-    where r = sqrt(x^2 + y^2), `R` is the radius of curvature at the surface vertex, and `conic` is
-    the conic constant.  Different ranges of `conic` produce different categories of surfaces:
+        z(x, y) = z(r) = \\frac{r^2}{R \\left(1 + \\sqrt{1 - \\frac{r^2}{R^2} (1 + \\kappa)}\\right)}
+
+    where :math:`r = \\sqrt{x^2 + y^2}`, `R` is the radius of curvature at the
+    surface vertex, and :math:`\\kappa` is the conic constant.  Different
+    ranges of :math:`\\kappa` indicate different categories of surfaces:
 
         conic > 0        =>  oblate ellipsoid
         conic == 0       =>  sphere
@@ -315,8 +335,7 @@ class Quadric(Surface):
     R : float
         Radius of curvature at vertex.
     conic : float
-        Conic constant.
-
+        Conic constant :math:`\\kappa`
     """
     def __init__(self, R, conic):
         self._surface = _batoid.Quadric(R, conic)
@@ -352,14 +371,20 @@ class Quadric(Surface):
 
 
 class Asphere(Surface):
-    """Surface of revolution where the cross section is a conic section plus an even polynomial.
-    Represents the equation
+    """Surface of revolution where the cross section is a conic section plus an
+    even polynomial.  Represents the equation
 
-    z(x, y) = z(r) = r^2 / (R (1 + sqrt(1 -r^2/R^2 (1 + conic)))) + sum_i alpha_i r^(2 i)
+    The surface sag follows the equation:
 
-    where r = sqrt(x^2 + y^2), `R` is the radius of curvature at the surface vertex, and `conic` is
-    the conic constant, and `alpha` are the even polynomial coefficients.  Different ranges of
-    `conic` produce different categories of surfaces (where alpha==0):
+    .. math::
+
+        z(x, y) = z(r) = \\frac{r^2}{R \\left(1 + \\sqrt{1 - \\frac{r^2}{R^2} (1 + \\kappa)}\\right)} + \\sum_i \\alpha_i r^{2 i}
+
+    where :math:`r = \\sqrt{x^2 + y^2}`, `R` is the radius of curvature at the
+    surface vertex, :math:`\\kappa` is the conic constant, and
+    :math:`\\left\\{\\alpha_i\\right\\}` are the even polynomial coefficients.
+    Different ranges of :math:`\\kappa` produce different categories of
+    surfaces (where alpha==0):
 
         conic > 0        =>  oblate ellipsoid
         conic == 0       =>  sphere
@@ -372,9 +397,9 @@ class Asphere(Surface):
     R : float
         Radius of curvature at vertex.
     conic : float
-        Conic constant.
-    alpha : list of float
-        Even polynomial coefficients.
+        Conic constant :math:`\\kappa`.
+    coefs : list of float
+        Even polynomial coefficients :math:`\\left\\{\\alpha_i\\right\\}`
     """
     def __init__(self, R, conic, coefs):
         self._surface = _batoid.Asphere(R, conic, coefs)
@@ -417,17 +442,23 @@ class Asphere(Surface):
 
 
 class Zernike(Surface):
-    """Surface defined by Zernike polynomials.  Represents the equation
+    """Surface defined by Zernike polynomials.  The surface sag follows the
+    equation:
 
-    z(x, y) = sum_j coef_j Z_j(R_inner/R_outer; x/R_outer, y/R_outer)
+    .. math::
 
-    where Z_j(eps, u, v) are the annular Zernike polynomials (Mahajan) with central obscuration
-    `eps` indexed by the Noll (1976) convention, `R_outer` is the outer radius of the annulus,
-    `R_inner` is the inner radius of the annulus, and `coef_j` are corresponding annular
+        z(x, y) = \\sum_j a_j Z_j\\left(\\epsilon; \\frac{x}{R_{outer}}, \\frac{y}{R_{outer}}\\right)
+
+    where :math:`Z_j(\\epsilon, u, v)` are the annular Zernike polynomials
+    (Mahajan) with central obscuration
+    :math:`\\epsilon = \\frac{R_{inner}}{R_{outer}}`
+    indexed by the Noll (1976) convention, :math:`R_{outer}` is the outer
+    radius of the annulus, :math:`R_{inner}` is the inner radius of the
+    annulus, and :math:`\\left\\{a_j\\right\\}` are the annular
     coefficients.
 
-    Note that the Noll convention starts at j=1, so the coef_0 = coef[0] value has no effect on the
-    surface.
+    Note that the Noll convention starts at j=1, so the :math:`a_0` =
+    ``coef[0]`` value has no effect on the surface.
 
     Parameters
     ----------
@@ -466,20 +497,11 @@ class Zernike(Surface):
         """
         return self._R_inner
 
-    @property
-    def gradX(self):
-        """Gradient of Zernike surface in the x direction as a new Zernike object.
-        """
-        return Zernike(self.Z.gradX.coef, self.R_outer, self.R_inner)
-
-    @property
-    def gradY(self):
-        """Gradient of Zernike surface in the y direction as a new Zernike object.
-        """
-        return Zernike(self.Z.gradY.coef, self.R_outer, self.R_inner)
-
     def __hash__(self):
-        return hash(("batoid.Zernike", tuple(self.coef), self.R_outer, self.R_inner))
+        return hash((
+            "batoid.Zernike",
+            tuple(self.coef), self.R_outer, self.R_inner
+        ))
 
     def __setstate__(self, args):
         self.__init__(*args)
@@ -494,7 +516,9 @@ class Zernike(Surface):
                 self.R_inner == rhs.R_inner)
 
     def __repr__(self):
-        return "Zernike({!r}, {!r}, {!r})".format(self.coef, self.R_outer, self.R_inner)
+        return "Zernike({!r}, {!r}, {!r})".format(
+            self.coef, self.R_outer, self.R_inner
+        )
 
 
 class Bicubic(Surface):
@@ -513,7 +537,9 @@ class Bicubic(Surface):
     d2zdxdys : array_like, optional
         2d array indicating mixed derivatives d^2 z / (dx dy) at grid points.
     """
-    def __init__(self, xs, ys, zs, dzdxs=None, dzdys=None, d2zdxdys=None, _slopFrac=1e-4):
+    def __init__(self, xs, ys, zs,
+                 dzdxs=None, dzdys=None, d2zdxdys=None,
+                 _slopFrac=1e-4):
         self._xs = np.ascontiguousarray(xs)
         self._ys = np.ascontiguousarray(ys)
         self._zs = np.ascontiguousarray(zs)
@@ -541,9 +567,11 @@ class Bicubic(Surface):
         self._d2zdxdys = np.ascontiguousarray(d2zdxdys)
         self._slopFrac = _slopFrac
 
-        self._surface = _batoid.Bicubic(self._xs, self._ys, self._zs,
-                                        self._dzdxs, self._dzdys, self._d2zdxdys,
-                                        self._slopFrac)
+        self._surface = _batoid.Bicubic(
+            self._xs, self._ys, self._zs,
+            self._dzdxs, self._dzdys, self._d2zdxdys,
+            self._slopFrac
+        )
 
     @property
     def xs(self):
@@ -570,9 +598,11 @@ class Bicubic(Surface):
         return self._d2zdxdys
 
     def __hash__(self):
-        return hash(("Bicubic", tuple(self.xs), tuple(self.ys), tuple(self.zs.ravel()),
-                     tuple(self.dzdxs.ravel()), tuple(self.dzdys.ravel()),
-                     tuple(self.d2zdxdys.ravel())))
+        return hash((
+            "Bicubic", tuple(self.xs), tuple(self.ys), tuple(self.zs.ravel()),
+            tuple(self.dzdxs.ravel()), tuple(self.dzdys.ravel()),
+            tuple(self.d2zdxdys.ravel())
+        ))
 
     def __setstate__(self, args):
         (self._xs, self._ys, self._zs,
@@ -584,7 +614,10 @@ class Bicubic(Surface):
                                         self._slopFrac)
 
     def __getstate__(self):
-        return self.xs, self.ys, self.zs, self.dzdxs, self.dzdys, self.d2zdxdys, self._slopFrac
+        return (
+            self.xs, self.ys, self.zs,
+            self.dzdxs, self.dzdys, self.d2zdxdys, self._slopFrac
+        )
 
     def __eq__(self, rhs):
         if not isinstance(rhs, Bicubic): return False
@@ -601,17 +634,19 @@ class Bicubic(Surface):
 
 
 class Sum(Surface):
-    """Composite surface combining two or more other Surfaces through addition.  Represents the
-    equation
+    """Composite surface combining two or more other Surfaces through addition.
+    The surface sag follows the equation:
 
-    z(x, y) = sum_i S_i(x, y)
+    .. math::
 
-    where S_i is the ith input Surface.
+        z(x, y) = \\sum_i S_i(x, y)
+
+    where :math:`S_i` is the ith input `Surface`.
 
     Parameters
     ----------
     surfaces : list of Surface
-        `Surface`s to add together.
+        `Surface` s to add together.
     """
     def __init__(self, surfaces):
         self._surfaces = surfaces
@@ -619,8 +654,7 @@ class Sum(Surface):
 
     @property
     def surfaces(self):
-        """List of constituent `Surface`s.
-        """
+        """List of constituent `Surface` s."""
         return self._surfaces
 
     def __hash__(self):

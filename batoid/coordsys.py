@@ -18,38 +18,18 @@ class CoordSys:
     """A coordinate system against which to measure Surfaces or Rays.
 
     Coordinate systems consist of an origin and a rotation.  The `origin`
-    attribute specifies where in 3D space the current coordinate system's origin
-    lands in the global coordinate system.  The rotation `rot` specifies the
-    3D rotation matrix to apply to the global coordinate axes to yield the
+    attribute specifies where in 3D space the current coordinate system's
+    origin lands in the global coordinate system.  The rotation `rot` specifies
+    the 3D rotation matrix to apply to the global coordinate axes to yield the
     axes of the this coordinate system.
 
 
     Parameters
     ----------
-    origin : (3,) array of float
+    origin : ndarray of float, shape (3,)
         Origin of coordinate system in global coordinates.
-    rot : (3, 3) array of float
+    rot : ndarray of float, shape (3, 3)
         Rotation matrix taking global axes into current system axes.
-
-
-    Attributes
-    ----------
-    origin
-    rot
-    xhat, yhat, zhat : (3,) array of float
-        Orientation of local x, y, z vector in global coordinates.
-
-
-    Methods
-    -------
-    shiftGlobal(dr)
-        Return new CoordSys with origin shifted along global axes.
-    shiftLocal(dr)
-        Return new CoordSys with origin shifted along local axes.
-    rotateGlobal(rot, rotCenter, coordSys)
-        Return new CoordSys with axes rotated wrt global coordinates.
-    rotateLocal(rot, rotCenter, coordSys)
-        Return new CoordSys with axes rotated wrt local coordinates.
     """
     def __init__(self, origin=None, rot=None):
         if origin is None:
@@ -71,22 +51,37 @@ class CoordSys:
 
     @property
     def origin(self):
+        """ndarray of float, shape (3,): Origin of coordinate system in global
+        coordinates.
+        """
         return self._coordSys.origin
 
     @property
     def rot(self):
+        """ndarray of float, shape (3, 3): Rotation matrix taking global axes
+        into current system axes.
+        """
         return self._coordSys.rot
 
     @property
     def xhat(self):
+        """ndarray of float, shape (3,): Orientation of local x vector in
+        global coordinates.
+        """
         return self._coordSys.xhat
 
     @property
     def yhat(self):
+        """ndarray of float, shape (3,): Orientation of local y vector in
+        global coordinates.
+        """
         return self._coordSys.yhat
 
     @property
     def zhat(self):
+        """ndarray of float, shape (3,): Orientation of local z vector in
+        global coordinates.
+        """
         return self._coordSys.zhat
 
     def __repr__(self):
@@ -97,12 +92,12 @@ class CoordSys:
 
         Parameters
         ----------
-        dr : (3,) array of float
-            Amount to shift.
+        dr : ndarray of float, shape (3,)
+            Amount to shift in meters.
 
         Returns
         -------
-        newCoordSys : CoordSys
+        CoordSys
         """
         return CoordSys._fromCoordSys(self._coordSys.shiftGlobal(dr))
 
@@ -111,12 +106,12 @@ class CoordSys:
 
         Parameters
         ----------
-        dr : (3,) array of float
-            Amount to shift.
+        dr : ndarray of float, shape (3,)
+            Amount to shift in meters.
 
         Returns
         -------
-        newCoordSys : CoordSys
+        CoordSys
         """
         return CoordSys._fromCoordSys(self._coordSys.shiftLocal(dr))
 
@@ -125,40 +120,44 @@ class CoordSys:
 
         Parameters
         ----------
-        rot : (3, 3) array of float
+        rot : ndarray of float, shape (3, 3)
             Rotation matrix to apply.
-        rotCenter : (3,) array of float
+        rotCenter : ndarray of float, shape (3,)
             Point about which to rotate.
         coordSys : CoordSys
             Coordinate system in which rotCenter is specified.
 
         Returns
         -------
-        newCoordSys : CoordSys
+        CoordSys
         """
         if coordSys is None:
             coordSys = self
-        return CoordSys._fromCoordSys(self._coordSys.rotateGlobal(rot, rotCenter, coordSys._coordSys))
+        return CoordSys._fromCoordSys(
+            self._coordSys.rotateGlobal(rot, rotCenter, coordSys._coordSys)
+        )
 
     def rotateLocal(self, rot, rotCenter=(0,0,0), coordSys=None):
         """Return new CoordSys rotated with respect to local axes.
 
         Parameters
         ----------
-        rot : (3, 3) array of float
+        rot : ndarray of float, shape (3, 3)
             Rotation matrix to apply.
-        rotCenter : (3,) array of float
+        rotCenter : ndarray of float, shape (3,)
             Point about which to rotate.
         coordSys : CoordSys
             Coordinate system in which rotCenter is specified.
 
         Returns
         -------
-        newCoordSys : CoordSys
+        CoordSys
         """
         if coordSys is None:
             coordSys = self
-        return CoordSys._fromCoordSys(self._coordSys.rotateLocal(rot, rotCenter, coordSys._coordSys))
+        return CoordSys._fromCoordSys(
+            self._coordSys.rotateLocal(rot, rotCenter, coordSys._coordSys)
+        )
 
     def __eq__(self, rhs):
         if not isinstance(rhs, CoordSys): return False
@@ -176,18 +175,16 @@ class CoordTransform:
 
     Parameters
     ----------
-    fromSys, toSys : CoordSys
-        Origin and destination coordinate systems.
-
-    Methods
-    -------
-    applyForward(*args)
-        Apply forward-direction transformation.
-    applyReverse(*args)
-        Apply reverse-direction transformation.
+    fromSys : CoordSys
+        Origin coordinate systems.
+    toSys : CoordSys
+        Destination coordinate systems.
     """
     def __init__(self, fromSys, toSys):
-        self._coordTransform = _batoid.CoordTransform(fromSys._coordSys, toSys._coordSys)
+        self._coordTransform = _batoid.CoordTransform(
+            fromSys._coordSys,
+            toSys._coordSys
+        )
 
     def applyForward(self, arg1, arg2=None, arg3=None):
         """Apply forward-direction transformation.
@@ -209,7 +206,9 @@ class CoordTransform:
         elif isinstance(arg1, Ray):
             return Ray._fromRay(self._coordTransform.applyForward(arg1._r))
         elif isinstance(arg1, RayVector):
-            return RayVector._fromRayVector(self._coordTransform.applyForward(arg1._r))
+            return RayVector._fromRayVector(
+                self._coordTransform.applyForward(arg1._r)
+            )
         else:
             return self._coordTransform.applyForward(arg1)
 
@@ -233,7 +232,9 @@ class CoordTransform:
         elif isinstance(arg1, Ray):
             return Ray._fromRay(self._coordTransform.applyReverse(arg1._r))
         elif isinstance(arg1, RayVector):
-            return RayVector._fromRayVector(self._coordTransform.applyReverse(arg1._r))
+            return RayVector._fromRayVector(
+                self._coordTransform.applyReverse(arg1._r)
+            )
         else:
             return self._coordTransform.applyReverse(arg1)
 
