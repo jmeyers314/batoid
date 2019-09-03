@@ -82,7 +82,7 @@ def huygensPSF(optic, theta_x, theta_y, wavelength,
         optic.dist, wavelength,
         dirCos=dirCos, nx=nx, lx=optic.pupilSize,
         medium=optic.inMedium,
-        interface=optic.entrancePupil
+        stopSurface=optic.stopSurface
     )
 
     amplitudes = np.zeros((nxOut*pad_factor, nxOut*pad_factor), dtype=np.complex128)
@@ -148,7 +148,7 @@ def wavefront(optic, theta_x, theta_y, wavelength,
         nx=nx, lx=optic.pupilSize,
         dirCos=dirCos,
         medium=optic.inMedium,
-        interface=optic.entrancePupil
+        stopSurface=optic.stopSurface
     )
 
     if sphereRadius is None:
@@ -303,12 +303,12 @@ def zernike(optic, theta_x, theta_y, wavelength,
         nx=nx, lx=optic.pupilSize,
         dirCos=dirCos,
         medium=optic.inMedium,
-        interface=optic.entrancePupil
+        stopSurface=optic.stopSurface
     )
     # Propagate to entrance pupil to get positions
-    transform = batoid.CoordTransform(batoid.globalCoordSys, optic.entrancePupil.coordSys)
+    transform = batoid.CoordTransform(batoid.globalCoordSys, optic.stopSurface.coordSys)
     epRays = transform.applyForward(rays)
-    optic.entrancePupil.surface.intersectInPlace(epRays)
+    optic.stopSurface.surface.intersectInPlace(epRays)
     orig_x = np.array(epRays.x).reshape(nx, nx)
     orig_y = np.array(epRays.y).reshape(nx, nx)
 
@@ -401,13 +401,13 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
         spokes=spokes,
         spacing='GQ',
         medium=optic.inMedium,
-        interface=optic.entrancePupil
+        stopSurface=optic.stopSurface
     )
 
-    # Trace to entrancePupil to get points at which to evalue Zernikes
-    transform = batoid.CoordTransform(batoid.globalCoordSys, optic.entrancePupil.coordSys)
+    # Trace to stopSurface to get points at which to evalue Zernikes
+    transform = batoid.CoordTransform(batoid.globalCoordSys, optic.stopSurface.coordSys)
     epRays = transform.applyForward(rays)
-    optic.entrancePupil.surface.intersectInPlace(epRays)
+    optic.stopSurface.surface.intersectInPlace(epRays)
 
     basis = galsim.zernike.zernikeBasis(
         jmax, epRays.x, epRays.y,
@@ -426,12 +426,12 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
         w = np.where(1-rays.vignetted)[0]
         point = np.mean(rays.r[w], axis=0)
     elif reference == 'chief':
-        chiefRay = batoid.Ray.fromPupil(
+        chiefRay = batoid.Ray.fromStop(
             0.0, 0.0,
             optic.dist, wavelength,
             dirCos=dirCos,
             medium=optic.inMedium,
-            interface=optic.entrancePupil
+            stopSurface=optic.stopSurface
         )
         optic.traceInPlace(chiefRay, outCoordSys=batoid.globalCoordSys)
         point = chiefRay.r

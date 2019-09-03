@@ -7,8 +7,8 @@ from .constants import vacuum, globalCoordSys
 from .coordsys import CoordSys, CoordTransform
 
 class Ray:
-    """A geometric ray to trace through an optical system.  May also be
-    thought of as a monochromatic propagating plane wave.
+    """A geometric ray to trace through an optical system.  May also be thought
+    of as a monochromatic propagating plane wave.
 
     Parameters
     ----------
@@ -49,19 +49,67 @@ class Ray:
         return ret
 
     @classmethod
-    def fromPupil(cls, x, y,
-                  dist, wavelength,
-                  source=None, dirCos=None,
-                  flux=1, medium=vacuum,
-                  interface=None):
+    def fromStop(cls, x, y,
+                 dist, wavelength,
+                 source=None, dirCos=None,
+                 flux=1, medium=vacuum,
+                 stopSurface=None):
+        """Create a Ray that intersects the "stop" surface at a given point.
+
+        The algorithm used here starts by placing the ray on the "stop"
+        surface, and then backing it up such that it is in front of any
+        surfaces of the optic it's intended to trace.
+
+        The stop surface of most large telescopes is the plane perpendicular to
+        the optic axis and flush with the rim of the primary mirror.  This
+        plane is usually also the entrance pupil since there are no earlier
+        refractive or reflective surfaces.  However, since this plane is a bit
+        difficult to locate automatically, the default stop surface in batoid
+        is the global x-y plane.
+
+        If a telescope has an stopSurface attribute in its yaml file, then this
+        is usually a good choice to use in this function.  Using a curved
+        surface for the stop surface is allowed, but is usually a bad idea as
+        this may lead to a non-uniformly illuminated pupil and is inconsistent
+        with, say, an incoming uniform spherical wave or uniform plane wave.
+
+        Parameters
+        ----------
+        x, y : float
+            X/Y coordinates on the stop surface where the ray would intersect
+            if not refracted or reflected first.
+        dist : float
+            Map ray backwards from the stop surface to the plane that is
+            perpendicular to the ray velocity and ``dist`` meters from the
+            point (0, 0, z(0,0)) on the stop surface.  This should generally be
+            set large enough that any obscurations or phantom surfaces occuring
+            before the stop surface are "in front" of the ray.
+        wavelength : float
+            Vacuum wavelength of ray in meters.
+        source : None or ndarray of float, shape (3,), optional
+            Where the ray originates.  If None, then the ray originates an
+            infinite distance away, in which case the ``dirCos`` kwarg must also
+            be specified to set the direction of ray propagation.  If an
+            ndarray, then the ray originates from this point in global
+            coordinates and the ``dirCos`` kwarg is ignored.
+        dirCos : ndarray of float, shape (3,), optional
+            If source is None, then indicates the direction of ray propagation.
+            If source is not None, then this is ignored.
+        flux : float, optional
+            Flux of ray.  Default is 1.0.
+        medium : batoid.Medium, optional
+            Initial medium of Ray.  Default is vacuum.
+        stopSurface : batoid.Interface, optional
+            Surface defining the system stop.  Default: ``Interface(Plane())``.
+        """
         from .optic import Interface
         from .surface import Plane
 
-        if interface is None:
-            interface = Interface(Plane())
+        if stopSurface is None:
+            stopSurface = Interface(Plane())
 
-        z = interface.surface.sag(x, y)
-        transform = CoordTransform(interface.coordSys, globalCoordSys)
+        z = stopSurface.surface.sag(x, y)
+        transform = CoordTransform(stopSurface.coordSys, globalCoordSys)
         x, y, z = transform.applyForward(x, y, z)
 
         t = 0.0
@@ -172,15 +220,16 @@ class Ray:
 
     @property
     def v(self):
-        """ndarray of float, shape (3,): Velocity of ray in units of the speed of light in vacuum.
-        Note that this may have magnitude < 1 if the ray is inside a refractive medium.
+        """ndarray of float, shape (3,): Velocity of ray in units of the speed
+        of light in vacuum. Note that this may have magnitude < 1 if the ray is
+        inside a refractive medium.
         """
         return self._r.v
 
     @property
     def t(self):
-        """Reference time (divided by the speed of light in vacuum) in units of meters, also known
-        as the optical path length.
+        """Reference time (divided by the speed of light in vacuum) in units of
+        meters, also known as the optical path length.
         """
         return self._r.t
 
@@ -201,8 +250,8 @@ class Ray:
 
     @property
     def failed(self):
-        """True if ray is in a failed state.  This may occur, for example, if batoid failed to find
-        the intersection of a ray with a surface.
+        """True if ray is in a failed state.  This may occur, for example, if
+        batoid failed to find the intersection of a ray with a surface.
         """
         return self._r.failed
 
@@ -223,24 +272,31 @@ class Ray:
 
     @property
     def vx(self):
-        """The x component of the ray velocity in units of the vacuum speed of light."""
+        """The x component of the ray velocity in units of the vacuum speed of
+        light.
+        """
         return self._r.vx
 
     @property
     def vy(self):
-        """The y component of the ray velocity in units of the vacuum speed of light."""
+        """The y component of the ray velocity in units of the vacuum speed of
+        light.
+        """
         return self._r.vy
 
     @property
     def vz(self):
-        """The z component of the ray velocity in units of the vacuum speed of light."""
+        """The z component of the ray velocity in units of the vacuum speed of
+        light.
+        """
         return self._r.vz
 
     @property
     def k(self):
-        """ndarray of float, shape (3,): Wavevector of plane wave in units of radians per meter.
-        The magnitude of the wavevector is equal to :math:`2 \pi n / \lambda`, where :math:`n` is
-        the refractive index and :math:`\lambda` is the wavelength.
+        r"""ndarray of float, shape (3,): Wavevector of plane wave in units of
+        radians per meter.  The magnitude of the wavevector is equal to
+        :math:`2 \pi n / \lambda`, where :math:`n` is the refractive index and
+        :math:`\lambda` is the wavelength.
         """
         return self._r.k
 
@@ -261,8 +317,9 @@ class Ray:
 
     @property
     def omega(self):
-        """The temporal angular frequency of the plane wave divided by the vacuum speed of light in
-        units of radians per meter.  Equals :math:`2 \pi / \lambda`.
+        r"""The temporal angular frequency of the plane wave divided by the
+        vacuum speed of light in units of radians per meter.  Equals
+        :math:`2 \pi / \lambda`.
         """
         return self._r.omega
 
