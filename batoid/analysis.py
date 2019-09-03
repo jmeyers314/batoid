@@ -23,12 +23,14 @@ def huygensPSF(optic, theta_x, theta_y, wavelength,
     nx : int, optional
         Size of ray grid to use.
     dx, dy : float, optional
-        Lattice scales to use for PSF evaluation locations.  Default, use fftPSF lattice.
+        Lattice scales to use for PSF evaluation locations.  Default, use
+        fftPSF lattice.
     nxOut : int, optional
         Size of the output lattice.  Default is to use nx.
     reference : {'chief', 'mean'}
-        If 'chief', then center the output lattice where the chief ray intersecs the focal plane.
-        If 'mean', then center at the mean non-vignetted ray intersection.
+        If 'chief', then center the output lattice where the chief ray
+        intersects the focal plane.  If 'mean', then center at the mean
+        non-vignetted ray intersection.
 
     Returns
     -------
@@ -39,29 +41,46 @@ def huygensPSF(optic, theta_x, theta_y, wavelength,
     -----
     The Huygens construction is to evaluate the PSF as
 
-    I(x) \propto \Sum_u exp(i phi(u)) exp(i k(u).r)
+    .. math::
 
-    The u are assumed to uniformly sample the entrance pupil, but not include any rays that get
-    vignetted before they reach the focal plane.  The phis are the phases of the exit rays evaluated
-    at a single arbitrary time.  The k(u) indicates the conversion of the uniform entrance pupil
-    samples into nearly (though not exactly) uniform samples in k-space of the output rays.
+        I(x) \propto \sum_u \exp(i \phi(u)) \exp(i k(u) \cdot r)
 
-    The output locations where the PSF is evaluated are governed by dx, dy and nx.  If dx and dy are
-    None, then the same lattice as in fftPSF will be used.  If dx and dy are scalars, then a lattice
-    with primitive vectors [dx, 0] and [0, dy] will be used.  If dx and dy are 2-vectors, then those
-    will be the primitive vectors of the output lattice.
+    The :math:`u` are assumed to uniformly sample the entrance pupil, but not
+    include any rays that get vignetted before they reach the focal plane.  The
+    :math:`\phi` s are the phases of the exit rays evaluated at a single
+    arbitrary time.  The :math:`k(u)` indicates the conversion of the uniform
+    entrance pupil samples into nearly (though not exactly) uniform samples in
+    k-space of the output rays.
+
+    The output locations where the PSF is evaluated are governed by ``dx``,
+    ``dy``, and ``nx``.  If ``dx`` and ``dy`` are None, then the same lattice
+    as in fftPSF will be used.  If ``dx`` and ``dy`` are scalars, then a
+    lattice with primitive vectors ``[dx, 0]`` and ``[0, dy]`` will be used.
+    If ``dx`` and ``dy`` are 2-vectors, then those will be the primitive
+    vectors of the output lattice.
     """
     from numbers import Real
 
     if dx is None:
         if (nx%2) == 0:
-            primitiveU = np.array([[optic.pupilSize/(nx-2),0], [0, optic.pupilSize/(nx-2)]])
+            primitiveU = np.array(
+                [[optic.pupilSize/(nx-2),0],
+                 [0, optic.pupilSize/(nx-2)]]
+            )
         else:
-            primitiveU = np.array([[optic.pupilSize/(nx-1),0], [0, optic.pupilSize/(nx-1)]])
-        primitiveK = dkdu(optic, theta_x, theta_y, wavelength, projection=projection).dot(primitiveU)
+            primitiveU = np.array(
+                [[optic.pupilSize/(nx-1),0],
+                 [0, optic.pupilSize/(nx-1)]]
+            )
+        primitiveK = dkdu(
+            optic, theta_x, theta_y, wavelength,
+            projection=projection
+        ).dot(primitiveU)
         pad_factor = 2
         primitiveX = np.vstack(
-            reciprocalLatticeVectors(primitiveK[0], primitiveK[1], pad_factor*nx)
+            reciprocalLatticeVectors(
+                primitiveK[0], primitiveK[1], pad_factor*nx
+            )
         )
     elif isinstance(dx, Real):
         if dy is None:
@@ -85,8 +104,14 @@ def huygensPSF(optic, theta_x, theta_y, wavelength,
         stopSurface=optic.stopSurface
     )
 
-    amplitudes = np.zeros((nxOut*pad_factor, nxOut*pad_factor), dtype=np.complex128)
-    out = batoid.Lattice(np.zeros((nxOut*pad_factor, nxOut*pad_factor), dtype=float), primitiveX)
+    amplitudes = np.zeros(
+        (nxOut*pad_factor, nxOut*pad_factor),
+        dtype=np.complex128
+    )
+    out = batoid.Lattice(
+        np.zeros((nxOut*pad_factor, nxOut*pad_factor), dtype=float),
+        primitiveX
+    )
 
     rays, outCoordSys = optic.traceInPlace(rays)
     if reference == 'mean':
@@ -127,13 +152,15 @@ def wavefront(optic, theta_x, theta_y, wavelength,
     nx : int, optional
         Size of ray grid to use.
     sphereRadius : float, optional
-        The radius of the reference sphere.  Nominally this should be set to the distance to the
-        exit pupil, though the calculation is usually not very sensitive to this.  Many of the
-        telescopes that come with batoid have values for this set in their yaml files, which will
-        be used if this is None.
+        The radius of the reference sphere.  Nominally this should be set to
+        the distance to the exit pupil, though the calculation is usually not
+        very sensitive to this.  Many of the telescopes that come with batoid
+        have values for this set in their yaml files, which will be used if
+        this is None.
     reference : {'chief', 'mean'}
-        If 'chief', then center the output lattice where the chief ray intersecs the focal plane.
-        If 'mean', then center at the mean non-vignetted ray intersection.
+        If 'chief', then center the output lattice where the chief ray
+        intersects the focal plane.  If 'mean', then center at the mean
+        non-vignetted ray intersection.
 
     Returns
     -------
@@ -162,10 +189,11 @@ def wavefront(optic, theta_x, theta_y, wavelength,
         cridx = (nx//2)*nx+nx//2 if (nx%2)==0 else (nx*nx-1)//2
         point = rays[cridx].r
 
-    # Place vertex of reference sphere one radius length away from the intersection point.
-    # So transform our rays into that coordinate system.
+    # Place vertex of reference sphere one radius length away from the
+    # intersection point.  So transform our rays into that coordinate system.
     transform = batoid.CoordTransform(
-        batoid.globalCoordSys, batoid.CoordSys(point+np.array([0,0,sphereRadius]))
+        batoid.globalCoordSys,
+        batoid.CoordSys(point+np.array([0,0,sphereRadius]))
     )
     transform.applyForwardInPlace(rays)
 
@@ -177,7 +205,10 @@ def wavefront(optic, theta_x, theta_y, wavelength,
         t0 = np.mean(rays.t[w])
     elif reference == 'chief':
         t0 = rays[cridx].t
-    arr = np.ma.masked_array((t0-rays.t)/wavelength, mask=rays.vignetted).reshape(nx, nx)
+    arr = np.ma.masked_array(
+        (t0-rays.t)/wavelength,
+        mask=rays.vignetted
+    ).reshape(nx, nx)
     if (nx%2) == 0:
         primitiveVectors = np.vstack(
             [[optic.pupilSize/(nx-2), 0],
@@ -211,13 +242,15 @@ def fftPSF(optic, theta_x, theta_y, wavelength,
     pad_factor : int, optional
         Factor by which to pad pupil array.  Default: 2
     sphereRadius : float, optional
-        The radius of the reference sphere.  Nominally this should be set to the distance to the
-        exit pupil, though the calculation is usually not very sensitive to this.  Many of the
-        telescopes that come with batoid have values for this set in their yaml files, which will
-        be used if this is None.
+        The radius of the reference sphere.  Nominally this should be set to
+        the distance to the exit pupil, though the calculation is usually not
+        very sensitive to this.  Many of the telescopes that come with batoid
+        have values for this set in their yaml files, which will be used if
+        this is None.
     reference : {'chief', 'mean'}
-        If 'chief', then center the output lattice where the chief ray intersecs the focal plane.
-        If 'mean', then center at the mean non-vignetted ray intersection.
+        If 'chief', then center the output lattice where the chief ray
+        intersects the focal plane.  If 'mean', then center at the mean
+        non-vignetted ray intersection.
 
     Returns
     -------
@@ -225,19 +258,28 @@ def fftPSF(optic, theta_x, theta_y, wavelength,
         A batoid.Lattice object containing the relative PSF values and
         the primitive lattice vectors of the focal plane grid.
     """
-    wf = wavefront(optic, theta_x, theta_y, wavelength, nx=nx, projection=projection,
-                   sphereRadius=sphereRadius, reference=reference)
+    wf = wavefront(
+        optic, theta_x, theta_y, wavelength,
+        nx=nx, projection=projection,
+        sphereRadius=sphereRadius, reference=reference
+    )
     wfarr = wf.array
     pad_size = nx*pad_factor
     expwf = np.zeros((pad_size, pad_size), dtype=np.complex128)
     start = pad_size//2-nx//2
     stop = pad_size//2+nx//2
-    expwf[start:stop, start:stop][~wfarr.mask] = np.exp(2j*np.pi*wfarr[~wfarr.mask])
+    expwf[start:stop, start:stop][~wfarr.mask] = \
+        np.exp(2j*np.pi*wfarr[~wfarr.mask])
     psf = np.abs(np.fft.fftshift(np.fft.fft2(expwf)))**2
 
     primitiveU = wf.primitiveVectors
-    primitiveK = dkdu(optic, theta_x, theta_y, wavelength, projection=projection).dot(primitiveU)
-    primitiveX = np.vstack(reciprocalLatticeVectors(primitiveK[0], primitiveK[1], pad_size))
+    primitiveK = dkdu(
+        optic, theta_x, theta_y, wavelength,
+        projection=projection
+    ).dot(primitiveU)
+    primitiveX = np.vstack(
+        reciprocalLatticeVectors(primitiveK[0], primitiveK[1], pad_size)
+    )
 
     return batoid.Lattice(psf, primitiveX)
 
@@ -247,9 +289,10 @@ def zernike(optic, theta_x, theta_y, wavelength,
             sphereRadius=None, reference='mean', jmax=22, eps=0.0):
     """Compute Zernike polynomial decomposition of the wavefront.
 
-    This calculation propagates a square grid of rays to the exit pupil reference sphere where the
-    wavefront is computed.  The optical path differences of non-vignetted rays are then fit to
-    Zernike polynomial coefficients numerically.
+    This calculation propagates a square grid of rays to the exit pupil
+    reference sphere where the wavefront is computed.  The optical path
+    differences of non-vignetted rays are then fit to Zernike polynomial
+    coefficients numerically.
 
 
     Parameters
@@ -265,17 +308,20 @@ def zernike(optic, theta_x, theta_y, wavelength,
     nx : int, optional
         Size of ray grid to use.
     sphereRadius : float, optional
-        The radius of the reference sphere.  Nominally this should be set to the distance to the
-        exit pupil, though the calculation is usually not very sensitive to this.  Many of the
-        telescopes that come with batoid have values for this set in their yaml files, which will
-        be used if this is None.
+        The radius of the reference sphere.  Nominally this should be set to
+        the distance to the exit pupil, though the calculation is usually not
+        very sensitive to this.  Many of the telescopes that come with batoid
+        have values for this set in their yaml files, which will be used if
+        this is None.
     reference : {'chief', 'mean'}
-        If 'chief', then center the output lattice where the chief ray intersecs the focal plane.
-        If 'mean', then center at the mean non-vignetted ray intersection.
+        If 'chief', then center the output lattice where the chief ray
+        intersects the focal plane.  If 'mean', then center at the mean
+        non-vignetted ray intersection.
     jmax : int, optional
         Number of coefficients to compute.  Default: 12.
     eps : float, optional
-        Use annular Zernike polynomials with this fractional inner radius.  Default: 0.0.
+        Use annular Zernike polynomials with this fractional inner radius.
+        Default: 0.0.
 
     Returns
     -------
@@ -284,15 +330,18 @@ def zernike(optic, theta_x, theta_y, wavelength,
 
     Notes
     -----
-    Zernike coefficients are indexed following the Noll convention.  Additionally, since python
-    lists start at 0, but the Noll convention starts at 1, the 0-th index of the returned array is
-    meaningless.  I.e., zernikes[1] is piston, zernikes[4] is defocus, and so on...
+    Zernike coefficients are indexed following the Noll convention.
+    Additionally, since python lists start at 0, but the Noll convention starts
+    at 1, the 0-th index of the returned array is meaningless.  I.e.,
+    zernikes[1] is piston, zernikes[4] is defocus, and so on...
 
-    Also, since Zernike polynomials are orthogonal over a circle or annulus, but vignetting may make
-    the actual wavefront region of support something different, the values of fit coefficients can
-    depend on the total number of coefficients being fit.  For example, the j=4 (defocus)
-    coefficient may depend on whether jmax=11 and jmax=21 (or some other value).  See the zernikeGQ
-    function for an alternative algorithm that is independent of jmax.
+    Also, since Zernike polynomials are orthogonal over a circle or annulus,
+    but vignetting may make the actual wavefront region of support something
+    different, the values of fit coefficients can depend on the total number of
+    coefficients being fit.  For example, the j=4 (defocus) coefficient may
+    depend on whether jmax=11 and jmax=21 (or some other value).  See the
+    zernikeGQ function for an alternative algorithm that is independent of
+    jmax.
     """
     import galsim
 
@@ -306,7 +355,9 @@ def zernike(optic, theta_x, theta_y, wavelength,
         stopSurface=optic.stopSurface
     )
     # Propagate to entrance pupil to get positions
-    transform = batoid.CoordTransform(batoid.globalCoordSys, optic.stopSurface.coordSys)
+    transform = batoid.CoordTransform(
+        batoid.globalCoordSys, optic.stopSurface.coordSys
+    )
     epRays = transform.applyForward(rays)
     optic.stopSurface.surface.intersectInPlace(epRays)
     orig_x = np.array(epRays.x).reshape(nx, nx)
@@ -334,9 +385,10 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
               jmax=22, eps=None):
     """Compute Zernike polynomial decomposition of the wavefront.
 
-    This calculation uses Gaussian Quadrature points and weights to compute the Zernike
-    decomposition of the wavefront.  The wavefront values at the GQ points are determined by tracing
-    from the entrance pupil to the exit pupil reference sphere, and evaluating the optical path
+    This calculation uses Gaussian Quadrature points and weights to compute the
+    Zernike decomposition of the wavefront.  The wavefront values at the GQ
+    points are determined by tracing from the entrance pupil to the exit pupil
+    reference sphere, and evaluating the optical path
     differences on this sphere.
 
     Parameters
@@ -354,17 +406,20 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
     spokes : int, optional
         Number of Gaussian quadrature spokes to use.  Default: 2*rings + 1
     sphereRadius : float, optional
-        The radius of the reference sphere.  Nominally this should be set to the distance to the
-        exit pupil, though the calculation is usually not very sensitive to this.  Many of the
-        telescopes that come with batoid have values for this set in their yaml files, which will
-        be used if this is None.
+        The radius of the reference sphere.  Nominally this should be set to
+        the distance to the exit pupil, though the calculation is usually not
+        very sensitive to this.  Many of the telescopes that come with batoid
+        have values for this set in their yaml files, which will be used if
+        this is None.
     reference : {'chief', 'mean'}
-        If 'chief', then center the output lattice where the chief ray intersecs the focal plane.
-        If 'mean', then center at the mean non-vignetted ray intersection.
+        If 'chief', then center the output lattice where the chief ray
+        intersects the focal plane.  If 'mean', then center at the mean
+        non-vignetted ray intersection.
     jmax : int, optional
         Number of coefficients to compute.  Default: 12.
     eps : float, optional
-        Use annular Zernike polynomials with this fractional inner radius.  Default: 0.0.
+        Use annular Zernike polynomials with this fractional inner radius.
+        Default: 0.0.
 
     Returns
     -------
@@ -373,19 +428,24 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
 
     Notes
     -----
-    Zernike coefficients are indexed following the Noll convention.  Additionally, since python
-    lists start at 0, but the Noll convention starts at 1, the 0-th index of the returned array is
-    meaningless.  I.e., zernikes[1] is piston, zernikes[4] is defocus, and so on...
+    Zernike coefficients are indexed following the Noll convention.
+    Additionally, since python lists start at 0, but the Noll convention starts
+    at 1, the 0-th index of the returned array is meaningless.  I.e.,
+    zernikes[1] is piston, zernikes[4] is defocus, and so on...
 
-    This algorithm takes advantage of the fact that Zernike polynomials are orthogonal on a circle
-    or annulus to compute the value of individual coefficients via an integral:
+    This algorithm takes advantage of the fact that Zernike polynomials are
+    orthogonal on a circle or annulus to compute the value of individual
+    coefficients via an integral:
 
-        a_j \propto \int Z_j W
+    .. math::
 
-    This integral is approximated using Gaussian quadrature.  Since the above integral depends on
-    orthogonality, the wavefront must be decomposed over a circular or annular region of support.
-    As such, this algorithm is unaffected by vignetting.  It is required that no rays fail to be
-    traced, even in vignetted regions.
+        a_j \propto \int Z_j(x, y) W(x, y) dx dy
+
+    This integral is approximated using Gaussian quadrature.  Since the above
+    integral depends on orthogonality, the wavefront must be decomposed over a
+    circular or annular region of support.  As such, this algorithm is
+    unaffected by vignetting.  It is required that no rays fail to be traced,
+    even in vignetted regions.
     """
     import galsim
     dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
@@ -405,7 +465,9 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
     )
 
     # Trace to stopSurface to get points at which to evalue Zernikes
-    transform = batoid.CoordTransform(batoid.globalCoordSys, optic.stopSurface.coordSys)
+    transform = batoid.CoordTransform(
+        batoid.globalCoordSys, optic.stopSurface.coordSys
+    )
     epRays = transform.applyForward(rays)
     optic.stopSurface.surface.intersectInPlace(epRays)
 
@@ -421,7 +483,9 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
     optic.traceInPlace(rays, outCoordSys=batoid.globalCoordSys)
 
     if np.any(rays.failed):
-        raise ValueError("Cannot compute zernike with Gaussian Quadrature with failed rays.")
+        raise ValueError(
+            "Cannot compute zernike with Gaussian Quadrature with failed rays."
+        )
     if reference == 'mean':
         w = np.where(1-rays.vignetted)[0]
         point = np.mean(rays.r[w], axis=0)
@@ -436,10 +500,11 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
         optic.traceInPlace(chiefRay, outCoordSys=batoid.globalCoordSys)
         point = chiefRay.r
 
-    # Place vertex of reference sphere one radius length away from the intersection point.
-    # So transform our rays into that coordinate system.
+    # Place vertex of reference sphere one radius length away from the
+    # intersection point.  So transform our rays into that coordinate system.
     transform = batoid.CoordTransform(
-        batoid.globalCoordSys, batoid.CoordSys(point+np.array([0,0,sphereRadius]))
+        batoid.globalCoordSys,
+        batoid.CoordSys(point+np.array([0,0,sphereRadius]))
     )
     transform.applyForwardInPlace(rays)
 
@@ -454,5 +519,6 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
         sphere.intersectInPlace(chiefRay)
         t0 = chiefRay.t
 
-    # Zernike coefficients are flux-weighted dot products of relative phases with basis.
+    # Zernike coefficients are flux-weighted dot products of relative phases
+    # with basis.
     return np.dot(basis, (t0-rays.t)/wavelength*rays.flux)/np.pi
