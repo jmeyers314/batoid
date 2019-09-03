@@ -137,24 +137,6 @@ def test_intersect_vectorized():
 
 @pytest.mark.skipif(not hasGalSim, reason="galsim not found")
 @timer
-def test_grad():
-    np.random.seed(577215)
-    jmaxmax = 100
-    for i in range(100):
-        jmax = np.random.randint(1, jmaxmax)
-        coef = np.random.normal(size=jmax+1)*1e-3
-        R_outer = np.random.uniform(0.5, 5.0)
-        R_inner = np.random.uniform(0.0, 0.8*R_outer)
-
-        zernike = batoid.Zernike(coef, R_outer=R_outer, R_inner=R_inner)
-        gz = galsim.zernike.Zernike(coef, R_outer=R_outer, R_inner=R_inner)
-
-        np.testing.assert_allclose(zernike.gradX.coef, gz.gradX.coef, rtol=1e-9, atol=1e-9)
-        np.testing.assert_allclose(zernike.gradY.coef, gz.gradY.coef, rtol=1e-9, atol=1e-9)
-
-
-@pytest.mark.skipif(not hasGalSim, reason="galsim not found")
-@timer
 def test_normal():
     np.random.seed(5772156)
     jmaxmax = 100
@@ -165,8 +147,8 @@ def test_normal():
         R_inner = np.random.uniform(0.0, 0.8*R_outer)
 
         zernike = batoid.Zernike(coef, R_outer=R_outer, R_inner=R_inner)
-        gradx = zernike.gradX
-        grady = zernike.gradY
+        gradx = zernike.Z.gradX
+        grady = zernike.Z.gradY
 
         x = np.random.uniform(-R_outer, R_outer, size=500)
         y = np.random.uniform(-R_outer, R_outer, size=500)
@@ -176,10 +158,10 @@ def test_normal():
 
         for _x, _y in zip(x, y):
             n1 = zernike.normal(_x, _y)
-            n2 = normalized(np.array([-gradx.sag(_x, _y), -grady.sag(_x, _y), 1]))
+            n2 = normalized(np.array([-gradx(_x, _y), -grady(_x, _y), 1]))
             np.testing.assert_allclose(
                 zernike.normal(_x, _y),
-                normalized(np.array([-gradx.sag(_x, _y), -grady.sag(_x, _y), 1])),
+                normalized(np.array([-gradx(_x, _y), -grady(_x, _y), 1])),
                 atol=1e-9
             )
 

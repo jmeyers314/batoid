@@ -3,10 +3,12 @@
 batoid: c++ backed python optical raytracer
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
    overview
    rays
+   surfaces
+   coords
    analysis
 
 ==================
