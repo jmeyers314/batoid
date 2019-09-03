@@ -23,7 +23,7 @@ opticalSystem:
   pupilObscuration: 0.140625  # (1.5/4.0) ** 2
   # Reference sphere radius to use for wavefront calculation
   sphereRadius: 10.0
-  entrancePupil:
+  stopSurface:
     type: Interface
     name: entrancePupil
     surface:

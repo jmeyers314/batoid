@@ -125,8 +125,8 @@ def parse_optic(config,
         for k in ['dist', 'sphereRadius', 'pupilSize', 'pupilObscuration']:
             if k in config:
                 kwargs[k] = config[k]
-        if 'entrancePupil' in config:
-            kwargs['entrancePupil'] = parse_optic(config['entrancePupil'])
+        if 'stopSurface' in config:
+            kwargs['stopSurface'] = parse_optic(config['stopSurface'])
         return batoid.optic.CompoundOptic(
                 items, inMedium=inMedium, outMedium=outMedium,
                 name=name, coordSys=coordSys, **kwargs)

@@ -6,21 +6,28 @@ import numpy as np
 from . import _batoid
 from .constants import vacuum, globalCoordSys
 from .coordsys import CoordSys, CoordTransform
+from .ray import Ray
+
 
 class RayVector:
-    """A sequence of `Ray`s.
+    """A sequence of `Ray` s.
 
     Parameters
     ----------
     rays : list of Ray
         The Rays to assemble into a RayVector.
     """
-    def __init__(self, rays, wavelength=float("nan")):
+    def __init__(self, rays):
         if len(rays) < 1:
             raise ValueError("No Rays from which to create RayVector")
         if isinstance(rays, RayVector):
             self._r = _batoid.RayVector(rays._r)
         elif isinstance(rays, Sequence):
+            wavelength = rays[0].wavelength
+            for r in rays:
+                if r.wavelength != wavelength:
+                    wavelength = float("nan")
+                    break
             self._r = _batoid.RayVector([ray._r for ray in rays], wavelength)
         else:
             raise ValueError("Wrong arguments to RayVector")
@@ -67,23 +74,47 @@ class RayVector:
                flux=1,
                medium=vacuum,
                nrandom=None,
-               interface=None):
+               stopSurface=None):
         """Create RayVector on a parallelogram shaped region.
+
+        This function will often be used to create a grid of rays on a square
+        grid, but is flexible enough to also create gris on an arbitrary
+        parallelogram, or even uniformly distributed across an arbitrary
+        parallelogram-shaped region.
+
+        The algorithm used here starts by placing rays on the "stop" surface,
+        and then backing them up such that they are in front of any surfaces of
+        the optic they're intended to trace.
+
+        The stop surface of most large telescopes is the plane perpendicular to
+        the optic axis and flush with the rim of the primary mirror.  This
+        plane is usually also the entrance pupil since there are no earlier
+        refractive or reflective surfaces.  However, since this plane is a bit
+        difficult to locate automatically, the default stop surface in batoid
+        is the global x-y plane.
+
+        If a telescope has an stopSurface attribute in its yaml file, then this
+        is usually a good choice to use in this function.  Using a curved
+        surface for the stop surface is allowed, but is usually a bad idea as
+        this may lead to a non-uniformly illuminated pupil and is inconsistent
+        with, say, an incoming uniform spherical wave or uniform plane wave.
 
         Parameters
         ----------
         dist : float
-            Map rays backwards from entrance pupil such that the central ray
-            is this distance from the point (0, 0, z(0,0)) on the entrance
-            pupil surface.
+            Map rays backwards from the stop surface to the plane that is
+            perpendicular to the ray velocity and ``dist`` meters from the
+            point (0, 0, z(0,0)) on the stop surface.  This should generally be
+            set large enough that any obscurations or phantom surfaces occuring
+            before the stop surface are "in front" of the ray.
         wavelength : float
             Vacuum wavelength of rays in meters.
         source : None or ndarray of float, shape (3,), optional
             Where rays originate.  If None, then rays originate an infinite
-            distance away, in which case the `dirCos` kwarg must also be
-            specified to set the direction of ray propagation.  If an array,
+            distance away, in which case the ``dirCos`` kwarg must also be
+            specified to set the direction of ray propagation.  If an ndarray,
             then the rays originate from this point in global coordinates and
-            the `dirCos` kwarg is ignored.
+            the ``dirCos`` kwarg is ignored.
         dirCos : ndarray of float, shape (3,), optional
             If source is None, then this indicates the initial direction of
             propagation of the rays.  If source is not None, then this is
@@ -110,8 +141,8 @@ class RayVector:
         nrandom : None or int, optional
             If not None, then uniformly sample this many rays from
             parallelogram region instead of sampling on a regular grid.
-        interface : batoid.Interface, optional
-            Interface from which grid is projected.
+        stopSurface : batoid.Interface, optional
+            Surface defining the system stop.  Default: Interface(Plane()).
         """
         from .optic import Interface
         from .surface import Plane
@@ -120,8 +151,8 @@ class RayVector:
         if sum(a is not None for a in [nx, dx, lx]) != 2:
             raise ValueError("Exactly 2 of nx, dx, lx must be specified")
 
-        if interface is None:
-            interface = Interface(Plane())
+        if stopSurface is None:
+            stopSurface = Interface(Plane())
 
         if nx is not None and ny is None:
             ny = nx
@@ -171,8 +202,8 @@ class RayVector:
         stack = np.stack([x, y])
         x = np.dot(lx, stack)
         y = np.dot(ly, stack)
-        z = interface.surface.sag(x, y)
-        transform = CoordTransform(interface.coordSys, globalCoordSys)
+        z = stopSurface.surface.sag(x, y)
+        transform = CoordTransform(stopSurface.coordSys, globalCoordSys)
         x, y, z = transform.applyForward(x, y, z)
 
         t = np.zeros_like(x)
@@ -190,16 +221,45 @@ class RayVector:
                 flux=1,
                 medium=vacuum,
                 nrandom=None,
-                interface=None):
-        """
-        Create RayVector on an annular region using a hexapolar grid.
+                stopSurface=None):
+        """Create RayVector on an annular region using a hexapolar grid.
+
+        This function can be used to regularly sample the entrance pupil of a
+        telescope using polar symmetry (really, hexagonal symmetry).  Rings of
+        different radii are used, with the number of samples on each ring
+        restricted to a multiple of 6 (with the exception of a potential
+        central "ring" of radius 0, which is only ever sampled once).  This may
+        be more efficient than using a square grid since more of the rays
+        generated may avoid vignetting.
+
+        This function is also used to generate rays uniformly randomly sampled
+        from a given annular region.
+
+        The algorithm used here starts by placing rays on the "stop" surface,
+        and then backing them up such that they are in front of any surfaces of
+        the optic they're intended to trace.
+
+        The stop surface of most large telescopes is the plane perpendicular to
+        the optic axis and flush with the rim of the primary mirror.  This
+        plane is usually also the entrance pupil since there are no earlier
+        refractive or reflective surfaces.  However, since this plane is a bit
+        difficult to locate automatically, the default stop surface in batoid
+        is the global x-y plane.
+
+        If a telescope has an stopSurface attribute in its yaml file, then this
+        is usually a good choice to use in this function.  Using a curved
+        surface for the stop surface is allowed, but is usually a bad idea as
+        this may lead to a non-uniformly illuminated pupil and is inconsistent
+        with, say, an incoming uniform spherical wave or uniform plane wave.
 
         Parameters
         ----------
         dist : float
-            Map rays backwards from entrance pupil such that the central ray
-            is this distance from the point (0, 0, z(0,0)) on the entrance
-            pupil surface.
+            Map rays backwards from the stop surface to the plane that is
+            perpendicular to the ray velocity and ``dist`` meters from the
+            point (0, 0, z(0,0)) on the stop surface.  This should generally be
+            set large enough that any obscurations or phantom surfaces occuring
+            before the stop surface are "in front" of the ray.
         wavelength : float
             Vacuum wavelength of rays in meters.
         outer : float
@@ -208,10 +268,10 @@ class RayVector:
             Inner radius of annulus in meters.  Default is 0.0.
         source : None or ndarray of float, shape (3,), optional
             Where rays originate.  If None, then rays originate an infinite
-            distance away, in which case the `dirCos` kwarg must also be
-            specified to set the direction of ray propagation.  If an array,
+            distance away, in which case the ``dirCos`` kwarg must also be
+            specified to set the direction of ray propagation.  If an ndarray,
             then the rays originate from this point in global coordinates and
-            the `dirCos` kwarg is ignored.
+            the ``dirCos`` kwarg is ignored.
         dirCos : ndarray of float, shape (3,), optional
             If source is None, then this indicates the initial direction of
             propagation of the rays.  If source is not None, then this is
@@ -233,14 +293,14 @@ class RayVector:
         nrandom : int, optional
             If not None, then uniformly sample this many rays from annular
             region instead of sampling on a hexapolar grid.
-        interface : batoid.Interface, optional
-            Interface from which grid is projected.
+        stopSurface : batoid.Interface, optional
+            Surface defining the system stop.  Default: Interface(Plane()).
         """
         from .optic import Interface
         from .surface import Plane
 
-        if interface is None:
-            interface = Interface(Plane())
+        if stopSurface is None:
+            stopSurface = Interface(Plane())
 
         if nrandom is None:
             ths = []
@@ -260,8 +320,8 @@ class RayVector:
             th = np.random.uniform(0, 2*np.pi, size=nrandom)
         x = r*np.cos(th)
         y = r*np.sin(th)
-        z = interface.surface.sag(x, y)
-        transform = CoordTransform(interface.coordSys, globalCoordSys)
+        z = stopSurface.surface.sag(x, y)
+        transform = CoordTransform(stopSurface.coordSys, globalCoordSys)
         x, y, z = transform.applyForward(x, y, z)
         t = np.zeros_like(x)
         w = np.empty_like(x)
@@ -278,16 +338,41 @@ class RayVector:
                  spacing='uniform',
                  flux=1,
                  medium=vacuum,
-                 interface=None):
-        """
-        Create RayVector on an annular region using a spokes pattern.
+                 stopSurface=None):
+        """Create RayVector on an annular region using a spokes pattern.
+
+        The function generates rays on a rings-and-spokes pattern, with a fixed
+        number of radii for each azimuth and a fixed number of azimuths for
+        each radius.  Its main use is for decomposing functions in pupil space
+        into Zernike components using Gaussian Quadrature integration on
+        annuli.  For more general purpose annular sampling, RayVector.asPolar()
+        is often a better choice since it samples the pupil more uniformly.
+
+        The algorithm used here starts by placing rays on the "stop" surface,
+        and then backing them up such that they are in front of any surfaces of
+        the optic they're intended to trace.
+
+        The stop surface of most large telescopes is the plane perpendicular to
+        the optic axis and flush with the rim of the primary mirror.  This
+        plane is usually also the entrance pupil since there are no earlier
+        refractive or reflective surfaces.  However, since this plane is a bit
+        difficult to locate automatically, the default stop surface in batoid
+        is the global x-y plane.
+
+        If a telescope has an stopSurface attribute in its yaml file, then this
+        is usually a good choice to use in this function.  Using a curved
+        surface for the stop surface is allowed, but is usually a bad idea as
+        this may lead to a non-uniformly illuminated pupil and is inconsistent
+        with, say, an incoming uniform spherical wave or uniform plane wave.
 
         Parameters
         ----------
         dist : float
-            Map rays backwards from entrance pupil such that the central ray
-            is this distance from the point (0, 0, z(0,0)) on the entrance
-            pupil surface.
+            Map rays backwards from the stop surface to the plane that is
+            perpendicular to the ray velocity and ``dist`` meters from the
+            point (0, 0, z(0,0)) on the stop surface.  This should generally be
+            set large enough that any obscurations or phantom surfaces occuring
+            before the stop surface are "in front" of the ray.
         wavelength : float
             Vacuum wavelength of rays in meters.
         outer : float
@@ -296,40 +381,40 @@ class RayVector:
             Inner radius of annulus in meters.  Default is 0.0.
         source : None or ndarray of float, shape (3,), optional
             Where rays originate.  If None, then rays originate an infinite
-            distance away, in which case the `dirCos` kwarg must also be
-            specified to set the direction of ray propagation.  If an array,
+            distance away, in which case the ``dirCos`` kwarg must also be
+            specified to set the direction of ray propagation.  If an ndarray,
             then the rays originate from this point in global coordinates and
-            the `dirCos` kwarg is ignored.
+            the ``dirCos`` kwarg is ignored.
         dirCos : ndarray of float, shape (3,), optional
             If source is None, then this indicates the initial direction of
             propagation of the rays.  If source is not None, then this is
             ignored.
         spokes : int or ndarray of float
             If int, then number of spokes to use.
-            If array, then the values of the spokes azimuthal angles in
+            If ndarray, then the values of the spokes azimuthal angles in
             radians.
         rings : int or ndarray of float
             If int, then number of rings to use.
             If array, then the values of the ring radii to use in meters.
         spacing : {'uniform', 'GQ'}
-            If uniform, assign ring radii uniformly between `inner` and
-            `outer`.
+            If uniform, assign ring radii uniformly between ``inner`` and
+            ``outer``.
             If GQ, then assign ring radii as the Gaussian Quadrature points
             for integration on an annulus.  In this case, the ray fluxes will
-            be set to the Gaussian Quadrature weights (and the `flux` kwarg
+            be set to the Gaussian Quadrature weights (and the ``flux`` kwarg
             will be ignored).
         flux : float, optional
             Flux to assign each ray.  Default is 1.0.
         medium : batoid.Medium, optional
             Initial medium of each Ray.  Default is vacuum.
-        interface : batoid.Interface, optional
-            Interface from which grid is projected.
+        stopSurface : batoid.Interface, optional
+            Surface defining the system stop.  Default: Interface(Plane()).
         """
         from .optic import Interface
         from .surface import Plane
 
-        if interface is None:
-            interface = Interface(Plane())
+        if stopSurface is None:
+            stopSurface = Interface(Plane())
 
         if isinstance(rings, Integral):
             if spacing == 'uniform':
@@ -351,8 +436,8 @@ class RayVector:
 
         x = rings*np.cos(spokes)
         y = rings*np.sin(spokes)
-        z = interface.surface.sag(x, y)
-        transform = CoordTransform(interface.coordSys, globalCoordSys)
+        z = stopSurface.surface.sag(x, y)
+        transform = CoordTransform(stopSurface.coordSys, globalCoordSys)
         x, y, z = transform.applyForward(x, y, z)
         t = np.zeros_like(x)
         w = np.empty_like(x)
@@ -363,8 +448,7 @@ class RayVector:
 
     @classmethod
     def _finish(cls, dist, source, dirCos, n, x, y, z, t, w, flux):
-        """Map rays backwards to their source position.
-        """
+        """Map rays backwards to their source position."""
         from .surface import Plane
         if source is None:
             v = np.array(dirCos, dtype=float)
@@ -389,7 +473,9 @@ class RayVector:
             plane = Plane()
             plane.intersectInPlace(rays)
             transform.applyReverseInPlace(rays)
-            return RayVector.fromArrays(rays.x, rays.y, rays.z, vx, vy, vz, t, w, flux=flux)
+            return RayVector.fromArrays(
+                rays.x, rays.y, rays.z, vx, vy, vz, t, w, flux=flux
+            )
         else:
             vx = x - source[0]
             vy = y - source[1]
@@ -399,7 +485,9 @@ class RayVector:
             x.fill(source[0])
             y.fill(source[1])
             z.fill(source[2])
-            return RayVector.fromArrays(x, y, z, v[0], v[1], v[2], t, w, flux=flux)
+            return RayVector.fromArrays(
+                x, y, z, v[0], v[1], v[2], t, w, flux=flux
+            )
 
     @classmethod
     def _fromRayVector(cls, _r):
@@ -547,23 +635,29 @@ class RayVector:
 
     @property
     def vx(self):
-        """The x components of ray velocities units of the vacuum speed of light."""
+        """The x components of ray velocities units of the vacuum speed of
+        light.
+        """
         return self._r.vx
 
     @property
     def vy(self):
-        """The y components of ray velocities units of the vacuum speed of light."""
+        """The y components of ray velocities units of the vacuum speed of
+        light.
+        """
         return self._r.vy
 
     @property
     def vz(self):
-        """The z components of ray velocities units of the vacuum speed of light."""
+        """The z components of ray velocities units of the vacuum speed of
+        light.
+        """
         return self._r.vz
 
     @property
     def t(self):
-        """Reference times (divided by the speed of light in vacuum) in units of meters, also known
-        as the optical path lengths.
+        """Reference times (divided by the speed of light in vacuum) in units
+        of meters, also known as the optical path lengths.
         """
         return self._r.t
 
@@ -584,8 +678,8 @@ class RayVector:
 
     @property
     def failed(self):
-        """True for rays that have failed.  This may occur, for example, if batoid failed to find
-        the intersection of a ray wiht a surface.
+        """True for rays that have failed.  This may occur, for example, if
+        batoid failed to find the intersection of a ray wiht a surface.
         """
         return self._r.failed
 
@@ -596,16 +690,18 @@ class RayVector:
 
     @property
     def v(self):
-        """ndarray of float, shape (n, 3): Velocities of rays in units of the speed of light in
-        vacuum.  Note that these may have magnitudes < 1 if the rays are inside a refractive medium.
+        """ndarray of float, shape (n, 3): Velocities of rays in units of the
+        speed of light in vacuum.  Note that these may have magnitudes < 1 if
+        the rays are inside a refractive medium.
         """
         return self._r.v
 
     @property
     def k(self):
-        """ndarray of float, shape (n, 3): Wavevectors of plane waves in units of radians per meter.
-        The magnitude of each wavevector is equal to :math:`2 \pi n / \lambda`, where :math:`n` is
-        the refractive index and :math:`\lambda` is the wavelength.
+        r"""ndarray of float, shape (n, 3): Wavevectors of plane waves in units
+        of radians per meter.  The magnitude of each wavevector is equal to
+        :math:`2 \pi n / \lambda`, where :math:`n` is the refractive index and
+        :math:`\lambda` is the wavelength.
         """
         return self._r.k
 
@@ -626,13 +722,13 @@ class RayVector:
 
     @property
     def omega(self):
-        """The temporal angular frequency of each plane wave divided by the vacuum speed of light in
-        units of radians per meter.  Equals :math:`2 \pi / \lambda`.
+        r"""The temporal angular frequency of each plane wave divided by the
+        vacuum speed of light in units of radians per meter.  Equals
+        :math:`2 \pi / \lambda`.
         """
         return self._r.omega
 
     def __getitem__(self, idx):
-        from .ray import Ray
         return Ray._fromRay(self._r[idx])
 
     def __iter__(self):
@@ -640,7 +736,6 @@ class RayVector:
         return self
 
     def __next__(self):
-        from .ray import Ray
         return Ray._fromRay(next(self._iter))
 
     def __len__(self):
@@ -809,5 +904,7 @@ def pointSourceCircularGrid(source, outer, inner, nradii, naz, wavelength,
         The hexapolar grid of rays.
     """
     return RayVector._fromRayVector(
-        _batoid.pointSourceCircularGrid(source, outer, inner, nradii, naz, wavelength, flux, medium)
+        _batoid.pointSourceCircularGrid(
+            source, outer, inner, nradii, naz, wavelength, flux, medium
+        )
     )
