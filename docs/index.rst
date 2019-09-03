@@ -7,6 +7,7 @@ batoid: c++ backed python optical raytracer
 
    overview
    rays
+   analysis
 
 ==================
 Indices and tables

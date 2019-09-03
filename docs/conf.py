@@ -47,8 +47,6 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.autosectionlabel',
 ]
-
-
 napoleon_google_docstring = False
 napoleon_numpy_docstring = True
 napoleon_include_init_with_doc = False
@@ -58,9 +56,10 @@ napoleon_use_admonition_for_examples = False
 napoleon_use_admonition_for_notes = False
 napoleon_use_admonition_for_references = False
 napoleon_use_ivar = False
-napoleon_use_param = True
+napoleon_use_param = False
 napoleon_use_rtype = False
 autodoc_member_order = 'bysource'
+
 # Add any paths that contain templates here, relative to this directory.
 #templates_path = ['_templates']
 
@@ -110,105 +109,29 @@ html_theme = 'sphinx_rtd_theme'
 # so a file named "default.css" will overwrite the builtin "default.css".
 # html_static_path = ['_static']
 
-# https://michaelgoerz.net/notes/extending-sphinx-napoleon-docstring-sections.html
-# -- Extensions to the  Napoleon GoogleDocstring class ---------------------
-
-from sphinx.ext.napoleon.docstring import GoogleDocstring
-
-# first, we define new methods for any new sections and add them to the class
-def parse_keys_section(self, section):
-    return self._format_fields('Keys', self._consume_fields())
-GoogleDocstring._parse_keys_section = parse_keys_section
-
-def parse_attributes_section(self, section):
-    return self._format_fields('Attributes', self._consume_fields())
-GoogleDocstring._parse_attributes_section = parse_attributes_section
-
-def parse_class_attributes_section(self, section):
-    return self._format_fields('Class Attributes', self._consume_fields())
-GoogleDocstring._parse_class_attributes_section = parse_class_attributes_section
-
-# we now patch the parse method to guarantee that the the above methods are
-# assigned to the _section dict
-def patched_parse(self):
-    self._sections['keys'] = self._parse_keys_section
-    self._sections['class attributes'] = self._parse_class_attributes_section
-    self._unpatched_parse()
-GoogleDocstring._unpatched_parse = GoogleDocstring._parse
-GoogleDocstring._parse = patched_parse
-
-# -- Options for HTMLHelp output ---------------------------------------------
-
-# Output file base name for HTML help builder.
-htmlhelp_basename = 'batoiddoc'
-
-# -- Options for LaTeX output ------------------------------------------------
-
-latex_elements = {
-    # The paper size ('letterpaper' or 'a4paper').
-    #
-    # 'papersize': 'letterpaper',
-
-    # The font size ('10pt', '11pt' or '12pt').
-    #
-    # 'pointsize': '10pt',
-
-    # Additional stuff for the LaTeX preamble.
-    #
-    # 'preamble': '',
-
-    # Latex figure (float) alignment
-    #
-    # 'figure_align': 'htbp',
-}
-
-# Grouping the document tree into LaTeX files. List of tuples
-# (source start file, target name, title,
-#  author, documentclass [howto, manual, or own class]).
-latex_documents = [
-    (master_doc, 'batoid.tex', 'Batoid Documentation',
-     'Josh Meyers', 'manual'),
-]
-
-
-# -- Options for manual page output ------------------------------------------
-
-# One entry per manual page. List of tuples
-# (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'batoid', 'Batoid Documentation',
-     [author], 1)
-]
-
-
-# -- Options for Texinfo output ----------------------------------------------
-
-# Grouping the document tree into Texinfo files. List of tuples
-# (source start file, target name, title, author,
-#  dir menu entry, description, category)
-texinfo_documents = [
-    (master_doc, 'Batoid', 'Batoid Documentation',
-     author, 'Batoid', 'One line description of project.',
-     'Miscellaneous'),
-]
-
-
-# -- Options for Epub output -------------------------------------------------
-
-# Bibliographic Dublin Core info.
-epub_title = project
-
-# The unique identifier of the text. This can be a ISBN number
-# or the project homepage.
+# # https://michaelgoerz.net/notes/extending-sphinx-napoleon-docstring-sections.html
+# # -- Extensions to the  Napoleon GoogleDocstring class ---------------------
 #
-# epub_identifier = ''
-
-# A unique identification for the text.
+# from sphinx.ext.napoleon.docstring import GoogleDocstring
 #
-# epub_uid = ''
-
-# A list of files that should not be packed into the epub file.
-epub_exclude_files = ['search.html']
-
-
-# -- Extension configuration -------------------------------------------------
+# # first, we define new methods for any new sections and add them to the class
+# def parse_keys_section(self, section):
+#     return self._format_fields('Keys', self._consume_fields())
+# GoogleDocstring._parse_keys_section = parse_keys_section
+#
+# def parse_attributes_section(self, section):
+#     return self._format_fields('Attributes', self._consume_fields())
+# GoogleDocstring._parse_attributes_section = parse_attributes_section
+#
+# def parse_class_attributes_section(self, section):
+#     return self._format_fields('Class Attributes', self._consume_fields())
+# GoogleDocstring._parse_class_attributes_section = parse_class_attributes_section
+#
+# # we now patch the parse method to guarantee that the the above methods are
+# # assigned to the _section dict
+# def patched_parse(self):
+#     self._sections['keys'] = self._parse_keys_section
+#     self._sections['class attributes'] = self._parse_class_attributes_section
+#     self._unpatched_parse()
+# GoogleDocstring._unpatched_parse = GoogleDocstring._parse
+# GoogleDocstring._parse = patched_parse
