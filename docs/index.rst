@@ -8,6 +8,7 @@ batoid: c++ backed python optical raytracer
    overview
    rays
    surfaces
+   optic
    coords
    analysis
 
