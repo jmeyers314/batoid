@@ -108,7 +108,7 @@ class Interface(Optic):
         obscured/unobscured for rays intersecting this optic.  Default: None,
         which means don't apply any ray obscuration.
     **kwargs :
-        Other parameters to forward to `Optic.__init__`
+        Other parameters to forward to ``Optic.__init__``
     """
     def __init__(self, surface, obscuration=None, **kwargs):
         Optic.__init__(self, **kwargs)
@@ -1576,15 +1576,15 @@ class Lens(CompoundOptic):
     def draw2d(self, ax, **kwargs):
         """Specialized draw2d for `Lens` instances.
 
-        If the optional keyword 'only' equals `batoid.optic.Lens`,
-        then fill the area between the lens refractive interfaces
-        using the remaining specified kwargs (fc, ec, alpha, ...)
+        If the optional keyword 'only' equals `batoid.Lens`, then fill the area
+        between the lens refractive interfaces using the remaining specified
+        kwargs (fc, ec, alpha, ...)
 
         Otherwise, call draw2d on each of our refractive interfaces.
 
-        The optional labelpos and fontdict kwargs are used to
-        draw a label at the specified x position (in global coords),
-        using the specified font properties.
+        The optional labelpos and fontdict kwargs are used to draw a label at
+        the specified x position (in global coords), using the specified font
+        properties.
         """
         only = kwargs.pop('only', None)
         if only == Lens:

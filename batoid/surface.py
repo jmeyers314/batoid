@@ -329,11 +329,11 @@ class Quadric(Surface):
     surface vertex, and :math:`\\kappa` is the conic constant.  Different
     ranges of :math:`\\kappa` indicate different categories of surfaces:
 
-        conic > 0        =>  oblate ellipsoid
-        conic == 0       =>  sphere
-        -1 < conic < 0   =>  prolate ellipsoid
-        conic = -1       =>  paraboloid
-        conic < -1       =>  hyperboloid
+        - :math:`\\kappa > 0`      =>  oblate ellipsoid
+        - :math:`\\kappa = 0`      =>  sphere
+        - :math:`-1 < \\kappa < 0` =>  prolate ellipsoid
+        - :math:`\\kappa = -1`    =>  paraboloid
+        - :math:`\\kappa < -1`     =>  hyperboloid
 
     Parameters
     ----------
@@ -391,11 +391,11 @@ class Asphere(Surface):
     Different ranges of :math:`\\kappa` produce different categories of
     surfaces (where alpha==0):
 
-        conic > 0        =>  oblate ellipsoid
-        conic == 0       =>  sphere
-        -1 < conic < 0   =>  prolate ellipsoid
-        conic = -1       =>  paraboloid
-        conic < -1       =>  hyperboloid
+        - :math:`\\kappa > 0`      =>  oblate ellipsoid
+        - :math:`\\kappa = 0`      =>  sphere
+        - :math:`-1 < \\kappa < 0` =>  prolate ellipsoid
+        - :math:`\\kappa = -1`    =>  paraboloid
+        - :math:`\\kappa < -1`     =>  hyperboloid
 
     Parameters
     ----------
