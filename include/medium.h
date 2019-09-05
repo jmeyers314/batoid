@@ -67,6 +67,7 @@ namespace batoid {
     bool operator==(const SumitaMedium& sm1, const SumitaMedium& sm2);
     bool operator!=(const SumitaMedium& sm1, const SumitaMedium& sm2);
 
+
     class Air: public Medium {
     public:
         Air(double pressure=69.328, double temperature=293.15, double h2o_pressure=1.067);
