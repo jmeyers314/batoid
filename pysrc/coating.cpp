@@ -9,7 +9,11 @@ using namespace pybind11::literals;
 namespace batoid {
     void pyExportCoating(py::module& m) {
         py::class_<Coating, std::shared_ptr<Coating>>(m, "Coating")
-            .def("getCoefs", &Coating::getCoefs)
+            .def("getCoefs", [](const Coating& coating, double wavelength, double cosIncidenceAngle){
+                double reflect, transmit;
+                coating.getCoefs(wavelength, cosIncidenceAngle, reflect, transmit);
+                return py::make_tuple(reflect, transmit);
+            })
             .def("getReflect", &Coating::getReflect)
             .def("getTransmit", &Coating::getTransmit)
             .def("__repr__", &Coating::repr);

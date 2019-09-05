@@ -21,7 +21,6 @@ namespace batoid {
     bool SimpleCoating::operator==(const Coating& rhs) const {
         if (const SimpleCoating* other = dynamic_cast<const SimpleCoating*>(&rhs)) {
             return _reflectivity == other->_reflectivity &&
-                   _reflectivity == other->_reflectivity &&
                    _transmissivity == other->_transmissivity;
         } else return false;
     }

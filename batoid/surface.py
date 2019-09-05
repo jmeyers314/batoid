@@ -85,7 +85,8 @@ class Surface(ABC):
             New object corresponding to original ray(s) propagated and
             reflected.
         """
-        return _rayify(self._surface.reflect(r._r, coating))
+        _coating = coating._coating if coating is not None else None
+        return _rayify(self._surface.reflect(r._r, _coating))
 
     def reflectInPlace(self, r, coating=None):
         """Calculate intersection of ray(s) with this surface, and immediately
@@ -99,7 +100,8 @@ class Surface(ABC):
         coating : Coating, optional
             Coating object to control reflection coefficient.
         """
-        self._surface.reflectInPlace(r._r, coating)
+        _coating = coating._coating if coating is not None else None
+        self._surface.reflectInPlace(r._r, _coating)
 
     def refract(self, r, inMedium, outMedium, coating=None):
         """Calculate intersection of ray(s) with this surface, and immediately
@@ -122,8 +124,9 @@ class Surface(ABC):
             New object corresponding to original ray(s) propagated and
             refracted.
         """
+        _coating = coating._coating if coating is not None else None
         return _rayify(self._surface.refract(
-            r._r, inMedium, outMedium, coating
+            r._r, inMedium, outMedium, _coating
         ))
 
     def refractInPlace(self, r, inMedium, outMedium, coating=None):
@@ -142,7 +145,8 @@ class Surface(ABC):
         coating : Coating, optional
             Coating object to control transmission coefficient.
         """
-        self._surface.refractInPlace(r._r, inMedium, outMedium, coating)
+        _coating = coating._coating if coating is not None else None
+        self._surface.refractInPlace(r._r, inMedium, outMedium, _coating)
 
     def rSplit(self, r, inMedium, outMedium, coating):
         """Calculate intersection of rays with this surface, and immediately
@@ -166,8 +170,9 @@ class Surface(ABC):
             New objects corresponding to original rays propagated and
             reflected/refracted.
         """
+        _coating = coating._coating if coating is not None else None
         reflectedRays, refractedRays = self._surface.rSplit(
-            r._r, inMedium, outMedium, coating
+            r._r, inMedium, outMedium, _coating
         )
         return _rayify(reflectedRays), _rayify(refractedRays)
 
