@@ -12,6 +12,9 @@ def test_SimpleCoating():
         sc = batoid.SimpleCoating(reflectivity, transmissivity)
         assert sc.reflectivity == reflectivity == sc.getReflect(0.1, 0.2) == sc.getReflect(0.3, 0.4)
         assert sc.transmissivity == transmissivity == sc.getTransmit(0.1, 0.2) == sc.getTransmit(0.3, 0.4)
+        r, t = sc.getCoefs(0.3, 0.6)
+        assert r == reflectivity
+        assert t == transmissivity
         do_pickle(sc)
 
 

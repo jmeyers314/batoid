@@ -14,7 +14,7 @@ from ._batoid import ObscUnion, ObscIntersection, ObscNegation
 
 from .coordsys import CoordSys, CoordTransform
 
-from ._batoid import SimpleCoating
+from .coating import Coating, SimpleCoating
 
 from .psf import huygensPSF, wavefront, fftPSF, zernike, fpPosition
 

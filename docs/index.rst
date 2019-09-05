@@ -11,6 +11,7 @@ batoid: c++ backed python optical raytracer
    optic
    coords
    analysis
+   coatings
 
 ==================
 Indices and tables
