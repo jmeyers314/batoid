@@ -157,11 +157,13 @@ def test_normal():
         y = y[w]
 
         for _x, _y in zip(x, y):
-            n1 = zernike.normal(_x, _y)
-            n2 = normalized(np.array([-gradx(_x, _y), -grady(_x, _y), 1]))
             np.testing.assert_allclose(
                 zernike.normal(_x, _y),
-                normalized(np.array([-gradx(_x, _y), -grady(_x, _y), 1])),
+                normalized(np.array([
+                    -gradx.evalCartesian(_x, _y),
+                    -grady.evalCartesian(_x, _y),
+                    1
+                ])),
                 atol=1e-9
             )
 
