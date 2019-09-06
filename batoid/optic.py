@@ -1,11 +1,10 @@
 import numpy as np
 
-from ._batoid import SimpleCoating
-from ._batoid import ObscNegation, ObscCircle, ObscAnnulus
+from .coating import SimpleCoating
+from .obscuration import ObscNegation, ObscCircle, ObscAnnulus
 from .constants import globalCoordSys, vacuum
 from .coordsys import CoordTransform
 from .rayVector import concatenateRayVectors
-from .utils import _rayify
 
 
 class Optic:
@@ -312,7 +311,7 @@ class Interface(Optic):
         r = self.interact(r)
 
         if self.obscuration is not None:
-            r = _rayify(self.obscuration.obscure(r._r))
+            r = self.obscuration.obscure(r)
 
         if outCoordSys is None:
             return r, self.coordSys
@@ -391,7 +390,7 @@ class Interface(Optic):
         self.interactInPlace(r)
 
         if self.obscuration is not None:
-            self.obscuration.obscureInPlace(r._r)
+            self.obscuration.obscureInPlace(r)
 
         if outCoordSys is None:
             return r, self.coordSys
@@ -432,7 +431,7 @@ class Interface(Optic):
         r = self.interactReverse(r)
 
         if self.obscuration is not None:
-            r = _rayify(self.obscuration.obscure(r._r))
+            r = self.obscuration.obscure(r)
 
         if outCoordSys is None:
             return r, self.coordSys
@@ -491,8 +490,8 @@ class Interface(Optic):
 
         # For now, apply obscuration equally forwards and backwards
         if self.obscuration is not None:
-            rForward = _rayify(self.obscuration.obscure(rForward._r))
-            rReverse = _rayify(self.obscuration.obscure(rReverse._r))
+            rForward = self.obscuration.obscure(rForward)
+            rReverse = self.obscuration.obscure(rReverse)
 
         if forwardCoordSys is None:
             forwardCoordSys = self.coordSys
@@ -561,8 +560,8 @@ class Interface(Optic):
 
         # For now, apply obscuration equally forwards and backwards
         if self.obscuration is not None:
-            rForward = _rayify(self.obscuration.obscure(rForward._r))
-            rReverse = _rayify(self.obscuration.obscure(rReverse._r))
+            rForward = self.obscuration.obscure(rForward)
+            rReverse = self.obscuration.obscure(rReverse)
 
         if forwardCoordSys is None:
             forwardCoordSys = self.coordSys

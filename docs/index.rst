@@ -10,6 +10,7 @@ batoid: c++ backed python optical raytracer
    surfaces
    optic
    coords
+   obscurations
    analysis
    coatings
 

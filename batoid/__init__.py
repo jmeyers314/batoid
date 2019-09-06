@@ -9,8 +9,8 @@ from ._batoid import Table
 
 from ._batoid import Medium, ConstMedium, TableMedium, SellmeierMedium, SumitaMedium, Air
 
-from ._batoid import Obscuration, ObscCircle, ObscAnnulus, ObscRectangle, ObscRay
-from ._batoid import ObscUnion, ObscIntersection, ObscNegation
+from .obscuration import Obscuration, ObscCircle, ObscAnnulus, ObscRectangle, ObscRay
+from .obscuration import ObscUnion, ObscIntersection, ObscNegation
 
 from .coordsys import CoordSys, CoordTransform
 
