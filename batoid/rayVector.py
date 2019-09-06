@@ -795,7 +795,7 @@ def rayGrid(zdist, length, xcos, ycos, zcos, nside, wavelength, flux, medium,
     return RayVector._fromRayVector(
         _batoid.rayGrid(
             zdist, length, xcos, ycos, zcos, nside,
-            wavelength, flux, medium, lattice
+            wavelength, flux, medium._medium, lattice
         )
     )
 
@@ -832,7 +832,7 @@ def circularGrid(zdist, outer, inner, xcos, ycos, zcos, nradii, naz,
     return RayVector._fromRayVector(
         _batoid.circularGrid(
             zdist, outer, inner, xcos, ycos, zcos, nradii, naz, wavelength,
-            flux, medium
+            flux, medium._medium
         )
     )
 
@@ -868,7 +868,7 @@ def uniformCircularGrid(zdist, outer, inner, xcos, ycos, zcos, nrays,
     return RayVector._fromRayVector(
         _batoid.uniformCircularGrid(
             zdist, outer, inner, xcos, ycos, zcos, nrays, wavelength, flux,
-            medium, seed
+            medium._medium, seed
         )
     )
 
@@ -905,6 +905,6 @@ def pointSourceCircularGrid(source, outer, inner, nradii, naz, wavelength,
     """
     return RayVector._fromRayVector(
         _batoid.pointSourceCircularGrid(
-            source, outer, inner, nradii, naz, wavelength, flux, medium
+            source, outer, inner, nradii, naz, wavelength, flux, medium._medium
         )
     )

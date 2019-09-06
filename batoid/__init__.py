@@ -7,7 +7,7 @@ from .surface import Surface, Plane, Paraboloid, Sphere, Quadric, Asphere
 from .surface import Bicubic, Zernike, Sum
 from ._batoid import Table
 
-from ._batoid import Medium, ConstMedium, TableMedium, SellmeierMedium, SumitaMedium, Air
+from .medium import Medium, ConstMedium, TableMedium, SellmeierMedium, SumitaMedium, Air
 
 from .obscuration import Obscuration, ObscCircle, ObscAnnulus, ObscRectangle, ObscRay
 from .obscuration import ObscUnion, ObscIntersection, ObscNegation

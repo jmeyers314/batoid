@@ -126,7 +126,7 @@ class Surface(ABC):
         """
         _coating = coating._coating if coating is not None else None
         return _rayify(self._surface.refract(
-            r._r, inMedium, outMedium, _coating
+            r._r, inMedium._medium, outMedium._medium, _coating
         ))
 
     def refractInPlace(self, r, inMedium, outMedium, coating=None):
@@ -146,7 +146,9 @@ class Surface(ABC):
             Coating object to control transmission coefficient.
         """
         _coating = coating._coating if coating is not None else None
-        self._surface.refractInPlace(r._r, inMedium, outMedium, _coating)
+        self._surface.refractInPlace(
+            r._r, inMedium._medium, outMedium._medium, _coating
+        )
 
     def rSplit(self, r, inMedium, outMedium, coating):
         """Calculate intersection of rays with this surface, and immediately
@@ -172,7 +174,7 @@ class Surface(ABC):
         """
         _coating = coating._coating if coating is not None else None
         reflectedRays, refractedRays = self._surface.rSplit(
-            r._r, inMedium, outMedium, _coating
+            r._r, inMedium._medium, outMedium._medium, _coating
         )
         return _rayify(reflectedRays), _rayify(refractedRays)
 

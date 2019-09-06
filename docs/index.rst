@@ -11,8 +11,9 @@ batoid: c++ backed python optical raytracer
    optic
    coords
    obscurations
-   analysis
+   media
    coatings
+   analysis
 
 ==================
 Indices and tables

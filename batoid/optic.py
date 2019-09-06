@@ -713,13 +713,13 @@ class RefractiveInterface(Interface):
 
     def rSplit(self, r):
         reflectedR, refractedR = self.surface.rSplit(
-            r, self.inMedium, self.outMedium,self.forwardCoating
+            r, self.inMedium, self.outMedium, self.forwardCoating
         )
         return refractedR, reflectedR
 
     def rSplitReverse(self, r):
         reflectedR, refractedR = self.surface.rSplit(
-            r, self.outMedium, self.inMedium,self.reverseCoating
+            r, self.outMedium, self.inMedium, self.reverseCoating
         )
         # rays coming into a refractive interface from reverse direction,
         # means that the refracted rays are going in the reverse direction,
@@ -753,13 +753,13 @@ class Mirror(Interface):
 
     def rSplit(self, r):
         reflectedR, refractedR = self.surface.rSplit(
-            r, self.inMedium, self.outMedium,self.forwardCoating
+            r, self.inMedium, self.outMedium, self.forwardCoating
         )
         return reflectedR, refractedR
 
     def rSplitReverse(self, r):
         reflectedR, refractedR = self.surface.rSplit(
-            r, self.outMedium, self.inMedium,self.reverseCoating
+            r, self.outMedium, self.inMedium, self.reverseCoating
         )
         return refractedR, reflectedR
 
