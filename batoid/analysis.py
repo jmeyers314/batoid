@@ -383,7 +383,7 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
               projection='postel', rings=6, spokes=None,
               sphereRadius=None, reference='mean',
               jmax=22, eps=None):
-    """Compute Zernike polynomial decomposition of the wavefront.
+    r"""Compute Zernike polynomial decomposition of the wavefront.
 
     This calculation uses Gaussian Quadrature points and weights to compute the
     Zernike decomposition of the wavefront.  The wavefront values at the GQ

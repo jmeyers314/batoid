@@ -60,7 +60,6 @@ namespace batoid {
                     return SellmeierMedium(coefs);
                 }
             ))
-            // See http://effbot.org/zone/python-hash.htm#tuples
             .def("__hash__", [](const SellmeierMedium& sm) {
                 return py::hash(py::make_tuple(
                     "SellmeierMedium",
@@ -81,7 +80,6 @@ namespace batoid {
                     return SumitaMedium(coefs);
                 }
             ))
-            // See http://effbot.org/zone/python-hash.htm#tuples
             .def("__hash__", [](const SumitaMedium& sm) {
                 return py::hash(py::make_tuple(
                     "SumitaMedium",
