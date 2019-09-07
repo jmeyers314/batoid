@@ -1,29 +1,19 @@
 language: python
 
-python:
-  - 3.5
-  - 3.6
-
-env:
-  -
-    - COMPILER=clang
-    - CC=clang
-    - CXX=clang++
-    - LD_LIBRARY_PATH=/usr/local/clang/lib:$LD_LIBRARY_PATH
-  -
-    - COMPILER=gcc
-    - CC=gcc
-    - CXX=g++
-
 matrix:
   include:
-    # Add a c++ code coverage build
+    - python: 3.5
+      env:
+        - COMPILER=gcc
+        - CC=gcc
+        - CXX=g++
+
     - python: 3.6
       env:
         - COMPILER=gcc
         - CC=gcc
         - CXX=g++
-        - CMAKE_COVER=1
+
     # Add 3.7 builds by hand.  This is the officially supported method for now.
     - python: 3.7
       dist: xenial
@@ -32,6 +22,7 @@ matrix:
         - COMPILER=gcc
         - CC=gcc
         - CXX=g++
+
     - python: 3.7
       dist: xenial
       sudo: true
@@ -39,18 +30,19 @@ matrix:
         - COMPILER=clang
         - CC=clang
         - CXX=clang++
+        - LD_LIBRARY_PATH=/usr/local/clang/lib:$LD_LIBRARY_PATH
+        - CMAKE_COVER=1  # Just use c++ coverage in one build
 
 before_install:
   - export EIGEN_DIR=$PWD/eigen/
   - sudo apt-get install -y libfftw3-dev
-  - pip install -U setuptools pip==9.0
+  # - pip install -U setuptools pip==9.0
   - pip install numpy astropy future pyyaml LSSTDESC.Coord pybind11
   # - pip install galsim
   - cd ../
   - git clone https://github.com/GalSim-developers/GalSim.git
   - cd GalSim/
   - python setup.py install
-  # - python setup.py test
   - cd ../batoid/
   - pip install -r requirements.txt
   - pip install -r test_requirements.txt
