@@ -49,6 +49,7 @@ before_install:
   - git clone https://github.com/GalSim-developers/GalSim.git
   - cd GalSim/
   - python setup.py install
+  - python setup.py test
   - cd ../batoid/
   - pip install -r requirements.txt
   - pip install -r test_requirements.txt
