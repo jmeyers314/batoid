@@ -95,7 +95,6 @@ def huygensPSF(optic, theta_x, theta_y, wavelength,
         nxOut = nx
 
     dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
-    dirCos = dirCos[0:2] + (-dirCos[2],)
 
     rays = batoid.RayVector.asGrid(
         optic.dist, wavelength,
@@ -169,7 +168,6 @@ def wavefront(optic, theta_x, theta_y, wavelength,
         the primitive lattice vectors of the entrance pupil grid in meters.
     """
     dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
-    dirCos = dirCos[0:2]+(-dirCos[2],)
     rays = batoid.RayVector.asGrid(
         optic.dist, wavelength,
         nx=nx, lx=optic.pupilSize,
@@ -346,7 +344,6 @@ def zernike(optic, theta_x, theta_y, wavelength,
     import galsim
 
     dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
-    dirCos = dirCos[0:2]+(-dirCos[2],)
     rays = batoid.RayVector.asGrid(
         optic.dist, wavelength,
         nx=nx, lx=optic.pupilSize,
@@ -449,7 +446,6 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
     """
     import galsim
     dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
-    dirCos = (dirCos[0], dirCos[1], -dirCos[2])
 
     inner = 0.0 if eps is None else eps*optic.pupilSize/2
     rays = batoid.RayVector.asSpokes(
