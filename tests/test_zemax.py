@@ -395,6 +395,66 @@ def test_LSST_huygensPSF(plot=False):
                 plt.show()
 
 
+@timer
+def test_LSST_trace():
+    # The g_500 file uses vacuum instead of air, which is important to match
+    # Zemax for this test.
+    telescope = batoid.Optic.fromYaml("LSST_g_500.yaml")
+
+    zSurfaces = [4, 5, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+
+    for fn in ["LSST_trace_0.txt", "LSST_trace_1.txt", "LSST_trace_2.txt"]:
+        filename = os.path.join(directory, "testdata", fn)
+        # Get normalized coordinates
+        with open(filename, encoding='utf-16-le') as f:
+            Hx, Hy, Px, Py = np.genfromtxt(f, skip_header=13, max_rows=4, usecols=(6,))
+        with open(filename, encoding='utf-16-le') as f:
+            arr = np.genfromtxt(f, skip_header=22, max_rows=18, usecols=list(range(1, 12)))
+
+        dirCos = batoid.utils.fieldToDirCos(
+            np.deg2rad(Hx*1.75),
+            np.deg2rad(Hy*1.75),
+            projection='zemax'
+        )
+        ray = batoid.Ray.fromStop(
+            Px*4.18, Py*4.18,
+            telescope.dist, wavelength=500e-9,
+            dirCos=dirCos, medium=batoid.ConstMedium(1.0),
+            stopSurface=telescope.stopSurface
+        )
+        tf = telescope.traceFull(ray)
+
+        for surface, iz in zip(tf, zSurfaces):
+            r = surface['out']
+            transform = batoid.CoordTransform(
+                surface['outCoordSys'], batoid.globalCoordSys
+            )
+            r = transform.applyForward(r)
+            n = 1./np.sqrt(np.sum(r.v**2))
+
+            # Note Zemax has different sign convention for z-coordinates and
+            # direction cosines.  The important bits to match are x and y, which
+            # do match, including the signs.
+
+            # print(surface['name'])
+            # print('x', r.x, arr[iz][0]/1e3, r.x-arr[iz][0]/1e3)
+            # print('y', r.y, arr[iz][1]/1e3, r.y-arr[iz][1]/1e3)
+            # print('z', r.z, arr[iz][2]/1e3, r.z-arr[iz][2]/1e3)
+            # print('vx', r.vx*n, arr[iz][3], np.abs(r.vx*n) - np.abs(arr[iz][3]))
+            # print('vy', r.vy*n, arr[iz][4], np.abs(r.vy*n) - np.abs(arr[iz][4]))
+            # print('vz', r.vz*n, arr[iz][5], np.abs(r.vz*n) - np.abs(arr[iz][5]))
+            # print()
+            np.testing.assert_allclose(r.x, arr[iz][0]/1e3, rtol=0, atol=1e-10)
+            np.testing.assert_allclose(r.y, arr[iz][1]/1e3, rtol=0, atol=1e-10)
+            np.testing.assert_allclose(
+                np.abs(r.z), np.abs(arr[iz][2]/1e3),
+                rtol=0, atol=1e-10
+            )
+            np.testing.assert_allclose(np.abs(r.vx*n), np.abs(arr[iz][3]), rtol=0, atol=1e-10)
+            np.testing.assert_allclose(np.abs(r.vy*n), np.abs(arr[iz][4]), rtol=0, atol=1e-10)
+            np.testing.assert_allclose(np.abs(r.vz*n), np.abs(arr[iz][5]), rtol=0, atol=1e-10)
+
+
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
@@ -410,3 +470,4 @@ if __name__ == '__main__':
     test_LSST_wf(args.plotWF)
     test_LSST_fftPSF(args.plotFFT)
     test_LSST_huygensPSF(args.plotHuygens)
+    test_LSST_trace()

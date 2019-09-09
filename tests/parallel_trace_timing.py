@@ -33,7 +33,7 @@ def parallel_trace_timing(nside=1024, nthread=None, minChunk=None):
         telescope.dist,
         0.5*telescope.pupilSize,
         0.5*telescope.pupilObscuration*telescope.pupilSize,
-        dirCos[0], dirCos[1], -dirCos[2],
+        dirCos[0], dirCos[1], dirCos[2],
         nside, nside, 750e-9, 1.0, telescope.inMedium
     )
 

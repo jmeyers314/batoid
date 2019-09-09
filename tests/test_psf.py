@@ -132,7 +132,7 @@ def test_lsst_psf():
         print(theta/3600.0)
         dirCos = batoid.utils.gnomonicToDirCos(0.0, theta/206265)
         rays = batoid.circularGrid(10.0, 4.2, 2.55,
-                                   dirCos[0], dirCos[1], -dirCos[2],
+                                   dirCos[0], dirCos[1], dirCos[2],
                                    10, 100, 620e-9, 1.0, batoid.Air())
         telescope.traceInPlace(rays)
         rays.trimVignettedInPlace()
@@ -181,7 +181,7 @@ def test_hsc_psf():
         print(theta/3600.0)
         dirCos = batoid.utils.gnomonicToDirCos(0.0, theta/206265)
         rays = batoid.circularGrid(20.0, 4.1, 0.9,
-                                   dirCos[0], dirCos[1], -dirCos[2],
+                                   dirCos[0], dirCos[1], dirCos[2],
                                    10, 100, 620e-9, 1.0, batoid.ConstMedium(1.0))
         telescope.traceInPlace(rays)
         rays.trimVignettedInPlace()
@@ -230,7 +230,7 @@ def test_decam_psf():
         print(theta/3600.0)
         dirCos = batoid.utils.gnomonicToDirCos(0.0, theta/206265)
         rays = batoid.circularGrid(10.0, 1.95, 0.5,
-                                   dirCos[0], dirCos[1], -dirCos[2],
+                                   dirCos[0], dirCos[1], dirCos[2],
                                    10, 100, 620e-9, 1.0, batoid.Air())
         telescope.traceInPlace(rays)
         rays.trimVignettedInPlace()
