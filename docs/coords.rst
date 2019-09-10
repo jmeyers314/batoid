@@ -18,3 +18,39 @@ There are two parts to a coordinate system in batoid:
 
 .. autoclass:: batoid.CoordTransform
     :members:
+
+
+Angle Projections
+-----------------
+
+For exact specification of ray directions, it's convenient to use a
+two-dimensional projection.  Batoid includes a number of such projections and
+deprojections:
+
+.. autofunction:: batoid.utils.fieldToDirCos
+
+.. autofunction:: batoid.utils.dirCosToField
+
+.. autofunction:: batoid.utils.gnomonicToDirCos
+
+.. autofunction:: batoid.utils.dirCosToGnomonic
+
+.. autofunction:: batoid.utils.postelToDirCos
+
+.. autofunction:: batoid.utils.dirCosToPostel
+
+.. autofunction:: batoid.utils.zemaxToDirCos
+
+.. autofunction:: batoid.utils.dirCosToZemax
+
+.. autofunction:: batoid.utils.stereographicToDirCos
+
+.. autofunction:: batoid.utils.dirCosToStereographic
+
+.. autofunction:: batoid.utils.orthographicToDirCos
+
+.. autofunction:: batoid.utils.dirCosToOrthographic
+
+.. autofunction:: batoid.utils.lambertToDirCos
+
+.. autofunction:: batoid.utils.dirCosToLambert
