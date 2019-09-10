@@ -420,7 +420,7 @@ def dirCosToField(alpha, beta, gamma, projection='postel'):
     alpha, beta, gamma : float
         Direction cosines (unit vector projected onto x, y, z in order)
     projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}
-        Projection used to convert field angle to direction cosines.
+        Projection used to convert direction cosines to field angle.
 
     Returns
     -------
