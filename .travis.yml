@@ -31,7 +31,7 @@ matrix:
         - CC=clang
         - CXX=clang++
         - LD_LIBRARY_PATH=/usr/local/clang/lib:$LD_LIBRARY_PATH
-        - CMAKE_COVER=1  # Just use c++ coverage in one build
+        # - CMAKE_COVER=1  # c++ coverage is expensive.  punt on it for now.
 
 before_install:
   - export EIGEN_DIR=$PWD/eigen/
