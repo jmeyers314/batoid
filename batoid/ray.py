@@ -49,11 +49,13 @@ class Ray:
         return ret
 
     @classmethod
-    def fromStop(cls, x, y,
-                 dist, wavelength,
-                 source=None, dirCos=None,
-                 flux=1, medium=vacuum,
-                 stopSurface=None):
+    def fromStop(
+        cls, x, y,
+        optic=None, backDist=None, medium=None, stopSurface=None,
+        wavelength=None,
+        source=None, dirCos=None,
+        flux=1
+    ):
         """Create a Ray that intersects the "stop" surface at a given point.
 
         The algorithm used here starts by placing the ray on the "stop"
@@ -78,12 +80,32 @@ class Ray:
         x, y : float
             X/Y coordinates on the stop surface where the ray would intersect
             if not refracted or reflected first.
-        dist : float
+        optic : `batoid.Optic`, optional
+            If present, then try to extract values for ``backDist``,
+            ``medium``, and ``stopSurface`` from the Optic.  Note that values
+            explicitly passed here as keyword arguments override those
+            extracted from ``optic``.
+        backDist : float, optional
             Map ray backwards from the stop surface to the plane that is
-            perpendicular to the ray velocity and ``dist`` meters from the
-            point (0, 0, z(0,0)) on the stop surface.  This should generally be
-            set large enough that any obscurations or phantom surfaces occuring
-            before the stop surface are "in front" of the ray.
+            perpendicular to the ray and ``backDist`` meters from the point
+            (0, 0, z(0,0)) on the stop surface.  This should generally be set
+            large enough that any obscurations or phantom surfaces occuring
+            before the stop surface are now "in front" of the ray.  If this
+            keyword is set to ``None`` and the ``optic`` keyword is set, then
+            infer a value from ``optic.backDist``.  If both this keyword and
+            ``optic`` are ``None``, then use a default of 40 meters, which
+            should be sufficiently large for foreseeable telescopes.
+        medium : `batoid.Medium`, optional
+            Initial medium of ray.  If this keyword is set to ``None`` and
+            the ``optic`` keyword is set, then infer a value from
+            ``optic.inMedium``.  If both this keyword and ``optic`` are
+            ``None``, then use a default of vacuum.
+        stopSurface : batoid.Interface, optional
+            Surface defining the system stop.  If this keyword is set to
+            ``None`` and the ``optic`` keyword is set, then infer a value from
+            ``optic.stopSurface``.  If both this keyword and ``optic`` are
+            ``None``, then use a default ``Interface(Plane())``, which is the
+            global x-y plane.
         wavelength : float
             Vacuum wavelength of ray in meters.
         source : None or ndarray of float, shape (3,), optional
@@ -97,16 +119,24 @@ class Ray:
             If source is not None, then this is ignored.
         flux : float, optional
             Flux of ray.  Default is 1.0.
-        medium : batoid.Medium, optional
-            Initial medium of Ray.  Default is vacuum.
-        stopSurface : batoid.Interface, optional
-            Surface defining the system stop.  Default: ``Interface(Plane())``.
         """
         from .optic import Interface
         from .surface import Plane
 
+        if optic is not None:
+            if backDist is None:
+                backDist = optic.backDist
+            if medium is None:
+                medium = optic.inMedium
+            if stopSurface is None:
+                stopSurface = optic.stopSurface
+
+        if backDist is None:
+            backDist = 40.0
         if stopSurface is None:
             stopSurface = Interface(Plane())
+        if medium is None:
+            medium = vacuum
 
         z = stopSurface.surface.sag(x, y)
         transform = CoordTransform(stopSurface.coordSys, globalCoordSys)
@@ -122,7 +152,7 @@ class Ray:
             xhat = np.cross(np.array([1.0, 0.0, 0.0]), zhat)
             xhat /= np.sqrt(np.dot(xhat, xhat))
             yhat = np.cross(xhat, zhat)
-            origin = zhat*dist
+            origin = zhat*backDist
             coordSys = CoordSys(origin, np.stack([xhat, yhat, zhat]).T)
             transform = CoordTransform(globalCoordSys, coordSys)
             transform.applyForwardInPlace(ray)

@@ -259,7 +259,7 @@ class ObscUnion(Obscuration):
     above, their behavior with respect to obscuring rays is the same:
 
     >>> rays = batoid.RayVector.asGrid(
-            10.0, 500e-9, nx=10, lx=4.0, dirCos=(0,0,1)
+            backDist=10.0, wavelength=500e-9, nx=10, lx=4.0, dirCos=(0,0,1)
         )
     >>> obsc1 = big_circle.obscure(rays)
     >>> obsc2 = alternate_big_circle.obscure(rays)
@@ -313,7 +313,7 @@ class ObscIntersection(Obscuration):
     above, their behavior with respect to obscuring rays is the same:
 
     >>> rays = batoid.RayVector.asGrid(
-            10.0, 500e-9, nx=10, lx=4.0, dirCos=(0,0,1)
+            backDist=10.0, wavelength=500e-9, nx=10, lx=4.0, dirCos=(0,0,1)
         )
     >>> obsc1 = annulus.obscure(rays)
     >>> obsc2 = alternate_annulus.obscure(rays)

@@ -177,7 +177,7 @@ def test_thread():
     telescope = batoid.Optic.fromYaml("HSC.yaml")
 
     rayGrid = batoid.rayGrid(
-        telescope.dist, telescope.pupilSize,
+        telescope.backDist, telescope.pupilSize,
         0.0, 0.0, -1.0,
         32, 750e-9, 1.0, telescope.inMedium)
 
