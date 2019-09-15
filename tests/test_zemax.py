@@ -420,7 +420,8 @@ def test_LSST_trace():
             Px*4.18, Py*4.18,
             optic=telescope,
             wavelength=500e-9,
-            dirCos=dirCos
+            theta_x=np.deg2rad(Hx*1.75), theta_y=np.deg2rad(Hy*1.75),
+            projection='zemax'
         )
         tf = telescope.traceFull(ray)
 

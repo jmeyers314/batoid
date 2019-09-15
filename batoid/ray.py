@@ -5,6 +5,7 @@ import numpy as np
 from . import _batoid
 from .constants import vacuum, globalCoordSys
 from .coordsys import CoordSys, CoordTransform
+from .utils import fieldToDirCos
 
 class Ray:
     """A geometric ray to trace through an optical system.  May also be thought
@@ -54,6 +55,7 @@ class Ray:
         optic=None, backDist=None, medium=None, stopSurface=None,
         wavelength=None,
         source=None, dirCos=None,
+        theta_x=None, theta_y=None, projection='postel',
         flux=1
     ):
         """Create a Ray that intersects the "stop" surface at a given point.
@@ -117,6 +119,14 @@ class Ray:
         dirCos : ndarray of float, shape (3,), optional
             If source is None, then indicates the direction of ray propagation.
             If source is not None, then this is ignored.
+        theta_x, theta_y : float, optional
+            Field angle in radians.  If source is None, then this indicates the
+            initial direction of propagation of the ray.  If source is not
+            None, then this is ignored.  Uses `utils.fieldToDirCos` to convert
+            to direction cosines.  Also see ``dirCos`` as an alternative to
+            this keyword.
+        projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}, optional
+            Projection used to convert field angle to direction cosines.
         flux : float, optional
             Flux of ray.  Default is 1.0.
         """
@@ -137,6 +147,12 @@ class Ray:
             stopSurface = Interface(Plane())
         if medium is None:
             medium = vacuum
+
+        if dirCos is None and source is None:
+            dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
+
+        if wavelength is None:
+            raise ValueError("Missing wavelength keyword")
 
         z = stopSurface.surface.sag(x, y)
         transform = CoordTransform(stopSurface.coordSys, globalCoordSys)

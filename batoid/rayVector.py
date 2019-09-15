@@ -7,6 +7,7 @@ from . import _batoid
 from .constants import vacuum, globalCoordSys
 from .coordsys import CoordSys, CoordTransform
 from .ray import Ray
+from .utils import fieldToDirCos
 
 
 class RayVector:
@@ -71,6 +72,7 @@ class RayVector:
         optic=None, backDist=None, medium=None, stopSurface=None,
         wavelength=None,
         source=None, dirCos=None,
+        theta_x=None, theta_y=None, projection='postel',
         nx=None, ny=None,
         dx=None, dy=None,
         lx=None, ly=None,
@@ -140,7 +142,16 @@ class RayVector:
         dirCos : ndarray of float, shape (3,), optional
             If source is None, then this indicates the initial direction of
             propagation of the rays.  If source is not None, then this is
-            ignored.
+            ignored.  Also see ``theta_x``, ``theta_y`` as an alternative to
+            this keyword.
+        theta_x, theta_y : float, optional
+            Field angle in radians.  If source is None, then this indicates the
+            initial direction of propagation of the rays.  If source is not
+            None, then this is ignored.  Uses `utils.fieldToDirCos` to convert
+            to direction cosines.  Also see ``dirCos`` as an alternative to
+            this keyword.
+        projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}, optional
+            Projection used to convert field angle to direction cosines.
         nx, ny : int, optional
             Number of rays on each side of grid.
         dx, dy : float or (2,) array of float, optional
@@ -186,6 +197,12 @@ class RayVector:
             stopSurface = Interface(Plane())
         if medium is None:
             medium = vacuum
+
+        if dirCos is None and source is None:
+            dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
+
+        if wavelength is None:
+            raise ValueError("Missing wavelength keyword")
 
         # To determine the parallelogram, exactly 2 of nx, dx, lx must be set.
         if sum(a is not None for a in [nx, dx, lx]) != 2:
@@ -262,6 +279,7 @@ class RayVector:
         wavelength=None,
         outer=None, inner=0.0,
         source=None, dirCos=None,
+        theta_x=None, theta_y=None, projection='postel',
         nrad=None, naz=None,
         flux=1,
         nrandom=None
@@ -339,7 +357,16 @@ class RayVector:
         dirCos : ndarray of float, shape (3,), optional
             If source is None, then this indicates the initial direction of
             propagation of the rays.  If source is not None, then this is
-            ignored.
+            ignored.  Also see ``theta_x``, ``theta_y`` as an alternative to
+            this keyword.
+        theta_x, theta_y : float, optional
+            Field angle in radians.  If source is None, then this indicates the
+            initial direction of propagation of the rays.  If source is not
+            None, then this is ignored.  Uses `utils.fieldToDirCos` to convert
+            to direction cosines.  Also see ``dirCos`` as an alternative to
+            this keyword.
+        projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}, optional
+            Projection used to convert field angle to direction cosines.
         nrad : int
             Number of radii on which create rays.
         naz : int
@@ -378,6 +405,12 @@ class RayVector:
         if medium is None:
             medium = vacuum
 
+        if dirCos is None and source is None:
+            dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
+
+        if wavelength is None:
+            raise ValueError("Missing wavelength keyword")
+
         if nrandom is None:
             ths = []
             rs = []
@@ -413,6 +446,7 @@ class RayVector:
         wavelength=None,
         outer=None, inner=0.0,
         source=None, dirCos=None,
+        theta_x=None, theta_y=None, projection='postel',
         spokes=None, rings=None,
         spacing='uniform',
         flux=1
@@ -486,7 +520,16 @@ class RayVector:
         dirCos : ndarray of float, shape (3,), optional
             If source is None, then this indicates the initial direction of
             propagation of the rays.  If source is not None, then this is
-            ignored.
+            ignored.  Also see ``theta_x``, ``theta_y`` as an alternative to
+            this keyword.
+        theta_x, theta_y : float, optional
+            Field angle in radians.  If source is None, then this indicates the
+            initial direction of propagation of the rays.  If source is not
+            None, then this is ignored.  Uses `utils.fieldToDirCos` to convert
+            to direction cosines.  Also see ``dirCos`` as an alternative to
+            this keyword.
+        projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}, optional
+            Projection used to convert field angle to direction cosines.
         spokes : int or ndarray of float
             If int, then number of spokes to use.
             If ndarray, then the values of the spokes azimuthal angles in
@@ -523,6 +566,12 @@ class RayVector:
             stopSurface = Interface(Plane())
         if medium is None:
             medium = vacuum
+
+        if dirCos is None and source is None:
+            dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
+
+        if wavelength is None:
+            raise ValueError("Missing wavelength keyword")
 
         if isinstance(rings, Integral):
             if spacing == 'uniform':

@@ -445,9 +445,15 @@ def test_RVasGrid():
             backDist=backDist, wavelength=wavelength,
             nx=nx, lx=(lx, 0.0), dirCos=dirCos
         )
+        theta_x, theta_y = batoid.utils.dirCosToField(*dirCos)
+        grid5 = batoid.RayVector.asGrid(
+            backDist=backDist, wavelength=wavelength,
+            nx=nx, lx=(lx, 0.0), theta_x=theta_x, theta_y=theta_y
+        )
         assert rays_allclose(grid1, grid2)
         assert rays_allclose(grid1, grid3)
         assert rays_allclose(grid1, grid4)
+        assert rays_allclose(grid1, grid5)
 
         # Check distance to chief ray
         cridx = (nx//2)*nx+nx//2
@@ -764,6 +770,47 @@ def test_RVasSpokes():
             )
 
 
+@timer
+def test_RV_factory_optic():
+    telescope = batoid.Optic.fromYaml("LSST_r.yaml")
+
+    grid1 = batoid.RayVector.asGrid(
+        optic=telescope, wavelength=500e-9, theta_x=0.1, theta_y=0.1,
+        nx=16
+    )
+    grid2 = batoid.RayVector.asGrid(
+        wavelength=500e-9, theta_x=0.1, theta_y=0.1,
+        backDist=telescope.backDist, stopSurface=telescope.stopSurface,
+        medium=telescope.inMedium, lx=telescope.pupilSize,
+        nx=16
+    )
+    assert rays_allclose(grid1, grid2)
+
+    grid1 = batoid.RayVector.asPolar(
+        optic=telescope, wavelength=500e-9, theta_x=0.1, theta_y=0.1,
+        naz=100, nrad=20
+    )
+    grid2 = batoid.RayVector.asPolar(
+        wavelength=500e-9, theta_x=0.1, theta_y=0.1,
+        backDist=telescope.backDist, stopSurface=telescope.stopSurface,
+        medium=telescope.inMedium, outer=telescope.pupilSize/2,
+        naz=100, nrad=20
+    )
+    assert rays_allclose(grid1, grid2)
+
+    grid1 = batoid.RayVector.asSpokes(
+        optic=telescope, wavelength=500e-9, theta_x=0.1, theta_y=0.1,
+        rings=10, spokes=21
+    )
+    grid2 = batoid.RayVector.asSpokes(
+        wavelength=500e-9, theta_x=0.1, theta_y=0.1,
+        backDist=telescope.backDist, stopSurface=telescope.stopSurface,
+        medium=telescope.inMedium, outer=telescope.pupilSize/2,
+        rings=10, spokes=21
+    )
+    assert rays_allclose(grid1, grid2)
+
+
 if __name__ == '__main__':
     test_positionAtTime()
     test_properties()
@@ -778,3 +825,4 @@ if __name__ == '__main__':
     test_RVasGrid()
     test_RVasPolar()
     test_RVasSpokes()
+    test_RV_factory_optic()
