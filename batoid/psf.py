@@ -65,7 +65,7 @@ def huygensPSF(optic, theta_x=None, theta_y=None, wavelength=None, nx=None,
         nxOut = nx
 
     dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
-    rays = batoid.rayGrid(optic.dist, optic.pupilSize,
+    rays = batoid.rayGrid(optic.backDist, optic.pupilSize,
         dirCos[0], dirCos[1], dirCos[2],
         nx, wavelength=wavelength, flux=1, medium=optic.inMedium,
         lattice=True)
@@ -124,15 +124,15 @@ def drdth(optic, theta_x, theta_y, wavelength, nx=16, projection='postel'):
     dthxCos = fieldToDirCos(theta_x + dth, theta_y, projection=projection)
     dthyCos = fieldToDirCos(theta_x, theta_y + dth, projection=projection)
 
-    rays = batoid.rayGrid(optic.dist, optic.pupilSize,
+    rays = batoid.rayGrid(optic.backDist, optic.pupilSize,
         nominalCos[0], nominalCos[1], nominalCos[2],
         nx, wavelength=wavelength, flux=1, medium=optic.inMedium)
 
-    rays_x = batoid.rayGrid(optic.dist, optic.pupilSize,
+    rays_x = batoid.rayGrid(optic.backDist, optic.pupilSize,
         dthxCos[0], dthxCos[1], dthxCos[2],
         nx, wavelength=wavelength, flux=1, medium=optic.inMedium)
 
-    rays_y = batoid.rayGrid(optic.dist, optic.pupilSize,
+    rays_y = batoid.rayGrid(optic.backDist, optic.pupilSize,
         dthyCos[0], dthyCos[1], dthyCos[2],
         nx, wavelength=wavelength, flux=1, medium=optic.inMedium)
 
@@ -209,7 +209,7 @@ def dkdu(optic, theta_x, theta_y, wavelength, nx=16, projection='postel'):
     """
     dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
     rays = batoid.rayGrid(
-        optic.dist, optic.pupilSize,
+        optic.backDist, optic.pupilSize,
         dirCos[0], dirCos[1], dirCos[2],
         nx, wavelength, 1.0, optic.inMedium
     )
@@ -260,7 +260,7 @@ def wavefront(optic, theta_x, theta_y, wavelength, nx=32, projection='postel', s
     """
     dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
     rays = batoid.rayGrid(
-        optic.dist, optic.pupilSize,
+        optic.backDist, optic.pupilSize,
         dirCos[0], dirCos[1], dirCos[2],
         nx, wavelength, 1.0, optic.inMedium,
         lattice=lattice
@@ -352,14 +352,14 @@ def zernike(optic, theta_x, theta_y, wavelength, nx=32, projection='postel', jma
 
     dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
     rays = batoid.rayGrid(
-        optic.dist, optic.pupilSize,
+        optic.backDist, optic.pupilSize,
         dirCos[0], dirCos[1], dirCos[2],
         nx, wavelength, 1.0, optic.inMedium
     )
 
-    # Propagate to t=optic.dist where rays are close to being
+    # Propagate to t=optic.backDist where rays are close to being
     # in the entrance pupil.  (TODO: actually intersect EP here?)
-    rays.propagateInPlace(optic.dist)
+    rays.propagateInPlace(optic.backDist)
     orig_x = np.array(rays.x).reshape(nx,nx)
     orig_y = np.array(rays.y).reshape(nx,nx)
 
@@ -380,7 +380,7 @@ def zernike(optic, theta_x, theta_y, wavelength, nx=32, projection='postel', jma
 def fpPosition(optic, theta_x, theta_y, wavelength, nx=32, projection='postel'):
     dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
     rays = batoid.rayGrid(
-        optic.dist, optic.pupilSize,
+        optic.backDist, optic.pupilSize,
         dirCos[0], dirCos[1], dirCos[2],
         nx, wavelength, 1.0, optic.inMedium
     )

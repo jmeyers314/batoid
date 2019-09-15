@@ -122,7 +122,7 @@ def parse_optic(config,
         ]
         # Look for a few more possible attributes
         kwargs = {}
-        for k in ['dist', 'sphereRadius', 'pupilSize', 'pupilObscuration']:
+        for k in ['backDist', 'sphereRadius', 'pupilSize', 'pupilObscuration']:
             if k in config:
                 kwargs[k] = config[k]
         if 'stopSurface' in config:

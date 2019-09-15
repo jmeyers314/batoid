@@ -39,7 +39,7 @@ def test_huygens_psf():
                 )
             ],
             pupilSize=diam,
-            dist=10.0,
+            backDist=10.0,
             inMedium=batoid.ConstMedium(1.0)
         )
 

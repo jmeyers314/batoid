@@ -97,10 +97,8 @@ def huygensPSF(optic, theta_x, theta_y, wavelength,
     dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
 
     rays = batoid.RayVector.asGrid(
-        optic.dist, wavelength,
-        dirCos=dirCos, nx=nx, lx=optic.pupilSize,
-        medium=optic.inMedium,
-        stopSurface=optic.stopSurface
+        optic=optic, wavelength=wavelength,
+        dirCos=dirCos, nx=nx
     )
 
     amplitudes = np.zeros(
@@ -169,11 +167,8 @@ def wavefront(optic, theta_x, theta_y, wavelength,
     """
     dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
     rays = batoid.RayVector.asGrid(
-        optic.dist, wavelength,
-        nx=nx, lx=optic.pupilSize,
-        dirCos=dirCos,
-        medium=optic.inMedium,
-        stopSurface=optic.stopSurface
+        optic=optic, wavelength=wavelength,
+        nx=nx, dirCos=dirCos
     )
 
     if sphereRadius is None:
@@ -345,11 +340,8 @@ def zernike(optic, theta_x, theta_y, wavelength,
 
     dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
     rays = batoid.RayVector.asGrid(
-        optic.dist, wavelength,
-        nx=nx, lx=optic.pupilSize,
-        dirCos=dirCos,
-        medium=optic.inMedium,
-        stopSurface=optic.stopSurface
+        optic=optic, wavelength=wavelength,
+        nx=nx, dirCos=dirCos
     )
     # Propagate to entrance pupil to get positions
     transform = batoid.CoordTransform(
@@ -449,15 +441,12 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
 
     inner = 0.0 if eps is None else eps*optic.pupilSize/2
     rays = batoid.RayVector.asSpokes(
-        optic.dist, wavelength,
-        outer=optic.pupilSize/2,
+        optic=optic, wavelength=wavelength,
         inner=inner,
         dirCos=dirCos,
         rings=rings,
         spokes=spokes,
         spacing='GQ',
-        medium=optic.inMedium,
-        stopSurface=optic.stopSurface
     )
 
     # Trace to stopSurface to get points at which to evalue Zernikes
@@ -488,7 +477,7 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
     elif reference == 'chief':
         chiefRay = batoid.Ray.fromStop(
             0.0, 0.0,
-            optic.dist, wavelength,
+            backDist=optic.backDist, wavelength=wavelength,
             dirCos=dirCos,
             medium=optic.inMedium,
             stopSurface=optic.stopSurface

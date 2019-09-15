@@ -16,7 +16,8 @@ def initialize(ngrid=25, theta_x=1.):
     telescope = batoid.Optic.fromYaml("DESI.yaml")
     dirCos = batoid.utils.gnomonicToDirCos(np.deg2rad(theta_x), 0.)
     rays = batoid.rayGrid(
-        telescope.dist, telescope.pupilSize, dirCos[0], dirCos[1], -dirCos[2],
+        telescope.backDist, telescope.pupilSize,
+        dirCos[0], dirCos[1], dirCos[2],
         ngrid, 500e-9, 1.0, telescope.inMedium
     )
     return telescope, telescope.traceFull(rays)

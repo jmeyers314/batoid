@@ -62,7 +62,7 @@ def test_phase():
     import random
     random.seed(577)
     for n in [1.0, 1.3]:  # refractive index
-        for i in range(1000):
+        for i in range(100):
             x = random.gauss(0.1, 2.3)
             y = random.gauss(2.1, 4.3)
             z = random.gauss(-0.13, 1.3)
@@ -414,7 +414,7 @@ def test_fail():
 @timer
 def test_RVasGrid():
     for _ in range(10):
-        dist = np.random.uniform(9.0, 11.0)
+        backDist = np.random.uniform(9.0, 11.0)
         wavelength = np.random.uniform(300e-9, 1100e-9)
         nx = 1
         while (nx%2) == 1:
@@ -430,19 +430,19 @@ def test_RVasGrid():
 
         # Some things that should be equivalent
         grid1 = batoid.RayVector.asGrid(
-            dist, wavelength,
+            backDist=backDist, wavelength=wavelength,
             nx=nx, lx=lx, dirCos=dirCos
         )
         grid2 = batoid.RayVector.asGrid(
-            dist, wavelength,
+            backDist=backDist, wavelength=wavelength,
             nx=nx, dx=dx, dirCos=dirCos
         )
         grid3 = batoid.RayVector.asGrid(
-            dist, wavelength,
+            backDist=backDist, wavelength=wavelength,
             dx=dx, lx=lx, dirCos=dirCos
         )
         grid4 = batoid.RayVector.asGrid(
-            dist, wavelength,
+            backDist=backDist, wavelength=wavelength,
             nx=nx, lx=(lx, 0.0), dirCos=dirCos
         )
         assert rays_allclose(grid1, grid2)
@@ -452,7 +452,7 @@ def test_RVasGrid():
         # Check distance to chief ray
         cridx = (nx//2)*nx+nx//2
         obs_dist = np.sqrt(np.dot(grid1[cridx].r, grid1[cridx].r))
-        np.testing.assert_allclose(obs_dist, dist)
+        np.testing.assert_allclose(obs_dist, backDist)
 
         np.testing.assert_allclose(grid1.t, 0)
         np.testing.assert_allclose(grid1.wavelength, wavelength)
@@ -472,7 +472,7 @@ def test_RVasGrid():
 
         # Another set, but with odd nx
     for _ in range(10):
-        dist = np.random.uniform(9.0, 11.0)
+        backDist = np.random.uniform(9.0, 11.0)
         wavelength = np.random.uniform(300e-9, 1100e-9)
         while (nx%2) == 0:
             nx = np.random.randint(10, 20)
@@ -486,21 +486,21 @@ def test_RVasGrid():
         dirCos /= np.sqrt(np.dot(dirCos, dirCos))
 
         grid1 = batoid.RayVector.asGrid(
-            dist, wavelength,
+            backDist=backDist, wavelength=wavelength,
             nx=nx, lx=lx, dirCos=dirCos
         )
         grid2 = batoid.RayVector.asGrid(
-            dist, wavelength,
+            backDist=backDist, wavelength=wavelength,
             nx=nx, dx=dx, dirCos=dirCos
         )
         grid3 = batoid.RayVector.asGrid(
-            dist, wavelength,
+            backDist=backDist, wavelength=wavelength,
             nx=nx, lx=(lx, 0), dirCos=dirCos
         )
         # ... but the following is not equivalent, since default is to always
         # infer an even nx and ny
         # grid4 = batoid.RayVector.asGrid(
-        #     dist, wavelength,
+        #     backDist=backDist, wavelength=wavelength,
         #     dx=1/9, lx=1.0, dirCos=dirCos
         # )
 
@@ -509,7 +509,7 @@ def test_RVasGrid():
 
         cridx = (nx*nx-1)//2
         obs_dist = np.sqrt(np.dot(grid1[cridx].r, grid1[cridx].r))
-        np.testing.assert_allclose(obs_dist, dist)
+        np.testing.assert_allclose(obs_dist, backDist)
 
         np.testing.assert_allclose(grid1.t, 0)
         np.testing.assert_allclose(grid1.wavelength, wavelength)
@@ -530,7 +530,7 @@ def test_RVasGrid():
     for _ in range(10):
         # Check nrandom
         rays = batoid.RayVector.asGrid(
-            dist, wavelength,
+            backDist=backDist, wavelength=wavelength,
             lx=1.0, nx=1,
             nrandom=1000, dirCos=dirCos
         )
@@ -561,7 +561,7 @@ def test_RVasGrid():
 @timer
 def test_RVasPolar():
     for _ in range(10):
-        dist = np.random.uniform(9.0, 11.0)
+        backDist = np.random.uniform(9.0, 11.0)
         wavelength = np.random.uniform(300e-9, 1100e-9)
         inner = np.random.uniform(1.0, 3.0)
         outer = inner + np.random.uniform(1.0, 3.0)
@@ -575,8 +575,8 @@ def test_RVasPolar():
         dirCos /= np.sqrt(np.dot(dirCos, dirCos))
 
         rays = batoid.RayVector.asPolar(
-            dist, wavelength,
-            outer, inner,
+            backDist=backDist, wavelength=wavelength,
+            outer=outer, inner=inner,
             nrad=nrad, naz=naz,
             dirCos=dirCos
         )
@@ -596,8 +596,8 @@ def test_RVasPolar():
 
         inner = 0.0
         rays = batoid.RayVector.asPolar(
-            dist, wavelength,
-            outer, inner,
+            backDist=backDist, wavelength=wavelength,
+            outer=outer, inner=inner,
             nrad=nrad, naz=naz,
             dirCos=dirCos
         )
@@ -614,7 +614,7 @@ def test_RVasPolar():
 @timer
 def test_RVasSpokes():
     for _ in range(10):
-        dist = np.random.uniform(9.0, 11.0)
+        backDist = np.random.uniform(9.0, 11.0)
         wavelength = np.random.uniform(300e-9, 1100e-9)
         inner = np.random.uniform(1.0, 3.0)
         outer = inner + np.random.uniform(1.0, 3.0)
@@ -628,8 +628,8 @@ def test_RVasSpokes():
         dirCos /= np.sqrt(np.dot(dirCos, dirCos))
 
         rays = batoid.RayVector.asSpokes(
-            dist, wavelength,
-            outer, inner=inner,
+            backDist=backDist, wavelength=wavelength,
+            outer=outer, inner=inner,
             spokes=spokes, rings=rings,
             dirCos=dirCos
         )
@@ -662,7 +662,8 @@ def test_RVasSpokes():
         spokes = np.random.uniform(0, 2*np.pi, spokes)
 
         rays = batoid.RayVector.asSpokes(
-            dist, wavelength,
+            backDist=backDist, wavelength=wavelength,
+            outer=outer, inner=inner,
             rings=rings, spokes=spokes,
             dirCos=dirCos
         )
@@ -687,7 +688,7 @@ def test_RVasSpokes():
         rings = np.random.randint(5, 10)
         spokes = 2*rings+1
         rays = batoid.RayVector.asSpokes(
-            dist, wavelength,
+            backDist=backDist, wavelength=wavelength,
             outer=outer,
             rings=rings,
             spacing='GQ',
@@ -743,7 +744,8 @@ def test_RVasSpokes():
 
     for rings_, rad_, w_ in zip(rings, rad, w):
         rays = batoid.RayVector.asSpokes(
-            dist, wavelength, outer=1,
+            backDist=backDist, wavelength=wavelength,
+            outer=1,
             rings=rings_,
             spacing='GQ',
             dirCos=[0,0,-1]

@@ -66,25 +66,27 @@ class RayVector:
         return ret
 
     @classmethod
-    def asGrid(cls, dist, wavelength,
-               source=None, dirCos=None,
-               nx=None, ny=None,
-               dx=None, dy=None,
-               lx=None, ly=None,
-               flux=1,
-               medium=vacuum,
-               nrandom=None,
-               stopSurface=None):
+    def asGrid(
+        cls,
+        optic=None, backDist=None, medium=None, stopSurface=None,
+        wavelength=None,
+        source=None, dirCos=None,
+        nx=None, ny=None,
+        dx=None, dy=None,
+        lx=None, ly=None,
+        flux=1,
+        nrandom=None
+    ):
         """Create RayVector on a parallelogram shaped region.
 
         This function will often be used to create a grid of rays on a square
         grid, but is flexible enough to also create gris on an arbitrary
-        parallelogram, or even uniformly distributed across an arbitrary
+        parallelogram, or even randomly distributed across an arbitrary
         parallelogram-shaped region.
 
-        The algorithm used here starts by placing rays on the "stop" surface,
-        and then backing them up such that they are in front of any surfaces of
-        the optic they're intended to trace.
+        The algorithm starts by placing rays on the "stop" surface, and then
+        backing them up such that they are in front of any surfaces of the
+        optic they're intended to trace.
 
         The stop surface of most large telescopes is the plane perpendicular to
         the optic axis and flush with the rim of the primary mirror.  This
@@ -101,12 +103,32 @@ class RayVector:
 
         Parameters
         ----------
-        dist : float
+        optic : `batoid.Optic`, optional
+            If present, then try to extract values for ``backDist``,
+            ``medium``, ``stopSurface``, and ``lx`` from the Optic.  Note that
+            values explicitly passed to `asGrid` as keyword arguments override
+            those extracted from ``optic``.
+        backDist : float, optional
             Map rays backwards from the stop surface to the plane that is
-            perpendicular to the ray velocity and ``dist`` meters from the
-            point (0, 0, z(0,0)) on the stop surface.  This should generally be
-            set large enough that any obscurations or phantom surfaces occuring
-            before the stop surface are "in front" of the ray.
+            perpendicular to the ray and ``backDist`` meters from the point
+            (0, 0, z(0,0)) on the stop surface.  This should generally be set
+            large enough that any obscurations or phantom surfaces occuring
+            before the stop surface are now "in front" of the ray.  If this
+            keyword is set to ``None`` and the ``optic`` keyword is set, then
+            infer a value from ``optic.backDist``.  If both this keyword and
+            ``optic`` are ``None``, then use a default of 40 meters, which
+            should be sufficiently large for foreseeable telescopes.
+        medium : `batoid.Medium`, optional
+            Initial medium of each ray.  If this keyword is set to ``None`` and
+            the ``optic`` keyword is set, then infer a value from
+            ``optic.inMedium``.  If both this keyword and ``optic`` are
+            ``None``, then use a default of vacuum.
+        stopSurface : batoid.Interface, optional
+            Surface defining the system stop.  If this keyword is set to
+            ``None`` and the ``optic`` keyword is set, then infer a value from
+            ``optic.stopSurface``.  If both this keyword and ``optic`` are
+            ``None``, then use a default ``Interface(Plane())``, which is the
+            global x-y plane.
         wavelength : float
             Vacuum wavelength of rays in meters.
         source : None or ndarray of float, shape (3,), optional
@@ -133,26 +155,41 @@ class RayVector:
             measured along the x and y directions.  If arrays, then these also
             indicate the primitive vectors orientation of the grid.  If only
             lx is specified, then ly will be inferred as a 90-degree rotation
-            from lx with the same length as lx.
+            from lx with the same length as lx.  If lx is ``None``, then first
+            infer a value from ``nx`` and ``dx``, and if that doesn't work,
+            infer a value from ``optic.pupilSize``.
         flux : float, optional
             Flux to assign each ray.  Default is 1.0.
-        medium : batoid.Medium, optional
-            Initial medium of each Ray.  Default is vacuum.
         nrandom : None or int, optional
             If not None, then uniformly sample this many rays from
             parallelogram region instead of sampling on a regular grid.
-        stopSurface : batoid.Interface, optional
-            Surface defining the system stop.  Default: Interface(Plane()).
         """
         from .optic import Interface
         from .surface import Plane
 
+        if optic is not None:
+            if backDist is None:
+                backDist = optic.backDist
+            if medium is None:
+                medium = optic.inMedium
+            if stopSurface is None:
+                stopSurface = optic.stopSurface
+            if lx is None:
+                # If nx and dx are both present, then let lx get inferred from
+                # them.  Otherwise, infer from optic.
+                if nx is None or dx is None:
+                    lx = optic.pupilSize
+
+        if backDist is None:
+            backDist = 40.0
+        if stopSurface is None:
+            stopSurface = Interface(Plane())
+        if medium is None:
+            medium = vacuum
+
         # To determine the parallelogram, exactly 2 of nx, dx, lx must be set.
         if sum(a is not None for a in [nx, dx, lx]) != 2:
             raise ValueError("Exactly 2 of nx, dx, lx must be specified")
-
-        if stopSurface is None:
-            stopSurface = Interface(Plane())
 
         if nx is not None and ny is None:
             ny = nx
@@ -164,6 +201,8 @@ class RayVector:
             else:
                 ly = np.dot(np.array([[0, -1], [1, 0]]), lx)
 
+        # We need lx, ly, nx, ny for below, so construct these from other
+        # arguments if they're not already available.
         if nx is not None and dx is not None:
             if (nx%2) == 0:
                 lx = dx*(nx-2)
@@ -180,8 +219,11 @@ class RayVector:
             slop = 0.1  # prevent 3.9999 -> 3, e.g.
             nx = int((lx/dx+slop)//2)*2+2
             ny = int((ly/dy+slop)//2)*2+2
-            dx = lx/(nx-2)
-            dy = ly/(ny-2)
+            # These are the real dx, dy; which may be different from what was
+            # passed in order to force an integer for nx/ny.  We don't actually
+            # need them after this point though.
+            # dx = lx/(nx-2)
+            # dy = ly/(ny-2)
 
         if isinstance(lx, Real):
             lx = (lx, 0.0)
@@ -211,17 +253,19 @@ class RayVector:
         w.fill(wavelength)
         n = medium.getN(wavelength)
 
-        return cls._finish(dist, source, dirCos, n, x, y, z, t, w, flux)
+        return cls._finish(backDist, source, dirCos, n, x, y, z, t, w, flux)
 
     @classmethod
-    def asPolar(cls, dist, wavelength,
-                outer, inner=0.0,
-                source=None, dirCos=None,
-                nrad=None, naz=None,
-                flux=1,
-                medium=vacuum,
-                nrandom=None,
-                stopSurface=None):
+    def asPolar(
+        cls,
+        optic=None, backDist=None, medium=None, stopSurface=None,
+        wavelength=None,
+        outer=None, inner=0.0,
+        source=None, dirCos=None,
+        nrad=None, naz=None,
+        flux=1,
+        nrandom=None
+    ):
         """Create RayVector on an annular region using a hexapolar grid.
 
         This function can be used to regularly sample the entrance pupil of a
@@ -254,12 +298,32 @@ class RayVector:
 
         Parameters
         ----------
-        dist : float
+        optic : `batoid.Optic`, optional
+            If present, then try to extract values for ``backDist``,
+            ``medium``, ``stopSurface``, and ``outer`` from the Optic.  Note
+            that values explicitly passed to `asPolar` as keyword arguments
+            override those extracted from ``optic``.
+        backDist : float, optional
             Map rays backwards from the stop surface to the plane that is
-            perpendicular to the ray velocity and ``dist`` meters from the
-            point (0, 0, z(0,0)) on the stop surface.  This should generally be
-            set large enough that any obscurations or phantom surfaces occuring
-            before the stop surface are "in front" of the ray.
+            perpendicular to the ray and ``backDist`` meters from the point
+            (0, 0, z(0,0)) on the stop surface.  This should generally be set
+            large enough that any obscurations or phantom surfaces occuring
+            before the stop surface are now "in front" of the ray.  If this
+            keyword is set to ``None`` and the ``optic`` keyword is set, then
+            infer a value from ``optic.backDist``.  If both this keyword and
+            ``optic`` are ``None``, then use a default of 40 meters, which
+            should be sufficiently large for foreseeable telescopes.
+        medium : `batoid.Medium`, optional
+            Initial medium of each ray.  If this keyword is set to ``None`` and
+            the ``optic`` keyword is set, then infer a value from
+            ``optic.inMedium``.  If both this keyword and ``optic`` are
+            ``None``, then use a default of vacuum.
+        stopSurface : batoid.Interface, optional
+            Surface defining the system stop.  If this keyword is set to
+            ``None`` and the ``optic`` keyword is set, then infer a value from
+            ``optic.stopSurface``.  If both this keyword and ``optic`` are
+            ``None``, then use a default ``Interface(Plane())``, which is the
+            global x-y plane.
         wavelength : float
             Vacuum wavelength of rays in meters.
         outer : float
@@ -288,19 +352,31 @@ class RayVector:
             1 ray, with azimuth undefined, will be used on that "ring".)
         flux : float, optional
             Flux to assign each ray.  Default is 1.0.
-        medium : batoid.Medium, optional
-            Initial medium of each Ray.  Default is vacuum.
         nrandom : int, optional
             If not None, then uniformly sample this many rays from annular
             region instead of sampling on a hexapolar grid.
-        stopSurface : batoid.Interface, optional
-            Surface defining the system stop.  Default: Interface(Plane()).
         """
         from .optic import Interface
         from .surface import Plane
 
+        if optic is not None:
+            if backDist is None:
+                backDist = optic.backDist
+            if medium is None:
+                medium = optic.inMedium
+            if stopSurface is None:
+                stopSurface = optic.stopSurface
+            if outer is None:
+                outer = optic.pupilSize/2
+            if outer is None:
+                outer = optic.pupilSize/2
+
+        if backDist is None:
+            backDist = 40.0
         if stopSurface is None:
             stopSurface = Interface(Plane())
+        if medium is None:
+            medium = vacuum
 
         if nrandom is None:
             ths = []
@@ -328,17 +404,19 @@ class RayVector:
         w.fill(wavelength)
         n = medium.getN(wavelength)
 
-        return cls._finish(dist, source, dirCos, n, x, y, z, t, w, flux)
+        return cls._finish(backDist, source, dirCos, n, x, y, z, t, w, flux)
 
     @classmethod
-    def asSpokes(cls, dist, wavelength,
-                 outer=None, inner=0.0,
-                 source=None, dirCos=None,
-                 spokes=None, rings=None,
-                 spacing='uniform',
-                 flux=1,
-                 medium=vacuum,
-                 stopSurface=None):
+    def asSpokes(
+        cls,
+        optic=None, backDist=None, medium=None, stopSurface=None,
+        wavelength=None,
+        outer=None, inner=0.0,
+        source=None, dirCos=None,
+        spokes=None, rings=None,
+        spacing='uniform',
+        flux=1
+    ):
         """Create RayVector on an annular region using a spokes pattern.
 
         The function generates rays on a rings-and-spokes pattern, with a fixed
@@ -367,12 +445,32 @@ class RayVector:
 
         Parameters
         ----------
-        dist : float
+        optic : `batoid.Optic`, optional
+            If present, then try to extract values for ``backDist``,
+            ``medium``, ``stopSurface``, and ``outer`` from the Optic.  Note
+            that values explicitly passed to `asSpokes` as keyword arguments
+            override those extracted from ``optic``.
+        backDist : float, optional
             Map rays backwards from the stop surface to the plane that is
-            perpendicular to the ray velocity and ``dist`` meters from the
-            point (0, 0, z(0,0)) on the stop surface.  This should generally be
-            set large enough that any obscurations or phantom surfaces occuring
-            before the stop surface are "in front" of the ray.
+            perpendicular to the ray and ``backDist`` meters from the point
+            (0, 0, z(0,0)) on the stop surface.  This should generally be set
+            large enough that any obscurations or phantom surfaces occuring
+            before the stop surface are now "in front" of the ray.  If this
+            keyword is set to ``None`` and the ``optic`` keyword is set, then
+            infer a value from ``optic.backDist``.  If both this keyword and
+            ``optic`` are ``None``, then use a default of 40 meters, which
+            should be sufficiently large for foreseeable telescopes.
+        medium : `batoid.Medium`, optional
+            Initial medium of each ray.  If this keyword is set to ``None`` and
+            the ``optic`` keyword is set, then infer a value from
+            ``optic.inMedium``.  If both this keyword and ``optic`` are
+            ``None``, then use a default of vacuum.
+        stopSurface : batoid.Interface, optional
+            Surface defining the system stop.  If this keyword is set to
+            ``None`` and the ``optic`` keyword is set, then infer a value from
+            ``optic.stopSurface``.  If both this keyword and ``optic`` are
+            ``None``, then use a default ``Interface(Plane())``, which is the
+            global x-y plane.
         wavelength : float
             Vacuum wavelength of rays in meters.
         outer : float
@@ -405,16 +503,26 @@ class RayVector:
             will be ignored).
         flux : float, optional
             Flux to assign each ray.  Default is 1.0.
-        medium : batoid.Medium, optional
-            Initial medium of each Ray.  Default is vacuum.
-        stopSurface : batoid.Interface, optional
-            Surface defining the system stop.  Default: Interface(Plane()).
         """
         from .optic import Interface
         from .surface import Plane
 
+        if optic is not None:
+            if backDist is None:
+                backDist = optic.backDist
+            if medium is None:
+                medium = optic.inMedium
+            if stopSurface is None:
+                stopSurface = optic.stopSurface
+            if outer is None:
+                outer = optic.pupilSize/2
+
+        if backDist is None:
+            backDist = 40.0
         if stopSurface is None:
             stopSurface = Interface(Plane())
+        if medium is None:
+            medium = vacuum
 
         if isinstance(rings, Integral):
             if spacing == 'uniform':
@@ -444,10 +552,10 @@ class RayVector:
         w.fill(wavelength)
         n = medium.getN(wavelength)
 
-        return cls._finish(dist, source, dirCos, n, x, y, z, t, w, flux)
+        return cls._finish(backDist, source, dirCos, n, x, y, z, t, w, flux)
 
     @classmethod
-    def _finish(cls, dist, source, dirCos, n, x, y, z, t, w, flux):
+    def _finish(cls, backDist, source, dirCos, n, x, y, z, t, w, flux):
         """Map rays backwards to their source position."""
         from .surface import Plane
         if source is None:
@@ -466,7 +574,7 @@ class RayVector:
             xhat = np.cross(np.array([1.0, 0.0, 0.0]), zhat)
             xhat /= np.sqrt(np.dot(xhat, xhat))
             yhat = np.cross(xhat, zhat)
-            origin = zhat*dist
+            origin = zhat*backDist
             coordSys = CoordSys(origin, np.stack([xhat, yhat, zhat]).T)
             transform = CoordTransform(globalCoordSys, coordSys)
             transform.applyForwardInPlace(rays)

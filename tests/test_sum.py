@@ -160,7 +160,7 @@ def test_sum_bicubic():
         np.deg2rad(0.8), np.deg2rad(0.8)
     )
     rays = batoid.circularGrid(
-        telescope.dist,
+        telescope.backDist,
         telescope.pupilSize/2,
         telescope.pupilSize*telescope.pupilObscuration/2,
         xcos, ycos, -zcos,

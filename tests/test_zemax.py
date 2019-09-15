@@ -418,9 +418,9 @@ def test_LSST_trace():
         )
         ray = batoid.Ray.fromStop(
             Px*4.18, Py*4.18,
-            telescope.dist, wavelength=500e-9,
-            dirCos=dirCos, medium=batoid.ConstMedium(1.0),
-            stopSurface=telescope.stopSurface
+            optic=telescope,
+            wavelength=500e-9,
+            dirCos=dirCos
         )
         tf = telescope.traceFull(ray)
 
