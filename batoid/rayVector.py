@@ -184,7 +184,10 @@ class RayVector:
             if medium is None:
                 medium = optic.inMedium
             if stopSurface is None:
-                stopSurface = optic.stopSurface
+                try:
+                    stopSurface = optic.stopSurface
+                except AttributeError:
+                    stopSurface = None
             if lx is None:
                 # If nx and dx are both present, then let lx get inferred from
                 # them.  Otherwise, infer from optic.
