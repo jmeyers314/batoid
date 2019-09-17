@@ -103,6 +103,10 @@ def test_shift():
         shifted = telescope.withGloballyShiftedOptic(item, shift)
         shifted = shifted.withGloballyShiftedOptic(item, -shift)
         assert telescope == shifted
+    # Also test a non-fully-qualified name
+    shifted = telescope.withGloballyShiftedOptic("G1", shift)
+    shifted = shifted.withGloballyShiftedOptic("G1", -shift)
+    assert shifted == telescope
 
 
 @timer
@@ -170,7 +174,20 @@ def test_rotation():
             batoid.psf.zernike(rotTel2, theta_x, theta_y, wavelength),
             atol=1e-5
         )
-
+    # Test with non-fully-qualified name
+    rotTel = telescope.withLocallyRotatedOptic('G1', rot)
+    rotTel = rotTel.withLocallyRotatedOptic('G1', rotInv)
+    rotTel2 = rotTel.withLocallyRotatedOptic('G1', np.eye(3))
+    np.testing.assert_allclose(
+        batoid.psf.zernike(telescope, theta_x, theta_y, wavelength),
+        batoid.psf.zernike(rotTel, theta_x, theta_y, wavelength),
+        atol=1e-5
+    )
+    np.testing.assert_allclose(
+        batoid.psf.zernike(telescope, theta_x, theta_y, wavelength),
+        batoid.psf.zernike(rotTel2, theta_x, theta_y, wavelength),
+        atol=1e-5
+    )
 
 @timer
 def test_thread():

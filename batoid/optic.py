@@ -5,6 +5,7 @@ from .obscuration import ObscNegation, ObscCircle, ObscAnnulus
 from .constants import globalCoordSys, vacuum
 from .coordsys import CoordTransform
 from .rayVector import concatenateRayVectors
+from .utils import lazy_property
 
 
 class Optic:
@@ -880,18 +881,17 @@ class CompoundOptic(Optic):
                 raise ValueError("Cannot find item {}".format(key))
         return item
 
-    @property
+    @lazy_property
     def _names(self):
-        if not hasattr(self, '__names'):
-            self.__names = {}
-            for k, v in self.itemDict.items():
-                if v.name in self.__names:
-                    # Names are not unique; return empty dict
-                    self.__names = {}
-                    break
-                else:
-                    self.__names[v.name] = k
-        return self.__names
+        out = {}
+        for k, v in self.itemDict.items():
+            if v.name in out:
+                # Names are not unique; return empty dict
+                out = {}
+                break
+            else:
+                out[v.name] = k
+        return out
 
     def trace(self, r, inCoordSys=globalCoordSys, outCoordSys=None):
         """Recursively trace through all subitems of this `CompoundOptic`.
@@ -1376,7 +1376,10 @@ class CompoundOptic(Optic):
         """
         # If name is one of items.names, the we use withGlobalShift, and we're
         # done.  If not, then we need to recurse down to whichever item
-        # contains name.  First verify that name is in self.itemDict
+        # contains name.  Verify that name is in self.itemDict, but first
+        # convert partially qualified name to fully qualified.
+        if name in self._names:
+            name = self._names[name]
         if name not in self.itemDict:
             raise ValueError("Optic {} not found".format(name))
         if name == self.name:
@@ -1464,7 +1467,10 @@ class CompoundOptic(Optic):
         """
         # If name is one of items.names, the we use withLocalRotation, and
         # we're done.  If not, then we need to recurse down to whichever item
-        # contains name.  First verify that name is in self.itemDict
+        # contains name.  Verify that name is in self.itemDict, but first
+        # convert partially qualified name to fully qualified.
+        if name in self._names:
+            name = self._names[name]
         if name not in self.itemDict:
             raise ValueError("Optic {} not found".format(name))
         if name == self.name:
@@ -1515,6 +1521,8 @@ class CompoundOptic(Optic):
         `batoid.CompoundOptic`
             Optic with new surface.
         """
+        if name in self._names:
+            name = self._names[name]
         if name not in self.itemDict:
             raise ValueError("Optic {} not found".format(name))
         # name is fully qualified, so clip off leading token
@@ -1662,6 +1670,8 @@ class Lens(CompoundOptic):
         # If name is one of items.names, the we use withGlobalShift, and we're
         # done.  If not, then we need to recurse down to whicever item contains
         # name.  First verify that name is in self.itemDict
+        if name in self._names:
+            name = self._names[name]
         if name not in self.itemDict:
             raise ValueError("Optic {} not found".format(name))
         if name == self.name:
@@ -1748,6 +1758,8 @@ class Lens(CompoundOptic):
         # If name is one of items.names, the we use withLocalRotation, and
         # we're done.  If not, then we need to recurse down to whichever item
         # contains name.  First verify that name is in self.itemDict
+        if name in self._names:
+            name = self._names[name]
         if name not in self.itemDict:
             raise ValueError("Optic {} not found".format(name))
         if name == self.name:
@@ -1798,6 +1810,8 @@ class Lens(CompoundOptic):
         `batoid.Lens`
             Lens with new surface.
         """
+        if name in self._names:
+            name = self._names[name]
         if name not in self.itemDict:
             raise ValueError("Optic {} not found".format(name))
         # name is fully qualified, so clip off leading token
