@@ -5,17 +5,22 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-# fn = os.path.join(batoid.datadir, "LSST", "LSST_r.yaml")
-# factor = 0.2/1e-5/3600
+telescope = batoid.Optic.fromYaml("LSST_g.yaml")
+factor = 0.2/1e-5/3600
 
-fn = os.path.join(batoid.datadir, "HSC", "HSC.yaml")
-factor = 0.168/1.5e-5/3600
+# telescope = batoid.Optic.fromYaml("HSC.yaml")
+# factor = 0.168/1.5e-5/3600
 
-# fn = os.path.join(batoid.datadir, "DECam", "DECam.yaml")
+# telescope = batoid.Optic.fromYaml("DECam.yaml")
 # factor = 0.27/1.5e-5/3600
 
-config = yaml.safe_load(open(fn))
-telescope = batoid.parse.parse_optic(config['opticalSystem'])
+# Make refractive interfaces partially reflective
+for surface in telescope.itemDict.values():
+    if isinstance(surface, batoid.RefractiveInterface):
+        surface.forwardCoating = batoid.SimpleCoating(0.02, 0.98)
+        surface.reverseCoating = batoid.SimpleCoating(0.02, 0.98)
+    if isinstance(surface, batoid.Detector):
+        surface.forwardCoating = batoid.SimpleCoating(0.02, 0.98)
 
 angles = np.linspace(0.0, 1.0, 21, endpoint=True)
 angles = [0.3]
@@ -23,7 +28,7 @@ for angle in angles:
     dirCos = batoid.utils.gnomonicToDirCos(0.0, np.deg2rad(angle))
 
     rays = batoid.circularGrid(
-        telescope.dist,
+        telescope.backDist,
         telescope.pupilSize/2,
         telescope.pupilSize*telescope.pupilObscuration/2,
         dirCos[0], dirCos[1], dirCos[2],

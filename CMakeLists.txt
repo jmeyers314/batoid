@@ -4,7 +4,7 @@ project(_batoid)
 cmake_policy(SET CMP0063 NEW)  # Compile the static lib with hidden visibility.
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_MACOSX_RPATH 1)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -14,7 +14,7 @@ if(CCACHE_PROGRAM)
 endif()
 # for testing vectorization.
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-vectorize -fno-slp-vectorize")
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE RelWithDebInfo)
 if (DEFINED ENV{CMAKE_COVER})
   set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
   set(CMAKE_BUILD_TYPE Debug)
