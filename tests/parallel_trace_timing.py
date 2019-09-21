@@ -30,7 +30,7 @@ def parallel_trace_timing(nside=1024, nthread=None, minChunk=None):
         pm = 'SubaruHSC.PM'
 
     rays = batoid.circularGrid(
-        telescope.dist,
+        telescope.backDist,
         0.5*telescope.pupilSize,
         0.5*telescope.pupilObscuration*telescope.pupilSize,
         dirCos[0], dirCos[1], dirCos[2],

@@ -16,7 +16,8 @@ class RayVector:
     Parameters
     ----------
     rays : list of Ray
-        The Rays to assemble into a RayVector.
+        The Rays to assemble into a RayVector.  Note that all Rays must have
+        the same coordSys.
     """
     def __init__(self, rays):
         if len(rays) < 1:
@@ -32,9 +33,11 @@ class RayVector:
             self._r = _batoid.RayVector([ray._r for ray in rays], wavelength)
         else:
             raise ValueError("Wrong arguments to RayVector")
+        self.coordSys = rays[0].coordSys
 
     @classmethod
-    def fromArrays(cls, x, y, z, vx, vy, vz, t, w, flux=1, vignetted=False):
+    def fromArrays(cls, x, y, z, vx, vy, vz, t, w, flux=1, vignetted=False,
+                   coordSys=globalCoordSys):
         """Create RayVector from 1d parameter arrays.
 
         Parameters
@@ -52,6 +55,9 @@ class RayVector:
             Fluxes in arbitrary units.
         vignetted : ndarray of bool, shape (n,)
             True where rays have been vignetted.
+        coordSys : CoordSys
+            Coordinate system in which this ray is expressed.  Default: the
+            global coordinate system.
         """
         n = len(x)
         if isinstance(flux, Real):
@@ -64,6 +70,7 @@ class RayVector:
             vignetted.fill(tmp)
         ret = cls.__new__(cls)
         ret._r = _batoid.RayVector(x, y, z, vx, vy, vz, t, w, flux, vignetted)
+        ret.coordSys = coordSys
         return ret
 
     @classmethod
@@ -627,8 +634,8 @@ class RayVector:
             xhat /= np.sqrt(np.dot(xhat, xhat))
             yhat = np.cross(xhat, zhat)
             origin = zhat*backDist
-            coordSys = CoordSys(origin, np.stack([xhat, yhat, zhat]).T)
-            transform = CoordTransform(globalCoordSys, coordSys)
+            cs = CoordSys(origin, np.stack([xhat, yhat, zhat]).T)
+            transform = CoordTransform(globalCoordSys, cs)
             transform.applyForwardInPlace(rays)
             plane = Plane()
             plane.intersectInPlace(rays)
@@ -650,10 +657,11 @@ class RayVector:
             )
 
     @classmethod
-    def _fromRayVector(cls, _r):
+    def _fromRayVector(cls, _r, coordSys=globalCoordSys):
         """Turn a c++ RayVector into a python RayVector."""
         ret = cls.__new__(cls)
         ret._r = _r
+        ret.coordSys=coordSys
         return ret
 
     def __repr__(self):
@@ -709,6 +717,14 @@ class RayVector:
         """
         return self._r.phase(r, t)
 
+    def toCoordSys(self, coordSys):
+        transform = CoordTransform(self.coordSys, coordSys)
+        return transform.applyForward(self)
+
+    def toCoordSysInPlace(self, coordSys):
+        transform = CoordTransform(self.coordSys, coordSys)
+        transform.applyForwardInPlace(self)
+
     def positionAtTime(self, t):
         """Calculate the positions of the rays at a given time.
 
@@ -761,7 +777,9 @@ class RayVector:
         -------
         RayVector
         """
-        return RayVector._fromRayVector(self._r.trimVignetted(minflux))
+        return RayVector._fromRayVector(
+            self._r.trimVignetted(minflux), self.coordSys
+        )
 
     def trimVignettedInPlace(self, minflux=0.0):
         """Remove vignetted rays and rays with flux below a given threshold.
@@ -920,8 +938,16 @@ def concatenateRayVectors(rvs):
     -------
     concatenatedRayVector : RayVector
     """
+    if len(rvs) == 0:
+        return RayVector._fromRayVector(_batoid.RayVector())
+    coordSys = rvs[0].coordSys
+    for rv in rvs[1:]:
+        if rv.coordSys != coordSys:
+            raise ValueError(
+                "Cannot concatenate RayVectors with different coordinate systems"
+            )
     _r = _batoid.concatenateRayVectors([rv._r for rv in rvs])
-    return RayVector._fromRayVector(_r)
+    return RayVector._fromRayVector(_r, coordSys)
 
 
 def rayGrid(zdist, length, xcos, ycos, zcos, nside, wavelength, flux, medium,

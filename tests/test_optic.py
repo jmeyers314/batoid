@@ -24,9 +24,9 @@ def test_optic():
 
     t0 = time.time()
 
-    rays_fast, _ = telescope.trace(rays)
+    rays_fast = telescope.trace(rays)
     t1 = time.time()
-    rays_slow = batoid.RayVector([telescope.trace(r)[0] for r in rays])
+    rays_slow = batoid.RayVector([telescope.trace(r) for r in rays])
     t2 = time.time()
 
     assert rays_fast == rays_slow
@@ -53,7 +53,7 @@ def test_traceFull():
     telescope = batoid.Optic.fromYaml("HSC.yaml")
 
     tf = telescope.traceFull(rays)
-    rays, _ = telescope.trace(rays)
+    rays = telescope.trace(rays)
 
     assert rays == tf[-1]['out']
 
@@ -68,7 +68,7 @@ def test_traceReverse():
     telescope = batoid.Optic.fromYaml("HSC.yaml")
 
     init_rays = batoid.rayGrid(20, 12.0, 0.005, 0.005, -1.0, nside, 500e-9, 1.0, batoid.ConstMedium(1.0))
-    forward_rays, _ = telescope.trace(init_rays, outCoordSys=batoid.CoordSys())
+    forward_rays = telescope.trace(init_rays, outCoordSys=batoid.CoordSys())
 
     # Now, turn the result rays around and trace backwards
     forward_rays = forward_rays.propagatedToTime(40.0)
@@ -76,7 +76,7 @@ def test_traceReverse():
         [batoid.Ray(r.r, -r.v, -r.t, r.wavelength) for r in forward_rays]
     )
 
-    final_rays, _ = telescope.traceReverse(reverse_rays, outCoordSys=batoid.CoordSys())
+    final_rays = telescope.traceReverse(reverse_rays, outCoordSys=batoid.CoordSys())
     # propagate all the way to t=0
     final_rays = final_rays.propagatedToTime(0.0)
 
@@ -201,17 +201,17 @@ def test_thread():
     batoid._batoid.setNThread(4)
     assert batoid._batoid.getNThread() == 4
 
-    rays4, _ = telescope.trace(rayGrid)
+    rays4 = telescope.trace(rayGrid)
 
     batoid._batoid.setNThread(2)
     assert batoid._batoid.getNThread() == 2
 
-    rays2, _ = telescope.trace(rayGrid)
+    rays2 = telescope.trace(rayGrid)
 
     batoid._batoid.setNThread(1)
     assert batoid._batoid.getNThread() == 1
 
-    rays1, _ = telescope.trace(rayGrid)
+    rays1 = telescope.trace(rayGrid)
 
     assert rays1 == rays2 == rays4
 

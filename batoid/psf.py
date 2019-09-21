@@ -73,7 +73,7 @@ def huygensPSF(optic, theta_x=None, theta_y=None, wavelength=None, nx=None,
     amplitudes = np.zeros((nxOut*pad_factor, nxOut*pad_factor), dtype=np.complex128)
     out = batoid.Lattice(np.zeros((nxOut*pad_factor, nxOut*pad_factor), dtype=float), primitiveX)
 
-    rays, outCoordSys = optic.traceInPlace(rays)
+    rays = optic.traceInPlace(rays)
     rays.trimVignettedInPlace()
     # Need transpose to conform to numpy [y,x] ordering convention
     xs = out.coords[..., 0].T + np.mean(rays.x)

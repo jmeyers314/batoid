@@ -181,6 +181,8 @@ class CoordTransform:
         Destination coordinate systems.
     """
     def __init__(self, fromSys, toSys):
+        self.fromSys = fromSys
+        self.toSys = toSys
         self._coordTransform = _batoid.CoordTransform(
             fromSys._coordSys,
             toSys._coordSys
@@ -204,10 +206,14 @@ class CoordTransform:
         if arg2 is not None:
             return self._coordTransform.applyForward(arg1, arg2, arg3)
         elif isinstance(arg1, Ray):
-            return Ray._fromRay(self._coordTransform.applyForward(arg1._r))
+            return Ray._fromRay(
+                self._coordTransform.applyForward(arg1._r),
+                self.toSys
+            )
         elif isinstance(arg1, RayVector):
             return RayVector._fromRayVector(
-                self._coordTransform.applyForward(arg1._r)
+                self._coordTransform.applyForward(arg1._r),
+                self.toSys
             )
         else:
             return self._coordTransform.applyForward(arg1)
@@ -230,10 +236,14 @@ class CoordTransform:
         if arg2 is not None:
             return self._coordTransform.applyReverse(arg1, arg2, arg3)
         elif isinstance(arg1, Ray):
-            return Ray._fromRay(self._coordTransform.applyReverse(arg1._r))
+            return Ray._fromRay(
+                self._coordTransform.applyReverse(arg1._r),
+                self.fromSys
+            )
         elif isinstance(arg1, RayVector):
             return RayVector._fromRayVector(
-                self._coordTransform.applyReverse(arg1._r)
+                self._coordTransform.applyReverse(arg1._r),
+                self.fromSys
             )
         else:
             return self._coordTransform.applyReverse(arg1)
@@ -252,6 +262,7 @@ class CoordTransform:
             Result of transformation.  Type is the same as the input type.
         """
         self._coordTransform.applyForwardInPlace(r._r)
+        r.coordSys = self.toSys
 
     def applyReverseInPlace(self, r):
         """Apply reverse-direction transformation in place.
@@ -267,6 +278,7 @@ class CoordTransform:
             Result of transformation.  Type is the same as the input type.
         """
         self._coordTransform.applyReverseInPlace(r._r)
+        r.coordSys = self.fromSys
 
     def __eq__(self, rhs):
         if not isinstance(rhs, CoordTransform): return False

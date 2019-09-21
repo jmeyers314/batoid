@@ -26,17 +26,21 @@ for angle in angles:
         telescope.dist,
         telescope.pupilSize/2,
         telescope.pupilSize*telescope.pupilObscuration/2,
-        dirCos[0], dirCos[1], -dirCos[2],
-        300, 900, 500e-9, 1.0, telescope.inMedium)
+        dirCos[0], dirCos[1], dirCos[2],
+        300, 900, 500e-9, 1.0, telescope.inMedium
+    )
 
-    rForward, rReverse, _, _ = telescope.traceSplit(rays, minFlux=1e-4, _verbose=True)
+    rForward, rReverse = telescope.traceSplit(rays, minFlux=1e-4, _verbose=True)
 
-    print(len(rays))
-    print(np.sum(rays.flux))
-    print(len(rForward))
-    print(len(rReverse))
-    print(np.sum(rForward.flux))
-    print(np.sum(rReverse.flux))
+    print("# input rays          = {}".format(len(rays)))
+    print("# forward output rays = {}".format(len(rForward)))
+    print("# reverse output rays = {}".format(len(rReverse)))
+    print("input flux          = {}".format(np.sum(rays.flux)))
+    print("forward output flux = {}".format(np.sum(rForward.flux)))
+    print("reverse output flux = {}".format(np.sum(rReverse.flux)))
+    print("destroyed flux      = {}".format(
+        np.sum(rays.flux) - np.sum(rForward.flux) - np.sum(rReverse.flux))
+    )
 
 
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(8, 8))

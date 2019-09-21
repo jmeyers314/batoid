@@ -30,9 +30,12 @@ class Ray:
     failed : bool
         Whether Ray is in failed state or not, which may happen if an
         intersection with a surface is requested but cannot be found.
+    coordSys : CoordSys
+        Coordinate system in which this ray is expressed.  Default: the global
+        coordinate system.
     """
     def __init__(self, r=None, v=None, t=0.0, wavelength=0.0, flux=1.0,
-                 vignetted=False, failed=False):
+                 vignetted=False, failed=False, coordSys=globalCoordSys):
         if failed:
             self._r = _batoid.Ray(failed=True)
         elif r is None and v is None:
@@ -41,12 +44,14 @@ class Ray:
             self._r = _batoid.Ray(r._r)
         else:
             self._r = _batoid.Ray(r, v, t, wavelength, flux, vignetted)
+        self.coordSys = coordSys
 
     @classmethod
-    def _fromRay(cls, _r):
+    def _fromRay(cls, _r, coordSys=globalCoordSys):
         """Turn a c++ Ray into a python Ray."""
         ret = cls.__new__(cls)
         ret._r = _r
+        ret.coordSys = coordSys
         return ret
 
     @classmethod
@@ -56,7 +61,7 @@ class Ray:
         wavelength=None,
         source=None, dirCos=None,
         theta_x=None, theta_y=None, projection='postel',
-        flux=1
+        flux=1, coordSys=globalCoordSys
     ):
         """Create a Ray that intersects the "stop" surface at a given point.
 
@@ -129,6 +134,9 @@ class Ray:
             Projection used to convert field angle to direction cosines.
         flux : float, optional
             Flux of ray.  Default is 1.0.
+        coordSys : CoordSys
+            Coordinate system in which ray is expressed.  Default: the global
+            coordinate system.
         """
         from .optic import Interface
         from .surface import Plane
@@ -175,14 +183,18 @@ class Ray:
             plane = Plane()
             plane.intersectInPlace(ray)
             transform.applyReverseInPlace(ray)
-            return Ray((ray.x, ray.y, ray.z), v, t, wavelength, flux)
+            return Ray(
+                (ray.x, ray.y, ray.z),
+                v, t, wavelength, flux,
+                coordSys=globalCoordSys
+            )
         else:
             vx = x - source[0]
             vy = y - source[1]
             vz = z - source[2]
             v = np.array([vx, vy, vz])
             v /= n*np.sqrt(np.dot(v, v))
-            return Ray((x, y, z), v, t, w, flux)
+            return Ray((x, y, z), v, t, w, flux, coordSys=globalCoordSys)
 
     def __repr__(self):
         return repr(self._r)
@@ -258,6 +270,14 @@ class Ray:
         float
         """
         return self._r.phase(r, t)
+
+    def toCoordSys(self, coordSys):
+        transform = CoordTransform(self.coordSys, coordSys)
+        return transform.applyForward(self)
+
+    def toCoordSysInPlace(self, coordSys):
+        transform = CoordTransform(self.coordSys, coordSys)
+        transform.applyForwardInPlace(self)
 
     @property
     def r(self):
@@ -371,7 +391,7 @@ class Ray:
 
     def __eq__(self, rhs):
         if not isinstance(rhs, Ray): return False
-        return self._r == rhs._r
+        return self._r == rhs._r and self.coordSys == rhs.coordSys
 
     def __ne__(self, rhs):
         return not (self == rhs)

@@ -54,8 +54,7 @@ def test_HSC_trace():
             s = surface['out']
             v = s.v/np.linalg.norm(s.v)
 
-            transform = batoid.CoordTransform(surface['outCoordSys'], batoid.CoordSys())
-            s = transform.applyForward(s)
+            s.toCoordSysInPlace(batoid.CoordSys())
             bt_isec = np.array([s.x, s.y, s.z-16.0])
             zx_isec = arr[HSC_surfaces[i]-1][1:4]/1000
             np.testing.assert_allclose(bt_isec, zx_isec, rtol=0, atol=1e-9) # nanometer agreement
@@ -426,11 +425,7 @@ def test_LSST_trace():
         tf = telescope.traceFull(ray)
 
         for surface, iz in zip(tf, zSurfaces):
-            r = surface['out']
-            transform = batoid.CoordTransform(
-                surface['outCoordSys'], batoid.globalCoordSys
-            )
-            r = transform.applyForward(r)
+            r = surface['out'].toCoordSys(batoid.globalCoordSys)
             n = 1./np.sqrt(np.sum(r.v**2))
 
             # Note Zemax has different sign convention for z-coordinates and

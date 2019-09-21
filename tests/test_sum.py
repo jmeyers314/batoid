@@ -166,7 +166,7 @@ def test_sum_bicubic():
         xcos, ycos, -zcos,
         50, 50, 750e-9, 1.0, telescope.inMedium
     )
-    out, _ = telescope.trace(rays)
+    out = telescope.trace(rays)
 
     m2 = telescope['LSST.M2']
 
@@ -176,7 +176,7 @@ def test_sum_bicubic():
     bicubic = batoid.Bicubic(xs, ys, zs)
 
     m2.surface = batoid.Sum([m2.surface, bicubic])
-    out2, _ = telescope.trace(rays)
+    out2 = telescope.trace(rays)
 
     # Don't expect exact equality, but should be very similar
     assert rays_allclose(out, out2, atol=1e-13)
