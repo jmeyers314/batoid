@@ -22,8 +22,6 @@ class RayVector:
     def __init__(self, rays):
         if len(rays) < 1:
             raise ValueError("No Rays from which to create RayVector")
-        if isinstance(rays, RayVector):
-            self._r = _batoid.RayVector(rays._r)
         elif isinstance(rays, Sequence):
             wavelength = rays[0].wavelength
             for r in rays:
@@ -663,6 +661,13 @@ class RayVector:
         ret._r = _r
         ret.coordSys=coordSys
         return ret
+
+    def copy(self):
+        """Return a copy of this RayVector."""
+        return RayVector._fromRayVector(
+            _batoid.RayVector(self._r),
+            self.coordSys
+        )
 
     def __repr__(self):
         return repr(self._r)

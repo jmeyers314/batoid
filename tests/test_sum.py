@@ -139,10 +139,10 @@ def test_intersect():
         s2 = batoid.Paraboloid(np.random.uniform(3, 10))
         sum = batoid.Sum([s1, s2])
 
-        rv = batoid.RayVector(rv0)
+        rv = rv0.copy()
         rv1 = sum.intersect(rv)
         rv2 = batoid.RayVector([sum.intersect(r) for r in rv])
-        rv3 = batoid.RayVector(rv)
+        rv3 = rv.copy()
         sum.intersectInPlace(rv)
 
         for r in rv3:
