@@ -40,8 +40,6 @@ class Ray:
             self._r = _batoid.Ray(failed=True)
         elif r is None and v is None:
             self._r = _batoid.Ray()
-        elif isinstance(r, Ray):
-            self._r = _batoid.Ray(r._r)
         else:
             self._r = _batoid.Ray(r, v, t, wavelength, flux, vignetted)
         self.coordSys = coordSys
@@ -195,6 +193,10 @@ class Ray:
             v = np.array([vx, vy, vz])
             v /= n*np.sqrt(np.dot(v, v))
             return Ray((x, y, z), v, t, w, flux, coordSys=globalCoordSys)
+
+    def copy(self):
+        """Return a copy of this Ray."""
+        return Ray._fromRay(_batoid.Ray(self._r), self.coordSys)
 
     def __repr__(self):
         return repr(self._r)

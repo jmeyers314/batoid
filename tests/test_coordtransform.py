@@ -105,7 +105,7 @@ def test_composition():
 
             # Test in-place on Ray
             ray = randomRay()
-            ray_copy = batoid.Ray(ray)
+            ray_copy = ray.copy()
             transform1to2.applyForwardInPlace(ray)
             transform2to3.applyForwardInPlace(ray)
             transform1to3.applyForwardInPlace(ray_copy)
@@ -113,7 +113,7 @@ def test_composition():
 
             # in-place reverse on Ray
             ray = randomRay()
-            ray_copy = batoid.Ray(ray)
+            ray_copy = ray.copy()
             transform2to3.applyReverseInPlace(ray)
             transform1to2.applyReverseInPlace(ray)
             transform1to3.applyReverseInPlace(ray_copy)
@@ -121,7 +121,7 @@ def test_composition():
 
             # Test in-place on RayVector
             rv = randomRayVector()
-            rv_copy = batoid.RayVector(rv)
+            rv_copy = rv.copy()
             transform1to2.applyForwardInPlace(rv)
             transform2to3.applyForwardInPlace(rv)
             transform1to3.applyForwardInPlace(rv_copy)
@@ -129,7 +129,7 @@ def test_composition():
 
             # in-place reverse on RayVector
             rv = randomRayVector()
-            rv_copy = batoid.RayVector(rv)
+            rv_copy = rv.copy()
             transform2to3.applyReverseInPlace(rv)
             transform1to2.applyReverseInPlace(rv)
             transform1to3.applyReverseInPlace(rv_copy)

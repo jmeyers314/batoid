@@ -24,7 +24,7 @@ def test_plane_refraction_plane():
         rray = plane.refract(ray, m1, m2)
         np.testing.assert_allclose(np.linalg.norm(rray.v), 1./m2.getN(wavelength), rtol=1e-15)
         # also check refractInPlace
-        rray2 = batoid.Ray(ray)
+        rray2 = ray.copy()
         plane.refractInPlace(rray2, m1, m2)
         assert rray == rray2
 
@@ -98,7 +98,7 @@ def test_paraboloid_refraction_plane():
         rray = para.refract(ray, m1, m2)
         np.testing.assert_allclose(np.linalg.norm(rray.v), 1./m2.getN(wavelength), rtol=1e-15)
         # also check refractInPlace
-        rray2 = batoid.Ray(ray)
+        rray2 = ray.copy()
         para.refractInPlace(rray2, m1, m2)
         assert rray == rray2
 
@@ -174,7 +174,7 @@ def test_asphere_refraction_plane():
         rray = asphere.refract(ray, m1, m2)
         np.testing.assert_allclose(np.linalg.norm(rray.v), 1./m2.getN(wavelength), rtol=1e-15)
         # also check refractInPlace
-        rray2 = batoid.Ray(ray)
+        rray2 = ray.copy()
         asphere.refractInPlace(rray2, m1, m2)
         assert rray == rray2
 

@@ -331,10 +331,8 @@ class Interface(Optic):
         """
         if self.skip:
             return []
-        result = [{'name':self.name, 'in':r}]
-        r = self.trace(r, outCoordSys=outCoordSys)
-        result[0]['out'] = r
-        return result
+        r_out = self.trace(r, outCoordSys=outCoordSys)
+        return [{'name':self.name, 'in':r, 'out':r_out}]
 
     def traceInPlace(self, r, outCoordSys=None):
         """Trace ray(s) through this optical element in place (result replaces
