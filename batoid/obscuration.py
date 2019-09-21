@@ -40,7 +40,7 @@ class Obscuration:
         out : `Ray` or `RayVector`
             Returned object will have appropriate elements marked as vignetted.
         """
-        return _rayify(self._obsc.obscure(r._r))
+        return _rayify(self._obsc.obscure(r._r), r.coordSys)
 
     def obscureInPlace(self, r):
         """Mark a `Ray` or `RayVector` for potential vignetting in place.

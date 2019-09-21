@@ -110,7 +110,7 @@ def huygensPSF(optic, theta_x, theta_y, wavelength,
         primitiveX
     )
 
-    rays, outCoordSys = optic.traceInPlace(rays)
+    optic.traceInPlace(rays)
     if reference == 'mean':
         w = np.where(1-rays.vignetted)[0]
         point = np.mean(rays.r[w], axis=0)

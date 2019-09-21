@@ -467,12 +467,12 @@ class lazy_property(object):
         return value
 
 
-def _rayify(r):
+def _rayify(r, coordSys=None):
     from .ray import Ray
     from .rayVector import RayVector
     if isinstance(r, _batoid.Ray):
-        return Ray._fromRay(r)
+        return Ray._fromRay(r, coordSys)
     elif isinstance(r, _batoid.RayVector):
-        return RayVector._fromRayVector(r)
+        return RayVector._fromRayVector(r, coordSys)
     else:
         raise ValueError("Unknown type in _rayify")
