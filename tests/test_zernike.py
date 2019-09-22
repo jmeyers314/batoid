@@ -201,7 +201,6 @@ if __name__ == '__main__':
     test_properties()
     test_intersect()
     test_intersect_vectorized()
-    test_grad()
     test_normal()
     test_ne()
     test_fail()

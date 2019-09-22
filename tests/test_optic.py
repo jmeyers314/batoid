@@ -55,7 +55,7 @@ def test_traceFull():
     tf = telescope.traceFull(rays)
     rays = telescope.trace(rays)
 
-    assert rays == tf[-1]['out']
+    assert rays == tf['D']['out']
 
 
 @timer

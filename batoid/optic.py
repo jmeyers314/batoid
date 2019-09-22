@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 import numpy as np
 
 from .coating import SimpleCoating
@@ -318,21 +320,32 @@ class Interface(Optic):
 
         Returns
         -------
-        List of dict
-            Each dict contains fields:
-                'name' : name of Interface
-                'in' : the incoming Ray or RayVector to that Interface
-                'out' : the outgoing Ray or RayVector to that Interface
+        OrderedDict of dict
+            There will be one key-value pair for every Interface traced
+            through (which for this class, is just a single Interface).  The
+            values will be dicts with key-value pairs:
+                'name' : str
+                    name of Interface
+                'in' : Ray or RayVector
+                    the incoming ray(s) to that Interface
+                'out' : Ray or RayVector
+                    the outgoing ray(s) from that Interface
 
         Notes
         -----
-        Returned rays will be expressed in the local coordinate system of the
-        Optic.  See `Ray.toCoordSys` or `RayVector.toCoordSys` to express rays
-        in a different coordinate system.
+        Pay careful attention to the coordinate systems of the returned rays.
+        These will generally differ from the original input coordinate system.
+        To transform to another coordinate system, see `Ray.toCoordSys` or
+        `RayVector.toCoordSys`.
         """
-        if self.skip:
-            return []
-        return [{'name':self.name, 'in':r, 'out':self.trace(r)}]
+        result = OrderedDict()
+        if not self.skip:
+            result[self.name] = {
+                'name':self.name,
+                'in':r,
+                'out':self.trace(r)
+            }
+        return result
 
     def traceInPlace(self, r):
         """Trace ray(s) through this optical element in place (result replaces
@@ -851,25 +864,30 @@ class CompoundOptic(Optic):
 
         Returns
         -------
-        List of dict
-            Each dict contains fields:
-                - 'name' : name of `Interface`
-                - 'in' : the incoming `Ray` or `RayVector` to that `Interface`
-                - 'out' : the outgoing Ray or RayVector to that Interface
+        OrderedDict of dict
+            There will be one key-value pair for every Interface traced
+            through.  The values will be dicts with key-value pairs:
+                'name' : str
+                    name of Interface
+                'in' : Ray or RayVector
+                    the incoming ray(s) to that Interface
+                'out' : Ray or RayVector
+                    the outgoing ray(s) from that Interface
         Notes
         -----
-        Returned rays will be expressed in the local coordinate system of the
-        each element of the CompoundOptic.  See `Ray.toCoordSys` or
-        `RayVector.toCoordSys` to express rays in a different coordinate
-        system.
+        Pay careful attention to the coordinate systems of the returned rays.
+        These will generally differ from the original input coordinate system.
+        To transform to another coordinate system, see `Ray.toCoordSys` or
+        `RayVector.toCoordSys`.
         """
-        if self.skip:
-            return []
-        result = []
-        r_in = r
-        for item in self.items:
-            result.extend(item.traceFull(r_in))
-            r_in = result[-1]['out']
+        result = OrderedDict()
+        if not self.skip:
+            r_in = r
+            for item in self.items:
+                tf = item.traceFull(r_in)
+                for k, v in tf.items():
+                    result[k] = v
+                    r_in = v['out']
         return result
 
     def traceInPlace(self, r):
@@ -1672,7 +1690,7 @@ def getGlobalRays(traceFull, start=None, end=None, globalSys=globalCoordSys):
 
     Parameters
     ----------
-    traceFull : array
+    traceFull : OrderedDict
         Array of per-surface ray-tracing output from traceFull()
     start : str or None
         Name of the first surface to include in the output, or use the first
@@ -1691,16 +1709,20 @@ def getGlobalRays(traceFull, start=None, end=None, globalSys=globalCoordSys):
         ray vertex, with raylen giving the number of visible (not vignetted)
         vertices for each ray.
     """
-    names = [trace['name'] for trace in traceFull]
+    names = [trace['name'] for trace in traceFull.values()]
+    if start is None:
+        start = names[0]
+    if end is None:
+        end = names[-1]
     try:
-        start = 0 if start is None else names.index(start)
+        istart = names.index(start)
     except ValueError:
         raise ValueError('No such start surface "{0}".'.format(start))
     try:
-        end = len(names) if end is None else names.index(end) + 1
+        iend = names.index(end)
     except ValueError:
         raise ValueError('No such end surface "{0}".'.format(end))
-    nsurf = end - start
+    nsurf = iend - istart + 1
     if nsurf <= 0:
         raise ValueError('Expected start < end.')
     nray = len(traceFull[start]['in'])
@@ -1713,7 +1735,8 @@ def getGlobalRays(traceFull, start=None, end=None, globalSys=globalCoordSys):
     )
     # Keep track of the number of visible points on each ray.
     raylen = np.ones(nray, dtype=int)
-    for i, surface in enumerate(traceFull[start:end]):
+    for i, name in enumerate(names[istart:iend+1]):
+        surface = traceFull[name]
         # Add a point for where each ray leaves this surface.
         transform = CoordTransform(surface['out'].coordSys, globalSys)
         xyz[:, :, i + 1] = np.stack(
@@ -1732,7 +1755,7 @@ def drawTrace3d(ax, traceFull, start=None, end=None, **kwargs):
     ----------
     ax : mplot3d.Axis
         Axis on which to draw rays.
-    traceFull : array
+    traceFull : OrderedDict
         Array of per-surface ray-tracing output from traceFull()
     start : str or None
         Name of the first surface to include in the output, or use the first
@@ -1756,7 +1779,7 @@ def drawTrace2d(ax, traceFull, start=None, end=None, **kwargs):
     ----------
     ax : matplotlib.axes.Axes
         Axis on which to draw rays.
-    traceFull : array
+    traceFull : OrderedDict
         Array of per-surface ray-tracing output from traceFull()
     start : str or None
         Name of the first surface to include in the output, or use the first
