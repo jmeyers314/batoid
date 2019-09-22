@@ -274,10 +274,28 @@ class Ray:
         return self._r.phase(r, t)
 
     def toCoordSys(self, coordSys):
+        """Transform ray into new coordinate system.
+
+        Parameters
+        ----------
+        coordSys: batoid.CoordSys
+            Destination coordinate system.
+
+        Returns
+        -------
+        Ray
+        """
         transform = CoordTransform(self.coordSys, coordSys)
         return transform.applyForward(self)
 
     def toCoordSysInPlace(self, coordSys):
+        """Transform ray into new coordinate system in place.
+
+        Parameters
+        ----------
+        coordSys: batoid.CoordSys
+            Destination coordinate system.
+        """
         transform = CoordTransform(self.coordSys, coordSys)
         transform.applyForwardInPlace(self)
 
