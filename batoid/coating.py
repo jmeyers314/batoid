@@ -75,7 +75,7 @@ class SimpleCoating(Coating):
         Transmission coefficient
     """
     def __init__(self, reflectivity, transmissivity):
-        self._coating = _batoid.SimpleCoating(
+        self._coating = _batoid.CPPSimpleCoating(
             reflectivity, transmissivity
         )
 

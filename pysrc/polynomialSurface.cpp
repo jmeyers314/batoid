@@ -8,7 +8,7 @@ using Eigen::MatrixXd;
 
 namespace batoid {
     void pyExportPolynomialSurface(py::module& m) {
-        py::class_<PolynomialSurface, std::shared_ptr<PolynomialSurface>, Surface>(m, "PolynomialSurface")
+        py::class_<PolynomialSurface, std::shared_ptr<PolynomialSurface>, Surface>(m, "CPPPolynomialSurface")
             .def(py::init<MatrixXd>(), "init", "coefs"_a)
             .def_property_readonly("coefs", &PolynomialSurface::getCoefs);
 

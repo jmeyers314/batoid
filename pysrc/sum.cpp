@@ -9,7 +9,7 @@ using namespace pybind11::literals;
 
 namespace batoid {
     void pyExportSum(py::module& m) {
-        py::class_<Sum, std::shared_ptr<Sum>, Surface>(m, "Sum")
+        py::class_<Sum, std::shared_ptr<Sum>, Surface>(m, "CPPSum")
             .def(py::init<std::vector<std::shared_ptr<Surface>>>(), "init", "surfaces"_a)
             .def_property_readonly("surfaces", &Sum::getSurfaces);
     }

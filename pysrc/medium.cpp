@@ -10,12 +10,12 @@ using namespace pybind11::literals;
 
 namespace batoid {
     void pyExportMedium(py::module& m) {
-        py::class_<Medium, std::shared_ptr<Medium>>(m, "Medium")
+        py::class_<Medium, std::shared_ptr<Medium>>(m, "CPPMedium")
             .def("getN", &Medium::getN)
             .def("__repr__", &Medium::repr);
 
 
-        py::class_<ConstMedium, std::shared_ptr<ConstMedium>, Medium>(m, "ConstMedium")
+        py::class_<ConstMedium, std::shared_ptr<ConstMedium>, Medium>(m, "CPPConstMedium")
             .def(py::init<double>())
             .def(py::self == py::self)
             .def(py::self != py::self)
@@ -25,13 +25,13 @@ namespace batoid {
             ))
             .def("__hash__", [](const ConstMedium& cm) {
                 return py::hash(py::make_tuple(
-                    "ConstMedium",
+                    "CPPConstMedium",
                     cm.getN(0.0)
                 ));
             });
 
 
-        py::class_<TableMedium, std::shared_ptr<TableMedium>, Medium>(m, "TableMedium")
+        py::class_<TableMedium, std::shared_ptr<TableMedium>, Medium>(m, "CPPTableMedium")
             .def(py::init<std::shared_ptr<Table<double,double>>>())
             .def_property_readonly("table", &TableMedium::getTable)
             .def(py::self == py::self)
@@ -42,13 +42,13 @@ namespace batoid {
             ))
             .def("__hash__", [](const TableMedium& tm) {
                 return py::hash(py::make_tuple(
-                    "TableMedium",
+                    "CPPTableMedium",
                     *tm.getTable()
                 ));
             });
 
 
-        py::class_<SellmeierMedium, std::shared_ptr<SellmeierMedium>, Medium>(m, "SellmeierMedium")
+        py::class_<SellmeierMedium, std::shared_ptr<SellmeierMedium>, Medium>(m, "CPPSellmeierMedium")
             .def(py::init<double,double,double,double,double,double>())
             .def(py::init<std::array<double,6>>())
             .def_property_readonly("coefs", &SellmeierMedium::getCoefs)
@@ -62,13 +62,13 @@ namespace batoid {
             ))
             .def("__hash__", [](const SellmeierMedium& sm) {
                 return py::hash(py::make_tuple(
-                    "SellmeierMedium",
+                    "CPPSellmeierMedium",
                     py::tuple(py::cast(sm.getCoefs()))
                 ));
             });
 
 
-        py::class_<SumitaMedium, std::shared_ptr<SumitaMedium>, Medium>(m, "SumitaMedium")
+        py::class_<SumitaMedium, std::shared_ptr<SumitaMedium>, Medium>(m, "CPPSumitaMedium")
             .def(py::init<double,double,double,double,double,double>())
             .def(py::init<std::array<double,6>>())
             .def_property_readonly("coefs", &SumitaMedium::getCoefs)
@@ -82,13 +82,13 @@ namespace batoid {
             ))
             .def("__hash__", [](const SumitaMedium& sm) {
                 return py::hash(py::make_tuple(
-                    "SumitaMedium",
+                    "CPPSumitaMedium",
                     py::tuple(py::cast(sm.getCoefs()))
                 ));
             });
 
 
-        py::class_<Air, std::shared_ptr<Air>, Medium>(m, "Air")
+        py::class_<Air, std::shared_ptr<Air>, Medium>(m, "CPPAir")
             .def(py::init<double,double,double>(),
                  "init",
                  "pressure"_a=69.328, "temperature"_a=293.15, "h2o_pressure"_a=1.067)
@@ -108,7 +108,7 @@ namespace batoid {
             ))
             .def("__hash__", [](const Air& a) {
                 return py::hash(py::make_tuple(
-                    "Air",
+                    "CPPAir",
                     a.getPressure(),
                     a.getTemperature(),
                     a.getH2OPressure()

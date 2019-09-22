@@ -12,7 +12,7 @@ using namespace pybind11::literals;
 
 namespace batoid {
     void pyExportRayVector(py::module& m) {
-        py::class_<RayVector>(m, "RayVector")
+        py::class_<RayVector>(m, "CPPRayVector")
             .def(py::init<>())
             .def(py::init<RayVector>())
             .def(py::init<std::vector<Ray>>())
@@ -55,7 +55,7 @@ namespace batoid {
             ))
             .def("__hash__", [](const RayVector& rv) {
                 return py::hash(py::make_tuple(
-                    "RayVector",
+                    "CPPRayVector",
                     py::tuple(py::cast(rv.getRays())),
                     rv.getWavelength()
                 ));

@@ -10,7 +10,7 @@ namespace py = pybind11;
 
 namespace batoid {
     void pyExportCoordSys(py::module& m) {
-        py::class_<CoordSys, std::shared_ptr<CoordSys>>(m, "CoordSys")
+        py::class_<CoordSys, std::shared_ptr<CoordSys>>(m, "CPPCoordSys")
             .def(py::init<>())
             .def(py::init<Vector3d>())
             .def(py::init<Matrix3d>())
@@ -39,7 +39,7 @@ namespace batoid {
             ))
             .def("__hash__", [](const CoordSys& cs) {
                 return py::hash(py::make_tuple(
-                    "CoordSys",
+                    "CPPCoordSys",
                     py::tuple(py::cast(cs.m_origin)),
                     py::tuple(py::cast(cs.m_rot).attr("ravel")())
                 ));
@@ -162,7 +162,7 @@ namespace batoid {
 
 
     void pyExportCoordTransform(py::module& m) {
-        py::class_<CoordTransform, std::shared_ptr<CoordTransform>>(m, "CoordTransform")
+        py::class_<CoordTransform, std::shared_ptr<CoordTransform>>(m, "CPPCoordTransform")
             .def(py::init<const CoordSys&, const CoordSys&>())
             .def("applyForward", (Vector3d (CoordTransform::*)(const Vector3d&) const) &CoordTransform::applyForward)
             .def("applyReverse", (Vector3d (CoordTransform::*)(const Vector3d&) const) &CoordTransform::applyReverse)
@@ -188,7 +188,7 @@ namespace batoid {
             ))
             .def("__hash__", [](CoordTransform& ct) {
                 return py::hash(py::make_tuple(
-                    "CoordTransform",
+                    "CPPCoordTransform",
                     py::tuple(py::cast(ct.getDr())),
                     py::tuple(py::cast(ct.getRot()).attr("ravel")())
                 ));

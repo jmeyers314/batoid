@@ -216,7 +216,7 @@ class Plane(Surface):
         z(x, y) = 0
     """
     def __init__(self, allowReverse=False):
-        self._surface = _batoid.Plane(allowReverse)
+        self._surface = _batoid.CPPPlane(allowReverse)
 
     @property
     def allowReverse(self):
@@ -226,7 +226,7 @@ class Plane(Surface):
         return hash(("batoid.Plane", self.allowReverse))
 
     def __setstate__(self, allowReverse):
-        self._surface = _batoid.Plane(allowReverse)
+        self._surface = _batoid.CPPPlane(allowReverse)
 
     def __getstate__(self):
         return self.allowReverse
@@ -260,7 +260,7 @@ class Paraboloid(Surface):
         Radius of curvature at paraboloid vertex.
     """
     def __init__(self, R):
-        self._surface = _batoid.Paraboloid(R)
+        self._surface = _batoid.CPPParaboloid(R)
 
     @property
     def R(self):
@@ -271,7 +271,7 @@ class Paraboloid(Surface):
         return hash(("batoid.Paraboloid", self.R))
 
     def __setstate__(self, R):
-        self._surface = _batoid.Paraboloid(R)
+        self._surface = _batoid.CPPParaboloid(R)
 
     def __getstate__(self):
         return self.R
@@ -300,7 +300,7 @@ class Sphere(Surface):
         Sphere radius.
     """
     def __init__(self, R):
-        self._surface = _batoid.Sphere(R)
+        self._surface = _batoid.CPPSphere(R)
 
     @property
     def R(self):
@@ -312,7 +312,7 @@ class Sphere(Surface):
         return hash(("batoid.Sphere", self.R))
 
     def __setstate__(self, R):
-        self._surface = _batoid.Sphere(R)
+        self._surface = _batoid.CPPSphere(R)
 
     def __getstate__(self):
         return self.R
@@ -351,7 +351,7 @@ class Quadric(Surface):
         Conic constant :math:`\\kappa`
     """
     def __init__(self, R, conic):
-        self._surface = _batoid.Quadric(R, conic)
+        self._surface = _batoid.CPPQuadric(R, conic)
 
     @property
     def R(self):
@@ -369,7 +369,7 @@ class Quadric(Surface):
         return hash(("batoid.Quadric", self.R, self.conic))
 
     def __setstate__(self, args):
-        self._surface = _batoid.Quadric(*args)
+        self._surface = _batoid.CPPQuadric(*args)
 
     def __getstate__(self):
         return (self.R, self.conic)
@@ -415,7 +415,7 @@ class Asphere(Surface):
         Even polynomial coefficients :math:`\\left\\{\\alpha_i\\right\\}`
     """
     def __init__(self, R, conic, coefs):
-        self._surface = _batoid.Asphere(R, conic, coefs)
+        self._surface = _batoid.CPPAsphere(R, conic, coefs)
 
     @property
     def R(self):
@@ -439,7 +439,7 @@ class Asphere(Surface):
         return hash(("batoid.Asphere", self.R, self.conic, tuple(self.coefs)))
 
     def __setstate__(self, args):
-        self._surface = _batoid.Asphere(*args)
+        self._surface = _batoid.CPPAsphere(*args)
 
     def __getstate__(self):
         return self.R, self.conic, self.coefs
@@ -490,7 +490,7 @@ class Zernike(Surface):
         self._R_inner = float(R_inner)
         self.Z = galsim.zernike.Zernike(coef, R_outer, R_inner)
         pcoef = self.Z._coef_array_xy
-        self._surface = _batoid.PolynomialSurface(pcoef)
+        self._surface = _batoid.CPPPolynomialSurface(pcoef)
 
     @property
     def coef(self):
@@ -580,7 +580,7 @@ class Bicubic(Surface):
         self._d2zdxdys = np.ascontiguousarray(d2zdxdys)
         self._slopFrac = _slopFrac
 
-        self._surface = _batoid.Bicubic(
+        self._surface = _batoid.CPPBicubic(
             self._xs, self._ys, self._zs,
             self._dzdxs, self._dzdys, self._d2zdxdys,
             self._slopFrac
@@ -622,7 +622,7 @@ class Bicubic(Surface):
          self._dzdxs, self._dzdys, self._d2zdxdys,
          self._slopFrac
         ) = args
-        self._surface = _batoid.Bicubic(self.xs, self.ys, self.zs,
+        self._surface = _batoid.CPPBicubic(self.xs, self.ys, self.zs,
                                         self.dzdxs, self.dzdys, self.d2zdxdys,
                                         self._slopFrac)
 
@@ -663,7 +663,7 @@ class Sum(Surface):
     """
     def __init__(self, surfaces):
         self._surfaces = surfaces
-        self._surface = _batoid.Sum([s._surface for s in surfaces])
+        self._surface = _batoid.CPPSum([s._surface for s in surfaces])
 
     @property
     def surfaces(self):
@@ -675,7 +675,7 @@ class Sum(Surface):
 
     def __setstate__(self, args):
         self._surfaces = args
-        self._surface = _batoid.Sum([s._surface for s in args])
+        self._surface = _batoid.CPPSum([s._surface for s in args])
 
     def __getstate__(self):
         return self.surfaces

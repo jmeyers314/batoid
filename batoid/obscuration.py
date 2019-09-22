@@ -77,7 +77,7 @@ class ObscCircle(Obscuration):
         Coordinates of circle center in meters.  [default: 0.0]
     """
     def __init__(self, radius, x=0.0, y=0.0):
-        self._obsc = _batoid.ObscCircle(radius, x, y)
+        self._obsc = _batoid.CPPObscCircle(radius, x, y)
 
     @property
     def radius(self):
@@ -108,7 +108,7 @@ class ObscAnnulus(Obscuration):
         Coordinates of annulus center in meters.  [default: 0.0]
     """
     def __init__(self, inner, outer, x=0.0, y=0.0):
-        self._obsc = _batoid.ObscAnnulus(inner, outer, x, y)
+        self._obsc = _batoid.CPPObscAnnulus(inner, outer, x, y)
 
     @property
     def inner(self):
@@ -146,7 +146,7 @@ class ObscRectangle(Obscuration):
         Counter-clockwise rotation of rectangle in radians.  [default: 0.0]
     """
     def __init__(self, width, height, x=0.0, y=0.0, theta=0.0):
-        self._obsc = _batoid.ObscRectangle(width, height, x, y, theta)
+        self._obsc = _batoid.CPPObscRectangle(width, height, x, y, theta)
 
     @property
     def width(self):
@@ -189,7 +189,7 @@ class ObscRay(Obscuration):
         Coordinates of ray origin in meters.  [default: 0.0]
     """
     def __init__(self, width, theta, x=0.0, y=0.0):
-        self._obsc = _batoid.ObscRay(width, theta, x, y)
+        self._obsc = _batoid.CPPObscRay(width, theta, x, y)
 
     @property
     def width(self):
@@ -225,7 +225,7 @@ class ObscNegation(Obscuration):
     """
     def __init__(self, original):
         self._original = original
-        self._obsc = _batoid.ObscNegation(original._obsc)
+        self._obsc = _batoid.CPPObscNegation(original._obsc)
 
     @property
     def original(self):
@@ -273,7 +273,7 @@ class ObscUnion(Obscuration):
             if isinstance(items, (list, tuple)):
                 items = items[0]
         self._items = items
-        self._obsc = _batoid.ObscUnion([item._obsc for item in items])
+        self._obsc = _batoid.CPPObscUnion([item._obsc for item in items])
 
     @property
     def items(self):
@@ -327,7 +327,7 @@ class ObscIntersection(Obscuration):
             if isinstance(items, (list, tuple)):
                 items = items[0]
         self._items = items
-        self._obsc = _batoid.ObscIntersection([item._obsc for item in items])
+        self._obsc = _batoid.CPPObscIntersection([item._obsc for item in items])
 
     @property
     def items(self):
