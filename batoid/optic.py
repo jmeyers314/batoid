@@ -750,7 +750,7 @@ class CompoundOptic(Optic):
         Optic.__init__(self, **kwargs)
         self.items = tuple(items)
 
-    @property
+    @lazy_property
     def itemDict(self):
         """Dictionary access of the entire hierarchy of subitems of this
         `CompoundOptic`.
@@ -765,25 +765,25 @@ class CompoundOptic(Optic):
         Note: It's also possible to access subitems using the [] operator
         directly: ``optic['SubaruHSC.PM']``
         """
-        if not hasattr(self, '_itemDict'):
-            self._itemDict = {}
-            self._itemDict[self.name] = self
-            for item in self.items:
-                self._itemDict[self.name+'.'+item.name] = item
-                if hasattr(item, 'itemDict'):
-                    for k, v in item.itemDict.items():
-                        self._itemDict[self.name+'.'+k] = v
-        return self._itemDict
+        _itemDict = {}
+        _itemDict[self.name] = self
+        for item in self.items:
+            _itemDict[self.name+'.'+item.name] = item
+            if hasattr(item, 'itemDict'):
+                for k, v in item.itemDict.items():
+                    _itemDict[self.name+'.'+k] = v
+        return _itemDict
 
     def __getitem__(self, key):
         """Dictionary access to the entire hierarchy of subitems of this
         `CompoundOptic`.
 
         Either access through the fully-qualified name
-        (``optic['SubaruHSC.PM']``) or by local name (``optic['PM']``).  See
-        the `itemDict` docstring for further explanation of the fully-qualified
-        name.  Note that local name access is only available if all of the item
-        names for this optic are unique.
+        (``optic['LSST.LSSTCamera.L1']``) or by partially-qualified name
+        (``optic['LSSTCamera.L1']`` or even ``optic['L1']``).  See the
+        `itemDict` docstring for further explanation of the fully-qualified
+        name.  Note that partially-qualified name access is only available for
+        unique partially-qualified names.
         """
         try:
             item = self.itemDict[key]
@@ -797,15 +797,21 @@ class CompoundOptic(Optic):
 
     @lazy_property
     def _names(self):
-        out = {}
+        nameDict = {}
+        duplicates = set()
         for k, v in self.itemDict.items():
-            if v.name in out:
-                # Names are not unique; return empty dict
-                out = {}
-                break
-            else:
-                out[v.name] = k
-        return out
+            tokens = k.split('.')
+            shortNames = [tokens[-1]]
+            for token in reversed(tokens[:-1]):
+                shortNames.append('.'.join([token, shortNames[-1]]))
+            for shortName in shortNames:
+                if shortName in nameDict:
+                    duplicates.add(shortName)
+                else:
+                    nameDict[shortName] = k
+        for name in duplicates:
+            del nameDict[name]
+        return nameDict
 
     def trace(self, r):
         """Recursively trace through all subitems of this `CompoundOptic`.
