@@ -324,12 +324,13 @@ class Interface(Optic):
             There will be one key-value pair for every Interface traced
             through (which for this class, is just a single Interface).  The
             values will be dicts with key-value pairs:
-                'name' : str
-                    name of Interface
-                'in' : Ray or RayVector
-                    the incoming ray(s) to that Interface
-                'out' : Ray or RayVector
-                    the outgoing ray(s) from that Interface
+
+            ``'name'``
+                name of Interface (str)
+            ``'in'``
+                the incoming ray(s) to that Interface (Ray or RayVector)
+            ``'out'``
+                the outgoing ray(s) from that Interface (Ray or RayVector)
 
         Notes
         -----
@@ -763,7 +764,7 @@ class CompoundOptic(Optic):
         Optic.__init__(self, **kwargs)
         self.items = tuple(items)
 
-    @lazy_property
+    @property
     def itemDict(self):
         """Dictionary access of the entire hierarchy of subitems of this
         `CompoundOptic`.
@@ -778,14 +779,15 @@ class CompoundOptic(Optic):
         Note: It's also possible to access subitems using the [] operator
         directly: ``optic['SubaruHSC.PM']``
         """
-        _itemDict = {}
-        _itemDict[self.name] = self
-        for item in self.items:
-            _itemDict[self.name+'.'+item.name] = item
-            if hasattr(item, 'itemDict'):
-                for k, v in item.itemDict.items():
-                    _itemDict[self.name+'.'+k] = v
-        return _itemDict
+        if not hasattr(self, '_itemDict'):
+            self._itemDict = {}
+            self._itemDict[self.name] = self
+            for item in self.items:
+                self._itemDict[self.name+'.'+item.name] = item
+                if hasattr(item, 'itemDict'):
+                    for k, v in item.itemDict.items():
+                        self._itemDict[self.name+'.'+k] = v
+        return self._itemDict
 
     def __getitem__(self, key):
         """Dictionary access to the entire hierarchy of subitems of this
