@@ -47,10 +47,8 @@ def test_HSC_trace():
         tf = telescope.traceFull(ray)
 
         i = 0
-        for surface in tf:
-            if surface['name'] != surface_names[i]:
-                continue
-
+        for name in surface_names:
+            surface = tf[name]
             s = surface['out']
             v = s.v/np.linalg.norm(s.v)
 
@@ -424,7 +422,7 @@ def test_LSST_trace():
         )
         tf = telescope.traceFull(ray)
 
-        for surface, iz in zip(tf, zSurfaces):
+        for surface, iz in zip(tf.values(), zSurfaces):
             r = surface['out'].toCoordSys(batoid.globalCoordSys)
             n = 1./np.sqrt(np.sum(r.v**2))
 
