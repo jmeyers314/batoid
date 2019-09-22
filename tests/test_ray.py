@@ -380,17 +380,22 @@ def test_pointSourceCircularGrid():
 @timer
 def test_ne():
     objs = [batoid.Ray((0,0,0), (0,0,0)),
+            batoid.Ray((0,0,0), (0,0,0), coordSys=batoid.CoordSys((0,0,1))),
             batoid.Ray((0,0,1), (0,0,0)),
             batoid.Ray((0,1,0), (0,0,0)),
             batoid.Ray((0,0,0), (0,0,0), t=1),
             batoid.Ray((0,0,0), (0,0,0), wavelength=500e-9),
             batoid.Ray((0,0,0), (0,0,0), wavelength=500e-9, flux=1.2),
             batoid.Ray((0,0,0), (0,0,0), vignetted=True),
-            # Should really get a failed Ray to test here...
+            batoid.Ray(failed=True),
             (0,0,0),
             batoid.RayVector([
                 batoid.Ray((0,0,1), (0,0,0)),
                 batoid.Ray((0,0,0), (0,0,0))
+            ]),
+            batoid.RayVector([
+                batoid.Ray((0,0,1), (0,0,0), coordSys=batoid.CoordSys((0,0,1))),
+                batoid.Ray((0,0,0), (0,0,0), coordSys=batoid.CoordSys((0,0,1)))
             ]),
             batoid.RayVector([
                 batoid.Ray((0,0,0), (0,0,0)),

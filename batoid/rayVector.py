@@ -930,7 +930,7 @@ class RayVector:
 
     def __eq__(self, rhs):
         if not isinstance(rhs, RayVector): return False
-        return self._r == rhs._r
+        return (self._r == rhs._r and self.coordSys == rhs.coordSys)
 
     def __ne__(self, rhs):
         return not (self == rhs)
