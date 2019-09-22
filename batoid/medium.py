@@ -60,13 +60,11 @@ class TableMedium(Medium):
         Lookup table for refractive index.
     """
     def __init__(self, table):
-        self._table = table
-        self._medium = _batoid.CPPTableMedium(table)
+        self.table = table
+        self._medium = _batoid.CPPTableMedium(self.table._table)
 
-    @property
-    def table(self):
-        """Lookup table for refractive index."""
-        return self._table
+    def __repr__(self):
+        return "TableMedium({!r})".format(self.table)
 
 
 class SellmeierMedium(Medium):

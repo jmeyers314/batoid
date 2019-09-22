@@ -239,7 +239,7 @@ def test_table_medium_refraction():
 
     filename = os.path.join(batoid.datadir, "media", "silica_dispersion.txt")
     wave, n = np.genfromtxt(filename).T
-    table = batoid.Table(wave, n, batoid.Table.Interpolant.linear)
+    table = batoid.Table(wave, n, 'linear')
     silica = batoid.TableMedium(table)
     air = batoid.ConstMedium(1.000277)
 
@@ -273,7 +273,7 @@ def test_refraction_chromatic():
     filename = os.path.join(batoid.datadir, "media", "silica_dispersion.txt")
     wave, n = np.genfromtxt(filename).T
     wave *= 1e-6  # micron -> meters
-    table = batoid.Table(wave, n, batoid.Table.Interpolant.linear)
+    table = batoid.Table(wave, n, 'linear')
     silica = batoid.TableMedium(table)
     air = batoid.Air()
 

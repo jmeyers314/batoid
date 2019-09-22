@@ -26,7 +26,7 @@ def test_table_medium():
     filename = os.path.join(batoid.datadir, "media", "silica_dispersion.txt")
     wave, n = np.genfromtxt(filename).T
     wave *= 1e-6    # microns -> meters
-    table = batoid.Table(wave, n, batoid.Table.Interpolant.linear)
+    table = batoid.Table(wave, n, 'linear')
     table_medium = batoid.TableMedium(table)
     for i in range(100):
         w = random.uniform(0.3e-6, 1.2e-6)
@@ -45,7 +45,7 @@ def test_silica_sellmeier_table():
     filename = os.path.join(batoid.datadir, "media", "silica_dispersion.txt")
     wave, n = np.genfromtxt(filename).T
     wave *= 1e-6    # microns -> meters
-    table = batoid.Table(wave, n, batoid.Table.Interpolant.linear)
+    table = batoid.Table(wave, n, 'linear')
     table_silica = batoid.TableMedium(table)
 
     # Coefficients from
@@ -89,8 +89,8 @@ def test_ne():
     filename = os.path.join(batoid.datadir, "media", "silica_dispersion.txt")
     wave, n = np.genfromtxt(filename).T
     wave *= 1e-6    # microns -> meters
-    table = batoid.Table(wave, n, batoid.Table.Interpolant.linear)
-    table2 = batoid.Table(wave*1.01, n, batoid.Table.Interpolant.linear)
+    table = batoid.Table(wave, n, 'linear')
+    table2 = batoid.Table(wave*1.01, n, 'linear')
 
     objs = [
         batoid.ConstMedium(1.0),

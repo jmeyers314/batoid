@@ -160,12 +160,4 @@ def parse_medium(config):
 
 
 def parse_table(config):
-    args = config['args']
-    vals = config['vals']
-    interp = dict(
-        nearest=batoid.Table.Interpolant.nearest,
-        floor=batoid.Table.Interpolant.floor,
-        ceil=batoid.Table.Interpolant.ceil,
-        linear=batoid.Table.Interpolant.linear,
-    )
-    return batoid.Table(args, vals, interp[config['interp']])
+    return batoid.Table(config['args'], config['vals'], config['interp'])
