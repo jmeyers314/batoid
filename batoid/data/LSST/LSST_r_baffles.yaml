@@ -248,7 +248,14 @@ opticalSystem:
         -
           type: Lens
           name: L1
-          medium: silica
+          medium: &silica
+            type: SellmeierMedium
+            B1: 0.6961663
+            B2: 0.4079426
+            B3: 0.8974794
+            C1: 0.00467914825849
+            C2: 0.013512063073959999
+            C3: 97.93400253792099
           items:
             -
               type: RefractiveInterface
@@ -273,7 +280,7 @@ opticalSystem:
         -
           type: Lens
           name: L2
-          medium: silica
+          medium: *silica
           coordSys:
             z: 0.49487202
           items:
@@ -301,7 +308,7 @@ opticalSystem:
         -
           type: Lens
           name: Filter
-          medium: silica
+          medium: *silica
           coordSys:
             z: 0.87445202
           items:
@@ -328,7 +335,7 @@ opticalSystem:
         -
           type: Lens
           name: L3
-          medium: silica
+          medium: *silica
           coordSys:
             z: 0.94345202
           items:
