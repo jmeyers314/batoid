@@ -16,7 +16,7 @@ def test_table():
         x = np.array([random.uniform(0, 1) for i in range(10)])
         x.sort()
         y = f(x)
-        table = batoid.Table(x, y, batoid.Table.Interpolant.linear)
+        table = batoid.Table(x, y, 'linear')
 
         xtest = np.array([random.uniform(min(x), max(x)) for i in range(10)])
         ytruth = f(xtest)
@@ -25,7 +25,7 @@ def test_table():
         np.testing.assert_allclose(x, table.args, rtol=0, atol=1e-14)
         np.testing.assert_allclose(y, table.vals, rtol=0, atol=1e-14)
         np.testing.assert_allclose(ytruth, yinterp, rtol=0, atol=1e-14)
-        assert table.interp == batoid.Table.Interpolant.linear
+        assert table.interp == 'linear'
 
         do_pickle(table)
 
@@ -33,12 +33,13 @@ def test_table():
 @timer
 def test_ne():
     objs = [
-        batoid.Table([0,1], [1,2], batoid.Table.Interpolant.linear),
-        batoid.Table([0,1], [1,2], batoid.Table.Interpolant.ceil),
-        batoid.Table([0,1], [2,1], batoid.Table.Interpolant.linear),
-        batoid.Table([], [], batoid.Table.Interpolant.linear)
+        batoid.Table([0,1], [1,2], 'linear'),
+        batoid.Table([0,1], [1,2], 'ceil'),
+        batoid.Table([0,1], [2,1], 'linear'),
+        batoid.Table([], [], 'linear')
     ]
     all_obj_diff(objs)
+
 
 if __name__ == '__main__':
     test_table()

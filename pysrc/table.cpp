@@ -8,7 +8,7 @@ namespace py = pybind11;
 namespace batoid {
     void pyExportTable(py::module& m) {
         using TableDD = Table<double, double>;
-        auto table = py::class_<TableDD, std::shared_ptr<TableDD>>(m, "Table")
+        auto table = py::class_<TableDD, std::shared_ptr<TableDD>>(m, "CPPTable")
             .def(py::init<std::vector<double>,std::vector<double>,TableDD::interpolant>())
             .def_property_readonly("args", &TableDD::getArgs)
             .def_property_readonly("vals", &TableDD::getVals)
@@ -29,7 +29,7 @@ namespace batoid {
             ))
             .def("__hash__", [](const TableDD& t) {
                 return py::hash(py::make_tuple(
-                    "Table",
+                    "CPPTable",
                     t.getInterp(),
                     py::tuple(py::cast(t.getArgs())),
                     py::tuple(py::cast(t.getVals()))

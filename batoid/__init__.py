@@ -5,7 +5,7 @@ from .rayVector import RayVector, concatenateRayVectors, rayGrid, circularGrid
 from .rayVector import uniformCircularGrid, pointSourceCircularGrid
 from .surface import Surface, Plane, Paraboloid, Sphere, Quadric, Asphere
 from .surface import Bicubic, Zernike, Sum
-from ._batoid import Table
+from .table import Table
 
 from .medium import Medium, ConstMedium, TableMedium
 from .medium import SellmeierMedium, SumitaMedium, Air

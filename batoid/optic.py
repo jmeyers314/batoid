@@ -315,7 +315,7 @@ class Interface(Optic):
 
         Parameters
         ----------
-        r : batoid.Ray or batoid.RayVector
+        r : `batoid.Ray` or `batoid.RayVector`
             Input ray(s) to trace
 
         Returns
@@ -869,12 +869,13 @@ class CompoundOptic(Optic):
         OrderedDict of dict
             There will be one key-value pair for every Interface traced
             through.  The values will be dicts with key-value pairs:
-                'name' : str
-                    name of Interface
-                'in' : Ray or RayVector
-                    the incoming ray(s) to that Interface
-                'out' : Ray or RayVector
-                    the outgoing ray(s) from that Interface
+
+            ``'name'``
+                name of Interface (str)
+            ``'in'``
+                the incoming ray(s) to that Interface (Ray or RayVector)
+            ``'out'``
+                the outgoing ray(s) from that Interface (Ray or RayVector)
         Notes
         -----
         Pay careful attention to the coordinate systems of the returned rays.
