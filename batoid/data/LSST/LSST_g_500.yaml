@@ -1,8 +1,8 @@
 opticalSystem:
   type: CompoundOptic
   name: LSST
-  inMedium: 1.0
-  medium: 1.0
+  inMedium: &vacuum 1.0
+  medium: *vacuum
   backDist: 15.0  # distance from global vertex to use to start tracing rays
   sphereRadius: 5.0  # reference sphere radius to use for wavefront calculation
   pupilSize: 8.36  # Pupil fits inside a square with this side length
@@ -68,7 +68,7 @@ opticalSystem:
         -
           type: Lens
           name: L1
-          medium: 1.462326484507719
+          medium: &silica 1.462326484507719
           items:
             -
               type: RefractiveInterface
@@ -93,7 +93,7 @@ opticalSystem:
         -
           type: Lens
           name: L2
-          medium: 1.462326484507719
+          medium: *silica
           coordSys:
             z: 0.49487202
           items:
@@ -121,7 +121,7 @@ opticalSystem:
         -
           type: Lens
           name: Filter
-          medium: 1.462326484507719
+          medium: *silica
           coordSys:
             z: 0.87445202
           items:
@@ -148,7 +148,7 @@ opticalSystem:
         -
           type: Lens
           name: L3
-          medium: 1.462326484507719
+          medium: *silica
           coordSys:
             z: 0.94345202
           items:

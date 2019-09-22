@@ -12,8 +12,8 @@
 opticalSystem:
   type: CompoundOptic
   name: DESI
-  inMedium: hsc_air
-  medium: hsc_air
+  inMedium: &air 1.0
+  medium: *air
   # distance from global vertex to use to start tracing rays
   # Matches Surf#1 in the ZEMAX model.
   backDist: 14.448609
@@ -178,7 +178,13 @@ opticalSystem:
           -
             type: Lens
             name: C1
-            medium: desi_C1
+            medium:
+              type: TableMedium
+              table:
+                # Melt data from DESI-2880-v2
+                args: &waves [365.015e-9, 435.835e-9, 486.133e-9, 587.562e-9, 656.273e-9, 852.110e-9, 1013.98e-9]
+                vals: [1.474580, 1.466730, 1.463162, 1.458499, 1.456402, 1.452500, 1.450278]
+                interp: linear
             items:
               -
                 type: RefractiveInterface
@@ -236,7 +242,13 @@ opticalSystem:
           -
             type: Lens
             name: C2
-            medium: desi_C2
+            medium:
+              type: TableMedium
+              table:
+                # Melt data from DESI-2880-v2
+                args: *waves
+                vals: [1.474641, 1.466791, 1.463223, 1.458561, 1.45646, 1.452563, 1.450342]
+                interp: linear
             coordSys:
               # C2 front face to C1 front face
               z: +0.611807
@@ -296,7 +308,13 @@ opticalSystem:
               name: ADC1
               # ADC lenses use Schott N-BK7 (n ~ 1.52) for chromatic correction relative to fused silica (n ~ 1.46)
               # https://refractiveindex.info/?shelf=glass&book=BK7&page=SCHOTT
-              medium: desi_ADC1
+              medium:
+                type: TableMedium
+                table:
+                  # Melt data from DESI-2880-v2
+                  args: *waves
+                  vals: [1.536945, 1.527374, 1.523070, 1.517498, 1.515022, 1.510508, 1.508023]
+                  interp: linear
               coordSys:
                 # ADC1 front face to C1 front face
                 z: +0.847401
@@ -346,7 +364,13 @@ opticalSystem:
               name: ADC2
               # ADC lenses use Schott N-BK7 (n ~ 1.52) for chromatic correction relative to fused silica (n ~ 1.46)
               # https://refractiveindex.info/?shelf=glass&book=BK7&page=SCHOTT
-              medium: desi_ADC2
+              medium:
+                type: TableMedium
+                table:
+                  # Melt data from DESI-2880-v2
+                  args: *waves
+                  vals: [1.536225, 1.526635, 1.522325, 1.516746, 1.514267, 1.509743, 1.507246]
+                  interp: linear
               coordSys:
                 # ADC2 front face to C1 front face
                 z: +0.932401
@@ -399,7 +423,12 @@ opticalSystem:
           -
             type: Lens
             name: C3
-            medium: desi_C3
+            medium: &silica  # Use generic fused silica until melt data is available.
+              type: TableMedium
+              table:
+                args: *waves
+                vals: [1.474555, 1.466701, 1.463132, 1.458467, 1.45637, 1.452469, 1.450245]
+                interp: linear
             coordSys:
               # C3 front face to C1 front face
               z: +1.191808
@@ -490,7 +519,7 @@ opticalSystem:
           -
             type: Lens
             name: C4
-            medium: desi_C4
+            medium: *silica # Use generic fused silica until melt data is available.
             coordSys:
               # C4 front face to C1 front face
               z: +1.80908

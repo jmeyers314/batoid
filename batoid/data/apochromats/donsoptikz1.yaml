@@ -10,7 +10,14 @@ opticalSystem:
     -
       type: Lens
       name: L1
-      medium: NLAK10
+      medium: &NLAK10
+        type: SellmeierMedium
+        B1: 1.72878017
+        B2: 0.169257825
+        B3: 1.19386956
+        C1: 0.00886014635
+        C2: 0.0363416509
+        C3: 82.9009069
       items:
         -
           type: RefractiveInterface
@@ -35,7 +42,14 @@ opticalSystem:
     -
       type: Lens
       name: L2
-      medium: PFK85
+      medium: &PFK85
+        type: SumitaMedium
+        A0: 2.1858326
+        A1: -0.0050155632
+        A2: 0.0075107775
+        A3: 0.00017770562
+        A4: -1.2164148e-05
+        A5: 6.1341005e-07
       coordSys:
         z: -0.013417
       items:
@@ -62,7 +76,14 @@ opticalSystem:
     -
       type: Lens
       name: L3
-      medium: BK7
+      medium: &BK7
+        type: SellmeierMedium
+        B1: 1.03961212
+        B2: 0.231792344
+        B3: 1.01046945
+        C1: 0.00600069867
+        C2: 0.0200179144
+        C3: 103.560653
       coordSys:
         z: -0.575115
       items:

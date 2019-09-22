@@ -263,7 +263,7 @@ def test_decam_psf():
 
 
 if __name__ == '__main__':
-    test_huygens_psf()
-    test_lsst_psf()
+    # test_huygens_psf()
+    # test_lsst_psf()
     test_hsc_psf()
-    test_decam_psf()
+    # test_decam_psf()

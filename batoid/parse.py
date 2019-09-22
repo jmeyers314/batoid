@@ -66,7 +66,6 @@ def parse_optic(config,
     @param inMedium  default in Medium, often set by optic parent
     @param outMedium default out Medium, often set by optic parent
     """
-
     if 'obscuration' in config:
         obscuration = parse_obscuration(config.pop('obscuration'))
     else:
@@ -140,117 +139,33 @@ def parse_optic(config,
         raise ValueError("Unknown optic type")
 
 
-def parse_medium(value):
+def parse_medium(config):
     from numbers import Real
-    if isinstance(value, batoid.Medium):
-        return value
-    elif isinstance(value, Real):
-        return batoid.ConstMedium(value)
-    elif isinstance(value, str):
-        if value == 'air':
-            return batoid.Air()
-        elif value == 'silica':
-            return batoid.SellmeierMedium(
-                0.6961663, 0.4079426, 0.8974794,
-                0.0684043**2, 0.1162414**2, 9.896161**2)
-        elif value == 'hsc_air':
-            return batoid.ConstMedium(1.0)
-        w = [0.4, 0.6, 0.75, 0.9, 1.1]
-        w = [w_*1e-6 for w_ in w]
-        w_desi = [365.015, 435.835, 486.133, 587.562, 656.273, 852.110, 1013.98]
-        w_desi = [w_*1e-9 for w_ in w_desi]
-        if value == 'hsc_silica':
-            return batoid.TableMedium(
-                batoid.Table(
-                    w,
-                    [1.47009272, 1.45801158, 1.45421013, 1.45172729, 1.44917721],
-                    batoid.Table.Interpolant.linear
-                )
-            )
-        elif value == 'hsc_bsl7y':
-            return batoid.TableMedium(
-                batoid.Table(
-                    w,
-                    [1.53123287, 1.51671428, 1.51225242, 1.50939738, 1.50653251],
-                    batoid.Table.Interpolant.linear
-                )
-            )
-        elif value == 'hsc_pbl1y':
-            return batoid.TableMedium(
-                batoid.Table(
-                    w,
-                    [1.57046066, 1.54784671, 1.54157395, 1.53789058, 1.53457169],
-                    batoid.Table.Interpolant.linear
-                )
-            )
-        elif value == 'desi_C1':
-            # Use melt data from DESI-2880-v2
-            return batoid.TableMedium(
-                batoid.Table(
-                    w_desi,
-                    [1.474580, 1.466730, 1.463162, 1.458499, 1.456402, 1.452500, 1.450278],
-                    batoid.Table.Interpolant.linear
-                )
-            )
-        elif value == 'desi_C2':
-            # Use melt data from DESI-2880-v2
-            return batoid.TableMedium(
-                batoid.Table(
-                    w_desi,
-                    [1.474641, 1.466791, 1.463223, 1.458561, 1.45646, 1.452563, 1.450342],
-                    batoid.Table.Interpolant.linear
-                )
-            )
-        elif value == 'desi_ADC1':
-            # Use melt data from DESI-2880-v2
-            return batoid.TableMedium(
-                batoid.Table(
-                    w_desi,
-                    [1.536945, 1.527374, 1.523070, 1.517498, 1.515022, 1.510508, 1.508023],
-                    batoid.Table.Interpolant.linear
-                )
-            )
-        elif value == 'desi_ADC2':
-            # Use melt data from DESI-2880-v2
-            return batoid.TableMedium(
-                batoid.Table(
-                    w_desi,
-                    [1.536225, 1.526635, 1.522325, 1.516746, 1.514267, 1.509743, 1.507246],
-                    batoid.Table.Interpolant.linear
-                )
-            )
-        elif value == 'desi_C3':
-            # Use generic fused silica until melt data is available.
-            return batoid.TableMedium(
-                batoid.Table(
-                    w_desi,
-                    [1.474555, 1.466701, 1.463132, 1.458467, 1.45637, 1.452469, 1.450245],
-                    batoid.Table.Interpolant.linear
-                )
-            )
-        elif value == 'desi_C4':
-            # Use generic fused silica until melt data is available.
-            return batoid.TableMedium(
-                batoid.Table(
-                    w_desi,
-                    [1.474555, 1.466701, 1.463132, 1.458467, 1.45637, 1.452469, 1.450245],
-                    batoid.Table.Interpolant.linear
-                )
-            )
-        elif value == 'NLAK10':
-            return batoid.SellmeierMedium(
-                1.72878017, 0.169257825, 1.19386956,
-                0.00886014635, 0.0363416509, 82.9009069
-            )
-        elif value == 'PFK85':
-            return batoid.SumitaMedium(
-                2.1858326, -0.0050155632, 0.0075107775,
-                0.00017770562, -1.2164148e-05, 6.1341005e-07
-            )
-        elif value == 'BK7':
-            return batoid.SellmeierMedium(
-                1.03961212, 0.231792344, 1.01046945,
-                0.00600069867, 0.0200179144, 103.560653
-            )
-        else:
-            raise RuntimeError("Unknown medium {}".format(value))
+    if config is None:
+        return None
+    if isinstance(config, batoid.Medium):
+        return config
+    if isinstance(config, Real):
+        return batoid.ConstMedium(config)
+    # This dict may be referenced again in an ancestor config, so copy it
+    # before parsing
+    config = dict(**config)
+    typ = config.pop('type')
+    if typ == 'TableMedium':
+        table = parse_table(config['table'])
+        return batoid.TableMedium(table=table)
+    # Sellmeier, ConstMedium, SumitaMedium, Air end up here...
+    evalstr = "batoid.{}(**config)".format(typ)
+    return eval(evalstr)
+
+
+def parse_table(config):
+    args = config['args']
+    vals = config['vals']
+    interp = dict(
+        nearest=batoid.Table.Interpolant.nearest,
+        floor=batoid.Table.Interpolant.floor,
+        ceil=batoid.Table.Interpolant.ceil,
+        linear=batoid.Table.Interpolant.linear,
+    )
+    return batoid.Table(args, vals, interp[config['interp']])

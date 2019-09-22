@@ -1,10 +1,10 @@
 opticalSystem:
   type: CompoundOptic
   name: SubaruHSC
-  inMedium: hsc_air
-  # implicit `outMedium: hsc_air`, although nothings really gets through the Detector at the end
+  inMedium: &air 1.0
+  # implicit `outMedium: *air`, although nothings really gets through the Detector at the end
   # anyway
-  medium: hsc_air # subitems will use this as their default inMedium/outMedium
+  medium: *air # subitems will use this as their default inMedium/outMedium
   # By not specifying a coordSys, the vertex/orientation of this CompoundOptic is implicitly
   # the global coordSys.
   backDist: 15.0  # distance from global vertex to use to start tracing rays
@@ -45,7 +45,12 @@ opticalSystem:
           name: G1
           # For a Lens, `medium` is the internal medium between the two refractive surfaces.  Note
           # that a Lens must have exactly two surfaces.
-          medium: hsc_silica
+          medium: &silica
+            type: TableMedium
+            table:
+              args: &waves [0.4e-6, 0.6e-6, 0.75e-6, 0.9e-6, 1.1e-6]
+              vals: [1.47009272, 1.45801158, 1.45421013, 1.45172729, 1.44917721]
+              interp: linear
           items:
             -
               type: RefractiveInterface
@@ -74,7 +79,12 @@ opticalSystem:
         -
           type: Lens
           name: G2
-          medium: hsc_bsl7y
+          medium: &bsl7y
+            type: TableMedium
+            table:
+              args: *waves
+              vals: [1.53123287, 1.51671428, 1.51225242, 1.50939738, 1.50653251]
+              interp: linear
           # Note that this coordSys is wrt the parent.  I.e., not wrt the global coords, and also
           # not wrt the G1_exit coords given above, since those are at the same level in the
           # hierarchy.
@@ -115,7 +125,7 @@ opticalSystem:
           -
             type: Lens
             name: ADC1
-            medium: hsc_bsl7y
+            medium: *bsl7y
             items:
               -
                 type: RefractiveInterface
@@ -143,7 +153,12 @@ opticalSystem:
             name: ADC2
             coordSys:
               z: 0.043
-            medium: hsc_pbl1y
+            medium: &pbl1y
+              type: TableMedium
+              table:
+                args: *waves
+                vals: [1.57046066, 1.54784671, 1.54157395, 1.53789058, 1.53457169]
+                interp: linear
             items:
               -
                 type: RefractiveInterface
@@ -171,7 +186,7 @@ opticalSystem:
           name: G3
           coordSys:
             z: 1.23333
-          medium: hsc_pbl1y
+          medium: *pbl1y
           items:
             -
               type: RefractiveInterface
@@ -203,7 +218,7 @@ opticalSystem:
           name: G4
           coordSys:
             z: 1.36333
-          medium: hsc_bsl7y
+          medium: *bsl7y
           items:
             -
               type: RefractiveInterface
@@ -233,7 +248,7 @@ opticalSystem:
           name: G5
           coordSys:
             z: 1.56553
-          medium: hsc_silica
+          medium: *silica
           items:
             -
               type: RefractiveInterface
@@ -263,7 +278,7 @@ opticalSystem:
           name: F
           coordSys:
             z: 1.7435712564515065
-          medium: hsc_silica
+          medium: *silica
           items:
             -
               type: RefractiveInterface
@@ -292,7 +307,7 @@ opticalSystem:
           name: W
           coordSys:
             z: 1.7910712564515077
-          medium: hsc_silica
+          medium: *silica
           items:
             -
               type: RefractiveInterface
