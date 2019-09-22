@@ -249,6 +249,26 @@ def test_ne():
     all_obj_diff(objs)
 
 
+@timer
+def test_name():
+    telescope = batoid.Optic.fromYaml("LSST_r.yaml")
+    for name, surface in telescope.itemDict.items():
+        shortName = name.split('.')[-1]
+        assert telescope[name] == telescope[shortName]
+    # What about partially qualified names?
+    for name, surface in telescope.itemDict.items():
+        tokens = name.split('.')
+        shortName = tokens[-1]
+        for token in reversed(tokens[:-1]):
+            shortName = '.'.join([token, shortName])
+            assert telescope[name] == telescope[shortName]
+    # Now introduce a name conflict and verify we get an exception
+    telescope = batoid.Optic.fromYaml("LSST_r.yaml")
+    telescope.items[3].items[0].name = 'L2'
+    with np.testing.assert_raises(ValueError):
+        telescope['L1'].name
+
+
 if __name__ == '__main__':
     test_optic()
     test_traceFull()
@@ -258,3 +278,4 @@ if __name__ == '__main__':
     test_rotation()
     test_thread()
     test_ne()
+    test_name()
