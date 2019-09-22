@@ -269,16 +269,16 @@ def wavefront(optic, theta_x, theta_y, wavelength, nx=32, projection='postel', s
     if sphereRadius is None:
         sphereRadius = optic.sphereRadius
 
-    outCoordSys = batoid.CoordSys()
-    optic.traceInPlace(rays, outCoordSys=outCoordSys)
+    optic.traceInPlace(rays)
     w = np.where(1-rays.vignetted)[0]
     point = np.mean(rays.r[w], axis=0)
 
     # We want to place the vertex of the reference sphere one radius length away from the
     # intersection point.  So transform our rays into that coordinate system.
-    transform = batoid.CoordTransform(
-            outCoordSys, batoid.CoordSys(point+np.array([0,0,sphereRadius])))
-    transform.applyForwardInPlace(rays)
+    targetCoordSys = rays.coordSys.shiftLocal(
+        point+np.array([0,0,sphereRadius])
+    )
+    rays.toCoordSysInPlace(targetCoordSys)
 
     sphere = batoid.Sphere(-sphereRadius)
     sphere.intersectInPlace(rays)

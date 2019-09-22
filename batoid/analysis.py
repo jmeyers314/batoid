@@ -174,7 +174,7 @@ def wavefront(optic, theta_x, theta_y, wavelength,
     if sphereRadius is None:
         sphereRadius = optic.sphereRadius
 
-    optic.traceInPlace(rays, outCoordSys=batoid.globalCoordSys)
+    optic.traceInPlace(rays)
     if reference == 'mean':
         w = np.where(1-rays.vignetted)[0]
         point = np.mean(rays.r[w], axis=0)
@@ -184,11 +184,10 @@ def wavefront(optic, theta_x, theta_y, wavelength,
 
     # Place vertex of reference sphere one radius length away from the
     # intersection point.  So transform our rays into that coordinate system.
-    transform = batoid.CoordTransform(
-        batoid.globalCoordSys,
-        batoid.CoordSys(point+np.array([0,0,sphereRadius]))
+    targetCoordSys = rays.coordSys.shiftLocal(
+        point+np.array([0,0,sphereRadius])
     )
-    transform.applyForwardInPlace(rays)
+    rays.toCoordSysInPlace(targetCoordSys)
 
     sphere = batoid.Sphere(-sphereRadius)
     sphere.intersectInPlace(rays)
@@ -344,10 +343,7 @@ def zernike(optic, theta_x, theta_y, wavelength,
         nx=nx, dirCos=dirCos
     )
     # Propagate to entrance pupil to get positions
-    transform = batoid.CoordTransform(
-        batoid.globalCoordSys, optic.stopSurface.coordSys
-    )
-    epRays = transform.applyForward(rays)
+    epRays = rays.toCoordSys(optic.stopSurface.coordSys)
     optic.stopSurface.surface.intersectInPlace(epRays)
     orig_x = np.array(epRays.x).reshape(nx, nx)
     orig_y = np.array(epRays.y).reshape(nx, nx)
@@ -450,10 +446,7 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
     )
 
     # Trace to stopSurface to get points at which to evalue Zernikes
-    transform = batoid.CoordTransform(
-        batoid.globalCoordSys, optic.stopSurface.coordSys
-    )
-    epRays = transform.applyForward(rays)
+    epRays = rays.toCoordSys(optic.stopSurface.coordSys)
     optic.stopSurface.surface.intersectInPlace(epRays)
 
     basis = galsim.zernike.zernikeBasis(
@@ -465,7 +458,7 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
     if sphereRadius is None:
         sphereRadius = optic.sphereRadius
 
-    optic.traceInPlace(rays, outCoordSys=batoid.globalCoordSys)
+    optic.traceInPlace(rays)
 
     if np.any(rays.failed):
         raise ValueError(
@@ -482,16 +475,15 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
             medium=optic.inMedium,
             stopSurface=optic.stopSurface
         )
-        optic.traceInPlace(chiefRay, outCoordSys=batoid.globalCoordSys)
+        optic.traceInPlace(chiefRay)
         point = chiefRay.r
 
     # Place vertex of reference sphere one radius length away from the
     # intersection point.  So transform our rays into that coordinate system.
-    transform = batoid.CoordTransform(
-        batoid.globalCoordSys,
-        batoid.CoordSys(point+np.array([0,0,sphereRadius]))
+    targetCoordSys = rays.coordSys.shiftLocal(
+        point+np.array([0,0,sphereRadius])
     )
-    transform.applyForwardInPlace(rays)
+    rays.toCoordSysInPlace(targetCoordSys)
 
     sphere = batoid.Sphere(-sphereRadius)
     sphere.intersectInPlace(rays)
@@ -500,7 +492,7 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
         w = np.where(1-rays.vignetted)[0]
         t0 = np.mean(rays.t[w])
     elif reference == 'chief':
-        transform.applyForwardInPlace(chiefRay)
+        chiefRay.toCoordSysInPlace(targetCoordSys)
         sphere.intersectInPlace(chiefRay)
         t0 = chiefRay.t
 

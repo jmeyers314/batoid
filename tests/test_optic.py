@@ -68,7 +68,7 @@ def test_traceReverse():
     telescope = batoid.Optic.fromYaml("HSC.yaml")
 
     init_rays = batoid.rayGrid(20, 12.0, 0.005, 0.005, -1.0, nside, 500e-9, 1.0, batoid.ConstMedium(1.0))
-    forward_rays = telescope.trace(init_rays, outCoordSys=batoid.CoordSys())
+    forward_rays = telescope.trace(init_rays)
 
     # Now, turn the result rays around and trace backwards
     forward_rays = forward_rays.propagatedToTime(40.0)
@@ -76,9 +76,10 @@ def test_traceReverse():
         [batoid.Ray(r.r, -r.v, -r.t, r.wavelength) for r in forward_rays]
     )
 
-    final_rays = telescope.traceReverse(reverse_rays, outCoordSys=batoid.CoordSys())
+    final_rays = telescope.traceReverse(reverse_rays)
     # propagate all the way to t=0
     final_rays = final_rays.propagatedToTime(0.0)
+    final_rays.toCoordSysInPlace(batoid.globalCoordSys)
 
     w = np.where(np.logical_not(final_rays.vignetted))[0]
     for idx in w:
