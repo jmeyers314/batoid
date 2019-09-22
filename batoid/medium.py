@@ -48,7 +48,7 @@ class ConstMedium(Medium):
         The refractive index.
     """
     def __init__(self, n):
-        self._medium = _batoid.ConstMedium(n)
+        self._medium = _batoid.CPPConstMedium(n)
 
 
 class TableMedium(Medium):
@@ -61,7 +61,7 @@ class TableMedium(Medium):
     """
     def __init__(self, table):
         self._table = table
-        self._medium = _batoid.TableMedium(table)
+        self._medium = _batoid.CPPTableMedium(table)
 
     @property
     def table(self):
@@ -86,7 +86,7 @@ class SellmeierMedium(Medium):
         Sellmeier coefficients.
     """
     def __init__(self, B1, B2, B3, C1, C2, C3):
-        self._medium = _batoid.SellmeierMedium(B1, B2, B3, C1, C2, C3)
+        self._medium = _batoid.CPPSellmeierMedium(B1, B2, B3, C1, C2, C3)
 
     @property
     def coefs(self):
@@ -113,7 +113,7 @@ class SumitaMedium(Medium):
         Sumita coefficients.
     """
     def __init__(self, A0, A1, A2, A3, A4, A5):
-        self._medium = _batoid.SumitaMedium(A0, A1, A2, A3, A4, A5)
+        self._medium = _batoid.CPPSumitaMedium(A0, A1, A2, A3, A4, A5)
 
     @property
     def coefs(self):
@@ -144,7 +144,7 @@ class Air(Medium):
     reasonable for most observatories.
     """
     def __init__(self, pressure=69.328, temperature=293.15, h2o_pressure=1.067):
-        self._medium = _batoid.Air(pressure, temperature, h2o_pressure)
+        self._medium = _batoid.CPPAir(pressure, temperature, h2o_pressure)
 
     @property
     def pressure(self):

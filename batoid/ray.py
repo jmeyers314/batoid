@@ -37,15 +37,15 @@ class Ray:
     def __init__(self, r=None, v=None, t=0.0, wavelength=0.0, flux=1.0,
                  vignetted=False, failed=False, coordSys=globalCoordSys):
         if failed:
-            self._r = _batoid.Ray(failed=True)
+            self._r = _batoid.CPPRay(failed=True)
         elif r is None and v is None:
-            self._r = _batoid.Ray()
+            self._r = _batoid.CPPRay()
         else:
-            self._r = _batoid.Ray(r, v, t, wavelength, flux, vignetted)
+            self._r = _batoid.CPPRay(r, v, t, wavelength, flux, vignetted)
         self.coordSys = coordSys
 
     @classmethod
-    def _fromRay(cls, _r, coordSys=globalCoordSys):
+    def _fromCPPRay(cls, _r, coordSys=globalCoordSys):
         """Turn a c++ Ray into a python Ray."""
         ret = cls.__new__(cls)
         ret._r = _r
@@ -196,7 +196,7 @@ class Ray:
 
     def copy(self):
         """Return a copy of this Ray."""
-        return Ray._fromRay(_batoid.Ray(self._r), self.coordSys)
+        return Ray._fromCPPRay(_batoid.CPPRay(self._r), self.coordSys)
 
     def __repr__(self):
         return repr(self._r)

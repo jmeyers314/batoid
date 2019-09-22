@@ -28,7 +28,9 @@ class RayVector:
                 if r.wavelength != wavelength:
                     wavelength = float("nan")
                     break
-            self._r = _batoid.RayVector([ray._r for ray in rays], wavelength)
+            self._r = _batoid.CPPRayVector(
+                [ray._r for ray in rays], wavelength
+            )
         else:
             raise ValueError("Wrong arguments to RayVector")
         self.coordSys = rays[0].coordSys
@@ -67,7 +69,9 @@ class RayVector:
             vignetted = np.empty_like(x, dtype=bool)
             vignetted.fill(tmp)
         ret = cls.__new__(cls)
-        ret._r = _batoid.RayVector(x, y, z, vx, vy, vz, t, w, flux, vignetted)
+        ret._r = _batoid.CPPRayVector(
+            x, y, z, vx, vy, vz, t, w, flux, vignetted
+        )
         ret.coordSys = coordSys
         return ret
 
@@ -655,7 +659,7 @@ class RayVector:
             )
 
     @classmethod
-    def _fromRayVector(cls, _r, coordSys=globalCoordSys):
+    def _fromCPPRayVector(cls, _r, coordSys=globalCoordSys):
         """Turn a c++ RayVector into a python RayVector."""
         ret = cls.__new__(cls)
         ret._r = _r
@@ -664,8 +668,8 @@ class RayVector:
 
     def copy(self):
         """Return a copy of this RayVector."""
-        return RayVector._fromRayVector(
-            _batoid.RayVector(self._r),
+        return RayVector._fromCPPRayVector(
+            _batoid.CPPRayVector(self._r),
             self.coordSys
         )
 
@@ -757,7 +761,7 @@ class RayVector:
         -------
         RayVector
         """
-        return RayVector._fromRayVector(self._r.propagatedToTime(t))
+        return RayVector._fromCPPRayVector(self._r.propagatedToTime(t))
 
     def propagateInPlace(self, t):
         """Propagate RayVector to given time.
@@ -782,7 +786,7 @@ class RayVector:
         -------
         RayVector
         """
-        return RayVector._fromRayVector(
+        return RayVector._fromCPPRayVector(
             self._r.trimVignetted(minflux), self.coordSys
         )
 
@@ -912,14 +916,14 @@ class RayVector:
         return self._r.omega
 
     def __getitem__(self, idx):
-        return Ray._fromRay(self._r[idx])
+        return Ray._fromCPPRay(self._r[idx])
 
     def __iter__(self):
         self._iter = iter(self._r)
         return self
 
     def __next__(self):
-        return Ray._fromRay(next(self._iter))
+        return Ray._fromCPPRay(next(self._iter))
 
     def __len__(self):
         return len(self._r)
@@ -944,15 +948,16 @@ def concatenateRayVectors(rvs):
     concatenatedRayVector : RayVector
     """
     if len(rvs) == 0:
-        return RayVector._fromRayVector(_batoid.RayVector())
+        return RayVector._fromCPPRayVector(_batoid.CPPRayVector())
     coordSys = rvs[0].coordSys
     for rv in rvs[1:]:
         if rv.coordSys != coordSys:
             raise ValueError(
-                "Cannot concatenate RayVectors with different coordinate systems"
+                "Cannot concatenate RayVectors "
+                "with different coordinate systems"
             )
     _r = _batoid.concatenateRayVectors([rv._r for rv in rvs])
-    return RayVector._fromRayVector(_r, coordSys)
+    return RayVector._fromCPPRayVector(_r, coordSys)
 
 
 def rayGrid(zdist, length, xcos, ycos, zcos, nside, wavelength, flux, medium,
@@ -983,7 +988,7 @@ def rayGrid(zdist, length, xcos, ycos, zcos, nside, wavelength, flux, medium,
     grid : RayVector
         The grid of rays.
     """
-    return RayVector._fromRayVector(
+    return RayVector._fromCPPRayVector(
         _batoid.rayGrid(
             zdist, length, xcos, ycos, zcos, nside,
             wavelength, flux, medium._medium, lattice
@@ -1020,7 +1025,7 @@ def circularGrid(zdist, outer, inner, xcos, ycos, zcos, nradii, naz,
     hexgrid : RayVector
         The hexapolar grid of rays.
     """
-    return RayVector._fromRayVector(
+    return RayVector._fromCPPRayVector(
         _batoid.circularGrid(
             zdist, outer, inner, xcos, ycos, zcos, nradii, naz, wavelength,
             flux, medium._medium
@@ -1056,7 +1061,7 @@ def uniformCircularGrid(zdist, outer, inner, xcos, ycos, zcos, nrays,
     hexgrid : RayVector
         The hexapolar grid of rays.
     """
-    return RayVector._fromRayVector(
+    return RayVector._fromCPPRayVector(
         _batoid.uniformCircularGrid(
             zdist, outer, inner, xcos, ycos, zcos, nrays, wavelength, flux,
             medium._medium, seed
@@ -1094,7 +1099,7 @@ def pointSourceCircularGrid(source, outer, inner, nradii, naz, wavelength,
     hexgrid : RayVector
         The hexapolar grid of rays.
     """
-    return RayVector._fromRayVector(
+    return RayVector._fromCPPRayVector(
         _batoid.pointSourceCircularGrid(
             source, outer, inner, nradii, naz, wavelength, flux, medium._medium
         )

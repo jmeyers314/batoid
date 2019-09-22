@@ -12,7 +12,7 @@ using namespace pybind11::literals;
 
 namespace batoid {
     void pyExportRay(py::module& m) {
-        py::class_<Ray>(m, "Ray")
+        py::class_<Ray>(m, "CPPRay")
             .def(py::init<double,double,double,double,double,double,double,double,double,bool>(),
                  "x"_a, "y"_a, "z"_a, "vx"_a, "vy"_a, "vz"_a, "t"_a=0.0,
                  "wavelength"_a=0.0, "flux"_a=1.0, "vignetted"_a=false)
@@ -68,7 +68,7 @@ namespace batoid {
             ))
             .def("__hash__", [](const Ray& r) {
                 return py::hash(py::make_tuple(
-                    "Ray",
+                    "CPPRay",
                     py::tuple(py::cast(r.r)),
                     py::tuple(py::cast(r.v)),
                     r.t,

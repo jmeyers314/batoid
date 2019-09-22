@@ -34,14 +34,14 @@ class CoordSys:
     def __init__(self, origin=None, rot=None):
         if origin is None:
             if rot is None:
-                self._coordSys = _batoid.CoordSys()
+                self._coordSys = _batoid.CPPCoordSys()
             else:
-                self._coordSys = _batoid.CoordSys(rot)
+                self._coordSys = _batoid.CPPCoordSys(rot)
         else:
             if rot is None:
-                self._coordSys = _batoid.CoordSys(origin)
+                self._coordSys = _batoid.CPPCoordSys(origin)
             else:
-                self._coordSys = _batoid.CoordSys(origin, rot)
+                self._coordSys = _batoid.CPPCoordSys(origin, rot)
 
     @classmethod
     def _fromCoordSys(cls, _coordSys):
@@ -183,7 +183,7 @@ class CoordTransform:
     def __init__(self, fromSys, toSys):
         self.fromSys = fromSys
         self.toSys = toSys
-        self._coordTransform = _batoid.CoordTransform(
+        self._coordTransform = _batoid.CPPCoordTransform(
             fromSys._coordSys,
             toSys._coordSys
         )
@@ -206,12 +206,12 @@ class CoordTransform:
         if arg2 is not None:
             return self._coordTransform.applyForward(arg1, arg2, arg3)
         elif isinstance(arg1, Ray):
-            return Ray._fromRay(
+            return Ray._fromCPPRay(
                 self._coordTransform.applyForward(arg1._r),
                 self.toSys
             )
         elif isinstance(arg1, RayVector):
-            return RayVector._fromRayVector(
+            return RayVector._fromCPPRayVector(
                 self._coordTransform.applyForward(arg1._r),
                 self.toSys
             )
@@ -236,12 +236,12 @@ class CoordTransform:
         if arg2 is not None:
             return self._coordTransform.applyReverse(arg1, arg2, arg3)
         elif isinstance(arg1, Ray):
-            return Ray._fromRay(
+            return Ray._fromCPPRay(
                 self._coordTransform.applyReverse(arg1._r),
                 self.fromSys
             )
         elif isinstance(arg1, RayVector):
-            return RayVector._fromRayVector(
+            return RayVector._fromCPPRayVector(
                 self._coordTransform.applyReverse(arg1._r),
                 self.fromSys
             )

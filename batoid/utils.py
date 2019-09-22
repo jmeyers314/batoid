@@ -470,9 +470,9 @@ class lazy_property(object):
 def _rayify(r, coordSys=None):
     from .ray import Ray
     from .rayVector import RayVector
-    if isinstance(r, _batoid.Ray):
-        return Ray._fromRay(r, coordSys)
-    elif isinstance(r, _batoid.RayVector):
-        return RayVector._fromRayVector(r, coordSys)
+    if isinstance(r, _batoid.CPPRay):
+        return Ray._fromCPPRay(r, coordSys)
+    elif isinstance(r, _batoid.CPPRayVector):
+        return RayVector._fromCPPRayVector(r, coordSys)
     else:
         raise ValueError("Unknown type in _rayify")
