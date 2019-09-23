@@ -22,6 +22,7 @@ matrix:
         - COMPILER=gcc
         - CC=gcc
         - CXX=g++
+        - CMAKE_COVER=1
 
     - python: 3.7
       dist: xenial
@@ -31,7 +32,6 @@ matrix:
         - CC=clang
         - CXX=clang++
         - LD_LIBRARY_PATH=/usr/local/clang/lib:$LD_LIBRARY_PATH
-        - CMAKE_COVER=1
 
 before_install:
   - export EIGEN_DIR=$PWD/eigen/
