@@ -31,12 +31,14 @@ class Lattice:
     -----
         The ``coords`` attribute will contain the coordinates of each lattice
         point determined by the coordinate index and the primitive lattice
-        vectors.  E.g., in 2-dimensions:
+        vectors.  E.g., in 2-dimensions
 
-        lattice.coord[i, j] == (i - N1//2) * primitiveVector[0] + (j - N2//2) * primitiveVector[1]
+            lattice.coord[i, j] = (i - N1//2) * primitiveVector[0] + (j - N2//2) * primitiveVector[1]
 
         Note, this convention places
+
             lattice.coord[0,0] = (-N1//2) * primitiveVector[0] + (-N2/2) * primitiveVector[1]
+
         but the location of lattice.coord[-1,-1] depends on whether the size of
         each dimension is even or odd.  An odd-sized dimension is "centered", in
         that the 0-coordinate is precisely in the middle of the dimension.  An
