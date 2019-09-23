@@ -36,14 +36,8 @@ matrix:
 before_install:
   - export EIGEN_DIR=$PWD/eigen/
   - sudo apt-get install -y libfftw3-dev
-  # - pip install -U setuptools pip==9.0
   - pip install numpy astropy future pyyaml LSSTDESC.Coord pybind11
-  # - pip install galsim
-  - cd ../
-  - git clone https://github.com/GalSim-developers/GalSim.git
-  - cd GalSim/
-  - python setup.py install
-  - cd ../batoid/
+  - pip install galsim
   - pip install -r requirements.txt
   - pip install -r test_requirements.txt
 
