@@ -3,6 +3,7 @@ from ._version import __version__, __version_info__
 from .ray import Ray
 from .rayVector import RayVector, concatenateRayVectors, rayGrid, circularGrid
 from .rayVector import uniformCircularGrid, pointSourceCircularGrid
+from .rayVector2 import RayVector2
 from .surface import Surface, Plane, Paraboloid, Sphere, Quadric, Asphere
 from .surface import Bicubic, Zernike, Sum
 from .table import Table
