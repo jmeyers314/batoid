@@ -401,7 +401,7 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
         intersects the focal plane.  If 'mean', then center at the mean
         non-vignetted ray intersection.
     jmax : int, optional
-        Number of coefficients to compute.  Default: 12.
+        Number of coefficients to compute.  Default: 22.
     eps : float, optional
         Use annular Zernike polynomials with this fractional inner radius.
         Default: 0.0.
