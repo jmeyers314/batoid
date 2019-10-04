@@ -500,3 +500,70 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
     # with basis.
     area = np.pi*(1.-eps**2)
     return np.dot(basis, (t0-rays.t)/wavelength*rays.flux)/area
+
+
+def doubleZernike(optic, field, wavelength, rings=6, spokes=None, kmax=22,
+                  **kwargs):
+    r"""Compute double Zernike polynomial decomposition of the wavefront.
+
+    The double Zernike decomposition describes both the focal and pupil
+    variation of the wavefront.  More specifically:
+
+    .. math::
+
+        W(u, \theta) = \sum_{jk} a_{jk} Z_j(u), Z_k(\theta)
+
+    where :math:`u` indicates the pupil coordinate and :math:`\theta` indicates
+    the field angle coordinate.
+
+    Parameters
+    ----------
+    optic : batoid.Optic
+        Optical system
+    field : float
+        Outer field angle radius in radians.
+    wavelength : float
+        Wavelength in meters
+    rings : int, optional
+        Number of Gaussian quadrature rings to use.  Default: 6.
+    spokes : int, optional
+        Number of Gaussian quadrature spokes to use.  Default: 2*rings + 1
+    kmax : int, optional
+        Number of focal coefficients to compute.  Default: 22.
+    **kwargs : dict
+        Keyword arguments to pass to `zernikeGQ`.
+
+    Returns
+    -------
+    dzs : array
+        Double Zernike polynomial coefficients.
+    """
+    if spokes is None:
+        spokes = 2*rings+1
+    Li, w = np.polynomial.legendre.leggauss(rings)
+    radii = np.sqrt((1+Li)/2)*field
+    w *= np.pi/(2*spokes)
+    azs = np.linspace(0, 2*np.pi, spokes, endpoint=False)
+    radii, azs = np.meshgrid(radii, azs)
+    w = np.broadcast_to(w, radii.shape)
+    radii = radii.ravel()
+    azs = azs.ravel()
+    w = w.ravel()
+
+    thx = radii * np.cos(azs)
+    thy = radii * np.sin(azs)
+    coefs = []
+    for thx_, thy_ in zip(thx, thy):
+        coefs.append(zernikeGQ(
+            optic, thx_, thy_, wavelength,
+            rings=rings, spokes=spokes,
+            **kwargs
+        ))
+    coefs = np.array(coefs)
+
+    import galsim
+    basis = galsim.zernike.zernikeBasis(
+        kmax, thx, thy, R_outer=field
+    )
+    dzs = np.dot(basis, coefs*w[:,None])/np.pi
+    return dzs
