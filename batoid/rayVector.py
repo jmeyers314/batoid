@@ -593,8 +593,9 @@ class RayVector:
                     spokes = 2*rings+1
                 Li, w = np.polynomial.legendre.leggauss(rings)
                 eps = inner/outer
+                area = np.pi*(1-eps**2)
                 rings = np.sqrt(eps**2 + (1+Li)*(1-eps**2)/2)*outer
-                flux = w*(2*np.pi)/(4*spokes)
+                flux = w*area/(2*spokes)
             if isinstance(spokes, Integral):
                 spokes = np.linspace(0, 2*np.pi, spokes, endpoint=False)
         rings, spokes = np.meshgrid(rings, spokes)

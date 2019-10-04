@@ -714,7 +714,7 @@ def test_RVasSpokes():
 
         Li, w = np.polynomial.legendre.leggauss(rings)
         rings = np.sqrt((1+Li)/2)*outer
-        flux = w*(2*np.pi)/(4*spokes)
+        flux = w*np.pi/(2*spokes)
         spokes = np.linspace(0, 2*np.pi, spokes, endpoint=False)
 
         for i in range(len(spokes)):
@@ -770,7 +770,7 @@ def test_RVasSpokes():
                 rad_
             )
             np.testing.assert_allclose(
-                rays.flux[rings_*i:rings_*(i+1)]/(2*np.pi/spokes),
+                rays.flux[rings_*i:rings_*(i+1)]*spokes/(2*np.pi),
                 w_
             )
 
