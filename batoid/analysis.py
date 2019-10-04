@@ -367,7 +367,7 @@ def zernike(optic, theta_x, theta_y, wavelength,
 def zernikeGQ(optic, theta_x, theta_y, wavelength,
               projection='postel', rings=6, spokes=None,
               sphereRadius=None, reference='mean',
-              jmax=22, eps=None):
+              jmax=22, eps=0.0):
     r"""Compute Zernike polynomial decomposition of the wavefront.
 
     This calculation uses Gaussian Quadrature points and weights to compute the
@@ -435,7 +435,7 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
     import galsim
     dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
 
-    inner = 0.0 if eps is None else eps*optic.pupilSize/2
+    inner = eps*optic.pupilSize/2
     rays = batoid.RayVector.asSpokes(
         optic=optic, wavelength=wavelength,
         inner=inner,
