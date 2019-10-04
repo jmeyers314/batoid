@@ -156,16 +156,10 @@ def test_normal():
         x = x[w]
         y = y[w]
 
-        for _x, _y in zip(x, y):
-            np.testing.assert_allclose(
-                zernike.normal(_x, _y),
-                normalized(np.array([
-                    -gradx.evalCartesian(_x, _y),
-                    -grady.evalCartesian(_x, _y),
-                    1
-                ])),
-                atol=1e-9
-            )
+        norm1 = zernike.normal(x, y)
+        norm2 = np.stack([-gradx(x, y), -grady(x, y), np.ones_like(x)], axis=1)
+        norm2 /= np.sqrt(np.sum(norm2**2, axis=1))[:, None]
+        np.testing.assert_allclose(norm1, norm2, atol=1e-9)
 
 
 @pytest.mark.skipif(not hasGalSim, reason="galsim not found")
