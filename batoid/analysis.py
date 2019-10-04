@@ -498,4 +498,5 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
 
     # Zernike coefficients are flux-weighted dot products of relative phases
     # with basis.
-    return np.dot(basis, (t0-rays.t)/wavelength*rays.flux)/np.pi
+    area = np.pi*(1.-eps**2)
+    return np.dot(basis, (t0-rays.t)/wavelength*rays.flux)/area
