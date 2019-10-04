@@ -42,7 +42,7 @@ class Optic:
         self.inMedium = inMedium
         self.outMedium = outMedium
         self.skip = False
-        kwargs.pop('_itemDict', None)
+        kwargs.pop('itemDict', None)
         self.__dict__.update(**kwargs)
 
     def _repr_helper(self):
@@ -764,7 +764,7 @@ class CompoundOptic(Optic):
         Optic.__init__(self, **kwargs)
         self.items = tuple(items)
 
-    @property
+    @lazy_property
     def itemDict(self):
         """Dictionary access of the entire hierarchy of subitems of this
         `CompoundOptic`.
@@ -779,15 +779,14 @@ class CompoundOptic(Optic):
         Note: It's also possible to access subitems using the [] operator
         directly: ``optic['SubaruHSC.PM']``
         """
-        if not hasattr(self, '_itemDict'):
-            self._itemDict = {}
-            self._itemDict[self.name] = self
-            for item in self.items:
-                self._itemDict[self.name+'.'+item.name] = item
-                if hasattr(item, 'itemDict'):
-                    for k, v in item.itemDict.items():
-                        self._itemDict[self.name+'.'+k] = v
-        return self._itemDict
+        out = {}
+        out[self.name] = self
+        for item in self.items:
+            out[self.name+'.'+item.name] = item
+            if hasattr(item, 'itemDict'):
+                for k, v in item.itemDict.items():
+                    out[self.name+'.'+k] = v
+        return out
 
     def __getitem__(self, key):
         """Dictionary access to the entire hierarchy of subitems of this
@@ -795,10 +794,9 @@ class CompoundOptic(Optic):
 
         Either access through the fully-qualified name
         (``optic['LSST.LSSTCamera.L1']``) or by partially-qualified name
-        (``optic['LSSTCamera.L1']`` or even ``optic['L1']``).  See the
-        `itemDict` docstring for further explanation of the fully-qualified
-        name.  Note that partially-qualified name access is only available for
-        unique partially-qualified names.
+        (``optic['LSSTCamera.L1']`` or even ``optic['L1']``).  Note that
+        partially-qualified name access is only available for unique
+        partially-qualified names.
         """
         try:
             item = self.itemDict[key]
