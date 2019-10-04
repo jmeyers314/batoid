@@ -349,11 +349,11 @@ def test_ne():
 
 
 if __name__ == '__main__':
-    # test_properties()
-    # test_sag()
-    # test_normal()
-    # test_intersect()
-    # test_approximate_asphere()
-    # test_approximate_zernike()
+    test_properties()
+    test_sag()
+    test_normal()
+    test_intersect()
+    test_approximate_asphere()
+    test_approximate_zernike()
     test_LSST_M1_zernike()
-    # test_ne()
+    test_ne()
