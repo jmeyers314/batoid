@@ -2,13 +2,16 @@
         :target: https://travis-ci.org/jmeyers314/batoid
 .. image:: https://codecov.io/gh/jmeyers314/batoid/branch/master/graph/badge.svg
         :target: https://codecov.io/gh/jmeyers314/batoid
-.. image:: https://readthedocs.org/projects/batoid/badge/?version=latest
 
 
 batoid
 ======
 
 A c++ backed python optical raytracer.
+
+docs
+====
+https://jmeyers314.github.io/batoid/overview.html
 
 
 Requirements
