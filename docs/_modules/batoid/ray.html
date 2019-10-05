@@ -1,0 +1,619 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>batoid.ray &mdash; batoid 0.1.0rc2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> batoid
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rays.html">Rays</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../surfaces.html">Surfaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optic.html">Optics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../coords.html">Coordinate Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../obscurations.html">Obscurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../media.html">Media</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../table.html">Lookup tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../coatings.html">Coatings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../lattice.html">Lattices</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">batoid</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>batoid.ray</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for batoid.ray</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">collections.abc</span> <span class="k">import</span> <span class="n">Sequence</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">_batoid</span>
+<span class="kn">from</span> <span class="nn">.constants</span> <span class="k">import</span> <span class="n">vacuum</span><span class="p">,</span> <span class="n">globalCoordSys</span>
+<span class="kn">from</span> <span class="nn">.coordsys</span> <span class="k">import</span> <span class="n">CoordSys</span><span class="p">,</span> <span class="n">CoordTransform</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">fieldToDirCos</span>
+
+<div class="viewcode-block" id="Ray"><a class="viewcode-back" href="../../rays.html#batoid.Ray">[docs]</a><span class="k">class</span> <span class="nc">Ray</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A geometric ray to trace through an optical system.  May also be thought</span>
+<span class="sd">    of as a monochromatic propagating plane wave.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    r : ndarray of float, shape (3,)</span>
+<span class="sd">        Position of ray in meters.</span>
+<span class="sd">    v : ndarray of float, shape (3,)</span>
+<span class="sd">        Velocity vector in units of the speed of light in vacuum.  Note this</span>
+<span class="sd">        may have magnitude &lt; 1 if the Ray is inside a refractive medium.</span>
+<span class="sd">    t : float</span>
+<span class="sd">        Reference time (divided by the speed of light in vacuum) in units of</span>
+<span class="sd">        meters.  Equivalent to the optical path length.</span>
+<span class="sd">    wavelength : float</span>
+<span class="sd">        Vacuum wavelength in meters.</span>
+<span class="sd">    flux : float</span>
+<span class="sd">        Flux in arbitrary units.</span>
+<span class="sd">    vignetted : bool</span>
+<span class="sd">        Whether Ray has been vignetted or not.</span>
+<span class="sd">    failed : bool</span>
+<span class="sd">        Whether Ray is in failed state or not, which may happen if an</span>
+<span class="sd">        intersection with a surface is requested but cannot be found.</span>
+<span class="sd">    coordSys : CoordSys</span>
+<span class="sd">        Coordinate system in which this ray is expressed.  Default: the global</span>
+<span class="sd">        coordinate system.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">wavelength</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                 <span class="n">vignetted</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">failed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">coordSys</span><span class="o">=</span><span class="n">globalCoordSys</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">failed</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_r</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPRay</span><span class="p">(</span><span class="n">failed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">r</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_r</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPRay</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_r</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPRay</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">vignetted</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span> <span class="o">=</span> <span class="n">coordSys</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_fromCPPRay</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">_r</span><span class="p">,</span> <span class="n">coordSys</span><span class="o">=</span><span class="n">globalCoordSys</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Turn a c++ Ray into a python Ray.&quot;&quot;&quot;</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">_r</span> <span class="o">=</span> <span class="n">_r</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">coordSys</span> <span class="o">=</span> <span class="n">coordSys</span>
+        <span class="k">return</span> <span class="n">ret</span>
+
+<div class="viewcode-block" id="Ray.fromStop"><a class="viewcode-back" href="../../rays.html#batoid.Ray.fromStop">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">fromStop</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span>
+        <span class="n">optic</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">backDist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">medium</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stopSurface</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">wavelength</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dirCos</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">theta_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">theta_y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;postel&#39;</span><span class="p">,</span>
+        <span class="n">flux</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">coordSys</span><span class="o">=</span><span class="n">globalCoordSys</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a Ray that intersects the &quot;stop&quot; surface at a given point.</span>
+
+<span class="sd">        The algorithm used here starts by placing the ray on the &quot;stop&quot;</span>
+<span class="sd">        surface, and then backing it up such that it is in front of any</span>
+<span class="sd">        surfaces of the optic it&#39;s intended to trace.</span>
+
+<span class="sd">        The stop surface of most large telescopes is the plane perpendicular to</span>
+<span class="sd">        the optic axis and flush with the rim of the primary mirror.  This</span>
+<span class="sd">        plane is usually also the entrance pupil since there are no earlier</span>
+<span class="sd">        refractive or reflective surfaces.  However, since this plane is a bit</span>
+<span class="sd">        difficult to locate automatically, the default stop surface in batoid</span>
+<span class="sd">        is the global x-y plane.</span>
+
+<span class="sd">        If a telescope has an stopSurface attribute in its yaml file, then this</span>
+<span class="sd">        is usually a good choice to use in this function.  Using a curved</span>
+<span class="sd">        surface for the stop surface is allowed, but is usually a bad idea as</span>
+<span class="sd">        this may lead to a non-uniformly illuminated pupil and is inconsistent</span>
+<span class="sd">        with, say, an incoming uniform spherical wave or uniform plane wave.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x, y : float</span>
+<span class="sd">            X/Y coordinates on the stop surface where the ray would intersect</span>
+<span class="sd">            if not refracted or reflected first.</span>
+<span class="sd">        optic : `batoid.Optic`, optional</span>
+<span class="sd">            If present, then try to extract values for ``backDist``,</span>
+<span class="sd">            ``medium``, and ``stopSurface`` from the Optic.  Note that values</span>
+<span class="sd">            explicitly passed here as keyword arguments override those</span>
+<span class="sd">            extracted from ``optic``.</span>
+<span class="sd">        backDist : float, optional</span>
+<span class="sd">            Map ray backwards from the stop surface to the plane that is</span>
+<span class="sd">            perpendicular to the ray and ``backDist`` meters from the point</span>
+<span class="sd">            (0, 0, z(0,0)) on the stop surface.  This should generally be set</span>
+<span class="sd">            large enough that any obscurations or phantom surfaces occuring</span>
+<span class="sd">            before the stop surface are now &quot;in front&quot; of the ray.  If this</span>
+<span class="sd">            keyword is set to ``None`` and the ``optic`` keyword is set, then</span>
+<span class="sd">            infer a value from ``optic.backDist``.  If both this keyword and</span>
+<span class="sd">            ``optic`` are ``None``, then use a default of 40 meters, which</span>
+<span class="sd">            should be sufficiently large for foreseeable telescopes.</span>
+<span class="sd">        medium : `batoid.Medium`, optional</span>
+<span class="sd">            Initial medium of ray.  If this keyword is set to ``None`` and</span>
+<span class="sd">            the ``optic`` keyword is set, then infer a value from</span>
+<span class="sd">            ``optic.inMedium``.  If both this keyword and ``optic`` are</span>
+<span class="sd">            ``None``, then use a default of vacuum.</span>
+<span class="sd">        stopSurface : batoid.Interface, optional</span>
+<span class="sd">            Surface defining the system stop.  If this keyword is set to</span>
+<span class="sd">            ``None`` and the ``optic`` keyword is set, then infer a value from</span>
+<span class="sd">            ``optic.stopSurface``.  If both this keyword and ``optic`` are</span>
+<span class="sd">            ``None``, then use a default ``Interface(Plane())``, which is the</span>
+<span class="sd">            global x-y plane.</span>
+<span class="sd">        wavelength : float</span>
+<span class="sd">            Vacuum wavelength of ray in meters.</span>
+<span class="sd">        source : None or ndarray of float, shape (3,), optional</span>
+<span class="sd">            Where the ray originates.  If None, then the ray originates an</span>
+<span class="sd">            infinite distance away, in which case the ``dirCos`` kwarg must also</span>
+<span class="sd">            be specified to set the direction of ray propagation.  If an</span>
+<span class="sd">            ndarray, then the ray originates from this point in global</span>
+<span class="sd">            coordinates and the ``dirCos`` kwarg is ignored.</span>
+<span class="sd">        dirCos : ndarray of float, shape (3,), optional</span>
+<span class="sd">            If source is None, then indicates the direction of ray propagation.</span>
+<span class="sd">            If source is not None, then this is ignored.</span>
+<span class="sd">        theta_x, theta_y : float, optional</span>
+<span class="sd">            Field angle in radians.  If source is None, then this indicates the</span>
+<span class="sd">            initial direction of propagation of the ray.  If source is not</span>
+<span class="sd">            None, then this is ignored.  Uses `utils.fieldToDirCos` to convert</span>
+<span class="sd">            to direction cosines.  Also see ``dirCos`` as an alternative to</span>
+<span class="sd">            this keyword.</span>
+<span class="sd">        projection : {&#39;postel&#39;, &#39;zemax&#39;, &#39;gnomonic&#39;, &#39;stereographic&#39;, &#39;lambert&#39;, &#39;orthographic&#39;}, optional</span>
+<span class="sd">            Projection used to convert field angle to direction cosines.</span>
+<span class="sd">        flux : float, optional</span>
+<span class="sd">            Flux of ray.  Default is 1.0.</span>
+<span class="sd">        coordSys : CoordSys</span>
+<span class="sd">            Coordinate system in which ray is expressed.  Default: the global</span>
+<span class="sd">            coordinate system.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">.optic</span> <span class="k">import</span> <span class="n">Interface</span>
+        <span class="kn">from</span> <span class="nn">.surface</span> <span class="k">import</span> <span class="n">Plane</span>
+
+        <span class="k">if</span> <span class="n">optic</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">backDist</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">backDist</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">backDist</span>
+            <span class="k">if</span> <span class="n">medium</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">medium</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">inMedium</span>
+            <span class="k">if</span> <span class="n">stopSurface</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">stopSurface</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">stopSurface</span>
+
+        <span class="k">if</span> <span class="n">backDist</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">backDist</span> <span class="o">=</span> <span class="mf">40.0</span>
+        <span class="k">if</span> <span class="n">stopSurface</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">stopSurface</span> <span class="o">=</span> <span class="n">Interface</span><span class="p">(</span><span class="n">Plane</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">medium</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">medium</span> <span class="o">=</span> <span class="n">vacuum</span>
+
+        <span class="k">if</span> <span class="n">dirCos</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dirCos</span> <span class="o">=</span> <span class="n">fieldToDirCos</span><span class="p">(</span><span class="n">theta_x</span><span class="p">,</span> <span class="n">theta_y</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="n">projection</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">wavelength</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Missing wavelength keyword&quot;</span><span class="p">)</span>
+
+        <span class="n">z</span> <span class="o">=</span> <span class="n">stopSurface</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">sag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">transform</span> <span class="o">=</span> <span class="n">CoordTransform</span><span class="p">(</span><span class="n">stopSurface</span><span class="o">.</span><span class="n">coordSys</span><span class="p">,</span> <span class="n">globalCoordSys</span><span class="p">)</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">applyForward</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+
+        <span class="n">t</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">medium</span><span class="o">.</span><span class="n">getN</span><span class="p">(</span><span class="n">wavelength</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dirCos</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="n">v</span> <span class="o">/=</span> <span class="n">n</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+            <span class="n">ray</span> <span class="o">=</span> <span class="n">Ray</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">),</span> <span class="o">-</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span> <span class="n">flux</span><span class="p">)</span>
+            <span class="n">zhat</span> <span class="o">=</span> <span class="o">-</span><span class="n">n</span><span class="o">*</span><span class="n">v</span>
+            <span class="n">xhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]),</span> <span class="n">zhat</span><span class="p">)</span>
+            <span class="n">xhat</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">xhat</span><span class="p">,</span> <span class="n">xhat</span><span class="p">))</span>
+            <span class="n">yhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">xhat</span><span class="p">,</span> <span class="n">zhat</span><span class="p">)</span>
+            <span class="n">origin</span> <span class="o">=</span> <span class="n">zhat</span><span class="o">*</span><span class="n">backDist</span>
+            <span class="n">coordSys</span> <span class="o">=</span> <span class="n">CoordSys</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">xhat</span><span class="p">,</span> <span class="n">yhat</span><span class="p">,</span> <span class="n">zhat</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+            <span class="n">transform</span> <span class="o">=</span> <span class="n">CoordTransform</span><span class="p">(</span><span class="n">globalCoordSys</span><span class="p">,</span> <span class="n">coordSys</span><span class="p">)</span>
+            <span class="n">transform</span><span class="o">.</span><span class="n">applyForwardInPlace</span><span class="p">(</span><span class="n">ray</span><span class="p">)</span>
+            <span class="n">plane</span> <span class="o">=</span> <span class="n">Plane</span><span class="p">()</span>
+            <span class="n">plane</span><span class="o">.</span><span class="n">intersectInPlace</span><span class="p">(</span><span class="n">ray</span><span class="p">)</span>
+            <span class="n">transform</span><span class="o">.</span><span class="n">applyReverseInPlace</span><span class="p">(</span><span class="n">ray</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Ray</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">ray</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">ray</span><span class="o">.</span><span class="n">z</span><span class="p">),</span>
+                <span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span>
+                <span class="n">coordSys</span><span class="o">=</span><span class="n">globalCoordSys</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">vx</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="n">source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">vy</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">source</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">vz</span> <span class="o">=</span> <span class="n">z</span> <span class="o">-</span> <span class="n">source</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">vx</span><span class="p">,</span> <span class="n">vy</span><span class="p">,</span> <span class="n">vz</span><span class="p">])</span>
+            <span class="n">v</span> <span class="o">/=</span> <span class="n">n</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">Ray</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">),</span> <span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">coordSys</span><span class="o">=</span><span class="n">globalCoordSys</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Ray.copy"><a class="viewcode-back" href="../../rays.html#batoid.Ray.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a copy of this Ray.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Ray</span><span class="o">.</span><span class="n">_fromCPPRay</span><span class="p">(</span><span class="n">_batoid</span><span class="o">.</span><span class="n">CPPRay</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Ray.amplitude"><a class="viewcode-back" href="../../rays.html#batoid.Ray.amplitude">[docs]</a>    <span class="k">def</span> <span class="nf">amplitude</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate (scalar) complex electric-field amplitude at given</span>
+<span class="sd">        position and time.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        r : ndarray of float, shape (3,)</span>
+<span class="sd">            Position in meters.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time (over vacuum speed of light; in meters).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        complex</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">amplitude</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Ray.positionAtTime"><a class="viewcode-back" href="../../rays.html#batoid.Ray.positionAtTime">[docs]</a>    <span class="k">def</span> <span class="nf">positionAtTime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate the position of the Ray at a given time.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time (over vacuum speed of light; in meters).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray of float, shape (3,)</span>
+<span class="sd">            Position in meters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">positionAtTime</span><span class="p">(</span><span class="n">t</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Ray.propagatedToTime"><a class="viewcode-back" href="../../rays.html#batoid.Ray.propagatedToTime">[docs]</a>    <span class="k">def</span> <span class="nf">propagatedToTime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a Ray propagated to given time.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time (over vacuum speed of light; in meters).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Ray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">propagatedToTime</span><span class="p">(</span><span class="n">t</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Ray.propagateInPlace"><a class="viewcode-back" href="../../rays.html#batoid.Ray.propagateInPlace">[docs]</a>    <span class="k">def</span> <span class="nf">propagateInPlace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Propagate Ray to given time.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time (over vacuum speed of light; in meters).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">propagateInPlace</span><span class="p">(</span><span class="n">t</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Ray.phase"><a class="viewcode-back" href="../../rays.html#batoid.Ray.phase">[docs]</a>    <span class="k">def</span> <span class="nf">phase</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate plane wave phase at given position and time.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        r : ndarray of float, shape (3,)</span>
+<span class="sd">            Position in meters at which to compute phase</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time (over vacuum speed of light; in meters).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">phase</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Ray.toCoordSys"><a class="viewcode-back" href="../../rays.html#batoid.Ray.toCoordSys">[docs]</a>    <span class="k">def</span> <span class="nf">toCoordSys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coordSys</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transform ray into new coordinate system.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        coordSys: batoid.CoordSys</span>
+<span class="sd">            Destination coordinate system.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Ray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">transform</span> <span class="o">=</span> <span class="n">CoordTransform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span><span class="p">,</span> <span class="n">coordSys</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">transform</span><span class="o">.</span><span class="n">applyForward</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Ray.toCoordSysInPlace"><a class="viewcode-back" href="../../rays.html#batoid.Ray.toCoordSysInPlace">[docs]</a>    <span class="k">def</span> <span class="nf">toCoordSysInPlace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coordSys</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transform ray into new coordinate system in place.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        coordSys: batoid.CoordSys</span>
+<span class="sd">            Destination coordinate system.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">transform</span> <span class="o">=</span> <span class="n">CoordTransform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span><span class="p">,</span> <span class="n">coordSys</span><span class="p">)</span>
+        <span class="n">transform</span><span class="o">.</span><span class="n">applyForwardInPlace</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">r</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;ndarray of float, shape (3,): Position of ray in meters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">r</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">v</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;ndarray of float, shape (3,): Velocity of ray in units of the speed</span>
+<span class="sd">        of light in vacuum. Note that this may have magnitude &lt; 1 if the ray is</span>
+<span class="sd">        inside a refractive medium.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">v</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">t</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reference time (divided by the speed of light in vacuum) in units of</span>
+<span class="sd">        meters, also known as the optical path length.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">t</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">wavelength</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Vacuum wavelength in meters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">wavelength</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">flux</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Ray flux in arbitrary units.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">flux</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vignetted</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;True if ray has been vignetted.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">vignetted</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">failed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;True if ray is in a failed state.  This may occur, for example, if</span>
+<span class="sd">        batoid failed to find the intersection of a ray with a surface.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">failed</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">x</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The x component of the ray position in meters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">x</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">y</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The y component of the ray position in meters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">y</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">z</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The z component of the ray position in meters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">z</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The x component of the ray velocity in units of the vacuum speed of</span>
+<span class="sd">        light.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">vx</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The y component of the ray velocity in units of the vacuum speed of</span>
+<span class="sd">        light.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">vy</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The z component of the ray velocity in units of the vacuum speed of</span>
+<span class="sd">        light.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">vz</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">k</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;ndarray of float, shape (3,): Wavevector of plane wave in units of</span>
+<span class="sd">        radians per meter.  The magnitude of the wavevector is equal to</span>
+<span class="sd">        :math:`2 \pi n / \lambda`, where :math:`n` is the refractive index and</span>
+<span class="sd">        :math:`\lambda` is the wavelength.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">k</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">kx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The x component of the ray wave vector in radians per meter.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">kx</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ky</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The y component of the ray wave vector in radians per meter.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">ky</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">kz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The z component of the ray wave vector in radians per meter.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">kz</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">omega</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;The temporal angular frequency of the plane wave divided by the</span>
+<span class="sd">        vacuum speed of light in units of radians per meter.  Equals</span>
+<span class="sd">        :math:`2 \pi / \lambda`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">omega</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">Ray</span><span class="p">):</span> <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">_r</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">coordSys</span>
+
+    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span> <span class="o">==</span> <span class="n">rhs</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Josh Meyers
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

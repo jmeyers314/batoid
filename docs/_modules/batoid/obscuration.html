@@ -1,0 +1,537 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>batoid.obscuration &mdash; batoid 0.1.0rc2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> batoid
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rays.html">Rays</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../surfaces.html">Surfaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optic.html">Optics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../coords.html">Coordinate Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../obscurations.html">Obscurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../media.html">Media</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../table.html">Lookup tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../coatings.html">Coatings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../lattice.html">Lattices</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">batoid</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>batoid.obscuration</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for batoid.obscuration</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">_batoid</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">_rayify</span>
+
+
+<div class="viewcode-block" id="Obscuration"><a class="viewcode-back" href="../../obscurations.html#batoid.Obscuration">[docs]</a><span class="k">class</span> <span class="nc">Obscuration</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;An `Obscuration` instance is used to mark `Ray` s (potentially in</span>
+<span class="sd">    a `RayVector`) as vignetted (i.e., obscured) if their x/y coordinates lie</span>
+<span class="sd">    in a particular region.</span>
+
+<span class="sd">    `Obscuration` s are useful for modeling pupils, clear apertures of optical</span>
+<span class="sd">    elements, struts, or other physical obstructions in an optical system.</span>
+<span class="sd">    Note that only the x and y local coordinates of a `Ray` are considered; the</span>
+<span class="sd">    z coordinate is ignored.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Obscuration.contains"><a class="viewcode-back" href="../../obscurations.html#batoid.Obscuration.contains">[docs]</a>    <span class="k">def</span> <span class="nf">contains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return True if the point (x,y) is obscured.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x, y : float</span>
+<span class="sd">            X/Y coordinates of point in meters.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        obscured : bool</span>
+<span class="sd">            True if point is obscured.  False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Obscuration.obscure"><a class="viewcode-back" href="../../obscurations.html#batoid.Obscuration.obscure">[docs]</a>    <span class="k">def</span> <span class="nf">obscure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Mark a `Ray` or `RayVector` for potential vignetting.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        r : `Ray` or `RayVector`</span>
+<span class="sd">            Rays to analyze.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        out : `Ray` or `RayVector`</span>
+<span class="sd">            Returned object will have appropriate elements marked as vignetted.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_rayify</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span><span class="o">.</span><span class="n">obscure</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">_r</span><span class="p">),</span> <span class="n">r</span><span class="o">.</span><span class="n">coordSys</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Obscuration.obscureInPlace"><a class="viewcode-back" href="../../obscurations.html#batoid.Obscuration.obscureInPlace">[docs]</a>    <span class="k">def</span> <span class="nf">obscureInPlace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Mark a `Ray` or `RayVector` for potential vignetting in place.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        r : `Ray` or `RayVector`</span>
+<span class="sd">            Rays to analyze and vignette in place.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span><span class="o">.</span><span class="n">obscureInPlace</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">_r</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="n">rhs</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">_obsc</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span> <span class="o">==</span> <span class="n">rhs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ObscCircle"><a class="viewcode-back" href="../../obscurations.html#batoid.ObscCircle">[docs]</a><span class="k">class</span> <span class="nc">ObscCircle</span><span class="p">(</span><span class="n">Obscuration</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A circular obscuration.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    radius : float</span>
+<span class="sd">        Radius of circle in meters.</span>
+<span class="sd">    x, y : float, optional</span>
+<span class="sd">        Coordinates of circle center in meters.  [default: 0.0]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPObscCircle</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">radius</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Radius of circle in meters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span><span class="o">.</span><span class="n">radius</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">x</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;X coordinate of circle center in meters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span><span class="o">.</span><span class="n">x</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">y</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Y coordinate of circle center in meters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span><span class="o">.</span><span class="n">y</span></div>
+
+
+<div class="viewcode-block" id="ObscAnnulus"><a class="viewcode-back" href="../../obscurations.html#batoid.ObscAnnulus">[docs]</a><span class="k">class</span> <span class="nc">ObscAnnulus</span><span class="p">(</span><span class="n">Obscuration</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An annular obscuration.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    inner : float</span>
+<span class="sd">        Inner radius of annulus in meters.</span>
+<span class="sd">    outer : float</span>
+<span class="sd">        Outer radius of annulus in meters.</span>
+<span class="sd">    x, y : float, optional</span>
+<span class="sd">        Coordinates of annulus center in meters.  [default: 0.0]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inner</span><span class="p">,</span> <span class="n">outer</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPObscAnnulus</span><span class="p">(</span><span class="n">inner</span><span class="p">,</span> <span class="n">outer</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">inner</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Inner radius of annulus in meters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span><span class="o">.</span><span class="n">inner</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">outer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Outer radius of annulus in meters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span><span class="o">.</span><span class="n">outer</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">x</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;X coordinate of annulus center in meters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span><span class="o">.</span><span class="n">x</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">y</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Y coordinate of annulus center in meters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span><span class="o">.</span><span class="n">y</span></div>
+
+
+<div class="viewcode-block" id="ObscRectangle"><a class="viewcode-back" href="../../obscurations.html#batoid.ObscRectangle">[docs]</a><span class="k">class</span> <span class="nc">ObscRectangle</span><span class="p">(</span><span class="n">Obscuration</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A rectangular obscuration.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    width : float</span>
+<span class="sd">        Width (X-extent) of rectangle in meters.</span>
+<span class="sd">    height : float</span>
+<span class="sd">        Height (Y-extent) of rectangle in meters.</span>
+<span class="sd">    x, y : float, optional</span>
+<span class="sd">        Coordinates of rectangle center in meters.  [default: 0.0]</span>
+<span class="sd">    theta : float, optional</span>
+<span class="sd">        Counter-clockwise rotation of rectangle in radians.  [default: 0.0]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">theta</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPObscRectangle</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Width (X-center) of rectangle in meters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span><span class="o">.</span><span class="n">width</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">height</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Height (Y-center) of rectangle in meters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span><span class="o">.</span><span class="n">height</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">x</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;X coordinate of rectangle center in meters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span><span class="o">.</span><span class="n">x</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">y</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Y coordinate of rectangle center in meters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span><span class="o">.</span><span class="n">y</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">theta</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Counter-clockwise rotation of rectangle in radians.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span><span class="o">.</span><span class="n">theta</span></div>
+
+
+<div class="viewcode-block" id="ObscRay"><a class="viewcode-back" href="../../obscurations.html#batoid.ObscRay">[docs]</a><span class="k">class</span> <span class="nc">ObscRay</span><span class="p">(</span><span class="n">Obscuration</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A finite-width ray-like obscuration.</span>
+
+<span class="sd">    (Like a rectangle, but infinitely long in one direction.)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    width : float</span>
+<span class="sd">        Width of ray in meters.</span>
+<span class="sd">    theta : float</span>
+<span class="sd">        Rotation angle of ray in radians.</span>
+<span class="sd">    x, y : float, optional</span>
+<span class="sd">        Coordinates of ray origin in meters.  [default: 0.0]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPObscRay</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Width of ray in meters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span><span class="o">.</span><span class="n">width</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">theta</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Rotation angle of ray in radians.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span><span class="o">.</span><span class="n">theta</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">x</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;X coordinate of ray origin in meters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span><span class="o">.</span><span class="n">x</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">y</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Y coordinate of ray origin in meters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span><span class="o">.</span><span class="n">y</span></div>
+
+
+<div class="viewcode-block" id="ObscNegation"><a class="viewcode-back" href="../../obscurations.html#batoid.ObscNegation">[docs]</a><span class="k">class</span> <span class="nc">ObscNegation</span><span class="p">(</span><span class="n">Obscuration</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A negated obscuration.</span>
+
+<span class="sd">    The originally obscured regions become clear, and the original clear</span>
+<span class="sd">    regions become obscured.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    original : `Obscuration`</span>
+<span class="sd">        The obscuration to negate.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">original</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_original</span> <span class="o">=</span> <span class="n">original</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPObscNegation</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">_obsc</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">original</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The negated original `Obscuration`.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_original</span></div>
+
+
+<div class="viewcode-block" id="ObscUnion"><a class="viewcode-back" href="../../obscurations.html#batoid.ObscUnion">[docs]</a><span class="k">class</span> <span class="nc">ObscUnion</span><span class="p">(</span><span class="n">Obscuration</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A union of `Obscuration` s.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    *items : `Obscuration` s</span>
+<span class="sd">        The `Obscuration` s to unionize.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Though not very useful, one could in principle unionize a circle and an</span>
+<span class="sd">    annulus to make a larger circle:</span>
+
+<span class="sd">    &gt;&gt;&gt; small_circle = batoid.ObscCircle(1.0)</span>
+<span class="sd">    &gt;&gt;&gt; annulus = batoid.ObscAnnulus(1.0, 2.0)</span>
+<span class="sd">    &gt;&gt;&gt; big_circle = batoid.ObscCircle(2.0)</span>
+<span class="sd">    &gt;&gt;&gt; alternate_big_circle = batoid.ObscUnion(small_circle, annulus)</span>
+
+<span class="sd">    Using a list or tuple is also okay with `ObscUnion`.</span>
+
+<span class="sd">    &gt;&gt;&gt; other_alternate_big_circle = batoid.ObscUnion([small_circle, annulus])</span>
+
+<span class="sd">    Although ``big_circle`` and ``alternate_big_circle`` will not compare equal</span>
+<span class="sd">    above, their behavior with respect to obscuring rays is the same:</span>
+
+<span class="sd">    &gt;&gt;&gt; rays = batoid.RayVector.asGrid(</span>
+<span class="sd">            backDist=10.0, wavelength=500e-9, nx=10, lx=4.0, dirCos=(0,0,1)</span>
+<span class="sd">        )</span>
+<span class="sd">    &gt;&gt;&gt; obsc1 = big_circle.obscure(rays)</span>
+<span class="sd">    &gt;&gt;&gt; obsc2 = alternate_big_circle.obscure(rays)</span>
+<span class="sd">    &gt;&gt;&gt; obsc1 == obsc2</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">items</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Not enough items&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="n">items</span> <span class="o">=</span> <span class="n">items</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_items</span> <span class="o">=</span> <span class="n">items</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPObscUnion</span><span class="p">([</span><span class="n">item</span><span class="o">.</span><span class="n">_obsc</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;List of `Obscuration` : unionized `Obscuration` s.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_items</span></div>
+
+
+<div class="viewcode-block" id="ObscIntersection"><a class="viewcode-back" href="../../obscurations.html#batoid.ObscIntersection">[docs]</a><span class="k">class</span> <span class="nc">ObscIntersection</span><span class="p">(</span><span class="n">Obscuration</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An intersection of `Obscuration` s.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    *items : `Obscuration` s</span>
+<span class="sd">        The `Obscuration` s to intersect.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    An alternate way to create an annulus is the intersection of a large circle</span>
+<span class="sd">    and a negated small circle.</span>
+
+<span class="sd">    &gt;&gt;&gt; big_circle = batoid.ObscCircle(2.0)</span>
+<span class="sd">    &gt;&gt;&gt; small_circle = batoid.ObscCircle(1.0)</span>
+<span class="sd">    &gt;&gt;&gt; annulus = batoid.ObscAnnulus(1.0, 2.0)</span>
+<span class="sd">    &gt;&gt;&gt; alternate_annulus = batoid.ObscIntersection(</span>
+<span class="sd">            batoid.ObscNegation(small_circle),</span>
+<span class="sd">            big_circle</span>
+<span class="sd">        )</span>
+
+<span class="sd">    Using a list or tuple is also okay with `ObscIntersection`.</span>
+
+<span class="sd">    &gt;&gt;&gt; other_alternate_annulus = batoid.ObscIntersection([</span>
+<span class="sd">            batoid.ObscNegation(small_circle),</span>
+<span class="sd">            big_circle</span>
+<span class="sd">        ])</span>
+
+<span class="sd">    Although ``annulus`` and ``alternate_annulus`` will not compare equal</span>
+<span class="sd">    above, their behavior with respect to obscuring rays is the same:</span>
+
+<span class="sd">    &gt;&gt;&gt; rays = batoid.RayVector.asGrid(</span>
+<span class="sd">            backDist=10.0, wavelength=500e-9, nx=10, lx=4.0, dirCos=(0,0,1)</span>
+<span class="sd">        )</span>
+<span class="sd">    &gt;&gt;&gt; obsc1 = annulus.obscure(rays)</span>
+<span class="sd">    &gt;&gt;&gt; obsc2 = alternate_annulus.obscure(rays)</span>
+<span class="sd">    &gt;&gt;&gt; obsc1 == obsc2</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">items</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Not enough items&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="n">items</span> <span class="o">=</span> <span class="n">items</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_items</span> <span class="o">=</span> <span class="n">items</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obsc</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPObscIntersection</span><span class="p">([</span><span class="n">item</span><span class="o">.</span><span class="n">_obsc</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;List of `Obscuration` : intersected `Obscuration` s.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_items</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Josh Meyers
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

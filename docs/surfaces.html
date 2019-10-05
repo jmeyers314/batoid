@@ -1,0 +1,611 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Surfaces &mdash; batoid 0.1.0rc2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Optics" href="optic.html" />
+    <link rel="prev" title="Rays" href="rays.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> batoid
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rays.html">Rays</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Surfaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optic.html">Optics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coords.html">Coordinate Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="obscurations.html">Obscurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="media.html">Media</a></li>
+<li class="toctree-l1"><a class="reference internal" href="table.html">Lookup tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coatings.html">Coatings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lattice.html">Lattices</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">batoid</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Surfaces</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/surfaces.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="surfaces">
+<h1>Surfaces<a class="headerlink" href="#surfaces" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="batoid.Surface">
+<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">Surface</code><a class="reference internal" href="_modules/batoid/surface.html#Surface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Surface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract base class representing a 2D geometric surface.</p>
+<dl class="method">
+<dt id="batoid.Surface.sag">
+<code class="sig-name descname">sag</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/surface.html#Surface.sag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Surface.sag" title="Permalink to this definition">¶</a></dt>
+<dd><p>The function defining the surface; z(x, y).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x, y</strong> (<em>array_like, shape (n,)</em>) – Positions at which to evaluate the surface sag.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>z</strong> (<em>array_like, shape (n,)</em>) – Surface height.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Surface.normal">
+<code class="sig-name descname">normal</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/surface.html#Surface.normal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Surface.normal" title="Permalink to this definition">¶</a></dt>
+<dd><p>The normal vector to the surface at (x, y, z(x, y)).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x, y</strong> (<em>array_like, shape (n,)</em>) – Positions at which to evaluate the surface normal.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>normal</strong> (<em>array_like, shape (n, 3)</em>) – Surface normals.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Surface.intersect">
+<code class="sig-name descname">intersect</code><span class="sig-paren">(</span><em class="sig-param">r</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/surface.html#Surface.intersect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Surface.intersect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate intersection of a ray or rays with this surface.  If the
+intersection is in the past, then set the ray.fail flag.  If the ray
+intersects at an obscured point, then set the ray.vignetted flag.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>r</strong> (<em>Ray or RayVector</em>) – Input ray(s) to intersect</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>outRays</strong> (<em>Ray or RayVector</em>) – New object corresponding to original ray(s) propagated to the
+intersection point.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Surface.intersectInPlace">
+<code class="sig-name descname">intersectInPlace</code><span class="sig-paren">(</span><em class="sig-param">r</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/surface.html#Surface.intersectInPlace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Surface.intersectInPlace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate intersection of ray or rays with this surface.  Same as
+<a class="reference internal" href="#batoid.Surface.intersect" title="batoid.Surface.intersect"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">intersect</span></code></a>, but operates on the input argument in place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>r</strong> (<em>Ray or RayVector</em>) – Ray(s) to manipulate in place.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Surface.reflect">
+<code class="sig-name descname">reflect</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">coating=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/surface.html#Surface.reflect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Surface.reflect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate intersection of ray(s) with this surface, and immediately
+reflect the ray(s) at the point(s) of intersection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>Ray or RayVector</em>) – Ray(s) to reflect.</p></li>
+<li><p><strong>coating</strong> (<em>Coating, optional</em>) – Coating object to control reflection coefficient.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>outRays</strong> (<em>Ray or RayVector</em>) – New object corresponding to original ray(s) propagated and
+reflected.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Surface.reflectInPlace">
+<code class="sig-name descname">reflectInPlace</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">coating=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/surface.html#Surface.reflectInPlace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Surface.reflectInPlace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate intersection of ray(s) with this surface, and immediately
+reflect the ray(s) at the point(s) of intersection.  Same as <a class="reference internal" href="#batoid.Surface.reflect" title="batoid.Surface.reflect"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">reflect</span></code></a>,
+but manipulates the input ray(s) in place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>Ray or RayVector</em>) – Ray(s) to reflect in place.</p></li>
+<li><p><strong>coating</strong> (<em>Coating, optional</em>) – Coating object to control reflection coefficient.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Surface.refract">
+<code class="sig-name descname">refract</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">inMedium</em>, <em class="sig-param">outMedium</em>, <em class="sig-param">coating=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/surface.html#Surface.refract"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Surface.refract" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate intersection of ray(s) with this surface, and immediately
+refract the ray(s) through the surface at the point(s) of intersection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>Ray or RayVector</em>) – Ray(s) to refract.</p></li>
+<li><p><strong>inMedium</strong> (<em>Medium</em>) – Refractive medium on the incoming side of the surface.</p></li>
+<li><p><strong>outMedium</strong> (<em>Medium</em>) – Refractive medium on the outgoing side of the surface.</p></li>
+<li><p><strong>coating</strong> (<em>Coating, optional</em>) – Coating object to control transmission coefficient.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>outRays</strong> (<em>Ray or RayVector</em>) – New object corresponding to original ray(s) propagated and
+refracted.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Surface.refractInPlace">
+<code class="sig-name descname">refractInPlace</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">inMedium</em>, <em class="sig-param">outMedium</em>, <em class="sig-param">coating=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/surface.html#Surface.refractInPlace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Surface.refractInPlace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate intersection of ray(s) with this surface, and immediately
+refract the ray(s) through the surface at the point(s) of intersection.
+Same as <a class="reference internal" href="#batoid.Surface.refract" title="batoid.Surface.refract"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">refract</span></code></a>, but manipulates the input ray(s) in place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>Ray or RayVector</em>) – Ray(s) to refract in place.</p></li>
+<li><p><strong>inMedium</strong> (<em>Medium</em>) – Refractive medium on the incoming side of the surface.</p></li>
+<li><p><strong>outMedium</strong> (<em>Medium</em>) – Refractive medium on the outgoing side of the surface.</p></li>
+<li><p><strong>coating</strong> (<em>Coating, optional</em>) – Coating object to control transmission coefficient.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Surface.rSplit">
+<code class="sig-name descname">rSplit</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">inMedium</em>, <em class="sig-param">outMedium</em>, <em class="sig-param">coating</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/surface.html#Surface.rSplit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Surface.rSplit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate intersection of rays with this surface, and immediately
+split the rays into reflected and refracted rays, with appropriate
+fluxes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>RayVector</em>) – Rays to refract.</p></li>
+<li><p><strong>inMedium</strong> (<em>Medium</em>) – Refractive medium on the incoming side of the surface.</p></li>
+<li><p><strong>outMedium</strong> (<em>Medium</em>) – Refractive medium on the outgoing side of the surface.</p></li>
+<li><p><strong>coating</strong> (<em>Coating</em>) – Coating object to control transmission coefficient.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>reflectedRays, refractedRays</strong> (<em>RayVector</em>) – New objects corresponding to original rays propagated and
+reflected/refracted.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="batoid.Plane">
+<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">Plane</code><span class="sig-paren">(</span><em class="sig-param">allowReverse=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/surface.html#Plane"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Plane" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.surface.Surface</span></code></p>
+<p>Planar surface.  The surface sag follows the equation:</p>
+<div class="math notranslate nohighlight">
+\[z(x, y) = 0\]</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="batoid.Paraboloid">
+<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">Paraboloid</code><span class="sig-paren">(</span><em class="sig-param">R</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/surface.html#Paraboloid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Paraboloid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.surface.Surface</span></code></p>
+<p>Surface of revolution with parabolic cross-section, and where the axis
+of revolution is along the axis of the parabola.  The surface sag follows
+the equation</p>
+<div class="math notranslate nohighlight">
+\[z(x, y) = z(r) = \frac{r^2}{2 R}\]</div>
+<p>where <span class="math notranslate nohighlight">\(r = \sqrt{x^2 + y^2}\)</span> and <a class="reference internal" href="#batoid.Paraboloid.R" title="batoid.Paraboloid.R"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">R</span></code></a> is the radius of curvature at
+the paraboloid vertex.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>R</strong> (<em>float</em>) – Radius of curvature at paraboloid vertex.</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="batoid.Paraboloid.R">
+<em class="property">property </em><code class="sig-name descname">R</code><a class="headerlink" href="#batoid.Paraboloid.R" title="Permalink to this definition">¶</a></dt>
+<dd><p>Radius of curvature at paraboloid vertex.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="batoid.Sphere">
+<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">Sphere</code><span class="sig-paren">(</span><em class="sig-param">R</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/surface.html#Sphere"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Sphere" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.surface.Surface</span></code></p>
+<p>Spherical surface.  The surface sag follows the equation:</p>
+<div class="math notranslate nohighlight">
+\[z(x, y) = z(r) = R \left(1 - \sqrt{1-\frac{r^2}{R^2}}\right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(r = \sqrt{x^2 + y^2}\)</span> and <a class="reference internal" href="#batoid.Sphere.R" title="batoid.Sphere.R"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">R</span></code></a> is the radius the sphere.  Note
+that the center of the sphere is a distance <a class="reference internal" href="#batoid.Sphere.R" title="batoid.Sphere.R"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">R</span></code></a> above the vertex.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>R</strong> (<em>float</em>) – Sphere radius.</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="batoid.Sphere.R">
+<em class="property">property </em><code class="sig-name descname">R</code><a class="headerlink" href="#batoid.Sphere.R" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sphere radius.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="batoid.Quadric">
+<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">Quadric</code><span class="sig-paren">(</span><em class="sig-param">R</em>, <em class="sig-param">conic</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/surface.html#Quadric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Quadric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.surface.Surface</span></code></p>
+<p>Surface of revolution where the cross section is a conic section.
+The surface sag follows the equation:</p>
+<div class="math notranslate nohighlight">
+\[z(x, y) = z(r) = \frac{r^2}{R \left(1 + \sqrt{1 - \frac{r^2}{R^2} (1 + \kappa)}\right)}\]</div>
+<p>where <span class="math notranslate nohighlight">\(r = \sqrt{x^2 + y^2}\)</span>, <a class="reference internal" href="#batoid.Quadric.R" title="batoid.Quadric.R"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">R</span></code></a> is the radius of curvature at the
+surface vertex, and <span class="math notranslate nohighlight">\(\kappa\)</span> is the conic constant.  Different
+ranges of <span class="math notranslate nohighlight">\(\kappa\)</span> indicate different categories of surfaces:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\kappa &gt; 0\)</span>      =&gt;  oblate ellipsoid</p></li>
+<li><p><span class="math notranslate nohighlight">\(\kappa = 0\)</span>      =&gt;  sphere</p></li>
+<li><p><span class="math notranslate nohighlight">\(-1 &lt; \kappa &lt; 0\)</span> =&gt;  prolate ellipsoid</p></li>
+<li><p><span class="math notranslate nohighlight">\(\kappa = -1\)</span>    =&gt;  paraboloid</p></li>
+<li><p><span class="math notranslate nohighlight">\(\kappa &lt; -1\)</span>     =&gt;  hyperboloid</p></li>
+</ul>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>R</strong> (<em>float</em>) – Radius of curvature at vertex.</p></li>
+<li><p><strong>conic</strong> (<em>float</em>) – Conic constant <span class="math notranslate nohighlight">\(\kappa\)</span></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="batoid.Quadric.R">
+<em class="property">property </em><code class="sig-name descname">R</code><a class="headerlink" href="#batoid.Quadric.R" title="Permalink to this definition">¶</a></dt>
+<dd><p>Radius of curvature at quadric vertex.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Quadric.conic">
+<em class="property">property </em><code class="sig-name descname">conic</code><a class="headerlink" href="#batoid.Quadric.conic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Conic constant.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="batoid.Asphere">
+<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">Asphere</code><span class="sig-paren">(</span><em class="sig-param">R</em>, <em class="sig-param">conic</em>, <em class="sig-param">coefs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/surface.html#Asphere"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Asphere" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.surface.Surface</span></code></p>
+<p>Surface of revolution where the cross section is a conic section plus an
+even polynomial.  Represents the equation</p>
+<p>The surface sag follows the equation:</p>
+<div class="math notranslate nohighlight">
+\[z(x, y) = z(r) = \frac{r^2}{R \left(1 + \sqrt{1 - \frac{r^2}{R^2} (1 + \kappa)}\right)} + \sum_i \alpha_i r^{2 i}\]</div>
+<p>where <span class="math notranslate nohighlight">\(r = \sqrt{x^2 + y^2}\)</span>, <a class="reference internal" href="#batoid.Asphere.R" title="batoid.Asphere.R"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">R</span></code></a> is the radius of curvature at the
+surface vertex, <span class="math notranslate nohighlight">\(\kappa\)</span> is the conic constant, and
+<span class="math notranslate nohighlight">\(\left\{\alpha_i\right\}\)</span> are the even polynomial coefficients.
+Different ranges of <span class="math notranslate nohighlight">\(\kappa\)</span> produce different categories of
+surfaces (where alpha==0):</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\kappa &gt; 0\)</span>      =&gt;  oblate ellipsoid</p></li>
+<li><p><span class="math notranslate nohighlight">\(\kappa = 0\)</span>      =&gt;  sphere</p></li>
+<li><p><span class="math notranslate nohighlight">\(-1 &lt; \kappa &lt; 0\)</span> =&gt;  prolate ellipsoid</p></li>
+<li><p><span class="math notranslate nohighlight">\(\kappa = -1\)</span>    =&gt;  paraboloid</p></li>
+<li><p><span class="math notranslate nohighlight">\(\kappa &lt; -1\)</span>     =&gt;  hyperboloid</p></li>
+</ul>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>R</strong> (<em>float</em>) – Radius of curvature at vertex.</p></li>
+<li><p><strong>conic</strong> (<em>float</em>) – Conic constant <span class="math notranslate nohighlight">\(\kappa\)</span>.</p></li>
+<li><p><strong>coefs</strong> (<em>list of float</em>) – Even polynomial coefficients <span class="math notranslate nohighlight">\(\left\{\alpha_i\right\}\)</span></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="batoid.Asphere.R">
+<em class="property">property </em><code class="sig-name descname">R</code><a class="headerlink" href="#batoid.Asphere.R" title="Permalink to this definition">¶</a></dt>
+<dd><p>Radius of curvature at asphere vertex.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Asphere.conic">
+<em class="property">property </em><code class="sig-name descname">conic</code><a class="headerlink" href="#batoid.Asphere.conic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Conic constant.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Asphere.coefs">
+<em class="property">property </em><code class="sig-name descname">coefs</code><a class="headerlink" href="#batoid.Asphere.coefs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Even polynomial coefficients.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="batoid.Zernike">
+<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">Zernike</code><span class="sig-paren">(</span><em class="sig-param">coef</em>, <em class="sig-param">R_outer=1.0</em>, <em class="sig-param">R_inner=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/surface.html#Zernike"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Zernike" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.surface.Surface</span></code></p>
+<p>Surface defined by Zernike polynomials.  The surface sag follows the
+equation:</p>
+<div class="math notranslate nohighlight">
+\[z(x, y) = \sum_j a_j Z_j\left(\epsilon; \frac{x}{R_{outer}}, \frac{y}{R_{outer}}\right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(Z_j(\epsilon, u, v)\)</span> are the annular Zernike polynomials
+(Mahajan) with central obscuration
+<span class="math notranslate nohighlight">\(\epsilon = \frac{R_{inner}}{R_{outer}}\)</span>
+indexed by the Noll (1976) convention, <span class="math notranslate nohighlight">\(R_{outer}\)</span> is the outer
+radius of the annulus, <span class="math notranslate nohighlight">\(R_{inner}\)</span> is the inner radius of the
+annulus, and <span class="math notranslate nohighlight">\(\left\{a_j\right\}\)</span> are the annular
+coefficients.</p>
+<p>Note that the Noll convention starts at j=1, so the <span class="math notranslate nohighlight">\(a_0\)</span> =
+<code class="docutils literal notranslate"><span class="pre">coef[0]</span></code> value has no effect on the surface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coef</strong> (<em>list of float</em>) – Annular Zernike polynomial coefficients.</p></li>
+<li><p><strong>R_outer</strong> (<em>float</em>) – Outer radius of annulus.</p></li>
+<li><p><strong>R_inner</strong> (<em>float</em>) – Inner radius of annulus.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="batoid.Zernike.coef">
+<em class="property">property </em><code class="sig-name descname">coef</code><a class="headerlink" href="#batoid.Zernike.coef" title="Permalink to this definition">¶</a></dt>
+<dd><p>Annular Zernike polynomial coefficients.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Zernike.R_outer">
+<em class="property">property </em><code class="sig-name descname">R_outer</code><a class="headerlink" href="#batoid.Zernike.R_outer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Outer radius of annulus.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Zernike.R_inner">
+<em class="property">property </em><code class="sig-name descname">R_inner</code><a class="headerlink" href="#batoid.Zernike.R_inner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Outer radius of annulus.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="batoid.Bicubic">
+<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">Bicubic</code><span class="sig-paren">(</span><em class="sig-param">xs</em>, <em class="sig-param">ys</em>, <em class="sig-param">zs</em>, <em class="sig-param">dzdxs=None</em>, <em class="sig-param">dzdys=None</em>, <em class="sig-param">d2zdxdys=None</em>, <em class="sig-param">_slopFrac=0.0001</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/surface.html#Bicubic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Bicubic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.surface.Surface</span></code></p>
+<p>Surface defined by interpolating from a grid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xs, ys</strong> (<em>array_like</em>) – 1d uniform-spaced arrays indicating the grid points.</p></li>
+<li><p><strong>zs</strong> (<em>array_like</em>) – 2d array indicating the surface.</p></li>
+<li><p><strong>dzdxs</strong> (<em>array_like, optional</em>) – 2d array indicating derivatives dz/dx at grid points.</p></li>
+<li><p><strong>dzdys</strong> (<em>array_like, optional</em>) – 2d array indicating derivatives dz/dy at grid points.</p></li>
+<li><p><strong>d2zdxdys</strong> (<em>array_like, optional</em>) – 2d array indicating mixed derivatives d^2 z / (dx dy) at grid points.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="batoid.Sum">
+<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">Sum</code><span class="sig-paren">(</span><em class="sig-param">surfaces</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/surface.html#Sum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Sum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.surface.Surface</span></code></p>
+<p>Composite surface combining two or more other Surfaces through addition.
+The surface sag follows the equation:</p>
+<div class="math notranslate nohighlight">
+\[z(x, y) = \sum_i S_i(x, y)\]</div>
+<p>where <span class="math notranslate nohighlight">\(S_i\)</span> is the ith input <a class="reference internal" href="#batoid.Surface" title="batoid.Surface"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Surface</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>surfaces</strong> (<em>list of Surface</em>) – <a class="reference internal" href="#batoid.Surface" title="batoid.Surface"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Surface</span></code></a> s to add together.</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="batoid.Sum.surfaces">
+<em class="property">property </em><code class="sig-name descname">surfaces</code><a class="headerlink" href="#batoid.Sum.surfaces" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of constituent <a class="reference internal" href="#batoid.Surface" title="batoid.Surface"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Surface</span></code></a> s.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="optic.html" class="btn btn-neutral float-right" title="Optics" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="rays.html" class="btn btn-neutral float-left" title="Rays" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Josh Meyers
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

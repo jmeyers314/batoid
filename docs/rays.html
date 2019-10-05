@@ -1,0 +1,1131 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Rays &mdash; batoid 0.1.0rc2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Surfaces" href="surfaces.html" />
+    <link rel="prev" title="Overview" href="overview.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> batoid
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Rays</a></li>
+<li class="toctree-l1"><a class="reference internal" href="surfaces.html">Surfaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optic.html">Optics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coords.html">Coordinate Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="obscurations.html">Obscurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="media.html">Media</a></li>
+<li class="toctree-l1"><a class="reference internal" href="table.html">Lookup tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coatings.html">Coatings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lattice.html">Lattices</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">batoid</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Rays</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/rays.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="rays">
+<h1>Rays<a class="headerlink" href="#rays" title="Permalink to this headline">¶</a></h1>
+<p>The fundamental types in batoid are the <a class="reference internal" href="#batoid.Ray" title="batoid.Ray"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Ray</span></code></a> and <a class="reference internal" href="#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RayVector</span></code></a>.  These classes
+represent either a single geometric ray, or a collection of rays.  These rays
+can be generated, traced through optical systems, and then interrogated to
+provide insight into PSFs, aberrations, vignetting, and more.</p>
+<dl class="class">
+<dt id="batoid.Ray">
+<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">Ray</code><span class="sig-paren">(</span><em class="sig-param">r=None, v=None, t=0.0, wavelength=0.0, flux=1.0, vignetted=False, failed=False, coordSys=CoordSys([0,0,0],[[1,0,0],[0,1,0],[0,0,1]])</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/ray.html#Ray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Ray" title="Permalink to this definition">¶</a></dt>
+<dd><p>A geometric ray to trace through an optical system.  May also be thought
+of as a monochromatic propagating plane wave.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>ndarray of float, shape (3,)</em>) – Position of ray in meters.</p></li>
+<li><p><strong>v</strong> (<em>ndarray of float, shape (3,)</em>) – Velocity vector in units of the speed of light in vacuum.  Note this
+may have magnitude &lt; 1 if the Ray is inside a refractive medium.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Reference time (divided by the speed of light in vacuum) in units of
+meters.  Equivalent to the optical path length.</p></li>
+<li><p><strong>wavelength</strong> (<em>float</em>) – Vacuum wavelength in meters.</p></li>
+<li><p><strong>flux</strong> (<em>float</em>) – Flux in arbitrary units.</p></li>
+<li><p><strong>vignetted</strong> (<em>bool</em>) – Whether Ray has been vignetted or not.</p></li>
+<li><p><strong>failed</strong> (<em>bool</em>) – Whether Ray is in failed state or not, which may happen if an
+intersection with a surface is requested but cannot be found.</p></li>
+<li><p><strong>coordSys</strong> (<em>CoordSys</em>) – Coordinate system in which this ray is expressed.  Default: the global
+coordinate system.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="batoid.Ray.fromStop">
+<em class="property">classmethod </em><code class="sig-name descname">fromStop</code><span class="sig-paren">(</span><em class="sig-param">x, y, optic=None, backDist=None, medium=None, stopSurface=None, wavelength=None, source=None, dirCos=None, theta_x=None, theta_y=None, projection='postel', flux=1, coordSys=CoordSys([0,0,0],[[1,0,0],[0,1,0],[0,0,1]])</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/ray.html#Ray.fromStop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Ray.fromStop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Ray that intersects the “stop” surface at a given point.</p>
+<p>The algorithm used here starts by placing the ray on the “stop”
+surface, and then backing it up such that it is in front of any
+surfaces of the optic it’s intended to trace.</p>
+<p>The stop surface of most large telescopes is the plane perpendicular to
+the optic axis and flush with the rim of the primary mirror.  This
+plane is usually also the entrance pupil since there are no earlier
+refractive or reflective surfaces.  However, since this plane is a bit
+difficult to locate automatically, the default stop surface in batoid
+is the global x-y plane.</p>
+<p>If a telescope has an stopSurface attribute in its yaml file, then this
+is usually a good choice to use in this function.  Using a curved
+surface for the stop surface is allowed, but is usually a bad idea as
+this may lead to a non-uniformly illuminated pupil and is inconsistent
+with, say, an incoming uniform spherical wave or uniform plane wave.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x, y</strong> (<em>float</em>) – X/Y coordinates on the stop surface where the ray would intersect
+if not refracted or reflected first.</p></li>
+<li><p><strong>optic</strong> (<a class="reference internal" href="optic.html#batoid.Optic" title="batoid.Optic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Optic</span></code></a>, optional) – If present, then try to extract values for <code class="docutils literal notranslate"><span class="pre">backDist</span></code>,
+<code class="docutils literal notranslate"><span class="pre">medium</span></code>, and <code class="docutils literal notranslate"><span class="pre">stopSurface</span></code> from the Optic.  Note that values
+explicitly passed here as keyword arguments override those
+extracted from <code class="docutils literal notranslate"><span class="pre">optic</span></code>.</p></li>
+<li><p><strong>backDist</strong> (<em>float, optional</em>) – Map ray backwards from the stop surface to the plane that is
+perpendicular to the ray and <code class="docutils literal notranslate"><span class="pre">backDist</span></code> meters from the point
+(0, 0, z(0,0)) on the stop surface.  This should generally be set
+large enough that any obscurations or phantom surfaces occuring
+before the stop surface are now “in front” of the ray.  If this
+keyword is set to <code class="docutils literal notranslate"><span class="pre">None</span></code> and the <code class="docutils literal notranslate"><span class="pre">optic</span></code> keyword is set, then
+infer a value from <code class="docutils literal notranslate"><span class="pre">optic.backDist</span></code>.  If both this keyword and
+<code class="docutils literal notranslate"><span class="pre">optic</span></code> are <code class="docutils literal notranslate"><span class="pre">None</span></code>, then use a default of 40 meters, which
+should be sufficiently large for foreseeable telescopes.</p></li>
+<li><p><strong>medium</strong> (<a class="reference internal" href="media.html#batoid.Medium" title="batoid.Medium"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Medium</span></code></a>, optional) – Initial medium of ray.  If this keyword is set to <code class="docutils literal notranslate"><span class="pre">None</span></code> and
+the <code class="docutils literal notranslate"><span class="pre">optic</span></code> keyword is set, then infer a value from
+<code class="docutils literal notranslate"><span class="pre">optic.inMedium</span></code>.  If both this keyword and <code class="docutils literal notranslate"><span class="pre">optic</span></code> are
+<code class="docutils literal notranslate"><span class="pre">None</span></code>, then use a default of vacuum.</p></li>
+<li><p><strong>stopSurface</strong> (<em>batoid.Interface, optional</em>) – Surface defining the system stop.  If this keyword is set to
+<code class="docutils literal notranslate"><span class="pre">None</span></code> and the <code class="docutils literal notranslate"><span class="pre">optic</span></code> keyword is set, then infer a value from
+<code class="docutils literal notranslate"><span class="pre">optic.stopSurface</span></code>.  If both this keyword and <code class="docutils literal notranslate"><span class="pre">optic</span></code> are
+<code class="docutils literal notranslate"><span class="pre">None</span></code>, then use a default <code class="docutils literal notranslate"><span class="pre">Interface(Plane())</span></code>, which is the
+global x-y plane.</p></li>
+<li><p><strong>wavelength</strong> (<em>float</em>) – Vacuum wavelength of ray in meters.</p></li>
+<li><p><strong>source</strong> (<em>None or ndarray of float, shape (3,), optional</em>) – Where the ray originates.  If None, then the ray originates an
+infinite distance away, in which case the <code class="docutils literal notranslate"><span class="pre">dirCos</span></code> kwarg must also
+be specified to set the direction of ray propagation.  If an
+ndarray, then the ray originates from this point in global
+coordinates and the <code class="docutils literal notranslate"><span class="pre">dirCos</span></code> kwarg is ignored.</p></li>
+<li><p><strong>dirCos</strong> (<em>ndarray of float, shape (3,), optional</em>) – If source is None, then indicates the direction of ray propagation.
+If source is not None, then this is ignored.</p></li>
+<li><p><strong>theta_x, theta_y</strong> (<em>float, optional</em>) – Field angle in radians.  If source is None, then this indicates the
+initial direction of propagation of the ray.  If source is not
+None, then this is ignored.  Uses <a class="reference internal" href="coords.html#batoid.utils.fieldToDirCos" title="batoid.utils.fieldToDirCos"><code class="xref any py py-func docutils literal notranslate"><span class="pre">utils.fieldToDirCos</span></code></a> to convert
+to direction cosines.  Also see <code class="docutils literal notranslate"><span class="pre">dirCos</span></code> as an alternative to
+this keyword.</p></li>
+<li><p><strong>projection</strong> (<em>{‘postel’, ‘zemax’, ‘gnomonic’, ‘stereographic’, ‘lambert’, ‘orthographic’}, optional</em>) – Projection used to convert field angle to direction cosines.</p></li>
+<li><p><strong>flux</strong> (<em>float, optional</em>) – Flux of ray.  Default is 1.0.</p></li>
+<li><p><strong>coordSys</strong> (<em>CoordSys</em>) – Coordinate system in which ray is expressed.  Default: the global
+coordinate system.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Ray.copy">
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/ray.html#Ray.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Ray.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a copy of this Ray.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Ray.amplitude">
+<code class="sig-name descname">amplitude</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/ray.html#Ray.amplitude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Ray.amplitude" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate (scalar) complex electric-field amplitude at given
+position and time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>ndarray of float, shape (3,)</em>) – Position in meters.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Time (over vacuum speed of light; in meters).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>complex</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Ray.positionAtTime">
+<code class="sig-name descname">positionAtTime</code><span class="sig-paren">(</span><em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/ray.html#Ray.positionAtTime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Ray.positionAtTime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the position of the Ray at a given time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time (over vacuum speed of light; in meters).</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>ndarray of float, shape (3,)</em> – Position in meters.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Ray.propagatedToTime">
+<code class="sig-name descname">propagatedToTime</code><span class="sig-paren">(</span><em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/ray.html#Ray.propagatedToTime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Ray.propagatedToTime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a Ray propagated to given time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time (over vacuum speed of light; in meters).</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>Ray</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Ray.propagateInPlace">
+<code class="sig-name descname">propagateInPlace</code><span class="sig-paren">(</span><em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/ray.html#Ray.propagateInPlace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Ray.propagateInPlace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Propagate Ray to given time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time (over vacuum speed of light; in meters).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Ray.phase">
+<code class="sig-name descname">phase</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/ray.html#Ray.phase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Ray.phase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate plane wave phase at given position and time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>ndarray of float, shape (3,)</em>) – Position in meters at which to compute phase</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Time (over vacuum speed of light; in meters).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>float</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Ray.toCoordSys">
+<code class="sig-name descname">toCoordSys</code><span class="sig-paren">(</span><em class="sig-param">coordSys</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/ray.html#Ray.toCoordSys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Ray.toCoordSys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform ray into new coordinate system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>coordSys</strong> (<em>batoid.CoordSys</em>) – Destination coordinate system.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>Ray</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Ray.toCoordSysInPlace">
+<code class="sig-name descname">toCoordSysInPlace</code><span class="sig-paren">(</span><em class="sig-param">coordSys</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/ray.html#Ray.toCoordSysInPlace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Ray.toCoordSysInPlace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform ray into new coordinate system in place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>coordSys</strong> (<em>batoid.CoordSys</em>) – Destination coordinate system.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Ray.r">
+<em class="property">property </em><code class="sig-name descname">r</code><a class="headerlink" href="#batoid.Ray.r" title="Permalink to this definition">¶</a></dt>
+<dd><p>Position of ray in meters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>ndarray of float, shape (3,)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Ray.v">
+<em class="property">property </em><code class="sig-name descname">v</code><a class="headerlink" href="#batoid.Ray.v" title="Permalink to this definition">¶</a></dt>
+<dd><p>Velocity of ray in units of the speed
+of light in vacuum. Note that this may have magnitude &lt; 1 if the ray is
+inside a refractive medium.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>ndarray of float, shape (3,)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Ray.t">
+<em class="property">property </em><code class="sig-name descname">t</code><a class="headerlink" href="#batoid.Ray.t" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reference time (divided by the speed of light in vacuum) in units of
+meters, also known as the optical path length.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Ray.wavelength">
+<em class="property">property </em><code class="sig-name descname">wavelength</code><a class="headerlink" href="#batoid.Ray.wavelength" title="Permalink to this definition">¶</a></dt>
+<dd><p>Vacuum wavelength in meters.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Ray.flux">
+<em class="property">property </em><code class="sig-name descname">flux</code><a class="headerlink" href="#batoid.Ray.flux" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ray flux in arbitrary units.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Ray.vignetted">
+<em class="property">property </em><code class="sig-name descname">vignetted</code><a class="headerlink" href="#batoid.Ray.vignetted" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if ray has been vignetted.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Ray.failed">
+<em class="property">property </em><code class="sig-name descname">failed</code><a class="headerlink" href="#batoid.Ray.failed" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if ray is in a failed state.  This may occur, for example, if
+batoid failed to find the intersection of a ray with a surface.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Ray.x">
+<em class="property">property </em><code class="sig-name descname">x</code><a class="headerlink" href="#batoid.Ray.x" title="Permalink to this definition">¶</a></dt>
+<dd><p>The x component of the ray position in meters.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Ray.y">
+<em class="property">property </em><code class="sig-name descname">y</code><a class="headerlink" href="#batoid.Ray.y" title="Permalink to this definition">¶</a></dt>
+<dd><p>The y component of the ray position in meters.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Ray.z">
+<em class="property">property </em><code class="sig-name descname">z</code><a class="headerlink" href="#batoid.Ray.z" title="Permalink to this definition">¶</a></dt>
+<dd><p>The z component of the ray position in meters.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Ray.vx">
+<em class="property">property </em><code class="sig-name descname">vx</code><a class="headerlink" href="#batoid.Ray.vx" title="Permalink to this definition">¶</a></dt>
+<dd><p>The x component of the ray velocity in units of the vacuum speed of
+light.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Ray.vy">
+<em class="property">property </em><code class="sig-name descname">vy</code><a class="headerlink" href="#batoid.Ray.vy" title="Permalink to this definition">¶</a></dt>
+<dd><p>The y component of the ray velocity in units of the vacuum speed of
+light.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Ray.vz">
+<em class="property">property </em><code class="sig-name descname">vz</code><a class="headerlink" href="#batoid.Ray.vz" title="Permalink to this definition">¶</a></dt>
+<dd><p>The z component of the ray velocity in units of the vacuum speed of
+light.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Ray.k">
+<em class="property">property </em><code class="sig-name descname">k</code><a class="headerlink" href="#batoid.Ray.k" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wavevector of plane wave in units of
+radians per meter.  The magnitude of the wavevector is equal to
+<span class="math notranslate nohighlight">\(2 \pi n / \lambda\)</span>, where <span class="math notranslate nohighlight">\(n\)</span> is the refractive index and
+<span class="math notranslate nohighlight">\(\lambda\)</span> is the wavelength.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>ndarray of float, shape (3,)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Ray.kx">
+<em class="property">property </em><code class="sig-name descname">kx</code><a class="headerlink" href="#batoid.Ray.kx" title="Permalink to this definition">¶</a></dt>
+<dd><p>The x component of the ray wave vector in radians per meter.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Ray.ky">
+<em class="property">property </em><code class="sig-name descname">ky</code><a class="headerlink" href="#batoid.Ray.ky" title="Permalink to this definition">¶</a></dt>
+<dd><p>The y component of the ray wave vector in radians per meter.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Ray.kz">
+<em class="property">property </em><code class="sig-name descname">kz</code><a class="headerlink" href="#batoid.Ray.kz" title="Permalink to this definition">¶</a></dt>
+<dd><p>The z component of the ray wave vector in radians per meter.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.Ray.omega">
+<em class="property">property </em><code class="sig-name descname">omega</code><a class="headerlink" href="#batoid.Ray.omega" title="Permalink to this definition">¶</a></dt>
+<dd><p>The temporal angular frequency of the plane wave divided by the
+vacuum speed of light in units of radians per meter.  Equals
+<span class="math notranslate nohighlight">\(2 \pi / \lambda\)</span>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="batoid.RayVector">
+<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">RayVector</code><span class="sig-paren">(</span><em class="sig-param">rays</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.RayVector" title="Permalink to this definition">¶</a></dt>
+<dd><p>A sequence of <a class="reference internal" href="#batoid.Ray" title="batoid.Ray"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Ray</span></code></a> s.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>rays</strong> (<em>list of Ray</em>) – The Rays to assemble into a RayVector.  Note that all Rays must have
+the same coordSys.</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="batoid.RayVector.fromArrays">
+<em class="property">classmethod </em><code class="sig-name descname">fromArrays</code><span class="sig-paren">(</span><em class="sig-param">x, y, z, vx, vy, vz, t, w, flux=1, vignetted=False, coordSys=CoordSys([0,0,0],[[1,0,0],[0,1,0],[0,0,1]])</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.fromArrays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.RayVector.fromArrays" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create RayVector from 1d parameter arrays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x, y, z</strong> (<em>ndarray of float, shape (n,)</em>) – Positions of rays in meters.</p></li>
+<li><p><strong>vx, vy, vz</strong> (<em>ndarray of float, shape (n,)</em>) – Velocities of rays in units of the speed of light in vacuum.</p></li>
+<li><p><strong>t</strong> (<em>ndarray of float, shape (n,)</em>) – Reference times (divided by the speed of light in vacuum) in units
+of meters.</p></li>
+<li><p><strong>wavelength</strong> (<em>ndarray of float, shape (n,)</em>) – Vacuum wavelengths in meters.</p></li>
+<li><p><strong>flux</strong> (<em>ndarray of float, shape (n,)</em>) – Fluxes in arbitrary units.</p></li>
+<li><p><strong>vignetted</strong> (<em>ndarray of bool, shape (n,)</em>) – True where rays have been vignetted.</p></li>
+<li><p><strong>coordSys</strong> (<em>CoordSys</em>) – Coordinate system in which this ray is expressed.  Default: the
+global coordinate system.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.asGrid">
+<em class="property">classmethod </em><code class="sig-name descname">asGrid</code><span class="sig-paren">(</span><em class="sig-param">optic=None</em>, <em class="sig-param">backDist=None</em>, <em class="sig-param">medium=None</em>, <em class="sig-param">stopSurface=None</em>, <em class="sig-param">wavelength=None</em>, <em class="sig-param">source=None</em>, <em class="sig-param">dirCos=None</em>, <em class="sig-param">theta_x=None</em>, <em class="sig-param">theta_y=None</em>, <em class="sig-param">projection='postel'</em>, <em class="sig-param">nx=None</em>, <em class="sig-param">ny=None</em>, <em class="sig-param">dx=None</em>, <em class="sig-param">dy=None</em>, <em class="sig-param">lx=None</em>, <em class="sig-param">ly=None</em>, <em class="sig-param">flux=1</em>, <em class="sig-param">nrandom=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.asGrid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.RayVector.asGrid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create RayVector on a parallelogram shaped region.</p>
+<p>This function will often be used to create a grid of rays on a square
+grid, but is flexible enough to also create gris on an arbitrary
+parallelogram, or even randomly distributed across an arbitrary
+parallelogram-shaped region.</p>
+<p>The algorithm starts by placing rays on the “stop” surface, and then
+backing them up such that they are in front of any surfaces of the
+optic they’re intended to trace.</p>
+<p>The stop surface of most large telescopes is the plane perpendicular to
+the optic axis and flush with the rim of the primary mirror.  This
+plane is usually also the entrance pupil since there are no earlier
+refractive or reflective surfaces.  However, since this plane is a bit
+difficult to locate automatically, the default stop surface in batoid
+is the global x-y plane.</p>
+<p>If a telescope has an stopSurface attribute in its yaml file, then this
+is usually a good choice to use in this function.  Using a curved
+surface for the stop surface is allowed, but is usually a bad idea as
+this may lead to a non-uniformly illuminated pupil and is inconsistent
+with, say, an incoming uniform spherical wave or uniform plane wave.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>optic</strong> (<a class="reference internal" href="optic.html#batoid.Optic" title="batoid.Optic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Optic</span></code></a>, optional) – If present, then try to extract values for <code class="docutils literal notranslate"><span class="pre">backDist</span></code>,
+<code class="docutils literal notranslate"><span class="pre">medium</span></code>, <code class="docutils literal notranslate"><span class="pre">stopSurface</span></code>, and <code class="docutils literal notranslate"><span class="pre">lx</span></code> from the Optic.  Note that
+values explicitly passed to <a class="reference internal" href="#batoid.RayVector.asGrid" title="batoid.RayVector.asGrid"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">asGrid</span></code></a> as keyword arguments override
+those extracted from <code class="docutils literal notranslate"><span class="pre">optic</span></code>.</p></li>
+<li><p><strong>backDist</strong> (<em>float, optional</em>) – Map rays backwards from the stop surface to the plane that is
+perpendicular to the ray and <code class="docutils literal notranslate"><span class="pre">backDist</span></code> meters from the point
+(0, 0, z(0,0)) on the stop surface.  This should generally be set
+large enough that any obscurations or phantom surfaces occuring
+before the stop surface are now “in front” of the ray.  If this
+keyword is set to <code class="docutils literal notranslate"><span class="pre">None</span></code> and the <code class="docutils literal notranslate"><span class="pre">optic</span></code> keyword is set, then
+infer a value from <code class="docutils literal notranslate"><span class="pre">optic.backDist</span></code>.  If both this keyword and
+<code class="docutils literal notranslate"><span class="pre">optic</span></code> are <code class="docutils literal notranslate"><span class="pre">None</span></code>, then use a default of 40 meters, which
+should be sufficiently large for foreseeable telescopes.</p></li>
+<li><p><strong>medium</strong> (<a class="reference internal" href="media.html#batoid.Medium" title="batoid.Medium"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Medium</span></code></a>, optional) – Initial medium of each ray.  If this keyword is set to <code class="docutils literal notranslate"><span class="pre">None</span></code> and
+the <code class="docutils literal notranslate"><span class="pre">optic</span></code> keyword is set, then infer a value from
+<code class="docutils literal notranslate"><span class="pre">optic.inMedium</span></code>.  If both this keyword and <code class="docutils literal notranslate"><span class="pre">optic</span></code> are
+<code class="docutils literal notranslate"><span class="pre">None</span></code>, then use a default of vacuum.</p></li>
+<li><p><strong>stopSurface</strong> (<em>batoid.Interface, optional</em>) – Surface defining the system stop.  If this keyword is set to
+<code class="docutils literal notranslate"><span class="pre">None</span></code> and the <code class="docutils literal notranslate"><span class="pre">optic</span></code> keyword is set, then infer a value from
+<code class="docutils literal notranslate"><span class="pre">optic.stopSurface</span></code>.  If both this keyword and <code class="docutils literal notranslate"><span class="pre">optic</span></code> are
+<code class="docutils literal notranslate"><span class="pre">None</span></code>, then use a default <code class="docutils literal notranslate"><span class="pre">Interface(Plane())</span></code>, which is the
+global x-y plane.</p></li>
+<li><p><strong>wavelength</strong> (<em>float</em>) – Vacuum wavelength of rays in meters.</p></li>
+<li><p><strong>source</strong> (<em>None or ndarray of float, shape (3,), optional</em>) – Where rays originate.  If None, then rays originate an infinite
+distance away, in which case the <code class="docutils literal notranslate"><span class="pre">dirCos</span></code> kwarg must also be
+specified to set the direction of ray propagation.  If an ndarray,
+then the rays originate from this point in global coordinates and
+the <code class="docutils literal notranslate"><span class="pre">dirCos</span></code> kwarg is ignored.</p></li>
+<li><p><strong>dirCos</strong> (<em>ndarray of float, shape (3,), optional</em>) – If source is None, then this indicates the initial direction of
+propagation of the rays.  If source is not None, then this is
+ignored.  Also see <code class="docutils literal notranslate"><span class="pre">theta_x</span></code>, <code class="docutils literal notranslate"><span class="pre">theta_y</span></code> as an alternative to
+this keyword.</p></li>
+<li><p><strong>theta_x, theta_y</strong> (<em>float, optional</em>) – Field angle in radians.  If source is None, then this indicates the
+initial direction of propagation of the rays.  If source is not
+None, then this is ignored.  Uses <a class="reference internal" href="coords.html#batoid.utils.fieldToDirCos" title="batoid.utils.fieldToDirCos"><code class="xref any py py-func docutils literal notranslate"><span class="pre">utils.fieldToDirCos</span></code></a> to convert
+to direction cosines.  Also see <code class="docutils literal notranslate"><span class="pre">dirCos</span></code> as an alternative to
+this keyword.</p></li>
+<li><p><strong>projection</strong> (<em>{‘postel’, ‘zemax’, ‘gnomonic’, ‘stereographic’, ‘lambert’, ‘orthographic’}, optional</em>) – Projection used to convert field angle to direction cosines.</p></li>
+<li><p><strong>nx, ny</strong> (<em>int, optional</em>) – Number of rays on each side of grid.</p></li>
+<li><p><strong>dx, dy</strong> (<em>float or (2,) array of float, optional</em>) – Separation in meters between adjacent rays in grid.  If scalars,
+then the separations are exactly along the x and y directions.  If
+arrays, then these are interpretted as the primitive vectors for
+the first and second dimensions of the grid.  If only dx is
+explicitly specified, then dy will be inferred as a 90-degree
+rotation from dx with the same length as dx.</p></li>
+<li><p><strong>lx, ly</strong> (<em>float or (2,) array of float, optional</em>) – Length of each side of ray grid.  If scalars, then these are
+measured along the x and y directions.  If arrays, then these also
+indicate the primitive vectors orientation of the grid.  If only
+lx is specified, then ly will be inferred as a 90-degree rotation
+from lx with the same length as lx.  If lx is <code class="docutils literal notranslate"><span class="pre">None</span></code>, then first
+infer a value from <code class="docutils literal notranslate"><span class="pre">nx</span></code> and <code class="docutils literal notranslate"><span class="pre">dx</span></code>, and if that doesn’t work,
+infer a value from <code class="docutils literal notranslate"><span class="pre">optic.pupilSize</span></code>.</p></li>
+<li><p><strong>flux</strong> (<em>float, optional</em>) – Flux to assign each ray.  Default is 1.0.</p></li>
+<li><p><strong>nrandom</strong> (<em>None or int, optional</em>) – If not None, then uniformly sample this many rays from
+parallelogram region instead of sampling on a regular grid.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.asPolar">
+<em class="property">classmethod </em><code class="sig-name descname">asPolar</code><span class="sig-paren">(</span><em class="sig-param">optic=None</em>, <em class="sig-param">backDist=None</em>, <em class="sig-param">medium=None</em>, <em class="sig-param">stopSurface=None</em>, <em class="sig-param">wavelength=None</em>, <em class="sig-param">outer=None</em>, <em class="sig-param">inner=0.0</em>, <em class="sig-param">source=None</em>, <em class="sig-param">dirCos=None</em>, <em class="sig-param">theta_x=None</em>, <em class="sig-param">theta_y=None</em>, <em class="sig-param">projection='postel'</em>, <em class="sig-param">nrad=None</em>, <em class="sig-param">naz=None</em>, <em class="sig-param">flux=1</em>, <em class="sig-param">nrandom=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.asPolar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.RayVector.asPolar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create RayVector on an annular region using a hexapolar grid.</p>
+<p>This function can be used to regularly sample the entrance pupil of a
+telescope using polar symmetry (really, hexagonal symmetry).  Rings of
+different radii are used, with the number of samples on each ring
+restricted to a multiple of 6 (with the exception of a potential
+central “ring” of radius 0, which is only ever sampled once).  This may
+be more efficient than using a square grid since more of the rays
+generated may avoid vignetting.</p>
+<p>This function is also used to generate rays uniformly randomly sampled
+from a given annular region.</p>
+<p>The algorithm used here starts by placing rays on the “stop” surface,
+and then backing them up such that they are in front of any surfaces of
+the optic they’re intended to trace.</p>
+<p>The stop surface of most large telescopes is the plane perpendicular to
+the optic axis and flush with the rim of the primary mirror.  This
+plane is usually also the entrance pupil since there are no earlier
+refractive or reflective surfaces.  However, since this plane is a bit
+difficult to locate automatically, the default stop surface in batoid
+is the global x-y plane.</p>
+<p>If a telescope has an stopSurface attribute in its yaml file, then this
+is usually a good choice to use in this function.  Using a curved
+surface for the stop surface is allowed, but is usually a bad idea as
+this may lead to a non-uniformly illuminated pupil and is inconsistent
+with, say, an incoming uniform spherical wave or uniform plane wave.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>optic</strong> (<a class="reference internal" href="optic.html#batoid.Optic" title="batoid.Optic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Optic</span></code></a>, optional) – If present, then try to extract values for <code class="docutils literal notranslate"><span class="pre">backDist</span></code>,
+<code class="docutils literal notranslate"><span class="pre">medium</span></code>, <code class="docutils literal notranslate"><span class="pre">stopSurface</span></code>, and <code class="docutils literal notranslate"><span class="pre">outer</span></code> from the Optic.  Note
+that values explicitly passed to <a class="reference internal" href="#batoid.RayVector.asPolar" title="batoid.RayVector.asPolar"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">asPolar</span></code></a> as keyword arguments
+override those extracted from <code class="docutils literal notranslate"><span class="pre">optic</span></code>.</p></li>
+<li><p><strong>backDist</strong> (<em>float, optional</em>) – Map rays backwards from the stop surface to the plane that is
+perpendicular to the ray and <code class="docutils literal notranslate"><span class="pre">backDist</span></code> meters from the point
+(0, 0, z(0,0)) on the stop surface.  This should generally be set
+large enough that any obscurations or phantom surfaces occuring
+before the stop surface are now “in front” of the ray.  If this
+keyword is set to <code class="docutils literal notranslate"><span class="pre">None</span></code> and the <code class="docutils literal notranslate"><span class="pre">optic</span></code> keyword is set, then
+infer a value from <code class="docutils literal notranslate"><span class="pre">optic.backDist</span></code>.  If both this keyword and
+<code class="docutils literal notranslate"><span class="pre">optic</span></code> are <code class="docutils literal notranslate"><span class="pre">None</span></code>, then use a default of 40 meters, which
+should be sufficiently large for foreseeable telescopes.</p></li>
+<li><p><strong>medium</strong> (<a class="reference internal" href="media.html#batoid.Medium" title="batoid.Medium"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Medium</span></code></a>, optional) – Initial medium of each ray.  If this keyword is set to <code class="docutils literal notranslate"><span class="pre">None</span></code> and
+the <code class="docutils literal notranslate"><span class="pre">optic</span></code> keyword is set, then infer a value from
+<code class="docutils literal notranslate"><span class="pre">optic.inMedium</span></code>.  If both this keyword and <code class="docutils literal notranslate"><span class="pre">optic</span></code> are
+<code class="docutils literal notranslate"><span class="pre">None</span></code>, then use a default of vacuum.</p></li>
+<li><p><strong>stopSurface</strong> (<em>batoid.Interface, optional</em>) – Surface defining the system stop.  If this keyword is set to
+<code class="docutils literal notranslate"><span class="pre">None</span></code> and the <code class="docutils literal notranslate"><span class="pre">optic</span></code> keyword is set, then infer a value from
+<code class="docutils literal notranslate"><span class="pre">optic.stopSurface</span></code>.  If both this keyword and <code class="docutils literal notranslate"><span class="pre">optic</span></code> are
+<code class="docutils literal notranslate"><span class="pre">None</span></code>, then use a default <code class="docutils literal notranslate"><span class="pre">Interface(Plane())</span></code>, which is the
+global x-y plane.</p></li>
+<li><p><strong>wavelength</strong> (<em>float</em>) – Vacuum wavelength of rays in meters.</p></li>
+<li><p><strong>outer</strong> (<em>float</em>) – Outer radius of annulus in meters.</p></li>
+<li><p><strong>inner</strong> (<em>float, optional</em>) – Inner radius of annulus in meters.  Default is 0.0.</p></li>
+<li><p><strong>source</strong> (<em>None or ndarray of float, shape (3,), optional</em>) – Where rays originate.  If None, then rays originate an infinite
+distance away, in which case the <code class="docutils literal notranslate"><span class="pre">dirCos</span></code> kwarg must also be
+specified to set the direction of ray propagation.  If an ndarray,
+then the rays originate from this point in global coordinates and
+the <code class="docutils literal notranslate"><span class="pre">dirCos</span></code> kwarg is ignored.</p></li>
+<li><p><strong>dirCos</strong> (<em>ndarray of float, shape (3,), optional</em>) – If source is None, then this indicates the initial direction of
+propagation of the rays.  If source is not None, then this is
+ignored.  Also see <code class="docutils literal notranslate"><span class="pre">theta_x</span></code>, <code class="docutils literal notranslate"><span class="pre">theta_y</span></code> as an alternative to
+this keyword.</p></li>
+<li><p><strong>theta_x, theta_y</strong> (<em>float, optional</em>) – Field angle in radians.  If source is None, then this indicates the
+initial direction of propagation of the rays.  If source is not
+None, then this is ignored.  Uses <a class="reference internal" href="coords.html#batoid.utils.fieldToDirCos" title="batoid.utils.fieldToDirCos"><code class="xref any py py-func docutils literal notranslate"><span class="pre">utils.fieldToDirCos</span></code></a> to convert
+to direction cosines.  Also see <code class="docutils literal notranslate"><span class="pre">dirCos</span></code> as an alternative to
+this keyword.</p></li>
+<li><p><strong>projection</strong> (<em>{‘postel’, ‘zemax’, ‘gnomonic’, ‘stereographic’, ‘lambert’, ‘orthographic’}, optional</em>) – Projection used to convert field angle to direction cosines.</p></li>
+<li><p><strong>nrad</strong> (<em>int</em>) – Number of radii on which create rays.</p></li>
+<li><p><strong>naz</strong> (<em>int</em>) – Approximate number of azimuthal angles uniformly spaced along the
+outermost ring.  Each ring is constrained to have a multiple of 6
+azimuths, so the realized value may be slightly different than
+the input value here.  Inner rings will have fewer azimuths in
+proportion to their radius, but will still be constrained to a
+multiple of 6.  (If the innermost ring has radius 0, then exactly
+1 ray, with azimuth undefined, will be used on that “ring”.)</p></li>
+<li><p><strong>flux</strong> (<em>float, optional</em>) – Flux to assign each ray.  Default is 1.0.</p></li>
+<li><p><strong>nrandom</strong> (<em>int, optional</em>) – If not None, then uniformly sample this many rays from annular
+region instead of sampling on a hexapolar grid.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.asSpokes">
+<em class="property">classmethod </em><code class="sig-name descname">asSpokes</code><span class="sig-paren">(</span><em class="sig-param">optic=None</em>, <em class="sig-param">backDist=None</em>, <em class="sig-param">medium=None</em>, <em class="sig-param">stopSurface=None</em>, <em class="sig-param">wavelength=None</em>, <em class="sig-param">outer=None</em>, <em class="sig-param">inner=0.0</em>, <em class="sig-param">source=None</em>, <em class="sig-param">dirCos=None</em>, <em class="sig-param">theta_x=None</em>, <em class="sig-param">theta_y=None</em>, <em class="sig-param">projection='postel'</em>, <em class="sig-param">spokes=None</em>, <em class="sig-param">rings=None</em>, <em class="sig-param">spacing='uniform'</em>, <em class="sig-param">flux=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.asSpokes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.RayVector.asSpokes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create RayVector on an annular region using a spokes pattern.</p>
+<p>The function generates rays on a rings-and-spokes pattern, with a fixed
+number of radii for each azimuth and a fixed number of azimuths for
+each radius.  Its main use is for decomposing functions in pupil space
+into Zernike components using Gaussian Quadrature integration on
+annuli.  For more general purpose annular sampling, RayVector.asPolar()
+is often a better choice since it samples the pupil more uniformly.</p>
+<p>The algorithm used here starts by placing rays on the “stop” surface,
+and then backing them up such that they are in front of any surfaces of
+the optic they’re intended to trace.</p>
+<p>The stop surface of most large telescopes is the plane perpendicular to
+the optic axis and flush with the rim of the primary mirror.  This
+plane is usually also the entrance pupil since there are no earlier
+refractive or reflective surfaces.  However, since this plane is a bit
+difficult to locate automatically, the default stop surface in batoid
+is the global x-y plane.</p>
+<p>If a telescope has an stopSurface attribute in its yaml file, then this
+is usually a good choice to use in this function.  Using a curved
+surface for the stop surface is allowed, but is usually a bad idea as
+this may lead to a non-uniformly illuminated pupil and is inconsistent
+with, say, an incoming uniform spherical wave or uniform plane wave.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>optic</strong> (<a class="reference internal" href="optic.html#batoid.Optic" title="batoid.Optic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Optic</span></code></a>, optional) – If present, then try to extract values for <code class="docutils literal notranslate"><span class="pre">backDist</span></code>,
+<code class="docutils literal notranslate"><span class="pre">medium</span></code>, <code class="docutils literal notranslate"><span class="pre">stopSurface</span></code>, and <code class="docutils literal notranslate"><span class="pre">outer</span></code> from the Optic.  Note
+that values explicitly passed to <a class="reference internal" href="#batoid.RayVector.asSpokes" title="batoid.RayVector.asSpokes"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">asSpokes</span></code></a> as keyword arguments
+override those extracted from <code class="docutils literal notranslate"><span class="pre">optic</span></code>.</p></li>
+<li><p><strong>backDist</strong> (<em>float, optional</em>) – Map rays backwards from the stop surface to the plane that is
+perpendicular to the ray and <code class="docutils literal notranslate"><span class="pre">backDist</span></code> meters from the point
+(0, 0, z(0,0)) on the stop surface.  This should generally be set
+large enough that any obscurations or phantom surfaces occuring
+before the stop surface are now “in front” of the ray.  If this
+keyword is set to <code class="docutils literal notranslate"><span class="pre">None</span></code> and the <code class="docutils literal notranslate"><span class="pre">optic</span></code> keyword is set, then
+infer a value from <code class="docutils literal notranslate"><span class="pre">optic.backDist</span></code>.  If both this keyword and
+<code class="docutils literal notranslate"><span class="pre">optic</span></code> are <code class="docutils literal notranslate"><span class="pre">None</span></code>, then use a default of 40 meters, which
+should be sufficiently large for foreseeable telescopes.</p></li>
+<li><p><strong>medium</strong> (<a class="reference internal" href="media.html#batoid.Medium" title="batoid.Medium"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Medium</span></code></a>, optional) – Initial medium of each ray.  If this keyword is set to <code class="docutils literal notranslate"><span class="pre">None</span></code> and
+the <code class="docutils literal notranslate"><span class="pre">optic</span></code> keyword is set, then infer a value from
+<code class="docutils literal notranslate"><span class="pre">optic.inMedium</span></code>.  If both this keyword and <code class="docutils literal notranslate"><span class="pre">optic</span></code> are
+<code class="docutils literal notranslate"><span class="pre">None</span></code>, then use a default of vacuum.</p></li>
+<li><p><strong>stopSurface</strong> (<em>batoid.Interface, optional</em>) – Surface defining the system stop.  If this keyword is set to
+<code class="docutils literal notranslate"><span class="pre">None</span></code> and the <code class="docutils literal notranslate"><span class="pre">optic</span></code> keyword is set, then infer a value from
+<code class="docutils literal notranslate"><span class="pre">optic.stopSurface</span></code>.  If both this keyword and <code class="docutils literal notranslate"><span class="pre">optic</span></code> are
+<code class="docutils literal notranslate"><span class="pre">None</span></code>, then use a default <code class="docutils literal notranslate"><span class="pre">Interface(Plane())</span></code>, which is the
+global x-y plane.</p></li>
+<li><p><strong>wavelength</strong> (<em>float</em>) – Vacuum wavelength of rays in meters.</p></li>
+<li><p><strong>outer</strong> (<em>float</em>) – Outer radius of annulus in meters.</p></li>
+<li><p><strong>inner</strong> (<em>float, optional</em>) – Inner radius of annulus in meters.  Default is 0.0.</p></li>
+<li><p><strong>source</strong> (<em>None or ndarray of float, shape (3,), optional</em>) – Where rays originate.  If None, then rays originate an infinite
+distance away, in which case the <code class="docutils literal notranslate"><span class="pre">dirCos</span></code> kwarg must also be
+specified to set the direction of ray propagation.  If an ndarray,
+then the rays originate from this point in global coordinates and
+the <code class="docutils literal notranslate"><span class="pre">dirCos</span></code> kwarg is ignored.</p></li>
+<li><p><strong>dirCos</strong> (<em>ndarray of float, shape (3,), optional</em>) – If source is None, then this indicates the initial direction of
+propagation of the rays.  If source is not None, then this is
+ignored.  Also see <code class="docutils literal notranslate"><span class="pre">theta_x</span></code>, <code class="docutils literal notranslate"><span class="pre">theta_y</span></code> as an alternative to
+this keyword.</p></li>
+<li><p><strong>theta_x, theta_y</strong> (<em>float, optional</em>) – Field angle in radians.  If source is None, then this indicates the
+initial direction of propagation of the rays.  If source is not
+None, then this is ignored.  Uses <a class="reference internal" href="coords.html#batoid.utils.fieldToDirCos" title="batoid.utils.fieldToDirCos"><code class="xref any py py-func docutils literal notranslate"><span class="pre">utils.fieldToDirCos</span></code></a> to convert
+to direction cosines.  Also see <code class="docutils literal notranslate"><span class="pre">dirCos</span></code> as an alternative to
+this keyword.</p></li>
+<li><p><strong>projection</strong> (<em>{‘postel’, ‘zemax’, ‘gnomonic’, ‘stereographic’, ‘lambert’, ‘orthographic’}, optional</em>) – Projection used to convert field angle to direction cosines.</p></li>
+<li><p><strong>spokes</strong> (<em>int or ndarray of float</em>) – If int, then number of spokes to use.
+If ndarray, then the values of the spokes azimuthal angles in
+radians.</p></li>
+<li><p><strong>rings</strong> (<em>int or ndarray of float</em>) – If int, then number of rings to use.
+If array, then the values of the ring radii to use in meters.</p></li>
+<li><p><strong>spacing</strong> (<em>{‘uniform’, ‘GQ’}</em>) – If uniform, assign ring radii uniformly between <code class="docutils literal notranslate"><span class="pre">inner</span></code> and
+<code class="docutils literal notranslate"><span class="pre">outer</span></code>.
+If GQ, then assign ring radii as the Gaussian Quadrature points
+for integration on an annulus.  In this case, the ray fluxes will
+be set to the Gaussian Quadrature weights (and the <code class="docutils literal notranslate"><span class="pre">flux</span></code> kwarg
+will be ignored).</p></li>
+<li><p><strong>flux</strong> (<em>float, optional</em>) – Flux to assign each ray.  Default is 1.0.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.copy">
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.RayVector.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a copy of this RayVector.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.amplitude">
+<code class="sig-name descname">amplitude</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.amplitude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.RayVector.amplitude" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate (scalar) complex electric-field amplitudes at given
+position and time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>ndarray of float, shape (3,)</em>) – Position in meters.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Time (over vacuum speed of light; in meters).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>ndarray of complex, shape (n,)</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.sumAmplitude">
+<code class="sig-name descname">sumAmplitude</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.sumAmplitude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.RayVector.sumAmplitude" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the sum of (scalar) complex electric-field amplitudes of
+all rays at given position and time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>ndarray of float, shape (3,)</em>) – Position in meters.</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Time (over vacuum speed of light; in meters).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>complex</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.phase">
+<code class="sig-name descname">phase</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.phase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.RayVector.phase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate plane wave phases at given position and time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>ndarray of float, shape (3,)</em>) – Position in meters at which to compute phase</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Time (over vacuum speed of light; in meters).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>ndarray of float, shape(n,)</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.toCoordSys">
+<code class="sig-name descname">toCoordSys</code><span class="sig-paren">(</span><em class="sig-param">coordSys</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.toCoordSys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.RayVector.toCoordSys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform rays into new coordinate system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>coordSys</strong> (<em>batoid.CoordSys</em>) – Destination coordinate system.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>RayVector</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.toCoordSysInPlace">
+<code class="sig-name descname">toCoordSysInPlace</code><span class="sig-paren">(</span><em class="sig-param">coordSys</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.toCoordSysInPlace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.RayVector.toCoordSysInPlace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform rays into new coordinate system in place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>coordSys</strong> (<em>batoid.CoordSys</em>) – Destination coordinate system.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.positionAtTime">
+<code class="sig-name descname">positionAtTime</code><span class="sig-paren">(</span><em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.positionAtTime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.RayVector.positionAtTime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the positions of the rays at a given time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time (over vacuum speed of light; in meters).</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>ndarray of float, shape (n, 3)</em> – Positions in meters.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.propagatedToTime">
+<code class="sig-name descname">propagatedToTime</code><span class="sig-paren">(</span><em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.propagatedToTime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.RayVector.propagatedToTime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a RayVector propagated to given time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time (over vacuum speed of light; in meters).</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>RayVector</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.propagateInPlace">
+<code class="sig-name descname">propagateInPlace</code><span class="sig-paren">(</span><em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.propagateInPlace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.RayVector.propagateInPlace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Propagate RayVector to given time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time (over vacuum speed of light; in meters).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.trimVignetted">
+<code class="sig-name descname">trimVignetted</code><span class="sig-paren">(</span><em class="sig-param">minflux=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.trimVignetted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.RayVector.trimVignetted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return new RayVector with vignetted rays or rays with flux below
+given threshold removed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>minflux</strong> (<em>float</em>) – Minimum flux value to not remove.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>RayVector</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.trimVignettedInPlace">
+<code class="sig-name descname">trimVignettedInPlace</code><span class="sig-paren">(</span><em class="sig-param">minflux=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.trimVignettedInPlace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.RayVector.trimVignettedInPlace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove vignetted rays and rays with flux below a given threshold.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>minflux</strong> (<em>float</em>) – Minimum flux value to not remove.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.monochromatic">
+<em class="property">property </em><code class="sig-name descname">monochromatic</code><a class="headerlink" href="#batoid.RayVector.monochromatic" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if all rays have same wavelength.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.x">
+<em class="property">property </em><code class="sig-name descname">x</code><a class="headerlink" href="#batoid.RayVector.x" title="Permalink to this definition">¶</a></dt>
+<dd><p>The x components of ray positions in meters.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.y">
+<em class="property">property </em><code class="sig-name descname">y</code><a class="headerlink" href="#batoid.RayVector.y" title="Permalink to this definition">¶</a></dt>
+<dd><p>The y components of ray positions in meters.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.z">
+<em class="property">property </em><code class="sig-name descname">z</code><a class="headerlink" href="#batoid.RayVector.z" title="Permalink to this definition">¶</a></dt>
+<dd><p>The z components of ray positions in meters.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.vx">
+<em class="property">property </em><code class="sig-name descname">vx</code><a class="headerlink" href="#batoid.RayVector.vx" title="Permalink to this definition">¶</a></dt>
+<dd><p>The x components of ray velocities units of the vacuum speed of
+light.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.vy">
+<em class="property">property </em><code class="sig-name descname">vy</code><a class="headerlink" href="#batoid.RayVector.vy" title="Permalink to this definition">¶</a></dt>
+<dd><p>The y components of ray velocities units of the vacuum speed of
+light.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.vz">
+<em class="property">property </em><code class="sig-name descname">vz</code><a class="headerlink" href="#batoid.RayVector.vz" title="Permalink to this definition">¶</a></dt>
+<dd><p>The z components of ray velocities units of the vacuum speed of
+light.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.t">
+<em class="property">property </em><code class="sig-name descname">t</code><a class="headerlink" href="#batoid.RayVector.t" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reference times (divided by the speed of light in vacuum) in units
+of meters, also known as the optical path lengths.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.wavelength">
+<em class="property">property </em><code class="sig-name descname">wavelength</code><a class="headerlink" href="#batoid.RayVector.wavelength" title="Permalink to this definition">¶</a></dt>
+<dd><p>Vacuum wavelengths in meters.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.flux">
+<em class="property">property </em><code class="sig-name descname">flux</code><a class="headerlink" href="#batoid.RayVector.flux" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fluxes in arbitrary units.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.vignetted">
+<em class="property">property </em><code class="sig-name descname">vignetted</code><a class="headerlink" href="#batoid.RayVector.vignetted" title="Permalink to this definition">¶</a></dt>
+<dd><p>True for rays that have been vignetted.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.failed">
+<em class="property">property </em><code class="sig-name descname">failed</code><a class="headerlink" href="#batoid.RayVector.failed" title="Permalink to this definition">¶</a></dt>
+<dd><p>True for rays that have failed.  This may occur, for example, if
+batoid failed to find the intersection of a ray wiht a surface.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.r">
+<em class="property">property </em><code class="sig-name descname">r</code><a class="headerlink" href="#batoid.RayVector.r" title="Permalink to this definition">¶</a></dt>
+<dd><p>Positions of rays in meters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>ndarray of float, shape (n, 3)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.v">
+<em class="property">property </em><code class="sig-name descname">v</code><a class="headerlink" href="#batoid.RayVector.v" title="Permalink to this definition">¶</a></dt>
+<dd><p>Velocities of rays in units of the
+speed of light in vacuum.  Note that these may have magnitudes &lt; 1 if
+the rays are inside a refractive medium.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>ndarray of float, shape (n, 3)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.k">
+<em class="property">property </em><code class="sig-name descname">k</code><a class="headerlink" href="#batoid.RayVector.k" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wavevectors of plane waves in units
+of radians per meter.  The magnitude of each wavevector is equal to
+<span class="math notranslate nohighlight">\(2 \pi n / \lambda\)</span>, where <span class="math notranslate nohighlight">\(n\)</span> is the refractive index and
+<span class="math notranslate nohighlight">\(\lambda\)</span> is the wavelength.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>ndarray of float, shape (n, 3)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.kx">
+<em class="property">property </em><code class="sig-name descname">kx</code><a class="headerlink" href="#batoid.RayVector.kx" title="Permalink to this definition">¶</a></dt>
+<dd><p>The x component of each ray wavevector in radians per meter.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.ky">
+<em class="property">property </em><code class="sig-name descname">ky</code><a class="headerlink" href="#batoid.RayVector.ky" title="Permalink to this definition">¶</a></dt>
+<dd><p>The y component of each ray wavevector in radians per meter.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.kz">
+<em class="property">property </em><code class="sig-name descname">kz</code><a class="headerlink" href="#batoid.RayVector.kz" title="Permalink to this definition">¶</a></dt>
+<dd><p>The z component of each ray wavevector in radians per meter.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.RayVector.omega">
+<em class="property">property </em><code class="sig-name descname">omega</code><a class="headerlink" href="#batoid.RayVector.omega" title="Permalink to this definition">¶</a></dt>
+<dd><p>The temporal angular frequency of each plane wave divided by the
+vacuum speed of light in units of radians per meter.  Equals
+<span class="math notranslate nohighlight">\(2 \pi / \lambda\)</span>.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="surfaces.html" class="btn btn-neutral float-right" title="Surfaces" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="overview.html" class="btn btn-neutral float-left" title="Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Josh Meyers
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
