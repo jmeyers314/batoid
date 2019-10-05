@@ -1,0 +1,721 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Coordinate Systems &mdash; batoid 0.1.0rc2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Obscurations" href="obscurations.html" />
+    <link rel="prev" title="Optics" href="optic.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> batoid
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rays.html">Rays</a></li>
+<li class="toctree-l1"><a class="reference internal" href="surfaces.html">Surfaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optic.html">Optics</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Coordinate Systems</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#angle-projections">Angle Projections</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="obscurations.html">Obscurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="media.html">Media</a></li>
+<li class="toctree-l1"><a class="reference internal" href="table.html">Lookup tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coatings.html">Coatings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lattice.html">Lattices</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">batoid</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Coordinate Systems</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/coords.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="coordinate-systems">
+<h1>Coordinate Systems<a class="headerlink" href="#coordinate-systems" title="Permalink to this headline">¶</a></h1>
+<p>Batoid uses coordinate systems to track the positions and orientations of Rays
+and Surfaces.  By using coordinate systems, one only ever has to define how
+surfaces behave when their vertexes are at the origin (0,0,0); relocating the
+surface to a non-origin vertex is accomplished by transforming coordinates.</p>
+<p>There are two parts to a coordinate system in batoid:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>the origin, which specifies in global coordinates to the location of
+(0, 0, 0) in local coordinates, and</p></li>
+<li><p>the orientation, which specifies how the local x, y, and z axes are rotated
+with respect to the global axes.</p></li>
+</ul>
+</div></blockquote>
+<dl class="class">
+<dt id="batoid.CoordSys">
+<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">CoordSys</code><span class="sig-paren">(</span><em class="sig-param">origin=None</em>, <em class="sig-param">rot=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordsys.html#CoordSys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CoordSys" title="Permalink to this definition">¶</a></dt>
+<dd><p>A coordinate system against which to measure Surfaces or Rays.</p>
+<p>Coordinate systems consist of an origin and a rotation.  The <a class="reference internal" href="#batoid.CoordSys.origin" title="batoid.CoordSys.origin"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">origin</span></code></a>
+attribute specifies where in 3D space the current coordinate system’s
+origin lands in the global coordinate system.  The rotation <a class="reference internal" href="#batoid.CoordSys.rot" title="batoid.CoordSys.rot"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">rot</span></code></a> specifies
+the 3D rotation matrix to apply to the global coordinate axes to yield the
+axes of the this coordinate system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>origin</strong> (<em>ndarray of float, shape (3,)</em>) – Origin of coordinate system in global coordinates.</p></li>
+<li><p><strong>rot</strong> (<em>ndarray of float, shape (3, 3)</em>) – Rotation matrix taking global axes into current system axes.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="batoid.CoordSys.origin">
+<em class="property">property </em><code class="sig-name descname">origin</code><a class="headerlink" href="#batoid.CoordSys.origin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Origin of coordinate system in global
+coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>ndarray of float, shape (3,)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.CoordSys.rot">
+<em class="property">property </em><code class="sig-name descname">rot</code><a class="headerlink" href="#batoid.CoordSys.rot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotation matrix taking global axes
+into current system axes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>ndarray of float, shape (3, 3)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.CoordSys.xhat">
+<em class="property">property </em><code class="sig-name descname">xhat</code><a class="headerlink" href="#batoid.CoordSys.xhat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Orientation of local x vector in
+global coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>ndarray of float, shape (3,)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.CoordSys.yhat">
+<em class="property">property </em><code class="sig-name descname">yhat</code><a class="headerlink" href="#batoid.CoordSys.yhat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Orientation of local y vector in
+global coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>ndarray of float, shape (3,)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.CoordSys.zhat">
+<em class="property">property </em><code class="sig-name descname">zhat</code><a class="headerlink" href="#batoid.CoordSys.zhat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Orientation of local z vector in
+global coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>ndarray of float, shape (3,)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.CoordSys.shiftGlobal">
+<code class="sig-name descname">shiftGlobal</code><span class="sig-paren">(</span><em class="sig-param">dr</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordsys.html#CoordSys.shiftGlobal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CoordSys.shiftGlobal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return new CoordSys with origin shifted along global axes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dr</strong> (<em>ndarray of float, shape (3,)</em>) – Amount to shift in meters.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>CoordSys</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.CoordSys.shiftLocal">
+<code class="sig-name descname">shiftLocal</code><span class="sig-paren">(</span><em class="sig-param">dr</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordsys.html#CoordSys.shiftLocal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CoordSys.shiftLocal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return new CoordSys with origin shifted along local axes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dr</strong> (<em>ndarray of float, shape (3,)</em>) – Amount to shift in meters.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>CoordSys</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.CoordSys.rotateGlobal">
+<code class="sig-name descname">rotateGlobal</code><span class="sig-paren">(</span><em class="sig-param">rot</em>, <em class="sig-param">rotCenter=(0</em>, <em class="sig-param">0</em>, <em class="sig-param">0)</em>, <em class="sig-param">coordSys=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordsys.html#CoordSys.rotateGlobal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CoordSys.rotateGlobal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return new CoordSys rotated with respect to global axes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rot</strong> (<em>ndarray of float, shape (3, 3)</em>) – Rotation matrix to apply.</p></li>
+<li><p><strong>rotCenter</strong> (<em>ndarray of float, shape (3,)</em>) – Point about which to rotate.</p></li>
+<li><p><strong>coordSys</strong> (<em>CoordSys</em>) – Coordinate system in which rotCenter is specified.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>CoordSys</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.CoordSys.rotateLocal">
+<code class="sig-name descname">rotateLocal</code><span class="sig-paren">(</span><em class="sig-param">rot</em>, <em class="sig-param">rotCenter=(0</em>, <em class="sig-param">0</em>, <em class="sig-param">0)</em>, <em class="sig-param">coordSys=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordsys.html#CoordSys.rotateLocal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CoordSys.rotateLocal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return new CoordSys rotated with respect to local axes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rot</strong> (<em>ndarray of float, shape (3, 3)</em>) – Rotation matrix to apply.</p></li>
+<li><p><strong>rotCenter</strong> (<em>ndarray of float, shape (3,)</em>) – Point about which to rotate.</p></li>
+<li><p><strong>coordSys</strong> (<em>CoordSys</em>) – Coordinate system in which rotCenter is specified.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>CoordSys</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="batoid.CoordTransform">
+<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">CoordTransform</code><span class="sig-paren">(</span><em class="sig-param">fromSys</em>, <em class="sig-param">toSys</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordsys.html#CoordTransform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CoordTransform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transformation between two coordinate systems.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fromSys</strong> (<em>CoordSys</em>) – Origin coordinate systems.</p></li>
+<li><p><strong>toSys</strong> (<em>CoordSys</em>) – Destination coordinate systems.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="batoid.CoordTransform.applyForward">
+<code class="sig-name descname">applyForward</code><span class="sig-paren">(</span><em class="sig-param">arg1</em>, <em class="sig-param">arg2=None</em>, <em class="sig-param">arg3=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordsys.html#CoordTransform.applyForward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CoordTransform.applyForward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply forward-direction transformation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>arg</strong> (<em>Ray or RayVector or array</em>) – Object to transform.  Return type is the same as the input type.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>transformed</strong> (<em>Ray or RayVector or array</em>) – Result of transformation.  Type is the same as the input type.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.CoordTransform.applyReverse">
+<code class="sig-name descname">applyReverse</code><span class="sig-paren">(</span><em class="sig-param">arg1</em>, <em class="sig-param">arg2=None</em>, <em class="sig-param">arg3=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordsys.html#CoordTransform.applyReverse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CoordTransform.applyReverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply reverse-direction transformation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>arg</strong> (<em>Ray or RayVector or array</em>) – Object to transform.  Return type is the same as the input type.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>transformed</strong> (<em>Ray or RayVector or array</em>) – Result of transformation.  Type is the same as the input type.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.CoordTransform.applyForwardInPlace">
+<code class="sig-name descname">applyForwardInPlace</code><span class="sig-paren">(</span><em class="sig-param">r</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordsys.html#CoordTransform.applyForwardInPlace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CoordTransform.applyForwardInPlace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply forward-direction transformation in place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>arg</strong> (<em>Ray or RayVector</em>) – Object to transform.  Return type is the same as the input type.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>transformed</strong> (<em>Ray or RayVector</em>) – Result of transformation.  Type is the same as the input type.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="batoid.CoordTransform.applyReverseInPlace">
+<code class="sig-name descname">applyReverseInPlace</code><span class="sig-paren">(</span><em class="sig-param">r</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordsys.html#CoordTransform.applyReverseInPlace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CoordTransform.applyReverseInPlace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply reverse-direction transformation in place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>arg</strong> (<em>Ray or RayVector</em>) – Object to transform.  Return type is the same as the input type.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>transformed</strong> (<em>Ray or RayVector</em>) – Result of transformation.  Type is the same as the input type.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="angle-projections">
+<h2>Angle Projections<a class="headerlink" href="#angle-projections" title="Permalink to this headline">¶</a></h2>
+<p>For exact specification of ray directions, it’s convenient to use a
+two-dimensional projection.  Batoid includes a number of such projections and
+deprojections:</p>
+<dl class="function">
+<dt id="batoid.utils.fieldToDirCos">
+<code class="sig-prename descclassname">batoid.utils.</code><code class="sig-name descname">fieldToDirCos</code><span class="sig-paren">(</span><em class="sig-param">u</em>, <em class="sig-param">v</em>, <em class="sig-param">projection='postel'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#fieldToDirCos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.utils.fieldToDirCos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert field angle to direction cosines using specified projection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u, v</strong> (<em>float</em>) – Tangent plane coordinates in radians.</p></li>
+<li><p><strong>projection</strong> (<em>{‘postel’, ‘zemax’, ‘gnomonic’, ‘stereographic’, ‘lambert’, ‘orthographic’}</em>) – Projection used to convert field angle to direction cosines.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>alpha, beta, gamma</strong> (<em>float</em>) – Direction cosines (unit vector projected onto x, y, z in order)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The tangent plane reference is at (u,v) = (0,0), which corresponds to
+(alpha, beta, gamma) = (0, 0, -1) (a ray coming directly from above).  The
+orientation is such that vx (vy) is positive when u (v) is positive.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="batoid.utils.dirCosToField">
+<code class="sig-prename descclassname">batoid.utils.</code><code class="sig-name descname">dirCosToField</code><span class="sig-paren">(</span><em class="sig-param">alpha</em>, <em class="sig-param">beta</em>, <em class="sig-param">gamma</em>, <em class="sig-param">projection='postel'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#dirCosToField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.utils.dirCosToField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert direction cosines to field angle using specified projection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>alpha, beta, gamma</strong> (<em>float</em>) – Direction cosines (unit vector projected onto x, y, z in order)</p></li>
+<li><p><strong>projection</strong> (<em>{‘postel’, ‘zemax’, ‘gnomonic’, ‘stereographic’, ‘lambert’, ‘orthographic’}</em>) – Projection used to convert direction cosines to field angle.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>u, v</strong> (<em>float</em>) – Tangent plane coordinates in radians.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The tangent plane reference is at (u,v) = (0,0), which corresponds to
+(alpha, beta, gamma) = (0, 0, -1) (a ray coming directly from above).  The
+orientation is such that vx (vy) is positive when u (v) is positive.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="batoid.utils.gnomonicToDirCos">
+<code class="sig-prename descclassname">batoid.utils.</code><code class="sig-name descname">gnomonicToDirCos</code><span class="sig-paren">(</span><em class="sig-param">u</em>, <em class="sig-param">v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#gnomonicToDirCos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.utils.gnomonicToDirCos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert gnomonic tangent plane projection u,v to direction cosines.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>u, v</strong> (<em>float</em>) – Gnomonic tangent plane coordinates in radians.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>alpha, beta, gamma</strong> (<em>float</em>) – Direction cosines (unit vector projected onto x, y, z in order)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The tangent plane reference is at (u,v) = (0,0), which corresponds to
+(alpha, beta, gamma) = (0, 0, -1) (a ray coming directly from above).  The
+orientation is such that vx (vy) is positive when u (v) is positive.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="batoid.utils.dirCosToGnomonic">
+<code class="sig-prename descclassname">batoid.utils.</code><code class="sig-name descname">dirCosToGnomonic</code><span class="sig-paren">(</span><em class="sig-param">alpha</em>, <em class="sig-param">beta</em>, <em class="sig-param">gamma</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#dirCosToGnomonic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.utils.dirCosToGnomonic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert direction cosines to gnomonic tangent plane projection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>alpha, beta, gamma</strong> (<em>float</em>) – Direction cosines (unit vector projected onto x, y, z in order)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>u, v</strong> (<em>float</em>) – Gnomonic tangent plane coordinates in radians.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The tangent plane reference is at (u,v) = (0,0), which corresponds to
+(alpha, beta, gamma) = (0, 0, -1) (a ray coming directly from above).  The
+orientation is such that vx (vy) is positive when u (v) is positive.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="batoid.utils.postelToDirCos">
+<code class="sig-prename descclassname">batoid.utils.</code><code class="sig-name descname">postelToDirCos</code><span class="sig-paren">(</span><em class="sig-param">u</em>, <em class="sig-param">v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#postelToDirCos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.utils.postelToDirCos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert Postel azimuthal equidistant tangent plane projection u,v to
+direction cosines.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>u, v</strong> (<em>float</em>) – Postel tangent plane coordinates in radians.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>alpha, beta, gamma</strong> (<em>float</em>) – Direction cosines (unit vector projected onto x, y, z in order)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The tangent plane reference is at (u,v) = (0,0), which corresponds to
+(alpha, beta, gamma) = (0, 0, -1) (a ray coming directly from above).  The
+orientation is such that vx (vy) is positive when u (v) is positive.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="batoid.utils.dirCosToPostel">
+<code class="sig-prename descclassname">batoid.utils.</code><code class="sig-name descname">dirCosToPostel</code><span class="sig-paren">(</span><em class="sig-param">alpha</em>, <em class="sig-param">beta</em>, <em class="sig-param">gamma</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#dirCosToPostel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.utils.dirCosToPostel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert direction cosines to Postel azimuthal equidistant tangent plane
+projection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>alpha, beta, gamma</strong> (<em>float</em>) – Direction cosines (unit vector projected onto x, y, z in order)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>u, v</strong> (<em>float</em>) – Postel tangent plane coordinates in radians.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The tangent plane reference is at (u,v) = (0,0), which corresponds to
+(alpha, beta, gamma) = (0, 0, -1) (a ray coming directly from above).  The
+orientation is such that vx (vy) is positive when u (v) is positive.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="batoid.utils.zemaxToDirCos">
+<code class="sig-prename descclassname">batoid.utils.</code><code class="sig-name descname">zemaxToDirCos</code><span class="sig-paren">(</span><em class="sig-param">u</em>, <em class="sig-param">v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#zemaxToDirCos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.utils.zemaxToDirCos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert Zemax field angles u,v to direction cosines.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>u, v</strong> (<em>float</em>) – Zemax field angles in radians.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>alpha, beta, gamma</strong> (<em>float</em>) – Direction cosines (unit vector projected onto x, y, z in order)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The tangent plane reference is at (u,v) = (0,0), which corresponds to
+(alpha, beta, gamma) = (0, 0, -1) (a ray coming directly from above).  The
+orientation is such that vx (vy) is positive when u (v) is positive.</p>
+<p>The Zemax field angle convention is not rotationally invariant.  The
+z-direction cosine for (u, v) = (0, 1) does not equal the z-direction
+cosine for (u, v) = (0.6, 0.8).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="batoid.utils.dirCosToZemax">
+<code class="sig-prename descclassname">batoid.utils.</code><code class="sig-name descname">dirCosToZemax</code><span class="sig-paren">(</span><em class="sig-param">alpha</em>, <em class="sig-param">beta</em>, <em class="sig-param">gamma</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#dirCosToZemax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.utils.dirCosToZemax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert direction cosines to Postel azimuthal equidistant tangent plane
+projection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>alpha, beta, gamma</strong> (<em>float</em>) – Direction cosines (unit vector projected onto x, y, z in order)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>u, v</strong> (<em>float</em>) – Postel tangent plane coordinates in radians.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The tangent plane reference is at (u,v) = (0,0), which corresponds to
+(alpha, beta, gamma) = (0, 0, -1) (a ray coming directly from above).  The
+orientation is such that vx (vy) is positive when u (v) is positive.</p>
+<p>The Zemax field angle convention is not rotationally invariant.  The
+z-direction cosine for (u, v) = (0, 1) does not equal the z-direction
+cosine for (u, v) = (0.6, 0.8).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="batoid.utils.stereographicToDirCos">
+<code class="sig-prename descclassname">batoid.utils.</code><code class="sig-name descname">stereographicToDirCos</code><span class="sig-paren">(</span><em class="sig-param">u</em>, <em class="sig-param">v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#stereographicToDirCos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.utils.stereographicToDirCos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert stereographic tangent plane projection u,v to direction cosines.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>u, v</strong> (<em>float</em>) – Stereographic tangent plane coordinates in radians.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>alpha, beta, gamma</strong> (<em>float</em>) – Direction cosines (unit vector projected onto x, y, z in order)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The tangent plane reference is at (u,v) = (0,0), which corresponds to
+(alpha, beta, gamma) = (0, 0, -1) (a ray coming directly from above).  The
+orientation is such that vx (vy) is positive when u (v) is positive.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="batoid.utils.dirCosToStereographic">
+<code class="sig-prename descclassname">batoid.utils.</code><code class="sig-name descname">dirCosToStereographic</code><span class="sig-paren">(</span><em class="sig-param">alpha</em>, <em class="sig-param">beta</em>, <em class="sig-param">gamma</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#dirCosToStereographic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.utils.dirCosToStereographic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert direction cosines to stereographic tangent plane projection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>alpha, beta, gamma</strong> (<em>float</em>) – Direction cosines (unit vector projected onto x, y, z in order)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>u, v</strong> (<em>float</em>) – Stereographic tangent plane coordinates in radians.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The tangent plane reference is at (u,v) = (0,0), which corresponds to
+(alpha, beta, gamma) = (0, 0, -1) (a ray coming directly from above).  The
+orientation is such that vx (vy) is positive when u (v) is positive.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="batoid.utils.orthographicToDirCos">
+<code class="sig-prename descclassname">batoid.utils.</code><code class="sig-name descname">orthographicToDirCos</code><span class="sig-paren">(</span><em class="sig-param">u</em>, <em class="sig-param">v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#orthographicToDirCos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.utils.orthographicToDirCos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert orthographic tangent plane projection u,v to direction cosines.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>u, v</strong> (<em>float</em>) – Orthographic tangent plane coordinates in radians.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>alpha, beta, gamma</strong> (<em>float</em>) – Direction cosines (unit vector projected onto x, y, z in order)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The tangent plane reference is at (u,v) = (0,0), which corresponds to
+(alpha, beta, gamma) = (0, 0, -1) (a ray coming directly from above).  The
+orientation is such that vx (vy) is positive when u (v) is positive.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="batoid.utils.dirCosToOrthographic">
+<code class="sig-prename descclassname">batoid.utils.</code><code class="sig-name descname">dirCosToOrthographic</code><span class="sig-paren">(</span><em class="sig-param">alpha</em>, <em class="sig-param">beta</em>, <em class="sig-param">gamma</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#dirCosToOrthographic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.utils.dirCosToOrthographic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert direction cosines to orthographic tangent plane projection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>alpha, beta, gamma</strong> (<em>float</em>) – Direction cosines (unit vector projected onto x, y, z in order)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>u, v</strong> (<em>float</em>) – Orthographic tangent plane coordinates in radians.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The tangent plane reference is at (u,v) = (0,0), which corresponds to
+(alpha, beta, gamma) = (0, 0, -1) (a ray coming directly from above).  The
+orientation is such that vx (vy) is positive when u (v) is positive.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="batoid.utils.lambertToDirCos">
+<code class="sig-prename descclassname">batoid.utils.</code><code class="sig-name descname">lambertToDirCos</code><span class="sig-paren">(</span><em class="sig-param">u</em>, <em class="sig-param">v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#lambertToDirCos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.utils.lambertToDirCos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert Lambert azimuthal equal-area tangent plane projection u,v to
+direction cosines.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>u, v</strong> (<em>float</em>) – Lambert tangent plane coordinates in radians.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>alpha, beta, gamma</strong> (<em>float</em>) – Direction cosines (unit vector projected onto x, y, z in order)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The tangent plane reference is at (u,v) = (0,0), which corresponds to
+(alpha, beta, gamma) = (0, 0, -1) (a ray coming directly from above).  The
+orientation is such that vx (vy) is positive when u (v) is positive.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="batoid.utils.dirCosToLambert">
+<code class="sig-prename descclassname">batoid.utils.</code><code class="sig-name descname">dirCosToLambert</code><span class="sig-paren">(</span><em class="sig-param">alpha</em>, <em class="sig-param">beta</em>, <em class="sig-param">gamma</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#dirCosToLambert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.utils.dirCosToLambert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert direction cosines to Lambert azimuthal equal-area tangent plane
+projection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>alpha, beta, gamma</strong> (<em>float</em>) – Direction cosines (unit vector projected onto x, y, z in order)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>u, v</strong> (<em>float</em>) – Lambert tangent plane coordinates in radians.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The tangent plane reference is at (u,v) = (0,0), which corresponds to
+(alpha, beta, gamma) = (0, 0, -1) (a ray coming directly from above).  The
+orientation is such that vx (vy) is positive when u (v) is positive.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="obscurations.html" class="btn btn-neutral float-right" title="Obscurations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="optic.html" class="btn btn-neutral float-left" title="Optics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Josh Meyers
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

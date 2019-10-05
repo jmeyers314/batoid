@@ -1,0 +1,1327 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>batoid.rayVector &mdash; batoid 0.1.0rc2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> batoid
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rays.html">Rays</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../surfaces.html">Surfaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optic.html">Optics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../coords.html">Coordinate Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../obscurations.html">Obscurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../media.html">Media</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../table.html">Lookup tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../coatings.html">Coatings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../lattice.html">Lattices</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">batoid</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>batoid.rayVector</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for batoid.rayVector</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">numbers</span> <span class="k">import</span> <span class="n">Real</span><span class="p">,</span> <span class="n">Integral</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="k">import</span> <span class="n">Sequence</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">_batoid</span>
+<span class="kn">from</span> <span class="nn">.constants</span> <span class="k">import</span> <span class="n">vacuum</span><span class="p">,</span> <span class="n">globalCoordSys</span>
+<span class="kn">from</span> <span class="nn">.coordsys</span> <span class="k">import</span> <span class="n">CoordSys</span><span class="p">,</span> <span class="n">CoordTransform</span>
+<span class="kn">from</span> <span class="nn">.ray</span> <span class="k">import</span> <span class="n">Ray</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">fieldToDirCos</span>
+
+
+<div class="viewcode-block" id="RayVector"><a class="viewcode-back" href="../../rays.html#batoid.RayVector">[docs]</a><span class="k">class</span> <span class="nc">RayVector</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A sequence of `Ray` s.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rays : list of Ray</span>
+<span class="sd">        The Rays to assemble into a RayVector.  Note that all Rays must have</span>
+<span class="sd">        the same coordSys.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rays</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rays</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No Rays from which to create RayVector&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rays</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
+            <span class="n">wavelength</span> <span class="o">=</span> <span class="n">rays</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">wavelength</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rays</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">wavelength</span> <span class="o">!=</span> <span class="n">wavelength</span><span class="p">:</span>
+                    <span class="n">wavelength</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">)</span>
+                    <span class="k">break</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_r</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPRayVector</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">ray</span><span class="o">.</span><span class="n">_r</span> <span class="k">for</span> <span class="n">ray</span> <span class="ow">in</span> <span class="n">rays</span><span class="p">],</span> <span class="n">wavelength</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Wrong arguments to RayVector&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span> <span class="o">=</span> <span class="n">rays</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">coordSys</span>
+
+<div class="viewcode-block" id="RayVector.fromArrays"><a class="viewcode-back" href="../../rays.html#batoid.RayVector.fromArrays">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">fromArrays</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">vx</span><span class="p">,</span> <span class="n">vy</span><span class="p">,</span> <span class="n">vz</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">vignetted</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                   <span class="n">coordSys</span><span class="o">=</span><span class="n">globalCoordSys</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create RayVector from 1d parameter arrays.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x, y, z : ndarray of float, shape (n,)</span>
+<span class="sd">            Positions of rays in meters.</span>
+<span class="sd">        vx, vy, vz : ndarray of float, shape (n,)</span>
+<span class="sd">            Velocities of rays in units of the speed of light in vacuum.</span>
+<span class="sd">        t : ndarray of float, shape (n,)</span>
+<span class="sd">            Reference times (divided by the speed of light in vacuum) in units</span>
+<span class="sd">            of meters.</span>
+<span class="sd">        wavelength : ndarray of float, shape (n,)</span>
+<span class="sd">            Vacuum wavelengths in meters.</span>
+<span class="sd">        flux : ndarray of float, shape (n,)</span>
+<span class="sd">            Fluxes in arbitrary units.</span>
+<span class="sd">        vignetted : ndarray of bool, shape (n,)</span>
+<span class="sd">            True where rays have been vignetted.</span>
+<span class="sd">        coordSys : CoordSys</span>
+<span class="sd">            Coordinate system in which this ray is expressed.  Default: the</span>
+<span class="sd">            global coordinate system.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="n">Real</span><span class="p">):</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">flux</span>
+            <span class="n">flux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">flux</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vignetted</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">vignetted</span>
+            <span class="n">vignetted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+            <span class="n">vignetted</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">_r</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPRayVector</span><span class="p">(</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">vx</span><span class="p">,</span> <span class="n">vy</span><span class="p">,</span> <span class="n">vz</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">vignetted</span>
+        <span class="p">)</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">coordSys</span> <span class="o">=</span> <span class="n">coordSys</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+<div class="viewcode-block" id="RayVector.asGrid"><a class="viewcode-back" href="../../rays.html#batoid.RayVector.asGrid">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">asGrid</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">optic</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">backDist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">medium</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stopSurface</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">wavelength</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dirCos</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">theta_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">theta_y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;postel&#39;</span><span class="p">,</span>
+        <span class="n">nx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ny</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">dx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">lx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ly</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">flux</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">nrandom</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create RayVector on a parallelogram shaped region.</span>
+
+<span class="sd">        This function will often be used to create a grid of rays on a square</span>
+<span class="sd">        grid, but is flexible enough to also create gris on an arbitrary</span>
+<span class="sd">        parallelogram, or even randomly distributed across an arbitrary</span>
+<span class="sd">        parallelogram-shaped region.</span>
+
+<span class="sd">        The algorithm starts by placing rays on the &quot;stop&quot; surface, and then</span>
+<span class="sd">        backing them up such that they are in front of any surfaces of the</span>
+<span class="sd">        optic they&#39;re intended to trace.</span>
+
+<span class="sd">        The stop surface of most large telescopes is the plane perpendicular to</span>
+<span class="sd">        the optic axis and flush with the rim of the primary mirror.  This</span>
+<span class="sd">        plane is usually also the entrance pupil since there are no earlier</span>
+<span class="sd">        refractive or reflective surfaces.  However, since this plane is a bit</span>
+<span class="sd">        difficult to locate automatically, the default stop surface in batoid</span>
+<span class="sd">        is the global x-y plane.</span>
+
+<span class="sd">        If a telescope has an stopSurface attribute in its yaml file, then this</span>
+<span class="sd">        is usually a good choice to use in this function.  Using a curved</span>
+<span class="sd">        surface for the stop surface is allowed, but is usually a bad idea as</span>
+<span class="sd">        this may lead to a non-uniformly illuminated pupil and is inconsistent</span>
+<span class="sd">        with, say, an incoming uniform spherical wave or uniform plane wave.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        optic : `batoid.Optic`, optional</span>
+<span class="sd">            If present, then try to extract values for ``backDist``,</span>
+<span class="sd">            ``medium``, ``stopSurface``, and ``lx`` from the Optic.  Note that</span>
+<span class="sd">            values explicitly passed to `asGrid` as keyword arguments override</span>
+<span class="sd">            those extracted from ``optic``.</span>
+<span class="sd">        backDist : float, optional</span>
+<span class="sd">            Map rays backwards from the stop surface to the plane that is</span>
+<span class="sd">            perpendicular to the ray and ``backDist`` meters from the point</span>
+<span class="sd">            (0, 0, z(0,0)) on the stop surface.  This should generally be set</span>
+<span class="sd">            large enough that any obscurations or phantom surfaces occuring</span>
+<span class="sd">            before the stop surface are now &quot;in front&quot; of the ray.  If this</span>
+<span class="sd">            keyword is set to ``None`` and the ``optic`` keyword is set, then</span>
+<span class="sd">            infer a value from ``optic.backDist``.  If both this keyword and</span>
+<span class="sd">            ``optic`` are ``None``, then use a default of 40 meters, which</span>
+<span class="sd">            should be sufficiently large for foreseeable telescopes.</span>
+<span class="sd">        medium : `batoid.Medium`, optional</span>
+<span class="sd">            Initial medium of each ray.  If this keyword is set to ``None`` and</span>
+<span class="sd">            the ``optic`` keyword is set, then infer a value from</span>
+<span class="sd">            ``optic.inMedium``.  If both this keyword and ``optic`` are</span>
+<span class="sd">            ``None``, then use a default of vacuum.</span>
+<span class="sd">        stopSurface : batoid.Interface, optional</span>
+<span class="sd">            Surface defining the system stop.  If this keyword is set to</span>
+<span class="sd">            ``None`` and the ``optic`` keyword is set, then infer a value from</span>
+<span class="sd">            ``optic.stopSurface``.  If both this keyword and ``optic`` are</span>
+<span class="sd">            ``None``, then use a default ``Interface(Plane())``, which is the</span>
+<span class="sd">            global x-y plane.</span>
+<span class="sd">        wavelength : float</span>
+<span class="sd">            Vacuum wavelength of rays in meters.</span>
+<span class="sd">        source : None or ndarray of float, shape (3,), optional</span>
+<span class="sd">            Where rays originate.  If None, then rays originate an infinite</span>
+<span class="sd">            distance away, in which case the ``dirCos`` kwarg must also be</span>
+<span class="sd">            specified to set the direction of ray propagation.  If an ndarray,</span>
+<span class="sd">            then the rays originate from this point in global coordinates and</span>
+<span class="sd">            the ``dirCos`` kwarg is ignored.</span>
+<span class="sd">        dirCos : ndarray of float, shape (3,), optional</span>
+<span class="sd">            If source is None, then this indicates the initial direction of</span>
+<span class="sd">            propagation of the rays.  If source is not None, then this is</span>
+<span class="sd">            ignored.  Also see ``theta_x``, ``theta_y`` as an alternative to</span>
+<span class="sd">            this keyword.</span>
+<span class="sd">        theta_x, theta_y : float, optional</span>
+<span class="sd">            Field angle in radians.  If source is None, then this indicates the</span>
+<span class="sd">            initial direction of propagation of the rays.  If source is not</span>
+<span class="sd">            None, then this is ignored.  Uses `utils.fieldToDirCos` to convert</span>
+<span class="sd">            to direction cosines.  Also see ``dirCos`` as an alternative to</span>
+<span class="sd">            this keyword.</span>
+<span class="sd">        projection : {&#39;postel&#39;, &#39;zemax&#39;, &#39;gnomonic&#39;, &#39;stereographic&#39;, &#39;lambert&#39;, &#39;orthographic&#39;}, optional</span>
+<span class="sd">            Projection used to convert field angle to direction cosines.</span>
+<span class="sd">        nx, ny : int, optional</span>
+<span class="sd">            Number of rays on each side of grid.</span>
+<span class="sd">        dx, dy : float or (2,) array of float, optional</span>
+<span class="sd">            Separation in meters between adjacent rays in grid.  If scalars,</span>
+<span class="sd">            then the separations are exactly along the x and y directions.  If</span>
+<span class="sd">            arrays, then these are interpretted as the primitive vectors for</span>
+<span class="sd">            the first and second dimensions of the grid.  If only dx is</span>
+<span class="sd">            explicitly specified, then dy will be inferred as a 90-degree</span>
+<span class="sd">            rotation from dx with the same length as dx.</span>
+<span class="sd">        lx, ly : float or (2,) array of float, optional</span>
+<span class="sd">            Length of each side of ray grid.  If scalars, then these are</span>
+<span class="sd">            measured along the x and y directions.  If arrays, then these also</span>
+<span class="sd">            indicate the primitive vectors orientation of the grid.  If only</span>
+<span class="sd">            lx is specified, then ly will be inferred as a 90-degree rotation</span>
+<span class="sd">            from lx with the same length as lx.  If lx is ``None``, then first</span>
+<span class="sd">            infer a value from ``nx`` and ``dx``, and if that doesn&#39;t work,</span>
+<span class="sd">            infer a value from ``optic.pupilSize``.</span>
+<span class="sd">        flux : float, optional</span>
+<span class="sd">            Flux to assign each ray.  Default is 1.0.</span>
+<span class="sd">        nrandom : None or int, optional</span>
+<span class="sd">            If not None, then uniformly sample this many rays from</span>
+<span class="sd">            parallelogram region instead of sampling on a regular grid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">.optic</span> <span class="k">import</span> <span class="n">Interface</span>
+        <span class="kn">from</span> <span class="nn">.surface</span> <span class="k">import</span> <span class="n">Plane</span>
+
+        <span class="k">if</span> <span class="n">optic</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">backDist</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">backDist</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">backDist</span>
+            <span class="k">if</span> <span class="n">medium</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">medium</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">inMedium</span>
+            <span class="k">if</span> <span class="n">stopSurface</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">stopSurface</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">stopSurface</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                    <span class="n">stopSurface</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">lx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># If nx and dx are both present, then let lx get inferred from</span>
+                <span class="c1"># them.  Otherwise, infer from optic.</span>
+                <span class="k">if</span> <span class="n">nx</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">dx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">lx</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">pupilSize</span>
+
+        <span class="k">if</span> <span class="n">backDist</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">backDist</span> <span class="o">=</span> <span class="mf">40.0</span>
+        <span class="k">if</span> <span class="n">stopSurface</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">stopSurface</span> <span class="o">=</span> <span class="n">Interface</span><span class="p">(</span><span class="n">Plane</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">medium</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">medium</span> <span class="o">=</span> <span class="n">vacuum</span>
+
+        <span class="k">if</span> <span class="n">dirCos</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dirCos</span> <span class="o">=</span> <span class="n">fieldToDirCos</span><span class="p">(</span><span class="n">theta_x</span><span class="p">,</span> <span class="n">theta_y</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="n">projection</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">wavelength</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Missing wavelength keyword&quot;</span><span class="p">)</span>
+
+        <span class="c1"># To determine the parallelogram, exactly 2 of nx, dx, lx must be set.</span>
+        <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">a</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="p">[</span><span class="n">nx</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">lx</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Exactly 2 of nx, dx, lx must be specified&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">nx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ny</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ny</span> <span class="o">=</span> <span class="n">nx</span>
+        <span class="k">if</span> <span class="n">dx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">dy</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dy</span> <span class="o">=</span> <span class="n">dx</span>
+        <span class="k">if</span> <span class="n">lx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ly</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lx</span><span class="p">,</span> <span class="n">Real</span><span class="p">):</span>
+                <span class="n">ly</span> <span class="o">=</span> <span class="n">lx</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ly</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]),</span> <span class="n">lx</span><span class="p">)</span>
+
+        <span class="c1"># We need lx, ly, nx, ny for below, so construct these from other</span>
+        <span class="c1"># arguments if they&#39;re not already available.</span>
+        <span class="k">if</span> <span class="n">nx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">dx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">nx</span><span class="o">%</span><span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">lx</span> <span class="o">=</span> <span class="n">dx</span><span class="o">*</span><span class="p">(</span><span class="n">nx</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lx</span> <span class="o">=</span> <span class="n">dx</span><span class="o">*</span><span class="p">(</span><span class="n">nx</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">ny</span><span class="o">%</span><span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">ly</span> <span class="o">=</span> <span class="n">dy</span><span class="o">*</span><span class="p">(</span><span class="n">ny</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ly</span> <span class="o">=</span> <span class="n">dy</span><span class="o">*</span><span class="p">(</span><span class="n">ny</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">lx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">dx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># adjust dx in this case</span>
+            <span class="c1"># always infer an even n (since even and odd are degenerate given</span>
+            <span class="c1"># only lx, dx).</span>
+            <span class="n">slop</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># prevent 3.9999 -&gt; 3, e.g.</span>
+            <span class="n">nx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">lx</span><span class="o">/</span><span class="n">dx</span><span class="o">+</span><span class="n">slop</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="mi">2</span>
+            <span class="n">ny</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">ly</span><span class="o">/</span><span class="n">dy</span><span class="o">+</span><span class="n">slop</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="mi">2</span>
+            <span class="c1"># These are the real dx, dy; which may be different from what was</span>
+            <span class="c1"># passed in order to force an integer for nx/ny.  We don&#39;t actually</span>
+            <span class="c1"># need them after this point though.</span>
+            <span class="c1"># dx = lx/(nx-2)</span>
+            <span class="c1"># dy = ly/(ny-2)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lx</span><span class="p">,</span> <span class="n">Real</span><span class="p">):</span>
+            <span class="n">lx</span> <span class="o">=</span> <span class="p">(</span><span class="n">lx</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ly</span><span class="p">,</span> <span class="n">Real</span><span class="p">):</span>
+            <span class="n">ly</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">ly</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">nrandom</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nrandom</span><span class="p">)</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nrandom</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x_d</span> <span class="o">=</span> <span class="p">(</span><span class="n">nx</span><span class="o">-</span><span class="p">(</span><span class="mi">2</span> <span class="k">if</span> <span class="p">(</span><span class="n">nx</span><span class="o">%</span><span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span><span class="p">))</span><span class="o">/</span><span class="n">nx</span>
+            <span class="n">y_d</span> <span class="o">=</span> <span class="p">(</span><span class="n">ny</span><span class="o">-</span><span class="p">(</span><span class="mi">2</span> <span class="k">if</span> <span class="p">(</span><span class="n">ny</span><span class="o">%</span><span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span><span class="p">))</span><span class="o">/</span><span class="n">ny</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftfreq</span><span class="p">(</span><span class="n">nx</span><span class="p">,</span> <span class="n">x_d</span><span class="p">))</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftfreq</span><span class="p">(</span><span class="n">ny</span><span class="p">,</span> <span class="n">y_d</span><span class="p">))</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="n">stack</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">])</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">lx</span><span class="p">,</span> <span class="n">stack</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ly</span><span class="p">,</span> <span class="n">stack</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">stopSurface</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">sag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">transform</span> <span class="o">=</span> <span class="n">CoordTransform</span><span class="p">(</span><span class="n">stopSurface</span><span class="o">.</span><span class="n">coordSys</span><span class="p">,</span> <span class="n">globalCoordSys</span><span class="p">)</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">applyForward</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+
+        <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">wavelength</span><span class="p">)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">medium</span><span class="o">.</span><span class="n">getN</span><span class="p">(</span><span class="n">wavelength</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_finish</span><span class="p">(</span><span class="n">backDist</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">dirCos</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">flux</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RayVector.asPolar"><a class="viewcode-back" href="../../rays.html#batoid.RayVector.asPolar">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">asPolar</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">optic</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">backDist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">medium</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stopSurface</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">wavelength</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">outer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inner</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dirCos</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">theta_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">theta_y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;postel&#39;</span><span class="p">,</span>
+        <span class="n">nrad</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">naz</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">flux</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">nrandom</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create RayVector on an annular region using a hexapolar grid.</span>
+
+<span class="sd">        This function can be used to regularly sample the entrance pupil of a</span>
+<span class="sd">        telescope using polar symmetry (really, hexagonal symmetry).  Rings of</span>
+<span class="sd">        different radii are used, with the number of samples on each ring</span>
+<span class="sd">        restricted to a multiple of 6 (with the exception of a potential</span>
+<span class="sd">        central &quot;ring&quot; of radius 0, which is only ever sampled once).  This may</span>
+<span class="sd">        be more efficient than using a square grid since more of the rays</span>
+<span class="sd">        generated may avoid vignetting.</span>
+
+<span class="sd">        This function is also used to generate rays uniformly randomly sampled</span>
+<span class="sd">        from a given annular region.</span>
+
+<span class="sd">        The algorithm used here starts by placing rays on the &quot;stop&quot; surface,</span>
+<span class="sd">        and then backing them up such that they are in front of any surfaces of</span>
+<span class="sd">        the optic they&#39;re intended to trace.</span>
+
+<span class="sd">        The stop surface of most large telescopes is the plane perpendicular to</span>
+<span class="sd">        the optic axis and flush with the rim of the primary mirror.  This</span>
+<span class="sd">        plane is usually also the entrance pupil since there are no earlier</span>
+<span class="sd">        refractive or reflective surfaces.  However, since this plane is a bit</span>
+<span class="sd">        difficult to locate automatically, the default stop surface in batoid</span>
+<span class="sd">        is the global x-y plane.</span>
+
+<span class="sd">        If a telescope has an stopSurface attribute in its yaml file, then this</span>
+<span class="sd">        is usually a good choice to use in this function.  Using a curved</span>
+<span class="sd">        surface for the stop surface is allowed, but is usually a bad idea as</span>
+<span class="sd">        this may lead to a non-uniformly illuminated pupil and is inconsistent</span>
+<span class="sd">        with, say, an incoming uniform spherical wave or uniform plane wave.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        optic : `batoid.Optic`, optional</span>
+<span class="sd">            If present, then try to extract values for ``backDist``,</span>
+<span class="sd">            ``medium``, ``stopSurface``, and ``outer`` from the Optic.  Note</span>
+<span class="sd">            that values explicitly passed to `asPolar` as keyword arguments</span>
+<span class="sd">            override those extracted from ``optic``.</span>
+<span class="sd">        backDist : float, optional</span>
+<span class="sd">            Map rays backwards from the stop surface to the plane that is</span>
+<span class="sd">            perpendicular to the ray and ``backDist`` meters from the point</span>
+<span class="sd">            (0, 0, z(0,0)) on the stop surface.  This should generally be set</span>
+<span class="sd">            large enough that any obscurations or phantom surfaces occuring</span>
+<span class="sd">            before the stop surface are now &quot;in front&quot; of the ray.  If this</span>
+<span class="sd">            keyword is set to ``None`` and the ``optic`` keyword is set, then</span>
+<span class="sd">            infer a value from ``optic.backDist``.  If both this keyword and</span>
+<span class="sd">            ``optic`` are ``None``, then use a default of 40 meters, which</span>
+<span class="sd">            should be sufficiently large for foreseeable telescopes.</span>
+<span class="sd">        medium : `batoid.Medium`, optional</span>
+<span class="sd">            Initial medium of each ray.  If this keyword is set to ``None`` and</span>
+<span class="sd">            the ``optic`` keyword is set, then infer a value from</span>
+<span class="sd">            ``optic.inMedium``.  If both this keyword and ``optic`` are</span>
+<span class="sd">            ``None``, then use a default of vacuum.</span>
+<span class="sd">        stopSurface : batoid.Interface, optional</span>
+<span class="sd">            Surface defining the system stop.  If this keyword is set to</span>
+<span class="sd">            ``None`` and the ``optic`` keyword is set, then infer a value from</span>
+<span class="sd">            ``optic.stopSurface``.  If both this keyword and ``optic`` are</span>
+<span class="sd">            ``None``, then use a default ``Interface(Plane())``, which is the</span>
+<span class="sd">            global x-y plane.</span>
+<span class="sd">        wavelength : float</span>
+<span class="sd">            Vacuum wavelength of rays in meters.</span>
+<span class="sd">        outer : float</span>
+<span class="sd">            Outer radius of annulus in meters.</span>
+<span class="sd">        inner : float, optional</span>
+<span class="sd">            Inner radius of annulus in meters.  Default is 0.0.</span>
+<span class="sd">        source : None or ndarray of float, shape (3,), optional</span>
+<span class="sd">            Where rays originate.  If None, then rays originate an infinite</span>
+<span class="sd">            distance away, in which case the ``dirCos`` kwarg must also be</span>
+<span class="sd">            specified to set the direction of ray propagation.  If an ndarray,</span>
+<span class="sd">            then the rays originate from this point in global coordinates and</span>
+<span class="sd">            the ``dirCos`` kwarg is ignored.</span>
+<span class="sd">        dirCos : ndarray of float, shape (3,), optional</span>
+<span class="sd">            If source is None, then this indicates the initial direction of</span>
+<span class="sd">            propagation of the rays.  If source is not None, then this is</span>
+<span class="sd">            ignored.  Also see ``theta_x``, ``theta_y`` as an alternative to</span>
+<span class="sd">            this keyword.</span>
+<span class="sd">        theta_x, theta_y : float, optional</span>
+<span class="sd">            Field angle in radians.  If source is None, then this indicates the</span>
+<span class="sd">            initial direction of propagation of the rays.  If source is not</span>
+<span class="sd">            None, then this is ignored.  Uses `utils.fieldToDirCos` to convert</span>
+<span class="sd">            to direction cosines.  Also see ``dirCos`` as an alternative to</span>
+<span class="sd">            this keyword.</span>
+<span class="sd">        projection : {&#39;postel&#39;, &#39;zemax&#39;, &#39;gnomonic&#39;, &#39;stereographic&#39;, &#39;lambert&#39;, &#39;orthographic&#39;}, optional</span>
+<span class="sd">            Projection used to convert field angle to direction cosines.</span>
+<span class="sd">        nrad : int</span>
+<span class="sd">            Number of radii on which create rays.</span>
+<span class="sd">        naz : int</span>
+<span class="sd">            Approximate number of azimuthal angles uniformly spaced along the</span>
+<span class="sd">            outermost ring.  Each ring is constrained to have a multiple of 6</span>
+<span class="sd">            azimuths, so the realized value may be slightly different than</span>
+<span class="sd">            the input value here.  Inner rings will have fewer azimuths in</span>
+<span class="sd">            proportion to their radius, but will still be constrained to a</span>
+<span class="sd">            multiple of 6.  (If the innermost ring has radius 0, then exactly</span>
+<span class="sd">            1 ray, with azimuth undefined, will be used on that &quot;ring&quot;.)</span>
+<span class="sd">        flux : float, optional</span>
+<span class="sd">            Flux to assign each ray.  Default is 1.0.</span>
+<span class="sd">        nrandom : int, optional</span>
+<span class="sd">            If not None, then uniformly sample this many rays from annular</span>
+<span class="sd">            region instead of sampling on a hexapolar grid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">.optic</span> <span class="k">import</span> <span class="n">Interface</span>
+        <span class="kn">from</span> <span class="nn">.surface</span> <span class="k">import</span> <span class="n">Plane</span>
+
+        <span class="k">if</span> <span class="n">optic</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">backDist</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">backDist</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">backDist</span>
+            <span class="k">if</span> <span class="n">medium</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">medium</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">inMedium</span>
+            <span class="k">if</span> <span class="n">stopSurface</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">stopSurface</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">stopSurface</span>
+            <span class="k">if</span> <span class="n">outer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">outer</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">pupilSize</span><span class="o">/</span><span class="mi">2</span>
+            <span class="k">if</span> <span class="n">outer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">outer</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">pupilSize</span><span class="o">/</span><span class="mi">2</span>
+
+        <span class="k">if</span> <span class="n">backDist</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">backDist</span> <span class="o">=</span> <span class="mf">40.0</span>
+        <span class="k">if</span> <span class="n">stopSurface</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">stopSurface</span> <span class="o">=</span> <span class="n">Interface</span><span class="p">(</span><span class="n">Plane</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">medium</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">medium</span> <span class="o">=</span> <span class="n">vacuum</span>
+
+        <span class="k">if</span> <span class="n">dirCos</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dirCos</span> <span class="o">=</span> <span class="n">fieldToDirCos</span><span class="p">(</span><span class="n">theta_x</span><span class="p">,</span> <span class="n">theta_y</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="n">projection</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">wavelength</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Missing wavelength keyword&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">nrandom</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ths</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">rs</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">outer</span><span class="p">,</span> <span class="n">inner</span><span class="p">,</span> <span class="n">nrad</span><span class="p">):</span>
+                <span class="n">nphi</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">naz</span><span class="o">*</span><span class="n">r</span><span class="o">/</span><span class="n">outer</span><span class="o">//</span><span class="mi">6</span><span class="p">)</span><span class="o">*</span><span class="mi">6</span>
+                <span class="n">ths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">nphi</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+                <span class="n">rs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nphi</span><span class="p">)</span><span class="o">*</span><span class="n">r</span><span class="p">)</span>
+            <span class="c1"># Point in center is a special case</span>
+            <span class="k">if</span> <span class="n">inner</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+                <span class="n">ths</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">])</span>
+                <span class="n">rs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">])</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">rs</span><span class="p">)</span>
+            <span class="n">th</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">ths</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">inner</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">outer</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nrandom</span><span class="p">))</span>
+            <span class="n">th</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nrandom</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">r</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">th</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">r</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">th</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">stopSurface</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">sag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">transform</span> <span class="o">=</span> <span class="n">CoordTransform</span><span class="p">(</span><span class="n">stopSurface</span><span class="o">.</span><span class="n">coordSys</span><span class="p">,</span> <span class="n">globalCoordSys</span><span class="p">)</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">applyForward</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">wavelength</span><span class="p">)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">medium</span><span class="o">.</span><span class="n">getN</span><span class="p">(</span><span class="n">wavelength</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_finish</span><span class="p">(</span><span class="n">backDist</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">dirCos</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">flux</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RayVector.asSpokes"><a class="viewcode-back" href="../../rays.html#batoid.RayVector.asSpokes">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">asSpokes</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">optic</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">backDist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">medium</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stopSurface</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">wavelength</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">outer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inner</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dirCos</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">theta_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">theta_y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;postel&#39;</span><span class="p">,</span>
+        <span class="n">spokes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">spacing</span><span class="o">=</span><span class="s1">&#39;uniform&#39;</span><span class="p">,</span>
+        <span class="n">flux</span><span class="o">=</span><span class="mi">1</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create RayVector on an annular region using a spokes pattern.</span>
+
+<span class="sd">        The function generates rays on a rings-and-spokes pattern, with a fixed</span>
+<span class="sd">        number of radii for each azimuth and a fixed number of azimuths for</span>
+<span class="sd">        each radius.  Its main use is for decomposing functions in pupil space</span>
+<span class="sd">        into Zernike components using Gaussian Quadrature integration on</span>
+<span class="sd">        annuli.  For more general purpose annular sampling, RayVector.asPolar()</span>
+<span class="sd">        is often a better choice since it samples the pupil more uniformly.</span>
+
+<span class="sd">        The algorithm used here starts by placing rays on the &quot;stop&quot; surface,</span>
+<span class="sd">        and then backing them up such that they are in front of any surfaces of</span>
+<span class="sd">        the optic they&#39;re intended to trace.</span>
+
+<span class="sd">        The stop surface of most large telescopes is the plane perpendicular to</span>
+<span class="sd">        the optic axis and flush with the rim of the primary mirror.  This</span>
+<span class="sd">        plane is usually also the entrance pupil since there are no earlier</span>
+<span class="sd">        refractive or reflective surfaces.  However, since this plane is a bit</span>
+<span class="sd">        difficult to locate automatically, the default stop surface in batoid</span>
+<span class="sd">        is the global x-y plane.</span>
+
+<span class="sd">        If a telescope has an stopSurface attribute in its yaml file, then this</span>
+<span class="sd">        is usually a good choice to use in this function.  Using a curved</span>
+<span class="sd">        surface for the stop surface is allowed, but is usually a bad idea as</span>
+<span class="sd">        this may lead to a non-uniformly illuminated pupil and is inconsistent</span>
+<span class="sd">        with, say, an incoming uniform spherical wave or uniform plane wave.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        optic : `batoid.Optic`, optional</span>
+<span class="sd">            If present, then try to extract values for ``backDist``,</span>
+<span class="sd">            ``medium``, ``stopSurface``, and ``outer`` from the Optic.  Note</span>
+<span class="sd">            that values explicitly passed to `asSpokes` as keyword arguments</span>
+<span class="sd">            override those extracted from ``optic``.</span>
+<span class="sd">        backDist : float, optional</span>
+<span class="sd">            Map rays backwards from the stop surface to the plane that is</span>
+<span class="sd">            perpendicular to the ray and ``backDist`` meters from the point</span>
+<span class="sd">            (0, 0, z(0,0)) on the stop surface.  This should generally be set</span>
+<span class="sd">            large enough that any obscurations or phantom surfaces occuring</span>
+<span class="sd">            before the stop surface are now &quot;in front&quot; of the ray.  If this</span>
+<span class="sd">            keyword is set to ``None`` and the ``optic`` keyword is set, then</span>
+<span class="sd">            infer a value from ``optic.backDist``.  If both this keyword and</span>
+<span class="sd">            ``optic`` are ``None``, then use a default of 40 meters, which</span>
+<span class="sd">            should be sufficiently large for foreseeable telescopes.</span>
+<span class="sd">        medium : `batoid.Medium`, optional</span>
+<span class="sd">            Initial medium of each ray.  If this keyword is set to ``None`` and</span>
+<span class="sd">            the ``optic`` keyword is set, then infer a value from</span>
+<span class="sd">            ``optic.inMedium``.  If both this keyword and ``optic`` are</span>
+<span class="sd">            ``None``, then use a default of vacuum.</span>
+<span class="sd">        stopSurface : batoid.Interface, optional</span>
+<span class="sd">            Surface defining the system stop.  If this keyword is set to</span>
+<span class="sd">            ``None`` and the ``optic`` keyword is set, then infer a value from</span>
+<span class="sd">            ``optic.stopSurface``.  If both this keyword and ``optic`` are</span>
+<span class="sd">            ``None``, then use a default ``Interface(Plane())``, which is the</span>
+<span class="sd">            global x-y plane.</span>
+<span class="sd">        wavelength : float</span>
+<span class="sd">            Vacuum wavelength of rays in meters.</span>
+<span class="sd">        outer : float</span>
+<span class="sd">            Outer radius of annulus in meters.</span>
+<span class="sd">        inner : float, optional</span>
+<span class="sd">            Inner radius of annulus in meters.  Default is 0.0.</span>
+<span class="sd">        source : None or ndarray of float, shape (3,), optional</span>
+<span class="sd">            Where rays originate.  If None, then rays originate an infinite</span>
+<span class="sd">            distance away, in which case the ``dirCos`` kwarg must also be</span>
+<span class="sd">            specified to set the direction of ray propagation.  If an ndarray,</span>
+<span class="sd">            then the rays originate from this point in global coordinates and</span>
+<span class="sd">            the ``dirCos`` kwarg is ignored.</span>
+<span class="sd">        dirCos : ndarray of float, shape (3,), optional</span>
+<span class="sd">            If source is None, then this indicates the initial direction of</span>
+<span class="sd">            propagation of the rays.  If source is not None, then this is</span>
+<span class="sd">            ignored.  Also see ``theta_x``, ``theta_y`` as an alternative to</span>
+<span class="sd">            this keyword.</span>
+<span class="sd">        theta_x, theta_y : float, optional</span>
+<span class="sd">            Field angle in radians.  If source is None, then this indicates the</span>
+<span class="sd">            initial direction of propagation of the rays.  If source is not</span>
+<span class="sd">            None, then this is ignored.  Uses `utils.fieldToDirCos` to convert</span>
+<span class="sd">            to direction cosines.  Also see ``dirCos`` as an alternative to</span>
+<span class="sd">            this keyword.</span>
+<span class="sd">        projection : {&#39;postel&#39;, &#39;zemax&#39;, &#39;gnomonic&#39;, &#39;stereographic&#39;, &#39;lambert&#39;, &#39;orthographic&#39;}, optional</span>
+<span class="sd">            Projection used to convert field angle to direction cosines.</span>
+<span class="sd">        spokes : int or ndarray of float</span>
+<span class="sd">            If int, then number of spokes to use.</span>
+<span class="sd">            If ndarray, then the values of the spokes azimuthal angles in</span>
+<span class="sd">            radians.</span>
+<span class="sd">        rings : int or ndarray of float</span>
+<span class="sd">            If int, then number of rings to use.</span>
+<span class="sd">            If array, then the values of the ring radii to use in meters.</span>
+<span class="sd">        spacing : {&#39;uniform&#39;, &#39;GQ&#39;}</span>
+<span class="sd">            If uniform, assign ring radii uniformly between ``inner`` and</span>
+<span class="sd">            ``outer``.</span>
+<span class="sd">            If GQ, then assign ring radii as the Gaussian Quadrature points</span>
+<span class="sd">            for integration on an annulus.  In this case, the ray fluxes will</span>
+<span class="sd">            be set to the Gaussian Quadrature weights (and the ``flux`` kwarg</span>
+<span class="sd">            will be ignored).</span>
+<span class="sd">        flux : float, optional</span>
+<span class="sd">            Flux to assign each ray.  Default is 1.0.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">.optic</span> <span class="k">import</span> <span class="n">Interface</span>
+        <span class="kn">from</span> <span class="nn">.surface</span> <span class="k">import</span> <span class="n">Plane</span>
+
+        <span class="k">if</span> <span class="n">optic</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">backDist</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">backDist</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">backDist</span>
+            <span class="k">if</span> <span class="n">medium</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">medium</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">inMedium</span>
+            <span class="k">if</span> <span class="n">stopSurface</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">stopSurface</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">stopSurface</span>
+            <span class="k">if</span> <span class="n">outer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">outer</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">pupilSize</span><span class="o">/</span><span class="mi">2</span>
+
+        <span class="k">if</span> <span class="n">backDist</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">backDist</span> <span class="o">=</span> <span class="mf">40.0</span>
+        <span class="k">if</span> <span class="n">stopSurface</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">stopSurface</span> <span class="o">=</span> <span class="n">Interface</span><span class="p">(</span><span class="n">Plane</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">medium</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">medium</span> <span class="o">=</span> <span class="n">vacuum</span>
+
+        <span class="k">if</span> <span class="n">dirCos</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dirCos</span> <span class="o">=</span> <span class="n">fieldToDirCos</span><span class="p">(</span><span class="n">theta_x</span><span class="p">,</span> <span class="n">theta_y</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="n">projection</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">wavelength</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Missing wavelength keyword&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rings</span><span class="p">,</span> <span class="n">Integral</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">spacing</span> <span class="o">==</span> <span class="s1">&#39;uniform&#39;</span><span class="p">:</span>
+                <span class="n">rings</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">inner</span><span class="p">,</span> <span class="n">outer</span><span class="p">,</span> <span class="n">rings</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">spacing</span> <span class="o">==</span> <span class="s1">&#39;GQ&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">spokes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">spokes</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">rings</span><span class="o">+</span><span class="mi">1</span>
+                <span class="n">Li</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polynomial</span><span class="o">.</span><span class="n">legendre</span><span class="o">.</span><span class="n">leggauss</span><span class="p">(</span><span class="n">rings</span><span class="p">)</span>
+                <span class="n">eps</span> <span class="o">=</span> <span class="n">inner</span><span class="o">/</span><span class="n">outer</span>
+                <span class="n">area</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">rings</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">Li</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">outer</span>
+                <span class="n">flux</span> <span class="o">=</span> <span class="n">w</span><span class="o">*</span><span class="n">area</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">spokes</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spokes</span><span class="p">,</span> <span class="n">Integral</span><span class="p">):</span>
+                <span class="n">spokes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">spokes</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">rings</span><span class="p">,</span> <span class="n">spokes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">rings</span><span class="p">,</span> <span class="n">spokes</span><span class="p">)</span>
+        <span class="n">flux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="n">rings</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">rings</span> <span class="o">=</span> <span class="n">rings</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="n">spokes</span> <span class="o">=</span> <span class="n">spokes</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="n">flux</span> <span class="o">=</span> <span class="n">flux</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="n">rings</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">spokes</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">rings</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">spokes</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">stopSurface</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">sag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">transform</span> <span class="o">=</span> <span class="n">CoordTransform</span><span class="p">(</span><span class="n">stopSurface</span><span class="o">.</span><span class="n">coordSys</span><span class="p">,</span> <span class="n">globalCoordSys</span><span class="p">)</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">applyForward</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">wavelength</span><span class="p">)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">medium</span><span class="o">.</span><span class="n">getN</span><span class="p">(</span><span class="n">wavelength</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_finish</span><span class="p">(</span><span class="n">backDist</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">dirCos</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">flux</span><span class="p">)</span></div>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_finish</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">backDist</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">dirCos</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">flux</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Map rays backwards to their source position.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">.surface</span> <span class="k">import</span> <span class="n">Plane</span>
+        <span class="k">if</span> <span class="n">source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dirCos</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="n">v</span> <span class="o">/=</span> <span class="n">n</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+            <span class="n">vx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">vx</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">vy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">vy</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">vz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">vz</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="c1"># Now need to raytrace backwards to the plane dist units away.</span>
+            <span class="n">rays</span> <span class="o">=</span> <span class="n">RayVector</span><span class="o">.</span><span class="n">fromArrays</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="o">-</span><span class="n">vx</span><span class="p">,</span> <span class="o">-</span><span class="n">vy</span><span class="p">,</span> <span class="o">-</span><span class="n">vz</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="n">flux</span><span class="p">)</span>
+
+            <span class="n">zhat</span> <span class="o">=</span> <span class="o">-</span><span class="n">n</span><span class="o">*</span><span class="n">v</span>
+            <span class="n">xhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]),</span> <span class="n">zhat</span><span class="p">)</span>
+            <span class="n">xhat</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">xhat</span><span class="p">,</span> <span class="n">xhat</span><span class="p">))</span>
+            <span class="n">yhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">xhat</span><span class="p">,</span> <span class="n">zhat</span><span class="p">)</span>
+            <span class="n">origin</span> <span class="o">=</span> <span class="n">zhat</span><span class="o">*</span><span class="n">backDist</span>
+            <span class="n">cs</span> <span class="o">=</span> <span class="n">CoordSys</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">xhat</span><span class="p">,</span> <span class="n">yhat</span><span class="p">,</span> <span class="n">zhat</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+            <span class="n">transform</span> <span class="o">=</span> <span class="n">CoordTransform</span><span class="p">(</span><span class="n">globalCoordSys</span><span class="p">,</span> <span class="n">cs</span><span class="p">)</span>
+            <span class="n">transform</span><span class="o">.</span><span class="n">applyForwardInPlace</span><span class="p">(</span><span class="n">rays</span><span class="p">)</span>
+            <span class="n">plane</span> <span class="o">=</span> <span class="n">Plane</span><span class="p">()</span>
+            <span class="n">plane</span><span class="o">.</span><span class="n">intersectInPlace</span><span class="p">(</span><span class="n">rays</span><span class="p">)</span>
+            <span class="n">transform</span><span class="o">.</span><span class="n">applyReverseInPlace</span><span class="p">(</span><span class="n">rays</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">RayVector</span><span class="o">.</span><span class="n">fromArrays</span><span class="p">(</span>
+                <span class="n">rays</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">rays</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">rays</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="n">vx</span><span class="p">,</span> <span class="n">vy</span><span class="p">,</span> <span class="n">vz</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="n">flux</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">vx</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="n">source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">vy</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">source</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">vz</span> <span class="o">=</span> <span class="n">z</span> <span class="o">-</span> <span class="n">source</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">vx</span><span class="p">,</span> <span class="n">vy</span><span class="p">,</span> <span class="n">vz</span><span class="p">])</span>
+            <span class="n">v</span> <span class="o">/=</span> <span class="n">n</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ab,ab-&gt;b&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">y</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">source</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">z</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">source</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">RayVector</span><span class="o">.</span><span class="n">fromArrays</span><span class="p">(</span>
+                <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">t</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="n">flux</span>
+            <span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_fromCPPRayVector</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">_r</span><span class="p">,</span> <span class="n">coordSys</span><span class="o">=</span><span class="n">globalCoordSys</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Turn a c++ RayVector into a python RayVector.&quot;&quot;&quot;</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">_r</span> <span class="o">=</span> <span class="n">_r</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">coordSys</span><span class="o">=</span><span class="n">coordSys</span>
+        <span class="k">return</span> <span class="n">ret</span>
+
+<div class="viewcode-block" id="RayVector.copy"><a class="viewcode-back" href="../../rays.html#batoid.RayVector.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a copy of this RayVector.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">RayVector</span><span class="o">.</span><span class="n">_fromCPPRayVector</span><span class="p">(</span>
+            <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPRayVector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span>
+        <span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RayVector.amplitude"><a class="viewcode-back" href="../../rays.html#batoid.RayVector.amplitude">[docs]</a>    <span class="k">def</span> <span class="nf">amplitude</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate (scalar) complex electric-field amplitudes at given</span>
+<span class="sd">        position and time.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        r : ndarray of float, shape (3,)</span>
+<span class="sd">            Position in meters.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time (over vacuum speed of light; in meters).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray of complex, shape (n,)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">amplitude</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RayVector.sumAmplitude"><a class="viewcode-back" href="../../rays.html#batoid.RayVector.sumAmplitude">[docs]</a>    <span class="k">def</span> <span class="nf">sumAmplitude</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate the sum of (scalar) complex electric-field amplitudes of</span>
+<span class="sd">        all rays at given position and time.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        r : ndarray of float, shape (3,)</span>
+<span class="sd">            Position in meters.</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time (over vacuum speed of light; in meters).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        complex</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">sumAmplitude</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RayVector.phase"><a class="viewcode-back" href="../../rays.html#batoid.RayVector.phase">[docs]</a>    <span class="k">def</span> <span class="nf">phase</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate plane wave phases at given position and time.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        r : ndarray of float, shape (3,)</span>
+<span class="sd">            Position in meters at which to compute phase</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time (over vacuum speed of light; in meters).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray of float, shape(n,)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">phase</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RayVector.toCoordSys"><a class="viewcode-back" href="../../rays.html#batoid.RayVector.toCoordSys">[docs]</a>    <span class="k">def</span> <span class="nf">toCoordSys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coordSys</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transform rays into new coordinate system.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        coordSys: batoid.CoordSys</span>
+<span class="sd">            Destination coordinate system.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        RayVector</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">transform</span> <span class="o">=</span> <span class="n">CoordTransform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span><span class="p">,</span> <span class="n">coordSys</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">transform</span><span class="o">.</span><span class="n">applyForward</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RayVector.toCoordSysInPlace"><a class="viewcode-back" href="../../rays.html#batoid.RayVector.toCoordSysInPlace">[docs]</a>    <span class="k">def</span> <span class="nf">toCoordSysInPlace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coordSys</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transform rays into new coordinate system in place.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        coordSys: batoid.CoordSys</span>
+<span class="sd">            Destination coordinate system.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">transform</span> <span class="o">=</span> <span class="n">CoordTransform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span><span class="p">,</span> <span class="n">coordSys</span><span class="p">)</span>
+        <span class="n">transform</span><span class="o">.</span><span class="n">applyForwardInPlace</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RayVector.positionAtTime"><a class="viewcode-back" href="../../rays.html#batoid.RayVector.positionAtTime">[docs]</a>    <span class="k">def</span> <span class="nf">positionAtTime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate the positions of the rays at a given time.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time (over vacuum speed of light; in meters).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray of float, shape (n, 3)</span>
+<span class="sd">            Positions in meters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">positionAtTime</span><span class="p">(</span><span class="n">t</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RayVector.propagatedToTime"><a class="viewcode-back" href="../../rays.html#batoid.RayVector.propagatedToTime">[docs]</a>    <span class="k">def</span> <span class="nf">propagatedToTime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a RayVector propagated to given time.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time (over vacuum speed of light; in meters).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        RayVector</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">RayVector</span><span class="o">.</span><span class="n">_fromCPPRayVector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">propagatedToTime</span><span class="p">(</span><span class="n">t</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="RayVector.propagateInPlace"><a class="viewcode-back" href="../../rays.html#batoid.RayVector.propagateInPlace">[docs]</a>    <span class="k">def</span> <span class="nf">propagateInPlace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Propagate RayVector to given time.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Time (over vacuum speed of light; in meters).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">propagateInPlace</span><span class="p">(</span><span class="n">t</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RayVector.trimVignetted"><a class="viewcode-back" href="../../rays.html#batoid.RayVector.trimVignetted">[docs]</a>    <span class="k">def</span> <span class="nf">trimVignetted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minflux</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return new RayVector with vignetted rays or rays with flux below</span>
+<span class="sd">        given threshold removed.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        minflux : float</span>
+<span class="sd">            Minimum flux value to not remove.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        RayVector</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">RayVector</span><span class="o">.</span><span class="n">_fromCPPRayVector</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">trimVignetted</span><span class="p">(</span><span class="n">minflux</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="RayVector.trimVignettedInPlace"><a class="viewcode-back" href="../../rays.html#batoid.RayVector.trimVignettedInPlace">[docs]</a>    <span class="k">def</span> <span class="nf">trimVignettedInPlace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minflux</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove vignetted rays and rays with flux below a given threshold.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        minflux : float</span>
+<span class="sd">            Minimum flux value to not remove.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">trimVignettedInPlace</span><span class="p">(</span><span class="n">minflux</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">monochromatic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;True if all rays have same wavelength.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">monochromatic</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">x</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The x components of ray positions in meters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">x</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">y</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The y components of ray positions in meters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">y</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">z</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The z components of ray positions in meters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">z</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The x components of ray velocities units of the vacuum speed of</span>
+<span class="sd">        light.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">vx</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The y components of ray velocities units of the vacuum speed of</span>
+<span class="sd">        light.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">vy</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The z components of ray velocities units of the vacuum speed of</span>
+<span class="sd">        light.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">vz</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">t</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reference times (divided by the speed of light in vacuum) in units</span>
+<span class="sd">        of meters, also known as the optical path lengths.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">t</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">wavelength</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Vacuum wavelengths in meters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">wavelength</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">flux</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fluxes in arbitrary units.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">flux</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vignetted</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;True for rays that have been vignetted.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">vignetted</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">failed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;True for rays that have failed.  This may occur, for example, if</span>
+<span class="sd">        batoid failed to find the intersection of a ray wiht a surface.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">failed</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">r</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;ndarray of float, shape (n, 3): Positions of rays in meters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">r</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">v</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;ndarray of float, shape (n, 3): Velocities of rays in units of the</span>
+<span class="sd">        speed of light in vacuum.  Note that these may have magnitudes &lt; 1 if</span>
+<span class="sd">        the rays are inside a refractive medium.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">v</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">k</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;ndarray of float, shape (n, 3): Wavevectors of plane waves in units</span>
+<span class="sd">        of radians per meter.  The magnitude of each wavevector is equal to</span>
+<span class="sd">        :math:`2 \pi n / \lambda`, where :math:`n` is the refractive index and</span>
+<span class="sd">        :math:`\lambda` is the wavelength.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">k</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">kx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The x component of each ray wavevector in radians per meter.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">kx</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ky</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The y component of each ray wavevector in radians per meter.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">ky</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">kz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The z component of each ray wavevector in radians per meter.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">kz</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">omega</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;The temporal angular frequency of each plane wave divided by the</span>
+<span class="sd">        vacuum speed of light in units of radians per meter.  Equals</span>
+<span class="sd">        :math:`2 \pi / \lambda`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">omega</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Ray</span><span class="o">.</span><span class="n">_fromCPPRay</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Ray</span><span class="o">.</span><span class="n">_fromCPPRay</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_iter</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">RayVector</span><span class="p">):</span> <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_r</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">_r</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">coordSys</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span> <span class="o">==</span> <span class="n">rhs</span><span class="p">)</span></div>
+
+<span class="k">def</span> <span class="nf">concatenateRayVectors</span><span class="p">(</span><span class="n">rvs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Concatenates two or more RayVectors together.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rvs : list of RayVector</span>
+<span class="sd">        RayVectors to concatenate.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    concatenatedRayVector : RayVector</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rvs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">RayVector</span><span class="o">.</span><span class="n">_fromCPPRayVector</span><span class="p">(</span><span class="n">_batoid</span><span class="o">.</span><span class="n">CPPRayVector</span><span class="p">())</span>
+    <span class="n">coordSys</span> <span class="o">=</span> <span class="n">rvs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">coordSys</span>
+    <span class="k">for</span> <span class="n">rv</span> <span class="ow">in</span> <span class="n">rvs</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+        <span class="k">if</span> <span class="n">rv</span><span class="o">.</span><span class="n">coordSys</span> <span class="o">!=</span> <span class="n">coordSys</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Cannot concatenate RayVectors &quot;</span>
+                <span class="s2">&quot;with different coordinate systems&quot;</span>
+            <span class="p">)</span>
+    <span class="n">_r</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">concatenateRayVectors</span><span class="p">([</span><span class="n">rv</span><span class="o">.</span><span class="n">_r</span> <span class="k">for</span> <span class="n">rv</span> <span class="ow">in</span> <span class="n">rvs</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">RayVector</span><span class="o">.</span><span class="n">_fromCPPRayVector</span><span class="p">(</span><span class="n">_r</span><span class="p">,</span> <span class="n">coordSys</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">rayGrid</span><span class="p">(</span><span class="n">zdist</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">xcos</span><span class="p">,</span> <span class="n">ycos</span><span class="p">,</span> <span class="n">zcos</span><span class="p">,</span> <span class="n">nside</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">medium</span><span class="p">,</span>
+            <span class="n">lattice</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Construct a parallel square grid of rays in a given direction.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    zdist : float</span>
+<span class="sd">        Distance of central Ray from origin.</span>
+<span class="sd">    length : float</span>
+<span class="sd">        Length of one side of square grid in meters.</span>
+<span class="sd">    xcos, ycos, zcos : float</span>
+<span class="sd">        Direction cosines of rays.</span>
+<span class="sd">    nside : int</span>
+<span class="sd">        Number of rays on a side.</span>
+<span class="sd">    wavelength : float</span>
+<span class="sd">        Vacuum wavelength of rays in meters.</span>
+<span class="sd">    flux : float</span>
+<span class="sd">        Flux of rays in arbitrary units.</span>
+<span class="sd">    medium : batoid.Medium</span>
+<span class="sd">        Medium containing rays.</span>
+<span class="sd">    lattice : bool</span>
+<span class="sd">        Whether to center grid as a batoid.Lattice or not.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    grid : RayVector</span>
+<span class="sd">        The grid of rays.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">RayVector</span><span class="o">.</span><span class="n">_fromCPPRayVector</span><span class="p">(</span>
+        <span class="n">_batoid</span><span class="o">.</span><span class="n">rayGrid</span><span class="p">(</span>
+            <span class="n">zdist</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">xcos</span><span class="p">,</span> <span class="n">ycos</span><span class="p">,</span> <span class="n">zcos</span><span class="p">,</span> <span class="n">nside</span><span class="p">,</span>
+            <span class="n">wavelength</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">medium</span><span class="o">.</span><span class="n">_medium</span><span class="p">,</span> <span class="n">lattice</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">circularGrid</span><span class="p">(</span><span class="n">zdist</span><span class="p">,</span> <span class="n">outer</span><span class="p">,</span> <span class="n">inner</span><span class="p">,</span> <span class="n">xcos</span><span class="p">,</span> <span class="n">ycos</span><span class="p">,</span> <span class="n">zcos</span><span class="p">,</span> <span class="n">nradii</span><span class="p">,</span> <span class="n">naz</span><span class="p">,</span>
+                 <span class="n">wavelength</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">medium</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Construct a hexapolar grid of rays in a given direction.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    zdist : float</span>
+<span class="sd">        Distance of central Ray from origin.</span>
+<span class="sd">    outer : float</span>
+<span class="sd">        Outer radius of grid in meters.</span>
+<span class="sd">    inner : float</span>
+<span class="sd">        Inner radius of grid in meters.</span>
+<span class="sd">    xcos, ycos, zcos : float</span>
+<span class="sd">        Direction cosines of rays.</span>
+<span class="sd">    nradii : int</span>
+<span class="sd">        Number of radii (rings) in hexapolar grid.</span>
+<span class="sd">    naz : int</span>
+<span class="sd">        Number of azimuthal positions along outermost ring.</span>
+<span class="sd">    wavelength : float</span>
+<span class="sd">        Vacuum wavelength of rays in meters.</span>
+<span class="sd">    flux : float</span>
+<span class="sd">        Flux of rays in arbitrary units.</span>
+<span class="sd">    medium : batoid.Medium</span>
+<span class="sd">        Medium containing rays.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    hexgrid : RayVector</span>
+<span class="sd">        The hexapolar grid of rays.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">RayVector</span><span class="o">.</span><span class="n">_fromCPPRayVector</span><span class="p">(</span>
+        <span class="n">_batoid</span><span class="o">.</span><span class="n">circularGrid</span><span class="p">(</span>
+            <span class="n">zdist</span><span class="p">,</span> <span class="n">outer</span><span class="p">,</span> <span class="n">inner</span><span class="p">,</span> <span class="n">xcos</span><span class="p">,</span> <span class="n">ycos</span><span class="p">,</span> <span class="n">zcos</span><span class="p">,</span> <span class="n">nradii</span><span class="p">,</span> <span class="n">naz</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span>
+            <span class="n">flux</span><span class="p">,</span> <span class="n">medium</span><span class="o">.</span><span class="n">_medium</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">uniformCircularGrid</span><span class="p">(</span><span class="n">zdist</span><span class="p">,</span> <span class="n">outer</span><span class="p">,</span> <span class="n">inner</span><span class="p">,</span> <span class="n">xcos</span><span class="p">,</span> <span class="n">ycos</span><span class="p">,</span> <span class="n">zcos</span><span class="p">,</span> <span class="n">nrays</span><span class="p">,</span>
+                        <span class="n">wavelength</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">medium</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Uniformly sample ray positions from an annulus, assign all the same</span>
+<span class="sd">    direction.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    zdist : float</span>
+<span class="sd">        Distance of central Ray from origin.</span>
+<span class="sd">    outer : float</span>
+<span class="sd">        Outer radius of grid in meters.</span>
+<span class="sd">    inner : float</span>
+<span class="sd">        Inner radius of grid in meters.</span>
+<span class="sd">    xcos, ycos, zcos : float</span>
+<span class="sd">        Direction cosines of rays.</span>
+<span class="sd">    nrays : int</span>
+<span class="sd">        Number of rays to create.</span>
+<span class="sd">    wavelength : float</span>
+<span class="sd">        Vacuum wavelength of rays in meters.</span>
+<span class="sd">    flux : float</span>
+<span class="sd">        Flux of rays in arbitrary units.</span>
+<span class="sd">    medium : batoid.Medium</span>
+<span class="sd">        Medium containing rays.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    hexgrid : RayVector</span>
+<span class="sd">        The hexapolar grid of rays.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">RayVector</span><span class="o">.</span><span class="n">_fromCPPRayVector</span><span class="p">(</span>
+        <span class="n">_batoid</span><span class="o">.</span><span class="n">uniformCircularGrid</span><span class="p">(</span>
+            <span class="n">zdist</span><span class="p">,</span> <span class="n">outer</span><span class="p">,</span> <span class="n">inner</span><span class="p">,</span> <span class="n">xcos</span><span class="p">,</span> <span class="n">ycos</span><span class="p">,</span> <span class="n">zcos</span><span class="p">,</span> <span class="n">nrays</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span>
+            <span class="n">medium</span><span class="o">.</span><span class="n">_medium</span><span class="p">,</span> <span class="n">seed</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">pointSourceCircularGrid</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">outer</span><span class="p">,</span> <span class="n">inner</span><span class="p">,</span> <span class="n">nradii</span><span class="p">,</span> <span class="n">naz</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span>
+                            <span class="n">flux</span><span class="p">,</span> <span class="n">medium</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Construct grid of rays all emanating from the same source location but</span>
+<span class="sd">    with a hexapolar grid in direction cosines.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    source : (3,) array of float</span>
+<span class="sd">        Source position of rays.</span>
+<span class="sd">    outer : float</span>
+<span class="sd">        Outer radius of rays at intersection with plane perpendicular to</span>
+<span class="sd">        source-origin line.</span>
+<span class="sd">    inner : float</span>
+<span class="sd">        Inner radius of rays at intersection with plane perpendicular to</span>
+<span class="sd">        source-origin line.</span>
+<span class="sd">    nradii : int</span>
+<span class="sd">        Number of radii (rings) in hexapolar grid.</span>
+<span class="sd">    naz : int</span>
+<span class="sd">        Number of azimuthal positions along outermost ring.</span>
+<span class="sd">    wavelength : float</span>
+<span class="sd">        Vacuum wavelength of rays in meters.</span>
+<span class="sd">    flux : float</span>
+<span class="sd">        Flux of rays in arbitrary units.</span>
+<span class="sd">    medium : batoid.Medium</span>
+<span class="sd">        Medium containing rays.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    hexgrid : RayVector</span>
+<span class="sd">        The hexapolar grid of rays.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">RayVector</span><span class="o">.</span><span class="n">_fromCPPRayVector</span><span class="p">(</span>
+        <span class="n">_batoid</span><span class="o">.</span><span class="n">pointSourceCircularGrid</span><span class="p">(</span>
+            <span class="n">source</span><span class="p">,</span> <span class="n">outer</span><span class="p">,</span> <span class="n">inner</span><span class="p">,</span> <span class="n">nradii</span><span class="p">,</span> <span class="n">naz</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">medium</span><span class="o">.</span><span class="n">_medium</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Josh Meyers
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

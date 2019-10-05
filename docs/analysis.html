@@ -1,0 +1,447 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Analysis &mdash; batoid 0.1.0rc2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Lattices" href="lattice.html" />
+    <link rel="prev" title="Coatings" href="coatings.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> batoid
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rays.html">Rays</a></li>
+<li class="toctree-l1"><a class="reference internal" href="surfaces.html">Surfaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optic.html">Optics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coords.html">Coordinate Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="obscurations.html">Obscurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="media.html">Media</a></li>
+<li class="toctree-l1"><a class="reference internal" href="table.html">Lookup tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coatings.html">Coatings</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lattice.html">Lattices</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">batoid</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Analysis</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/analysis.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="analysis">
+<h1>Analysis<a class="headerlink" href="#analysis" title="Permalink to this headline">¶</a></h1>
+<p>The batoid analysis module contains functions for evaluating wavefronts, PSFs,
+and Zernike polynomial decompositions.</p>
+<span class="target" id="module-batoid.analysis"></span><dl class="function">
+<dt id="batoid.analysis.huygensPSF">
+<code class="sig-prename descclassname">batoid.analysis.</code><code class="sig-name descname">huygensPSF</code><span class="sig-paren">(</span><em class="sig-param">optic</em>, <em class="sig-param">theta_x</em>, <em class="sig-param">theta_y</em>, <em class="sig-param">wavelength</em>, <em class="sig-param">projection='postel'</em>, <em class="sig-param">nx=None</em>, <em class="sig-param">dx=None</em>, <em class="sig-param">dy=None</em>, <em class="sig-param">nxOut=None</em>, <em class="sig-param">reference='mean'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/analysis.html#huygensPSF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.analysis.huygensPSF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute a PSF via the Huygens construction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>optic</strong> (<em>batoid.Optic</em>) – Optical system</p></li>
+<li><p><strong>theta_x, theta_y</strong> (<em>float</em>) – Field angle in radians</p></li>
+<li><p><strong>wavelength</strong> (<em>float</em>) – Wavelength in meters</p></li>
+<li><p><strong>projection</strong> (<em>{‘postel’, ‘zemax’, ‘gnomonic’, ‘stereographic’, ‘lambert’, ‘orthographic’}</em>) – Projection used to convert field angle to direction cosines.</p></li>
+<li><p><strong>nx</strong> (<em>int, optional</em>) – Size of ray grid to use.</p></li>
+<li><p><strong>dx, dy</strong> (<em>float, optional</em>) – Lattice scales to use for PSF evaluation locations.  Default, use
+fftPSF lattice.</p></li>
+<li><p><strong>nxOut</strong> (<em>int, optional</em>) – Size of the output lattice.  Default is to use nx.</p></li>
+<li><p><strong>reference</strong> (<em>{‘chief’, ‘mean’}</em>) – If ‘chief’, then center the output lattice where the chief ray
+intersects the focal plane.  If ‘mean’, then center at the mean
+non-vignetted ray intersection.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>psf</strong> (<em>batoid.Lattice</em>) – The PSF.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The Huygens construction is to evaluate the PSF as</p>
+<div class="math notranslate nohighlight">
+\[I(x) \propto \sum_u \exp(i \phi(u)) \exp(i k(u) \cdot r)\]</div>
+<p>The <span class="math notranslate nohighlight">\(u\)</span> are assumed to uniformly sample the entrance pupil, but not
+include any rays that get vignetted before they reach the focal plane.  The
+<span class="math notranslate nohighlight">\(\phi\)</span> s are the phases of the exit rays evaluated at a single
+arbitrary time.  The <span class="math notranslate nohighlight">\(k(u)\)</span> indicates the conversion of the uniform
+entrance pupil samples into nearly (though not exactly) uniform samples in
+k-space of the output rays.</p>
+<p>The output locations where the PSF is evaluated are governed by <code class="docutils literal notranslate"><span class="pre">dx</span></code>,
+<code class="docutils literal notranslate"><span class="pre">dy</span></code>, and <code class="docutils literal notranslate"><span class="pre">nx</span></code>.  If <code class="docutils literal notranslate"><span class="pre">dx</span></code> and <code class="docutils literal notranslate"><span class="pre">dy</span></code> are None, then the same lattice
+as in fftPSF will be used.  If <code class="docutils literal notranslate"><span class="pre">dx</span></code> and <code class="docutils literal notranslate"><span class="pre">dy</span></code> are scalars, then a
+lattice with primitive vectors <code class="docutils literal notranslate"><span class="pre">[dx,</span> <span class="pre">0]</span></code> and <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">dy]</span></code> will be used.
+If <code class="docutils literal notranslate"><span class="pre">dx</span></code> and <code class="docutils literal notranslate"><span class="pre">dy</span></code> are 2-vectors, then those will be the primitive
+vectors of the output lattice.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="batoid.analysis.wavefront">
+<code class="sig-prename descclassname">batoid.analysis.</code><code class="sig-name descname">wavefront</code><span class="sig-paren">(</span><em class="sig-param">optic</em>, <em class="sig-param">theta_x</em>, <em class="sig-param">theta_y</em>, <em class="sig-param">wavelength</em>, <em class="sig-param">projection='postel'</em>, <em class="sig-param">nx=32</em>, <em class="sig-param">sphereRadius=None</em>, <em class="sig-param">reference='mean'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/analysis.html#wavefront"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.analysis.wavefront" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute wavefront.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>optic</strong> (<em>batoid.Optic</em>) – Optical system</p></li>
+<li><p><strong>theta_x, theta_y</strong> (<em>float</em>) – Field angle in radians</p></li>
+<li><p><strong>wavelength</strong> (<em>float</em>) – Wavelength in meters</p></li>
+<li><p><strong>projection</strong> (<em>{‘postel’, ‘zemax’, ‘gnomonic’, ‘stereographic’, ‘lambert’, ‘orthographic’}</em>) – Projection used to convert field angle to direction cosines.</p></li>
+<li><p><strong>nx</strong> (<em>int, optional</em>) – Size of ray grid to use.</p></li>
+<li><p><strong>sphereRadius</strong> (<em>float, optional</em>) – The radius of the reference sphere.  Nominally this should be set to
+the distance to the exit pupil, though the calculation is usually not
+very sensitive to this.  Many of the telescopes that come with batoid
+have values for this set in their yaml files, which will be used if
+this is None.</p></li>
+<li><p><strong>reference</strong> (<em>{‘chief’, ‘mean’}</em>) – If ‘chief’, then center the output lattice where the chief ray
+intersects the focal plane.  If ‘mean’, then center at the mean
+non-vignetted ray intersection.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>wavefront</strong> (<em>batoid.Lattice</em>) – A batoid.Lattice object containing the wavefront values in waves and
+the primitive lattice vectors of the entrance pupil grid in meters.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="batoid.analysis.fftPSF">
+<code class="sig-prename descclassname">batoid.analysis.</code><code class="sig-name descname">fftPSF</code><span class="sig-paren">(</span><em class="sig-param">optic</em>, <em class="sig-param">theta_x</em>, <em class="sig-param">theta_y</em>, <em class="sig-param">wavelength</em>, <em class="sig-param">projection='postel'</em>, <em class="sig-param">nx=32</em>, <em class="sig-param">pad_factor=2</em>, <em class="sig-param">sphereRadius=None</em>, <em class="sig-param">reference='mean'</em>, <em class="sig-param">_addedWF=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/analysis.html#fftPSF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.analysis.fftPSF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute PSF using FFT.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>optic</strong> (<em>batoid.Optic</em>) – Optical system</p></li>
+<li><p><strong>theta_x, theta_y</strong> (<em>float</em>) – Field angle in radians</p></li>
+<li><p><strong>wavelength</strong> (<em>float</em>) – Wavelength in meters</p></li>
+<li><p><strong>projection</strong> (<em>{‘postel’, ‘zemax’, ‘gnomonic’, ‘stereographic’, ‘lambert’, ‘orthographic’}</em>) – Projection used to convert field angle to direction cosines.</p></li>
+<li><p><strong>nx</strong> (<em>int, optional</em>) – Size of ray grid to use.</p></li>
+<li><p><strong>pad_factor</strong> (<em>int, optional</em>) – Factor by which to pad pupil array.  Default: 2</p></li>
+<li><p><strong>sphereRadius</strong> (<em>float, optional</em>) – The radius of the reference sphere.  Nominally this should be set to
+the distance to the exit pupil, though the calculation is usually not
+very sensitive to this.  Many of the telescopes that come with batoid
+have values for this set in their yaml files, which will be used if
+this is None.</p></li>
+<li><p><strong>reference</strong> (<em>{‘chief’, ‘mean’}</em>) – If ‘chief’, then center the output lattice where the chief ray
+intersects the focal plane.  If ‘mean’, then center at the mean
+non-vignetted ray intersection.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>psf</strong> (<em>batoid.Lattice</em>) – A batoid.Lattice object containing the relative PSF values and
+the primitive lattice vectors of the focal plane grid.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="batoid.analysis.zernike">
+<code class="sig-prename descclassname">batoid.analysis.</code><code class="sig-name descname">zernike</code><span class="sig-paren">(</span><em class="sig-param">optic</em>, <em class="sig-param">theta_x</em>, <em class="sig-param">theta_y</em>, <em class="sig-param">wavelength</em>, <em class="sig-param">projection='postel'</em>, <em class="sig-param">nx=32</em>, <em class="sig-param">sphereRadius=None</em>, <em class="sig-param">reference='mean'</em>, <em class="sig-param">jmax=22</em>, <em class="sig-param">eps=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/analysis.html#zernike"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.analysis.zernike" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute Zernike polynomial decomposition of the wavefront.</p>
+<p>This calculation propagates a square grid of rays to the exit pupil
+reference sphere where the wavefront is computed.  The optical path
+differences of non-vignetted rays are then fit to Zernike polynomial
+coefficients numerically.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>optic</strong> (<em>batoid.Optic</em>) – Optical system</p></li>
+<li><p><strong>theta_x, theta_y</strong> (<em>float</em>) – Field angle in radians</p></li>
+<li><p><strong>wavelength</strong> (<em>float</em>) – Wavelength in meters</p></li>
+<li><p><strong>projection</strong> (<em>{‘postel’, ‘zemax’, ‘gnomonic’, ‘stereographic’, ‘lambert’, ‘orthographic’}</em>) – Projection used to convert field angle to direction cosines.</p></li>
+<li><p><strong>nx</strong> (<em>int, optional</em>) – Size of ray grid to use.</p></li>
+<li><p><strong>sphereRadius</strong> (<em>float, optional</em>) – The radius of the reference sphere.  Nominally this should be set to
+the distance to the exit pupil, though the calculation is usually not
+very sensitive to this.  Many of the telescopes that come with batoid
+have values for this set in their yaml files, which will be used if
+this is None.</p></li>
+<li><p><strong>reference</strong> (<em>{‘chief’, ‘mean’}</em>) – If ‘chief’, then center the output lattice where the chief ray
+intersects the focal plane.  If ‘mean’, then center at the mean
+non-vignetted ray intersection.</p></li>
+<li><p><strong>jmax</strong> (<em>int, optional</em>) – Number of coefficients to compute.  Default: 12.</p></li>
+<li><p><strong>eps</strong> (<em>float, optional</em>) – Use annular Zernike polynomials with this fractional inner radius.
+Default: 0.0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>zernikes</strong> (<em>array</em>) – Zernike polynomial coefficients.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Zernike coefficients are indexed following the Noll convention.
+Additionally, since python lists start at 0, but the Noll convention starts
+at 1, the 0-th index of the returned array is meaningless.  I.e.,
+zernikes[1] is piston, zernikes[4] is defocus, and so on…</p>
+<p>Also, since Zernike polynomials are orthogonal over a circle or annulus,
+but vignetting may make the actual wavefront region of support something
+different, the values of fit coefficients can depend on the total number of
+coefficients being fit.  For example, the j=4 (defocus) coefficient may
+depend on whether jmax=11 and jmax=21 (or some other value).  See the
+zernikeGQ function for an alternative algorithm that is independent of
+jmax.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="batoid.analysis.zernikeGQ">
+<code class="sig-prename descclassname">batoid.analysis.</code><code class="sig-name descname">zernikeGQ</code><span class="sig-paren">(</span><em class="sig-param">optic</em>, <em class="sig-param">theta_x</em>, <em class="sig-param">theta_y</em>, <em class="sig-param">wavelength</em>, <em class="sig-param">projection='postel'</em>, <em class="sig-param">rings=6</em>, <em class="sig-param">spokes=None</em>, <em class="sig-param">sphereRadius=None</em>, <em class="sig-param">reference='mean'</em>, <em class="sig-param">jmax=22</em>, <em class="sig-param">eps=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/analysis.html#zernikeGQ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.analysis.zernikeGQ" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute Zernike polynomial decomposition of the wavefront.</p>
+<p>This calculation uses Gaussian Quadrature points and weights to compute the
+Zernike decomposition of the wavefront.  The wavefront values at the GQ
+points are determined by tracing from the entrance pupil to the exit pupil
+reference sphere, and evaluating the optical path
+differences on this sphere.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>optic</strong> (<em>batoid.Optic</em>) – Optical system</p></li>
+<li><p><strong>theta_x, theta_y</strong> (<em>float</em>) – Field angle in radians</p></li>
+<li><p><strong>wavelength</strong> (<em>float</em>) – Wavelength in meters</p></li>
+<li><p><strong>projection</strong> (<em>{‘postel’, ‘zemax’, ‘gnomonic’, ‘stereographic’, ‘lambert’, ‘orthographic’}</em>) – Projection used to convert field angle to direction cosines.</p></li>
+<li><p><strong>rings</strong> (<em>int, optional</em>) – Number of Gaussian quadrature rings to use.  Default: 6.</p></li>
+<li><p><strong>spokes</strong> (<em>int, optional</em>) – Number of Gaussian quadrature spokes to use.  Default: 2*rings + 1</p></li>
+<li><p><strong>sphereRadius</strong> (<em>float, optional</em>) – The radius of the reference sphere.  Nominally this should be set to
+the distance to the exit pupil, though the calculation is usually not
+very sensitive to this.  Many of the telescopes that come with batoid
+have values for this set in their yaml files, which will be used if
+this is None.</p></li>
+<li><p><strong>reference</strong> (<em>{‘chief’, ‘mean’}</em>) – If ‘chief’, then center the output lattice where the chief ray
+intersects the focal plane.  If ‘mean’, then center at the mean
+non-vignetted ray intersection.</p></li>
+<li><p><strong>jmax</strong> (<em>int, optional</em>) – Number of coefficients to compute.  Default: 22.</p></li>
+<li><p><strong>eps</strong> (<em>float, optional</em>) – Use annular Zernike polynomials with this fractional inner radius.
+Default: 0.0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>zernikes</strong> (<em>array</em>) – Zernike polynomial coefficients.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Zernike coefficients are indexed following the Noll convention.
+Additionally, since python lists start at 0, but the Noll convention starts
+at 1, the 0-th index of the returned array is meaningless.  I.e.,
+zernikes[1] is piston, zernikes[4] is defocus, and so on…</p>
+<p>This algorithm takes advantage of the fact that Zernike polynomials are
+orthogonal on a circle or annulus to compute the value of individual
+coefficients via an integral:</p>
+<div class="math notranslate nohighlight">
+\[a_j \propto \int Z_j(x, y) W(x, y) dx dy\]</div>
+<p>This integral is approximated using Gaussian quadrature.  Since the above
+integral depends on orthogonality, the wavefront must be decomposed over a
+circular or annular region of support.  As such, this algorithm is
+unaffected by vignetting.  It is required that no rays fail to be traced,
+even in vignetted regions.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="batoid.analysis.doubleZernike">
+<code class="sig-prename descclassname">batoid.analysis.</code><code class="sig-name descname">doubleZernike</code><span class="sig-paren">(</span><em class="sig-param">optic</em>, <em class="sig-param">field</em>, <em class="sig-param">wavelength</em>, <em class="sig-param">rings=6</em>, <em class="sig-param">spokes=None</em>, <em class="sig-param">kmax=22</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/analysis.html#doubleZernike"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.analysis.doubleZernike" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute double Zernike polynomial decomposition of the wavefront.</p>
+<p>The double Zernike decomposition describes both the focal and pupil
+variation of the wavefront.  More specifically:</p>
+<div class="math notranslate nohighlight">
+\[W(u, \theta) = \sum_{jk} a_{jk} Z_j(u), Z_k(\theta)\]</div>
+<p>where <span class="math notranslate nohighlight">\(u\)</span> indicates the pupil coordinate and <span class="math notranslate nohighlight">\(\theta\)</span> indicates
+the field angle coordinate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>optic</strong> (<em>batoid.Optic</em>) – Optical system</p></li>
+<li><p><strong>field</strong> (<em>float</em>) – Outer field angle radius in radians.</p></li>
+<li><p><strong>wavelength</strong> (<em>float</em>) – Wavelength in meters</p></li>
+<li><p><strong>rings</strong> (<em>int, optional</em>) – Number of Gaussian quadrature rings to use.  Default: 6.</p></li>
+<li><p><strong>spokes</strong> (<em>int, optional</em>) – Number of Gaussian quadrature spokes to use.  Default: 2*rings + 1</p></li>
+<li><p><strong>kmax</strong> (<em>int, optional</em>) – Number of focal coefficients to compute.  Default: 22.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Keyword arguments to pass to <a class="reference internal" href="#batoid.analysis.zernikeGQ" title="batoid.analysis.zernikeGQ"><code class="xref any py py-func docutils literal notranslate"><span class="pre">zernikeGQ</span></code></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>dzs</strong> (<em>array</em>) – Double Zernike polynomial coefficients.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="lattice.html" class="btn btn-neutral float-right" title="Lattices" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="coatings.html" class="btn btn-neutral float-left" title="Coatings" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Josh Meyers
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,248 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Lattices &mdash; batoid 0.1.0rc2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Analysis" href="analysis.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> batoid
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rays.html">Rays</a></li>
+<li class="toctree-l1"><a class="reference internal" href="surfaces.html">Surfaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optic.html">Optics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coords.html">Coordinate Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="obscurations.html">Obscurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="media.html">Media</a></li>
+<li class="toctree-l1"><a class="reference internal" href="table.html">Lookup tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coatings.html">Coatings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Lattices</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">batoid</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Lattices</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/lattice.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="lattices">
+<h1>Lattices<a class="headerlink" href="#lattices" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="batoid.Lattice">
+<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">Lattice</code><span class="sig-paren">(</span><em class="sig-param">array</em>, <em class="sig-param">primitiveVectors</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/lattice.html#Lattice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Lattice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Container class for an ndarray + primitive lattice vectors.</p>
+<p>Used as the output type for several of the analysis algorithms, including
+PSFs and wavefronts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>array</strong> (<em>ndarray, shape (N1, N2, …, Nd)</em>) – d-dimensional ndarray with dimensions N1, N2, …, Nd</p></li>
+<li><p><strong>primitiveVector</strong> (<em>(d, d) ndarray</em>) – Primitive lattice vectors.  E.g., primitiveVector[0] should contain the
+lattice vector for the first dimension.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">coords</span></code> attribute will contain the coordinates of each lattice
+point determined by the coordinate index and the primitive lattice
+vectors.  E.g., in 2-dimensions</p>
+<blockquote>
+<div><p>lattice.coord[i, j] = (i - N1//2) * primitiveVector[0] + (j - N2//2) * primitiveVector[1]</p>
+</div></blockquote>
+<p>Note, this convention places</p>
+<blockquote>
+<div><p>lattice.coord[0,0] = (-N1//2) * primitiveVector[0] + (-N2/2) * primitiveVector[1]</p>
+</div></blockquote>
+<p>but the location of lattice.coord[-1,-1] depends on whether the size of
+each dimension is even or odd.  An odd-sized dimension is “centered”, in
+that the 0-coordinate is precisely in the middle of the dimension.  An
+even-sized dimension will be slightly decentered, with more negative
+points than positive points.  The above convention is the same as for
+numpy.fft.fftfreq.</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="analysis.html" class="btn btn-neutral float-left" title="Analysis" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Josh Meyers
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
