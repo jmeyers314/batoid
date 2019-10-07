@@ -76,7 +76,7 @@ def parallel_trace_timing(nside=1024, nthread=None, minChunk=None):
         t0 = time.time()
 
         for _ in range(args.nrepeat):
-            rays_out = batoid.RayVector(rays)
+            rays_out = rays.copy()
             telescope.traceInPlace(rays_out)
 
         t1 = time.time()
