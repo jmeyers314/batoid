@@ -23,10 +23,23 @@ either the clang or gcc compiler with support for c++11.
 Installation
 ============
 
-This *should* be as simple as cloning the repo and running setup.py.  One minor
-hiccup is that this repo includes submodules for ``pybind11`` and ``eigen``, so
-when cloning for the first time, a command similar to one of the following
-should be used ::
+PyPI
+----
+
+Released versions of batoid are available on pypi as source distributions.
+This means you will need at least c++14 compiler available and that setup.py
+can find it.  This should hopefully be the case on most *nix systems, in which
+case, the following ought to work::
+
+    pip install batoid
+
+Github
+------
+
+If Pypi doesn't work, then you can try cloning the source from github and
+running setup.py.  One minor hiccup in this case is that the batoid repo
+includes submodules for ``pybind11`` and ``eigen``, so when cloning for the
+first time, a command similar to one of the following should be used ::
 
     git clone --recurse-submodules git@github.com:jmeyers314/batoid.git
 
@@ -34,7 +47,8 @@ or ::
 
     git clone --recurse-submodules https://github.com/jmeyers314/batoid.git
 
-Once the repo and the submodules have been cloned, then compile and install with ::
+Once the repo and the submodules have been cloned, then compile and install
+with ::
 
     python setup.py install
 
