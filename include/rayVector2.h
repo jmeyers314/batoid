@@ -1,7 +1,10 @@
 #ifndef batoid_rayVector2_h
 #define batoid_rayVector2_h
 
+#include <iostream>
 #include <Eigen/Dense>
+#include <omp.h>
+
 using Eigen::MatrixX3d;
 using Eigen::VectorXd;
 using VectorXb = Eigen::Matrix<bool, Eigen::Dynamic, 1>;
@@ -16,25 +19,46 @@ namespace batoid {
             Ref<MatrixX3d> _r, Ref<MatrixX3d> _v, Ref<VectorXd> _t,
             Ref<VectorXd> _wavelength, Ref<VectorXd> _flux,
             Ref<VectorXb> _vignetted, Ref<VectorXb> _failed
-        );
+        ) : r(_r), v(_v), t(_t),
+          wavelength(_wavelength), flux(_flux),
+          vignetted(_vignetted), failed(_failed),
+	  owner(OwnerType::host), _size(t.size()),
+	  _hnum(omp_get_initial_device()),
+	  _dnum(omp_get_default_device()),
+	  _dt(static_cast<double*>(omp_target_alloc(_size*sizeof(double), _dnum))) {}
+
+
+        ~RayVector2() {
+	  omp_target_free(_dt, _dnum);
+        }
 
         // copy from device to host, so can be inspected or altered on host.
         // note that even inspecting on host will cause a future device action
         // to copy from host->device, even if nothing gets written.
         void synchronize() {
+            std::cout << "sending to host\n";
             if (owner == OwnerType::device) {
                 // TODO: copy from device -> host
+                omp_target_memcpy(t.data(), _dt, _size, 0, 0, _hnum, _dnum);
                 owner = OwnerType::host;
             }
         }
 
         void sendToDevice() {
+            std::cout << "sending to device\n";
             if (owner == OwnerType::host) {
                 // TODO: copy from host -> device
+	        omp_target_memcpy(_dt, t.data(), _size, 0, 0, _dnum, _hnum);
                 owner = OwnerType::device;
             }
         }
 
+        void inspect() {
+            std::cout << "size = " << _size << '\n';
+  	    std::cout << "_hnum = " << _hnum << '\n';
+	    std::cout << "_dnum = " << _dnum << '\n';
+        }
+      
         // Big Question: do I always want to send every array?  Or will, e.g., only position and t
         // be sufficient sometimes?  Could have flags for each variable instead of one flag for the
         // whole RayVector2?
@@ -48,6 +72,11 @@ namespace batoid {
         Ref<VectorXb> failed;
         enum class OwnerType { host, device };
         OwnerType owner;
+    private:
+      size_t _size;
+      int _dnum; // device index
+      int _hnum; // host index
+      double* _dt;  // device time array
     };
 }
 
