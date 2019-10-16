@@ -22,14 +22,14 @@ namespace batoid {
         ) : r(_r), v(_v), t(_t),
           wavelength(_wavelength), flux(_flux),
           vignetted(_vignetted), failed(_failed),
-	  owner(OwnerType::host), _size(t.size()),
-	  _hnum(omp_get_initial_device()),
-	  _dnum(omp_get_default_device()),
-	  _dt(static_cast<double*>(omp_target_alloc(_size*sizeof(double), _dnum))) {}
+	      owner(OwnerType::host), _size(t.size()),
+	      _hnum(omp_get_initial_device()),
+    	  _dnum(omp_get_default_device()),
+    	  _dt(static_cast<double*>(omp_target_alloc(_size*sizeof(double), _dnum))) {}
 
 
         ~RayVector2() {
-	  omp_target_free(_dt, _dnum);
+    	    omp_target_free(_dt, _dnum);
         }
 
         // copy from device to host, so can be inspected or altered on host.
@@ -55,10 +55,10 @@ namespace batoid {
 
         void inspect() {
             std::cout << "size = " << _size << '\n';
-  	    std::cout << "_hnum = " << _hnum << '\n';
-	    std::cout << "_dnum = " << _dnum << '\n';
+      	    std::cout << "_hnum = " << _hnum << '\n';
+    	    std::cout << "_dnum = " << _dnum << '\n';
         }
-      
+
         // Big Question: do I always want to send every array?  Or will, e.g., only position and t
         // be sufficient sometimes?  Could have flags for each variable instead of one flag for the
         // whole RayVector2?
