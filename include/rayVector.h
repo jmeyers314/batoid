@@ -7,6 +7,7 @@
 #include <complex>
 #include <vector>
 #include <Eigen/Dense>
+#include <limits>
 
 using Eigen::Vector3d;
 
@@ -73,7 +74,7 @@ namespace batoid {
 
     private:
         std::vector<Ray> _rays;
-        double _wavelength{NAN};  // If not NAN, then all wavelengths are this wavelength
+        double _wavelength{std::numeric_limits<double>::quiet_NaN()};  // If not NAN, then all wavelengths are this wavelength
     };
 
     inline std::ostream& operator<<(std::ostream& os, const RayVector& rv) {

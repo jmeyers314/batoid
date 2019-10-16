@@ -128,7 +128,7 @@ namespace batoid {
         double _wavelength = rvs[0].getWavelength();
         for (const auto& rv: rvs) {
             if (_wavelength != rv.getWavelength())
-                _wavelength = NAN;
+                _wavelength = std::numeric_limits<double>::quiet_NaN();
             out.insert(out.end(), rv.cbegin(), rv.cend());
         }
         return RayVector(out, _wavelength);

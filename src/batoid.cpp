@@ -13,6 +13,8 @@ using Eigen::Vector3d;
 using Eigen::Matrix3d;
 using Eigen::AngleAxisd;
 
+#define PI 3.14159265358979323846264338327950288419716939937510L
+
 namespace batoid{
     RayVector rayGrid(double dist, double length,
                       double xcos, double ycos, double zcos,
@@ -90,7 +92,7 @@ namespace batoid{
             double mu = distribution(generator);
             double nu = distribution(generator);
             double radius = sqrt(mu * outer * outer + (1 - mu) * inner * inner);
-            double az = 2 * M_PI * nu;
+            double az = 2 * PI * nu;
             Vector3d r(radius * std::cos(az), radius * std::sin(az), 0);
             double t = (r + v * n * dist).dot(v) * n * n;
             result.emplace_back(r - v * t, v, 0, wavelength, flux, false);
@@ -127,7 +129,7 @@ namespace batoid{
         rfrac = 1.0;
         for (int i=0; i<nradii; i++) {
             double az = 0.0;
-            double daz = 2*M_PI/nphis[i];
+            double daz = 2*PI/nphis[i];
             double radius = rfrac*outer;
             for (int j=0; j<nphis[i]; j++) {
                 Vector3d r(radius*std::cos(az), radius*std::sin(az), 0);
@@ -174,7 +176,7 @@ namespace batoid{
         thetaFrac = 1.0;
         for (int i=0; i<nradii; i++) {
             double az = 0.0;
-            double daz = 2*M_PI/nphis[i];
+            double daz = 2*PI/nphis[i];
             double theta = thetaFrac*thetaMax;
             Vector3d vref(std::sin(theta), 0, -std::cos(theta));
             vref /= n;

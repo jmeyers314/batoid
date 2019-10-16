@@ -2,6 +2,7 @@
 #include "solve.h"
 #include "table.h"
 #include <cmath>
+#include <limits>
 
 using Eigen::Vector2d;
 using Eigen::Vector4d;
@@ -57,7 +58,7 @@ namespace batoid {
             ix = _xargs.upperIndex(x);
             iy = _yargs.upperIndex(y);
         } catch (const TableOutOfRange&) {
-            return NAN;
+            return std::numeric_limits<double>::quiet_NaN();
         }
         double dx = _xargs.getDa();
         double dy = _yargs.getDa();
@@ -83,7 +84,11 @@ namespace batoid {
             ix = _xargs.upperIndex(x);
             iy = _yargs.upperIndex(y);
         } catch (const TableOutOfRange&) {
-            return Vector3d(NAN, NAN, NAN);
+            return Vector3d(
+                std::numeric_limits<double>::quiet_NaN(),
+                std::numeric_limits<double>::quiet_NaN(),
+                std::numeric_limits<double>::quiet_NaN()
+            );
         }
         double dx = _xargs.getDa();
         double dy = _yargs.getDa();
