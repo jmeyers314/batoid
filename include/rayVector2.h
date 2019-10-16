@@ -24,8 +24,11 @@ namespace batoid {
           vignetted(_vignetted), failed(_failed),
 	      owner(OwnerType::host), _size(t.size()),
 	      _hnum(omp_get_initial_device()),
-    	  _dnum(omp_get_default_device()),
-    	  _dt(static_cast<double*>(omp_target_alloc(_size*sizeof(double), _dnum))) {}
+    	  _dnum(omp_get_default_device())
+    	  {
+              _dt = static_cast<double*>(omp_target_alloc(_size*sizeof(double), _dnum));
+              std::cout << "_dt = " << _dt << '\n';
+          }
 
 
         ~RayVector2() {
@@ -36,19 +39,19 @@ namespace batoid {
         // note that even inspecting on host will cause a future device action
         // to copy from host->device, even if nothing gets written.
         void synchronize() {
-            std::cout << "sending to host\n";
             if (owner == OwnerType::device) {
-                // TODO: copy from device -> host
-                omp_target_memcpy(t.data(), _dt, _size, 0, 0, _hnum, _dnum);
+                std::cout << "c++ sending to host\n";
+                int result = omp_target_memcpy(t.data(), _dt, _size, 0, 0, _hnum, _dnum);
+                std::cout << "omp_target_memcpy result = " << result << '\n';
                 owner = OwnerType::host;
             }
         }
 
         void sendToDevice() {
-            std::cout << "sending to device\n";
             if (owner == OwnerType::host) {
-                // TODO: copy from host -> device
-	        omp_target_memcpy(_dt, t.data(), _size, 0, 0, _dnum, _hnum);
+                std::cout << "c++ sending to device\n";
+                int result = omp_target_memcpy(_dt, t.data(), _size, 0, 0, _dnum, _hnum);
+                std::cout << "omp_target_memcpy result = " << result << '\n';
                 owner = OwnerType::device;
             }
         }

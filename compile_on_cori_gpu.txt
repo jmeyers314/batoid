@@ -1,6 +1,6 @@
-module purge && module load esslurm PrgEnv-llvm/10.0.0-git_20190828 python3 cmake
-export CXX=/usr/common/software/llvm/10.0.0-git_20190828/bin/clang++
-salloc -C gpu -N 1 -t 30 -c 10 --gres=gpu:1 -A m1759
 cd ~jemeyers/sandbox/GPU/batoid/
+module purge && module load esslurm PrgEnv-llvm/10.0.0-git_20190828 python3 cmake
+export CXX=clang++
+salloc -C gpu -N 1 -t 30 -c 10 --gres=gpu:1 -A m1759
 python setup.py install --user
-
+python tests/test_ray.py
