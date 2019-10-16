@@ -3,4 +3,4 @@ module purge && module load esslurm PrgEnv-llvm/10.0.0-git_20190828 python3 cmak
 export CXX=clang++
 salloc -C gpu -N 1 -t 30 -c 10 --gres=gpu:1 -A m1759
 python setup.py install --user
-python tests/test_ray.py
+srun python tests/test_ray.py
