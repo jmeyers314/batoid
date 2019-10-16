@@ -79,33 +79,52 @@ set(SRC_FILES
   src/utils.cpp
 )
 
+set(ALL_FILES ${SRC_FILES} ${PYSRC_FILES})
+
 find_package(OpenMP)
-if(OpenMP_CXX_FOUND)
-  add_library(omp INTERFACE)
-  add_library(omp-offload INTERFACE)
-  target_link_libraries(omp-offload INTERFACE omp)
-  target_link_libraries(omp INTERFACE ${OpenMP_CXX_LIBRARIES})
-  target_compile_options(omp INTERFACE
-    $<$<COMPILE_LANGUAGE:CXX>:${OpenMP_CXX_FLAGS}>
-  )
-  check_cxx_compiler_flag("-fopenmp -fopenmp-targets=nvptx64-nvidia-cuda" OMP_OFFLOAD)
-  if(OMP_OFFLOAD)
-    target_compile_options(omp-offload INTERFACE
-      $<$<COMPILE_LANGUAGE:CXX>:-fopenmp-targets=nvptx64-nvidia-cuda>
-    )
-    add_library(batoid-offload STATIC ${SRC_FILES})
-    target_link_libraries(batoid-offload batoid-compile-flags omp-offload)
-    # set_target_properties(batoid-offload PROPERTIES LINKER_LANGUAGE CUDA)
-    pybind11_add_module(_batoid ${PYSRC_FILES})
-    target_link_libraries(_batoid PUBLIC batoid-compile-flags batoid-offload "-fopenmp -fopenmp-targets=nvptx64-nvidia-cuda")
-  else()
-    add_library(batoid-omp STATIC ${SRC_FILES})
-    target_link_libraries(batoid-omp batoid-compile-flags omp)
-    pybind11_add_module(_batoid ${PYSRC_FILES})
-    target_link_libraries(_batoid PUBLIC batoid-compile-flags batoid-omp)
-  endif()
-else()
-  add_library(batoid STATIC ${SRC_FILES})
-  pybind11_add_module(_batoid ${PYSRC_FILES})
-  target_link_libraries(_batoid PUBLIC batoid-compile-flags batoid)
-endif()
+# if(OpenMP_CXX_FOUND)
+#   add_library(omp INTERFACE)
+#   add_library(omp-offload INTERFACE)
+#   target_link_libraries(omp-offload INTERFACE omp "-fopenmp-targets=nvptx64-nvidia-cuda")
+#   # target_link_libraries(omp-offload INTERFACE omp)
+#   target_link_libraries(omp INTERFACE "-fopenmp")
+#   # target_link_libraries(omp INTERFACE ${OpenMP_CXX_LIBRARIES})
+#   target_compile_options(omp INTERFACE
+#     $<$<COMPILE_LANGUAGE:CXX>:${OpenMP_CXX_FLAGS}>
+#   )
+#   check_cxx_compiler_flag("-fopenmp -fopenmp-targets=nvptx64-nvidia-cuda" OMP_OFFLOAD)
+#   if(OMP_OFFLOAD)
+#     target_compile_options(omp-offload INTERFACE
+#       $<$<COMPILE_LANGUAGE:CXX>:-fopenmp-targets=nvptx64-nvidia-cuda>
+#     )
+#     add_library(batoid-offload STATIC ${SRC_FILES})
+#     target_link_libraries(batoid-offload batoid-compile-flags omp-offload)
+#     # set_target_properties(batoid-offload PROPERTIES LINKER_LANGUAGE CUDA)
+#     pybind11_add_module(_batoid ${PYSRC_FILES})
+#     target_link_libraries(_batoid PUBLIC batoid-compile-flags batoid-offload "-fopenmp -fopenmp-targets=nvptx64-nvidia-cuda")
+#   else()
+#     add_library(batoid-omp STATIC ${SRC_FILES})
+#     target_link_libraries(batoid-omp batoid-compile-flags omp)
+#     pybind11_add_module(_batoid ${PYSRC_FILES})
+#     target_link_libraries(_batoid PUBLIC batoid-compile-flags batoid-omp)
+#   endif()
+# else()
+#   add_library(batoid STATIC ${SRC_FILES})
+#   pybind11_add_module(_batoid ${PYSRC_FILES})
+#   target_link_libraries(_batoid PUBLIC batoid-compile-flags batoid)
+# endif()
+
+target_compile_options(batoid-compile-flags INTERFACE
+  $<$<COMPILE_LANGUAGE:CXX>:-fopenmp>
+)
+target_compile_options(batoid-compile-flags INTERFACE
+  $<$<COMPILE_LANGUAGE:CXX>:-fopenmp-targets=nvptx64-nvidia-cuda>
+)
+
+# add_library(batoid STATIC ${SRC_FILES})
+# target_link_libraries(batoid batoid-compile-flags "-fopenmp -fopenmp-targets=nvptx64-nvidia-cuda")
+# pybind11_add_module(_batoid ${PYSRC_FILES})
+# target_link_libraries(_batoid PUBLIC batoid-compile-flags batoid)
+
+pybind11_add_module(_batoid ${ALL_FILES})
+target_link_libraries(_batoid PUBLIC batoid-compile-flags "-fopenmp -fopenmp-targets=nvptx64-nvidia-cuda")

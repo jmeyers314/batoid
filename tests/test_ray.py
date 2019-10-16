@@ -816,51 +816,50 @@ def test_RV_factory_optic():
     assert rays_allclose(grid1, grid2)
 
 
-# @timer
-# def test_RV2():
-#     np.random.seed(57721)
-#     x = np.random.uniform(size=100)
-#     y = np.random.uniform(size=100)+1
-#     z = np.random.uniform(size=100)+2
-#     vx = np.random.uniform(size=100)+3
-#     vy = np.random.uniform(size=100)+4
-#     vz = np.random.uniform(size=100)+5
-#     t = np.random.uniform(size=100)
-#     w = np.random.uniform(size=100)    
-#     flux = np.random.uniform(size=100)
-#     vignetted = np.zeros(100, dtype=bool)
-#     failed = np.zeros(100, dtype=bool)
-#     RV2 = batoid.RayVector2.fromArrays(x, y, z, vx, vy, vz, t, w, flux, vignetted, failed)
-#     print(t)
-#     print(RV2._t)
-#     # Should be able to force send to device, manipulate host mem, and still be able to retrieve original
-#     print(RV2._rv2.owner)
-#     RV2._rv2.sendToDevice()
-#     RV2._t[:] = 0.0
-#     RV2._rv2.inspect()
-#     print(RV2._rv2.owner)
-#     print()
-#     print(RV2._t)
-#     print(RV2.t)
-#     print(RV2._rv2.owner)
-#     print(RV2.t)
-#     print(RV2.t)
-    
-    
-    
+@timer
+def test_RV2():
+    np.random.seed(57721)
+    x = np.random.uniform(size=100)
+    y = np.random.uniform(size=100)+1
+    z = np.random.uniform(size=100)+2
+    vx = np.random.uniform(size=100)+3
+    vy = np.random.uniform(size=100)+4
+    vz = np.random.uniform(size=100)+5
+    t = np.random.uniform(size=100)
+    w = np.random.uniform(size=100)
+    flux = np.random.uniform(size=100)
+    vignetted = np.zeros(100, dtype=bool)
+    failed = np.zeros(100, dtype=bool)
+    RV2 = batoid.RayVector2.fromArrays(x, y, z, vx, vy, vz, t, w, flux, vignetted, failed)
+    print(t)
+    print(RV2._t)
+    # Should be able to force send to device, manipulate host mem, and still be able to retrieve original
+    print(RV2._rv2.owner)
+    RV2._rv2.sendToDevice()
+    RV2._t[:] = 0.0
+    RV2._rv2.inspect()
+    print(RV2._rv2.owner)
+    print()
+    print(RV2._t)
+    print(RV2.t)
+    print(RV2._rv2.owner)
+    print(RV2.t)
+    print(RV2.t)
+
+
 if __name__ == '__main__':
-    test_positionAtTime()
-    test_properties()
-    test_phase()
-    test_RayVector()
-    test_rayGrid()
-    test_circularGrid()
-    test_uniformCircularGrid()
-    test_pointSourceCircularGrid()
-    test_ne()
-    test_fail()
-    test_RVasGrid()
-    test_RVasPolar()
-    test_RVasSpokes()
-    test_RV_factory_optic()
-    # test_RV2()
+    # test_positionAtTime()
+    # test_properties()
+    # test_phase()
+    # test_RayVector()
+    # test_rayGrid()
+    # test_circularGrid()
+    # test_uniformCircularGrid()
+    # test_pointSourceCircularGrid()
+    # test_ne()
+    # test_fail()
+    # test_RVasGrid()
+    # test_RVasPolar()
+    # test_RVasSpokes()
+    # test_RV_factory_optic()
+    test_RV2()
