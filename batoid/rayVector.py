@@ -407,8 +407,6 @@ class RayVector:
                 stopSurface = optic.stopSurface
             if outer is None:
                 outer = optic.pupilSize/2
-            if outer is None:
-                outer = optic.pupilSize/2
 
         if backDist is None:
             backDist = 40.0
@@ -427,7 +425,11 @@ class RayVector:
             ths = []
             rs = []
             for r in np.linspace(outer, inner, nrad):
-                nphi = int(naz*r/outer//6)*6
+                if r == 0:
+                    break
+                nphi = int((naz*r/outer)//6)*6
+                if nphi == 0:
+                    nphi = 6
                 ths.append(np.linspace(0, 2*np.pi, nphi, endpoint=False))
                 rs.append(np.ones(nphi)*r)
             # Point in center is a special case
