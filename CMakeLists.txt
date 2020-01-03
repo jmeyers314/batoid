@@ -52,6 +52,7 @@ set(PYSRC_FILES
   pysrc/ray.cpp
   pysrc/rayVector.cpp
   pysrc/rayVector2.cpp
+  pysrc/rayVector4.cpp
   pysrc/sphere.cpp
   pysrc/sum.cpp
   pysrc/surface.cpp
@@ -72,6 +73,8 @@ set(SRC_FILES
   src/ray.cpp
   src/rayVector.cpp
   src/rayVector2.cpp
+  # src/rayVector3.cpp
+  src/rayVector4.cpp
   src/sphere.cpp
   src/sum.cpp
   src/surface.cpp

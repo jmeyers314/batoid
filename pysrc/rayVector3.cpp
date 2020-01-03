@@ -1,4 +1,4 @@
-#include "rayVector2.h"
+#include "rayVector3.h"
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
@@ -8,8 +8,8 @@
 namespace py = pybind11;
 
 namespace batoid {
-    void pyExportRayVector2(py::module& m) {
-        auto rv2 = py::class_<RayVector2>(m, "CPPRayVector2")
+    void pyExportRayVector3(py::module& m) {
+        auto rv3 = py::class_<RayVector3>(m, "CPPRayVector3")
             .def(py::init<Ref<MatrixX3d>, Ref<MatrixX3d>, Ref<VectorXd>, Ref<VectorXd>, Ref<VectorXd>, Ref<VectorXb>, Ref<VectorXb>>())
             .def("synchronize", &RayVector2::synchronize)
             .def("sendToDevice", &RayVector2::sendToDevice)

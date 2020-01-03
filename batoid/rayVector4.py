@@ -4,12 +4,11 @@ from .utils import lazy_property
 from . import _batoid
 from .constants import globalCoordSys
 
-
-class RayVector2:
+class RayVector4:
     @classmethod
     def fromArrays(cls, x, y, z, vx, vy, vz, t, w, flux, vignetted, failed,
                    coordSys=globalCoordSys):
-        """Create RayVector2 from 1d parameter arrays.  Always makes a copy
+        """Create RayVector4 from 1d parameter arrays.  Always makes a copy
         of input arrays.
 
         Parameters
@@ -44,47 +43,47 @@ class RayVector2:
 
     @property
     def r(self):
-        self._rv2.synchronize()
+        self._rv4.r.copyToHost()
         return self._r
 
     @property
     def x(self):
-        self._rv2.synchronize()
+        self._rv4.r.copyToHost()
         return self._r[:, 0]
 
     @property
     def y(self):
-        self._rv2.synchronize()
+        self._rv4.r.copyToHost()
         return self._r[:, 1]
 
     @property
     def z(self):
-        self._rv2.synchronize()
+        self._rv4.r.copyToHost()
         return self._r[:, 2]
 
     @property
     def v(self):
-        self._rv2.synchronize()
+        self._rv4.v.copyToHost()
         return self._v
 
     @property
     def vx(self):
-        self._rv2.synchronize()
+        self._rv4.v.copyToHost()
         return self._v[:, 0]
 
     @property
     def vy(self):
-        self._rv2.synchronize()
+        self._rv4.v.copyToHost()
         return self._v[:, 1]
 
     @property
     def vz(self):
-        self._rv2.synchronize()
+        self._rv4.v.copyToHost()
         return self._v[:, 2]
 
     @property
     def t(self):
-        self._rv2.synchronize()
+        self._rv4.t.copyToHost()
         return self._t
 
     @property
@@ -94,23 +93,24 @@ class RayVector2:
 
     @property
     def flux(self):
-        self._rv2.synchronize()
+        self._rv4.flux.copyToHost()
         return self._flux
 
     @property
     def vignetted(self):
-        self._rv2.synchronize()
+        self._rv4.vignetted.copyToHost()
         return self._vignetted
 
     @property
     def failed(self):
-        self._rv2.synchronize()
+        self._rv4.failed.copyToHost()
         return self._failed
 
     @lazy_property
-    def _rv2(self):
-        return _batoid.CPPRayVector2(
-            self._r, self._v, self._t,
-            self._wavelength, self._flux,
-            self._vignetted, self._failed
+    def _rv4(self):
+        return _batoid.CPPRayVector4(
+            self._r.ctypes.data, self._v.ctypes.data, self._t.ctypes.data,
+            self._wavelength.ctypes.data, self._flux.ctypes.data,
+            self._vignetted.ctypes.data, self._failed.ctypes.data,
+            len(self._wavelength)
         )

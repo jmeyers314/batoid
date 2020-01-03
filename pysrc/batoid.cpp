@@ -9,6 +9,7 @@ namespace batoid {
     void pyExportRay(py::module&);
     void pyExportRayVector(py::module&);
     void pyExportRayVector2(py::module&);
+    void pyExportRayVector4(py::module&);
 
     void pyExportSurface(py::module&);
     void pyExportAsphere(py::module&);
@@ -36,6 +37,7 @@ namespace batoid {
         pyExportRay(m);
         pyExportRayVector(m);
         pyExportRayVector2(m);
+        pyExportRayVector4(m);
 
         pyExportSurface(m);
         pyExportAsphere(m);
