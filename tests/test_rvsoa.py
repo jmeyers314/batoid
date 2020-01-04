@@ -87,6 +87,7 @@ def testRV4(N):
     # RV4._rv4.positionAtTime(0.0, result.ctypes.data)
     for t in np.linspace(0, 10, 10):
         RV4._rv4.propagateInPlace(t)
+    # RV4._rv4.r.syncToHost()  # to be fair at the end...?
     t1 = time.time()
     print(f"RV4 took {t1 - t0} seconds")
 
