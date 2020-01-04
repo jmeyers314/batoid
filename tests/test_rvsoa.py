@@ -24,9 +24,14 @@ def testRV(N):
         x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
     )
     t0 = time.time()
-    result = RV.positionAtTime(0.0)
+    for t in np.linspace(0, 10, 10):
+        RV.propagateInPlace(t)
     t1 = time.time()
     print(f"RV took {t1 - t0} seconds")
+    # t0 = time.time()
+    # result = RV.positionAtTime(0.0)
+    # t1 = time.time()
+    # print(f"RV took {t1 - t0} seconds")
 
 
 #@timer
@@ -47,8 +52,10 @@ def testRV2(N):
         x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
     )
     t0 = time.time()
-    result = np.zeros_like(RV2.r)
-    RV2._rv2.positionAtTime(0.0, result)
+    for t in np.linspace(0, 10, 10):
+        RV.propagateInPlace(t)
+    # result = np.zeros_like(RV2.r)
+    # RV2._rv2.positionAtTime(0.0, result)
     t1 = time.time()
     print(f"RV2 took {t1 - t0} seconds")
 
@@ -76,8 +83,10 @@ def testRV4(N):
     RV4._rv4.t.syncToDevice()
 
     t0 = time.time()
-    result = np.zeros_like(RV4.r)
-    RV4._rv4.positionAtTime(0.0, result.ctypes.data)
+    # result = np.zeros_like(RV4.r)
+    # RV4._rv4.positionAtTime(0.0, result.ctypes.data)
+    for t in np.linspace(0, 10, 10):
+        RV4._rv4.propagateInPlace(t)
     t1 = time.time()
     print(f"RV4 took {t1 - t0} seconds")
 
@@ -92,8 +101,8 @@ if __name__ == "__main__":
     testRV(N)
     testRV(N)
 
-    testRV2(N)
-    testRV2(N)
+    # testRV2(N)
+    # testRV2(N)
 
     testRV4(N)
     testRV4(N)

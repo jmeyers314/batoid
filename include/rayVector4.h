@@ -60,6 +60,7 @@ namespace batoid {
         bool operator==(const RayVector4& rhs) const;
         bool operator!=(const RayVector4& rhs) const;
         void positionAtTime(double t, double* out) const;
+        void propagateInPlace(double t);
 
         DualView<double> r;
         DualView<double> v;

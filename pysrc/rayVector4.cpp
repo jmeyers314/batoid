@@ -45,6 +45,7 @@ namespace batoid {
                     rv4.positionAtTime(t, reinterpret_cast<double*>(out_ptr));
                 }
             )
+            .def("propagateInPlace", &RayVector4::propagateInPlace)
             .def(py::self == py::self)
             .def(py::self != py::self)
 

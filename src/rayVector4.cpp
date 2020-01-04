@@ -84,9 +84,32 @@ namespace batoid {
         {
             #pragma omp teams distribute parallel for
             for(int i=0; i<size; i++) {
-                out[i]        = rptr[i]        + vptr[i]        * (_t-tptr[i]);
-                out[i+size]   = rptr[i+size]   + vptr[i+size]   * (_t-tptr[i]);
-                out[i+2*size] = rptr[i+2*size] + vptr[i+2*size] * (_t-tptr[i]);
+                int j = i + size;
+                int k = i + 2*size;
+                out[i] = rptr[i] + vptr[i] * (_t-tptr[i]);
+                out[j] = rptr[j] + vptr[j] * (_t-tptr[i]);
+                out[k] = rptr[k] + vptr[k] * (_t-tptr[i]);
+            }
+        }
+    }
+
+    void RayVector4::propagateInPlace(double _t) {
+        r.syncToDevice();
+        v.syncToDevice();
+        t.syncToDevice();
+        double* rptr = r.deviceData;
+        double* vptr = v.deviceData;
+        double* tptr = t.deviceData;
+        #pragma omp target is_device_ptr(rptr, vptr, tptr)
+        {
+            #pragma omp teams distribute parallel for
+            for(int i=0; i<size; i++) {
+                int j=i+size;
+                int k=i+2*size;
+                rptr[i] += vptr[i] * (_t-tptr[i]);
+                rptr[j] += vptr[j] * (_t-tptr[i]);
+                rptr[k] += vptr[k] * (_t-tptr[i]);
+                tptr[i] = _t;
             }
         }
     }
