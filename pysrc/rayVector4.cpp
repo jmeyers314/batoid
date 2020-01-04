@@ -9,12 +9,12 @@ namespace py = pybind11;
 namespace batoid {
     void pyExportRayVector4(py::module& m) {
         auto dvd = py::class_<DualView<double>>(m, "CPPDualViewDouble")
-            .def("copyToHost", &DualView<double>::copyToHost)
-            .def("copyToDevice", &DualView<double>::copyToDevice);
+            .def("syncToHost", &DualView<double>::syncToHost)
+            .def("syncToDevice", &DualView<double>::syncToDevice);
 
         auto dvb = py::class_<DualView<bool>>(m, "CPPDualViewBool")
-            .def("copyToHost", &DualView<bool>::copyToHost)
-            .def("copyToDevice", &DualView<bool>::copyToDevice);
+            .def("syncToHost", &DualView<bool>::syncToHost)
+            .def("syncToDevice", &DualView<bool>::syncToDevice);
 
         auto rv4 = py::class_<RayVector4>(m, "CPPRayVector4")
             .def(py::init(
@@ -42,13 +42,13 @@ namespace batoid {
             ))
             .def("positionAtTime",
                 [](const RayVector4& rv4, double t, size_t out_ptr){
-                    return rv4.positionAtTime(t, reinterpret_cast<double*>(out_ptr));
+                    rv4.positionAtTime(t, reinterpret_cast<double*>(out_ptr));
                 }
             )
             .def(py::self == py::self)
             .def(py::self != py::self)
 
-            // Expose dualviews so can access their copyToHost methods
+            // Expose dualviews so can access their syncToHost methods
             .def_readonly("r", &RayVector4::r)
             .def_readonly("v", &RayVector4::v)
             .def_readonly("t", &RayVector4::t)

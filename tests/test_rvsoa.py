@@ -70,10 +70,10 @@ def testRV4(N):
     RV4 = batoid.RayVector4.fromArrays(
         x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
     )
-    # elide copy to device?
-    RV4._rv4.r.copyToDevice()
-    RV4._rv4.v.copyToDevice()
-    RV4._rv4.t.copyToDevice()
+    # # elide copy to device?
+    RV4._rv4.r.syncToDevice()
+    RV4._rv4.v.syncToDevice()
+    RV4._rv4.t.syncToDevice()
 
     t0 = time.time()
     result = np.zeros_like(RV4.r)
@@ -91,10 +91,9 @@ if __name__ == "__main__":
 
     testRV(N)
     testRV(N)
-    testRV(N)
+
     testRV2(N)
     testRV2(N)
-    testRV2(N)
-    testRV4(N)
+
     testRV4(N)
     testRV4(N)

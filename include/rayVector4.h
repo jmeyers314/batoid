@@ -4,6 +4,8 @@
 #include <omp.h>
 #include <vector>
 
+#pragma omp requires unified_address
+
 namespace batoid {
     template<typename T>
     struct DualView {
@@ -18,8 +20,8 @@ namespace batoid {
         );
         ~DualView();
 
-        void copyToHost() const;
-        void copyToDevice() const;
+        void syncToHost() const;
+        void syncToDevice() const;
 
         bool operator==(const DualView<T>& rhs) const;
         bool operator!=(const DualView<T>& rhs) const;

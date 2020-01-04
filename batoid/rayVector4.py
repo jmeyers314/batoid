@@ -43,47 +43,47 @@ class RayVector4:
 
     @property
     def r(self):
-        self._rv4.r.copyToHost()
+        self._rv4.r.syncToHost()
         return self._r
 
     @property
     def x(self):
-        self._rv4.r.copyToHost()
+        self._rv4.r.syncToHost()
         return self._r[:, 0]
 
     @property
     def y(self):
-        self._rv4.r.copyToHost()
+        self._rv4.r.syncToHost()
         return self._r[:, 1]
 
     @property
     def z(self):
-        self._rv4.r.copyToHost()
+        self._rv4.r.syncToHost()
         return self._r[:, 2]
 
     @property
     def v(self):
-        self._rv4.v.copyToHost()
+        self._rv4.v.syncToHost()
         return self._v
 
     @property
     def vx(self):
-        self._rv4.v.copyToHost()
+        self._rv4.v.syncToHost()
         return self._v[:, 0]
 
     @property
     def vy(self):
-        self._rv4.v.copyToHost()
+        self._rv4.v.syncToHost()
         return self._v[:, 1]
 
     @property
     def vz(self):
-        self._rv4.v.copyToHost()
+        self._rv4.v.syncToHost()
         return self._v[:, 2]
 
     @property
     def t(self):
-        self._rv4.t.copyToHost()
+        self._rv4.t.syncToHost()
         return self._t
 
     @property
@@ -93,17 +93,17 @@ class RayVector4:
 
     @property
     def flux(self):
-        self._rv4.flux.copyToHost()
+        self._rv4.flux.syncToHost()
         return self._flux
 
     @property
     def vignetted(self):
-        self._rv4.vignetted.copyToHost()
+        self._rv4.vignetted.syncToHost()
         return self._vignetted
 
     @property
     def failed(self):
-        self._rv4.failed.copyToHost()
+        self._rv4.failed.syncToHost()
         return self._failed
 
     @lazy_property
