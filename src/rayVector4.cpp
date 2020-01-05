@@ -41,9 +41,9 @@ namespace batoid {
         rhs.syncToDevice();
         T* ptr = deviceData;
         T* rhs_ptr = rhs.deviceData;
-        #pragma omp target is_device_ptr(ptr, rhs_ptr) map(tofrom:result) reduction(&:result)
+        #pragma omp target is_device_ptr(ptr, rhs_ptr) map(tofrom:result)
         {
-            #pragma omp teams distribute parallel for
+            #pragma omp teams distribute parallel for reduction(&:result)
             for(size_t i=0; i<size; i++) result &= ptr[i] == rhs_ptr[i];
         }
         return result;
@@ -56,6 +56,8 @@ namespace batoid {
 
     template class DualView<double>;
     template class DualView<bool>;
+
+
 
     RayVector4::RayVector4(
         double* _r, double* _v, double* _t,
@@ -112,6 +114,113 @@ namespace batoid {
                 tptr[i] = _t;
             }
         }
+    }
+
+    void RayVector4::phase(double _x, double _y, double _z, double _t, double* out) const {
+        const double PI = 3.14159265358979323846;
+        r.syncToDevice();
+        v.syncToDevice();
+        t.syncToDevice();
+        wavelength.syncToDevice();
+
+        // phi = k.(r-r0) - (t-t0)omega
+        // k = 2 pi v / lambda |v|^2
+        // omega = 2 pi / lambda
+        double* xptr = r.deviceData;
+        double* yptr = r.deviceData+size;
+        double* zptr = r.deviceData+2*size;
+        double* vxptr = v.deviceData;
+        double* vyptr = v.deviceData+size;
+        double* vzptr = v.deviceData+2*size;
+        double* tptr = t.deviceData;
+        double* wptr = wavelength.deviceData;
+        #pragma omp target is_device_ptr(xptr, yptr, zptr, vxptr, vyptr, vzptr, tptr, wptr) map(from:out[0:size])
+        {
+            #pragma omp teams distribute parallel for
+            for(int i=0; i<size; i++) {
+                double v2 = vxptr[i]*vxptr[i] + vyptr[i]*vyptr[i] + vzptr[i]*vzptr[i];
+                out[i] = (_x-xptr[i])*vxptr[i];
+                out[i] += (_y-yptr[i])*vyptr[i];
+                out[i] += (_z-zptr[i])*vzptr[i];
+                out[i] /= v2;
+                out[i] -= _t-tptr[i];
+                out[i] *= 2 * PI / wptr[i];
+            }
+        }
+    }
+
+    void RayVector4::amplitude(double _x, double _y, double _z, double _t, std::complex<double>* out) const {
+        const double PI = 3.14159265358979323846;
+        r.syncToDevice();
+        v.syncToDevice();
+        t.syncToDevice();
+        wavelength.syncToDevice();
+
+        // phi = k.(r-r0) - (t-t0)omega
+        // k = 2 pi v / lambda |v|^2
+        // omega = 2 pi / lambda
+        double* xptr = r.deviceData;
+        double* yptr = r.deviceData+size;
+        double* zptr = r.deviceData+2*size;
+        double* vxptr = v.deviceData;
+        double* vyptr = v.deviceData+size;
+        double* vzptr = v.deviceData+2*size;
+        double* tptr = t.deviceData;
+        double* wptr = wavelength.deviceData;
+        double* out_ptr = reinterpret_cast<double*>(out);
+        #pragma omp target is_device_ptr(xptr, yptr, zptr, vxptr, vyptr, vzptr, tptr, wptr) map(from:out_ptr[0:2*size])
+        {
+            #pragma omp teams distribute parallel for
+            for(int i=0; i<size; i++) {
+                double v2 = vxptr[i]*vxptr[i] + vyptr[i]*vyptr[i] + vzptr[i]*vzptr[i];
+                double phase = (_x-xptr[i])*vxptr[i];
+                phase += (_y-yptr[i])*vyptr[i];
+                phase += (_z-zptr[i])*vzptr[i];
+                phase /= v2;
+                phase -= _t-tptr[i];
+                phase *= 2 * PI / wptr[i];
+                out_ptr[2*i] = std::cos(phase);
+                out_ptr[2*i+1] = std::sin(phase);
+            }
+        }
+    }
+
+    std::complex<double> RayVector4::sumAmplitude(double _x, double _y, double _z, double _t) const {
+        const double PI = 3.14159265358979323846;
+        r.syncToDevice();
+        v.syncToDevice();
+        t.syncToDevice();
+        wavelength.syncToDevice();
+
+        // phi = k.(r-r0) - (t-t0)omega
+        // k = 2 pi v / lambda |v|^2
+        // omega = 2 pi / lambda
+        double* xptr = r.deviceData;
+        double* yptr = r.deviceData+size;
+        double* zptr = r.deviceData+2*size;
+        double* vxptr = v.deviceData;
+        double* vyptr = v.deviceData+size;
+        double* vzptr = v.deviceData+2*size;
+        double* tptr = t.deviceData;
+        double* wptr = wavelength.deviceData;
+        double real=0;
+        double imag=0;
+        #pragma omp target is_device_ptr(xptr, yptr, zptr, vxptr, vyptr, vzptr, tptr, wptr) map(tofrom:real,imag)
+        {
+            #pragma omp teams distribute parallel for reduction(+:real,imag)
+            for(int i=0; i<size; i++) {
+                double v2 = vxptr[i]*vxptr[i] + vyptr[i]*vyptr[i] + vzptr[i]*vzptr[i];
+                double phase = (_x-xptr[i])*vxptr[i];
+                phase += (_y-yptr[i])*vyptr[i];
+                phase += (_z-zptr[i])*vzptr[i];
+                phase /= v2;
+                phase -= _t-tptr[i];
+                phase *= 2 * PI / wptr[i];
+                real += std::cos(phase);
+                imag += std::sin(phase);
+            }
+        }
+        return std::complex<double>(real, imag);
     }
 
     bool RayVector4::operator==(const RayVector4& rhs) const {

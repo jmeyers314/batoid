@@ -3,6 +3,7 @@
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 #include <pybind11/operators.h>
+#include <pybind11/complex.h>
 
 namespace py = pybind11;
 
@@ -46,6 +47,17 @@ namespace batoid {
                 }
             )
             .def("propagateInPlace", &RayVector4::propagateInPlace)
+            .def("phase",
+                [](const RayVector4& rv4, double x, double y, double z, double t, size_t out_ptr){
+                    rv4.phase(x, y, z, t, reinterpret_cast<double*>(out_ptr));
+                }
+            )
+            .def("amplitude",
+                [](const RayVector4& rv4, double x, double y, double z, double t, size_t out_ptr){
+                    rv4.amplitude(x, y, z, t, reinterpret_cast<std::complex<double>*>(out_ptr));
+                }
+            )
+            .def("sumAmplitude", &RayVector4::sumAmplitude)
             .def(py::self == py::self)
             .def(py::self != py::self)
 
