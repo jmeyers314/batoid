@@ -66,6 +66,7 @@ namespace batoid {
             .def("intersect", (RayVector (Surface::*)(const RayVector&) const) &Surface::intersect)
             .def("intersectInPlace", (void (Surface::*)(Ray&) const) &Surface::intersectInPlace)
             .def("intersectInPlace", (void (Surface::*)(RayVector&) const) &Surface::intersectInPlace)
+            .def("intersectInPlace", (void (Surface::*)(RayVector4&) const) &Surface::intersectInPlace)
 
             .def("reflect", (Ray (Surface::*)(const Ray&, const Coating*) const) &Surface::reflect, py::arg(), py::arg()=nullptr)
             .def("reflect", (RayVector (Surface::*)(const RayVector&, const Coating*) const) &Surface::reflect, py::arg(), py::arg()=nullptr)

@@ -57,7 +57,16 @@ namespace batoid {
     template class DualView<double>;
     template class DualView<bool>;
 
+    template<typename T>
+    OwningDualView<T>::OwningDualView(size_t _size, int _dnum, int _hnum) :
+        DualView<T>{nullptr, _size, _dnum, _hnum}, dataVec(_size)
+    {
+        using DualView<T>::hostData;
+        using DualView<T>::owner;
 
+        hostData = dataVec.data();
+        owner = DualView<T>::OwnerType::device;
+    }
 
     RayVector4::RayVector4(
         double* _r, double* _v, double* _t,

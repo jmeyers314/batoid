@@ -10,7 +10,7 @@ def testRV(N, Nthread):
     np.random.seed(57721)
     x = np.random.uniform(size=N)
     y = np.random.uniform(size=N)+1
-    z = np.random.uniform(size=N)+2
+    z = np.random.uniform(size=N)-200
     vx = np.random.uniform(size=N)+3
     vy = np.random.uniform(size=N)+4
     vz = np.random.uniform(size=N)+5
@@ -22,11 +22,14 @@ def testRV(N, Nthread):
     RV = batoid.RayVector.fromArrays(
         x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
     )
+    plane = batoid.Plane()
+
     t0 = time.time()
     RV.propagateInPlace(10.0)
-    print(RV.sumAmplitude((0,0,0),0))
+    plane.intersectInPlace(RV)
     t1 = time.time()
     print(f"RV took {t1 - t0} seconds")
+
 
 
 #@timer
@@ -34,7 +37,7 @@ def testRV4(N):
     np.random.seed(57721)
     x = np.random.uniform(size=N)
     y = np.random.uniform(size=N)+1
-    z = np.random.uniform(size=N)+2
+    z = np.random.uniform(size=N)-200
     vx = np.random.uniform(size=N)+3
     vy = np.random.uniform(size=N)+4
     vz = np.random.uniform(size=N)+5
@@ -51,9 +54,11 @@ def testRV4(N):
     RV4._rv4.v.syncToDevice()
     RV4._rv4.t.syncToDevice()
 
+    plane = batoid.Plane()
+
     t0 = time.time()
     RV4._rv4.propagateInPlace(10.0)
-    print(RV4._rv4.sumAmplitude(0,0,0,0))
+    plane._surface.intersectInPlace(RV4._rv4)
     t1 = time.time()
     print(f"RV4 took {t1 - t0} seconds")
 

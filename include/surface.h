@@ -6,6 +6,7 @@
 #include <utility>
 #include "ray.h"
 #include "rayVector.h"
+#include "rayVector4.h"
 #include "medium.h"
 #include "coating.h"
 
@@ -40,6 +41,10 @@ namespace batoid {
         std::pair<Ray, Ray> rSplit(const Ray&, const Medium&, const Medium&, const Coating&) const;
         std::pair<RayVector, RayVector> rSplit(const RayVector&, const Medium&, const Medium&, const Coating&) const;
         std::pair<RayVector, RayVector> rSplitProb(const RayVector&, const Medium&, const Medium&, const Coating&) const;
+
+        virtual void intersectInPlace(RayVector4&) const;
+        virtual void reflectInPlace(RayVector4&, const Coating* coating=nullptr) const;
+        virtual void refractInPlace(RayVector4&, const Medium&, const Medium&, const Coating* coating=nullptr) const;
 
     private:
         Ray refract(const Ray&, const double, const double, const Coating* coating=nullptr) const;
