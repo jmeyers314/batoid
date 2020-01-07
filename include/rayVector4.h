@@ -19,6 +19,11 @@ namespace batoid {
             int _dnum=omp_get_default_device(),
             int _hnum=omp_get_initial_device()
         );
+        DualView(
+            size_t _size,
+            int _dnum=omp_get_default_device(),
+            int _hnum=omp_get_initial_device()
+        );
         ~DualView();
 
         void syncToHost() const;
@@ -35,19 +40,9 @@ namespace batoid {
         int dnum;  // device index
         int hnum;  // host index
         T* deviceData;
+        bool owns;
     };
 
-    template<typename T>
-    struct OwningDualView : public DualView<T> {
-    public:
-        OwningDualView(
-            size_t _size,
-            int _dnum=omp_get_default_device(),
-            int _hnum=omp_get_initial_device()
-        );
-    private:
-        std::vector<T> dataVec;
-    };
 
     struct RayVector4 {
     public:

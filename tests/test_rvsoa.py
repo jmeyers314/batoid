@@ -26,9 +26,11 @@ def testRV(N, Nthread):
 
     t0 = time.time()
     RV.propagateInPlace(10.0)
-    plane.intersectInPlace(RV)
+    # plane.intersectInPlace(RV)
+    plane.reflectInPlace(RV)
     t1 = time.time()
     print(f"RV took {t1 - t0} seconds")
+    print(RV.r[0], RV.v[0], RV.t[0])
 
 
 
@@ -49,7 +51,7 @@ def testRV4(N):
     RV4 = batoid.RayVector4.fromArrays(
         x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
     )
-    # # elide copy to device?
+    # elide copy to device?
     RV4._rv4.r.syncToDevice()
     RV4._rv4.v.syncToDevice()
     RV4._rv4.t.syncToDevice()
@@ -58,10 +60,11 @@ def testRV4(N):
 
     t0 = time.time()
     RV4._rv4.propagateInPlace(10.0)
-    plane._surface.intersectInPlace(RV4._rv4)
+    # plane._surface.intersectInPlace(RV4._rv4)
+    plane._surface.reflectInPlace(RV4._rv4)
     t1 = time.time()
     print(f"RV4 took {t1 - t0} seconds")
-
+    print(RV4.r[0], RV4.v[0], RV4.t[0])
 
 
 if __name__ == "__main__":

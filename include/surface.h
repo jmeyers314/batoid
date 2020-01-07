@@ -44,7 +44,7 @@ namespace batoid {
 
         virtual void intersectInPlace(RayVector4&) const;
         virtual void reflectInPlace(RayVector4&, const Coating* coating=nullptr) const;
-        virtual void refractInPlace(RayVector4&, const Medium&, const Medium&, const Coating* coating=nullptr) const;
+        // virtual void refractInPlace(RayVector4&, const Medium&, const Medium&, const Coating* coating=nullptr) const;
 
     private:
         Ray refract(const Ray&, const double, const double, const Coating* coating=nullptr) const;

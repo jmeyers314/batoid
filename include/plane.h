@@ -21,7 +21,7 @@ namespace batoid {
 
         virtual void intersectInPlace(RayVector4&) const override;
         virtual void reflectInPlace(RayVector4&, const Coating* coating=nullptr) const override;
-        virtual void refractInPlace(RayVector4&, const Medium&, const Medium&, const Coating* coating=nullptr) const override;
+        // virtual void refractInPlace(RayVector4&, const Medium&, const Medium&, const Coating* coating=nullptr) const override;
 
         bool getAllowReverse() const {return _allowReverse;}
 

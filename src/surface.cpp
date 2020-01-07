@@ -251,7 +251,7 @@ namespace batoid {
         return std::make_pair(reflected, refracted);
     }
 
-    void Surface::intersectInPlace(RayVector4& rv4) const {
+    void Surface::intersectInPlace(RayVector4& rv4) const {}
+    void Surface::reflectInPlace(RayVector4& rv4, const Coating* coating) const {}
 
-    }
 }

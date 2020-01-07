@@ -47,7 +47,7 @@ namespace batoid {
     void Plane::reflectInPlace(RayVector4& rv4, const Coating* coating) const {
         // 1. intersect
         intersectInPlace(rv4);
-        // 2. allocate/compute normal vectors.  For a plane, this is constant (0,0,1).  Need to separate b/c virtual.
+        // 2. allocate/compute normal vectors.  For a plane, this is constant (0,0,1).
         // 3. allocate/compute alpha which is used in next two steps.
         // data is already synchronized to device from intersect
         size_t size = rv4.size;
@@ -61,26 +61,44 @@ namespace batoid {
         bool* vigptr = rv4.vignetted.deviceData;
         bool* failptr = rv4.failed.deviceData;
 
-        OwningDualView<double> alpha(size);
-        OwningDualView<double> n(size);
+        DualView<double> alpha(size);
+        DualView<double> n(size);
         double* alphaptr = alpha.deviceData;
         double* nptr = n.deviceData;
 
-        #pragma omp target is_device_ptr(vxptr, vyptr, vzptr)
+        #pragma omp target is_device_ptr(vxptr, vyptr, vzptr, nptr, alphaptr)
         {
             #pragma omp teams distribute parallel for
             for(int i=0; i<size; i++) {
                 double tmp = vxptr[i]*vxptr[i];
                 tmp += vyptr[i]*vyptr[i];
                 tmp += vzptr[i]*vzptr[i];
-                nptr[i] = 1.0/tmp;
+                nptr[i] = 1.0/sqrt(tmp);
                 alphaptr[i] = vzptr[i] * nptr[i];
             }
         }
-
         // 4. do reflection
-
-        // 5. apply coating reflection.
+        #pragma omp target is_device_ptr(vxptr, vyptr, vzptr, nptr, alphaptr)
+        {
+            #pragma omp teams distribute parallel for
+            for(int i=0; i<size; i++) {
+                vxptr[i] = nptr[i]*vxptr[i];
+                vyptr[i] = nptr[i]*vyptr[i];
+                vzptr[i] = nptr[i]*vzptr[i] - 2*alphaptr[i];
+                double norm = vxptr[i]*vxptr[i];
+                norm += vyptr[i]*vyptr[i];
+                norm += vzptr[i]*vzptr[i];
+                norm = 1.0/(nptr[i]*sqrt(norm));
+                vxptr[i] *= norm;
+                vyptr[i] *= norm;
+                vzptr[i] *= norm;
+            }
+        }
+        // // 5. apply coating reflection.  Need to write kernel in Coating first...
+        // if (coating) {
+        //     OwningDualView<double> reflect(size);
+        //
+        // }
     }
 
     // void refractInPlace(RayVector4& rv4, const Medium& m1, const Medium& m2, const Coating*) const {

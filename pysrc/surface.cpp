@@ -72,6 +72,7 @@ namespace batoid {
             .def("reflect", (RayVector (Surface::*)(const RayVector&, const Coating*) const) &Surface::reflect, py::arg(), py::arg()=nullptr)
             .def("reflectInPlace", (void (Surface::*)(Ray&, const Coating*) const) &Surface::reflectInPlace, py::arg(), py::arg()=nullptr)
             .def("reflectInPlace", (void (Surface::*)(RayVector&, const Coating*) const) &Surface::reflectInPlace, py::arg(), py::arg()=nullptr)
+            .def("reflectInPlace", (void (Surface::*)(RayVector4&, const Coating*) const) &Surface::reflectInPlace, py::arg(), py::arg()=nullptr)
 
             .def("refract", (Ray (Surface::*)(const Ray&, const Medium&, const Medium&, const Coating*) const) &Surface::refract, py::arg(), py::arg(), py::arg(), py::arg()=nullptr)
             .def("refract", (RayVector (Surface::*)(const RayVector&, const Medium&, const Medium&, const Coating*) const) &Surface::refract, py::arg(), py::arg(), py::arg(), py::arg()=nullptr)

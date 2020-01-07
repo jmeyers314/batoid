@@ -9,12 +9,25 @@ namespace batoid {
         size(_size),
         dnum(_dnum),
         hnum(_hnum),
-        deviceData(static_cast<T*>(omp_target_alloc(size*sizeof(T), dnum)))
+        deviceData(static_cast<T*>(omp_target_alloc(size*sizeof(T), dnum))),
+        owns(false)
+    { }
+
+    template<typename T>
+    DualView<T>::DualView(size_t _size, int _dnum, int _hnum) :
+        owner(OwnerType::device),
+        hostData(new T[_size]),
+        size(_size),
+        dnum(_dnum),
+        hnum(_hnum),
+        deviceData(static_cast<T*>(omp_target_alloc(size*sizeof(T), dnum))),
+        owns(true)
     { }
 
     template<typename T>
     DualView<T>::~DualView() {
         omp_target_free(deviceData, dnum);
+        if (owns) delete[] hostData;
     }
 
     template<typename T>
@@ -57,16 +70,6 @@ namespace batoid {
     template class DualView<double>;
     template class DualView<bool>;
 
-    template<typename T>
-    OwningDualView<T>::OwningDualView(size_t _size, int _dnum, int _hnum) :
-        DualView<T>{nullptr, _size, _dnum, _hnum}, dataVec(_size)
-    {
-        using DualView<T>::hostData;
-        using DualView<T>::owner;
-
-        hostData = dataVec.data();
-        owner = DualView<T>::OwnerType::device;
-    }
 
     RayVector4::RayVector4(
         double* _r, double* _v, double* _t,
