@@ -1,8 +1,9 @@
 opticalSystem:
   type: CompoundOptic
   name: LSST
-  inMedium: air
-  medium: air
+  inMedium: &air
+    type: Air
+  medium: *air
   backDist: 15.0  # distance from global vertex to use to start tracing rays
   sphereRadius: 5.0  # reference sphere radius to use for wavefront calculation
   pupilSize: 8.36  # Pupil fits inside a square with this side length
@@ -173,8 +174,7 @@ opticalSystem:
         coefs: [-0.0, -1.381e-9]
       obscuration:
         type: ClearAnnulus
-        # outer: 4.18
-        outer: 5.0
+        outer: 4.18
         inner: 2.558
       coordSys:
         z: 0.0  # Unnecessary, but good for clarity.
