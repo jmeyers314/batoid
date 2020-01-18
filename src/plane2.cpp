@@ -1,9 +1,9 @@
-#include "plane.h"
+#include "plane2.h"
 #include "utils.h"
 #include <cmath>
 
 namespace batoid {
-    void Plane::intersectInPlace(RayVector2& rv2) const {
+    void Plane2::intersectInPlace(RayVector2& rv2) const {
         rv2.r.syncToDevice();
         rv2.v.syncToDevice();
         rv2.t.syncToDevice();
@@ -39,7 +39,7 @@ namespace batoid {
         }
     }
 
-    void Plane::reflectInPlace(RayVector2& rv2) const {
+    void Plane2::reflectInPlace(RayVector2& rv2) const {
         // 1. intersect
         intersectInPlace(rv2);
         // 2. allocate/compute normal vectors.  For a plane, this is constant (0,0,1).
@@ -86,7 +86,7 @@ namespace batoid {
         }
     }
 
-    void Plane::refractInPlace(RayVector2& rv2, const Medium2& m1, const Medium2& m2) const {
+    void Plane2::refractInPlace(RayVector2& rv2, const Medium2& m1, const Medium2& m2) const {
         // 1. intersect
         intersectInPlace(rv2);
         // 2. Allocate for refractive indices, alpha.
