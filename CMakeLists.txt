@@ -51,12 +51,14 @@ set(PYSRC_FILES
   pysrc/quadric.cpp
   pysrc/ray.cpp
   pysrc/rayVector.cpp
-  pysrc/rayVector2.cpp
-  pysrc/rayVector4.cpp
   pysrc/sphere.cpp
   pysrc/sum.cpp
   pysrc/surface.cpp
   pysrc/table.cpp
+# GPU stuff
+  pysrc/medium2.cpp
+  pysrc/rayVector2.cpp
+  pysrc/surface2.cpp
 )
 set(SRC_FILES
   src/asphere.cpp
@@ -64,6 +66,7 @@ set(SRC_FILES
   src/bicubic.cpp
   src/coating.cpp
   src/coordsys.cpp
+  src/dualView.cpp
   src/medium.cpp
   src/obscuration.cpp
   src/paraboloid.cpp
@@ -72,14 +75,15 @@ set(SRC_FILES
   src/quadric.cpp
   src/ray.cpp
   src/rayVector.cpp
-  src/rayVector2.cpp
-  # src/rayVector3.cpp
-  src/rayVector4.cpp
   src/sphere.cpp
   src/sum.cpp
   src/surface.cpp
   src/table.cpp
   src/utils.cpp
+# GPU stuff
+  src/medium2.cpp
+  src/rayVector2.cpp
+  src/surface2.cpp
 )
 
 set(ALL_FILES ${SRC_FILES} ${PYSRC_FILES})

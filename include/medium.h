@@ -4,6 +4,7 @@
 #include "table.h"
 #include <memory>
 #include <array>
+#include <cmath>
 
 namespace batoid {
     class Medium {

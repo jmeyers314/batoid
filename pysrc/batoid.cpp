@@ -8,8 +8,6 @@ namespace py = pybind11;
 namespace batoid {
     void pyExportRay(py::module&);
     void pyExportRayVector(py::module&);
-    void pyExportRayVector2(py::module&);
-    void pyExportRayVector4(py::module&);
 
     void pyExportSurface(py::module&);
     void pyExportAsphere(py::module&);
@@ -28,6 +26,11 @@ namespace batoid {
     void pyExportCoordSys(py::module&);
     void pyExportCoordTransform(py::module&);
 
+    // GPU stuff
+    // void pyExportSurface2(py::module&);
+    void pyExportRayVector2(py::module&);
+    void pyExportMedium2(py::module&);
+
 #if (PYBIND11_VERSION_MAJOR >= 2) & (PYBIND11_VERSION_MINOR >= 2)
     PYBIND11_MODULE(_batoid, m) {
 #else
@@ -36,8 +39,6 @@ namespace batoid {
 #endif
         pyExportRay(m);
         pyExportRayVector(m);
-        pyExportRayVector2(m);
-        pyExportRayVector4(m);
 
         pyExportSurface(m);
         pyExportAsphere(m);
@@ -55,6 +56,10 @@ namespace batoid {
         pyExportObscuration(m);
         pyExportCoordSys(m);
         pyExportCoordTransform(m);
+
+        // pyExportSurface2(m);
+        pyExportRayVector2(m);
+        pyExportMedium2(m);
 
         using namespace pybind11::literals;
 

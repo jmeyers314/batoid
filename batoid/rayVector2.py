@@ -4,7 +4,6 @@ from .utils import lazy_property
 from . import _batoid
 from .constants import globalCoordSys
 
-
 class RayVector2:
     @classmethod
     def fromArrays(cls, x, y, z, vx, vy, vz, t, w, flux, vignetted, failed,
@@ -44,47 +43,47 @@ class RayVector2:
 
     @property
     def r(self):
-        self._rv2.synchronize()
+        self._rv.r.syncToHost()
         return self._r
 
     @property
     def x(self):
-        self._rv2.synchronize()
+        self._rv.r.syncToHost()
         return self._r[:, 0]
 
     @property
     def y(self):
-        self._rv2.synchronize()
+        self._rv.r.syncToHost()
         return self._r[:, 1]
 
     @property
     def z(self):
-        self._rv2.synchronize()
+        self._rv.r.syncToHost()
         return self._r[:, 2]
 
     @property
     def v(self):
-        self._rv2.synchronize()
+        self._rv.v.syncToHost()
         return self._v
 
     @property
     def vx(self):
-        self._rv2.synchronize()
+        self._rv.v.syncToHost()
         return self._v[:, 0]
 
     @property
     def vy(self):
-        self._rv2.synchronize()
+        self._rv.v.syncToHost()
         return self._v[:, 1]
 
     @property
     def vz(self):
-        self._rv2.synchronize()
+        self._rv.v.syncToHost()
         return self._v[:, 2]
 
     @property
     def t(self):
-        self._rv2.synchronize()
+        self._rv.t.syncToHost()
         return self._t
 
     @property
@@ -94,23 +93,24 @@ class RayVector2:
 
     @property
     def flux(self):
-        self._rv2.synchronize()
+        self._rv.flux.syncToHost()
         return self._flux
 
     @property
     def vignetted(self):
-        self._rv2.synchronize()
+        self._rv.vignetted.syncToHost()
         return self._vignetted
 
     @property
     def failed(self):
-        self._rv2.synchronize()
+        self._rv.failed.syncToHost()
         return self._failed
 
     @lazy_property
-    def _rv2(self):
+    def _rv(self):
         return _batoid.CPPRayVector2(
-            self._r, self._v, self._t,
-            self._wavelength, self._flux,
-            self._vignetted, self._failed
+            self._r.ctypes.data, self._v.ctypes.data, self._t.ctypes.data,
+            self._wavelength.ctypes.data, self._flux.ctypes.data,
+            self._vignetted.ctypes.data, self._failed.ctypes.data,
+            len(self._wavelength)
         )

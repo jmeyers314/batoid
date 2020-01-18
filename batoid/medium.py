@@ -22,9 +22,6 @@ class Medium:
         """
         return self._medium.getN(wavelength)
 
-    def __repr__(self):
-        return repr(self._medium)
-
     def __eq__(self, rhs):
         return (type(self) == type(rhs)
                 and self._medium == rhs._medium)

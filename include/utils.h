@@ -1,6 +1,7 @@
 #ifndef batoid_utils_h
 #define batoid_utils_h
 
+// #include "dualView.h"
 #include <iterator>
 #include <future>
 #include <algorithm>

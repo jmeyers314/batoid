@@ -66,6 +66,15 @@ def testRV4(N):
     print(f"RV4 took {t1 - t0} seconds")
     print(RV4.r[0], RV4.v[0], RV4.t[0])
 
+    m1 = batoid._batoid.CPPSellmeierMedium(
+        0.6961663, 0.4079426, 0.8974794,
+        0.00467914825849, 0.013512063073959999, 97.93400253792099
+    )
+    m2 = batoid._batoid.CPPSellmeierMedium2(
+        0.6961663, 0.4079426, 0.8974794,
+        0.00467914825849, 0.013512063073959999, 97.93400253792099
+    )
+    plane._surface.refractInPlace(RV4._rv4, m2, m2, None)
 
 if __name__ == "__main__":
     from argparse import ArgumentParser

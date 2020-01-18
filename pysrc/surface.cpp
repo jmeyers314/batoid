@@ -9,7 +9,7 @@ namespace py = pybind11;
 
 namespace batoid {
     void pyExportSurface(py::module& m) {
-        py::class_<Surface, std::shared_ptr<Surface>>(m, "Surface")
+        py::class_<Surface, std::shared_ptr<Surface>>(m, "CPPSurface")
             .def("sag", py::vectorize(&Surface::sag))
             .def("normal", (Vector3d (Surface::*)(double, double) const) &Surface::normal)
             .def("normal",
@@ -66,13 +66,11 @@ namespace batoid {
             .def("intersect", (RayVector (Surface::*)(const RayVector&) const) &Surface::intersect)
             .def("intersectInPlace", (void (Surface::*)(Ray&) const) &Surface::intersectInPlace)
             .def("intersectInPlace", (void (Surface::*)(RayVector&) const) &Surface::intersectInPlace)
-            .def("intersectInPlace", (void (Surface::*)(RayVector4&) const) &Surface::intersectInPlace)
 
             .def("reflect", (Ray (Surface::*)(const Ray&, const Coating*) const) &Surface::reflect, py::arg(), py::arg()=nullptr)
             .def("reflect", (RayVector (Surface::*)(const RayVector&, const Coating*) const) &Surface::reflect, py::arg(), py::arg()=nullptr)
             .def("reflectInPlace", (void (Surface::*)(Ray&, const Coating*) const) &Surface::reflectInPlace, py::arg(), py::arg()=nullptr)
             .def("reflectInPlace", (void (Surface::*)(RayVector&, const Coating*) const) &Surface::reflectInPlace, py::arg(), py::arg()=nullptr)
-            .def("reflectInPlace", (void (Surface::*)(RayVector4&, const Coating*) const) &Surface::reflectInPlace, py::arg(), py::arg()=nullptr)
 
             .def("refract", (Ray (Surface::*)(const Ray&, const Medium&, const Medium&, const Coating*) const) &Surface::refract, py::arg(), py::arg(), py::arg(), py::arg()=nullptr)
             .def("refract", (RayVector (Surface::*)(const RayVector&, const Medium&, const Medium&, const Coating*) const) &Surface::refract, py::arg(), py::arg(), py::arg(), py::arg()=nullptr)

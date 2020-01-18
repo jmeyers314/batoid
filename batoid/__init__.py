@@ -3,8 +3,6 @@ from ._version import __version__, __version_info__
 from .ray import Ray
 from .rayVector import RayVector, concatenateRayVectors, rayGrid, circularGrid
 from .rayVector import uniformCircularGrid, pointSourceCircularGrid
-from .rayVector2 import RayVector2
-from .rayVector4 import RayVector4
 from .surface import Surface, Plane, Paraboloid, Sphere, Quadric, Asphere
 from .surface import Bicubic, Zernike, Sum
 from .table import Table
@@ -39,6 +37,12 @@ from .constants import globalCoordSys, vacuum
 
 import os
 datadir = os.path.join(os.path.dirname(__file__), "data")
+
+# GPU experimentation
+from .rayVector2 import RayVector2
+from .medium2 import Medium2, ConstMedium2
+from .medium2 import SellmeierMedium2, SumitaMedium2, Air2
+
 
 __all__ = []
 __all__ += ["Ray", "RayVector"]

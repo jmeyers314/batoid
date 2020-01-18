@@ -250,8 +250,4 @@ namespace batoid {
         refracted.trimVignettedInPlace(0.0);
         return std::make_pair(reflected, refracted);
     }
-
-    void Surface::intersectInPlace(RayVector4& rv4) const {}
-    void Surface::reflectInPlace(RayVector4& rv4, const Coating* coating) const {}
-
 }
