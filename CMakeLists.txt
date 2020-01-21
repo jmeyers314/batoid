@@ -59,6 +59,7 @@ set(PYSRC_FILES
   pysrc/medium2.cpp
   pysrc/rayVector2.cpp
   pysrc/surface2.cpp
+  pysrc/plane2.cpp
 )
 set(SRC_FILES
   src/asphere.cpp
@@ -84,6 +85,7 @@ set(SRC_FILES
   src/medium2.cpp
   src/rayVector2.cpp
   src/surface2.cpp
+  src/plane2.cpp
 )
 
 set(ALL_FILES ${SRC_FILES} ${PYSRC_FILES})

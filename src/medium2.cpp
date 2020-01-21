@@ -7,7 +7,7 @@ namespace batoid {
     template<typename T>
     double Medium2CRTP<T>::getN(double wavelength) const {
         const T* self = static_cast<const T*>(this);
-        return self->_getN(wavelength);  // point to correct getN?
+        return self->_getN(wavelength);
     }
 
     template<typename T>
@@ -29,7 +29,7 @@ namespace batoid {
         {
             #pragma omp teams distribute parallel for
             for(int i=0; i<size; i++)
-                outptr[i] = self->_getN(wptr[i]);  // point to correct getN?
+                outptr[i] = self->_getN(wptr[i]);
         }
     }
 

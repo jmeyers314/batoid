@@ -8,12 +8,17 @@
 
 namespace batoid {
 
-    class Plane2 : public Surface2 {
+    class Plane2 : public Surface2CRTP<Plane2> {
     public:
         Plane2(bool allowReverse=false) : _allowReverse(allowReverse) {}
-        virtual void intersectInPlace(RayVector2&) const override;
-        virtual void reflectInPlace(RayVector2&) const override;
-        virtual void refractInPlace(RayVector2&, const Medium2&, const Medium2&) const override;
+
+        double _sag(double, double) const;
+        void _normal(double, double, double&, double&, double&) const;
+        bool _timeToIntersect(double, double, double, double, double, double, double&) const;
+
+        void _intersectInPlace(RayVector2&) const;
+        void _reflectInPlace(RayVector2&) const;
+        void _refractInPlace(RayVector2&, const Medium2&, const Medium2&) const;
 
         bool getAllowReverse() const {return _allowReverse;}
 

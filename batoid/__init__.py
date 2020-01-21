@@ -42,6 +42,7 @@ datadir = os.path.join(os.path.dirname(__file__), "data")
 from .rayVector2 import RayVector2
 from .medium2 import Medium2, ConstMedium2
 from .medium2 import SellmeierMedium2, SumitaMedium2, Air2
+from .surface2 import Surface2, Plane2
 
 
 __all__ = []

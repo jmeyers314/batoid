@@ -4,9 +4,11 @@ import batoid
 from test_helpers import timer, rays_allclose, checkAngle
 
 
-def test_medium():
+@timer
+def test_medium(Nthread, N, Nloop):
+    batoid._batoid.setNThread(Nthread)
     np.random.seed(57721)
-    wavelength = np.random.uniform(size=3_000_000)
+    wavelength = np.random.uniform(size=N)
 
     mcpus = [
         batoid.ConstMedium(1.1),
@@ -35,15 +37,170 @@ def test_medium():
 
     for mcpu, mgpu in zip(mcpus, mgpus):
         t0 = time.time()
-        ncpu = mcpu.getN(wavelength)
+        for _ in range(Nloop):
+            ncpu = mcpu.getN(wavelength)
         t1 = time.time()
-        ngpu = mgpu.getN(wavelength)
+        for _ in range(Nloop):
+            ngpu = mgpu.getN(wavelength)
         t2 = time.time()
 
         print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
         print(f"gpu time = {(t2-t1)*1e3:.1f} ms")
+        print()
         np.testing.assert_array_equal(ncpu, ngpu)
 
 
+@timer
+def test_reflect(Nthread, N, Nloop):
+    batoid._batoid.setNThread(Nthread)
+    np.random.seed(57721)
+
+    x = np.random.uniform(size=N)
+    y = np.random.uniform(size=N)+1
+    z = np.random.uniform(size=N)-200
+    vx = np.random.uniform(size=N)+3
+    vy = np.random.uniform(size=N)+4
+    vz = np.random.uniform(size=N)+5
+    t = np.zeros(N)
+    w = np.random.uniform(size=N)
+    flux = np.random.uniform(size=N)
+    vignetted = np.zeros(N, dtype=bool)
+    failed = np.zeros(N, dtype=bool)
+
+    rv = batoid.RayVector.fromArrays(
+        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+    )
+    rv2 = batoid.RayVector2.fromArrays(
+        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+    )
+
+    plane = batoid.Plane()
+    plane2 = batoid.Plane2()
+
+    t0 = time.time()
+    for _ in range(Nloop):
+        plane.reflectInPlace(rv)
+    t1 = time.time()
+    for _ in range(Nloop):
+        plane2.reflectInPlace(rv2)
+    t2 = time.time()
+    print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
+    print(f"gpu time = {(t2-t1)*1e3:.1f} ms")
+    print(rv.vx)
+    print(rv2.vx)
+
+
+@timer
+def test_intersect(Nthread, N, Nloop):
+    batoid._batoid.setNThread(Nthread)
+    np.random.seed(57721)
+
+    x = np.random.uniform(size=N)
+    y = np.random.uniform(size=N)+1
+    z = np.random.uniform(size=N)-200
+    vx = np.random.uniform(size=N)+3
+    vy = np.random.uniform(size=N)+4
+    vz = np.random.uniform(size=N)+5
+    t = np.zeros(N)
+    w = np.random.uniform(size=N)
+    flux = np.random.uniform(size=N)
+    vignetted = np.zeros(N, dtype=bool)
+    failed = np.zeros(N, dtype=bool)
+
+    rv = batoid.RayVector.fromArrays(
+        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+    )
+    rv2 = batoid.RayVector2.fromArrays(
+        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+    )
+
+    plane = batoid.Plane()
+    plane2 = batoid.Plane2()
+
+    print(rv.x)
+    print(rv2.x)
+
+    t0 = time.time()
+    for _ in range(Nloop):
+        plane.intersectInPlace(rv)
+    t1 = time.time()
+    for _ in range(Nloop):
+        plane2.intersectInPlace(rv2)
+    t2 = time.time()
+    print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
+    print(f"gpu time = {(t2-t1)*1e3:.1f} ms")
+    print(rv.x)
+    print(rv2.x)
+
+    np.testing.assert_allclose(rv.x, rv2.x, rtol=0, atol=1e-13)
+    np.testing.assert_allclose(rv.y, rv2.y, rtol=0, atol=1e-13)
+    np.testing.assert_allclose(rv.z, rv2.z, rtol=0, atol=1e-13)
+    np.testing.assert_allclose(rv.vx, rv2.vx, rtol=0, atol=1e-13)
+    np.testing.assert_allclose(rv.vy, rv2.vy, rtol=0, atol=1e-13)
+    np.testing.assert_allclose(rv.vz, rv2.vz, rtol=0, atol=1e-13)
+    np.testing.assert_allclose(rv.t, rv2.t, rtol=0, atol=1e-13)
+
+@timer
+def test_refract(Nthread, N, Nloop):
+    batoid._batoid.setNThread(Nthread)
+    np.random.seed(57721)
+
+    x = np.random.uniform(size=N)
+    y = np.random.uniform(size=N)+1
+    z = np.random.uniform(size=N)-200
+    vx = np.random.uniform(size=N)+3
+    vy = np.random.uniform(size=N)+4
+    vz = np.random.uniform(size=N)+5
+    t = np.zeros(N)
+    w = np.random.uniform(size=N)
+    flux = np.random.uniform(size=N)
+    vignetted = np.zeros(N, dtype=bool)
+    failed = np.zeros(N, dtype=bool)
+
+    rv = batoid.RayVector.fromArrays(
+        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+    )
+    rv2 = batoid.RayVector2.fromArrays(
+        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+    )
+
+    plane = batoid.Plane()
+    plane2 = batoid.Plane2()
+
+    m1 = batoid.ConstMedium(1.1)
+    m2 = batoid.ConstMedium(1.2)
+    m1gpu = batoid.ConstMedium2(1.1)
+    m2gpu = batoid.ConstMedium2(1.2)
+
+
+    print(rv.vx)
+    print(rv2.vx)
+
+    t0 = time.time()
+    for _ in range(Nloop):
+        plane.refractInPlace(rv, m1, m2)
+    t1 = time.time()
+    for _ in range(Nloop):
+        plane2.refractInPlace(rv2, m1gpu, m2gpu)
+    t2 = time.time()
+    print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
+    print(f"gpu time = {(t2-t1)*1e3:.1f} ms")
+    print(rv.vx)
+    print(rv2.vx)
+
+
 if __name__ == '__main__':
-    test_medium()
+    from argparse import ArgumentParser
+    parser = ArgumentParser()
+    parser.add_argument("-N", type=int, default=3_000_000)
+    parser.add_argument("-Nthread", type=int, default=12)
+    parser.add_argument("-Nloop", type=int, default=50)
+    args = parser.parse_args()
+    N = args.N
+    Nthread = args.Nthread
+    Nloop = args.Nloop
+
+    # test_medium(Nthread, N, Nloop)
+    # test_reflect(Nthread, N, Nloop)
+    # test_intersect(Nthread, N, Nloop)
+    test_refract(Nthread, N, Nloop)

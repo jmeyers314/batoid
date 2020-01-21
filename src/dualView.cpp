@@ -69,4 +69,5 @@ namespace batoid {
 
     template class DualView<double>;
     template class DualView<bool>;
+    template class DualView<int>;
 }
