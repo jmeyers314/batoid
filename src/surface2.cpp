@@ -111,7 +111,75 @@ namespace batoid {
     template<typename T>
     void Surface2CRTP<T>::refractInPlace(RayVector2& rv, const Medium2& m1, const Medium2& m2) const {
         const T* self = static_cast<const T*>(this);
-        self->_refractInPlace(rv, m1, m2);
+        self->intersectInPlace(rv);
+        rv.r.syncToDevice();  // should be redundant...
+        rv.v.syncToDevice();
+        size_t size = rv.size;
+        double* xptr = rv.r.deviceData;
+        double* yptr = xptr + size;
+        double* vxptr = rv.v.deviceData;
+        double* vyptr = vxptr + size;
+        double* vzptr = vyptr + size;
+        // Note, n1 implicitly defined by rv.v.
+        // DualView<double> n1(size);
+        // double* n1ptr = n1.deviceData;
+        // m1.getNMany(rv.wavelength, n1);
+        DualView<double> n2(size);
+        double* n2ptr = n2.deviceData;
+        m2.getNMany(rv.wavelength, n2);
+
+        #pragma omp target is_device_ptr(xptr, yptr, vxptr, vyptr, vzptr, n2ptr) map(to:self[:1])
+        {
+            #pragma omp teams distribute parallel for
+            for(int i=0; i<size; i++) {
+                double n1 = vxptr[i]*vxptr[i];
+                n1 += vyptr[i]*vyptr[i];
+                n1 += vzptr[i]*vzptr[i];
+                n1 = 1/sqrt(n1);
+                double nvx = vxptr[i]*n1;
+                double nvy = vyptr[i]*n1;
+                double nvz = vzptr[i]*n1;
+                double normalx, normaly, normalz;
+                self->_normal(xptr[i], yptr[i], normalx, normaly, normalz);
+                double alpha = nvx*normalx;
+                alpha += nvy*normaly;
+                alpha += nvz*normalz;
+                double discriminant = alpha*alpha - (1. - (n2ptr[i]*n2ptr[i])/(n1*n1));
+                discriminant = sqrt(discriminant);
+                double k1 = -alpha + discriminant;
+                double k2 = -alpha - discriminant;
+
+                double f1x = nvx+k1*normalx;
+                double f1y = nvy+k1*normaly;
+                double f1z = nvz+k1*normalz;
+                double norm1 = f1x*f1x + f1y*f1y + f1z*f1z;
+                norm1 = 1/sqrt(norm1);
+                f1x *= norm1;
+                f1y *= norm1;
+                f1z *= norm1;
+
+                double f2x = nvx+k2*normalx;
+                double f2y = nvy+k2*normaly;
+                double f2z = nvz+k2*normalz;
+                double norm2 = f2x*f2x + f2y*f2y + f2z*f2z;
+                norm2 = 1/sqrt(norm2);
+                f2x *= norm2;
+                f2y *= norm2;
+                f2z *= norm2;
+
+                double dot1 = f1x*nvx + f1y*nvy + f1z*nvz;
+                double dot2 = f2x*nvx + f2y*nvy + f2z*nvz;
+                if (dot1 > dot2) {
+                    vxptr[i] = f1x/n2ptr[i];
+                    vyptr[i] = f1y/n2ptr[i];
+                    vzptr[i] = f1z/n2ptr[i];
+                } else {
+                    vxptr[i] = f2x/n2ptr[i];
+                    vyptr[i] = f2y/n2ptr[i];
+                    vzptr[i] = f2z/n2ptr[i];
+                }
+            }
+        }
     }
 
     // Instantiations

@@ -151,7 +151,10 @@ def test_refract(Nthread, N, Nloop):
     flux = np.random.uniform(size=N)
     vignetted = np.zeros(N, dtype=bool)
     failed = np.zeros(N, dtype=bool)
-
+    v = np.sqrt(vx*vx+vy*vy+vz*vz)
+    vx /= 1.1*v
+    vy /= 1.1*v
+    vz /= 1.1*v
     rv = batoid.RayVector.fromArrays(
         x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
     )

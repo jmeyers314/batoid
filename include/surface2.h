@@ -42,5 +42,6 @@ namespace batoid {
     class Plane2;
     template<> void Surface2CRTP<Plane2>::intersectInPlace(RayVector2&) const;
     template<> void Surface2CRTP<Plane2>::reflectInPlace(RayVector2&) const;
+    template<> void Surface2CRTP<Plane2>::refractInPlace(RayVector2&, const Medium2&, const Medium2&) const;
 }
 #endif

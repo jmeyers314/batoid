@@ -21,23 +21,22 @@ namespace batoid {
     }
     #pragma omp end declare target
 
-
-    void Plane2::_intersectInPlace(RayVector2& rv2) const {
-        rv2.r.syncToDevice();
-        rv2.v.syncToDevice();
-        rv2.t.syncToDevice();
-        rv2.vignetted.syncToDevice();
-        rv2.failed.syncToDevice();
-        size_t size = rv2.size;
-        double* xptr = rv2.r.deviceData;
+    void Plane2::_intersectInPlace(RayVector2& rv) const {
+        rv.r.syncToDevice();
+        rv.v.syncToDevice();
+        rv.t.syncToDevice();
+        rv.vignetted.syncToDevice();
+        rv.failed.syncToDevice();
+        size_t size = rv.size;
+        double* xptr = rv.r.deviceData;
         double* yptr = xptr + size;
         double* zptr = yptr + size;
-        double* vxptr = rv2.v.deviceData;
+        double* vxptr = rv.v.deviceData;
         double* vyptr = vxptr + size;
         double* vzptr = vyptr + size;
-        double* tptr = rv2.t.deviceData;
-        bool* vigptr = rv2.vignetted.deviceData;
-        bool* failptr = rv2.failed.deviceData;
+        double* tptr = rv.t.deviceData;
+        bool* vigptr = rv.vignetted.deviceData;
+        bool* failptr = rv.failed.deviceData;
         #pragma omp target is_device_ptr(xptr, yptr, zptr, vxptr, vyptr, vzptr, tptr, vigptr, failptr)
         {
             #pragma omp teams distribute parallel for
@@ -58,10 +57,10 @@ namespace batoid {
         }
     }
 
-    void Plane2::_reflectInPlace(RayVector2& rv2) const {
-        _intersectInPlace(rv2);
-        size_t size = rv2.size;
-        double* vzptr = rv2.v.deviceData+2*size;
+    void Plane2::_reflectInPlace(RayVector2& rv) const {
+        _intersectInPlace(rv);
+        size_t size = rv.size;
+        double* vzptr = rv.v.deviceData+2*size;
 
         #pragma omp target is_device_ptr(vzptr)
         {
@@ -72,43 +71,43 @@ namespace batoid {
         }
     }
 
-    void Plane2::_refractInPlace(RayVector2& rv2, const Medium2& m1, const Medium2& m2) const {
-        // 1. intersect
-        intersectInPlace(rv2);
-        // 2. Allocate for refractive indices, alpha.
-        size_t size = rv2.size;
-        double* vxptr = rv2.v.deviceData;
+    void Plane2::_refractInPlace(RayVector2& rv, const Medium2& m1, const Medium2& m2) const {
+        intersectInPlace(rv);
+        size_t size = rv.size;
+        double* vxptr = rv.v.deviceData;
         double* vyptr = vxptr + size;
         double* vzptr = vyptr + size;
-        double* wptr = rv2.wavelength.deviceData;
+        double* wptr = rv.wavelength.deviceData;
 
-        DualView<double> n1(size);
+        // DualView<double> n1(size);
+        // double* n1ptr = n1.deviceData;
+        // m1.getNMany(rv.wavelength, n1);
         DualView<double> n2(size);
-        double* n1ptr = n1.deviceData;
         double* n2ptr = n2.deviceData;
+        m2.getNMany(rv.wavelength, n2);
 
-        // Calculate refractive indices
-        m1.getNMany(rv2.wavelength, n1);
-        m2.getNMany(rv2.wavelength, n2);
-
-        #pragma omp target is_device_ptr(n1ptr, n2ptr, vxptr, vyptr, vzptr)
+        #pragma omp target is_device_ptr(n2ptr, vxptr, vyptr, vzptr)
         {
             #pragma omp teams distribute parallel for
             for(int i=0; i<size; i++) {
-                double discriminant = vzptr[i]*vzptr[i] * n1ptr[i]*n1ptr[i];
-                discriminant -= (1-n2ptr[i]*n2ptr[i]/(n1ptr[i]*n1ptr[i]));
+                double n1 = vxptr[i]*vxptr[i];
+                n1 += vyptr[i]*vyptr[i];
+                n1 += vzptr[i]*vzptr[i];
+                n1 = 1/sqrt(n1);
 
-                double norm = n1ptr[i]*n1ptr[i]*vxptr[i]*vxptr[i];
-                norm += n1ptr[i]*n1ptr[i]*vyptr[i]*vyptr[i];
+                double discriminant = vzptr[i]*vzptr[i] * n1*n1;
+                discriminant -= (1-n2ptr[i]*n2ptr[i]/(n1*n1));
+
+                double norm = n1*n1*vxptr[i]*vxptr[i];
+                norm += n1*n1*vyptr[i]*vyptr[i];
                 norm += discriminant;
                 norm = sqrt(norm);
-                vxptr[i] = n1ptr[i]*vxptr[i]/norm/n2ptr[i];
-                vyptr[i] = n1ptr[i]*vyptr[i]/norm/n2ptr[i];
+                vxptr[i] = n1*vxptr[i]/norm/n2ptr[i];
+                vyptr[i] = n1*vyptr[i]/norm/n2ptr[i];
                 vzptr[i] = sqrt(discriminant)/norm/n2ptr[i];
             }
         }
     }
-
 
     // Specializations
     template<>
@@ -121,6 +120,12 @@ namespace batoid {
     void Surface2CRTP<Plane2>::reflectInPlace(RayVector2& rv) const {
         const Plane2* self = static_cast<const Plane2*>(this);
         self->_reflectInPlace(rv);
+    }
+
+    template<>
+    void Surface2CRTP<Plane2>::refractInPlace(RayVector2& rv, const Medium2& m1, const Medium2& m2) const {
+        const Plane2* self = static_cast<const Plane2*>(this);
+        self->_refractInPlace(rv, m1, m2);
     }
 
 }
