@@ -37,5 +37,9 @@ namespace batoid {
         virtual void reflectInPlace(RayVector2&) const override;
         virtual void refractInPlace(RayVector2&, const Medium2&, const Medium2&) const override;
     };
+
+    // Declare specializations
+    class Plane2;
+    template<> void Surface2CRTP<Plane2>::intersectInPlace(RayVector2&) const;
 }
 #endif

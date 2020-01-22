@@ -1,4 +1,3 @@
-#include <iostream>
 #include "surface2.h"
 #include "plane2.h"
 
@@ -77,5 +76,6 @@ namespace batoid {
         self->_refractInPlace(rv, m1, m2);
     }
 
+    // Instantiations
     template class Surface2CRTP<Plane2>;
 }

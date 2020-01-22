@@ -2,6 +2,7 @@
 #include "utils.h"
 #include <cmath>
 
+
 namespace batoid {
     double Plane2::_sag(double, double) const {
         return 0.0;
@@ -226,5 +227,13 @@ namespace batoid {
                 }
             }
         }
+    }
+
+
+    // Specializations
+    template<>
+    void Surface2CRTP<Plane2>::intersectInPlace(RayVector2& rv) const {
+        const Plane2* self = static_cast<const Plane2*>(this);
+        self->_intersectInPlace(rv);
     }
 }

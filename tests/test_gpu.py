@@ -183,6 +183,7 @@ def test_refract(Nthread, N, Nloop):
     for _ in range(Nloop):
         plane2.refractInPlace(rv2, m1gpu, m2gpu)
     t2 = time.time()
+
     print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
     print(f"gpu time = {(t2-t1)*1e3:.1f} ms")
     print(rv.vx)
