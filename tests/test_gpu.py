@@ -77,9 +77,6 @@ def test_intersect(Nthread, N, Nloop):
     plane = batoid.Plane()
     plane2 = batoid.Plane2()
 
-    print(rv.x)
-    print(rv2.x)
-
     t0 = time.time()
     for _ in range(Nloop):
         plane.intersectInPlace(rv)
@@ -169,9 +166,6 @@ def test_refract(Nthread, N, Nloop):
     m2 = batoid.ConstMedium(1.2)
     m1gpu = batoid.ConstMedium2(1.1)
     m2gpu = batoid.ConstMedium2(1.2)
-
-    print(rv.vx)
-    print(rv2.vx)
 
     t0 = time.time()
     for _ in range(Nloop):

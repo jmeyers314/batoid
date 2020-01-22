@@ -1,3 +1,4 @@
+#include <iostream>
 #include "surface2.h"
 #include "plane2.h"
 
@@ -67,7 +68,44 @@ namespace batoid {
     template<typename T>
     void Surface2CRTP<T>::reflectInPlace(RayVector2& rv) const {
         const T* self = static_cast<const T*>(this);
-        self->_reflectInPlace(rv);
+        self->intersectInPlace(rv);
+        rv.r.syncToDevice();  // should be redundant...
+        rv.v.syncToDevice();
+        size_t size = rv.size;
+        double* xptr = rv.r.deviceData;
+        double* yptr = xptr + size;
+        double* vxptr = rv.v.deviceData;
+        double* vyptr = vxptr + size;
+        double* vzptr = vyptr + size;
+
+        #pragma omp target is_device_ptr(xptr, yptr, vxptr, vyptr, vzptr) map(to:self[:1])
+        {
+            #pragma omp teams distribute parallel for
+            for(int i=0; i<size; i++) {
+                double n = vxptr[i]*vxptr[i];
+                n += vyptr[i]*vyptr[i];
+                n += vzptr[i]*vzptr[i];
+                n = 1/sqrt(n);
+                double nvx = vxptr[i]*n;
+                double nvy = vyptr[i]*n;
+                double nvz = vzptr[i]*n;
+                double normalx, normaly, normalz;
+                self->_normal(xptr[i], yptr[i], normalx, normaly, normalz);
+                double alpha = nvx*normalx;
+                alpha += nvy*normaly;
+                alpha += nvz*normalz;
+                vxptr[i] = nvx - 2*alpha*normalx;
+                vyptr[i] = nvy - 2*alpha*normaly;
+                vzptr[i] = nvz - 2*alpha*normalz;
+                double norm = vxptr[i]*vxptr[i];
+                norm += vyptr[i]*vyptr[i];
+                norm += vzptr[i]*vzptr[i];
+                norm = sqrt(norm);
+                vxptr[i] /= norm*n;
+                vyptr[i] /= norm*n;
+                vzptr[i] /= norm*n;
+            }
+        }
     }
 
     template<typename T>

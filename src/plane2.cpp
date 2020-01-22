@@ -8,18 +8,19 @@ namespace batoid {
         return 0.0;
     }
 
+    #pragma omp declare target
     void Plane2::_normal(double, double, double& nx, double& ny, double& nz) const {
         nx = 0.0;
         ny = 0.0;
         nz = 1.0;
     }
 
-    #pragma omp declare target
     bool Plane2::_timeToIntersect(double x, double y, double z, double vx, double vy, double vz, double& dt) const {
         dt = -z/vz;
         return (_allowReverse || dt >= 0.0);
     }
     #pragma omp end declare target
+
 
     void Plane2::_intersectInPlace(RayVector2& rv2) const {
         rv2.r.syncToDevice();
@@ -58,36 +59,15 @@ namespace batoid {
     }
 
     void Plane2::_reflectInPlace(RayVector2& rv2) const {
-        // 1. intersect
         _intersectInPlace(rv2);
-        // 2. allocate/compute normal vectors.  For a plane, this is constant (0,0,1).
-        // 3. allocate/compute alpha which is used in next two steps.
-        // data is already synchronized to device from intersect
         size_t size = rv2.size;
-        double* vxptr = rv2.v.deviceData;
-        double* vyptr = rv2.v.deviceData+size;
         double* vzptr = rv2.v.deviceData+2*size;
 
-        #pragma omp target is_device_ptr(vxptr, vyptr, vzptr)
+        #pragma omp target is_device_ptr(vzptr)
         {
             #pragma omp teams distribute parallel for
             for(int i=0; i<size; i++) {
-                double n = vxptr[i]*vxptr[i];
-                n += vyptr[i]*vyptr[i];
-                n += vzptr[i]*vzptr[i];
-                n = 1.0/sqrt(n);
-                double alpha = vzptr[i] * n;
-
-                vxptr[i] = n*vxptr[i];
-                vyptr[i] = n*vyptr[i];
-                vzptr[i] = n*vzptr[i] - 2*alpha;
-                double norm = vxptr[i]*vxptr[i];
-                norm += vyptr[i]*vyptr[i];
-                norm += vzptr[i]*vzptr[i];
-                norm = 1.0/(n*sqrt(norm));
-                vxptr[i] *= norm;
-                vyptr[i] *= norm;
-                vzptr[i] *= norm;
+                vzptr[i] *= -1;
             }
         }
     }
@@ -136,4 +116,11 @@ namespace batoid {
         const Plane2* self = static_cast<const Plane2*>(this);
         self->_intersectInPlace(rv);
     }
+
+    template<>
+    void Surface2CRTP<Plane2>::reflectInPlace(RayVector2& rv) const {
+        const Plane2* self = static_cast<const Plane2*>(this);
+        self->_reflectInPlace(rv);
+    }
+
 }
