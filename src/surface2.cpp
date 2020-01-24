@@ -1,6 +1,7 @@
 #include <iostream>
 #include "surface2.h"
 #include "plane2.h"
+#include "sphere2.h"
 
 namespace batoid {
 
@@ -46,11 +47,12 @@ namespace batoid {
             for(int i=0; i<size; i++) {
                 if (!failptr[i]) {
                     double dt;
-                    if (self->_timeToIntersect(
+                    bool success = self->_timeToIntersect(
                         xptr[i], yptr[i], zptr[i],
                         vxptr[i], vyptr[i], vzptr[i],
-                        dt)
-                    ) {
+                        dt
+                    );
+                    if (success && dt >= 0) {
                         xptr[i] += vxptr[i] * dt;
                         yptr[i] += vyptr[i] * dt;
                         zptr[i] += vzptr[i] * dt;
@@ -82,28 +84,33 @@ namespace batoid {
         {
             #pragma omp teams distribute parallel for
             for(int i=0; i<size; i++) {
+                // n = 1/|v|
                 double n = vxptr[i]*vxptr[i];
                 n += vyptr[i]*vyptr[i];
                 n += vzptr[i]*vzptr[i];
                 n = 1/sqrt(n);
+                // nv = v*n
                 double nvx = vxptr[i]*n;
                 double nvy = vyptr[i]*n;
                 double nvz = vzptr[i]*n;
+                // get surface normal vector normVec
                 double normalx, normaly, normalz;
                 self->_normal(xptr[i], yptr[i], normalx, normaly, normalz);
+                // alpha = nv dot normVec
                 double alpha = nvx*normalx;
                 alpha += nvy*normaly;
                 alpha += nvz*normalz;
+                // v = (nv - 2 alpha normVec).normalized() / n
                 vxptr[i] = nvx - 2*alpha*normalx;
                 vyptr[i] = nvy - 2*alpha*normaly;
                 vzptr[i] = nvz - 2*alpha*normalz;
                 double norm = vxptr[i]*vxptr[i];
                 norm += vyptr[i]*vyptr[i];
                 norm += vzptr[i]*vzptr[i];
-                norm = sqrt(norm);
-                vxptr[i] /= norm*n;
-                vyptr[i] /= norm*n;
-                vzptr[i] /= norm*n;
+                norm = 1/(sqrt(norm)*n);
+                vxptr[i] *= norm;
+                vyptr[i] *= norm;
+                vzptr[i] *= norm;
             }
         }
     }
@@ -184,4 +191,5 @@ namespace batoid {
 
     // Instantiations
     template class Surface2CRTP<Plane2>;
+    template class Surface2CRTP<Sphere2>;
 }

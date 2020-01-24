@@ -23,13 +23,13 @@ namespace batoid {
         void amplitude(double x, double y, double z, double t, std::complex<double>* out) const;
         std::complex<double> sumAmplitude(double x, double y, double z, double t) const;
 
-        DualView<double> r;
-        DualView<double> v;
-        DualView<double> t;
-        DualView<double> wavelength;
-        DualView<double> flux;
-        DualView<bool> vignetted;
-        DualView<bool> failed;
+        DualView<double> r;           // 24
+        DualView<double> v;           // 48
+        DualView<double> t;           // 56
+        DualView<double> wavelength;  // 64
+        DualView<double> flux;        // 72
+        DualView<bool> vignetted;     // 73
+        DualView<bool> failed;        // 74 cumulative bytes per Ray.
         size_t size;
     };
 }
