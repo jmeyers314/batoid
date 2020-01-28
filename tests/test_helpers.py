@@ -1,4 +1,5 @@
 import numpy as np
+import batoid
 
 
 def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
@@ -133,3 +134,9 @@ def all_obj_diff(objs):
                 if hash(obj) == k:
                     print(i, repr(obj))
         raise e
+
+
+def init_gpu():
+    arr = np.zeros(100)
+    _arr = batoid._batoid.CPPDualViewDouble(arr.ctypes.data, len(arr))
+    _arr.syncToDevice()

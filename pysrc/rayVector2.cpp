@@ -10,6 +10,14 @@ namespace py = pybind11;
 namespace batoid {
     void pyExportRayVector2(py::module& m) {
         auto dvd = py::class_<DualView<double>>(m, "CPPDualViewDouble")
+            .def(py::init(
+                [](
+                    size_t arr_ptr,
+                    size_t size
+                ){
+                    return new DualView<double>(reinterpret_cast<double*>(arr_ptr), size);
+                }
+            ))
             .def("syncToHost", &DualView<double>::syncToHost)
             .def("syncToDevice", &DualView<double>::syncToDevice);
 

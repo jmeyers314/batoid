@@ -1,7 +1,7 @@
 import time
 import numpy as np
 import batoid
-from test_helpers import timer, rays_allclose
+from test_helpers import timer, rays_allclose, init_gpu
 
 
 @timer
@@ -44,9 +44,10 @@ def test_medium(Nthread, N, Nloop):
             ngpu = mgpu.getN(wavelength)
         t2 = time.time()
 
+        print("test_medium")
         print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
         print(f"gpu time = {(t2-t1)*1e3:.1f} ms")
-        print()
+
         np.testing.assert_array_equal(ncpu, ngpu)
 
 
@@ -84,10 +85,10 @@ def test_intersect_plane(Nthread, N, Nloop):
     for _ in range(Nloop):
         plane2.intersectInPlace(rv2)
     t2 = time.time()
+    print("test_intersect_plane")
     print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
     print(f"gpu time = {(t2-t1)*1e3:.1f} ms")
-    print(rv.x)
-    print(rv2.x)
+
     if (Nloop == 1):
         np.testing.assert_allclose(rv.r, rv2.r, rtol=0, atol=1e-13)
         np.testing.assert_allclose(rv.v, rv2.v, rtol=0, atol=1e-13)
@@ -129,10 +130,10 @@ def test_reflect_plane(Nthread, N, Nloop):
         plane2.reflectInPlace(rv2)
     t2 = time.time()
 
+    print("test_reflect_plane")
     print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
     print(f"gpu time = {(t2-t1)*1e3:.1f} ms")
-    print(rv.vz)
-    print(rv2.vz)
+
     if (Nloop == 1):
         np.testing.assert_allclose(rv.r, rv2.r, rtol=0, atol=1e-13)
         np.testing.assert_allclose(rv.v, rv2.v, rtol=0, atol=1e-13)
@@ -182,10 +183,9 @@ def test_refract_plane(Nthread, N, Nloop):
         plane2.refractInPlace(rv2, m1gpu, m2gpu)
     t2 = time.time()
 
+    print("test_refract_plane")
     print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
     print(f"gpu time = {(t2-t1)*1e3:.1f} ms")
-    print(rv.vx)
-    print(rv2.vx)
 
     if (Nloop == 1):
         np.testing.assert_allclose(rv.r, rv2.r, rtol=0, atol=1e-13)
@@ -227,10 +227,9 @@ def test_intersect_sphere(Nthread, N, Nloop):
     for _ in range(Nloop):
         sphere2.intersectInPlace(rv2)
     t2 = time.time()
+    print("test_intersect_sphere")
     print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
     print(f"gpu time = {(t2-t1)*1e3:.1f} ms")
-    print(rv.x)
-    print(rv2.x)
 
     if (Nloop == 1):
         np.testing.assert_allclose(rv.r, rv2.r, rtol=0, atol=1e-13)
@@ -273,10 +272,10 @@ def test_reflect_sphere(Nthread, N, Nloop):
         sphere2.reflectInPlace(rv2)
     t2 = time.time()
 
+    print("test_reflect_sphere")
     print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
     print(f"gpu time = {(t2-t1)*1e3:.1f} ms")
-    print(rv.vz)
-    print(rv2.vz)
+
     if (Nloop == 1):
         np.testing.assert_allclose(rv.r, rv2.r, rtol=0, atol=1e-13)
         np.testing.assert_allclose(rv.v, rv2.v, rtol=0, atol=1e-13)
@@ -326,10 +325,9 @@ def test_refract_sphere(Nthread, N, Nloop):
         sphere2.refractInPlace(rv2, m1gpu, m2gpu)
     t2 = time.time()
 
+    print("test_refract_sphere")
     print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
     print(f"gpu time = {(t2-t1)*1e3:.1f} ms")
-    print(rv.vz)
-    print(rv2.vz)
 
     if (Nloop == 1):
         np.testing.assert_allclose(rv.r, rv2.r, rtol=0, atol=1e-13)
@@ -348,6 +346,7 @@ if __name__ == '__main__':
     Nthread = args.Nthread
     Nloop = args.Nloop
 
+    init_gpu()
     test_medium(Nthread, N, Nloop)
     test_intersect_plane(Nthread, N, Nloop)
     test_reflect_plane(Nthread, N, Nloop)
