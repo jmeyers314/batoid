@@ -46,14 +46,11 @@ namespace batoid {
         if (r.failed) return r;
         Ray r2 = intersect(r);
         if (r2.failed) return r2;
-        double n = 1.0 / r2.v.norm();
-        Vector3d nv = r2.v * n;
         Vector3d normVec(normal(r2.r[0], r2.r[1]));
-        double alpha = nv.dot(normVec);
-
+        double alpha = r2.v.dot(normVec);
+        r2.v -= 2*alpha*normVec;
         if (coating)
-            r2.flux *= coating->getReflect(r.wavelength, alpha);
-        r2.v = (nv - 2*alpha*normVec).normalized()/n;
+            r2.flux *= coating->getReflect(r.wavelength, alpha/r2.v.norm());
         return r2;
     }
 
@@ -70,13 +67,11 @@ namespace batoid {
         if (r.failed) return;
         intersectInPlace(r);
         if (r.failed) return;
-        double n = 1.0 / r.v.norm();
-        Vector3d nv = r.v * n;
         Vector3d normVec(normal(r.r[0], r.r[1]));
-        double alpha = nv.dot(normVec);
+        double alpha = r.v.dot(normVec);
+        r.v -= 2*alpha*normVec;
         if (coating)
-            r.flux *= coating->getReflect(r.wavelength, alpha);
-        r.v = (nv - 2*alpha*normVec).normalized()/n;
+            r.flux *= coating->getReflect(r.wavelength, alpha/r.v.norm());
     }
 
     void Surface::reflectInPlace(RayVector& rv, const Coating* coating) const {
@@ -90,19 +85,19 @@ namespace batoid {
         if (r.failed) return r;
         Ray r2 = intersect(r);
         if (r2.failed) return r2;
-        Vector3d nv = r2.v * n1;
+        Vector3d i = r2.v * n1;
         Vector3d normVec(normal(r2.r[0], r2.r[1]));
-        double alpha = nv.dot(normVec);
+        double cos = i.dot(normVec);
+        if (cos > 0.) {
+            normVec *= -1;
+            cos *= -1;
+        }
+        double eta = n1/n2;
+        double sinsqr = eta*eta*(1-cos*cos);
+        Vector3d t = eta * i - (eta * cos + std::sqrt(1 - sinsqr)) * normVec;
+        r2.v = t/n2;
         if (coating)
-            r2.flux *= coating->getTransmit(r.wavelength, alpha);
-        double a = 1.;
-        double b = 2*alpha;
-        double c = (1. - (n2*n2)/(n1*n1));
-        double k1, k2;
-        solveQuadratic(a, b, c, k1, k2);
-        Vector3d f1 = (nv+k1*normVec).normalized();
-        Vector3d f2 = (nv+k2*normVec).normalized();
-        r2.v = (f1.dot(nv) > f2.dot(nv)) ? f1/n2 : f2/n2;
+            r2.flux *= coating->getTransmit(r2.wavelength, cos);
         return r2;
     }
 
@@ -135,19 +130,19 @@ namespace batoid {
         if (r.failed) return;
         intersectInPlace(r);
         if (r.failed) return;
-        Vector3d nv = r.v * n1;
+        Vector3d i = r.v*n1;
         Vector3d normVec(normal(r.r[0], r.r[1]));
-        double alpha = nv.dot(normVec);
+        double cos = i.dot(normVec);
+        if (cos > 0.) {
+            normVec *= -1;
+            cos *= -1;
+        }
+        double eta = n1/n2;
+        double sinsqr = eta*eta*(1-cos*cos);
+        Vector3d t = eta * i - (eta * cos + std::sqrt(1 - sinsqr)) * normVec;
+        r.v = t/n2;
         if (coating)
-            r.flux *= coating->getTransmit(r.wavelength, alpha);
-        double a = 1.;
-        double b = 2*alpha;
-        double c = (1. - (n2*n2)/(n1*n1));
-        double k1, k2;
-        solveQuadratic(a, b, c, k1, k2);
-        Vector3d f1 = (nv+k1*normVec).normalized();
-        Vector3d f2 = (nv+k2*normVec).normalized();
-        r.v = (f1.dot(nv) > f2.dot(nv)) ? f1/n2 : f2/n2;
+            r.flux *= coating->getTransmit(r.wavelength, cos);
     }
 
     void Surface::refractInPlace(Ray& r, const Medium& m1, const Medium& m2, const Coating* coating) const {
@@ -180,31 +175,30 @@ namespace batoid {
         if (r2.failed) return std::make_pair(r2, r2);
 
         // Common calculations
-        Vector3d nv = r.v * n1;  // Makes this a unit vector...
+        Vector3d i = r.v * n1;
         Vector3d normVec(normal(r2.r[0], r2.r[1]));
-        double alpha = nv.dot(normVec);
+        double cos = i.dot(normVec);
+        if (cos > 0.) {
+            normVec *= -1.;
+            cos *= -1;
+        }
 
         // Flux coefficients
         double reflect, transmit;
-        coating.getCoefs(r.wavelength, alpha, reflect, transmit);
+        coating.getCoefs(r.wavelength, cos, reflect, transmit);
 
         // Reflection calculation
         Ray reflectedRay(
-            r2.r, (nv - 2*alpha*normVec).normalized()/n1,
+            r2.r, (i - 2*cos*normVec)/n1,
             r2.t, r2.wavelength, reflect*r2.flux, r2.vignetted
         );
 
         // Refraction calculation
-        double a = 1.;
-        double b = 2*alpha;
-        double c = (1. - (n2*n2)/(n1*n1));
-        double k1, k2;
-        solveQuadratic(a, b, c, k1, k2);
-        Vector3d f1 = (nv+k1*normVec).normalized();
-        Vector3d f2 = (nv+k2*normVec).normalized();
-        // Use r2 instead of creating a new Ray
-        r2.v = f1.dot(nv)>f2.dot(nv) ? f1/n2 : f2/n2;
-        r2.flux = transmit*r2.flux;
+        double eta = n1/n2;
+        double sinsqr = eta*eta*(1-cos*cos);
+        Vector3d t = eta * i - (eta * cos + std::sqrt(1 - sinsqr)) * normVec;
+        r2.v = t/n2;
+        r2.flux *= transmit;
         return std::make_pair(reflectedRay, r2);
     }
 
