@@ -22,7 +22,7 @@ def test_plane_refraction_plane():
         v /= np.linalg.norm(v)
         ray = batoid.Ray([x, y, -10], v/m1.getN(wavelength), 0)
         rray = plane.refract(ray, m1, m2)
-        np.testing.assert_allclose(np.linalg.norm(rray.v), 1./m2.getN(wavelength), rtol=1e-15)
+        np.testing.assert_allclose(np.linalg.norm(rray.v), 1./m2.getN(wavelength), rtol=1e-14)
         # also check refractInPlace
         rray2 = ray.copy()
         plane.refractInPlace(rray2, m1, m2)
@@ -59,7 +59,7 @@ def test_plane_refraction_reversal():
                          normalized(np.array([vx, vy, 1]))/m1.getN(wavelength),
                          0)
         rray = plane.refract(ray, m1, m2)
-        np.testing.assert_allclose(np.linalg.norm(rray.v), 1./m2.getN(wavelength), rtol=1e-15)
+        np.testing.assert_allclose(np.linalg.norm(rray.v), 1./m2.getN(wavelength), rtol=1e-14)
 
         # Invert the refracted ray, and see that it ends back at the starting
         # point
@@ -73,7 +73,7 @@ def test_plane_refraction_reversal():
         np.testing.assert_allclose(rray.r[2], riray.r[2], rtol=0, atol=1e-10)
         # Refract and propagate back to t=0.
         cray = plane.refract(return_ray, m2, m1)
-        np.testing.assert_allclose(np.linalg.norm(cray.v), 1./m1.getN(wavelength), rtol=1e-15)
+        np.testing.assert_allclose(np.linalg.norm(cray.v), 1./m1.getN(wavelength), rtol=1e-14)
         cpoint = cray.positionAtTime(0)
         np.testing.assert_allclose(cpoint[0], x, rtol=0, atol=1e-10)
         np.testing.assert_allclose(cpoint[1], y, rtol=0, atol=1e-10)
@@ -96,7 +96,7 @@ def test_paraboloid_refraction_plane():
         v = normalized(np.array([vx, vy, 1]))/m1.getN(wavelength)
         ray = batoid.Ray((x, y, -10), (v[0], v[1], v[2]), 0)
         rray = para.refract(ray, m1, m2)
-        np.testing.assert_allclose(np.linalg.norm(rray.v), 1./m2.getN(wavelength), rtol=1e-15)
+        np.testing.assert_allclose(np.linalg.norm(rray.v), 1./m2.getN(wavelength), rtol=1e-14)
         # also check refractInPlace
         rray2 = ray.copy()
         para.refractInPlace(rray2, m1, m2)
@@ -134,7 +134,7 @@ def test_paraboloid_refraction_reversal():
                          normalized(np.array([vx, vy, 1]))/m1.getN(wavelength),
                          0)
         rray = para.refract(ray, m1, m2)
-        np.testing.assert_allclose(np.linalg.norm(rray.v), 1./m2.getN(wavelength), rtol=1e-15)
+        np.testing.assert_allclose(np.linalg.norm(rray.v), 1./m2.getN(wavelength), rtol=1e-14)
 
         # Invert the refracted ray, and see that it ends back at the starting
         # point
@@ -149,7 +149,7 @@ def test_paraboloid_refraction_reversal():
         np.testing.assert_allclose(rray.r[2], riray.r[2], rtol=0, atol=1e-10)
         # Refract and propagate back to t=0.
         cray = para.refract(return_ray, m2, m1)
-        np.testing.assert_allclose(np.linalg.norm(cray.v), 1./m1.getN(wavelength), rtol=1e-15)
+        np.testing.assert_allclose(np.linalg.norm(cray.v), 1./m1.getN(wavelength), rtol=1e-14)
         cpoint = cray.positionAtTime(0)
         np.testing.assert_allclose(cpoint[0], x, rtol=0, atol=1e-10)
         np.testing.assert_allclose(cpoint[1], y, rtol=0, atol=1e-10)
@@ -172,7 +172,7 @@ def test_asphere_refraction_plane():
         v = normalized(np.array([vx, vy, 1]))/m1.getN(wavelength)
         ray = batoid.Ray((x, y, -0.1), (v[0], v[1], v[2]), 0)
         rray = asphere.refract(ray, m1, m2)
-        np.testing.assert_allclose(np.linalg.norm(rray.v), 1./m2.getN(wavelength), rtol=1e-15)
+        np.testing.assert_allclose(np.linalg.norm(rray.v), 1./m2.getN(wavelength), rtol=1e-14)
         # also check refractInPlace
         rray2 = ray.copy()
         asphere.refractInPlace(rray2, m1, m2)
@@ -184,7 +184,7 @@ def test_asphere_refraction_plane():
         normal = asphere.normal(rray.r[0], rray.r[1])
         np.testing.assert_allclose(
             np.dot(np.cross(ray.v, normal), rray.v),
-            0.0, rtol=0, atol=1e-15)
+            0.0, rtol=0, atol=1e-14)
 
         # Test Snell's law
         np.testing.assert_allclose(
@@ -210,7 +210,7 @@ def test_asphere_refraction_reversal():
                          normalized(np.array([vx, vy, 1]))/m1.getN(wavelength),
                          0)
         rray = asphere.refract(ray, m1, m2)
-        np.testing.assert_allclose(np.linalg.norm(rray.v), 1./m2.getN(wavelength), rtol=1e-15)
+        np.testing.assert_allclose(np.linalg.norm(rray.v), 1./m2.getN(wavelength), rtol=1e-14)
 
         # Invert the refracted ray, and see that it ends back at the starting
         # point
@@ -225,7 +225,7 @@ def test_asphere_refraction_reversal():
         np.testing.assert_allclose(rray.r[2], riray.r[2], rtol=0, atol=1e-10)
         # Refract and propagate back to t=0.
         cray = asphere.refract(return_ray, m2, m1)
-        np.testing.assert_allclose(np.linalg.norm(cray.v), 1./m1.getN(wavelength), rtol=1e-15)
+        np.testing.assert_allclose(np.linalg.norm(cray.v), 1./m1.getN(wavelength), rtol=1e-14)
         cpoint = cray.positionAtTime(0)
         np.testing.assert_allclose(cpoint[0], x, rtol=0, atol=1e-10)
         np.testing.assert_allclose(cpoint[1], y, rtol=0, atol=1e-10)
