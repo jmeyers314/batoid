@@ -52,6 +52,51 @@ def test_medium(Nthread, N, Nloop):
 
 
 @timer
+def test_coordtransform(Nthread, N, Nloop):
+    x = np.random.uniform(size=N)
+    y = np.random.uniform(size=N)+1
+    z = np.random.uniform(size=N)-200
+    vx = np.random.uniform(size=N)+3
+    vy = np.random.uniform(size=N)+4
+    vz = np.random.uniform(size=N)+5
+    t = np.zeros(N)
+    w = np.random.uniform(size=N)
+    flux = np.random.uniform(size=N)
+    vignetted = np.zeros(N, dtype=bool)
+    failed = np.zeros(N, dtype=bool)
+
+    rv = batoid.RayVector.fromArrays(
+        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+    )
+    rv2 = batoid.RayVector2.fromArrays(
+        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+    )
+
+    cs1 = batoid.CoordSys(origin=(0,1,2), rot=batoid.RotX(0.1))
+    cs2 = batoid.CoordSys(origin=(20,-1,-2), rot=batoid.RotZ(0.1))
+    xf1 = batoid.CoordTransform(cs1, cs2)
+    xf2 = batoid.CoordTransform2(cs1, cs2)
+
+    t0 = time.time()
+    for _ in range(Nloop):
+        xf1.applyForwardInPlace(rv)
+        xf1.applyReverseInPlace(rv)
+    t1 = time.time()
+    for _ in range(Nloop):
+        xf2.applyForwardInPlace(rv2)
+        xf2.applyReverseInPlace(rv2)
+    t2 = time.time()
+    print("test_coordtransform")
+    print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
+    print(f"gpu time = {(t2-t1)*1e3:.1f} ms")
+
+    if (Nloop == 1):
+        np.testing.assert_allclose(rv.r, rv2.r, rtol=0, atol=1e-13)
+        np.testing.assert_allclose(rv.v, rv2.v, rtol=0, atol=1e-13)
+        np.testing.assert_allclose(rv.t, rv2.t, rtol=0, atol=1e-13)
+
+
+@timer
 def test_intersect_plane(Nthread, N, Nloop):
     batoid._batoid.setNThread(Nthread)
     np.random.seed(57721)
@@ -348,6 +393,7 @@ if __name__ == '__main__':
 
     init_gpu()
     test_medium(Nthread, N, Nloop)
+    test_coordtransform(Nthread, N, Nloop)
     test_intersect_plane(Nthread, N, Nloop)
     test_reflect_plane(Nthread, N, Nloop)
     test_refract_plane(Nthread, N, Nloop)
