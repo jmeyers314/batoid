@@ -263,8 +263,14 @@ class RayVector:
             x = np.random.uniform(-0.5, 0.5, size=nrandom)
             y = np.random.uniform(-0.5, 0.5, size=nrandom)
         else:
-            x_d = (nx-(2 if (nx%2) == 0 else 1))/nx
-            y_d = (ny-(2 if (ny%2) == 0 else 1))/ny
+            if nx <= 2:
+                x_d = 1.
+            else:
+                x_d = (nx-(2 if (nx%2) == 0 else 1))/nx
+            if ny <= 2:
+                y_d = 1.
+            else:
+                y_d = (ny-(2 if (ny%2) == 0 else 1))/ny
             x = np.fft.fftshift(np.fft.fftfreq(nx, x_d))
             y = np.fft.fftshift(np.fft.fftfreq(ny, y_d))
             x, y = np.meshgrid(x, y)
