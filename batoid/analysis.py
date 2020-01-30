@@ -170,7 +170,6 @@ def wavefront(optic, theta_x, theta_y, wavelength,
         optic=optic, wavelength=wavelength,
         nx=nx, dirCos=dirCos
     )
-
     if sphereRadius is None:
         sphereRadius = optic.sphereRadius
 
@@ -181,7 +180,6 @@ def wavefront(optic, theta_x, theta_y, wavelength,
     elif reference == 'chief':
         cridx = (nx//2)*nx+nx//2 if (nx%2)==0 else (nx*nx-1)//2
         point = rays[cridx].r
-
     # Place vertex of reference sphere one radius length away from the
     # intersection point.  So transform our rays into that coordinate system.
     targetCoordSys = rays.coordSys.shiftLocal(
@@ -213,6 +211,32 @@ def wavefront(optic, theta_x, theta_y, wavelength,
         )
     return batoid.Lattice(arr, primitiveVectors)
 
+
+def spot(optic, theta_x, theta_y, wavelength,
+         projection='postel', nx=32, reference='mean', sphereRadius=None):
+    dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
+    rays = batoid.RayVector.asGrid(
+        optic=optic, wavelength=wavelength,
+        nx=nx, dirCos=dirCos
+    )
+    if sphereRadius is None:
+        sphereRadius = optic.sphereRadius
+    optic.traceInPlace(rays)
+    if reference == 'mean':
+        w = np.where(1-rays.vignetted)[0]
+        point = np.mean(rays.r[w], axis=0)
+    elif reference == 'chief':
+        cridx = (nx//2)*nx+nx//2 if (nx%2)==0 else (nx*nx-1)//2
+        point = rays[cridx].r
+    # Place vertex of reference sphere one radius length away from the
+    # intersection point.  So transform our rays into that coordinate system.
+    targetCoordSys = rays.coordSys.shiftLocal(
+        point+np.array([0,0,sphereRadius])
+    )
+    rays.toCoordSysInPlace(targetCoordSys)
+
+    w = ~rays.vignetted
+    return rays.x[w], rays.y[w]
 
 def fftPSF(optic, theta_x, theta_y, wavelength,
            projection='postel', nx=32, pad_factor=2,
