@@ -50,3 +50,21 @@ class Paraboloid2(Surface2):
     @lazy_property
     def _surface(self):
         return _batoid.CPPParaboloid2(self._R)
+
+
+class Quadric2(Surface2):
+    def __init__(self, R, conic):
+        self._R = R
+        self._conic = conic
+
+    @property
+    def R(self):
+        return self._R
+
+    @property
+    def conic(self):
+        return self._conic
+
+    @lazy_property
+    def _surface(self):
+        return _batoid.CPPQuadric2(self._R, self._conic)

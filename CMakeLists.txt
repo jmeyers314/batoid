@@ -63,6 +63,7 @@ set(PYSRC_FILES
   pysrc/paraboloid2.cpp
   pysrc/plane2.cpp
   pysrc/sphere2.cpp
+  pysrc/quadric2.cpp
 )
 set(SRC_FILES
   src/asphere.cpp
@@ -92,6 +93,7 @@ set(SRC_FILES
   src/paraboloid2.cpp
   src/plane2.cpp
   src/sphere2.cpp
+  src/quadric2.cpp
 )
 
 set(ALL_FILES ${SRC_FILES} ${PYSRC_FILES})
