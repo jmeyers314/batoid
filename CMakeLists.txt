@@ -60,6 +60,7 @@ set(PYSRC_FILES
   pysrc/medium2.cpp
   pysrc/rayVector2.cpp
   pysrc/surface2.cpp
+  pysrc/paraboloid2.cpp
   pysrc/plane2.cpp
   pysrc/sphere2.cpp
 )
@@ -88,6 +89,7 @@ set(SRC_FILES
   src/medium2.cpp
   src/rayVector2.cpp
   src/surface2.cpp
+  src/paraboloid2.cpp
   src/plane2.cpp
   src/sphere2.cpp
 )

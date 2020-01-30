@@ -1,5 +1,5 @@
-#ifndef batoid_sphere2_h
-#define batoid_sphere2_h
+#ifndef batoid_paraboloid2_h
+#define batoid_paraboloid2_h
 
 #include <sstream>
 #include <limits>
@@ -8,9 +8,9 @@
 
 namespace batoid {
 
-    class Sphere2 : public Surface2CRTP<Sphere2> {
+    class Paraboloid2 : public Surface2CRTP<Paraboloid2> {
     public:
-        Sphere2(double R);
+        Paraboloid2(double R);
 
         double _sag(double, double) const;
         void _normal(double, double, double&, double&, double&) const;
@@ -18,11 +18,8 @@ namespace batoid {
 
     private:
         const double _R;  // Radius of curvature
-        const double _Rsq; // R*R
         const double _Rinv; // 1/R
-        const double _Rinvsq; // 1/R/R
-
-        double _dzdr(double r) const;
+        const double _2Rinv; // 1/(2*R)
     };
 }
 #endif

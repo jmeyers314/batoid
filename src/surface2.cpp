@@ -2,6 +2,7 @@
 #include "surface2.h"
 #include "plane2.h"
 #include "sphere2.h"
+#include "paraboloid2.h"
 
 namespace batoid {
 
@@ -158,4 +159,5 @@ namespace batoid {
     // Instantiations
     template class Surface2CRTP<Plane2>;
     template class Surface2CRTP<Sphere2>;
+    template class Surface2CRTP<Paraboloid2>;
 }

@@ -37,3 +37,16 @@ class Sphere2(Surface2):
     @lazy_property
     def _surface(self):
         return _batoid.CPPSphere2(self._R)
+
+
+class Paraboloid2(Surface2):
+    def __init__(self, R):
+        self._R = R
+
+    @property
+    def R(self):
+        return self._R
+
+    @lazy_property
+    def _surface(self):
+        return _batoid.CPPParaboloid2(self._R)

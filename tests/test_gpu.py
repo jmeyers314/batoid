@@ -5,10 +5,10 @@ from test_helpers import timer, rays_allclose, init_gpu
 
 
 @timer
-def test_medium(Nthread, N, Nloop):
+def test_medium(Nthread, Nray, Nloop):
     batoid._batoid.setNThread(Nthread)
     np.random.seed(57721)
-    wavelength = np.random.uniform(size=N)
+    wavelength = np.random.uniform(size=Nray)
 
     mcpus = [
         batoid.ConstMedium(1.1),
@@ -52,18 +52,18 @@ def test_medium(Nthread, N, Nloop):
 
 
 @timer
-def test_coordtransform(Nthread, N, Nloop):
-    x = np.random.uniform(size=N)
-    y = np.random.uniform(size=N)+1
-    z = np.random.uniform(size=N)-200
-    vx = np.random.uniform(size=N)+3
-    vy = np.random.uniform(size=N)+4
-    vz = np.random.uniform(size=N)+5
-    t = np.zeros(N)
-    w = np.random.uniform(size=N)
-    flux = np.random.uniform(size=N)
-    vignetted = np.zeros(N, dtype=bool)
-    failed = np.zeros(N, dtype=bool)
+def test_coordtransform(Nthread, Nray, Nloop):
+    x = np.random.uniform(size=Nray)
+    y = np.random.uniform(size=Nray)+1
+    z = np.random.uniform(size=Nray)-200
+    vx = np.random.uniform(size=Nray)+3
+    vy = np.random.uniform(size=Nray)+4
+    vz = np.random.uniform(size=Nray)+5
+    t = np.zeros(Nray)
+    w = np.random.uniform(size=Nray)
+    flux = np.random.uniform(size=Nray)
+    vignetted = np.zeros(Nray, dtype=bool)
+    failed = np.zeros(Nray, dtype=bool)
 
     rv = batoid.RayVector.fromArrays(
         x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
@@ -97,21 +97,21 @@ def test_coordtransform(Nthread, N, Nloop):
 
 
 @timer
-def test_intersect_plane(Nthread, N, Nloop):
+def test_intersect_plane(Nthread, Nray, Nloop):
     batoid._batoid.setNThread(Nthread)
     np.random.seed(57721)
 
-    x = np.random.uniform(size=N)
-    y = np.random.uniform(size=N)+1
-    z = np.random.uniform(size=N)-200
-    vx = np.random.uniform(size=N)+3
-    vy = np.random.uniform(size=N)+4
-    vz = np.random.uniform(size=N)+5
-    t = np.zeros(N)
-    w = np.random.uniform(size=N)
-    flux = np.random.uniform(size=N)
-    vignetted = np.zeros(N, dtype=bool)
-    failed = np.zeros(N, dtype=bool)
+    x = np.random.uniform(size=Nray)
+    y = np.random.uniform(size=Nray)+1
+    z = np.random.uniform(size=Nray)-200
+    vx = np.random.uniform(size=Nray)+3
+    vy = np.random.uniform(size=Nray)+4
+    vz = np.random.uniform(size=Nray)+5
+    t = np.zeros(Nray)
+    w = np.random.uniform(size=Nray)
+    flux = np.random.uniform(size=Nray)
+    vignetted = np.zeros(Nray, dtype=bool)
+    failed = np.zeros(Nray, dtype=bool)
 
     rv = batoid.RayVector.fromArrays(
         x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
@@ -141,21 +141,21 @@ def test_intersect_plane(Nthread, N, Nloop):
 
 
 @timer
-def test_reflect_plane(Nthread, N, Nloop):
+def test_reflect_plane(Nthread, Nray, Nloop):
     batoid._batoid.setNThread(Nthread)
     np.random.seed(57721)
 
-    x = np.random.uniform(size=N)
-    y = np.random.uniform(size=N)+1
-    z = np.random.uniform(size=N)-200
-    vx = np.random.uniform(size=N)+3
-    vy = np.random.uniform(size=N)+4
-    vz = np.random.uniform(size=N)+5
-    t = np.zeros(N)
-    w = np.random.uniform(size=N)
-    flux = np.random.uniform(size=N)
-    vignetted = np.zeros(N, dtype=bool)
-    failed = np.zeros(N, dtype=bool)
+    x = np.random.uniform(size=Nray)
+    y = np.random.uniform(size=Nray)+1
+    z = np.random.uniform(size=Nray)-200
+    vx = np.random.uniform(size=Nray)+3
+    vy = np.random.uniform(size=Nray)+4
+    vz = np.random.uniform(size=Nray)+5
+    t = np.zeros(Nray)
+    w = np.random.uniform(size=Nray)
+    flux = np.random.uniform(size=Nray)
+    vignetted = np.zeros(Nray, dtype=bool)
+    failed = np.zeros(Nray, dtype=bool)
 
     rv = batoid.RayVector.fromArrays(
         x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
@@ -186,21 +186,21 @@ def test_reflect_plane(Nthread, N, Nloop):
 
 
 @timer
-def test_refract_plane(Nthread, N, Nloop):
+def test_refract_plane(Nthread, Nray, Nloop):
     batoid._batoid.setNThread(Nthread)
     np.random.seed(57721)
 
-    x = np.random.uniform(size=N)
-    y = np.random.uniform(size=N)+1
-    z = np.random.uniform(size=N)-200
-    vx = np.random.uniform(size=N)+3
-    vy = np.random.uniform(size=N)+4
-    vz = np.random.uniform(size=N)+5
-    t = np.zeros(N)
-    w = np.random.uniform(size=N)
-    flux = np.random.uniform(size=N)
-    vignetted = np.zeros(N, dtype=bool)
-    failed = np.zeros(N, dtype=bool)
+    x = np.random.uniform(size=Nray)
+    y = np.random.uniform(size=Nray)+1
+    z = np.random.uniform(size=Nray)-200
+    vx = np.random.uniform(size=Nray)+3
+    vy = np.random.uniform(size=Nray)+4
+    vz = np.random.uniform(size=Nray)+5
+    t = np.zeros(Nray)
+    w = np.random.uniform(size=Nray)
+    flux = np.random.uniform(size=Nray)
+    vignetted = np.zeros(Nray, dtype=bool)
+    failed = np.zeros(Nray, dtype=bool)
     v = np.sqrt(vx*vx+vy*vy+vz*vz)
     vx /= 1.1*v
     vy /= 1.1*v
@@ -239,21 +239,21 @@ def test_refract_plane(Nthread, N, Nloop):
 
 
 @timer
-def test_intersect_sphere(Nthread, N, Nloop):
+def test_intersect_sphere(Nthread, Nray, Nloop):
     batoid._batoid.setNThread(Nthread)
     np.random.seed(57721)
 
-    x = np.random.uniform(size=N)-0.5
-    y = np.random.uniform(size=N)-0.5
-    z = np.random.uniform(size=N)+5
-    vx = np.random.uniform(size=N)*0.02-0.01
-    vy = np.random.uniform(size=N)*0.02-0.01
-    vz = np.random.uniform(size=N)*(-1)
-    t = np.zeros(N)
-    w = np.random.uniform(size=N)
-    flux = np.random.uniform(size=N)
-    vignetted = np.zeros(N, dtype=bool)
-    failed = np.zeros(N, dtype=bool)
+    x = np.random.uniform(size=Nray)-0.5
+    y = np.random.uniform(size=Nray)-0.5
+    z = np.random.uniform(size=Nray)+5
+    vx = np.random.uniform(size=Nray)*0.02-0.01
+    vy = np.random.uniform(size=Nray)*0.02-0.01
+    vz = np.random.uniform(size=Nray)*(-1)
+    t = np.zeros(Nray)
+    w = np.random.uniform(size=Nray)
+    flux = np.random.uniform(size=Nray)
+    vignetted = np.zeros(Nray, dtype=bool)
+    failed = np.zeros(Nray, dtype=bool)
 
     rv = batoid.RayVector.fromArrays(
         x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
@@ -283,21 +283,21 @@ def test_intersect_sphere(Nthread, N, Nloop):
 
 
 @timer
-def test_reflect_sphere(Nthread, N, Nloop):
+def test_reflect_sphere(Nthread, Nray, Nloop):
     batoid._batoid.setNThread(Nthread)
     np.random.seed(57721)
 
-    x = np.random.uniform(size=N)-0.5
-    y = np.random.uniform(size=N)-0.5
-    z = np.random.uniform(size=N)+5
-    vx = np.random.uniform(size=N)*0.02-0.01
-    vy = np.random.uniform(size=N)*0.02-0.01
-    vz = np.random.uniform(size=N)*(-1)
-    t = np.zeros(N)
-    w = np.random.uniform(size=N)
-    flux = np.random.uniform(size=N)
-    vignetted = np.zeros(N, dtype=bool)
-    failed = np.zeros(N, dtype=bool)
+    x = np.random.uniform(size=Nray)-0.5
+    y = np.random.uniform(size=Nray)-0.5
+    z = np.random.uniform(size=Nray)+5
+    vx = np.random.uniform(size=Nray)*0.02-0.01
+    vy = np.random.uniform(size=Nray)*0.02-0.01
+    vz = np.random.uniform(size=Nray)*(-1)
+    t = np.zeros(Nray)
+    w = np.random.uniform(size=Nray)
+    flux = np.random.uniform(size=Nray)
+    vignetted = np.zeros(Nray, dtype=bool)
+    failed = np.zeros(Nray, dtype=bool)
 
     rv = batoid.RayVector.fromArrays(
         x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
@@ -328,21 +328,21 @@ def test_reflect_sphere(Nthread, N, Nloop):
 
 
 @timer
-def test_refract_sphere(Nthread, N, Nloop):
+def test_refract_sphere(Nthread, Nray, Nloop):
     batoid._batoid.setNThread(Nthread)
     np.random.seed(57721)
 
-    x = np.random.uniform(size=N)-0.5
-    y = np.random.uniform(size=N)-0.5
-    z = np.random.uniform(size=N)+5
-    vx = np.random.uniform(size=N)*0.02-0.01
-    vy = np.random.uniform(size=N)*0.02-0.01
-    vz = np.random.uniform(size=N)*(-1)
-    t = np.zeros(N)
-    w = np.random.uniform(size=N)
-    flux = np.random.uniform(size=N)
-    vignetted = np.zeros(N, dtype=bool)
-    failed = np.zeros(N, dtype=bool)
+    x = np.random.uniform(size=Nray)-0.5
+    y = np.random.uniform(size=Nray)-0.5
+    z = np.random.uniform(size=Nray)+5
+    vx = np.random.uniform(size=Nray)*0.02-0.01
+    vy = np.random.uniform(size=Nray)*0.02-0.01
+    vz = np.random.uniform(size=Nray)*(-1)
+    t = np.zeros(Nray)
+    w = np.random.uniform(size=Nray)
+    flux = np.random.uniform(size=Nray)
+    vignetted = np.zeros(Nray, dtype=bool)
+    failed = np.zeros(Nray, dtype=bool)
     v = np.sqrt(vx*vx+vy*vy+vz*vz)
     vx /= 1.1*v
     vy /= 1.1*v
@@ -380,23 +380,166 @@ def test_refract_sphere(Nthread, N, Nloop):
         np.testing.assert_allclose(rv.t, rv2.t, rtol=0, atol=1e-13)
 
 
+@timer
+def test_intersect_paraboloid(Nthread, Nray, Nloop):
+    batoid._batoid.setNThread(Nthread)
+    np.random.seed(57721)
+
+    x = np.random.uniform(size=Nray)-0.5
+    y = np.random.uniform(size=Nray)-0.5
+    z = np.random.uniform(size=Nray)+5
+    vx = np.random.uniform(size=Nray)*0.02-0.01
+    vy = np.random.uniform(size=Nray)*0.02-0.01
+    vz = np.random.uniform(size=Nray)*(-1)
+    t = np.zeros(Nray)
+    w = np.random.uniform(size=Nray)
+    flux = np.random.uniform(size=Nray)
+    vignetted = np.zeros(Nray, dtype=bool)
+    failed = np.zeros(Nray, dtype=bool)
+
+    rv = batoid.RayVector.fromArrays(
+        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+    )
+    rv2 = batoid.RayVector2.fromArrays(
+        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+    )
+
+    paraboloid = batoid.Paraboloid(21.5)
+    paraboloid2 = batoid.Paraboloid2(21.5)
+
+    t0 = time.time()
+    for _ in range(Nloop):
+        paraboloid.intersectInPlace(rv)
+    t1 = time.time()
+    for _ in range(Nloop):
+        paraboloid2.intersectInPlace(rv2)
+    t2 = time.time()
+    print("test_intersect_paraboloid")
+    print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
+    print(f"gpu time = {(t2-t1)*1e3:.1f} ms")
+
+    if (Nloop == 1):
+        np.testing.assert_allclose(rv.r, rv2.r, rtol=0, atol=1e-13)
+        np.testing.assert_allclose(rv.v, rv2.v, rtol=0, atol=1e-13)
+        np.testing.assert_allclose(rv.t, rv2.t, rtol=0, atol=1e-13)
+
+
+@timer
+def test_reflect_paraboloid(Nthread, Nray, Nloop):
+    batoid._batoid.setNThread(Nthread)
+    np.random.seed(57721)
+
+    x = np.random.uniform(size=Nray)-0.5
+    y = np.random.uniform(size=Nray)-0.5
+    z = np.random.uniform(size=Nray)+5
+    vx = np.random.uniform(size=Nray)*0.02-0.01
+    vy = np.random.uniform(size=Nray)*0.02-0.01
+    vz = np.random.uniform(size=Nray)*(-1)
+    t = np.zeros(Nray)
+    w = np.random.uniform(size=Nray)
+    flux = np.random.uniform(size=Nray)
+    vignetted = np.zeros(Nray, dtype=bool)
+    failed = np.zeros(Nray, dtype=bool)
+
+    rv = batoid.RayVector.fromArrays(
+        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+    )
+    rv2 = batoid.RayVector2.fromArrays(
+        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+    )
+
+    paraboloid = batoid.Paraboloid(21.5)
+    paraboloid2 = batoid.Paraboloid2(21.5)
+
+    t0 = time.time()
+    for _ in range(Nloop):
+        paraboloid.reflectInPlace(rv)
+    t1 = time.time()
+    for _ in range(Nloop):
+        paraboloid2.reflectInPlace(rv2)
+    t2 = time.time()
+    print("test_reflect_paraboloid")
+    print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
+    print(f"gpu time = {(t2-t1)*1e3:.1f} ms")
+
+    if (Nloop == 1):
+        np.testing.assert_allclose(rv.r, rv2.r, rtol=0, atol=1e-13)
+        np.testing.assert_allclose(rv.v, rv2.v, rtol=0, atol=1e-13)
+        np.testing.assert_allclose(rv.t, rv2.t, rtol=0, atol=1e-13)
+
+
+@timer
+def test_refract_paraboloid(Nthread, Nray, Nloop):
+    batoid._batoid.setNThread(Nthread)
+    np.random.seed(57721)
+
+    x = np.random.uniform(size=Nray)-0.5
+    y = np.random.uniform(size=Nray)-0.5
+    z = np.random.uniform(size=Nray)+5
+    vx = np.random.uniform(size=Nray)*0.02-0.01
+    vy = np.random.uniform(size=Nray)*0.02-0.01
+    vz = np.random.uniform(size=Nray)*(-1)
+    t = np.zeros(Nray)
+    w = np.random.uniform(size=Nray)
+    flux = np.random.uniform(size=Nray)
+    vignetted = np.zeros(Nray, dtype=bool)
+    v = np.sqrt(vx*vx+vy*vy+vz*vz)
+    vx /= 1.1*v
+    vy /= 1.1*v
+    vz /= 1.1*v
+    failed = np.zeros(Nray, dtype=bool)
+
+    rv = batoid.RayVector.fromArrays(
+        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+    )
+    rv2 = batoid.RayVector2.fromArrays(
+        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+    )
+
+    paraboloid = batoid.Paraboloid(21.5)
+    paraboloid2 = batoid.Paraboloid2(21.5)
+
+    m1 = batoid.ConstMedium(1.1)
+    m2 = batoid.ConstMedium(1.2)
+    m1gpu = batoid.ConstMedium2(1.1)
+    m2gpu = batoid.ConstMedium2(1.2)
+
+    t0 = time.time()
+    for _ in range(Nloop):
+        paraboloid.refractInPlace(rv, m1, m2)
+    t1 = time.time()
+    for _ in range(Nloop):
+        paraboloid2.refractInPlace(rv2, m1gpu, m2gpu)
+    t2 = time.time()
+    print("test_refract_paraboloid")
+    print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
+    print(f"gpu time = {(t2-t1)*1e3:.1f} ms")
+
+    if (Nloop == 1):
+        np.testing.assert_allclose(rv.r, rv2.r, rtol=0, atol=1e-13)
+        np.testing.assert_allclose(rv.v, rv2.v, rtol=0, atol=1e-13)
+        np.testing.assert_allclose(rv.t, rv2.t, rtol=0, atol=1e-13)
+
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
-    parser.add_argument("-N", type=int, default=3_000_000)
+    parser.add_argument("-Nray", type=int, default=3_000_000)
     parser.add_argument("-Nthread", type=int, default=12)
     parser.add_argument("-Nloop", type=int, default=50)
     args = parser.parse_args()
-    N = args.N
+    Nray = args.Nray
     Nthread = args.Nthread
     Nloop = args.Nloop
 
     init_gpu()
-    test_medium(Nthread, N, Nloop)
-    test_coordtransform(Nthread, N, Nloop)
-    test_intersect_plane(Nthread, N, Nloop)
-    test_reflect_plane(Nthread, N, Nloop)
-    test_refract_plane(Nthread, N, Nloop)
-    test_intersect_sphere(Nthread, N, Nloop)
-    test_reflect_sphere(Nthread, N, Nloop)
-    test_refract_sphere(Nthread, N, Nloop)
+    test_medium(Nthread, Nray, Nloop)
+    test_coordtransform(Nthread, Nray, Nloop)
+    test_intersect_plane(Nthread, Nray, Nloop)
+    test_reflect_plane(Nthread, Nray, Nloop)
+    test_refract_plane(Nthread, Nray, Nloop)
+    test_intersect_sphere(Nthread, Nray, Nloop)
+    test_reflect_sphere(Nthread, Nray, Nloop)
+    test_refract_sphere(Nthread, Nray, Nloop)
+    test_intersect_paraboloid(Nthread, Nray, Nloop)
+    test_reflect_paraboloid(Nthread, Nray, Nloop)
+    test_refract_paraboloid(Nthread, Nray, Nloop)
