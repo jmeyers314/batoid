@@ -244,4 +244,38 @@ namespace batoid {
         refracted.trimVignettedInPlace(0.0);
         return std::make_pair(reflected, refracted);
     }
+
+    bool Surface::timeToIntersect(const Ray& r, double& t) const {
+        // Note t should be a good guess coming in for stability.
+        // Algorithm is:
+        // x,y,z <- ray.position(t)
+        // sag <- surface.sag(x,y)
+        // if z == sag
+        //   return
+        // normVec <- surface.normal(x,y)
+        // plane <- Plane((x,y,sag), normVec)
+        // t <- plane.intersect(r)
+        // x,z,y <- ray.position(t)
+        // sag <- surface.sag(x,y)
+        // if z == sag
+        //   return
+        // ...
+        Vector3d rayPoint = r.positionAtTime(t);
+        double surfaceZ = sag(rayPoint[0], rayPoint[1]);
+        size_t iter=0;
+        double err = std::abs(surfaceZ - rayPoint[2]);
+        while (err > 1e-12 && iter < 50) {
+            Vector3d normVec = normal(rayPoint[0], rayPoint[1]);
+            Vector3d surfacePoint{rayPoint[0], rayPoint[1], surfaceZ};
+            t = normVec.dot(surfacePoint - r.r) / normVec.dot(r.v) + r.t;
+            rayPoint = r.positionAtTime(t);
+            surfaceZ = sag(rayPoint[0], rayPoint[1]);
+            iter++;
+            err = std::abs(surfaceZ - rayPoint[2]);
+        }
+        if (iter == 50)
+            return false;
+        return true;
+    }
+
 }

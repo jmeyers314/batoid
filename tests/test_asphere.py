@@ -78,7 +78,6 @@ def test_intersect():
             np.testing.assert_allclose(r.r[0], x)
             np.testing.assert_allclose(r.r[1], y)
             np.testing.assert_allclose(r.r[2], asphere.sag(x, y), rtol=0, atol=1e-9)
-
     # Check normal for R=0 paraboloid (a plane)
     asphere = batoid.Asphere(0.0, 0.0, [])
     np.testing.assert_array_equal(asphere.normal(0.1, 0.1), [0,0,1])
@@ -128,6 +127,7 @@ def test_intersect_vectorized():
 
         r1s = asphere.intersect(r0s)
         r2s = batoid.RayVector([asphere.intersect(r0) for r0 in r0s])
+        np.testing.assert_allclose(asphere.sag(r1s.x, r1s.y), r1s.z, rtol=0, atol=1e-12)
         assert r1s == r2s
 
 

@@ -18,7 +18,7 @@ namespace batoid {
         Asphere(double R, double conic, std::vector<double> coefs);
         virtual double sag(double, double) const override;
         virtual Vector3d normal(double, double) const override;
-        bool timeToIntersect(const Ray& r, double& t) const override;
+        virtual bool timeToIntersect(const Ray& r, double& t) const override;
 
         const std::vector<double>& getCoefs() const { return _coefs; }
 
