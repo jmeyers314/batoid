@@ -1,8 +1,17 @@
+import pytest
 import numpy as np
 import batoid
 from test_helpers import timer
 
 
+hasGalSim = True
+try:
+    import galsim
+except ImportError:
+    hasGalSim = False
+
+
+@pytest.mark.skipif(not hasGalSim, reason="galsim not found")
 @timer
 def test_zernikeGQ():
     if __name__ == '__main__':

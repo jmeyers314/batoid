@@ -1,11 +1,12 @@
+import pytest
 import time
 import numpy as np
 import batoid
 from test_helpers import timer, rays_allclose, init_gpu
 
-
 @timer
-def test_medium(Nthread, Nray, Nloop):
+@pytest.mark.gpu
+def test_medium(Nthread=1, Nray=100_000, Nloop=1):
     batoid._batoid.setNThread(Nthread)
     np.random.seed(57721)
     wavelength = np.random.uniform(size=Nray)
@@ -52,7 +53,8 @@ def test_medium(Nthread, Nray, Nloop):
 
 
 @timer
-def test_coordtransform(Nthread, Nray, Nloop):
+@pytest.mark.gpu
+def test_coordtransform(Nthread=1, Nray=100_000, Nloop=1):
     x = np.random.uniform(size=Nray)
     y = np.random.uniform(size=Nray)+1
     z = np.random.uniform(size=Nray)-200
@@ -97,7 +99,8 @@ def test_coordtransform(Nthread, Nray, Nloop):
 
 
 @timer
-def test_intersect_plane(Nthread, Nray, Nloop):
+@pytest.mark.gpu
+def test_intersect_plane(Nthread=1, Nray=100_000, Nloop=1):
     batoid._batoid.setNThread(Nthread)
     np.random.seed(57721)
 
@@ -141,7 +144,8 @@ def test_intersect_plane(Nthread, Nray, Nloop):
 
 
 @timer
-def test_reflect_plane(Nthread, Nray, Nloop):
+@pytest.mark.gpu
+def test_reflect_plane(Nthread=1, Nray=100_000, Nloop=1):
     batoid._batoid.setNThread(Nthread)
     np.random.seed(57721)
 
@@ -186,7 +190,8 @@ def test_reflect_plane(Nthread, Nray, Nloop):
 
 
 @timer
-def test_refract_plane(Nthread, Nray, Nloop):
+@pytest.mark.gpu
+def test_refract_plane(Nthread=1, Nray=100_000, Nloop=1):
     batoid._batoid.setNThread(Nthread)
     np.random.seed(57721)
 
@@ -239,7 +244,8 @@ def test_refract_plane(Nthread, Nray, Nloop):
 
 
 @timer
-def test_intersect_sphere(Nthread, Nray, Nloop):
+@pytest.mark.gpu
+def test_intersect_sphere(Nthread=1, Nray=100_000, Nloop=1):
     batoid._batoid.setNThread(Nthread)
     np.random.seed(57721)
 
@@ -283,7 +289,8 @@ def test_intersect_sphere(Nthread, Nray, Nloop):
 
 
 @timer
-def test_reflect_sphere(Nthread, Nray, Nloop):
+@pytest.mark.gpu
+def test_reflect_sphere(Nthread=1, Nray=100_000, Nloop=1):
     batoid._batoid.setNThread(Nthread)
     np.random.seed(57721)
 
@@ -328,7 +335,8 @@ def test_reflect_sphere(Nthread, Nray, Nloop):
 
 
 @timer
-def test_refract_sphere(Nthread, Nray, Nloop):
+@pytest.mark.gpu
+def test_refract_sphere(Nthread=1, Nray=100_000, Nloop=1):
     batoid._batoid.setNThread(Nthread)
     np.random.seed(57721)
 
@@ -381,7 +389,8 @@ def test_refract_sphere(Nthread, Nray, Nloop):
 
 
 @timer
-def test_intersect_paraboloid(Nthread, Nray, Nloop):
+@pytest.mark.gpu
+def test_intersect_paraboloid(Nthread=1, Nray=100_000, Nloop=1):
     batoid._batoid.setNThread(Nthread)
     np.random.seed(57721)
 
@@ -425,7 +434,8 @@ def test_intersect_paraboloid(Nthread, Nray, Nloop):
 
 
 @timer
-def test_reflect_paraboloid(Nthread, Nray, Nloop):
+@pytest.mark.gpu
+def test_reflect_paraboloid(Nthread=1, Nray=100_000, Nloop=1):
     batoid._batoid.setNThread(Nthread)
     np.random.seed(57721)
 
@@ -469,7 +479,8 @@ def test_reflect_paraboloid(Nthread, Nray, Nloop):
 
 
 @timer
-def test_refract_paraboloid(Nthread, Nray, Nloop):
+@pytest.mark.gpu
+def test_refract_paraboloid(Nthread=1, Nray=100_000, Nloop=1):
     batoid._batoid.setNThread(Nthread)
     np.random.seed(57721)
 
@@ -522,7 +533,8 @@ def test_refract_paraboloid(Nthread, Nray, Nloop):
 
 
 @timer
-def test_intersect_quadric(Nthread, Nray, Nloop):
+@pytest.mark.gpu
+def test_intersect_quadric(Nthread=1, Nray=100_000, Nloop=1):
     batoid._batoid.setNThread(Nthread)
     np.random.seed(57721)
 
@@ -566,7 +578,8 @@ def test_intersect_quadric(Nthread, Nray, Nloop):
 
 
 @timer
-def test_reflect_quadric(Nthread, Nray, Nloop):
+@pytest.mark.gpu
+def test_reflect_quadric(Nthread=1, Nray=100_000, Nloop=1):
     batoid._batoid.setNThread(Nthread)
     np.random.seed(57721)
 
@@ -610,7 +623,8 @@ def test_reflect_quadric(Nthread, Nray, Nloop):
 
 
 @timer
-def test_refract_quadric(Nthread, Nray, Nloop):
+@pytest.mark.gpu
+def test_refract_quadric(Nthread=1, Nray=100_000, Nloop=1):
     batoid._batoid.setNThread(Nthread)
     np.random.seed(57721)
 

@@ -815,126 +815,18 @@ def test_RV_factory_optic():
     )
     assert rays_allclose(grid1, grid2)
 
-SIZE = 1_000_000
-@timer
-def test_RV2():
-    np.random.seed(57721)
-    x = np.random.uniform(size=SIZE)
-    y = np.random.uniform(size=SIZE)+1
-    z = np.random.uniform(size=SIZE)+2
-    vx = np.random.uniform(size=SIZE)+3
-    vy = np.random.uniform(size=SIZE)+4
-    vz = np.random.uniform(size=SIZE)+5
-    t = np.random.uniform(size=SIZE)
-    w = np.random.uniform(size=SIZE)
-    flux = np.random.uniform(size=SIZE)
-    vignetted = np.zeros(SIZE, dtype=bool)
-    failed = np.zeros(SIZE, dtype=bool)
-    # RV2 = batoid.RayVector2.fromArrays(
-    #     x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
-    # )
-    # assert RV2._rv2.owner == RV2._rv2.Owner.host
-    # # Force a copy from host -> device
-    # RV2._rv2.sendToDevice()
-    # assert RV2._rv2.owner == RV2._rv2.Owner.device
-    # # Now manipulate host RAM so original is locally lost
-    # RV2._t[:] = 0.0
-    # RV2._r[:, 0] = 0.0
-    # np.testing.assert_equal(RV2._t, 0.0)
-    # np.testing.assert_equal(RV2._r[:, 0], 0.0)
-    # np.testing.assert_equal(RV2._r[:, 1], y)
-    # np.testing.assert_equal(RV2._r[:, 2], z)
-    # # But calling an RV2 property should trigger a synchronize and get the data
-    # # back from the device.
-    # assert RV2._rv2.owner == RV2._rv2.Owner.device
-    # np.testing.assert_equal(RV2.t, t)
-    # np.testing.assert_equal(RV2.x, x)
-    # assert RV2._rv2.owner == RV2._rv2.Owner.host
-    #
-    # RV3 = batoid.RayVector2.fromArrays(
-    #     x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
-    # )
-    # assert RV2._rv2 == RV3._rv2
-    # RV3.t[:] = 0.0
-    # assert RV2._rv2 != RV3._rv2
-
-    # Try a trivial positionAtTime calculation
-    t[:] = 0.0
-    RV2 = batoid.RayVector2.fromArrays(
-        x, y, z, vx, vy, vz, t, w, flux,
-        vignetted, failed
-    )
-    result = np.zeros_like(RV2.r)
-    RV2._rv2.positionAtTime(0.0, result)
-    np.testing.assert_equal(result, RV2.r)
-
-    vx[:] = 1.0
-    vy[:] = 1.0
-    vz[:] = 1.0
-    RV2 = batoid.RayVector2.fromArrays(
-        x, y, z, vx, vy, vz, t, w, flux,
-        vignetted, failed
-    )
-    result = np.zeros_like(RV2.r)
-    RV2._rv2.positionAtTime(1.0, result)
-    np.testing.assert_allclose(result, RV2.r+1)
-
-
-# for comparison...
-@timer
-def test_RV():
-    batoid._batoid.setNThread(4)
-    print(batoid._batoid.getNThread())
-    np.random.seed(57721)
-    x = np.random.uniform(size=SIZE)
-    y = np.random.uniform(size=SIZE)+1
-    z = np.random.uniform(size=SIZE)+2
-    vx = np.random.uniform(size=SIZE)+3
-    vy = np.random.uniform(size=SIZE)+4
-    vz = np.random.uniform(size=SIZE)+5
-    t = np.random.uniform(size=SIZE)
-    w = np.random.uniform(size=SIZE)
-    flux = np.random.uniform(size=SIZE)
-    vignetted = np.zeros(SIZE, dtype=bool)
-    failed = np.zeros(SIZE, dtype=bool)
-    RV = batoid.RayVector.fromArrays(
-        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
-    )
-    # Try a trivial positionAtTime calculation
-    t[...] = 0.0
-    RV = batoid.RayVector.fromArrays(
-        x, y, z, vx, vy, vz, t, w, flux,
-        vignetted, failed
-    )
-    result = RV.positionAtTime(0.0)
-    np.testing.assert_equal(result, RV.r)
-
-    vx[:] = 1.0
-    vy[:] = 1.0
-    vz[:] = 1.0
-    RV = batoid.RayVector.fromArrays(
-        x, y, z, vx, vy, vz, t, w, flux,
-        vignetted, failed
-    )
-    result = RV.positionAtTime(1.0)
-    np.testing.assert_equal(result, RV.r+1)
-
-
-
 if __name__ == '__main__':
-    # test_positionAtTime()
-    # test_properties()
-    # test_phase()
-    # test_RayVector()
-    # test_rayGrid()
-    # test_circularGrid()
-    # test_uniformCircularGrid()
-    # test_pointSourceCircularGrid()
-    # test_ne()
-    # test_fail()
-    # test_RVasGrid()
-    # test_RVasPolar()
-    # test_RVasSpokes()
-    # test_RV_factory_optic()
-    # test_RV2()
-    test_RV()
+    test_positionAtTime()
+    test_properties()
+    test_phase()
+    test_RayVector()
+    test_rayGrid()
+    test_circularGrid()
+    test_uniformCircularGrid()
+    test_pointSourceCircularGrid()
+    test_ne()
+    test_fail()
+    test_RVasGrid()
+    test_RVasPolar()
+    test_RVasSpokes()
+    test_RV_factory_optic()
