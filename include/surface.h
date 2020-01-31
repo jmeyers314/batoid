@@ -20,7 +20,7 @@ namespace batoid {
 
         virtual double sag(double, double) const = 0;
         virtual Vector3d normal(double, double) const = 0;
-        virtual bool timeToIntersect(const Ray& r, double& t) const = 0;
+        virtual bool timeToIntersect(const Ray& r, double& t) const;
 
         Ray intersect(const Ray&) const;
         RayVector intersect(const RayVector&) const;

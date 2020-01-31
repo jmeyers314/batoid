@@ -15,7 +15,7 @@ namespace batoid {
 
         virtual double sag(double, double) const override;
         virtual Vector3d normal(double, double) const override;
-        bool timeToIntersect(const Ray& r, double& t) const override;
+        virtual bool timeToIntersect(const Ray& r, double& t) const override;
 
         const std::vector<std::shared_ptr<Surface>>& getSurfaces() const { return _surfaces; }
 

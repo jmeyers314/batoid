@@ -58,7 +58,7 @@ namespace batoid {
         );
         virtual double sag(double, double) const override;
         virtual Vector3d normal(double, double) const override;
-        bool timeToIntersect(const Ray& r, double& t) const override;
+        virtual bool timeToIntersect(const Ray& r, double& t) const override;
 
     private:
         double oneDSpline(double x, double val0, double val1, double der0, double der1) const;

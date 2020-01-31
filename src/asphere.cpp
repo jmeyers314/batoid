@@ -37,37 +37,46 @@ namespace batoid {
         return Vector3d(-dzdr1*x/r, -dzdr1*y/r, 1).normalized();
     }
 
-    class AsphereResidual {
-    public:
-        AsphereResidual(const Asphere& a, const Ray& r) : _a(a), _r(r) {}
-        double operator()(double t) const {
-            Vector3d p = _r.positionAtTime(t);
-            return _a.sag(p(0), p(1)) - p(2);
-        }
-    private:
-        const Asphere& _a;
-        const Ray& _r;
-    };
-
     bool Asphere::timeToIntersect(const Ray& r, double& t) const {
         // Solve the quadric problem analytically to get a good starting point.
         if (!Quadric::timeToIntersect(r, t))
             return false;
-
-        AsphereResidual resid(*this, r);
-        Solve<AsphereResidual> solve(resid, t, t+1e-2);
-        solve.setMethod(Method::Brent);
-        solve.setXTolerance(1e-12);
-
-        try {
-            solve.bracket();
-            t = solve.root();
-        } catch (const SolveError&) {
-            return false;
-        }
-        if (t < r.t) return false;
-        return true;
+        bool success = Surface::timeToIntersect(r, t);
+        return (success && t >= r.t);
     }
+
+    // Old Asphere code.  Might be useful if new version is every unstable?
+    // class AsphereResidual {
+    // public:
+    //     AsphereResidual(const Asphere& a, const Ray& r) : _a(a), _r(r) {}
+    //     double operator()(double t) const {
+    //         Vector3d p = _r.positionAtTime(t);
+    //         return _a.sag(p(0), p(1)) - p(2);
+    //     }
+    // private:
+    //     const Asphere& _a;
+    //     const Ray& _r;
+    // };
+    //
+    // bool Asphere::timeToIntersect(const Ray& r, double& t) const {
+    //     // Solve the quadric problem analytically to get a good starting point.
+    //     if (!Quadric::timeToIntersect(r, t))
+    //         return false;
+    //
+    //     AsphereResidual resid(*this, r);
+    //     Solve<AsphereResidual> solve(resid, t, t+1e-2);
+    //     solve.setMethod(Method::Brent);
+    //     solve.setXTolerance(1e-12);
+    //
+    //     try {
+    //         solve.bracket();
+    //         t = solve.root();
+    //     } catch (const SolveError&) {
+    //         return false;
+    //     }
+    //     if (t < r.t) return false;
+    //     return true;
+    // }
 
     double Asphere::dzdr(double r) const {
         double result = Quadric::dzdr(r);
