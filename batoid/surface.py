@@ -656,6 +656,12 @@ class Sum(Surface):
 
     where :math:`S_i` is the ith input `Surface`.
 
+    Note that Sum-Ray intersection calculations will use the intersection of the
+    ray with the first surface in the list as an initial guess for the
+    intersection with the full Sum surface.  Thus it is usually a good idea to
+    place any surface with an analytic intersection (Quadric or simpler) first
+    in the list, and any small perturbations around that surface after.
+
     Parameters
     ----------
     surfaces : list of Surface
