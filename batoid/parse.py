@@ -161,3 +161,114 @@ def parse_medium(config):
 
 def parse_table(config):
     return batoid.Table(config['args'], config['vals'], config['interp'])
+
+
+
+
+# GPU!
+
+def parse_surface2(config):
+    typ = config.pop('type')
+    evalstr = "batoid.{}2(**config)".format(typ)
+    return eval(evalstr)
+
+def parse_optic2(config,
+                 coordSys=batoid.CoordSys(),
+                 inMedium=batoid.ConstMedium2(1.0),
+                 outMedium=None):
+    """
+    @param config  configuration dictionary
+    @param coordSys  sys to which transformations in config are added
+    @param inMedium  default in Medium, often set by optic parent
+    @param outMedium default out Medium, often set by optic parent
+    """
+    if 'obscuration' in config:
+        raise NotImplementedError("obscuration not yet implemented")
+    else:
+        obscuration = None
+    name = config.pop('name', "")
+    if 'coordSys' in config:
+        coordSys = parse_coordSys(config.pop('coordSys'), coordSys)
+    inMedium = parse_medium2(config.pop('inMedium', inMedium))
+    outMedium = parse_medium2(config.pop('outMedium', outMedium))
+    if outMedium is None:
+        outMedium = inMedium
+
+    typ = config.pop('type')
+    if typ == 'Mirror':
+        surface = parse_surface2(config.pop('surface'))
+        return batoid.optic.Mirror(
+            surface, name=name,
+            coordSys=coordSys, obscuration=obscuration,
+            inMedium=inMedium, outMedium=outMedium)
+    elif typ == 'RefractiveInterface':
+        surface = parse_surface2(config.pop('surface'))
+        return batoid.optic.RefractiveInterface(
+            surface, name=name,
+            coordSys=coordSys, obscuration=obscuration,
+            inMedium=inMedium, outMedium=outMedium)
+    elif typ == 'Baffle':
+        surface = parse_surface2(config.pop('surface'))
+        return batoid.optic.Baffle(
+            surface, name=name,
+            coordSys=coordSys, obscuration=obscuration,
+            inMedium=inMedium, outMedium=outMedium)
+    elif typ == 'Detector':
+        surface = parse_surface2(config.pop('surface'))
+        return batoid.optic.Detector(
+            surface, name=name,
+            coordSys=coordSys, obscuration=obscuration,
+            inMedium=inMedium, outMedium=outMedium)
+    elif typ == 'Lens':
+        medium = parse_medium2(config.pop('medium'))
+        itemsConfig = config.pop('items')
+        items = [
+            parse_optic2(itemsConfig[0], coordSys=coordSys, inMedium=inMedium, outMedium=medium),
+            parse_optic2(itemsConfig[1], coordSys=coordSys, inMedium=medium, outMedium=outMedium)
+        ]
+        return batoid.optic.Lens(
+            items, medium, name=name, coordSys=coordSys,
+            inMedium=inMedium, outMedium=outMedium)
+    elif typ == 'CompoundOptic':
+        itemsConfig = config.pop('items')
+        items = [
+            parse_optic2(iC, coordSys=coordSys, inMedium=inMedium, outMedium=outMedium)
+            for iC in itemsConfig
+        ]
+        # Look for a few more possible attributes
+        kwargs = {}
+        for k in ['backDist', 'sphereRadius', 'pupilSize', 'pupilObscuration']:
+            if k in config:
+                kwargs[k] = config[k]
+        if 'stopSurface' in config:
+            kwargs['stopSurface'] = parse_optic2(config['stopSurface'])
+        return batoid.optic.CompoundOptic(
+                items, inMedium=inMedium, outMedium=outMedium,
+                name=name, coordSys=coordSys, **kwargs)
+    elif typ == 'Interface':
+        surface = parse_surface2(config.pop('surface'))
+        return batoid.optic.Interface(
+            surface, name=name,
+            coordSys=coordSys
+        )
+    else:
+        raise ValueError("Unknown optic type")
+
+
+def parse_medium2(config):
+    from numbers import Real
+    if config is None:
+        return None
+    if isinstance(config, batoid.Medium2):
+        return config
+    if isinstance(config, Real):
+        return batoid.ConstMedium2(config)
+    # This dict may be referenced again in an ancestor config, so copy it
+    # before parsing
+    config = dict(**config)
+    typ = config.pop('type')
+    if typ == 'TableMedium':
+        raise NotImplementedError("TableMedium2 not yet implemented")
+    # Sellmeier, ConstMedium, SumitaMedium, Air end up here...
+    evalstr = "batoid.{}2(**config)".format(typ)
+    return eval(evalstr)

@@ -57,7 +57,7 @@ class Optic:
         return out
 
     @classmethod
-    def fromYaml(cls, filename):
+    def fromYaml(cls, filename, gpu=False):
         """Load an `Optic` (commonly a complete telescope) from the given yaml
         file.  This is the most common way to create an `Optic`.  If the file
         is not initially found, then look in the ``batoid.datadir`` directory
@@ -91,8 +91,12 @@ class Optic:
                     break
             else:
                 raise FileNotFoundError(filename)
-        from .parse import parse_optic
-        return parse_optic(config['opticalSystem'])
+        if gpu:
+            from .parse import parse_optic2
+            return parse_optic2(config['opticalSystem'])
+        else:
+            from .parse import parse_optic
+            return parse_optic(config['opticalSystem'])
 
 
 class Interface(Optic):

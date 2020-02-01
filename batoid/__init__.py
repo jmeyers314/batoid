@@ -27,6 +27,13 @@ from .optic import drawTrace2d, drawTrace3d
 
 from .lattice import Lattice
 
+# GPU experimentation
+from .rayVector2 import RayVector2
+from .coordsys2 import CoordTransform2
+from .medium2 import Medium2, ConstMedium2
+from .medium2 import SellmeierMedium2, SumitaMedium2, Air2
+from .surface2 import Surface2, Plane2, Sphere2, Paraboloid2, Quadric2, Asphere2
+
 from . import parse
 from . import utils
 from . import analysis
@@ -38,12 +45,6 @@ from .constants import globalCoordSys, vacuum
 import os
 datadir = os.path.join(os.path.dirname(__file__), "data")
 
-# GPU experimentation
-from .rayVector2 import RayVector2
-from .coordsys2 import CoordTransform2
-from .medium2 import Medium2, ConstMedium2
-from .medium2 import SellmeierMedium2, SumitaMedium2, Air2
-from .surface2 import Surface2, Plane2, Sphere2, Paraboloid2, Quadric2, Asphere2
 
 
 __all__ = []

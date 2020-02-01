@@ -3,6 +3,7 @@ from .utils import lazy_property
 
 from . import _batoid
 from .constants import globalCoordSys
+from .coordsys2 import CoordTransform2
 
 class RayVector2:
     @classmethod
@@ -33,11 +34,11 @@ class RayVector2:
         ret = cls.__new__(cls)
         ret._r = np.ascontiguousarray([x, y, z]).T
         ret._v = np.ascontiguousarray([vx, vy, vz]).T
-        ret._t = np.array(t)
-        ret._wavelength = np.array(w)
-        ret._flux = np.array(flux)
-        ret._vignetted = np.array(vignetted)
-        ret._failed = np.array(vignetted)
+        ret._t = np.ascontiguousarray(t)
+        ret._wavelength = np.ascontiguousarray(w)
+        ret._flux = np.ascontiguousarray(flux)
+        ret._vignetted = np.ascontiguousarray(vignetted)
+        ret._failed = np.ascontiguousarray(vignetted)
         ret.coordSys = coordSys
         return ret
 
@@ -114,3 +115,19 @@ class RayVector2:
             self._vignetted.ctypes.data, self._failed.ctypes.data,
             len(self._wavelength)
         )
+
+    def copy(self):
+        # copy on host side for now...
+        return self.fromArrays(
+            self.x.copy(), self.y.copy(), self.z.copy(),
+            self.vx.copy(), self.vy.copy(), self.vz.copy(),
+            self.t.copy(), self.wavelength.copy(), self.flux.copy(),
+            self.vignetted.copy(), self.failed.copy()
+        )
+
+    def toCoordSysInPlace(self, coordSys):
+        transform = CoordTransform2(self.coordSys, coordSys)
+        transform.applyForwardInPlace(self)
+
+    def __len__(self):
+        return self._rv.t.size;

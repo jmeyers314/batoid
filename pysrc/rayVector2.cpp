@@ -19,11 +19,13 @@ namespace batoid {
                 }
             ))
             .def("syncToHost", &DualView<double>::syncToHost)
-            .def("syncToDevice", &DualView<double>::syncToDevice);
+            .def("syncToDevice", &DualView<double>::syncToDevice)
+            .def_readonly("size", &DualView<double>::size);
 
         auto dvb = py::class_<DualView<bool>>(m, "CPPDualViewBool")
             .def("syncToHost", &DualView<bool>::syncToHost)
-            .def("syncToDevice", &DualView<bool>::syncToDevice);
+            .def("syncToDevice", &DualView<bool>::syncToDevice)
+            .def_readonly("size", &DualView<bool>::size);
 
         auto rv4 = py::class_<RayVector2>(m, "CPPRayVector2")
             .def(py::init(

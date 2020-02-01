@@ -5,40 +5,60 @@ import time
 
 
 @timer
-def parallel_trace_timing(nside=1024, nthread=None, minChunk=None):
-    if nthread is not None:
-        print("setting nthread to {}".format(nthread))
-        batoid._batoid.setNThread(nthread)
+def parallel_trace_timing(args):
+    if args.nthread is not None:
+        print("setting nthread to {}".format(args.nthread))
+        batoid._batoid.setNThread(args.nthread)
     print("Using {} threads".format(batoid._batoid.getNThread()))
 
-    if minChunk is not None:
-        print("setting minChunk to {}".format(minChunk))
-        batoid._batoid.setMinChunk(minChunk)
-    print("Using minChunk of {}".format(batoid._batoid.getMinChunk()))
+    if args.minChunk is not None:
+        print("setting minChunk to {:_d}".format(args.minChunk))
+        batoid._batoid.setMinChunk(args.minChunk)
+    print("Using minChunk of {:_d}".format(batoid._batoid.getMinChunk()))
+    print("Using nside of {:_d}".format(args.nside))
 
     # 0.3, 0.3 should be in bounds for current wide-field telescopes
     dirCos = batoid.utils.gnomonicToDirCos(np.deg2rad(0.3), np.deg2rad(0.3))
 
-    if args.lsst:
+    if args.gpu:
+        telescope = batoid.Optic.fromYaml("LSST_r_noobsc.yaml", gpu=True)
+        pm = 'M1'
+    elif args.lsst:
         telescope = batoid.Optic.fromYaml("LSST_i.yaml")
-        pm = 'LSST.M1'
+        pm = 'M1'
     elif args.decam:
         telescope = batoid.Optic.fromYaml("DECam.yaml")
-        pm = 'BlancoDECam.PM'
+        pm = 'PM'
     else:
         telescope = batoid.Optic.fromYaml("HSC.yaml")
-        pm = 'SubaruHSC.PM'
+        pm = 'PM'
 
-    rays = batoid.circularGrid(
-        telescope.backDist,
-        0.5*telescope.pupilSize,
-        0.5*telescope.pupilObscuration*telescope.pupilSize,
-        dirCos[0], dirCos[1], dirCos[2],
-        nside, nside, 750e-9, 1.0, telescope.inMedium
-    )
+    if args.gpu:
+        rays = batoid.circularGrid(
+            telescope.backDist,
+            0.5*telescope.pupilSize,
+            0.5*telescope.pupilObscuration*telescope.pupilSize,
+            dirCos[0], dirCos[1], dirCos[2],
+            args.nside, args.nside, 750e-9, 1.0, batoid.Air()
+        )
+        # Turn RayVector into RayVector2
+        rays = batoid.RayVector2.fromArrays(
+            rays.x, rays.y, rays.z, rays.vx, rays.vy, rays.vz, rays.t,
+            rays.wavelength, rays.flux,
+            rays.vignetted, rays.failed
+        )
+    else:
+        rays = batoid.circularGrid(
+            telescope.backDist,
+            0.5*telescope.pupilSize,
+            0.5*telescope.pupilObscuration*telescope.pupilSize,
+            dirCos[0], dirCos[1], dirCos[2],
+            args.nside, args.nside, 750e-9, 1.0, telescope.inMedium
+        )
+
 
     nrays = len(rays)
-    print("Tracing {} rays.".format(nrays))
+    print("Tracing {:_d} rays.".format(nrays))
     print()
 
     # Optionally perturb the primary mirror using Zernike polynomial
@@ -69,7 +89,7 @@ def parallel_trace_timing(nside=1024, nthread=None, minChunk=None):
             rays_out, _ = telescope.trace(rays_in)
 
         t1 = time.time()
-        print("{} rays per second".format(int(nrays*args.nrepeat/(t1-t0))))
+        print("{:_d} rays per second".format(int(nrays*args.nrepeat/(t1-t0))))
         print()
     else:
         print("Trace in place")
@@ -80,7 +100,7 @@ def parallel_trace_timing(nside=1024, nthread=None, minChunk=None):
             telescope.traceInPlace(rays_out)
 
         t1 = time.time()
-        print("{} rays per second".format(int(nrays*args.nrepeat/(t1-t0))))
+        print("{:_d} rays per second".format(int(nrays*args.nrepeat/(t1-t0))))
 
     if args.plot:
         import matplotlib.pyplot as plt
@@ -112,6 +132,7 @@ if __name__ == '__main__':
     parser.add_argument("--lsst", action='store_true')
     parser.add_argument("--decam", action='store_true')
     parser.add_argument("--immutable", action='store_true')
+    parser.add_argument("--gpu", action='store_true')
     args = parser.parse_args()
 
-    parallel_trace_timing(args.nside, args.nthread, args.minChunk)
+    parallel_trace_timing(args)
