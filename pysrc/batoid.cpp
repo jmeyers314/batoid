@@ -35,6 +35,7 @@ namespace batoid {
     void pyExportSphere2(py::module&);
     void pyExportParaboloid2(py::module&);
     void pyExportQuadric2(py::module&);
+    void pyExportAsphere2(py::module&);
 
 #if (PYBIND11_VERSION_MAJOR >= 2) & (PYBIND11_VERSION_MINOR >= 2)
     PYBIND11_MODULE(_batoid, m) {
@@ -71,6 +72,7 @@ namespace batoid {
         pyExportSphere2(m);
         pyExportParaboloid2(m);
         pyExportQuadric2(m);
+        pyExportAsphere2(m);
 
         using namespace pybind11::literals;
 

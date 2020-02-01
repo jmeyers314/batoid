@@ -676,6 +676,158 @@ def test_refract_quadric(Nthread=1, Nray=100_000, Nloop=1):
         np.testing.assert_allclose(rv.t, rv2.t, rtol=0, atol=1e-13)
 
 
+@timer
+@pytest.mark.gpu
+def test_intersect_asphere(Nthread=1, Nray=100_000, Nloop=1):
+    batoid._batoid.setNThread(Nthread)
+    np.random.seed(57721)
+
+    x = np.random.uniform(size=Nray)-0.5
+    y = np.random.uniform(size=Nray)-0.5
+    z = np.random.uniform(size=Nray)+5
+    vx = np.random.uniform(size=Nray)*0.02-0.01
+    vy = np.random.uniform(size=Nray)*0.02-0.01
+    vz = np.random.uniform(size=Nray)*0.02-1
+    t = np.zeros(Nray)
+    w = np.random.uniform(size=Nray)
+    flux = np.random.uniform(size=Nray)
+    vignetted = np.zeros(Nray, dtype=bool)
+    failed = np.zeros(Nray, dtype=bool)
+    v = np.sqrt(vx*vx+vy*vy+vz*vz)
+    vx /= v
+    vy /= v
+    vz /= v
+
+    rv = batoid.RayVector.fromArrays(
+        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+    )
+    rv2 = batoid.RayVector2.fromArrays(
+        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+    )
+
+    asphere = batoid.Asphere(19.835, -1.215, [0.0, -1.381e-9])
+    asphere2 = batoid.Asphere2(19.835, -1.215, [0.0, -1.381e-9])
+
+    t0 = time.time()
+    for _ in range(Nloop):
+        asphere.intersectInPlace(rv)
+    t1 = time.time()
+    for _ in range(Nloop):
+        asphere2.intersectInPlace(rv2)
+    t2 = time.time()
+    print("test_intersect_asphere")
+    print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
+    print(f"gpu time = {(t2-t1)*1e3:.1f} ms")
+
+    if (Nloop == 1):
+        np.testing.assert_allclose(rv.r, rv2.r, rtol=0, atol=1e-13)
+        np.testing.assert_allclose(rv.v, rv2.v, rtol=0, atol=1e-13)
+        np.testing.assert_allclose(rv.t, rv2.t, rtol=0, atol=1e-13)
+
+
+@timer
+@pytest.mark.gpu
+def test_reflect_asphere(Nthread=1, Nray=100_000, Nloop=1):
+    batoid._batoid.setNThread(Nthread)
+    np.random.seed(57721)
+
+    x = np.random.uniform(size=Nray)-0.5
+    y = np.random.uniform(size=Nray)-0.5
+    z = np.random.uniform(size=Nray)+5
+    vx = np.random.uniform(size=Nray)*0.02-0.01
+    vy = np.random.uniform(size=Nray)*0.02-0.01
+    vz = np.random.uniform(size=Nray)*0.02-1
+    t = np.zeros(Nray)
+    w = np.random.uniform(size=Nray)
+    flux = np.random.uniform(size=Nray)
+    vignetted = np.zeros(Nray, dtype=bool)
+    failed = np.zeros(Nray, dtype=bool)
+    v = np.sqrt(vx*vx+vy*vy+vz*vz)
+    vx /= v
+    vy /= v
+    vz /= v
+
+    rv = batoid.RayVector.fromArrays(
+        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+    )
+    rv2 = batoid.RayVector2.fromArrays(
+        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+    )
+
+    asphere = batoid.Asphere(19.835, -1.215, [0.0, -1.381e-9])
+    asphere2 = batoid.Asphere2(19.835, -1.215, [0.0, -1.381e-9])
+
+    t0 = time.time()
+    for _ in range(Nloop):
+        asphere.reflectInPlace(rv)
+    t1 = time.time()
+    for _ in range(Nloop):
+        asphere2.reflectInPlace(rv2)
+    t2 = time.time()
+    print("test_reflect_asphere")
+    print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
+    print(f"gpu time = {(t2-t1)*1e3:.1f} ms")
+
+    if (Nloop == 1):
+        np.testing.assert_allclose(rv.r, rv2.r, rtol=0, atol=1e-13)
+        np.testing.assert_allclose(rv.v, rv2.v, rtol=0, atol=1e-13)
+        np.testing.assert_allclose(rv.t, rv2.t, rtol=0, atol=1e-13)
+
+
+@timer
+@pytest.mark.gpu
+def test_refract_asphere(Nthread=1, Nray=100_000, Nloop=1):
+    batoid._batoid.setNThread(Nthread)
+    np.random.seed(57721)
+
+    x = np.random.uniform(size=Nray)-0.5
+    y = np.random.uniform(size=Nray)-0.5
+    z = np.random.uniform(size=Nray)+5
+    vx = np.random.uniform(size=Nray)*0.02-0.01
+    vy = np.random.uniform(size=Nray)*0.02-0.01
+    vz = np.random.uniform(size=Nray)*0.02-1
+    t = np.zeros(Nray)
+    w = np.random.uniform(size=Nray)
+    flux = np.random.uniform(size=Nray)
+    vignetted = np.zeros(Nray, dtype=bool)
+    failed = np.zeros(Nray, dtype=bool)
+    v = np.sqrt(vx*vx+vy*vy+vz*vz)
+    vx /= 1.1*v
+    vy /= 1.1*v
+    vz /= 1.1*v
+
+    rv = batoid.RayVector.fromArrays(
+        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+    )
+    rv2 = batoid.RayVector2.fromArrays(
+        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+    )
+
+    asphere = batoid.Asphere(19.835, -1.215, [0.0, -1.381e-9])
+    asphere2 = batoid.Asphere2(19.835, -1.215, [0.0, -1.381e-9])
+
+    m1 = batoid.ConstMedium(1.1)
+    m2 = batoid.ConstMedium(1.2)
+    m1gpu = batoid.ConstMedium2(1.1)
+    m2gpu = batoid.ConstMedium2(1.2)
+
+    t0 = time.time()
+    for _ in range(Nloop):
+        asphere.refractInPlace(rv, m1, m2)
+    t1 = time.time()
+    for _ in range(Nloop):
+        asphere2.refractInPlace(rv2, m1gpu, m2gpu)
+    t2 = time.time()
+    print("test_refract_asphere")
+    print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
+    print(f"gpu time = {(t2-t1)*1e3:.1f} ms")
+
+    if (Nloop == 1):
+        np.testing.assert_allclose(rv.r, rv2.r, rtol=0, atol=1e-13)
+        np.testing.assert_allclose(rv.v, rv2.v, rtol=0, atol=1e-13)
+        np.testing.assert_allclose(rv.t, rv2.t, rtol=0, atol=1e-13)
+
+
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
@@ -702,3 +854,6 @@ if __name__ == '__main__':
     test_intersect_quadric(Nthread, Nray, Nloop)
     test_reflect_quadric(Nthread, Nray, Nloop)
     test_refract_quadric(Nthread, Nray, Nloop)
+    test_intersect_asphere(Nthread, Nray, Nloop)
+    test_reflect_asphere(Nthread, Nray, Nloop)
+    test_refract_asphere(Nthread, Nray, Nloop)

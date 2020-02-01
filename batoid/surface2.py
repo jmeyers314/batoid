@@ -1,3 +1,4 @@
+import numpy as np
 from . import _batoid
 from .utils import lazy_property
 
@@ -68,3 +69,28 @@ class Quadric2(Surface2):
     @lazy_property
     def _surface(self):
         return _batoid.CPPQuadric2(self._R, self._conic)
+
+
+class Asphere2(Surface2):
+    def __init__(self, R, conic, coefs):
+        self._R = R
+        self._conic = conic
+        self._coefs = coefs
+
+    @property
+    def R(self):
+        return self._R
+
+    @property
+    def conic(self):
+        return self._conic
+
+    @property
+    def coefs(self):
+        return self._coefs
+
+    @lazy_property
+    def _surface(self):
+        coefs = [0.0]*10
+        coefs[:len(self._coefs)] = self._coefs
+        return _batoid.CPPAsphere2(self._R, self._conic, coefs)

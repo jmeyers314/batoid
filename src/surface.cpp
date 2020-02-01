@@ -264,7 +264,7 @@ namespace batoid {
         double surfaceZ = sag(rayPoint[0], rayPoint[1]);
         size_t iter=0;
         double err = std::abs(surfaceZ - rayPoint[2]);
-        while (err > 1e-12 && iter < 50) {
+        while (err > 1e-14 && iter < 50) {
             Vector3d normVec = normal(rayPoint[0], rayPoint[1]);
             Vector3d surfacePoint{rayPoint[0], rayPoint[1], surfaceZ};
             t = normVec.dot(surfacePoint - r.r) / normVec.dot(r.v) + r.t;

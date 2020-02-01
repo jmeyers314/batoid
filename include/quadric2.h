@@ -15,6 +15,7 @@ namespace batoid {
         double _sag(double, double) const;
         void _normal(double, double, double&, double&, double&) const;
         bool _timeToIntersect(double, double, double, double, double, double, double&) const;
+        double _dzdr(double r) const;
 
     private:
         const double _R;  // Radius of curvature
@@ -28,7 +29,6 @@ namespace batoid {
         const double _RRcp1cp1; // R*R/(1+conic)/(1+conic)
         const double _cp1RR; // (1+conic)/R/R
 
-        double _dzdr(double r) const;
     };
 
 }

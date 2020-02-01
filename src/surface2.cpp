@@ -4,6 +4,7 @@
 #include "sphere2.h"
 #include "paraboloid2.h"
 #include "quadric2.h"
+#include "asphere2.h"
 
 namespace batoid {
 
@@ -162,4 +163,5 @@ namespace batoid {
     template class Surface2CRTP<Sphere2>;
     template class Surface2CRTP<Paraboloid2>;
     template class Surface2CRTP<Quadric2>;
+    template class Surface2CRTP<Asphere2>;
 }
