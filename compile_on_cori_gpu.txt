@@ -3,4 +3,7 @@ module purge && module load esslurm PrgEnv-llvm/10.0.0-git_20190828 python3 cmak
 export CXX=clang++
 salloc -C gpu -N 1 -t 30 -c 10 --gres=gpu:1 -A m1759
 python setup.py develop --user
-srun python tests/test_gpu.py
+# Run on GPU
+srun nvprof python tests/parallel_trace_timing.py --gpu --nside 8192
+# Compare on CPU
+python tests/parallel_trace_timing.py --lsst --nside 8192 --nthread 12

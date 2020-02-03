@@ -98,13 +98,17 @@ def parallel_trace_timing(args):
         for _ in range(args.nrepeat):
             rays_out = rays.copy()
             telescope.traceInPlace(rays_out)
-
+            rays_out.r # force copy back to host
+            rays_out.v
+            rays_out.t
+            rays_out.vignetted
+            rays_out.failed
         t1 = time.time()
         print("{:_d} rays per second".format(int(nrays*args.nrepeat/(t1-t0))))
 
     if args.plot:
         import matplotlib.pyplot as plt
-        rays_out.trimVignettedInPlace()
+        # rays_out.trimVignettedInPlace()
         x = rays_out.x
         y = rays_out.y
         x -= np.mean(x)
@@ -116,7 +120,9 @@ def parallel_trace_timing(args):
         plt.ylim(np.std(y)*np.r_[-5,5])
         plt.xlabel("x (microns)")
         plt.ylabel("y (microns)")
-        plt.show()
+        plt.savefig("parallel_trace_timing.png")
+        if not args.gpu:
+            plt.show()
 
 
 if __name__ == '__main__':
