@@ -551,7 +551,7 @@ class Interface(Optic):
 
         Returns
         -------
-        `batoid.Interface`
+        `Interface`
             Shifted interface.
         """
         ret = self.__class__.__new__(self.__class__)
@@ -563,6 +563,23 @@ class Interface(Optic):
             **newDict
         )
         return ret
+
+    def withLocalShift(self, shift):
+        """Return a new `Interface` with its coordinate system shifted.
+
+        Parameters
+        ----------
+        shift : array (3,)
+            The coordinate shift, relative to the local coordinate system, to
+            apply to self.coordSys
+
+        Returns
+        -------
+        `Interface`
+            Shifted interface.
+        """
+        # Clearer to apply the rotated global shift.
+        return self.withGlobalShift(np.dot(self.coordSys.rot, shift))
 
     def withLocalRotation(self, rot, rotOrigin=None, coordSys=None):
         """Return a new `Interface` with its coordinate system rotated.
@@ -579,7 +596,7 @@ class Interface(Optic):
 
         Returns
         -------
-        `batoid.Interface`
+        `Interface`
             Rotated interface.
         """
         if rotOrigin is None and coordSys is None:
@@ -607,7 +624,7 @@ class Interface(Optic):
 
         Returns
         -------
-        `batoid.Interface`
+        `Interface`
             Interface with new surface.
         """
         ret = self.__class__.__new__(self.__class__)
@@ -1140,7 +1157,7 @@ class CompoundOptic(Optic):
         ax : matplotlib.axes.Axes
             Axis on which to draw this optic.
         only : list
-            A list of types to draw, e.g., `batoid.Mirror`, or `batoid.Lens`.
+            A list of types to draw, e.g., `Mirror`, or `Lens`.
             Default: None means to draw all types.
         """
         only = kwargs.pop('only', None)
@@ -1207,6 +1224,23 @@ class CompoundOptic(Optic):
         )
         return ret
 
+    def withLocalShift(self, shift):
+        """Return a new `CompoundOptic` with its coordinate system shifted.
+
+        Parameters
+        ----------
+        shift : array (3,)
+            The coordinate shift, relative to the local coordinate system, to
+            apply to self.coordSys
+
+        Returns
+        -------
+        `CompoundOptic`
+            Shifted interface.
+        """
+        # Clearer to apply the rotated global shift.
+        return self.withGlobalShift(np.dot(self.coordSys.rot, shift))
+
     def withGloballyShiftedOptic(self, name, shift):
         """Return a new `CompoundOptic` with the coordinate system of one of
         its subitems shifted.
@@ -1221,7 +1255,7 @@ class CompoundOptic(Optic):
 
         Returns
         -------
-        `batoid.CompoundOptic`
+        `CompoundOptic`
             Optic with shifted subitem.
         """
         # If name is one of items.names, the we use withGlobalShift, and we're
@@ -1257,6 +1291,56 @@ class CompoundOptic(Optic):
             "Error in withGloballyShiftedOptic!, Shouldn't get here!"
         )
 
+    def withLocallyShiftedOptic(self, name, shift):
+        """Return a new `CompoundOptic` with the coordinate system of one of
+        its subitems shifted.
+
+        Parameters
+        ----------
+        name : str
+            The subitem to shift.
+        shift : array (3,)
+            The coordinate shift, relative to the local coordinate system of
+            that subitem, to apply to the subitem's coordSys.
+
+        Returns
+        -------
+        `CompoundOptic`
+            Optic with shifted subitem.
+        """
+        # If name is one of items.names, the we use withGlobalShift, and we're
+        # done.  If not, then we need to recurse down to whichever item
+        # contains name.  Verify that name is in self.itemDict, but first
+        # convert partially qualified name to fully qualified.
+        if name in self._names:
+            name = self._names[name]
+        if name not in self.itemDict:
+            raise ValueError("Optic {} not found".format(name))
+        if name == self.name:
+            return self.withLocalShift(shift)
+        # Clip off leading token
+        assert name[:len(self.name)+1] == \
+            self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
+        name = name[len(self.name)+1:]
+        newItems = []
+        newDict = dict(self.__dict__)
+        del newDict['items']
+        for i, item in enumerate(self.items):
+            if name.startswith(item.name):
+                if name == item.name:
+                    newItems.append(item.withLocalShift(shift))
+                else:
+                    newItems.append(item.withLocallyShiftedOptic(name, shift))
+                newItems.extend(self.items[i+1:])
+                return self.__class__(
+                    newItems,
+                    **newDict
+                )
+            newItems.append(item)
+        raise RuntimeError(
+            "Error in withLocallyShiftedOptic!, Shouldn't get here!"
+        )
+
     def withLocalRotation(self, rot, rotOrigin=None, coordSys=None):
         """Return a new `CompoundOptic` with its coordinate system rotated.
 
@@ -1272,7 +1356,7 @@ class CompoundOptic(Optic):
 
         Returns
         -------
-        `batoid.CompoundOptic`
+        `CompoundOptic`
             Rotated optic.
         """
         if rotOrigin is None and coordSys is None:
@@ -1312,7 +1396,7 @@ class CompoundOptic(Optic):
 
         Returns
         -------
-        `batoid.CompoundOptic`
+        `CompoundOptic`
             Optic with rotated subitem.
         """
         # If name is one of items.names, the we use withLocalRotation, and
@@ -1368,7 +1452,7 @@ class CompoundOptic(Optic):
 
         Returns
         -------
-        `batoid.CompoundOptic`
+        `CompoundOptic`
             Optic with new surface.
         """
         if name in self._names:
@@ -1433,7 +1517,7 @@ class Lens(CompoundOptic):
     def draw2d(self, ax, **kwargs):
         """Specialized draw2d for `Lens` instances.
 
-        If the optional keyword 'only' equals `batoid.Lens`, then fill the area
+        If the optional keyword 'only' equals `Lens`, then fill the area
         between the lens refractive interfaces using the remaining specified
         kwargs (fc, ec, alpha, ...)
 
@@ -1500,6 +1584,23 @@ class Lens(CompoundOptic):
         )
         return ret
 
+    def withLocalShift(self, shift):
+        """Return a new `Lens` with its coordinate system shifted.
+
+        Parameters
+        ----------
+        shift : array (3,)
+            The coordinate shift, relative to the local coordinate system, to
+            apply to self.coordSys
+
+        Returns
+        -------
+        `Lens`
+            Shifted interface.
+        """
+        # Clearer to apply the rotated global shift.
+        return self.withGlobalShift(np.dot(self.coordSys.rot, shift))
+
     def withGloballyShiftedOptic(self, name, shift):
         """Return a new `Lens` with the coordinate system of one of its
         subitems shifted.
@@ -1514,7 +1615,7 @@ class Lens(CompoundOptic):
 
         Returns
         -------
-        `batoid.Lens`
+        `Lens`
             Lens with shifted surface.
         """
         # If name is one of items.names, the we use withGlobalShift, and we're
@@ -1550,6 +1651,56 @@ class Lens(CompoundOptic):
             "Error in withGloballyShiftedOptic!, Shouldn't get here!"
         )
 
+    def withLocallyShiftedOptic(self, name, shift):
+        """Return a new `Lens` with the coordinate system of one of its
+        subitems shifted.
+
+        Parameters
+        ----------
+        name : str
+            The subitem to shift.
+        shift : array (3,)
+            The coordinate shift, relative to the global coordinate system, to
+            apply to the subitem's coordSys.
+
+        Returns
+        -------
+        `Lens`
+            Lens with shifted surface.
+        """
+        # If name is one of items.names, the we use withGlobalShift, and we're
+        # done.  If not, then we need to recurse down to whicever item contains
+        # name.  First verify that name is in self.itemDict
+        if name in self._names:
+            name = self._names[name]
+        if name not in self.itemDict:
+            raise ValueError("Optic {} not found".format(name))
+        if name == self.name:
+            return self.withLocalShift(shift)
+        # Clip off leading token
+        assert name[:len(self.name)+1] == \
+            self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
+        name = name[len(self.name)+1:]
+        newItems = []
+        newDict = dict(self.__dict__)
+        del newDict['items']
+        del newDict['medium']
+        for i, item in enumerate(self.items):
+            if name.startswith(item.name):
+                if name == item.name:
+                    newItems.append(item.withLocalShift(shift))
+                else:
+                    newItems.append(item.withLocallyShiftedOptic(name, shift))
+                newItems.extend(self.items[i+1:])
+                return self.__class__(
+                    newItems, self.medium,
+                    **newDict
+                )
+            newItems.append(item)
+        raise RuntimeError(
+            "Error in withLocallyShiftedOptic!, Shouldn't get here!"
+        )
+
     def withLocalRotation(self, rot, rotOrigin=None, coordSys=None):
         """Return a new `Lens` with its coordinate system rotated.
 
@@ -1565,7 +1716,7 @@ class Lens(CompoundOptic):
 
         Returns
         -------
-        `batoid.Lens`
+        `Lens`
             Rotated lens.
         """
         if rotOrigin is None and coordSys is None:
@@ -1574,6 +1725,9 @@ class Lens(CompoundOptic):
         newItems = [item.withLocalRotation(rot, rotOrigin, coordSys)
                     for item in self.items]
         newDict = dict(self.__dict__)
+        newDict['coordSys'] = self.coordSys.rotateLocal(
+            rot, rotOrigin, coordSys
+        )
         del newDict['items']
         del newDict['medium']
         ret = self.__class__.__new__(self.__class__)
@@ -1602,7 +1756,7 @@ class Lens(CompoundOptic):
 
         Returns
         -------
-        `batoid.Lens`
+        `Lens`
             Lens with rotated surface.
         """
         # If name is one of items.names, the we use withLocalRotation, and
@@ -1657,7 +1811,7 @@ class Lens(CompoundOptic):
 
         Returns
         -------
-        `batoid.Lens`
+        `Lens`
             Lens with new surface.
         """
         if name in self._names:
