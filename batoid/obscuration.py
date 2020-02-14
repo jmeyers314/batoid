@@ -1,5 +1,4 @@
 from . import _batoid
-from .utils import _rayify
 
 
 class Obscuration:
@@ -40,7 +39,13 @@ class Obscuration:
         out : `Ray` or `RayVector`
             Returned object will have appropriate elements marked as vignetted.
         """
-        return _rayify(self._obsc.obscure(r._r), r.coordSys)
+        from .ray import Ray
+        from .rayVector import RayVector
+        _r = self._obsc.obscure(r._r)
+        if isinstance(r, Ray):
+            return Ray._fromCPPRay(_r[0], r.coordSys)
+        else:
+            return RayVector._fromCPPRayVector(_r, r.coordSys)
 
     def obscureInPlace(self, r):
         """Mark a `Ray` or `RayVector` for potential vignetting in place.

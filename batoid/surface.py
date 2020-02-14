@@ -3,7 +3,6 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 from . import _batoid
-from .utils import _rayify
 
 
 class Surface(ABC):
@@ -55,7 +54,13 @@ class Surface(ABC):
             New object corresponding to original ray(s) propagated to the
             intersection point.
         """
-        return _rayify(self._surface.intersect(r._r), r.coordSys)
+        from .ray import Ray
+        from .rayVector import RayVector
+        _r = self._surface.intersect(r._r)
+        if isinstance(r, Ray):
+            return Ray._fromCPPRay(_r[0], r.coordSys)
+        else:
+            return RayVector._fromCPPRayVector(_r, r.coordSys)
 
     def intersectInPlace(self, r):
         """Calculate intersection of ray or rays with this surface.  Same as
@@ -85,8 +90,14 @@ class Surface(ABC):
             New object corresponding to original ray(s) propagated and
             reflected.
         """
+        from .ray import Ray
+        from .rayVector import RayVector
         _coating = coating._coating if coating is not None else None
-        return _rayify(self._surface.reflect(r._r, _coating), r.coordSys)
+        _r = self._surface.reflect(r._r, _coating)
+        if isinstance(r, Ray):
+            return Ray._fromCPPRay(_r[0], r.coordSys)
+        else:
+            return RayVector._fromCPPRayVector(_r, r.coordSys)
 
     def reflectInPlace(self, r, coating=None):
         """Calculate intersection of ray(s) with this surface, and immediately
@@ -124,13 +135,15 @@ class Surface(ABC):
             New object corresponding to original ray(s) propagated and
             refracted.
         """
+        from .ray import Ray
+        from .rayVector import RayVector
         _coating = coating._coating if coating is not None else None
-        return _rayify(
-            self._surface.refract(
-                r._r, inMedium._medium, outMedium._medium, _coating
-            ),
-            r.coordSys
-        )
+        _r = self._surface.refract(
+            r._r, inMedium._medium, outMedium._medium, _coating)
+        if isinstance(r, Ray):
+            return Ray._fromCPPRay(_r[0], r.coordSys)
+        else:
+            return RayVector._fromCPPRayVector(_r, r.coordSys)
 
     def refractInPlace(self, r, inMedium, outMedium, coating=None):
         """Calculate intersection of ray(s) with this surface, and immediately
@@ -175,14 +188,22 @@ class Surface(ABC):
             New objects corresponding to original rays propagated and
             reflected/refracted.
         """
+        from .ray import Ray
+        from .rayVector import RayVector
         _coating = coating._coating if coating is not None else None
         reflectedRays, refractedRays = self._surface.rSplit(
             r._r, inMedium._medium, outMedium._medium, _coating
         )
-        return (
-            _rayify(reflectedRays, r.coordSys),
-            _rayify(refractedRays, r.coordSys)
-        )
+        if isinstance(r, Ray):
+            return (
+                Ray._fromCPPRay(reflectedRays[0], r.coordSys),
+                Ray._fromCPPRay(refractedRays[0], r.coordSys)
+            )
+        else:
+            return (
+                RayVector._fromCPPRayVector(reflectedRays, r.coordSys),
+                RayVector._fromCPPRayVector(refractedRays, r.coordSys)
+            )
 
     @abstractmethod
     def __hash__(self):

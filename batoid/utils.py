@@ -470,6 +470,7 @@ class lazy_property(object):
 def _rayify(r, coordSys=None):
     from .ray import Ray
     from .rayVector import RayVector
+    import ipdb; ipdb.set_trace()
     if isinstance(r, _batoid.CPPRay):
         return Ray._fromCPPRay(r, coordSys)
     elif isinstance(r, _batoid.CPPRayVector):

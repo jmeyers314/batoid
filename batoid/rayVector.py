@@ -29,7 +29,7 @@ class RayVector:
                     wavelength = float("nan")
                     break
             self._r = _batoid.CPPRayVector(
-                [ray._r for ray in rays], wavelength
+                [ray._r[0] for ray in rays], wavelength
             )
         else:
             raise ValueError("Wrong arguments to RayVector")
@@ -950,6 +950,7 @@ class RayVector:
         return self
 
     def __next__(self):
+        # Note returns a new copy, not a reference to the original Ray.
         return Ray._fromCPPRay(next(self._iter))
 
     def __len__(self):

@@ -207,7 +207,7 @@ class CoordTransform:
             return self._coordTransform.applyForward(arg1, arg2, arg3)
         elif isinstance(arg1, Ray):
             return Ray._fromCPPRay(
-                self._coordTransform.applyForward(arg1._r),
+                self._coordTransform.applyForward(arg1._r)[0],
                 self.toSys
             )
         elif isinstance(arg1, RayVector):
@@ -237,7 +237,7 @@ class CoordTransform:
             return self._coordTransform.applyReverse(arg1, arg2, arg3)
         elif isinstance(arg1, Ray):
             return Ray._fromCPPRay(
-                self._coordTransform.applyReverse(arg1._r),
+                self._coordTransform.applyReverse(arg1._r)[0],
                 self.fromSys
             )
         elif isinstance(arg1, RayVector):
