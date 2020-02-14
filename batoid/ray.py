@@ -4,7 +4,8 @@ import numpy as np
 
 from . import _batoid
 from .constants import vacuum, globalCoordSys
-from .coordsys import CoordSys, CoordTransform
+from .coordsys import CoordSys
+from .coordtransform import CoordTransform
 from .utils import fieldToDirCos
 
 class Ray:

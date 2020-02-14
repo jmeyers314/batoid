@@ -5,7 +5,7 @@ import numpy as np
 from .coating import SimpleCoating
 from .obscuration import ObscNegation, ObscCircle, ObscAnnulus
 from .constants import globalCoordSys, vacuum
-from .coordsys import CoordTransform
+from .coordtransform import CoordTransform
 from .rayVector import concatenateRayVectors
 from .utils import lazy_property
 

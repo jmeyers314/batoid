@@ -5,7 +5,8 @@ import numpy as np
 
 from . import _batoid
 from .constants import vacuum, globalCoordSys
-from .coordsys import CoordSys, CoordTransform
+from .coordsys import CoordSys
+from .coordtransform import CoordTransform
 from .ray import Ray
 from .utils import fieldToDirCos
 

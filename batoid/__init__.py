@@ -13,7 +13,8 @@ from .medium import SellmeierMedium, SumitaMedium, Air
 from .obscuration import Obscuration, ObscCircle, ObscAnnulus, ObscRectangle, ObscRay
 from .obscuration import ObscUnion, ObscIntersection, ObscNegation
 
-from .coordsys import CoordSys, CoordTransform
+from .coordsys import CoordSys
+from .coordtransform import CoordTransform
 
 from .coating import Coating, SimpleCoating
 
