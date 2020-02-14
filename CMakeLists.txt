@@ -30,6 +30,7 @@ set(PYSRC_FILES
   pysrc/bicubic.cpp
   pysrc/coating.cpp
   pysrc/coordsys.cpp
+  pysrc/coordtransform.cpp
   pysrc/medium.cpp
   pysrc/obscuration.cpp
   pysrc/paraboloid.cpp
@@ -49,6 +50,7 @@ set(SRC_FILES
   src/bicubic.cpp
   src/coating.cpp
   src/coordsys.cpp
+  src/coordtransform.cpp
   src/medium.cpp
   src/obscuration.cpp
   src/paraboloid.cpp
