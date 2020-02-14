@@ -2,6 +2,7 @@
 #define batoid_rayVector_h
 
 #include "ray.h"
+#include "coordsys.h"
 #include <memory>
 #include <cmath>
 #include <complex>
@@ -18,19 +19,20 @@ namespace batoid {
         RayVector& operator=(const RayVector& rv) = default;
         RayVector& operator=(RayVector&& rv) = default;
 
-        RayVector(const std::vector<Ray>& rays) : _rays(rays) {}
-        RayVector(std::vector<Ray>&& rays) : _rays(std::move(rays)) {}
+        RayVector(const std::vector<Ray>& rays, const CoordSys& coordSys) : _rays(rays), _coordSys(coordSys) {}
+        RayVector(std::vector<Ray>&& rays, const CoordSys& coordSys) : _rays(std::move(rays)), _coordSys(coordSys) {}
 
-        RayVector(const std::vector<Ray>& rays, double wavelength)
-            : _rays(rays), _wavelength(wavelength) {}
-        RayVector(std::vector<Ray>&& rays, double wavelength)
-            : _rays(std::move(rays)), _wavelength(wavelength) {}
+        RayVector(const std::vector<Ray>& rays, const CoordSys& coordSys, double wavelength)
+            : _rays(rays), _coordSys(coordSys), _wavelength(wavelength) {}
+        RayVector(std::vector<Ray>&& rays, const CoordSys& coordSys, double wavelength)
+            : _rays(std::move(rays)), _coordSys(coordSys), _wavelength(wavelength) {}
 
         RayVector(
             const std::vector<double>& x, const std::vector<double>& y, const std::vector<double>& z,
             const std::vector<double>& vx, const std::vector<double>& vy, const std::vector<double>& vz,
             const std::vector<double>& t, const std::vector<double>& w,
-            const std::vector<double>& flux, const std::vector<bool>& vignetted
+            const std::vector<double>& flux, const std::vector<bool>& vignetted,
+            const CoordSys& coordSys
         );
 
         // std::vector forwarding
@@ -69,11 +71,13 @@ namespace batoid {
         std::string repr() const;
 
         double getWavelength() const { return _wavelength; }
+        const CoordSys& getCoordSys() const { return _coordSys; }
         const std::vector<Ray>& getRays() const { return _rays; }  // exposing just for pickle/hash
 
     private:
         std::vector<Ray> _rays;
         double _wavelength{NAN};  // If not NAN, then all wavelengths are this wavelength
+        CoordSys _coordSys;
     };
 
     inline std::ostream& operator<<(std::ostream& os, const RayVector& rv) {

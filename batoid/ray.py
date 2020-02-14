@@ -38,20 +38,20 @@ class Ray:
     def __init__(self, r=None, v=None, t=0.0, wavelength=0.0, flux=1.0,
                  vignetted=False, failed=False, coordSys=globalCoordSys):
         if failed:
-            self._r = _batoid.CPPRayVector([_batoid.CPPRay(failed=True)])
+            self._r = _batoid.CPPRayVector([_batoid.CPPRay(failed=True)], coordSys._coordSys)
         elif r is None and v is None:
-            self._r = _batoid.CPPRayVector([_batoid.CPPRay()])
+            self._r = _batoid.CPPRayVector([_batoid.CPPRay()], coordSys._coordSys)
         else:
             self._r = _batoid.CPPRayVector([_batoid.CPPRay(
                 r, v, t, wavelength, flux, vignetted
-            )])
+            )], coordSys._coordSys)
         self.coordSys = coordSys
 
     @classmethod
     def _fromCPPRay(cls, _r, coordSys=globalCoordSys):
         """Turn a c++ Ray into a python Ray."""
         ret = cls.__new__(cls)
-        ret._r = _batoid.CPPRayVector([_r])
+        ret._r = _batoid.CPPRayVector([_r], coordSys._coordSys)
         ret.coordSys = coordSys
         return ret
 

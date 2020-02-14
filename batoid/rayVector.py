@@ -30,7 +30,7 @@ class RayVector:
                     wavelength = float("nan")
                     break
             self._r = _batoid.CPPRayVector(
-                [ray._r[0] for ray in rays], wavelength
+                [ray._r[0] for ray in rays], rays[0].coordSys._coordSys, wavelength
             )
         else:
             raise ValueError("Wrong arguments to RayVector")
@@ -71,7 +71,7 @@ class RayVector:
             vignetted.fill(tmp)
         ret = cls.__new__(cls)
         ret._r = _batoid.CPPRayVector(
-            x, y, z, vx, vy, vz, t, w, flux, vignetted
+            x, y, z, vx, vy, vz, t, w, flux, vignetted, coordSys._coordSys
         )
         ret.coordSys = coordSys
         return ret
@@ -679,7 +679,7 @@ class RayVector:
     def copy(self):
         """Return a copy of this RayVector."""
         return RayVector._fromCPPRayVector(
-            _batoid.CPPRayVector(self._r),
+            _batoid.CPPRayVector(self._r, self.coordSys._coordSys),
             self.coordSys
         )
 
@@ -990,7 +990,7 @@ def concatenateRayVectors(rvs):
 
 
 def rayGrid(zdist, length, xcos, ycos, zcos, nside, wavelength, flux, medium,
-            lattice=False):
+            coordSys=globalCoordSys, lattice=False):
     """Construct a parallel square grid of rays in a given direction.
 
     Parameters
@@ -1009,6 +1009,8 @@ def rayGrid(zdist, length, xcos, ycos, zcos, nside, wavelength, flux, medium,
         Flux of rays in arbitrary units.
     medium : batoid.Medium
         Medium containing rays.
+    coordSys : batoid.CoordSys
+        Coordinate system in which rays are defined.
     lattice : bool
         Whether to center grid as a batoid.Lattice or not.
 
@@ -1020,12 +1022,12 @@ def rayGrid(zdist, length, xcos, ycos, zcos, nside, wavelength, flux, medium,
     return RayVector._fromCPPRayVector(
         _batoid.rayGrid(
             zdist, length, xcos, ycos, zcos, nside,
-            wavelength, flux, medium._medium, lattice
+            wavelength, flux, medium._medium, coordSys._coordSys, lattice
         )
     )
 
 def circularGrid(zdist, outer, inner, xcos, ycos, zcos, nradii, naz,
-                 wavelength, flux, medium):
+                 wavelength, flux, medium, coordSys=globalCoordSys):
     """Construct a hexapolar grid of rays in a given direction.
 
     Parameters
@@ -1048,6 +1050,8 @@ def circularGrid(zdist, outer, inner, xcos, ycos, zcos, nradii, naz,
         Flux of rays in arbitrary units.
     medium : batoid.Medium
         Medium containing rays.
+    coordSys : batoid.CoordSys
+        Coordinate system in which rays are defined.
 
     Returns
     -------
@@ -1057,12 +1061,13 @@ def circularGrid(zdist, outer, inner, xcos, ycos, zcos, nradii, naz,
     return RayVector._fromCPPRayVector(
         _batoid.circularGrid(
             zdist, outer, inner, xcos, ycos, zcos, nradii, naz, wavelength,
-            flux, medium._medium
+            flux, medium._medium, coordSys._coordSys
         )
     )
 
 def uniformCircularGrid(zdist, outer, inner, xcos, ycos, zcos, nrays,
-                        wavelength, flux, medium, seed=0):
+                        wavelength, flux, medium, coordSys=globalCoordSys,
+                        seed=0):
     """Uniformly sample ray positions from an annulus, assign all the same
     direction.
 
@@ -1084,6 +1089,8 @@ def uniformCircularGrid(zdist, outer, inner, xcos, ycos, zcos, nrays,
         Flux of rays in arbitrary units.
     medium : batoid.Medium
         Medium containing rays.
+    coordSys : batoid.CoordSys
+        Coordinate system in which rays are defined.
 
     Returns
     -------
@@ -1093,12 +1100,12 @@ def uniformCircularGrid(zdist, outer, inner, xcos, ycos, zcos, nrays,
     return RayVector._fromCPPRayVector(
         _batoid.uniformCircularGrid(
             zdist, outer, inner, xcos, ycos, zcos, nrays, wavelength, flux,
-            medium._medium, seed
+            medium._medium, coordSys._coordSys, seed
         )
     )
 
 def pointSourceCircularGrid(source, outer, inner, nradii, naz, wavelength,
-                            flux, medium):
+                            flux, medium, coordSys=globalCoordSys):
     """Construct grid of rays all emanating from the same source location but
     with a hexapolar grid in direction cosines.
 
@@ -1122,6 +1129,8 @@ def pointSourceCircularGrid(source, outer, inner, nradii, naz, wavelength,
         Flux of rays in arbitrary units.
     medium : batoid.Medium
         Medium containing rays.
+    coordSys : batoid.CoordSys
+        Coordinate system in which rays are defined.
 
     Returns
     -------
@@ -1130,6 +1139,7 @@ def pointSourceCircularGrid(source, outer, inner, nradii, naz, wavelength,
     """
     return RayVector._fromCPPRayVector(
         _batoid.pointSourceCircularGrid(
-            source, outer, inner, nradii, naz, wavelength, flux, medium._medium
+            source, outer, inner, nradii, naz, wavelength, flux, medium._medium,
+            coordSys._coordSys
         )
     )

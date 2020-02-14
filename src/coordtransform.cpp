@@ -74,7 +74,7 @@ namespace batoid {
         parallelTransform(rv.cbegin(), rv.cend(), result.begin(),
             [this](const Ray& r) { return applyForward(r); }
         );
-        return RayVector(std::move(result), rv.getWavelength());
+        return RayVector(std::move(result), rv.getCoordSys(), rv.getWavelength());
     }
 
     RayVector CoordTransform::applyReverse(const RayVector& rv) const {
@@ -82,7 +82,7 @@ namespace batoid {
         parallelTransform(rv.cbegin(), rv.cend(), result.begin(),
             [this](const Ray& r) { return applyReverse(r); }
         );
-        return RayVector(std::move(result), rv.getWavelength());
+        return RayVector(std::move(result), rv.getCoordSys(), rv.getWavelength());
     }
 
     void CoordTransform::applyForwardInPlace(RayVector& rv) const {

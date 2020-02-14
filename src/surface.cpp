@@ -31,7 +31,7 @@ namespace batoid {
             [this](const Ray& ray)
             { return intersect(ray); }
         );
-        return RayVector(std::move(rays), rv.getWavelength());
+        return RayVector(std::move(rays), rv.getCoordSys(), rv.getWavelength());
     }
 
     void Surface::intersectInPlace(RayVector& rv) const {
@@ -60,7 +60,7 @@ namespace batoid {
             rv.cbegin(), rv.cend(), rv2.begin(),
             [this,coating](const Ray& r){ return reflect(r, coating); }
         );
-        return RayVector(std::move(rv2), rv.getWavelength());
+        return RayVector(std::move(rv2), rv.getCoordSys(), rv.getWavelength());
     }
 
     void Surface::reflectInPlace(Ray& r, const Coating* coating) const {
@@ -123,7 +123,7 @@ namespace batoid {
                 [this,n1,n2,coating](const Ray& r){ return refract(r, n1, n2, coating); }
             );
         }
-        return RayVector(std::move(rays), rv.getWavelength());
+        return RayVector(std::move(rays), rv.getCoordSys(), rv.getWavelength());
     }
 
     void Surface::refractInPlace(Ray& r, const double n1, const double n2, const Coating* coating) const {

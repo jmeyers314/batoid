@@ -15,12 +15,12 @@ namespace batoid {
         py::class_<RayVector>(m, "CPPRayVector")
             .def(py::init<>())
             .def(py::init<RayVector>())
-            .def(py::init<std::vector<Ray>>())
-            .def(py::init<std::vector<Ray>, double>())
+            .def(py::init<std::vector<Ray>, CoordSys>())
+            .def(py::init<std::vector<Ray>, CoordSys, double>())
             .def(py::init<std::vector<double>, std::vector<double>, std::vector<double>,
                           std::vector<double>, std::vector<double>, std::vector<double>,
                           std::vector<double>, std::vector<double>, std::vector<double>,
-                          std::vector<bool>>())
+                          std::vector<bool>, CoordSys>())
             .def("__repr__", &RayVector::repr)
             .def("amplitude", &RayVector::amplitude)
             .def("sumAmplitude", &RayVector::sumAmplitude)
@@ -44,12 +44,13 @@ namespace batoid {
             .def_property_readonly("monochromatic", [](const RayVector& rv){ return !std::isnan(rv.getWavelength()); })
             .def(py::pickle(
                 [](const RayVector& rv) {  // __getstate__
-                    return py::make_tuple(rv.getRays(), rv.getWavelength());
+                    return py::make_tuple(rv.getRays(), rv.getCoordSys(), rv.getWavelength());
                 },
                 [](py::tuple t) {  // __setstate__
                     return RayVector(
                         t[0].cast<std::vector<Ray>>(),
-                        t[1].cast<double>()
+                        t[1].cast<CoordSys>(),
+                        t[2].cast<double>()
                     );
                 }
             ))
