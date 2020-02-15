@@ -134,13 +134,9 @@ namespace batoid {
             .def("applyReverse", [](const CoordTransform& ct, py::array_t<double> xs, py::array_t<double> ys, py::array_t<double> zs){
                 return numpyApplyReverse(ct, xs, ys, zs);
             })
-            .def("applyForward", (Ray (CoordTransform::*)(const Ray&) const) &CoordTransform::applyForward)
-            .def("applyReverse", (Ray (CoordTransform::*)(const Ray&) const) &CoordTransform::applyReverse)
             .def("applyForward", (RayVector (CoordTransform::*)(const RayVector&) const) &CoordTransform::applyForward)
             .def("applyReverse", (RayVector (CoordTransform::*)(const RayVector&) const) &CoordTransform::applyReverse)
-            .def("applyForwardInPlace", (void (CoordTransform::*)(Ray&) const) &CoordTransform::applyForwardInPlace)
             .def("applyForwardInPlace", (void (CoordTransform::*)(RayVector&) const) &CoordTransform::applyForwardInPlace)
-            .def("applyReverseInPlace", (void (CoordTransform::*)(Ray&) const) &CoordTransform::applyReverseInPlace)
             .def("applyReverseInPlace", (void (CoordTransform::*)(RayVector&) const) &CoordTransform::applyReverseInPlace)
             .def(py::self == py::self)
             .def(py::self != py::self)
