@@ -14,6 +14,7 @@ namespace batoid {
     struct CoordSys {
         // explicitly construct the global coordinate system
         CoordSys();
+        CoordSys(const CoordSys& coordSys) : m_origin(coordSys.m_origin), m_rot(coordSys.m_rot) {}
 
         // origin indicates the origin in global coordinates of the new coordinate system.
         // rot indicates the rotation applied to the global unit vectors to produce
@@ -61,10 +62,10 @@ namespace batoid {
             return oss.str();
         }
 
-        const Vector3d m_origin;
+        Vector3d m_origin;
         // Could potentially use Euler angles instead of rotation matrix here to be
         // more compact?
-        const Matrix3d m_rot;
+        Matrix3d m_rot;
     };
 
     std::ostream& operator<<(std::ostream &os, const CoordSys& cs);

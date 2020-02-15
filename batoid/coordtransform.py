@@ -38,13 +38,12 @@ class CoordTransform:
             return self._coordTransform.applyForward(arg1, arg2, arg3)
         elif isinstance(arg1, Ray):
             return Ray._fromCPPRay(
-                self._coordTransform.applyForward(arg1._r)[0],
+                self._coordTransform.applyForward(arg1._rv)[0],
                 self.toSys
             )
         elif isinstance(arg1, RayVector):
             return RayVector._fromCPPRayVector(
-                self._coordTransform.applyForward(arg1._r),
-                self.toSys
+                self._coordTransform.applyForward(arg1._rv),
             )
         else:
             return self._coordTransform.applyForward(arg1)
@@ -68,13 +67,12 @@ class CoordTransform:
             return self._coordTransform.applyReverse(arg1, arg2, arg3)
         elif isinstance(arg1, Ray):
             return Ray._fromCPPRay(
-                self._coordTransform.applyReverse(arg1._r)[0],
+                self._coordTransform.applyReverse(arg1._rv)[0],
                 self.fromSys
             )
         elif isinstance(arg1, RayVector):
             return RayVector._fromCPPRayVector(
-                self._coordTransform.applyReverse(arg1._r),
-                self.fromSys
+                self._coordTransform.applyReverse(arg1._rv),
             )
         else:
             return self._coordTransform.applyReverse(arg1)
@@ -92,8 +90,7 @@ class CoordTransform:
         transformed : Ray or RayVector
             Result of transformation.  Type is the same as the input type.
         """
-        self._coordTransform.applyForwardInPlace(r._r)
-        r.coordSys = self.toSys
+        self._coordTransform.applyForwardInPlace(r._rv)
 
     def applyReverseInPlace(self, r):
         """Apply reverse-direction transformation in place.
@@ -108,8 +105,7 @@ class CoordTransform:
         transformed : Ray or RayVector
             Result of transformation.  Type is the same as the input type.
         """
-        self._coordTransform.applyReverseInPlace(r._r)
-        r.coordSys = self.fromSys
+        self._coordTransform.applyReverseInPlace(r._rv)
 
     def __eq__(self, rhs):
         if not isinstance(rhs, CoordTransform): return False

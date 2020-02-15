@@ -52,10 +52,10 @@ namespace batoid {
 
         // note: no test on _wavelength.
         bool operator==(const RayVector& rhs) const {
-            return _rays == rhs._rays;
+            return _rays == rhs._rays && _coordSys == rhs._coordSys;
         }
         bool operator!=(const RayVector& rhs) const {
-            return _rays != rhs._rays;
+            return !(*this == rhs);
         }
 
         // methods
@@ -72,6 +72,7 @@ namespace batoid {
 
         double getWavelength() const { return _wavelength; }
         const CoordSys& getCoordSys() const { return _coordSys; }
+        void setCoordSys(const CoordSys& coordSys) { _coordSys = coordSys; }
         const std::vector<Ray>& getRays() const { return _rays; }  // exposing just for pickle/hash
 
     private:

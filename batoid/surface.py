@@ -56,11 +56,11 @@ class Surface(ABC):
         """
         from .ray import Ray
         from .rayVector import RayVector
-        _r = self._surface.intersect(r._r)
+        _rv = self._surface.intersect(r._rv)
         if isinstance(r, Ray):
-            return Ray._fromCPPRay(_r[0], r.coordSys)
+            return Ray._fromCPPRay(_rv[0], r.coordSys)
         else:
-            return RayVector._fromCPPRayVector(_r, r.coordSys)
+            return RayVector._fromCPPRayVector(_rv)
 
     def intersectInPlace(self, r):
         """Calculate intersection of ray or rays with this surface.  Same as
@@ -71,7 +71,7 @@ class Surface(ABC):
         r : Ray or RayVector
             Ray(s) to manipulate in place.
         """
-        return self._surface.intersectInPlace(r._r)
+        return self._surface.intersectInPlace(r._rv)
 
     def reflect(self, r, coating=None):
         """Calculate intersection of ray(s) with this surface, and immediately
@@ -93,11 +93,11 @@ class Surface(ABC):
         from .ray import Ray
         from .rayVector import RayVector
         _coating = coating._coating if coating is not None else None
-        _r = self._surface.reflect(r._r, _coating)
+        _rv = self._surface.reflect(r._rv, _coating)
         if isinstance(r, Ray):
-            return Ray._fromCPPRay(_r[0], r.coordSys)
+            return Ray._fromCPPRay(_rv[0], r.coordSys)
         else:
-            return RayVector._fromCPPRayVector(_r, r.coordSys)
+            return RayVector._fromCPPRayVector(_rv)
 
     def reflectInPlace(self, r, coating=None):
         """Calculate intersection of ray(s) with this surface, and immediately
@@ -112,7 +112,7 @@ class Surface(ABC):
             Coating object to control reflection coefficient.
         """
         _coating = coating._coating if coating is not None else None
-        self._surface.reflectInPlace(r._r, _coating)
+        self._surface.reflectInPlace(r._rv, _coating)
 
     def refract(self, r, inMedium, outMedium, coating=None):
         """Calculate intersection of ray(s) with this surface, and immediately
@@ -138,12 +138,12 @@ class Surface(ABC):
         from .ray import Ray
         from .rayVector import RayVector
         _coating = coating._coating if coating is not None else None
-        _r = self._surface.refract(
-            r._r, inMedium._medium, outMedium._medium, _coating)
+        _rv = self._surface.refract(
+            r._rv, inMedium._medium, outMedium._medium, _coating)
         if isinstance(r, Ray):
-            return Ray._fromCPPRay(_r[0], r.coordSys)
+            return Ray._fromCPPRay(_rv[0], r.coordSys)
         else:
-            return RayVector._fromCPPRayVector(_r, r.coordSys)
+            return RayVector._fromCPPRayVector(_rv)
 
     def refractInPlace(self, r, inMedium, outMedium, coating=None):
         """Calculate intersection of ray(s) with this surface, and immediately
@@ -163,7 +163,7 @@ class Surface(ABC):
         """
         _coating = coating._coating if coating is not None else None
         self._surface.refractInPlace(
-            r._r, inMedium._medium, outMedium._medium, _coating
+            r._rv, inMedium._medium, outMedium._medium, _coating
         )
 
     def rSplit(self, r, inMedium, outMedium, coating):
@@ -192,7 +192,7 @@ class Surface(ABC):
         from .rayVector import RayVector
         _coating = coating._coating if coating is not None else None
         reflectedRays, refractedRays = self._surface.rSplit(
-            r._r, inMedium._medium, outMedium._medium, _coating
+            r._rv, inMedium._medium, outMedium._medium, _coating
         )
         if isinstance(r, Ray):
             return (
@@ -201,8 +201,8 @@ class Surface(ABC):
             )
         else:
             return (
-                RayVector._fromCPPRayVector(reflectedRays, r.coordSys),
-                RayVector._fromCPPRayVector(refractedRays, r.coordSys)
+                RayVector._fromCPPRayVector(reflectedRays),
+                RayVector._fromCPPRayVector(refractedRays)
             )
 
     @abstractmethod

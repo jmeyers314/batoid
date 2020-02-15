@@ -70,31 +70,37 @@ namespace batoid {
     }
 
     RayVector CoordTransform::applyForward(const RayVector& rv) const {
+        // assert rv.coordSys == getSource();
         std::vector<Ray> result(rv.size());
         parallelTransform(rv.cbegin(), rv.cend(), result.begin(),
             [this](const Ray& r) { return applyForward(r); }
         );
-        return RayVector(std::move(result), rv.getCoordSys(), rv.getWavelength());
+        return RayVector(std::move(result), getDestination(), rv.getWavelength());
     }
 
     RayVector CoordTransform::applyReverse(const RayVector& rv) const {
+        // assert rv.coordSys == getDestination();
         std::vector<Ray> result(rv.size());
         parallelTransform(rv.cbegin(), rv.cend(), result.begin(),
             [this](const Ray& r) { return applyReverse(r); }
         );
-        return RayVector(std::move(result), rv.getCoordSys(), rv.getWavelength());
+        return RayVector(std::move(result), getSource(), rv.getWavelength());
     }
 
     void CoordTransform::applyForwardInPlace(RayVector& rv) const {
+        // assert rv.coordSys == getSource();
         parallel_for_each(rv.begin(), rv.end(),
             [this](Ray& r) { applyForwardInPlace(r); }
         );
+        rv.setCoordSys(CoordSys(getDestination()));
     }
 
     void CoordTransform::applyReverseInPlace(RayVector& rv) const {
+        // assert rv.coordSys == getDestination();
         parallel_for_each(rv.begin(), rv.end(),
             [this](Ray& r) { applyReverseInPlace(r); }
         );
+        rv.setCoordSys(CoordSys(getSource()));
     }
 
     bool operator==(const CoordTransform& ct1, const CoordTransform& ct2) {

@@ -58,9 +58,11 @@ namespace batoid {
                 return py::hash(py::make_tuple(
                     "CPPRayVector",
                     py::tuple(py::cast(rv.getRays())),
+                    rv.getCoordSys(),
                     rv.getWavelength()
                 ));
             })
+            .def_property_readonly("coordSys", &RayVector::getCoordSys)
             .def_property_readonly("x",
                 [](RayVector& rv) -> py::array_t<double> {
                     return {{rv.size()},

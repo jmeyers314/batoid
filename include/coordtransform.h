@@ -42,6 +42,9 @@ namespace batoid {
             return oss.str();
         }
 
+        CoordSys getSource() const { return _source; }
+        CoordSys getDestination() const { return _destination; }
+
     private:
         const Vector3d _dr;
         const Matrix3d _rot;
