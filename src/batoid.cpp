@@ -3,6 +3,7 @@
 #include "surface.h"
 #include "medium.h"
 #include "utils.h"
+#include "coordsys.h"
 #include <cmath>
 #include <random>
 #include <numeric>
@@ -19,7 +20,7 @@ namespace batoid{
     RayVector rayGrid(double dist, double length,
                       double xcos, double ycos, double zcos,
                       int nside, double wavelength, double flux,
-                      const Medium& m, bool lattice=false) {
+                      const Medium& m, const CoordSys& coordSys, bool lattice=false) {
         double n = m.getN(wavelength);
     // `dist` is the distance from the center of the pupil to the center of the rayGrid.
     // `length` is the length of one side of the rayGrid square.
@@ -67,12 +68,13 @@ namespace batoid{
             }
             y += dy;
         }
-        return RayVector(std::move(result), wavelength);
+        return RayVector(std::move(result), coordSys, wavelength);
     }
 
     RayVector uniformCircularGrid(double dist, double outer, double inner,
                            double xcos, double ycos, double zcos,
-                           int nrays, double wavelength, double flux, const Medium& m, int seed) {
+                           int nrays, double wavelength, double flux, const Medium& m,
+                           const CoordSys& coordSys, int seed) {
         double n = m.getN(wavelength);
 
         std::vector<Ray> result;
@@ -97,12 +99,13 @@ namespace batoid{
             double t = (r + v * n * dist).dot(v) * n * n;
             result.emplace_back(r - v * t, v, 0, wavelength, flux, false);
         }
-        return RayVector(std::move(result), wavelength);
+        return RayVector(std::move(result), coordSys, wavelength);
     }
 
     RayVector circularGrid(double dist, double outer, double inner,
                            double xcos, double ycos, double zcos,
-                           int nradii, int naz, double wavelength, double flux, const Medium& m) {
+                           int nradii, int naz, double wavelength, double flux, const Medium& m,
+                           const CoordSys& coordSys) {
         double n = m.getN(wavelength);
 
         // Determine number of rays at each radius
@@ -139,12 +142,12 @@ namespace batoid{
             }
             rfrac -= drfrac;
         }
-        return RayVector(std::move(result), wavelength);
+        return RayVector(std::move(result), coordSys, wavelength);
     }
 
     RayVector pointSourceCircularGrid(const Vector3d& source, double outer, double inner,
                                       int nradii, int naz, double wavelength, double flux,
-                                      const Medium& m) {
+                                      const Medium& m, const CoordSys& coordSys) {
         double n = m.getN(wavelength);
 
         // Determine largest and smallest axial angle.
@@ -189,6 +192,6 @@ namespace batoid{
             }
             thetaFrac -= dthetaFrac;
         }
-        return RayVector(std::move(result), wavelength);
+        return RayVector(std::move(result), coordSys, wavelength);
     }
 }

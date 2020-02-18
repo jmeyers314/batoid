@@ -5,7 +5,8 @@ import numpy as np
 
 from . import _batoid
 from .constants import vacuum, globalCoordSys
-from .coordsys import CoordSys, CoordTransform
+from .coordsys import CoordSys
+from .coordtransform import CoordTransform
 from .ray import Ray
 from .utils import fieldToDirCos
 
@@ -28,12 +29,11 @@ class RayVector:
                 if r.wavelength != wavelength:
                     wavelength = float("nan")
                     break
-            self._r = _batoid.CPPRayVector(
-                [ray._r for ray in rays], wavelength
+            self._rv = _batoid.CPPRayVector(
+                [ray._rv[0] for ray in rays], rays[0].coordSys._coordSys, wavelength
             )
         else:
             raise ValueError("Wrong arguments to RayVector")
-        self.coordSys = rays[0].coordSys
 
     @classmethod
     def fromArrays(cls, x, y, z, vx, vy, vz, t, w, flux=1, vignetted=False,
@@ -69,10 +69,9 @@ class RayVector:
             vignetted = np.empty_like(x, dtype=bool)
             vignetted.fill(tmp)
         ret = cls.__new__(cls)
-        ret._r = _batoid.CPPRayVector(
-            x, y, z, vx, vy, vz, t, w, flux, vignetted
+        ret._rv = _batoid.CPPRayVector(
+            x, y, z, vx, vy, vz, t, w, flux, vignetted, coordSys._coordSys
         )
-        ret.coordSys = coordSys
         return ret
 
     @classmethod
@@ -263,8 +262,14 @@ class RayVector:
             x = np.random.uniform(-0.5, 0.5, size=nrandom)
             y = np.random.uniform(-0.5, 0.5, size=nrandom)
         else:
-            x_d = (nx-(2 if (nx%2) == 0 else 1))/nx
-            y_d = (ny-(2 if (ny%2) == 0 else 1))/ny
+            if nx <= 2:
+                x_d = 1.
+            else:
+                x_d = (nx-(2 if (nx%2) == 0 else 1))/nx
+            if ny <= 2:
+                y_d = 1.
+            else:
+                y_d = (ny-(2 if (ny%2) == 0 else 1))/ny
             x = np.fft.fftshift(np.fft.fftfreq(nx, x_d))
             y = np.fft.fftshift(np.fft.fftfreq(ny, y_d))
             x, y = np.meshgrid(x, y)
@@ -407,8 +412,6 @@ class RayVector:
                 stopSurface = optic.stopSurface
             if outer is None:
                 outer = optic.pupilSize/2
-            if outer is None:
-                outer = optic.pupilSize/2
 
         if backDist is None:
             backDist = 40.0
@@ -427,7 +430,11 @@ class RayVector:
             ths = []
             rs = []
             for r in np.linspace(outer, inner, nrad):
-                nphi = int(naz*r/outer//6)*6
+                if r == 0:
+                    break
+                nphi = int((naz*r/outer)//6)*6
+                if nphi == 0:
+                    nphi = 6
                 ths.append(np.linspace(0, 2*np.pi, nphi, endpoint=False))
                 rs.append(np.ones(nphi)*r)
             # Point in center is a special case
@@ -660,22 +667,18 @@ class RayVector:
             )
 
     @classmethod
-    def _fromCPPRayVector(cls, _r, coordSys=globalCoordSys):
+    def _fromCPPRayVector(cls, _rv):
         """Turn a c++ RayVector into a python RayVector."""
         ret = cls.__new__(cls)
-        ret._r = _r
-        ret.coordSys=coordSys
+        ret._rv = _rv
         return ret
 
     def copy(self):
         """Return a copy of this RayVector."""
-        return RayVector._fromCPPRayVector(
-            _batoid.CPPRayVector(self._r),
-            self.coordSys
-        )
+        return RayVector._fromCPPRayVector(_batoid.CPPRayVector(self._rv))
 
     def __repr__(self):
-        return repr(self._r)
+        return repr(self._rv)
 
     def amplitude(self, r, t):
         """Calculate (scalar) complex electric-field amplitudes at given
@@ -692,7 +695,7 @@ class RayVector:
         -------
         ndarray of complex, shape (n,)
         """
-        return self._r.amplitude(r, t)
+        return self._rv.amplitude(r, t)
 
     def sumAmplitude(self, r, t):
         """Calculate the sum of (scalar) complex electric-field amplitudes of
@@ -709,7 +712,7 @@ class RayVector:
         -------
         complex
         """
-        return self._r.sumAmplitude(r, t)
+        return self._rv.sumAmplitude(r, t)
 
     def phase(self, r, t):
         """Calculate plane wave phases at given position and time.
@@ -725,7 +728,7 @@ class RayVector:
         -------
         ndarray of float, shape(n,)
         """
-        return self._r.phase(r, t)
+        return self._rv.phase(r, t)
 
     def toCoordSys(self, coordSys):
         """Transform rays into new coordinate system.
@@ -766,7 +769,7 @@ class RayVector:
         ndarray of float, shape (n, 3)
             Positions in meters.
         """
-        return self._r.positionAtTime(t)
+        return self._rv.positionAtTime(t)
 
     def propagatedToTime(self, t):
         """Return a RayVector propagated to given time.
@@ -780,7 +783,7 @@ class RayVector:
         -------
         RayVector
         """
-        return RayVector._fromCPPRayVector(self._r.propagatedToTime(t))
+        return RayVector._fromCPPRayVector(self._rv.propagatedToTime(t))
 
     def propagateInPlace(self, t):
         """Propagate RayVector to given time.
@@ -790,7 +793,7 @@ class RayVector:
         t : float
             Time (over vacuum speed of light; in meters).
         """
-        self._r.propagateInPlace(t)
+        self._rv.propagateInPlace(t)
 
     def trimVignetted(self, minflux=0.0):
         """Return new RayVector with vignetted rays or rays with flux below
@@ -805,9 +808,7 @@ class RayVector:
         -------
         RayVector
         """
-        return RayVector._fromCPPRayVector(
-            self._r.trimVignetted(minflux), self.coordSys
-        )
+        return RayVector._fromCPPRayVector(self._rv.trimVignetted(minflux))
 
     def trimVignettedInPlace(self, minflux=0.0):
         """Remove vignetted rays and rays with flux below a given threshold.
@@ -817,82 +818,87 @@ class RayVector:
         minflux : float
             Minimum flux value to not remove.
         """
-        self._r.trimVignettedInPlace(minflux)
+        self._rv.trimVignettedInPlace(minflux)
+
+    @property
+    def coordSys(self):
+        """Coordinate system in which this RayVector is defined."""
+        return CoordSys._fromCoordSys(self._rv.coordSys)
 
     @property
     def monochromatic(self):
         """True if all rays have same wavelength."""
-        return self._r.monochromatic
+        return self._rv.monochromatic
 
     @property
     def x(self):
         """The x components of ray positions in meters."""
-        return self._r.x
+        return self._rv.x
 
     @property
     def y(self):
         """The y components of ray positions in meters."""
-        return self._r.y
+        return self._rv.y
 
     @property
     def z(self):
         """The z components of ray positions in meters."""
-        return self._r.z
+        return self._rv.z
 
     @property
     def vx(self):
         """The x components of ray velocities units of the vacuum speed of
         light.
         """
-        return self._r.vx
+        return self._rv.vx
 
     @property
     def vy(self):
         """The y components of ray velocities units of the vacuum speed of
         light.
         """
-        return self._r.vy
+        return self._rv.vy
 
     @property
     def vz(self):
         """The z components of ray velocities units of the vacuum speed of
         light.
         """
-        return self._r.vz
+        return self._rv.vz
 
     @property
     def t(self):
         """Reference times (divided by the speed of light in vacuum) in units
         of meters, also known as the optical path lengths.
         """
-        return self._r.t
+        return self._rv.t
 
     @property
     def wavelength(self):
         """Vacuum wavelengths in meters."""
-        return self._r.wavelength
+        return self._rv.wavelength
 
     @property
     def flux(self):
         """Fluxes in arbitrary units."""
-        return self._r.flux
+        return self._rv.flux
 
     @property
     def vignetted(self):
         """True for rays that have been vignetted."""
-        return self._r.vignetted
+        return self._rv.vignetted
 
     @property
     def failed(self):
         """True for rays that have failed.  This may occur, for example, if
         batoid failed to find the intersection of a ray wiht a surface.
         """
-        return self._r.failed
+        return self._rv.failed
 
     @property
     def r(self):
         """ndarray of float, shape (n, 3): Positions of rays in meters."""
-        return self._r.r
+        return self._rv.r
 
     @property
     def v(self):
@@ -900,7 +906,7 @@ class RayVector:
         speed of light in vacuum.  Note that these may have magnitudes < 1 if
         the rays are inside a refractive medium.
         """
-        return self._r.v
+        return self._rv.v
 
     @property
     def k(self):
@@ -909,22 +915,22 @@ class RayVector:
         :math:`2 \pi n / \lambda`, where :math:`n` is the refractive index and
         :math:`\lambda` is the wavelength.
         """
-        return self._r.k
+        return self._rv.k
 
     @property
     def kx(self):
         """The x component of each ray wavevector in radians per meter."""
-        return self._r.kx
+        return self._rv.kx
 
     @property
     def ky(self):
         """The y component of each ray wavevector in radians per meter."""
-        return self._r.ky
+        return self._rv.ky
 
     @property
     def kz(self):
         """The z component of each ray wavevector in radians per meter."""
-        return self._r.kz
+        return self._rv.kz
 
     @property
     def omega(self):
@@ -932,24 +938,25 @@ class RayVector:
         vacuum speed of light in units of radians per meter.  Equals
         :math:`2 \pi / \lambda`.
         """
-        return self._r.omega
+        return self._rv.omega
 
     def __getitem__(self, idx):
-        return Ray._fromCPPRay(self._r[idx])
+        return Ray._fromCPPRay(self._rv[idx], self.coordSys._coordSys)
 
     def __iter__(self):
-        self._iter = iter(self._r)
+        self._iter = iter(self._rv)
         return self
 
     def __next__(self):
-        return Ray._fromCPPRay(next(self._iter))
+        # Note returns a new copy, not a reference to the original Ray.
+        return Ray._fromCPPRay(next(self._iter), self.coordSys._coordSys)
 
     def __len__(self):
-        return len(self._r)
+        return len(self._rv)
 
     def __eq__(self, rhs):
         if not isinstance(rhs, RayVector): return False
-        return (self._r == rhs._r and self.coordSys == rhs.coordSys)
+        return (self._rv == rhs._rv)
 
     def __ne__(self, rhs):
         return not (self == rhs)
@@ -975,12 +982,12 @@ def concatenateRayVectors(rvs):
                 "Cannot concatenate RayVectors "
                 "with different coordinate systems"
             )
-    _r = _batoid.concatenateRayVectors([rv._r for rv in rvs])
-    return RayVector._fromCPPRayVector(_r, coordSys)
+    _rv = _batoid.concatenateRayVectors([rv._rv for rv in rvs])
+    return RayVector._fromCPPRayVector(_rv)
 
 
 def rayGrid(zdist, length, xcos, ycos, zcos, nside, wavelength, flux, medium,
-            lattice=False):
+            coordSys=globalCoordSys, lattice=False):
     """Construct a parallel square grid of rays in a given direction.
 
     Parameters
@@ -999,6 +1006,8 @@ def rayGrid(zdist, length, xcos, ycos, zcos, nside, wavelength, flux, medium,
         Flux of rays in arbitrary units.
     medium : batoid.Medium
         Medium containing rays.
+    coordSys : batoid.CoordSys
+        Coordinate system in which rays are defined.
     lattice : bool
         Whether to center grid as a batoid.Lattice or not.
 
@@ -1010,12 +1019,12 @@ def rayGrid(zdist, length, xcos, ycos, zcos, nside, wavelength, flux, medium,
     return RayVector._fromCPPRayVector(
         _batoid.rayGrid(
             zdist, length, xcos, ycos, zcos, nside,
-            wavelength, flux, medium._medium, lattice
+            wavelength, flux, medium._medium, coordSys._coordSys, lattice
         )
     )
 
 def circularGrid(zdist, outer, inner, xcos, ycos, zcos, nradii, naz,
-                 wavelength, flux, medium):
+                 wavelength, flux, medium, coordSys=globalCoordSys):
     """Construct a hexapolar grid of rays in a given direction.
 
     Parameters
@@ -1038,6 +1047,8 @@ def circularGrid(zdist, outer, inner, xcos, ycos, zcos, nradii, naz,
         Flux of rays in arbitrary units.
     medium : batoid.Medium
         Medium containing rays.
+    coordSys : batoid.CoordSys
+        Coordinate system in which rays are defined.
 
     Returns
     -------
@@ -1047,12 +1058,13 @@ def circularGrid(zdist, outer, inner, xcos, ycos, zcos, nradii, naz,
     return RayVector._fromCPPRayVector(
         _batoid.circularGrid(
             zdist, outer, inner, xcos, ycos, zcos, nradii, naz, wavelength,
-            flux, medium._medium
+            flux, medium._medium, coordSys._coordSys
         )
     )
 
 def uniformCircularGrid(zdist, outer, inner, xcos, ycos, zcos, nrays,
-                        wavelength, flux, medium, seed=0):
+                        wavelength, flux, medium, coordSys=globalCoordSys,
+                        seed=0):
     """Uniformly sample ray positions from an annulus, assign all the same
     direction.
 
@@ -1074,6 +1086,8 @@ def uniformCircularGrid(zdist, outer, inner, xcos, ycos, zcos, nrays,
         Flux of rays in arbitrary units.
     medium : batoid.Medium
         Medium containing rays.
+    coordSys : batoid.CoordSys
+        Coordinate system in which rays are defined.
 
     Returns
     -------
@@ -1083,12 +1097,12 @@ def uniformCircularGrid(zdist, outer, inner, xcos, ycos, zcos, nrays,
     return RayVector._fromCPPRayVector(
         _batoid.uniformCircularGrid(
             zdist, outer, inner, xcos, ycos, zcos, nrays, wavelength, flux,
-            medium._medium, seed
+            medium._medium, coordSys._coordSys, seed
         )
     )
 
 def pointSourceCircularGrid(source, outer, inner, nradii, naz, wavelength,
-                            flux, medium):
+                            flux, medium, coordSys=globalCoordSys):
     """Construct grid of rays all emanating from the same source location but
     with a hexapolar grid in direction cosines.
 
@@ -1112,6 +1126,8 @@ def pointSourceCircularGrid(source, outer, inner, nradii, naz, wavelength,
         Flux of rays in arbitrary units.
     medium : batoid.Medium
         Medium containing rays.
+    coordSys : batoid.CoordSys
+        Coordinate system in which rays are defined.
 
     Returns
     -------
@@ -1120,6 +1136,7 @@ def pointSourceCircularGrid(source, outer, inner, nradii, naz, wavelength,
     """
     return RayVector._fromCPPRayVector(
         _batoid.pointSourceCircularGrid(
-            source, outer, inner, nradii, naz, wavelength, flux, medium._medium
+            source, outer, inner, nradii, naz, wavelength, flux, medium._medium,
+            coordSys._coordSys
         )
     )

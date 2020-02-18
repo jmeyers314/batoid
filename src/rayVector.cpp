@@ -13,8 +13,10 @@ namespace batoid {
         const std::vector<double>& x, const std::vector<double>& y, const std::vector<double>& z,
         const std::vector<double>& vx, const std::vector<double>& vy, const std::vector<double>& vz,
         const std::vector<double>& t, const std::vector<double>& w,
-        const std::vector<double>& flux, const std::vector<bool>& vignetted
-    ) {
+        const std::vector<double>& flux, const std::vector<bool>& vignetted,
+        const CoordSys& coordSys
+    ) : _coordSys(coordSys)
+    {
         _rays.reserve(x.size());
         bool wSame{true};
         double w0{w[0]};
@@ -81,7 +83,7 @@ namespace batoid {
             [=](const Ray& ray)
                 { return ray.propagatedToTime(t); }
         );
-        return result;
+        return RayVector(result, getCoordSys());
     }
 
     void RayVector::propagateInPlace(double t) {
@@ -129,8 +131,10 @@ namespace batoid {
         for (const auto& rv: rvs) {
             if (_wavelength != rv.getWavelength())
                 _wavelength = std::numeric_limits<double>::quiet_NaN();
+            if (rv.getCoordSys() != rvs[0].getCoordSys())
+                throw std::runtime_error("CoordSys's must match");
             out.insert(out.end(), rv.cbegin(), rv.cend());
         }
-        return RayVector(out, _wavelength);
+        return RayVector(out, rvs[0].getCoordSys(), _wavelength);
     }
 }

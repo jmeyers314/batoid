@@ -42,7 +42,7 @@ namespace batoid {
                     return Ray(ray.r, ray.v, ray.t, ray.wavelength, ray.flux, ray.vignetted);
             }
         );
-        return RayVector(std::move(result), rv.getWavelength());
+        return RayVector(std::move(result), rv.getCoordSys(), rv.getWavelength());
     }
 
     void Obscuration::obscureInPlace(RayVector& rv) const {

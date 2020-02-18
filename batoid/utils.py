@@ -465,14 +465,3 @@ class lazy_property(object):
         value = self.fget(obj)
         setattr(obj, self.func_name, value)
         return value
-
-
-def _rayify(r, coordSys=None):
-    from .ray import Ray
-    from .rayVector import RayVector
-    if isinstance(r, _batoid.CPPRay):
-        return Ray._fromCPPRay(r, coordSys)
-    elif isinstance(r, _batoid.CPPRayVector):
-        return RayVector._fromCPPRayVector(r, coordSys)
-    else:
-        raise ValueError("Unknown type in _rayify")

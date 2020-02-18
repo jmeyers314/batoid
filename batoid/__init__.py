@@ -13,7 +13,8 @@ from .medium import SellmeierMedium, SumitaMedium, Air
 from .obscuration import Obscuration, ObscCircle, ObscAnnulus, ObscRectangle, ObscRay
 from .obscuration import ObscUnion, ObscIntersection, ObscNegation
 
-from .coordsys import CoordSys, CoordTransform
+from .coordsys import CoordSys
+from .coordtransform import CoordTransform
 
 from .coating import Coating, SimpleCoating
 
@@ -42,6 +43,8 @@ from .utils import normalized
 
 from .constants import globalCoordSys, vacuum
 
+from ._batoid import setNThread, getNThread, setMinChunk, getMinChunk
+
 import os
 datadir = os.path.join(os.path.dirname(__file__), "data")
 
@@ -62,3 +65,4 @@ __all__ += ["Optic", "CompoundOptic", "Lens"]
 __all__ += ["Interface", "RefractiveInterface", "Mirror", "Detector", "Baffle"]
 __all__ += ["drawTrace2d", "drawTrace3d"]
 __all__ += ["parse"]
+__all__ += ["setNThread", "getNThread", "setMinChunk", "getMinChunk"]

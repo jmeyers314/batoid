@@ -12,9 +12,7 @@ namespace batoid {
     void pyExportObscuration(py::module& m) {
         py::class_<Obscuration, std::shared_ptr<Obscuration>>(m, "CPPObscuration")
             .def("contains", &Obscuration::contains)
-            .def("obscure", (Ray (Obscuration::*)(const Ray&) const) &Obscuration::obscure)
             .def("obscure", (RayVector (Obscuration::*)(const RayVector&) const) &Obscuration::obscure)
-            .def("obscureInPlace", (void (Obscuration::*)(Ray&) const) &Obscuration::obscureInPlace)
             .def("obscureInPlace", (void (Obscuration::*)(RayVector&) const) &Obscuration::obscureInPlace)
             .def("__repr__", &Obscuration::repr);
 

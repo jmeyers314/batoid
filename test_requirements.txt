@@ -7,3 +7,4 @@ jupyter_contrib_nbextensions
 notebook
 matplotlib
 lmfit
+ipyvolume

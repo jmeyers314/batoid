@@ -142,15 +142,10 @@ def test_intersect():
         rv = rv0.copy()
         rv1 = sum.intersect(rv)
         rv2 = batoid.RayVector([sum.intersect(r) for r in rv])
-        rv3 = rv.copy()
         sum.intersectInPlace(rv)
-
-        for r in rv3:
-            sum.intersectInPlace(r)
 
         assert rays_allclose(rv1, rv)
         assert rays_allclose(rv2, rv)
-        assert rays_allclose(rv3, rv)
 
 
 @timer

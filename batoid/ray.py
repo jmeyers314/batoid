@@ -4,7 +4,8 @@ import numpy as np
 
 from . import _batoid
 from .constants import vacuum, globalCoordSys
-from .coordsys import CoordSys, CoordTransform
+from .coordsys import CoordSys
+from .coordtransform import CoordTransform
 from .utils import fieldToDirCos
 
 class Ray:
@@ -37,19 +38,26 @@ class Ray:
     def __init__(self, r=None, v=None, t=0.0, wavelength=0.0, flux=1.0,
                  vignetted=False, failed=False, coordSys=globalCoordSys):
         if failed:
-            self._r = _batoid.CPPRay(failed=True)
+            self._rv = _batoid.CPPRayVector([_batoid.CPPRay(failed=True)], coordSys._coordSys)
         elif r is None and v is None:
-            self._r = _batoid.CPPRay()
+            self._rv = _batoid.CPPRayVector([_batoid.CPPRay()], coordSys._coordSys)
         else:
-            self._r = _batoid.CPPRay(r, v, t, wavelength, flux, vignetted)
-        self.coordSys = coordSys
+            self._rv = _batoid.CPPRayVector([_batoid.CPPRay(
+                r, v, t, wavelength, flux, vignetted
+            )], coordSys._coordSys)
 
     @classmethod
-    def _fromCPPRay(cls, _r, coordSys=globalCoordSys):
+    def _fromCPPRay(cls, _r, _coordSys):
         """Turn a c++ Ray into a python Ray."""
         ret = cls.__new__(cls)
-        ret._r = _r
-        ret.coordSys = coordSys
+        ret._rv = _batoid.CPPRayVector([_r], _coordSys)
+        return ret
+
+    @classmethod
+    def _fromCPPRayVector(cls, _rv):
+        """Turn a single-element c++ RayVector into a python Ray."""
+        ret = cls.__new__(cls)
+        ret._rv = _rv
         return ret
 
     @classmethod
@@ -196,10 +204,10 @@ class Ray:
 
     def copy(self):
         """Return a copy of this Ray."""
-        return Ray._fromCPPRay(_batoid.CPPRay(self._r), self.coordSys)
+        return Ray._fromCPPRay(self._rv[0], self.coordSys._coordSys)
 
     def __repr__(self):
-        return repr(self._r)
+        return repr(self._rv[0])
 
     def amplitude(self, r, t):
         """Calculate (scalar) complex electric-field amplitude at given
@@ -216,7 +224,7 @@ class Ray:
         -------
         complex
         """
-        return self._r.amplitude(r, t)
+        return self._rv.amplitude(r, t)[0]
 
     def positionAtTime(self, t):
         """Calculate the position of the Ray at a given time.
@@ -231,7 +239,7 @@ class Ray:
         ndarray of float, shape (3,)
             Position in meters.
         """
-        return self._r.positionAtTime(t)
+        return self._rv.positionAtTime(t)[0]
 
     def propagatedToTime(self, t):
         """Return a Ray propagated to given time.
@@ -245,7 +253,7 @@ class Ray:
         -------
         Ray
         """
-        return self._r.propagatedToTime(t)
+        return self._rv.propagatedToTime(t)[0]
 
     def propagateInPlace(self, t):
         """Propagate Ray to given time.
@@ -255,7 +263,7 @@ class Ray:
         t : float
             Time (over vacuum speed of light; in meters).
         """
-        self._r.propagateInPlace(t)
+        self._rv.propagateInPlace(t)
 
     def phase(self, r, t):
         """Calculate plane wave phase at given position and time.
@@ -271,7 +279,7 @@ class Ray:
         -------
         float
         """
-        return self._r.phase(r, t)
+        return self._rv.phase(r, t)[0]
 
     def toCoordSys(self, coordSys):
         """Transform ray into new coordinate system.
@@ -300,9 +308,14 @@ class Ray:
         transform.applyForwardInPlace(self)
 
     @property
+    def coordSys(self):
+        """Coordinate system in which this Ray is defined."""
+        return CoordSys._fromCoordSys(self._rv.coordSys)
+
+    @property
     def r(self):
         """ndarray of float, shape (3,): Position of ray in meters."""
-        return self._r.r
+        return self._rv.r[0]
 
     @property
     def v(self):
@@ -310,72 +323,72 @@ class Ray:
         of light in vacuum. Note that this may have magnitude < 1 if the ray is
         inside a refractive medium.
         """
-        return self._r.v
+        return self._rv.v[0]
 
     @property
     def t(self):
         """Reference time (divided by the speed of light in vacuum) in units of
         meters, also known as the optical path length.
         """
-        return self._r.t
+        return self._rv.t[0]
 
     @property
     def wavelength(self):
         """Vacuum wavelength in meters."""
-        return self._r.wavelength
+        return self._rv.wavelength[0]
 
     @property
     def flux(self):
         """Ray flux in arbitrary units."""
-        return self._r.flux
+        return self._rv.flux[0]
 
     @property
     def vignetted(self):
         """True if ray has been vignetted."""
-        return self._r.vignetted
+        return self._rv.vignetted[0]
 
     @property
     def failed(self):
         """True if ray is in a failed state.  This may occur, for example, if
         batoid failed to find the intersection of a ray with a surface.
         """
-        return self._r.failed
+        return self._rv.failed[0]
 
     @property
     def x(self):
         """The x component of the ray position in meters."""
-        return self._r.x
+        return self._rv.x[0]
 
     @property
     def y(self):
         """The y component of the ray position in meters."""
-        return self._r.y
+        return self._rv.y[0]
 
     @property
     def z(self):
         """The z component of the ray position in meters."""
-        return self._r.z
+        return self._rv.z[0]
 
     @property
     def vx(self):
         """The x component of the ray velocity in units of the vacuum speed of
         light.
         """
-        return self._r.vx
+        return self._rv.vx[0]
 
     @property
     def vy(self):
         """The y component of the ray velocity in units of the vacuum speed of
         light.
         """
-        return self._r.vy
+        return self._rv.vy[0]
 
     @property
     def vz(self):
         """The z component of the ray velocity in units of the vacuum speed of
         light.
         """
-        return self._r.vz
+        return self._rv.vz[0]
 
     @property
     def k(self):
@@ -384,22 +397,22 @@ class Ray:
         :math:`2 \pi n / \lambda`, where :math:`n` is the refractive index and
         :math:`\lambda` is the wavelength.
         """
-        return self._r.k
+        return self._rv.k[0]
 
     @property
     def kx(self):
         """The x component of the ray wave vector in radians per meter."""
-        return self._r.kx
+        return self._rv.kx[0]
 
     @property
     def ky(self):
         """The y component of the ray wave vector in radians per meter."""
-        return self._r.ky
+        return self._rv.ky[0]
 
     @property
     def kz(self):
         """The z component of the ray wave vector in radians per meter."""
-        return self._r.kz
+        return self._rv.kz[0]
 
     @property
     def omega(self):
@@ -407,11 +420,11 @@ class Ray:
         vacuum speed of light in units of radians per meter.  Equals
         :math:`2 \pi / \lambda`.
         """
-        return self._r.omega
+        return self._rv.omega[0]
 
     def __eq__(self, rhs):
         if not isinstance(rhs, Ray): return False
-        return self._r == rhs._r and self.coordSys == rhs.coordSys
+        return self._rv == rhs._rv
 
     def __ne__(self, rhs):
         return not (self == rhs)

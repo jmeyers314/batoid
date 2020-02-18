@@ -239,7 +239,7 @@ def test_rayGrid():
 
     rays = batoid.rayGrid(
         dist, length, xcos, ycos, zcos, nside, wavelength, flux, medium,
-        lattice=True
+        batoid.globalCoordSys, lattice=True,
     )
     assert rays.monochromatic == True
     # Check that all rays are perpendicular to v

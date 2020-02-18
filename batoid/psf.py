@@ -150,7 +150,7 @@ def drdth(optic, theta_x, theta_y, wavelength, nx=16, projection='postel'):
     dry_dthx = (np.mean(rays_x.y) - np.mean(rays.y))/dth
     dry_dthy = (np.mean(rays_y.y) - np.mean(rays.y))/dth
 
-    return np.array([[drx_dthx, dry_dthx], [drx_dthy, dry_dthy]])
+    return np.array([[drx_dthx, drx_dthy], [dry_dthx, dry_dthy]])
 
 
 def dthdr(optic, theta_x, theta_y, wavelength, nx=16, projection='postel'):

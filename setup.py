@@ -87,7 +87,7 @@ setup(
         "Topic :: Scientific/Engineering :: Physics",
     ],
     project_urls={
-        'Documentation': "https://batoid.readthedocs.io",
+        'Documentation': "https://jmeyers314.github.io/batoid/overview.html",
         'Source': "https://github.com/jmeyers314/batoid",
         'Tracker': "https://github.com/jmeyers314/batoid/issues"
     }
