@@ -37,9 +37,8 @@ class CoordTransform:
         if arg2 is not None:
             return self._coordTransform.applyForward(arg1, arg2, arg3)
         elif isinstance(arg1, Ray):
-            return Ray._fromCPPRay(
-                self._coordTransform.applyForward(arg1._rv)[0],
-                self.toSys
+            return Ray._fromCPPRayVector(
+                self._coordTransform.applyForward(arg1._rv)
             )
         elif isinstance(arg1, RayVector):
             return RayVector._fromCPPRayVector(
@@ -66,9 +65,8 @@ class CoordTransform:
         if arg2 is not None:
             return self._coordTransform.applyReverse(arg1, arg2, arg3)
         elif isinstance(arg1, Ray):
-            return Ray._fromCPPRay(
-                self._coordTransform.applyReverse(arg1._rv)[0],
-                self.fromSys
+            return Ray._fromCPPRayVector(
+                self._coordTransform.applyReverse(arg1._rv),
             )
         elif isinstance(arg1, RayVector):
             return RayVector._fromCPPRayVector(

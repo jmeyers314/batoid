@@ -43,7 +43,7 @@ class Obscuration:
         from .rayVector import RayVector
         _rv = self._obsc.obscure(r._rv)
         if isinstance(r, Ray):
-            return Ray._fromCPPRay(_rv[0], r.coordSys)
+            return Ray._fromCPPRayVector(_rv)
         else:
             return RayVector._fromCPPRayVector(_rv)
 

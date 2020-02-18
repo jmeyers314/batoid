@@ -1,6 +1,6 @@
 import numpy as np
 import batoid
-from test_helpers import timer
+from test_helpers import timer, ray_isclose
 
 
 @timer
@@ -198,6 +198,35 @@ def test_asphere_reflection_reversal():
         np.testing.assert_allclose(cray[2], -0.1, rtol=0, atol=1e-9)
 
 
+@timer
+def test_asphere_reflection_coordtransform():
+    import random
+    random.seed(5772156)
+    asphere = batoid.Asphere(23.0, -0.97, [1e-5, 1e-6])
+    for i in range(1000):
+        x = random.gauss(0, 1)
+        y = random.gauss(0, 1)
+        vx = random.gauss(0, 1e-1)
+        vy = random.gauss(0, 1e-1)
+        v = np.array([vx, vy, 1])
+        v /= np.linalg.norm(v)
+        ray = batoid.Ray([x, y, -0.1], v, 0)
+        ray2 = ray.copy()
+
+        cs = batoid.CoordSys(
+            [random.uniform(-0.01, 0.01),
+             random.uniform(-0.01, 0.01),
+             random.uniform(-0.01, 0.01)],
+            (batoid.RotX(random.uniform(-0.01, 0.01))
+             .dot(batoid.RotY(random.uniform(-0.01, 0.01)))
+             .dot(batoid.RotZ(random.uniform(-0.01, 0.01)))
+            )
+        )
+
+        rray = asphere.reflect(ray, coordSys=cs)
+        rray2 = asphere.reflect(ray2.toCoordSys(cs))
+        assert ray_isclose(rray, rray2)
+
 if __name__ == '__main__':
     test_plane_reflection_plane()
     test_plane_reflection_reversal()
@@ -206,3 +235,4 @@ if __name__ == '__main__':
     test_paraboloid_reflection_to_focus()
     test_asphere_reflection_plane()
     test_asphere_reflection_reversal()
+    test_asphere_reflection_coordtransform()

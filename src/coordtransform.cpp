@@ -33,6 +33,8 @@ namespace batoid {
     CoordTransform::CoordTransform(const Vector3d& dr, const Matrix3d& rot) :
         _dr(dr), _rot(rot) {}
 
+    CoordTransform::CoordTransform() : _dr(Vector3d::Zero()), _rot(Matrix3d::Identity()) {}
+
     // We actively shift and rotate the coordinate system axes,
     // This looks like y = R x + dr
     // For a passive transformation of a fixed vector from one coord sys to another

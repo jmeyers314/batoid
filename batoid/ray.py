@@ -47,10 +47,17 @@ class Ray:
             )], coordSys._coordSys)
 
     @classmethod
-    def _fromCPPRay(cls, _r, coordSys=globalCoordSys):
+    def _fromCPPRay(cls, _r, _coordSys):
         """Turn a c++ Ray into a python Ray."""
         ret = cls.__new__(cls)
-        ret._rv = _batoid.CPPRayVector([_r], coordSys._coordSys)
+        ret._rv = _batoid.CPPRayVector([_r], _coordSys)
+        return ret
+
+    @classmethod
+    def _fromCPPRayVector(cls, _rv):
+        """Turn a single-element c++ RayVector into a python Ray."""
+        ret = cls.__new__(cls)
+        ret._rv = _rv
         return ret
 
     @classmethod
@@ -197,7 +204,7 @@ class Ray:
 
     def copy(self):
         """Return a copy of this Ray."""
-        return Ray._fromCPPRay(self._rv[0], self.coordSys)
+        return Ray._fromCPPRay(self._rv[0], self.coordSys._coordSys)
 
     def __repr__(self):
         return repr(self._rv[0])

@@ -299,7 +299,6 @@ class Interface(Optic):
         """
         if self.skip:
             return r
-        r = r.toCoordSys(self.coordSys)
 
         # refract, reflect, pass-through - depending on subclass
         r = self.interact(r)
@@ -373,7 +372,6 @@ class Interface(Optic):
         """
         if self.skip:
             return r
-        r.toCoordSysInPlace(self.coordSys)
 
         # refract, reflect, pass-through - depending on subclass
         self.interactInPlace(r)
@@ -406,7 +404,6 @@ class Interface(Optic):
         """
         if self.skip:
             return r
-        r.toCoordSysInPlace(self.coordSys)
 
         r = self.interactReverse(r)
 
@@ -449,7 +446,6 @@ class Interface(Optic):
             print(strtemplate.format(self.name, np.sum(r.flux), len(r)))
         if self.skip:
             return r, None
-        r = r.toCoordSys(self.coordSys)
 
         rForward, rReverse = self.rSplit(r)
 
@@ -495,7 +491,6 @@ class Interface(Optic):
             print(strtemplate.format(self.name, np.sum(r.flux), len(r)))
         if self.skip:
             return r, None
-        r = r.toCoordSys(self.coordSys)
 
         rForward, rReverse = self.rSplitReverse(r)
 
@@ -511,13 +506,13 @@ class Interface(Optic):
             self.obscuration = None
 
     def interact(self, r):
-        return self.surface.intersect(r)
+        return self.surface.intersect(r, coordSys=self.coordSys)
 
     def interactReverse(self, r):
-        return self.surface.intersect(r)
+        return self.surface.intersect(r, coordSys=self.coordSys)
 
     def interactInPlace(self, r):
-        self.surface.intersectInPlace(r)
+        self.surface.intersectInPlace(r, coordSys=self.coordSys)
 
     def __eq__(self, other):
         if not self.__class__ == other.__class__:
@@ -649,23 +644,31 @@ class RefractiveInterface(Interface):
         )
 
     def interact(self, r):
-        return self.surface.refract(r, self.inMedium, self.outMedium)
+        return self.surface.refract(
+            r, self.inMedium, self.outMedium, coordSys=self.coordSys
+        )
 
     def interactReverse(self, r):
-        return self.surface.refract(r, self.outMedium, self.inMedium)
+        return self.surface.refract(
+            r, self.outMedium, self.inMedium, coordSys=self.coordSys
+        )
 
     def interactInPlace(self, r):
-        self.surface.refractInPlace(r, self.inMedium, self.outMedium)
+        self.surface.refractInPlace(
+            r, self.inMedium, self.outMedium, coordSys=self.coordSys
+        )
 
     def rSplit(self, r):
         reflectedR, refractedR = self.surface.rSplit(
-            r, self.inMedium, self.outMedium, self.forwardCoating
+            r, self.inMedium, self.outMedium, self.forwardCoating,
+            coordSys=self.coordSys
         )
         return refractedR, reflectedR
 
     def rSplitReverse(self, r):
         reflectedR, refractedR = self.surface.rSplit(
-            r, self.outMedium, self.inMedium, self.reverseCoating
+            r, self.outMedium, self.inMedium, self.reverseCoating,
+            coordSys=self.coordSys
         )
         # rays coming into a refractive interface from reverse direction,
         # means that the refracted rays are going in the reverse direction,
@@ -689,23 +692,25 @@ class Mirror(Interface):
         )
 
     def interact(self, r):
-        return self.surface.reflect(r)
+        return self.surface.reflect(r, coordSys=self.coordSys)
 
     def interactReverse(self, r):
-        return self.surface.reflect(r)
+        return self.surface.reflect(r, coordSys=self.coordSys)
 
     def interactInPlace(self, r):
-        self.surface.reflectInPlace(r)
+        self.surface.reflectInPlace(r, coordSys=self.coordSys)
 
     def rSplit(self, r):
         reflectedR, refractedR = self.surface.rSplit(
-            r, self.inMedium, self.outMedium, self.forwardCoating
+            r, self.inMedium, self.outMedium, self.forwardCoating,
+            coordSys=self.coordSys
         )
         return reflectedR, refractedR
 
     def rSplitReverse(self, r):
         reflectedR, refractedR = self.surface.rSplit(
-            r, self.outMedium, self.inMedium, self.reverseCoating
+            r, self.outMedium, self.inMedium, self.reverseCoating,
+            coordSys=self.coordSys
         )
         return refractedR, reflectedR
 
@@ -726,13 +731,15 @@ class Detector(Interface):
 
     def rSplit(self, r):
         reflectedR, refractedR = self.surface.rSplit(
-            r, self.inMedium, self.outMedium, self.forwardCoating
+            r, self.inMedium, self.outMedium, self.forwardCoating,
+            coordSys=self.coordSys
         )
         return refractedR, reflectedR
 
     def rSplitReverse(self, r):
         reflectedR, refractedR = self.surface.rSplit(
-            r, self.outMedium, self.inMedium, self.reverseCoating
+            r, self.outMedium, self.inMedium, self.reverseCoating,
+            coordSys=self.coordSys
         )
         return reflectedR, refractedR
 
@@ -754,13 +761,15 @@ class Baffle(Interface):
 
     def rSplit(self, r):
         reflectedR, refractedR = self.surface.rSplit(
-            r, self.inMedium, self.outMedium, self.forwardCoating
+            r, self.inMedium, self.outMedium, self.forwardCoating,
+            coordSys=self.coordSys
         )
         return refractedR, reflectedR
 
     def rSplitReverse(self, r):
         reflectedR, refractedR = self.surface.rSplit(
-            r, self.outMedium, self.inMedium, self.reverseCoating
+            r, self.outMedium, self.inMedium, self.reverseCoating,
+            coordSys=self.coordSys
         )
         return reflectedR, refractedR
 

@@ -941,7 +941,7 @@ class RayVector:
         return self._rv.omega
 
     def __getitem__(self, idx):
-        return Ray._fromCPPRay(self._rv[idx])
+        return Ray._fromCPPRay(self._rv[idx], self.coordSys._coordSys)
 
     def __iter__(self):
         self._iter = iter(self._rv)
@@ -949,7 +949,7 @@ class RayVector:
 
     def __next__(self):
         # Note returns a new copy, not a reference to the original Ray.
-        return Ray._fromCPPRay(next(self._iter))
+        return Ray._fromCPPRay(next(self._iter), self.coordSys._coordSys)
 
     def __len__(self):
         return len(self._rv)

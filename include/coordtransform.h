@@ -16,6 +16,7 @@ using Eigen::Matrix3d;
 namespace batoid {
     class CoordTransform {
     public:
+        CoordTransform();
         CoordTransform(const CoordSys& source, const CoordSys& destination);
         CoordTransform(const Vector3d& dr, const Matrix3d& rot);
 
