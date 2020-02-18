@@ -68,7 +68,7 @@ def test_coordtransform(Nthread=1, Nray=100_000, Nloop=1):
     failed = np.zeros(Nray, dtype=bool)
 
     rv = batoid.RayVector.fromArrays(
-        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+        x, y, z, vx, vy, vz, t, w, flux, vignetted
     )
     rv2 = batoid.RayVector2.fromArrays(
         x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
@@ -117,7 +117,7 @@ def test_intersect_plane(Nthread=1, Nray=100_000, Nloop=1):
     failed = np.zeros(Nray, dtype=bool)
 
     rv = batoid.RayVector.fromArrays(
-        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+        x, y, z, vx, vy, vz, t, w, flux, vignetted
     )
     rv2 = batoid.RayVector2.fromArrays(
         x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
@@ -162,7 +162,7 @@ def test_reflect_plane(Nthread=1, Nray=100_000, Nloop=1):
     failed = np.zeros(Nray, dtype=bool)
 
     rv = batoid.RayVector.fromArrays(
-        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+        x, y, z, vx, vy, vz, t, w, flux, vignetted
     )
     rv2 = batoid.RayVector2.fromArrays(
         x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
@@ -211,7 +211,7 @@ def test_refract_plane(Nthread=1, Nray=100_000, Nloop=1):
     vy /= 1.1*v
     vz /= 1.1*v
     rv = batoid.RayVector.fromArrays(
-        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+        x, y, z, vx, vy, vz, t, w, flux, vignetted
     )
     rv2 = batoid.RayVector2.fromArrays(
         x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
@@ -262,7 +262,7 @@ def test_intersect_sphere(Nthread=1, Nray=100_000, Nloop=1):
     failed = np.zeros(Nray, dtype=bool)
 
     rv = batoid.RayVector.fromArrays(
-        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+        x, y, z, vx, vy, vz, t, w, flux, vignetted
     )
     rv2 = batoid.RayVector2.fromArrays(
         x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
@@ -307,7 +307,7 @@ def test_reflect_sphere(Nthread=1, Nray=100_000, Nloop=1):
     failed = np.zeros(Nray, dtype=bool)
 
     rv = batoid.RayVector.fromArrays(
-        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+        x, y, z, vx, vy, vz, t, w, flux, vignetted
     )
     rv2 = batoid.RayVector2.fromArrays(
         x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
@@ -356,7 +356,7 @@ def test_refract_sphere(Nthread=1, Nray=100_000, Nloop=1):
     vy /= 1.1*v
     vz /= 1.1*v
     rv = batoid.RayVector.fromArrays(
-        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+        x, y, z, vx, vy, vz, t, w, flux, vignetted
     )
     rv2 = batoid.RayVector2.fromArrays(
         x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
@@ -407,7 +407,7 @@ def test_intersect_paraboloid(Nthread=1, Nray=100_000, Nloop=1):
     failed = np.zeros(Nray, dtype=bool)
 
     rv = batoid.RayVector.fromArrays(
-        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+        x, y, z, vx, vy, vz, t, w, flux, vignetted
     )
     rv2 = batoid.RayVector2.fromArrays(
         x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
@@ -452,7 +452,7 @@ def test_reflect_paraboloid(Nthread=1, Nray=100_000, Nloop=1):
     failed = np.zeros(Nray, dtype=bool)
 
     rv = batoid.RayVector.fromArrays(
-        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+        x, y, z, vx, vy, vz, t, w, flux, vignetted
     )
     rv2 = batoid.RayVector2.fromArrays(
         x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
@@ -501,7 +501,7 @@ def test_refract_paraboloid(Nthread=1, Nray=100_000, Nloop=1):
     failed = np.zeros(Nray, dtype=bool)
 
     rv = batoid.RayVector.fromArrays(
-        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+        x, y, z, vx, vy, vz, t, w, flux, vignetted
     )
     rv2 = batoid.RayVector2.fromArrays(
         x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
@@ -551,7 +551,7 @@ def test_intersect_quadric(Nthread=1, Nray=100_000, Nloop=1):
     failed = np.zeros(Nray, dtype=bool)
 
     rv = batoid.RayVector.fromArrays(
-        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+        x, y, z, vx, vy, vz, t, w, flux, vignetted
     )
     rv2 = batoid.RayVector2.fromArrays(
         x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
@@ -596,7 +596,7 @@ def test_reflect_quadric(Nthread=1, Nray=100_000, Nloop=1):
     failed = np.zeros(Nray, dtype=bool)
 
     rv = batoid.RayVector.fromArrays(
-        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+        x, y, z, vx, vy, vz, t, w, flux, vignetted
     )
     rv2 = batoid.RayVector2.fromArrays(
         x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
@@ -645,7 +645,7 @@ def test_refract_quadric(Nthread=1, Nray=100_000, Nloop=1):
     failed = np.zeros(Nray, dtype=bool)
 
     rv = batoid.RayVector.fromArrays(
-        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+        x, y, z, vx, vy, vz, t, w, flux, vignetted
     )
     rv2 = batoid.RayVector2.fromArrays(
         x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
@@ -699,7 +699,7 @@ def test_intersect_asphere(Nthread=1, Nray=100_000, Nloop=1):
     vz /= v
 
     rv = batoid.RayVector.fromArrays(
-        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+        x, y, z, vx, vy, vz, t, w, flux, vignetted
     )
     rv2 = batoid.RayVector2.fromArrays(
         x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
@@ -748,7 +748,7 @@ def test_reflect_asphere(Nthread=1, Nray=100_000, Nloop=1):
     vz /= v
 
     rv = batoid.RayVector.fromArrays(
-        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+        x, y, z, vx, vy, vz, t, w, flux, vignetted
     )
     rv2 = batoid.RayVector2.fromArrays(
         x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
@@ -797,7 +797,7 @@ def test_refract_asphere(Nthread=1, Nray=100_000, Nloop=1):
     vz /= 1.1*v
 
     rv = batoid.RayVector.fromArrays(
-        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+        x, y, z, vx, vy, vz, t, w, flux, vignetted
     )
     rv2 = batoid.RayVector2.fromArrays(
         x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
