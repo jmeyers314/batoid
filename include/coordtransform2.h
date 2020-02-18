@@ -1,5 +1,5 @@
-#ifndef batoid_coordsys2_h
-#define batoid_coordsys2_h
+#ifndef batoid_coordtransform2_h
+#define batoid_coordtransform2_h
 
 #include "coordsys.h"
 #include "rayVector2.h"
@@ -13,8 +13,6 @@ using Eigen::Vector3d;
 using Eigen::Matrix3d;
 
 namespace batoid {
-    // Can use original CoordSys
-
     class CoordTransform2 {
     public:
         CoordTransform2(const CoordSys& source, const CoordSys& destination);

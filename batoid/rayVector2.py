@@ -3,7 +3,7 @@ from .utils import lazy_property
 
 from . import _batoid
 from .constants import globalCoordSys
-from .coordsys2 import CoordTransform2
+from .coordtransform2 import CoordTransform2
 
 class RayVector2:
     @classmethod
@@ -113,7 +113,7 @@ class RayVector2:
             self._r.ctypes.data, self._v.ctypes.data, self._t.ctypes.data,
             self._wavelength.ctypes.data, self._flux.ctypes.data,
             self._vignetted.ctypes.data, self._failed.ctypes.data,
-            len(self._wavelength)
+            len(self._wavelength), self.coordSys._coordSys
         )
 
     def copy(self):

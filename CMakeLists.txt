@@ -57,7 +57,7 @@ set(PYSRC_FILES
   pysrc/surface.cpp
   pysrc/table.cpp
 # GPU stuff
-  pysrc/coordsys2.cpp
+  pysrc/coordtransform2.cpp
   pysrc/medium2.cpp
   pysrc/rayVector2.cpp
   pysrc/surface2.cpp
@@ -89,7 +89,7 @@ set(SRC_FILES
   src/table.cpp
   src/utils.cpp
 # GPU stuff
-  src/coordsys2.cpp
+  src/coordtransform2.cpp
   src/medium2.cpp
   src/rayVector2.cpp
   src/surface2.cpp

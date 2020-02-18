@@ -6,7 +6,7 @@ namespace batoid {
         double* _r, double* _v, double* _t,
         double* _wavelength, double* _flux,
         bool* _vignetted, bool* _failed,
-        size_t _size
+        size_t _size, const CoordSys& coordSys
     ) :
         r(_r, 3*_size),
         v(_v, 3*_size),
@@ -15,7 +15,8 @@ namespace batoid {
         flux(_flux, _size),
         vignetted(_vignetted, _size),
         failed(_failed, _size),
-        size(_size)
+        size(_size),
+        _coordSys(coordSys)
     { }
 
     void RayVector2::positionAtTime(double _t, double* out) const {

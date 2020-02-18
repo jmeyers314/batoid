@@ -4,6 +4,7 @@
 #include <vector>
 #include <complex>
 #include "dualView.h"
+#include "coordsys.h"
 
 namespace batoid {
     struct RayVector2 {
@@ -12,7 +13,8 @@ namespace batoid {
             double* r, double* v, double* t,
             double* wavelength, double* flux,
             bool* vignetted, bool *failed,
-            size_t N
+            size_t N,
+            const CoordSys& coordSys
         );
 
         bool operator==(const RayVector2& rhs) const;
@@ -31,6 +33,7 @@ namespace batoid {
         DualView<bool> vignetted;     // 73
         DualView<bool> failed;        // 74 cumulative bytes per Ray.
         size_t size;
+        CoordSys _coordSys;
     };
 }
 

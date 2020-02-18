@@ -27,7 +27,7 @@ namespace batoid {
             .def("syncToDevice", &DualView<bool>::syncToDevice)
             .def_readonly("size", &DualView<bool>::size);
 
-        auto rv4 = py::class_<RayVector2>(m, "CPPRayVector2")
+        auto rv2 = py::class_<RayVector2>(m, "CPPRayVector2")
             .def(py::init(
                 [](
                     size_t r_ptr,
@@ -37,7 +37,8 @@ namespace batoid {
                     size_t f_ptr,
                     size_t vig_ptr,
                     size_t fail_ptr,
-                    size_t size
+                    size_t size,
+                    const CoordSys& coordSys
                 ){
                     return new RayVector2(
                         reinterpret_cast<double*>(r_ptr),
@@ -47,24 +48,25 @@ namespace batoid {
                         reinterpret_cast<double*>(f_ptr),
                         reinterpret_cast<bool*>(vig_ptr),
                         reinterpret_cast<bool*>(fail_ptr),
-                        size
+                        size,
+                        coordSys
                     );
                 }
             ))
             .def("positionAtTime",
-                [](const RayVector2& rv4, double t, size_t out_ptr){
-                    rv4.positionAtTime(t, reinterpret_cast<double*>(out_ptr));
+                [](const RayVector2& rv2, double t, size_t out_ptr){
+                    rv2.positionAtTime(t, reinterpret_cast<double*>(out_ptr));
                 }
             )
             .def("propagateInPlace", &RayVector2::propagateInPlace)
             .def("phase",
-                [](const RayVector2& rv4, double x, double y, double z, double t, size_t out_ptr){
-                    rv4.phase(x, y, z, t, reinterpret_cast<double*>(out_ptr));
+                [](const RayVector2& rv2, double x, double y, double z, double t, size_t out_ptr){
+                    rv2.phase(x, y, z, t, reinterpret_cast<double*>(out_ptr));
                 }
             )
             .def("amplitude",
-                [](const RayVector2& rv4, double x, double y, double z, double t, size_t out_ptr){
-                    rv4.amplitude(x, y, z, t, reinterpret_cast<std::complex<double>*>(out_ptr));
+                [](const RayVector2& rv2, double x, double y, double z, double t, size_t out_ptr){
+                    rv2.amplitude(x, y, z, t, reinterpret_cast<std::complex<double>*>(out_ptr));
                 }
             )
             .def("sumAmplitude", &RayVector2::sumAmplitude)

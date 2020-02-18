@@ -4,13 +4,16 @@ from .utils import lazy_property
 
 
 class Surface2:
-    def intersectInPlace(self, r):
+    def intersectInPlace(self, r, coordSys=None):
+        r.toCoordSysInPlace(coordSys)
         self._surface.intersectInPlace(r._rv)
 
-    def reflectInPlace(self, r):
+    def reflectInPlace(self, r, coordSys=None):
+        r.toCoordSysInPlace(coordSys)
         self._surface.reflectInPlace(r._rv)
 
-    def refractInPlace(self, r, m1, m2):
+    def refractInPlace(self, r, m1, m2, coordSys=None):
+        r.toCoordSysInPlace(coordSys)
         self._surface.refractInPlace(r._rv, m1._medium, m2._medium)
 
 

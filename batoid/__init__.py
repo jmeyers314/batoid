@@ -30,7 +30,7 @@ from .lattice import Lattice
 
 # GPU experimentation
 from .rayVector2 import RayVector2
-from .coordsys2 import CoordTransform2
+from .coordtransform2 import CoordTransform2
 from .medium2 import Medium2, ConstMedium2
 from .medium2 import SellmeierMedium2, SumitaMedium2, Air2
 from .surface2 import Surface2, Plane2, Sphere2, Paraboloid2, Quadric2, Asphere2
