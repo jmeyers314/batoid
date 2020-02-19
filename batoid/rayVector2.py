@@ -3,6 +3,7 @@ from .utils import lazy_property
 
 from . import _batoid
 from .constants import globalCoordSys
+from .coordsys import CoordSys
 from .coordtransform2 import CoordTransform2
 
 class RayVector2:
@@ -39,7 +40,7 @@ class RayVector2:
         ret._flux = np.ascontiguousarray(flux)
         ret._vignetted = np.ascontiguousarray(vignetted)
         ret._failed = np.ascontiguousarray(vignetted)
-        ret.coordSys = coordSys
+        ret._coordSys = coordSys
         return ret
 
     @property
@@ -107,13 +108,17 @@ class RayVector2:
         self._rv.failed.syncToHost()
         return self._failed
 
+    @property
+    def coordSys(self):
+        return CoordSys._fromCoordSys(self._rv.coordSys)
+
     @lazy_property
     def _rv(self):
         return _batoid.CPPRayVector2(
             self._r.ctypes.data, self._v.ctypes.data, self._t.ctypes.data,
             self._wavelength.ctypes.data, self._flux.ctypes.data,
             self._vignetted.ctypes.data, self._failed.ctypes.data,
-            len(self._wavelength), self.coordSys._coordSys
+            len(self._wavelength), self._coordSys._coordSys
         )
 
     def copy(self):

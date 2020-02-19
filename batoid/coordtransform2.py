@@ -11,8 +11,6 @@ class CoordTransform2:
 
     def applyForwardInPlace(self, r):
         self._coordTransform.applyForwardInPlace(r._rv)
-        r.coordSys = self.toSys
 
     def applyReverseInPlace(self, r):
         self._coordTransform.applyReverseInPlace(r._rv)
-        r.coordSys = self.fromSys

@@ -73,6 +73,7 @@ namespace batoid {
             .def(py::self == py::self)
             .def(py::self != py::self)
 
+            .def_property_readonly("coordSys", &RayVector2::getCoordSys)
             // Expose dualviews so can access their syncToHost methods
             .def_readonly("r", &RayVector2::r)
             .def_readonly("v", &RayVector2::v)

@@ -45,22 +45,40 @@ namespace batoid {
         double* tptr = rv.t.deviceData;
         bool* vigptr = rv.vignetted.deviceData;
         bool* failptr = rv.failed.deviceData;
-        #pragma omp target is_device_ptr(xptr, yptr, zptr, vxptr, vyptr, vzptr, tptr, vigptr, failptr) map(to:self[:1])
+        if (!cs)
+            cs = &rv.getCoordSys();
+        CoordTransform2 ct(rv.getCoordSys(), *cs);
+        const double* rot = ct.getRot().data();
+        const double* dr = ct.getDr().data();
+        #pragma omp target is_device_ptr(xptr, yptr, zptr, vxptr, vyptr, vzptr, tptr, vigptr, failptr) map(to:self[:1]) map(to:rot[:9],dr[:3])
         {
             #pragma omp teams distribute parallel for
             for(int i=0; i<size; i++) {
+                // Coordinate transformation
+                double x = (xptr[i]-dr[0])*rot[0] + (yptr[i]-dr[1])*rot[1] + (zptr[i]-dr[2])*rot[2];
+                double y = (xptr[i]-dr[0])*rot[3] + (yptr[i]-dr[1])*rot[4] + (zptr[i]-dr[2])*rot[5];
+                double z = (xptr[i]-dr[0])*rot[6] + (yptr[i]-dr[1])*rot[7] + (zptr[i]-dr[2])*rot[8];
+                double vx = vxptr[i]*rot[0] + vyptr[i]*rot[1] + vzptr[i]*rot[2];
+                double vy = vxptr[i]*rot[3] + vyptr[i]*rot[4] + vzptr[i]*rot[5];
+                double vz = vxptr[i]*rot[6] + vyptr[i]*rot[7] + vzptr[i]*rot[8];
+                double t = tptr[i];
+                // intersection
                 if (!failptr[i]) {
                     double dt;
-                    bool success = self->_timeToIntersect(
-                        xptr[i], yptr[i], zptr[i],
-                        vxptr[i], vyptr[i], vzptr[i],
-                        dt
-                    );
+                    bool success = self->_timeToIntersect(x, y, z, vx, vy, vz, dt);
+                    // output
                     if (success && dt >= 0) {
-                        xptr[i] += vxptr[i] * dt;
-                        yptr[i] += vyptr[i] * dt;
-                        zptr[i] += vzptr[i] * dt;
-                        tptr[i] += dt;
+                        x += vx * dt;
+                        y += vy * dt;
+                        z += vz * dt;
+                        t += dt;
+                        xptr[i] = x;
+                        yptr[i] = y;
+                        zptr[i] = z;
+                        vxptr[i] = vx;
+                        vyptr[i] = vy;
+                        vzptr[i] = vz;
+                        tptr[i] = t;
                     } else {
                         failptr[i] = true;
                         vigptr[i] = true;
@@ -68,7 +86,7 @@ namespace batoid {
                 }
             }
         }
-
+        rv.setCoordSys(CoordSys(*cs));
     }
 
     template<typename T>

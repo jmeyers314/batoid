@@ -6,18 +6,18 @@ from .utils import lazy_property
 class Surface2:
     def intersectInPlace(self, r, coordSys=None):
         if coordSys is not None:
-            r.toCoordSysInPlace(coordSys)
-        self._surface.intersectInPlace(r._rv)
+            coordSys = coordSys._coordSys
+        self._surface.intersectInPlace(r._rv, coordSys)
 
     def reflectInPlace(self, r, coordSys=None):
         if coordSys is not None:
-            r.toCoordSysInPlace(coordSys)
-        self._surface.reflectInPlace(r._rv)
+            coordSys = coordSys._coordSys
+        self._surface.reflectInPlace(r._rv, coordSys)
 
     def refractInPlace(self, r, m1, m2, coordSys=None):
         if coordSys is not None:
-            r.toCoordSysInPlace(coordSys)
-        self._surface.refractInPlace(r._rv, m1._medium, m2._medium)
+            coordSys = coordSys._coordSys
+        self._surface.refractInPlace(r._rv, m1._medium, m2._medium, coordSys)
 
 
 class Plane2(Surface2):

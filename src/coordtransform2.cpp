@@ -62,6 +62,7 @@ namespace batoid {
                 vzptr[i] = vz;
             }
         }
+        rv.setCoordSys(CoordSys(getDestination()));
     }
 
     void CoordTransform2::applyReverseInPlace(RayVector2& rv) const {
@@ -94,5 +95,6 @@ namespace batoid {
                 vzptr[i] = vz;
             }
         }
+        rv.setCoordSys(CoordSys(getSource()));
     }
 }
