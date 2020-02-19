@@ -16,9 +16,9 @@ namespace batoid {
         void _normal(double, double, double&, double&, double&) const;
         bool _timeToIntersect(double, double, double, double, double, double, double&) const;
 
-        void _intersectInPlace(RayVector2&) const;
-        void _reflectInPlace(RayVector2&) const;
-        void _refractInPlace(RayVector2&, const Medium2&, const Medium2&) const;
+        void _intersectInPlace(RayVector2&, const CoordSys* cs=nullptr) const;
+        void _reflectInPlace(RayVector2&, const CoordSys* cs=nullptr) const;
+        void _refractInPlace(RayVector2&, const Medium2&, const Medium2&, const CoordSys* cs=nullptr) const;
 
         bool getAllowReverse() const {return _allowReverse;}
 

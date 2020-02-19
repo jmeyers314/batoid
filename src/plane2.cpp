@@ -21,7 +21,7 @@ namespace batoid {
     }
     #pragma omp end declare target
 
-    void Plane2::_intersectInPlace(RayVector2& rv) const {
+    void Plane2::_intersectInPlace(RayVector2& rv, const CoordSys* cs) const {
         rv.r.syncToDevice();
         rv.v.syncToDevice();
         rv.t.syncToDevice();
@@ -57,8 +57,8 @@ namespace batoid {
         }
     }
 
-    void Plane2::_reflectInPlace(RayVector2& rv) const {
-        _intersectInPlace(rv);
+    void Plane2::_reflectInPlace(RayVector2& rv, const CoordSys* cs) const {
+        _intersectInPlace(rv, cs);
         size_t size = rv.size;
         double* vzptr = rv.v.deviceData+2*size;
 
@@ -71,8 +71,8 @@ namespace batoid {
         }
     }
 
-    void Plane2::_refractInPlace(RayVector2& rv, const Medium2& m1, const Medium2& m2) const {
-        intersectInPlace(rv);
+    void Plane2::_refractInPlace(RayVector2& rv, const Medium2& m1, const Medium2& m2, const CoordSys* cs) const {
+        intersectInPlace(rv, cs);
         size_t size = rv.size;
         double* vxptr = rv.v.deviceData;
         double* vyptr = vxptr + size;
@@ -111,21 +111,21 @@ namespace batoid {
 
     // Specializations
     template<>
-    void Surface2CRTP<Plane2>::intersectInPlace(RayVector2& rv) const {
+    void Surface2CRTP<Plane2>::intersectInPlace(RayVector2& rv, const CoordSys* cs) const {
         const Plane2* self = static_cast<const Plane2*>(this);
-        self->_intersectInPlace(rv);
+        self->_intersectInPlace(rv, cs);
     }
 
     template<>
-    void Surface2CRTP<Plane2>::reflectInPlace(RayVector2& rv) const {
+    void Surface2CRTP<Plane2>::reflectInPlace(RayVector2& rv, const CoordSys* cs) const {
         const Plane2* self = static_cast<const Plane2*>(this);
-        self->_reflectInPlace(rv);
+        self->_reflectInPlace(rv, cs);
     }
 
     template<>
-    void Surface2CRTP<Plane2>::refractInPlace(RayVector2& rv, const Medium2& m1, const Medium2& m2) const {
+    void Surface2CRTP<Plane2>::refractInPlace(RayVector2& rv, const Medium2& m1, const Medium2& m2, const CoordSys* cs) const {
         const Plane2* self = static_cast<const Plane2*>(this);
-        self->_refractInPlace(rv, m1, m2);
+        self->_refractInPlace(rv, m1, m2, cs);
     }
 
 }

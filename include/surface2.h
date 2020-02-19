@@ -6,6 +6,8 @@
 #include <utility>
 #include "rayVector2.h"
 #include "medium2.h"
+#include "coordsys.h"
+#include "coordtransform2.h"
 //#include "coating.h"
 
 #include <Eigen/Dense>
@@ -21,9 +23,9 @@ namespace batoid {
         virtual void normal(double, double, double&, double&, double&) const = 0;
         virtual bool timeToIntersect(double, double, double, double, double, double, double& t) const = 0;
 
-        virtual void intersectInPlace(RayVector2&) const = 0;
-        virtual void reflectInPlace(RayVector2&) const = 0;
-        virtual void refractInPlace(RayVector2&, const Medium2&, const Medium2&) const = 0;
+        virtual void intersectInPlace(RayVector2&, const CoordSys* cs=nullptr) const = 0;
+        virtual void reflectInPlace(RayVector2&, const CoordSys* cs=nullptr) const = 0;
+        virtual void refractInPlace(RayVector2&, const Medium2&, const Medium2&, const CoordSys* cs=nullptr) const = 0;
     };
 
     template<typename T>
@@ -33,15 +35,15 @@ namespace batoid {
         virtual void normal(double, double, double&, double&, double&) const override;
         virtual bool timeToIntersect(double, double, double, double, double, double, double& t) const override;
 
-        virtual void intersectInPlace(RayVector2&) const override;
-        virtual void reflectInPlace(RayVector2&) const override;
-        virtual void refractInPlace(RayVector2&, const Medium2&, const Medium2&) const override;
+        virtual void intersectInPlace(RayVector2&, const CoordSys* cs=nullptr) const override;
+        virtual void reflectInPlace(RayVector2&, const CoordSys* cs=nullptr) const override;
+        virtual void refractInPlace(RayVector2&, const Medium2&, const Medium2&, const CoordSys* cs=nullptr) const override;
     };
 
     // Declare specializations
     class Plane2;
-    template<> void Surface2CRTP<Plane2>::intersectInPlace(RayVector2&) const;
-    template<> void Surface2CRTP<Plane2>::reflectInPlace(RayVector2&) const;
-    template<> void Surface2CRTP<Plane2>::refractInPlace(RayVector2&, const Medium2&, const Medium2&) const;
+    template<> void Surface2CRTP<Plane2>::intersectInPlace(RayVector2&, const CoordSys* cs) const;
+    template<> void Surface2CRTP<Plane2>::reflectInPlace(RayVector2&, const CoordSys* cs) const;
+    template<> void Surface2CRTP<Plane2>::refractInPlace(RayVector2&, const Medium2&, const Medium2&, const CoordSys* cs) const;
 }
 #endif

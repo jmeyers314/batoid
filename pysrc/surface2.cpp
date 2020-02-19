@@ -10,8 +10,8 @@ namespace py = pybind11;
 namespace batoid {
     void pyExportSurface2(py::module& m) {
         py::class_<Surface2, std::shared_ptr<Surface2>>(m, "CPPSurface2")
-            .def("intersectInPlace", &Surface2::intersectInPlace)
-            .def("reflectInPlace", &Surface2::reflectInPlace)
-            .def("refractInPlace", &Surface2::refractInPlace);
+            .def("intersectInPlace", &Surface2::intersectInPlace, py::arg(), py::arg()=nullptr)
+            .def("reflectInPlace", &Surface2::reflectInPlace, py::arg(), py::arg()=nullptr)
+            .def("refractInPlace", &Surface2::refractInPlace, py::arg(), py::arg(), py::arg(), py::arg()=nullptr);
     }
 }

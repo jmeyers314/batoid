@@ -5,6 +5,7 @@
 #include "paraboloid2.h"
 #include "quadric2.h"
 #include "asphere2.h"
+#include "coordtransform2.h"
 
 namespace batoid {
 
@@ -27,7 +28,7 @@ namespace batoid {
     }
 
     template<typename T>
-    void Surface2CRTP<T>::intersectInPlace(RayVector2& rv) const {
+    void Surface2CRTP<T>::intersectInPlace(RayVector2& rv, const CoordSys* cs) const {
         const T* self = static_cast<const T*>(this);
         rv.r.syncToDevice();
         rv.v.syncToDevice();
@@ -71,9 +72,9 @@ namespace batoid {
     }
 
     template<typename T>
-    void Surface2CRTP<T>::reflectInPlace(RayVector2& rv) const {
+    void Surface2CRTP<T>::reflectInPlace(RayVector2& rv, const CoordSys* cs) const {
         const T* self = static_cast<const T*>(this);
-        self->intersectInPlace(rv);
+        self->intersectInPlace(rv, cs);
         rv.r.syncToDevice();  // should be redundant...
         rv.v.syncToDevice();
         size_t size = rv.size;
@@ -103,9 +104,9 @@ namespace batoid {
     }
 
     template<typename T>
-    void Surface2CRTP<T>::refractInPlace(RayVector2& rv, const Medium2& m1, const Medium2& m2) const {
+    void Surface2CRTP<T>::refractInPlace(RayVector2& rv, const Medium2& m1, const Medium2& m2, const CoordSys* cs) const {
         const T* self = static_cast<const T*>(this);
-        self->intersectInPlace(rv);
+        self->intersectInPlace(rv, cs);
         rv.r.syncToDevice();  // should be redundant...
         rv.v.syncToDevice();
         size_t size = rv.size;
