@@ -24,7 +24,7 @@ def parallel_trace_timing(args):
         telescope = batoid.Optic.fromYaml("LSST_r_noobsc.yaml", gpu=True)
         pm = 'M1'
     elif args.lsst:
-        telescope = batoid.Optic.fromYaml("LSST_i.yaml")
+        telescope = batoid.Optic.fromYaml("LSST_r.yaml")
         pm = 'M1'
     elif args.decam:
         telescope = batoid.Optic.fromYaml("DECam.yaml")
@@ -39,7 +39,7 @@ def parallel_trace_timing(args):
             0.5*telescope.pupilSize,
             0.5*telescope.pupilObscuration*telescope.pupilSize,
             dirCos[0], dirCos[1], dirCos[2],
-            args.nside, args.nside, 750e-9, 1.0, batoid.Air()
+            args.nside, args.nside, 620e-9, 1.0, batoid.Air()
         )
         # Turn RayVector into RayVector2
         rays = batoid.RayVector2.fromArrays(
@@ -53,7 +53,7 @@ def parallel_trace_timing(args):
             0.5*telescope.pupilSize,
             0.5*telescope.pupilObscuration*telescope.pupilSize,
             dirCos[0], dirCos[1], dirCos[2],
-            args.nside, args.nside, 750e-9, 1.0, telescope.inMedium
+            args.nside, args.nside, 620e-9, 1.0, telescope.inMedium
         )
 
 
