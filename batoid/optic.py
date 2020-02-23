@@ -429,10 +429,14 @@ class Interface(Optic):
 
         Returns
         -------
-        forwardRays : batoid.Ray or batoid.RayVector
-            Ray(s) propagating in the forward direction.
-        reverseRays : batoid.Ray or batoid.RayVector
-            Ray(s) propagating in the reverse direction.
+        forwardRays : list of batoid.Ray or batoid.RayVector.
+            Each item in list comes from one distinct path through the optic
+            exiting in the forward direction.  The exact path traversed is
+            accessible from the `.path` attribute of the item.
+        reverseRays : list of batoid.Ray or batoid.RayVector.
+            Each item in list comes from one distinct path through the optic
+            exiting in the reverse direction.  The exact path traversed is
+            accessible from the `.path` attribute of the item.
 
         Notes
         -----
@@ -453,8 +457,13 @@ class Interface(Optic):
         if self.obscuration is not None:
             self.obscuration.obscureInPlace(rForward)
             self.obscuration.obscureInPlace(rReverse)
-
-        return rForward, rReverse
+        if not hasattr(r, 'path'):
+            rForward.path = [self.name]
+            rReverse.path = [self.name]
+        else:
+            rForward.path = r.path+[self.name]
+            rReverse.path = r.path+[self.name]
+        return [rForward], [rReverse]
 
     def traceSplitReverse(self, r, minFlux=1e-3,_verbose=False):
         """Trace ray(s) through this optical element, splitting the return
@@ -474,10 +483,14 @@ class Interface(Optic):
 
         Returns
         -------
-        forwardRays : batoid.Ray or batoid.RayVector
-            Ray(s) propagating in the forward direction.
-        reverseRays : batoid.Ray or batoid.RayVector
-            Ray(s) propagating in the reverse direction.
+        forwardRays : list of batoid.Ray or batoid.RayVector.
+            Each item in list comes from one distinct path through the optic
+            exiting in the forward direction.  The exact path traversed is
+            accessible from the `.path` attribute of the item.
+        reverseRays : list of batoid.Ray or batoid.RayVector.
+            Each item in list comes from one distinct path through the optic
+            exiting in the reverse direction.  The exact path traversed is
+            accessible from the `.path` attribute of the item.
 
         Notes
         -----
@@ -498,8 +511,14 @@ class Interface(Optic):
         if self.obscuration is not None:
             self.obscuration.obscureInPlace(rForward)
             self.obscuration.obscureInPlace(rReverse)
+        if not hasattr(r, 'path'):
+            rForward.path = [self.name]
+            rReverse.path = [self.name]
+        else:
+            rForward.path = r.path+[self.name]
+            rReverse.path = r.path+[self.name]
 
-        return rForward, rReverse
+        return [rForward], [rReverse]
 
     def clearObscuration(self, unless=()):
         if self.name not in unless:
@@ -1000,10 +1019,14 @@ class CompoundOptic(Optic):
 
         Returns
         -------
-        forwardRays : `batoid.Ray` or `batoid.RayVector`
-            Ray(s) propagating in the forward direction.
-        reverseRays : `batoid.Ray` or `batoid.RayVector`
-            Ray(s) propagating in the reverse direction.
+        forwardRays : list of batoid.Ray or batoid.RayVector.
+            Each item in list comes from one distinct path through the optic
+            exiting in the forward direction.  The exact path traversed is
+            accessible from the `.path` attribute of the item.
+        reverseRays : list of batoid.Ray or batoid.RayVector.
+            Each item in list comes from one distinct path through the optic
+            exiting in the reverse direction.  The exact path traversed is
+            accessible from the `.path` attribute of the item.
 
         Notes
         -----
@@ -1038,24 +1061,25 @@ class CompoundOptic(Optic):
             else:
                 raise RuntimeError("Shouldn't get here!")
 
-            rForward.trimVignettedInPlace(minFlux)
-            rReverse.trimVignettedInPlace(minFlux)
+            for rr in rForward:
+                rr.trimVignettedInPlace(minFlux)
+            for rr in rReverse:
+                rr.trimVignettedInPlace(minFlux)
 
-            if len(rReverse) > 0:
-                if itemIndex == 0:
-                    outRReverse.append(rReverse)
-                else:
-                    workQueue.append((rReverse, "reverse", itemIndex-1))
+            for rr in rForward:
+                if len(rr) > 0:
+                    if itemIndex == len(self.items)-1:
+                        outRForward.append(rr)
+                    else:
+                        workQueue.append((rr, "forward", itemIndex+1))
+            for rr in rReverse:
+                if len(rr) > 0:
+                    if itemIndex == 0:
+                        outRReverse.append(rr)
+                    else:
+                        workQueue.append((rr, "reverse", itemIndex-1))
 
-            if len(rForward) > 0:
-                if itemIndex == len(self.items)-1:
-                    outRForward.append(rForward)
-                else:
-                    workQueue.append((rForward, "forward", itemIndex+1))
-
-        rForward = concatenateRayVectors(outRForward)
-        rReverse = concatenateRayVectors(outRReverse)
-        return rForward, rReverse
+        return outRForward, outRReverse
 
     def traceSplitReverse(self, r, minFlux=1e-3, _verbose=False):
         """Recursively trace ray(s) through this `CompoundOptic` in reverse,
@@ -1082,10 +1106,14 @@ class CompoundOptic(Optic):
 
         Returns
         -------
-        forwardRays : `batoid.Ray` or `batoid.RayVector`
-            Ray(s) propagating in the forward direction.
-        reverseRays : `batoid.Ray` or `batoid.RayVector`
-            Ray(s) propagating in the reverse direction.
+        forwardRays : list of batoid.Ray or batoid.RayVector.
+            Each item in list comes from one distinct path through the optic
+            exiting in the forward direction.  The exact path traversed is
+            accessible from the `.path` attribute of the item.
+        reverseRays : list of batoid.Ray or batoid.RayVector.
+            Each item in list comes from one distinct path through the optic
+            exiting in the reverse direction.  The exact path traversed is
+            accessible from the `.path` attribute of the item.
 
         Notes
         -----
@@ -1120,24 +1148,27 @@ class CompoundOptic(Optic):
             else:
                 raise RuntimeError("Shouldn't get here!")
 
-            rForward.trimVignettedInPlace(minFlux)
-            rReverse.trimVignettedInPlace(minFlux)
+            for rr in rForward:
+                rr.trimVignettedInPlace(minFlux)
+            for rr in rReverse:
+                rr.trimVignettedInPlace(minFlux)
 
-            if len(rReverse) > 0:
-                if itemIndex == 0:
-                    outRReverse.append(rReverse)
-                else:
-                    workQueue.append((rReverse, "reverse", itemIndex-1))
 
-            if len(rForward) > 0:
-                if itemIndex == len(self.items)-1:
-                    outRForward.append(rForward)
-                else:
-                    workQueue.append((rForward, "forward", itemIndex+1))
+            for rr in rForward:
+                if len(rr) > 0:
+                    if itemIndex == len(self.items)-1:
+                        outRForward.append(rr)
+                    else:
+                        workQueue.append((rr, "forward", itemIndex+1))
 
-        rForward = concatenateRayVectors(outRForward)
-        rReverse = concatenateRayVectors(outRReverse)
-        return rForward, rReverse
+            for rr in rReverse:
+                if len(rr) > 0:
+                    if itemIndex == 0:
+                        outRReverse.append(rr)
+                    else:
+                        workQueue.append((rr, "reverse", itemIndex-1))
+
+        return outRForward, outRReverse
 
     def draw3d(self, ax, **kwargs):
         """Recursively draw this `CompoundOptic` on a mplot3d axis by drawing
