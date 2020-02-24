@@ -898,7 +898,7 @@ class CompoundOptic(Optic):
                 r = item.trace(r)
         return r
 
-    def traceFull(self, r):
+    def traceFull(self, r, _path=None):
         """Recursively trace ray(s) through this `CompoundOptic`, returning a
         full history of all surface intersections.
 
@@ -927,13 +927,88 @@ class CompoundOptic(Optic):
         `RayVector.toCoordSys`.
         """
         result = OrderedDict()
-        if not self.skip:
+        if _path is None:
+            if not self.skip:
+                r_in = r
+                for item in self.items:
+                    tf = item.traceFull(r_in)
+                    for k, v in tf.items():
+                        result[k] = v
+                        r_in = v['out']
+        else:
+            # establish nominal order of elements by building dict
+            # of name -> order
+            i = 0
+            nominalOrder = {}
+            for name in _path:
+                if name not in nominalOrder.keys():
+                    nominalOrder[name] = i
+                    i += 1
+            direction = "forward"
             r_in = r
-            for item in self.items:
-                tf = item.traceFull(r_in)
-                for k, v in tf.items():
-                    result[k] = v
-                    r_in = v['out']
+            for i in range(len(_path)-1):
+                currentName = _path[i]
+                nextName = _path[i+1]
+                item = self[currentName]
+                # need logic to decide when to reverse direction
+                if direction == "forward":
+                    if nominalOrder[nextName] < nominalOrder[currentName]:
+                        # reversing direction always means reflecting at a
+                        # refractive interface.  Just do that manually here.
+                        direction = "reverse"
+                        if item.skip:
+                            r_out = r_in
+                        else:
+                            r_out = item.surface.reflect(
+                                r_in, coordSys=item.coordSys
+                            )
+                        if item.obscuration is not None:
+                            r_out = item.obscuration.obscure(r_out)
+                    else:
+                        r_out = item.trace(r_in)
+                else: # direct == "reverse"
+                    if nominalOrder[nextName] > nominalOrder[currentName]:
+                        direction = "forward"
+                        if item.skip:
+                            r_out = r_in
+                        else:
+                            r_out = item.surface.reflect(
+                                r_in, coordSys=item.coordSys
+                            )
+                        if item.obscuration is not None:
+                            r_out = item.obscuration.obscure(r_out)
+                    else:
+                        r_out = item.traceReverse(r_in)
+                # r_out = item.trace(r_in)
+                key = item.name+'_0'
+                j = 1
+                while key in result:
+                    key = item.name+f'_{j}'
+                    j += 1
+                result[key] = {
+                    'name':item.name,
+                    'in':r_in,
+                    'out':r_out
+                }
+                r_in = r_out
+            # last item in _path.  Just intersect it.
+            currentName = _path[-1]
+            item = self[currentName]
+            if item.skip:
+                r_out = r_in
+            else:
+                r_out = item.surface.intersect(r_in, coordSys=item.coordSys)
+            key = item.name+'_0'
+            j = 1
+            while key in result:
+                key = item.name+f'_{j}'
+                j += 1
+            result[key] = {
+                'name':item.name,
+                'in':r_in,
+                'out':r_out
+            }
+
         return result
 
     def traceInPlace(self, r):
@@ -1904,7 +1979,8 @@ def getGlobalRays(traceFull, start=None, end=None, globalSys=globalCoordSys):
         ray vertex, with raylen giving the number of visible (not vignetted)
         vertices for each ray.
     """
-    names = [trace['name'] for trace in traceFull.values()]
+    # names = [trace['name'] for trace in traceFull.values()]
+    names = list(traceFull.keys())
     if start is None:
         start = names[0]
     if end is None:
