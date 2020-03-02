@@ -4,15 +4,21 @@
 
 
 namespace batoid {
-    Asphere2::Asphere2(double R, double conic, const std::array<double, 10>& coefs) :
-        _coefs(coefs), _dzdrcoefs(_computeDzDrCoefs(coefs)), _q(Quadric2(R, conic)) {}
-
-    std::array<double,10> Asphere2::_computeDzDrCoefs(const std::array<double,10>& coefs) {
-        std::array<double,10> result;
-        for (int i=0, j=4; i<10; i++, j+=2) {
-            result[i] = coefs[i]*j;
+    Asphere2::Asphere2(double R, double conic, double* coefs, size_t size) :
+        _coefs(coefs, size), _dzdrcoefs(size), _size(size), _q(Quadric2(R, conic)) {
+            _computeDzDrCoefs();
+            _coefs.syncToDevice();
+            _dzdrcoefs.syncToDevice();
         }
-        return result;
+
+    void Asphere2::_computeDzDrCoefs() {
+        // Do computation on host
+        _coefs.syncToHost();
+        _dzdrcoefs.owner = DVOwnerType::host;
+
+        for (int i=0, j=4; i<_size; i++, j+=2) {
+            _dzdrcoefs.hostData[i] = _coefs.hostData[i]*j;
+        }
     }
 
     #pragma omp declare target
@@ -20,9 +26,9 @@ namespace batoid {
         double r2 = x*x + y*y;
         double rr = r2;
         double result = _q._sag(x, y);
-        for (const auto& c : _coefs) {
+        for (int i=0; i<_size; i++) {
             rr *= r2;
-            result += c*rr;
+            result += _coefs.deviceData[i]*rr;
         }
         return result;
     }
@@ -46,8 +52,8 @@ namespace batoid {
         double result = _q._dzdr(r);
         double rr = r*r;
         double rrr = rr*r;
-        for (const auto& c : _dzdrcoefs) {
-            result += c*rrr;
+        for (int i=0; i<_size; i++) {
+            result += _dzdrcoefs.deviceData[i]*rrr;
             rrr *= rr;
         }
         return result;

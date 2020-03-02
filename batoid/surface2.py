@@ -104,7 +104,7 @@ class Asphere2(Surface2):
     def __init__(self, R, conic, coefs):
         self._R = R
         self._conic = conic
-        self._coefs = coefs
+        self._coefs = np.ascontiguousarray(coefs)
 
     @property
     def R(self):
@@ -120,9 +120,9 @@ class Asphere2(Surface2):
 
     @lazy_property
     def _surface(self):
-        coefs = [0.0]*10
-        coefs[:len(self._coefs)] = self._coefs
-        return _batoid.CPPAsphere2(self._R, self._conic, coefs)
+        return _batoid.CPPAsphere2(
+            self._R, self._conic, self._coefs.ctypes.data, len(self._coefs)
+        )
 
 
 class Bilinear2(Surface2):
