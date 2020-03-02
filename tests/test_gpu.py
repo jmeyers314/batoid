@@ -73,6 +73,7 @@ def test_coordtransform(Nthread=1, Nray=100_000, Nloop=1):
     rv2 = batoid.RayVector2.fromArrays(
         x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
     )
+    print(rv2.r.shape)
 
     cs1 = batoid.CoordSys(origin=(0,1,2), rot=batoid.RotX(0.1))
     cs2 = batoid.CoordSys(origin=(20,-1,-2), rot=batoid.RotZ(0.1))
@@ -828,6 +829,216 @@ def test_refract_asphere(Nthread=1, Nray=100_000, Nloop=1):
         np.testing.assert_allclose(rv.t, rv2.t, rtol=0, atol=1e-13)
 
 
+@timer
+@pytest.mark.gpu
+def test_bicubic(Nthread=1, Nray=100_000, Nloop=1):
+    batoid._batoid.setNThread(Nthread)
+    np.random.seed(5772156)
+
+    xs = np.linspace(-4.4, 4.4, 101)
+    ys = np.linspace(-4.4, 4.4, 101)
+    def f(x, y):
+        return x**2*y - y**2*x + 3*x - 2
+    def dfdx(x, y):
+        return 2*x*y - y**2 + 3
+    def dfdy(x, y):
+        return x**2 - 2*y*x
+    def d2fdxdy(x, y):
+        return 2*x - 2*y
+
+    zs = f(*np.meshgrid(xs, ys))
+    surf = batoid.Bicubic(xs, ys, zs)
+    surf2 = batoid.Bicubic2(xs, ys, zs)
+
+    testx = np.random.uniform(-4, 4, size=Nray)
+    testy = np.random.uniform(-4, 4, size=Nray)
+    sag = surf.sag(testx, testy)
+    np.testing.assert_allclose(sag, f(testx, testy), atol=1e-10, rtol=0)
+
+    norm = surf.normal(testx, testy)
+    arr = np.vstack([
+        -dfdx(testx, testy),
+        -dfdy(testx, testy),
+        np.ones(len(testx))
+    ]).T
+    arr /= np.sqrt(np.sum(arr**2, axis=1))[:,None]
+    np.testing.assert_allclose(norm, arr, atol=1e-10, rtol=0)
+
+
+@timer
+@pytest.mark.gpu
+def test_intersect_bicubic(Nthread=1, Nray=100_000, Nloop=1):
+    batoid._batoid.setNThread(Nthread)
+    np.random.seed(5772156)
+
+    # Try some intersection
+    x = np.random.uniform(size=Nray)-0.5
+    y = np.random.uniform(size=Nray)-0.5
+    z = np.random.uniform(size=Nray)+5
+    vx = np.random.uniform(size=Nray)*0.02-0.01
+    vy = np.random.uniform(size=Nray)*0.02-0.01
+    vz = np.random.uniform(size=Nray)*0.02-1
+    t = np.zeros(Nray)
+    w = np.random.uniform(size=Nray)
+    flux = np.random.uniform(size=Nray)
+    vignetted = np.zeros(Nray, dtype=bool)
+    failed = np.zeros(Nray, dtype=bool)
+    v = np.sqrt(vx*vx+vy*vy+vz*vz)
+    vx /= 1.1*v
+    vy /= 1.1*v
+    vz /= 1.1*v
+
+    rv = batoid.RayVector.fromArrays(
+        x, y, z, vx, vy, vz, t, w, flux, vignetted
+    )
+    rv2 = batoid.RayVector2.fromArrays(
+        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+    )
+
+    xs = np.linspace(-4.4, 4.4, 101)
+    ys = np.linspace(-4.4, 4.4, 101)
+    def f(x, y):
+        return x**2*y - y**2*x + 3*x - 2
+
+    zs = f(*np.meshgrid(xs, ys))
+    surf = batoid.Bicubic(xs, ys, zs)
+    surf2 = batoid.Bicubic2(xs, ys, zs)
+
+    t0 = time.time()
+    for _ in range(Nloop):
+        surf.intersectInPlace(rv)
+    t1 = time.time()
+    for _ in range(Nloop):
+        surf2.intersectInPlace(rv2)
+    t2 = time.time()
+    print("test_intersect_bicubic")
+    print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
+    print(f"gpu time = {(t2-t1)*1e3:.1f} ms")
+
+    if (Nloop == 1):
+        np.testing.assert_allclose(rv.r, rv2.r, rtol=0, atol=1e-13)
+        np.testing.assert_allclose(rv.v, rv2.v, rtol=0, atol=1e-13)
+        np.testing.assert_allclose(rv.t, rv2.t, rtol=0, atol=1e-13)
+
+
+@timer
+@pytest.mark.gpu
+def test_reflect_bicubic(Nthread=1, Nray=100_000, Nloop=1):
+    batoid._batoid.setNThread(Nthread)
+    np.random.seed(5772156)
+
+    # Try some intersection
+    x = np.random.uniform(size=Nray)-0.5
+    y = np.random.uniform(size=Nray)-0.5
+    z = np.random.uniform(size=Nray)+5
+    vx = np.random.uniform(size=Nray)*0.02-0.01
+    vy = np.random.uniform(size=Nray)*0.02-0.01
+    vz = np.random.uniform(size=Nray)*0.02-1
+    t = np.zeros(Nray)
+    w = np.random.uniform(size=Nray)
+    flux = np.random.uniform(size=Nray)
+    vignetted = np.zeros(Nray, dtype=bool)
+    failed = np.zeros(Nray, dtype=bool)
+    v = np.sqrt(vx*vx+vy*vy+vz*vz)
+    vx /= 1.1*v
+    vy /= 1.1*v
+    vz /= 1.1*v
+
+    rv = batoid.RayVector.fromArrays(
+        x, y, z, vx, vy, vz, t, w, flux, vignetted
+    )
+    rv2 = batoid.RayVector2.fromArrays(
+        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+    )
+
+    xs = np.linspace(-4.4, 4.4, 101)
+    ys = np.linspace(-4.4, 4.4, 101)
+    def f(x, y):
+        return x**2*y - y**2*x + 3*x - 2
+
+    zs = f(*np.meshgrid(xs, ys))
+    surf = batoid.Bicubic(xs, ys, zs)
+    surf2 = batoid.Bicubic2(xs, ys, zs)
+
+    t0 = time.time()
+    for _ in range(Nloop):
+        surf.reflectInPlace(rv)
+    t1 = time.time()
+    for _ in range(Nloop):
+        surf2.reflectInPlace(rv2)
+    t2 = time.time()
+    print("test_reflect_bicubic")
+    print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
+    print(f"gpu time = {(t2-t1)*1e3:.1f} ms")
+
+    if (Nloop == 1):
+        np.testing.assert_allclose(rv.r, rv2.r, rtol=0, atol=1e-13)
+        np.testing.assert_allclose(rv.v, rv2.v, rtol=0, atol=1e-13)
+        np.testing.assert_allclose(rv.t, rv2.t, rtol=0, atol=1e-13)
+
+
+@timer
+@pytest.mark.gpu
+def test_refract_bicubic(Nthread=1, Nray=100_000, Nloop=1):
+    batoid._batoid.setNThread(Nthread)
+    np.random.seed(5772156)
+
+    # Try some intersection
+    x = np.random.uniform(size=Nray)-0.5
+    y = np.random.uniform(size=Nray)-0.5
+    z = np.random.uniform(size=Nray)+5
+    vx = np.random.uniform(size=Nray)*0.02-0.01
+    vy = np.random.uniform(size=Nray)*0.02-0.01
+    vz = np.random.uniform(size=Nray)*0.02-1
+    t = np.zeros(Nray)
+    w = np.random.uniform(size=Nray)
+    flux = np.random.uniform(size=Nray)
+    vignetted = np.zeros(Nray, dtype=bool)
+    failed = np.zeros(Nray, dtype=bool)
+    v = np.sqrt(vx*vx+vy*vy+vz*vz)
+    vx /= 1.1*v
+    vy /= 1.1*v
+    vz /= 1.1*v
+
+    rv = batoid.RayVector.fromArrays(
+        x, y, z, vx, vy, vz, t, w, flux, vignetted
+    )
+    rv2 = batoid.RayVector2.fromArrays(
+        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+    )
+
+    xs = np.linspace(-4.4, 4.4, 101)
+    ys = np.linspace(-4.4, 4.4, 101)
+    def f(x, y):
+        return x**2*y - y**2*x + 3*x - 2
+
+    zs = f(*np.meshgrid(xs, ys))
+    surf = batoid.Bicubic(xs, ys, zs)
+    surf2 = batoid.Bicubic2(xs, ys, zs)
+
+    m1 = batoid.ConstMedium(1.1)
+    m2 = batoid.ConstMedium(1.2)
+    m1gpu = batoid.ConstMedium2(1.1)
+    m2gpu = batoid.ConstMedium2(1.2)
+
+    t0 = time.time()
+    for _ in range(Nloop):
+        surf.refractInPlace(rv, m1, m2)
+    t1 = time.time()
+    for _ in range(Nloop):
+        surf2.refractInPlace(rv2, m1gpu, m2gpu)
+    t2 = time.time()
+
+    print("test_refract_bicubic")
+    print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
+    print(f"gpu time = {(t2-t1)*1e3:.1f} ms")
+
+    if (Nloop == 1):
+        np.testing.assert_allclose(rv.r, rv2.r, rtol=0, atol=1e-13)
+        np.testing.assert_allclose(rv.v, rv2.v, rtol=0, atol=1e-13)
+        np.testing.assert_allclose(rv.t, rv2.t, rtol=0, atol=1e-13)
+
+
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
@@ -857,3 +1068,7 @@ if __name__ == '__main__':
     test_intersect_asphere(Nthread, Nray, Nloop)
     test_reflect_asphere(Nthread, Nray, Nloop)
     test_refract_asphere(Nthread, Nray, Nloop)
+    test_bicubic(Nthread, Nray, Nloop)
+    test_intersect_bicubic(Nthread, Nray, Nloop)
+    test_reflect_bicubic(Nthread, Nray, Nloop)
+    test_refract_bicubic(Nthread, Nray, Nloop)

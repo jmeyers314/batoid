@@ -1,5 +1,5 @@
-#ifndef batoid_asphere_h
-#define batoid_asphere_h
+#ifndef batoid_asphere2_h
+#define batoid_asphere2_h
 
 #include <array>
 #include <sstream>

@@ -26,6 +26,8 @@ namespace batoid {
         virtual void intersectInPlace(RayVector2&, const CoordSys* cs=nullptr) const = 0;
         virtual void reflectInPlace(RayVector2&, const CoordSys* cs=nullptr) const = 0;
         virtual void refractInPlace(RayVector2&, const Medium2&, const Medium2&, const CoordSys* cs=nullptr) const = 0;
+        virtual void sag(const double* xptr, const double* yptr, const size_t size, double* out) const = 0;
+        virtual void normal(const double* xptr, const double* yptr, const size_t size, double* out) const = 0;
     };
 
     template<typename T>
@@ -38,6 +40,8 @@ namespace batoid {
         virtual void intersectInPlace(RayVector2&, const CoordSys* cs=nullptr) const override;
         virtual void reflectInPlace(RayVector2&, const CoordSys* cs=nullptr) const override;
         virtual void refractInPlace(RayVector2&, const Medium2&, const Medium2&, const CoordSys* cs=nullptr) const override;
+        virtual void sag(const double* xptr, const double* yptr, const size_t size, double* out) const override;
+        virtual void normal(const double* xptr, const double* yptr, const size_t size, double* out) const override;
     };
 
     // Declare specializations
@@ -45,5 +49,7 @@ namespace batoid {
     template<> void Surface2CRTP<Plane2>::intersectInPlace(RayVector2&, const CoordSys* cs) const;
     template<> void Surface2CRTP<Plane2>::reflectInPlace(RayVector2&, const CoordSys* cs) const;
     template<> void Surface2CRTP<Plane2>::refractInPlace(RayVector2&, const Medium2&, const Medium2&, const CoordSys* cs) const;
+    template<> void Surface2CRTP<Plane2>::sag(const double* xptr, const double* yptr, const size_t size, double* out) const;
+    template<> void Surface2CRTP<Plane2>::normal(const double* xptr, const double* yptr, const size_t size, double* out) const;
 }
 #endif

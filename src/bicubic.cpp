@@ -68,12 +68,16 @@ namespace batoid {
         // Interpolate
         double val0 = oneDSpline(xfrac, _zs(iy-1, ix-1), _zs(iy-1, ix),
                                  _dzdxs(iy-1, ix-1)*dx, _dzdxs(iy-1, ix)*dx);
+
         double val1 = oneDSpline(xfrac, _zs(iy, ix-1), _zs(iy, ix),
                                  _dzdxs(iy, ix-1)*dx, _dzdxs(iy, ix)*dx);
+
         double der0 = oneDSpline(xfrac, _dzdys(iy-1, ix-1), _dzdys(iy-1, ix),
                                  _d2zdxdys(iy-1, ix-1)*dx, _d2zdxdys(iy-1, ix)*dx);
+
         double der1 = oneDSpline(xfrac, _dzdys(iy, ix-1), _dzdys(iy, ix),
                                  _d2zdxdys(iy, ix-1)*dx, _d2zdxdys(iy, ix)*dx);
+
         return oneDSpline(yfrac, val0, val1, der0*dy, der1*dy);
     }
 
@@ -97,13 +101,13 @@ namespace batoid {
 
         // x-gradient
         double val0 = oneDGrad(xfrac, _zs(iy-1, ix-1), _zs(iy-1, ix),
-                               _dzdxs(iy-1, ix-1)*dx, _dzdxs(iy-1, ix)*dx);
+                                      _dzdxs(iy-1, ix-1)*dx, _dzdxs(iy-1, ix)*dx);
         double val1 = oneDGrad(xfrac, _zs(iy, ix-1), _zs(iy, ix),
-                               _dzdxs(iy, ix-1)*dx, _dzdxs(iy, ix)*dx);
+                                      _dzdxs(iy, ix-1)*dx, _dzdxs(iy, ix)*dx);
         double der0 = oneDGrad(xfrac, _dzdys(iy-1, ix-1), _dzdys(iy-1, ix),
-                               _d2zdxdys(iy-1, ix-1)*dx, _d2zdxdys(iy-1, ix)*dx);
+                                      _d2zdxdys(iy-1, ix-1)*dx, _d2zdxdys(iy-1, ix)*dx);
         double der1 = oneDGrad(xfrac, _dzdys(iy, ix-1), _dzdys(iy, ix),
-                               _d2zdxdys(iy, ix-1)*dx, _d2zdxdys(iy, ix)*dx);
+                                      _d2zdxdys(iy, ix-1)*dx, _d2zdxdys(iy, ix)*dx);
         double gradx = oneDSpline(yfrac, val0, val1, der0*dy, der1*dy)/dx;
 
         // y-gradient
@@ -137,7 +141,7 @@ namespace batoid {
         BicubicResidual resid(*this, r);
         Solve<BicubicResidual> solve(resid, t, t+1e-2);
         solve.setMethod(Method::Brent);
-        solve.setXTolerance(1e-12);
+        solve.setXTolerance(1e-14);
 
         try {
             solve.bracket();

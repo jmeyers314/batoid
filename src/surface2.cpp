@@ -5,6 +5,8 @@
 #include "paraboloid2.h"
 #include "quadric2.h"
 #include "asphere2.h"
+#include "bilinear2.h"
+#include "bicubic2.h"
 #include "coordtransform2.h"
 
 namespace batoid {
@@ -261,10 +263,40 @@ namespace batoid {
         rv.setCoordSys(CoordSys(*cs));
     }
 
+    template<typename T>
+    void Surface2CRTP<T>::sag(const double* xptr, const double* yptr, const size_t size, double* out) const {
+        const T* self = static_cast<const T*>(this);
+        #pragma omp target map(to:xptr[0:size], yptr[0:size]) map(to:self[:1]) map(from:out[0:size])
+        {
+            #pragma omp teams distribute parallel for
+            for(int i=0; i<size; i++) {
+                out[i] = self->_sag(xptr[i], yptr[i]);
+            }
+        }
+    }
+
+    template<typename T>
+    void Surface2CRTP<T>::normal(const double* xptr, const double* yptr, const size_t size, double* out) const {
+        const T* self = static_cast<const T*>(this);
+        #pragma omp target map(to:xptr[0:size], yptr[0:size]) map(to:self[:1]) map(from:out[0:3*size])
+        {
+            #pragma omp teams distribute parallel for
+            for(int i=0; i<size; i++) {
+                double nx, ny, nz;
+                self->_normal(xptr[i], yptr[i], nx, ny, nz);
+                out[i] = nx;
+                out[i+size] = ny;
+                out[i+2*size] = nz;
+            }
+        }
+    }
+
     // Instantiations
     template class Surface2CRTP<Plane2>;
     template class Surface2CRTP<Sphere2>;
     template class Surface2CRTP<Paraboloid2>;
     template class Surface2CRTP<Quadric2>;
     template class Surface2CRTP<Asphere2>;
+    template class Surface2CRTP<Bilinear2>;
+    template class Surface2CRTP<Bicubic2>;
 }

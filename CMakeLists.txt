@@ -66,6 +66,8 @@ set(PYSRC_FILES
   pysrc/sphere2.cpp
   pysrc/quadric2.cpp
   pysrc/asphere2.cpp
+  pysrc/bilinear2.cpp
+  pysrc/bicubic2.cpp
 )
 set(SRC_FILES
   src/asphere.cpp
@@ -98,6 +100,8 @@ set(SRC_FILES
   src/sphere2.cpp
   src/quadric2.cpp
   src/asphere2.cpp
+  src/bilinear2.cpp
+  src/bicubic2.cpp
 )
 
 set(ALL_FILES ${SRC_FILES} ${PYSRC_FILES})

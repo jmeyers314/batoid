@@ -244,4 +244,20 @@ namespace batoid {
         self->_refractInPlace(rv, m1, m2, cs);
     }
 
+    template<>
+    void Surface2CRTP<Plane2>::sag(const double* xptr, const double* yptr, const size_t size, double* out) const {
+        for(int i=0; i<size; i++){
+            out[i] = 0.0;
+        }
+    }
+
+    template<>
+    void Surface2CRTP<Plane2>::normal(const double* xptr, const double* yptr, const size_t size, double* out) const {
+        for(int i=0; i<2*size; i++) {
+            out[i] = 0.0;
+        }
+        for(int i=2*size; i<3*size; i++) {
+            out[i] = 0.0;
+        }
+    }
 }
