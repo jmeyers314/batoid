@@ -249,3 +249,58 @@ class Bicubic2(Surface2):
             self._d2zdxdys.ctypes.data,
             self._zs.shape[0]
         )
+
+
+class ExtendedAsphere2(Surface2):
+    def __init__(
+        self, R, conic, coefs,
+        xs, ys, zs,
+        dzdxs=None, dzdys=None, d2zdxdys=None
+    ):
+        # Asphere part
+        self._R = R
+        self._conic = conic
+        self._coefs = np.ascontiguousarray(coefs)
+
+        # Bicubic part
+        self._xs = xs
+        self._ys = ys
+        self._x0 = xs[0]
+        self._y0 = ys[0]
+        self._dx = (xs[-1]-xs[0])/(len(xs)-1)
+        self._dy = (ys[-1]-ys[0])/(len(ys)-1)
+        self._zs = np.ascontiguousarray(zs)
+
+        if dzdxs is None:
+            dx = self._dx
+            dy = self._dy
+            dzdys = np.empty_like(self._zs)
+            dzdys[1:-1, :] = (self._zs[2:, :] - self._zs[:-2, :])/(2*dy)
+            dzdys[0, :] = (self._zs[1, :] - self._zs[0, :])/dy
+            dzdys[-1, :] = (self._zs[-1, :] - self._zs[-2, :])/dy
+
+            dzdxs = np.empty_like(self._zs)
+            dzdxs[:, 1:-1] = (self._zs[:, 2:] - self._zs[:, :-2])/(2*dx)
+            dzdxs[:, 0] = (self._zs[:, 1] - self._zs[:, 0])/dx
+            dzdxs[:, -1] = (self._zs[:, -1] - self._zs[:, -2])/dx
+
+            d2zdxdys = np.empty_like(self._zs)
+            d2zdxdys[:, 1:-1] = (dzdys[:, 2:] - dzdys[:, :-2])/(2*dx)
+            d2zdxdys[:, 0] = (dzdys[:, 1] - dzdys[:, 0])/dx
+            d2zdxdys[:, -1] = (dzdys[:, -1] - dzdys[:, -2])/dx
+
+        self._dzdxs = np.ascontiguousarray(dzdxs)
+        self._dzdys = np.ascontiguousarray(dzdys)
+        self._d2zdxdys = np.ascontiguousarray(d2zdxdys)
+
+    @lazy_property
+    def _surface(self):
+        return _batoid.CPPExtendedAsphere2(
+            self._R, self._conic, self._coefs.ctypes.data, len(self._coefs),
+            self._x0, self._y0, self._dx, self._dy,
+            self._zs.ctypes.data,
+            self._dzdxs.ctypes.data,
+            self._dzdys.ctypes.data,
+            self._d2zdxdys.ctypes.data,
+            self._zs.shape[0]
+        )

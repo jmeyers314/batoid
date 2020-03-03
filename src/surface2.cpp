@@ -7,6 +7,7 @@
 #include "asphere2.h"
 #include "bilinear2.h"
 #include "bicubic2.h"
+#include "extendedAsphere2.h"
 #include "coordtransform2.h"
 
 namespace batoid {
@@ -299,4 +300,5 @@ namespace batoid {
     template class Surface2CRTP<Asphere2>;
     template class Surface2CRTP<Bilinear2>;
     template class Surface2CRTP<Bicubic2>;
+    template class Surface2CRTP<ExtendedAsphere2>;
 }

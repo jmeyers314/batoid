@@ -1039,6 +1039,48 @@ def test_refract_bicubic(Nthread=1, Nray=100_000, Nloop=1):
         np.testing.assert_allclose(rv.t, rv2.t, rtol=0, atol=1e-13)
 
 
+@timer
+@pytest.mark.gpu
+def test_extendedAsphere(Nthread=1, Nray=100_000, Nloop=1):
+    batoid._batoid.setNThread(Nthread)
+    np.random.seed(5772156)
+
+    xs = np.linspace(-4.4, 4.4, 101)
+    ys = np.linspace(-4.4, 4.4, 101)
+    def f(x, y):
+        return x**2*y - y**2*x + 3*x - 2
+    def dfdx(x, y):
+        return 2*x*y - y**2 + 3
+    def dfdy(x, y):
+        return x**2 - 2*y*x
+    def d2fdxdy(x, y):
+        return 2*x - 2*y
+
+    zs = f(*np.meshgrid(xs, ys))
+    asphere = batoid.Asphere(19.835, -1.215, [0.0, -1.381e-9])
+    bc = batoid.Bicubic(xs, ys, zs)
+    surf = batoid.Sum([asphere, bc])
+
+    surf2 = batoid.ExtendedAsphere2(
+        19.835, -1.215, [0.0, -1.381e-9],
+        xs, ys, zs
+    )
+
+    testx = np.random.uniform(-4, 4, size=Nray)
+    testy = np.random.uniform(-4, 4, size=Nray)
+    np.testing.assert_allclose(
+        surf.sag(testx, testy),
+        surf2.sag(testx, testy),
+        atol=1e-10, rtol=0
+    )
+
+    np.testing.assert_allclose(
+        surf.normal(testx, testy),
+        surf2.normal(testx, testy),
+        atol=1e-10, rtol=0
+    )
+
+
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
@@ -1072,3 +1114,4 @@ if __name__ == '__main__':
     test_intersect_bicubic(Nthread, Nray, Nloop)
     test_reflect_bicubic(Nthread, Nray, Nloop)
     test_refract_bicubic(Nthread, Nray, Nloop)
+    test_extendedAsphere(Nthread, Nray, Nloop)
