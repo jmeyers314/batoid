@@ -852,10 +852,10 @@ def test_bicubic(Nthread=1, Nray=100_000, Nloop=1):
 
     testx = np.random.uniform(-4, 4, size=Nray)
     testy = np.random.uniform(-4, 4, size=Nray)
-    sag = surf.sag(testx, testy)
+    sag = surf2.sag(testx, testy)
     np.testing.assert_allclose(sag, f(testx, testy), atol=1e-10, rtol=0)
 
-    norm = surf.normal(testx, testy)
+    norm = surf2.normal(testx, testy)
     arr = np.vstack([
         -dfdx(testx, testy),
         -dfdy(testx, testy),
