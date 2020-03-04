@@ -34,6 +34,7 @@ endmacro()
 
 add_library(batoid-compile-flags INTERFACE)
 add_cxx_flag_if_avail(batoid-compile-flags "-Wno-unused-value" CXX_W_NO_UNUSED_VALUE)
+# add_cxx_flag_if_avail(batoid-compile-flags "-O0" CXX_NO_OPTIMIZATION)
 
 include_directories(include eigen)
 add_subdirectory(pybind11)
