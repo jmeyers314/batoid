@@ -4,8 +4,6 @@
 #include <cstdlib>
 #include <omp.h>
 
-#pragma omp requires unified_address
-
 namespace batoid {
     enum class DVOwnerType{ host, device };
 
