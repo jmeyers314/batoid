@@ -107,6 +107,12 @@ set(SRC_FILES
   src/extendedAsphere2.cpp
 )
 
+set_source_files_properties(
+  src/bicubic2.cpp
+  PROPERTIES
+  COMPILE_FLAGS -O0
+)
+
 set(ALL_FILES ${SRC_FILES} ${PYSRC_FILES})
 
 find_package(OpenMP)
