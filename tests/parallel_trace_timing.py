@@ -70,15 +70,31 @@ def parallel_trace_timing(args):
 
     # Optionally perturb primary mirror using bicubic spline
     if args.perturbBC != 0:
-        orig = telescope[pm].surface
-        rad = telescope.pupilSize/2 * 1.1
-        xs = np.linspace(-rad, rad, 100)
-        ys = np.linspace(-rad, rad, 100)
-        def f(x, y):
-            return args.perturbBC*(np.cos(x) + np.sin(y))
-        zs = f(*np.meshgrid(xs, ys))
-        bc = batoid.Bicubic(xs, ys, zs)
-        telescope[pm].surface = batoid.Sum([orig, bc])
+        if args.gpu:
+            orig = telescope[pm].surface
+            rad = telescope.pupilSize/2 * 1.1
+            xs = np.linspace(-rad, rad, 100)
+            ys = np.linspace(-rad, rad, 100)
+            def f(x, y):
+                return args.perturbBC*(np.cos(x) + np.sin(y))
+            zs = f(*np.meshgrid(xs, ys))
+            bc = batoid.Bicubic(xs, ys, zs)
+            telescope[pm].surface = batoid.ExtendedAsphere2(
+                orig.R,
+                orig.conic,
+                orig.coefs,
+                xs, ys, zs,
+            )
+        else:
+            orig = telescope[pm].surface
+            rad = telescope.pupilSize/2 * 1.1
+            xs = np.linspace(-rad, rad, 100)
+            ys = np.linspace(-rad, rad, 100)
+            def f(x, y):
+                return args.perturbBC*(np.cos(x) + np.sin(y))
+            zs = f(*np.meshgrid(xs, ys))
+            bc = batoid.Bicubic(xs, ys, zs)
+            telescope[pm].surface = batoid.Sum([orig, bc])
 
     if args.immutable:
         print("Immutable trace")
