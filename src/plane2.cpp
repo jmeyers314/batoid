@@ -148,6 +148,7 @@ namespace batoid {
         rv.t.syncToDevice();
         rv.vignetted.syncToDevice();
         rv.failed.syncToDevice();
+        rv.wavelength.syncToDevice();
         size_t size = rv.size;
         double* xptr = rv.r.deviceData;
         double* yptr = xptr + size;
@@ -163,15 +164,10 @@ namespace batoid {
         CoordTransform2 ct(rv.getCoordSys(), *cs);
         const double* rot = ct.getRot().data();
         const double* dr = ct.getDr().data();
+        Medium2* mptr = m2.getDevPtr();
+        double* wptr = rv.wavelength.deviceData;
 
-        // DualView<double> n1(size);
-        // double* n1ptr = n1.deviceData;
-        // m1.getNMany(rv.wavelength, n1);
-        DualView<double> n2(size);
-        double* n2ptr = n2.deviceData;
-        m2.getNMany(rv.wavelength, n2);
-
-        #pragma omp target is_device_ptr(xptr, yptr, zptr, vxptr, vyptr, vzptr, n2ptr, tptr, vigptr, failptr) map(to:rot[:9],dr[:3])
+        #pragma omp target is_device_ptr(xptr, yptr, zptr, vxptr, vyptr, vzptr, wptr, tptr, vigptr, failptr, mptr) map(to:rot[:9],dr[:3])
         {
             #pragma omp teams distribute parallel for
             for(int i=0; i<size; i++) {
@@ -203,15 +199,16 @@ namespace batoid {
                         n1 = 1/sqrt(n1);
 
                         double discriminant = vz*vz * n1*n1;
-                        discriminant -= (1-n2ptr[i]*n2ptr[i]/(n1*n1));
+                        double n2 = mptr->getN(wptr[i]);
+                        discriminant -= (1-n2*n2/(n1*n1));
 
                         double norm = n1*n1*vx*vx;
                         norm += n1*n1*vy*vy;
                         norm += discriminant;
                         norm = sqrt(norm);
-                        vxptr[i] = n1*vx/norm/n2ptr[i];
-                        vyptr[i] = n1*vy/norm/n2ptr[i];
-                        vzptr[i] = sqrt(discriminant)/norm/n2ptr[i];
+                        vxptr[i] = n1*vx/norm/n2;
+                        vyptr[i] = n1*vy/norm/n2;
+                        vzptr[i] = sqrt(discriminant)/norm/n2;
 
                         // output
                         xptr[i] = x;

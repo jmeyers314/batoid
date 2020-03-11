@@ -175,6 +175,7 @@ namespace batoid {
         rv.t.syncToDevice();
         rv.vignetted.syncToDevice();
         rv.failed.syncToDevice();
+        rv.wavelength.syncToDevice();
         size_t size = rv.size;
         double* xptr = rv.r.deviceData;
         double* yptr = xptr + size;
@@ -190,15 +191,10 @@ namespace batoid {
         CoordTransform2 ct(rv.getCoordSys(), *cs);
         const double* rot = ct.getRot().data();
         const double* dr = ct.getDr().data();
-        // Note, n1 implicitly defined by rv.v.
-        // DualView<double> n1(size);
-        // double* n1ptr = n1.deviceData;
-        // m1.getNMany(rv.wavelength, n1);
-        DualView<double> n2(size);
-        double* n2ptr = n2.deviceData;
-        m2.getNMany(rv.wavelength, n2);
+        Medium2* mptr = m2.getDevPtr();
+        double* wptr = rv.wavelength.deviceData;
 
-        #pragma omp target is_device_ptr(xptr, yptr, zptr, vxptr, vyptr, vzptr, n2ptr, tptr, vigptr, failptr) map(to:self[:1]) map(to:rot[:9],dr[:3])
+        #pragma omp target is_device_ptr(xptr, yptr, zptr, vxptr, vyptr, vzptr, tptr, wptr, vigptr, failptr, mptr) map(to:self[:1]) map(to:rot[:9],dr[:3])
         {
             #pragma omp teams distribute parallel for
             for(int i=0; i<size; i++) {
@@ -240,16 +236,17 @@ namespace batoid {
                             normalz *= -1;
                             alpha *= -1;
                         }
-                        double eta = n1/n2ptr[i];
+                        double n2 = mptr->getN(wptr[i]);
+                        double eta = n1/n2;
                         double sinsqr = eta*eta*(1-alpha*alpha);
                         double nfactor = eta*alpha + sqrt(1-sinsqr);
                         // output
                         vxptr[i] = eta*nvx - nfactor*normalx;
                         vyptr[i] = eta*nvy - nfactor*normaly;
                         vzptr[i] = eta*nvz - nfactor*normalz;
-                        vxptr[i] /= n2ptr[i];
-                        vyptr[i] /= n2ptr[i];
-                        vzptr[i] /= n2ptr[i];
+                        vxptr[i] /= n2;
+                        vyptr[i] /= n2;
+                        vzptr[i] /= n2;
                         xptr[i] = x;
                         yptr[i] = y;
                         zptr[i] = z;
