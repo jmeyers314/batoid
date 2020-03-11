@@ -35,6 +35,9 @@ from .medium2 import Medium2, ConstMedium2
 from .medium2 import SellmeierMedium2, SumitaMedium2, Air2
 from .surface2 import Surface2, Plane2, Sphere2, Paraboloid2, Quadric2, Asphere2
 from .surface2 import Bilinear2, Bicubic2, ExtendedAsphere2
+from .obscuration2 import Obscuration2, ObscCircle2, ObscAnnulus2, ObscRay2
+from .obscuration2 import ObscRectangle2, ObscNegation2, ObscUnion2
+from .obscuration2 import ObscIntersection2
 
 from . import parse
 from . import utils

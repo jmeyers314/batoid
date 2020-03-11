@@ -954,7 +954,7 @@ def test_reflect_bicubic(Nthread=1, Nray=100_000, Nloop=1):
     xs = np.linspace(-4.4, 4.4, 101)
     ys = np.linspace(-4.4, 4.4, 101)
     def f(x, y):
-        return x**2*y - y**2*x + 3*x - 2
+        return 1e-4*(x**2*y - y**2*x + 3*x - 2)
 
     zs = f(*np.meshgrid(xs, ys))
     surf = batoid.Bicubic(xs, ys, zs)
@@ -1081,6 +1081,88 @@ def test_extendedAsphere(Nthread=1, Nray=100_000, Nloop=1):
     )
 
 
+@timer
+@pytest.mark.gpu
+def test_obsc(Nthread=1, Nray=100_000, Nloop=1):
+    batoid._batoid.setNThread(Nthread)
+    np.random.seed(5772)
+
+    # Try some intersection
+    x = np.random.uniform(size=Nray)-0.5
+    y = np.random.uniform(size=Nray)-0.5
+    z = np.random.uniform(size=Nray)+5
+    vx = np.random.uniform(size=Nray)*0.02-0.01
+    vy = np.random.uniform(size=Nray)*0.02-0.01
+    vz = np.random.uniform(size=Nray)*0.02-1
+    t = np.zeros(Nray)
+    w = np.random.uniform(size=Nray)
+    flux = np.random.uniform(size=Nray)
+    vignetted = np.zeros(Nray, dtype=bool)
+    failed = np.zeros(Nray, dtype=bool)
+    v = np.sqrt(vx*vx+vy*vy+vz*vz)
+    vx /= 1.1*v
+    vy /= 1.1*v
+    vz /= 1.1*v
+
+    rv_0 = batoid.RayVector.fromArrays(
+        x, y, z, vx, vy, vz, t, w, flux, vignetted
+    )
+    rv2_0 = batoid.RayVector2.fromArrays(
+        x, y, z, vx, vy, vz, t, w, flux, vignetted, failed
+    )
+
+    obscs = [
+        batoid.ObscCircle(0.25),
+        batoid.ObscAnnulus(0.1, 0.3, 0.01, 0.02),
+        batoid.ObscNegation(batoid.ObscAnnulus(0.1, 0.3, 0.01, 0.02)),
+        batoid.ObscRectangle(0.1, 0.14, 0.1, -0.02, 10.0),
+        batoid.ObscRay(0.1, 0.3, 0.1, -0.02),
+        batoid.ObscUnion([
+            batoid.ObscRectangle(0.1, 0.14, 0.1, -0.02, 10.0),
+            batoid.ObscRay(0.1, 0.3, 0.1, -0.02)
+        ]),
+        batoid.ObscIntersection([
+            batoid.ObscRectangle(0.1, 0.14, 0.1, -0.02, 10.0),
+            batoid.ObscRay(0.1, 0.3, 0.1, -0.02)
+        ])
+    ]
+
+    obsc2s = [
+        batoid.ObscCircle2(0.25),
+        batoid.ObscAnnulus2(0.1, 0.3, 0.01, 0.02),
+        batoid.ObscNegation2(batoid.ObscAnnulus2(0.1, 0.3, 0.01, 0.02)),
+        batoid.ObscRectangle2(0.1, 0.14, 0.1, -0.02, 10.0),
+        batoid.ObscRay2(0.1, 0.3, 0.1, -0.02),
+        batoid.ObscUnion2([
+            batoid.ObscRectangle2(0.1, 0.14, 0.1, -0.02, 10.0),
+            batoid.ObscRay2(0.1, 0.3, 0.1, -0.02)
+        ]),
+        batoid.ObscIntersection2([
+            batoid.ObscRectangle2(0.1, 0.14, 0.1, -0.02, 10.0),
+            batoid.ObscRay2(0.1, 0.3, 0.1, -0.02)
+        ])
+    ]
+
+    for obsc, obsc2 in zip(obscs, obsc2s):
+        rv = rv_0.copy()
+        rv2 = rv2_0.copy()
+        t0 = time.time()
+        for _ in range(Nloop):
+            obsc.obscureInPlace(rv)
+        t1 = time.time()
+        for _ in range(Nloop):
+            obsc2.obscureInPlace(rv2)
+        t2 = time.time()
+
+        print(f"{type(obsc)}")
+        print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
+        print(f"gpu time = {(t2-t1)*1e3:.1f} ms")
+
+        if (Nloop == 1):
+            np.testing.assert_array_equal(rv.failed, rv2.failed)
+            np.testing.assert_array_equal(rv.vignetted, rv2.vignetted)
+
+
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
@@ -1115,3 +1197,4 @@ if __name__ == '__main__':
     test_reflect_bicubic(Nthread, Nray, Nloop)
     test_refract_bicubic(Nthread, Nray, Nloop)
     test_extendedAsphere(Nthread, Nray, Nloop)
+    test_obsc(Nthread, Nray, Nloop)

@@ -70,6 +70,7 @@ set(PYSRC_FILES
   pysrc/bilinear2.cpp
   pysrc/bicubic2.cpp
   pysrc/extendedAsphere2.cpp
+  pysrc/obscuration2.cpp
 )
 set(SRC_FILES
   src/asphere.cpp
@@ -105,6 +106,7 @@ set(SRC_FILES
   src/bilinear2.cpp
   src/bicubic2.cpp
   src/extendedAsphere2.cpp
+  src/obscuration2.cpp
 )
 
 set_source_files_properties(
