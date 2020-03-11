@@ -33,32 +33,45 @@ def parallel_trace_timing(args):
         telescope = batoid.Optic.fromYaml("HSC.yaml")
         pm = 'PM'
 
-    if args.gpu:
-        rays = batoid.circularGrid(
-            telescope.backDist,
-            0.5*telescope.pupilSize,
-            0.5*telescope.pupilObscuration*telescope.pupilSize,
-            dirCos[0], dirCos[1], dirCos[2],
-            args.nside, args.nside, 620e-9, 1.0, batoid.Air()
-        )
-        # Turn RayVector into RayVector2
-        rays = batoid.RayVector2.fromArrays(
-            rays.x, rays.y, rays.z, rays.vx, rays.vy, rays.vz, rays.t,
-            rays.wavelength, rays.flux,
-            rays.vignetted, rays.failed
-        )
-    else:
-        rays = batoid.circularGrid(
-            telescope.backDist,
-            0.5*telescope.pupilSize,
-            0.5*telescope.pupilObscuration*telescope.pupilSize,
-            dirCos[0], dirCos[1], dirCos[2],
-            args.nside, args.nside, 620e-9, 1.0, telescope.inMedium
-        )
-
+    building = []
+    for _ in range(args.nrepeat):
+        t0 = time.time()
+        if args.gpu:
+            rays = batoid.circularGrid(
+                telescope.backDist,
+                0.5*telescope.pupilSize,
+                0.5*telescope.pupilObscuration*telescope.pupilSize,
+                dirCos[0], dirCos[1], dirCos[2],
+                args.nside, args.nside, 620e-9, 1.0, batoid.Air()
+            )
+            # Turn RayVector into RayVector2
+            rays = batoid.RayVector2.fromArrays(
+                rays.x, rays.y, rays.z, rays.vx, rays.vy, rays.vz, rays.t,
+                rays.wavelength, rays.flux,
+                rays.vignetted, rays.failed
+            )
+        else:
+            rays = batoid.circularGrid(
+                telescope.backDist,
+                0.5*telescope.pupilSize,
+                0.5*telescope.pupilObscuration*telescope.pupilSize,
+                dirCos[0], dirCos[1], dirCos[2],
+                args.nside, args.nside, 620e-9, 1.0, telescope.inMedium
+            )
+        t1 = time.time()
+        building.append(t1-t0)
+    building = np.array(building)
 
     nrays = len(rays)
     print("Tracing {:_d} rays.".format(nrays))
+    print()
+    if args.nrepeat > 1:
+        print("Ray generation: {:_} +/- {:_} rays per second".format(
+            int(np.mean(nrays/building)),
+            int(np.std(nrays/building)/np.sqrt(args.nrepeat))
+        ))
+    else:
+        print("Ray generation: {:_} rays per second".format(int(nrays/building[0])))
     print()
 
     # Optionally perturb the primary mirror using Zernike polynomial
@@ -96,31 +109,58 @@ def parallel_trace_timing(args):
             bc = batoid.Bicubic(xs, ys, zs)
             telescope[pm].surface = batoid.Sum([orig, bc])
 
+    copying = []
+    tracing = []
     if args.immutable:
         print("Immutable trace")
         t0 = time.time()
 
         for _ in range(args.nrepeat):
+            t1 = time.time()
             rays_in = batoid.RayVector(rays)
+            t2 = time.time()
             rays_out, _ = telescope.trace(rays_in)
-
-        t1 = time.time()
-        print("{:_d} rays per second".format(int(nrays*args.nrepeat/(t1-t0))))
-        print()
+            t3 = time.time()
+            copying.append(t2-t1)
+            tracing.append(t3-t2)
+        t4 = time.time()
     else:
         print("Trace in place")
         t0 = time.time()
+        copying = []
+        tracing = []
 
         for _ in range(args.nrepeat):
+            t1 = time.time()
             rays_out = rays.copy()
+            t2 = time.time()
             telescope.traceInPlace(rays_out)
             rays_out.r # force copy back to host
             rays_out.v
             rays_out.t
             rays_out.vignetted
             rays_out.failed
-        t1 = time.time()
-        print("{:_d} rays per second".format(int(nrays*args.nrepeat/(t1-t0))))
+            t3 = time.time()
+            copying.append(t2-t1)
+            tracing.append(t3-t2)
+        t4 = time.time()
+    copying = np.array(copying)
+    tracing = np.array(tracing)
+
+    if args.nrepeat > 1:
+        print("copying: {:_} +/- {:_} rays per second".format(
+            int(np.mean(nrays/copying)),
+            int(np.std(nrays/copying)/np.sqrt(args.nrepeat))
+        ))
+        print("tracing: {:_} +/- {:_} rays per second".format(
+            int(np.mean(nrays/tracing)),
+            int(np.std(nrays/tracing)/np.sqrt(args.nrepeat))
+        ))
+    else:
+        print("copying: {:_} rays per second".format(int(nrays/copying)))
+        print("tracing: {:_} rays per second".format(int(nrays/tracing)))
+    print("overall:")
+    print("{:_} rays per second".format(int(nrays*args.nrepeat/(t4-t0))))
 
     if args.plot:
         import matplotlib.pyplot as plt
