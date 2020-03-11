@@ -17,46 +17,39 @@ def parallel_trace_timing(args):
     print("Using minChunk of {:_d}".format(batoid._batoid.getMinChunk()))
     print("Using nside of {:_d}".format(args.nside))
 
-    # 0.3, 0.3 should be in bounds for current wide-field telescopes
-    dirCos = batoid.utils.gnomonicToDirCos(np.deg2rad(0.3), np.deg2rad(0.3))
-
-    if args.gpu:
-        telescope = batoid.Optic.fromYaml("LSST_r_noobsc.yaml", gpu=True)
-        pm = 'M1'
-    elif args.lsst:
-        telescope = batoid.Optic.fromYaml("LSST_r.yaml")
+    if args.lsst:
+        print("Tracing through LSST optics")
+        telescope = batoid.Optic.fromYaml("LSST_r.yaml", gpu=args.gpu)
         pm = 'M1'
     elif args.decam:
-        telescope = batoid.Optic.fromYaml("DECam.yaml")
+        print("Tracing through DECam optics")
+        telescope = batoid.Optic.fromYaml("DECam.yaml", gpu=args.gpu)
         pm = 'PM'
     else:
-        telescope = batoid.Optic.fromYaml("HSC.yaml")
+        print("Tracing through HSC optics")
+        telescope = batoid.Optic.fromYaml("HSC.yaml", gpu=args.gpu)
         pm = 'PM'
 
     building = []
     for _ in range(args.nrepeat):
         t0 = time.time()
         if args.gpu:
-            rays = batoid.circularGrid(
-                telescope.backDist,
-                0.5*telescope.pupilSize,
-                0.5*telescope.pupilObscuration*telescope.pupilSize,
-                dirCos[0], dirCos[1], dirCos[2],
-                args.nside, args.nside, 620e-9, 1.0, batoid.Air()
-            )
-            # Turn RayVector into RayVector2
-            rays = batoid.RayVector2.fromArrays(
-                rays.x, rays.y, rays.z, rays.vx, rays.vy, rays.vz, rays.t,
-                rays.wavelength, rays.flux,
-                rays.vignetted, rays.failed
+            rays = batoid.RayVector2.asPolar(
+                optic=telescope,
+                wavelength=620e-9,
+                theta_x=np.deg2rad(0.3),
+                theta_y=np.deg2rad(0.3),
+                inner=0.5*telescope.pupilSize*telescope.pupilObscuration,
+                nrad=args.nside, naz=args.nside
             )
         else:
-            rays = batoid.circularGrid(
-                telescope.backDist,
-                0.5*telescope.pupilSize,
-                0.5*telescope.pupilObscuration*telescope.pupilSize,
-                dirCos[0], dirCos[1], dirCos[2],
-                args.nside, args.nside, 620e-9, 1.0, telescope.inMedium
+            rays = batoid.RayVector.asPolar(
+                optic=telescope,
+                wavelength=620e-9,
+                theta_x=np.deg2rad(0.3),
+                theta_y=np.deg2rad(0.3),
+                inner=0.5*telescope.pupilSize*telescope.pupilObscuration,
+                nrad=args.nside, naz=args.nside
             )
         t1 = time.time()
         building.append(t1-t0)
@@ -92,10 +85,11 @@ def parallel_trace_timing(args):
                 return args.perturbBC*(np.cos(x) + np.sin(y))
             zs = f(*np.meshgrid(xs, ys))
             bc = batoid.Bicubic(xs, ys, zs)
+            coefs = orig.coefs if hasattr(orig, 'coefs') else []
             telescope[pm].surface = batoid.ExtendedAsphere2(
                 orig.R,
                 orig.conic,
-                orig.coefs,
+                coefs,
                 xs, ys, zs,
             )
         else:

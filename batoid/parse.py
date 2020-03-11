@@ -167,10 +167,29 @@ def parse_table(config):
 
 # GPU!
 
+def parse_obscuration2(config):
+    typ = config.pop('type')
+    if typ in ['ObscCircle', 'ObscAnnulus', 'ObscRay', 'ObscRectangle']:
+        evalstr = "batoid.{}2(**config)".format(typ)
+        return eval(evalstr)
+    if typ == 'ObscNegation':
+        original = parse_obscuration(config['original'])
+        return batoid.ObscNegation2(original)
+    if typ in ['ObscUnion', 'ObscIntersection']:
+        items = [parse_obscuration2(c) for c in config['items']]  # noqa
+        evalstr = "batoid.{}2(items)".format(typ)
+        return eval(evalstr)
+    if typ.startswith('Clear'): # triggers negation
+        # put type back into config, but with Clear->Obsc
+        config['type'] = typ.replace("Clear", "Obsc")
+        return batoid.ObscNegation2(parse_obscuration2(config))
+
+
 def parse_surface2(config):
     typ = config.pop('type')
     evalstr = "batoid.{}2(**config)".format(typ)
     return eval(evalstr)
+
 
 def parse_optic2(config,
                  coordSys=batoid.CoordSys(),
@@ -183,7 +202,7 @@ def parse_optic2(config,
     @param outMedium default out Medium, often set by optic parent
     """
     if 'obscuration' in config:
-        raise NotImplementedError("obscuration not yet implemented")
+        obscuration = parse_obscuration2(config.pop('obscuration'))
     else:
         obscuration = None
     name = config.pop('name', "")
