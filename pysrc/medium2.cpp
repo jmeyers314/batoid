@@ -15,8 +15,8 @@ namespace batoid {
                 [](const Medium2& m, size_t n, size_t wavelength_ptr, size_t out_ptr)
                 {
                     m.getNMany(
-                        n,
                         reinterpret_cast<double*>(wavelength_ptr),
+                        n,
                         reinterpret_cast<double*>(out_ptr)
                     );
                 }
