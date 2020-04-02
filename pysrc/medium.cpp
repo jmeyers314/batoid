@@ -4,6 +4,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/operators.h>
 #include <pybind11/stl.h>
+#include <pybind11/numpy.h>
 
 namespace py = pybind11;
 using namespace pybind11::literals;
@@ -11,7 +12,7 @@ using namespace pybind11::literals;
 namespace batoid {
     void pyExportMedium(py::module& m) {
         py::class_<Medium, std::shared_ptr<Medium>>(m, "CPPMedium")
-            .def("getN", &Medium::getN)
+            .def("getN", py::vectorize(&Medium::getN))
             .def("__repr__", &Medium::repr);
 
 
