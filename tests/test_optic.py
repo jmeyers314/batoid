@@ -76,7 +76,7 @@ def test_traceReverse():
         [batoid.Ray(r.r, -r.v, -r.t, r.wavelength) for r in forward_rays]
     )
 
-    final_rays = telescope.traceReverse(reverse_rays)
+    final_rays = telescope.trace(reverse_rays, reverse=True)
     # propagate all the way to t=0
     final_rays = final_rays.propagatedToTime(0.0)
     final_rays.toCoordSysInPlace(batoid.globalCoordSys)
