@@ -983,7 +983,7 @@ class CompoundOptic(Optic):
                 key = item.name+'_0'
                 j = 1
                 while key in result:
-                    key = item.name+f'_{j}'
+                    key = item.name+'_{}'.format(j)
                     j += 1
                 result[key] = {
                     'name':item.name,
@@ -1001,7 +1001,7 @@ class CompoundOptic(Optic):
             key = item.name+'_0'
             j = 1
             while key in result:
-                key = item.name+f'_{j}'
+                key = item.name+'_{}'.format(j)
                 j += 1
             result[key] = {
                 'name':item.name,
