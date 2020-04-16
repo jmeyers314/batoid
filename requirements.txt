@@ -1,2 +1,4 @@
 pyyaml
-numpy
+numpy>=1.18
+pybind11
+
