@@ -278,13 +278,15 @@ class Interface(Optic):
         for x, z in slice:
             ax.plot(x, z, **kwargs)
 
-    def trace(self, r):
+    def trace(self, r, reverse=False):
         """Trace ray(s) through this optical element.
 
         Parameters
         ----------
         r : `batoid.Ray` or `batoid.RayVector`
             Input ray(s) to trace
+        reverse : bool
+            Trace through optical element in reverse?
 
         Returns
         -------
@@ -296,12 +298,15 @@ class Interface(Optic):
         Returned rays will be expressed in the local coordinate system of the
         Optic.  See `Ray.toCoordSys` or `RayVector.toCoordSys` to express rays
         in a different coordinate system.
+
+        Also, you may need to reverse the directions of rays if using this
+        method with `reverse=True`.
         """
         if self.skip:
             return r
 
         # refract, reflect, pass-through - depending on subclass
-        r = self.interact(r)
+        r = self.interact(r, reverse=reverse)
 
         if self.obscuration is not None:
             r = self.obscuration.obscure(r)
@@ -378,37 +383,6 @@ class Interface(Optic):
 
         if self.obscuration is not None:
             self.obscuration.obscureInPlace(r)
-
-        return r
-
-    def traceReverse(self, r):
-        """Trace ray(s) through this optical element in reverse.
-
-        Parameters
-        ----------
-        r : batoid.Ray or batoid.RayVector
-            Input ray(s) to trace
-
-        Returns
-        -------
-        Ray or RayVector
-
-        Notes
-        -----
-        You may need to reverse the directions of rays before using this
-        method!
-
-        Returned rays will be expressed in the local coordinate system of the
-        Optic.  See `Ray.toCoordSys` or `RayVector.toCoordSys` to express rays
-        in a different coordinate system.
-        """
-        if self.skip:
-            return r
-
-        r = self.interactReverse(r)
-
-        if self.obscuration is not None:
-            r = self.obscuration.obscure(r)
 
         return r
 
@@ -524,10 +498,8 @@ class Interface(Optic):
         if self.name not in unless:
             self.obscuration = None
 
-    def interact(self, r):
-        return self.surface.intersect(r, coordSys=self.coordSys)
-
-    def interactReverse(self, r):
+    def interact(self, r, reverse=False):
+        # intersect independent of `reverse`
         return self.surface.intersect(r, coordSys=self.coordSys)
 
     def interactInPlace(self, r):
@@ -662,15 +634,12 @@ class RefractiveInterface(Interface):
             reflectivity=0.0, transmissivity=1.0
         )
 
-    def interact(self, r):
-        return self.surface.refract(
-            r, self.inMedium, self.outMedium, coordSys=self.coordSys
-        )
-
-    def interactReverse(self, r):
-        return self.surface.refract(
-            r, self.outMedium, self.inMedium, coordSys=self.coordSys
-        )
+    def interact(self, r, reverse=False):
+        if reverse:
+            m1, m2 = self.outMedium, self.inMedium
+        else:
+            m1, m2 = self.inMedium, self.outMedium
+        return self.surface.refract(r, m1, m2, coordSys=self.coordSys)
 
     def interactInPlace(self, r):
         self.surface.refractInPlace(
@@ -710,10 +679,8 @@ class Mirror(Interface):
             reflectivity=1.0, transmissivity=0.0
         )
 
-    def interact(self, r):
-        return self.surface.reflect(r, coordSys=self.coordSys)
-
-    def interactReverse(self, r):
+    def interact(self, r, reverse=False):
+        # reflect independent of reverse
         return self.surface.reflect(r, coordSys=self.coordSys)
 
     def interactInPlace(self, r):
@@ -871,13 +838,15 @@ class CompoundOptic(Optic):
             del nameDict[name]
         return nameDict
 
-    def trace(self, r):
+    def trace(self, r, reverse=False):
         """Recursively trace through all subitems of this `CompoundOptic`.
 
         Parameters
         ----------
         r : `batoid.Ray` or `batoid.RayVector`
             Input ray(s) to trace
+        reverse : bool
+            Trace through optical element in reverse?
 
         Returns
         -------
@@ -890,12 +859,16 @@ class CompoundOptic(Optic):
         last element of the CompoundOptic.  See `Ray.toCoordSys` or
         `RayVector.toCoordSys` to express rays in a different coordinate
         system.
+
+        Also, you may need to reverse the directions of rays if using this
+        method with `reverse=True`.
         """
         if self.skip:
             return r  # Should probably make a copy()?
-        for item in self.items:
+        items = self.items if not reverse else reversed(self.items)
+        for item in items:
             if not item.skip:
-                r = item.trace(r)
+                r = item.trace(r, reverse=reverse)
         return r
 
     def traceFull(self, r, _path=None):
@@ -978,7 +951,7 @@ class CompoundOptic(Optic):
                         if item.obscuration is not None:
                             r_out = item.obscuration.obscure(r_out)
                     else:
-                        r_out = item.traceReverse(r_in)
+                        r_out = item.trace(r_in, reverse=True)
                 # r_out = item.trace(r_in)
                 key = item.name+'_0'
                 j = 1
@@ -1039,35 +1012,6 @@ class CompoundOptic(Optic):
             return r
         for item in self.items:
             r = item.traceInPlace(r)
-        return r
-
-    def traceReverse(self, r):
-        """Recursively trace ray(s) through this `CompoundOptic` in reverse.
-
-        Parameters
-        ----------
-        r : `batoid.Ray` or `batoid.RayVector`
-            Input ray(s) to trace
-
-        Returns
-        -------
-        `Ray` or `RayVector`
-
-        Notes
-        -----
-        You may need to reverse the directions of rays before using this
-        method!
-
-        Returned rays will be expressed in the local coordinate system of the
-        first element of the CompoundOptic.  See `Ray.toCoordSys` or
-        `RayVector.toCoordSys` to express rays in a different coordinate
-        system.
-        """
-        if self.skip:
-            return r
-        for item in reversed(self.items):
-            if not item.skip:
-                r = item.traceReverse(r)
         return r
 
     def traceSplit(self, r, minFlux=1e-3, _verbose=False):
