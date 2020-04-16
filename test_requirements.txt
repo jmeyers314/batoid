@@ -8,3 +8,5 @@ notebook
 matplotlib
 lmfit
 ipyvolume
+LSSTDESC.Coord
+galsim
