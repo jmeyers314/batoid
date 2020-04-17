@@ -1,0 +1,6 @@
+API changes
+-----------
+- Eliminated in-place methods like traceInPlace(), reflectInPlace(), ...
+  Remaining operations on Ray and RayVector (e.g., trace(), reflect(), ...) are
+  now done in place.  A new idiom for performing operations not-in-place is to
+  first make a copy.  E.g., r2 = optic.trace(r1.copy())

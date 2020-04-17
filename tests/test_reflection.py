@@ -16,7 +16,7 @@ def test_plane_reflection_plane():
         v = np.array([vx, vy, 1])
         v / np.linalg.norm(v)
         ray = batoid.Ray([x, y, -10], v, 0)
-        rray = plane.reflect(ray)
+        rray = plane.reflect(ray.copy())
 
         # ray.v, surfaceNormal, and rray.v should all be in the same plane, and
         # hence (ray.v x surfaceNormal) . rray.v should have zero magnitude.
@@ -45,7 +45,7 @@ def test_plane_reflection_reversal():
         v = np.array([vx, vy, 1])
         v / np.linalg.norm(v)
         ray = batoid.Ray([x, y, -10], v, 0)
-        rray = plane.reflect(ray)
+        rray = plane.reflect(ray.copy())
 
         # Invert the reflected ray, and see that it ends back at the starting
         # point
@@ -53,12 +53,12 @@ def test_plane_reflection_reversal():
         # Keep going a bit before turning around though
         turn_around = rray.positionAtTime(rray.t+0.1)
         return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t+0.1))
-        riray = plane.intersect(return_ray)
+        riray = plane.intersect(return_ray.copy())
         np.testing.assert_allclose(rray.r[0], riray.r[0], rtol=0, atol=1e-10)
         np.testing.assert_allclose(rray.r[1], riray.r[1], rtol=0, atol=1e-10)
         np.testing.assert_allclose(rray.r[2], riray.r[2], rtol=0, atol=1e-10)
         # Reflect and propagate back to t=0.
-        cray = plane.reflect(return_ray)
+        cray = plane.reflect(return_ray.copy())
         cray = cray.positionAtTime(0)
         np.testing.assert_allclose(cray[0], x, rtol=0, atol=1e-10)
         np.testing.assert_allclose(cray[1], y, rtol=0, atol=1e-10)
@@ -76,7 +76,7 @@ def test_paraboloid_reflection_plane():
         vx = random.gauss(0, 1e-1)
         vy = random.gauss(0, 1e-1)
         ray = batoid.Ray((x, y, -10), (vx, vy, 1), 0)
-        rray = para.reflect(ray)
+        rray = para.reflect(ray.copy())
 
         # ray.v, surfaceNormal, and rray.v should all be in the same plane, and
         # hence (ray.v x surfaceNormal) . rray.v should have zero magnitude.
@@ -100,7 +100,7 @@ def test_paraboloid_reflection_reversal():
         v /= np.linalg.norm(v)
 
         ray = batoid.Ray([x, y, -10], v, 0)
-        rray = para.reflect(ray)
+        rray = para.reflect(ray.copy())
 
         # Invert the reflected ray, and see that it ends back at the starting
         # point
@@ -108,13 +108,13 @@ def test_paraboloid_reflection_reversal():
         # Keep going a bit before turning around though
         turn_around = rray.positionAtTime(rray.t+0.1)
         return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t+0.1))
-        riray = para.intersect(return_ray)
+        riray = para.intersect(return_ray.copy())
         # First check that we intersected at the same point
         np.testing.assert_allclose(rray.r[0], riray.r[0], rtol=0, atol=1e-10)
         np.testing.assert_allclose(rray.r[1], riray.r[1], rtol=0, atol=1e-10)
         np.testing.assert_allclose(rray.r[2], riray.r[2], rtol=0, atol=1e-10)
         # Reflect and propagate back to t=0.
-        cray = para.reflect(return_ray)
+        cray = para.reflect(return_ray.copy())
         cray = cray.positionAtTime(0)
         np.testing.assert_allclose(cray[0], x, rtol=0, atol=1e-10)
         np.testing.assert_allclose(cray[1], y, rtol=0, atol=1e-10)
@@ -132,7 +132,7 @@ def test_paraboloid_reflection_to_focus():
             x = random.gauss(0, 1)
             y = random.gauss(0, 1)
             ray = batoid.Ray((x,y,-1000), (0,0,1), 0)
-            rray = para.reflect(ray)
+            rray = para.reflect(ray.copy())
             # Now see if rray goes through (0,0,R/2)
             # Solve the x equation: 0 = rray.r[0] + rray.v[0]*(t-t0) for t:
             # t = t0 - p0[0]/vx
@@ -154,7 +154,7 @@ def test_asphere_reflection_plane():
         vx = random.gauss(0, 1e-1)
         vy = random.gauss(0, 1e-1)
         ray = batoid.Ray((x, y, -0.1), (vx, vy, 1), 0)
-        rray = asphere.reflect(ray)
+        rray = asphere.reflect(ray.copy())
 
         # ray.v, surfaceNormal, and rray.v should all be in the same plane, and
         # hence (ray.v x surfaceNormal) . rray.v should have zero magnitude.
@@ -177,7 +177,7 @@ def test_asphere_reflection_reversal():
         v = np.array([vx, vy, 1])
         v /= np.linalg.norm(v)
         ray = batoid.Ray([x, y, -0.1], v, 0)
-        rray = asphere.reflect(ray)
+        rray = asphere.reflect(ray.copy())
 
         # Invert the reflected ray, and see that it ends back at the starting
         # point
@@ -185,13 +185,13 @@ def test_asphere_reflection_reversal():
         # Keep going a bit before turning around though
         turn_around = rray.positionAtTime(rray.t+0.1)
         return_ray = batoid.Ray(turn_around, -rray.v, -(rray.t+0.1))
-        riray = asphere.intersect(return_ray)
+        riray = asphere.intersect(return_ray.copy())
         # First check that we intersected at the same point
         np.testing.assert_allclose(rray.r[0], riray.r[0], rtol=0, atol=1e-9)
         np.testing.assert_allclose(rray.r[1], riray.r[1], rtol=0, atol=1e-9)
         np.testing.assert_allclose(rray.r[2], riray.r[2], rtol=0, atol=1e-9)
         # Reflect and propagate back to t=0.
-        cray = asphere.reflect(return_ray)
+        cray = asphere.reflect(return_ray.copy())
         cray = cray.positionAtTime(0)
         np.testing.assert_allclose(cray[0], x, rtol=0, atol=1e-9)
         np.testing.assert_allclose(cray[1], y, rtol=0, atol=1e-9)

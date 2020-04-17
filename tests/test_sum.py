@@ -142,7 +142,7 @@ def test_intersect():
         rv = rv0.copy()
         rv1 = sum.intersect(rv)
         rv2 = batoid.RayVector([sum.intersect(r) for r in rv])
-        sum.intersectInPlace(rv)
+        sum.intersect(rv)
 
         assert rays_allclose(rv1, rv)
         assert rays_allclose(rv2, rv)
@@ -196,7 +196,7 @@ def test_fail():
     assert ray.failed
 
     ray = batoid.Ray([0,0,sum.sag(0,0)-1], [0,0,-1])
-    sum.intersectInPlace(ray)
+    sum.intersect(ray)
     assert ray.failed
 
 

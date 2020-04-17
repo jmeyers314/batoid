@@ -14,10 +14,10 @@ def test_rSplit():
 
         rays = batoid.rayGrid(10, 2*R, 0.0, 0.0, -1.0, 16, 500e-9, 1.0, batoid.Air())
         coating = batoid.SimpleCoating(0.9, 0.1)
-        reflectedRays = asphere.reflect(rays, coating)
+        reflectedRays = asphere.reflect(rays.copy(), coating)
         m1 = batoid.Air()
         m2 = batoid.ConstMedium(1.1)
-        refractedRays = asphere.refract(rays, m1, m2, coating)
+        refractedRays = asphere.refract(rays.copy(), m1, m2, coating)
         reflectedRays2, refractedRays2 = asphere.rSplit(rays, m1, m2, coating)
 
         assert reflectedRays == reflectedRays2

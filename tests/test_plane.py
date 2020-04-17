@@ -60,8 +60,8 @@ def test_intersect_vectorized():
 
     for i in range(100):
         plane = batoid.Plane()
-        r1s = plane.intersect(r0s)
-        r2s = batoid.RayVector([plane.intersect(r0) for r0 in r0s])
+        r1s = plane.intersect(r0s.copy())
+        r2s = batoid.RayVector([plane.intersect(r0.copy()) for r0 in r0s])
         assert r1s == r2s
 
 
@@ -84,7 +84,7 @@ def test_fail():
     assert ray.failed
 
     ray = batoid.Ray([0,0,-1], [0,0,-1])
-    plane.intersectInPlace(ray)
+    plane.intersect(ray)
     assert ray.failed
 
     # These should succeed though if allowReverse is True
@@ -95,7 +95,7 @@ def test_fail():
     assert not ray.failed
 
     ray = batoid.Ray([0,0,-1], [0,0,-1])
-    plane.intersectInPlace(ray)
+    plane.intersect(ray)
     assert not ray.failed
 
 if __name__ == '__main__':
