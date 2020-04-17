@@ -81,8 +81,8 @@ def test_intersect_vectorized():
     for i in range(100):
         R = random.gauss(0.05, 0.01)
         sphere = batoid.Sphere(R)
-        r1s = sphere.intersect(r0s)
-        r2s = batoid.RayVector([sphere.intersect(r0) for r0 in r0s])
+        r1s = sphere.intersect(r0s.copy())
+        r2s = batoid.RayVector([sphere.intersect(r0.copy()) for r0 in r0s])
         assert r1s == r2s
 
 
@@ -104,7 +104,7 @@ def test_fail():
     assert ray.failed
 
     ray = batoid.Ray([0,0,-1], [0,0,-1])
-    sphere.intersectInPlace(ray)
+    sphere.intersect(ray)
     assert ray.failed
 
 

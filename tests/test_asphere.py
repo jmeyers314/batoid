@@ -125,8 +125,8 @@ def test_intersect_vectorized():
         coefs = [random.gauss(0, 1e-10) for i in range(ncoefs)]
         asphere = batoid.Asphere(R, conic, coefs)
 
-        r1s = asphere.intersect(r0s)
-        r2s = batoid.RayVector([asphere.intersect(r0) for r0 in r0s])
+        r1s = asphere.intersect(r0s.copy())
+        r2s = batoid.RayVector([asphere.intersect(r0.copy()) for r0 in r0s])
         np.testing.assert_allclose(asphere.sag(r1s.x, r1s.y), r1s.z, rtol=0, atol=1e-12)
         assert r1s == r2s
 
@@ -181,7 +181,7 @@ def test_fail():
     assert ray.failed
 
     ray = batoid.Ray([0,0,-1], [0,0,-1])
-    asphere.intersectInPlace(ray)
+    asphere.intersect(ray)
     assert ray.failed
 
 

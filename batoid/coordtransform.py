@@ -1,4 +1,5 @@
 from . import _batoid
+import numpy as np
 
 
 class CoordTransform:
@@ -32,20 +33,13 @@ class CoordTransform:
         transformed : Ray or RayVector or array
             Result of transformation.  Type is the same as the input type.
         """
-        from .ray import Ray
-        from .rayVector import RayVector
-        if arg2 is not None:
+        if arg2 is not None:  # numpy arrays to transform (not-in-place)
             return self._coordTransform.applyForward(arg1, arg2, arg3)
-        elif isinstance(arg1, Ray):
-            return Ray._fromCPPRayVector(
-                self._coordTransform.applyForward(arg1._rv)
-            )
-        elif isinstance(arg1, RayVector):
-            return RayVector._fromCPPRayVector(
-                self._coordTransform.applyForward(arg1._rv),
-            )
-        else:
+        elif isinstance(arg1, np.ndarray):  # single np array
             return self._coordTransform.applyForward(arg1)
+        else: # Ray or RayVector
+            self._coordTransform.applyForwardInPlace(arg1._rv)
+            return arg1
 
     def applyReverse(self, arg1, arg2=None, arg3=None):
         """Apply reverse-direction transformation.
@@ -60,50 +54,13 @@ class CoordTransform:
         transformed : Ray or RayVector or array
             Result of transformation.  Type is the same as the input type.
         """
-        from .ray import Ray
-        from .rayVector import RayVector
-        if arg2 is not None:
+        if arg2 is not None:  # numpy arrays to transform (not-in-place)
             return self._coordTransform.applyReverse(arg1, arg2, arg3)
-        elif isinstance(arg1, Ray):
-            return Ray._fromCPPRayVector(
-                self._coordTransform.applyReverse(arg1._rv),
-            )
-        elif isinstance(arg1, RayVector):
-            return RayVector._fromCPPRayVector(
-                self._coordTransform.applyReverse(arg1._rv),
-            )
-        else:
+        elif isinstance(arg1, np.ndarray):  # single np array
             return self._coordTransform.applyReverse(arg1)
-
-    def applyForwardInPlace(self, r):
-        """Apply forward-direction transformation in place.
-
-        Parameters
-        ----------
-        arg : Ray or RayVector
-            Object to transform.  Return type is the same as the input type.
-
-        Returns
-        -------
-        transformed : Ray or RayVector
-            Result of transformation.  Type is the same as the input type.
-        """
-        self._coordTransform.applyForwardInPlace(r._rv)
-
-    def applyReverseInPlace(self, r):
-        """Apply reverse-direction transformation in place.
-
-        Parameters
-        ----------
-        arg : Ray or RayVector
-            Object to transform.  Return type is the same as the input type.
-
-        Returns
-        -------
-        transformed : Ray or RayVector
-            Result of transformation.  Type is the same as the input type.
-        """
-        self._coordTransform.applyReverseInPlace(r._rv)
+        else: # Ray or RayVector
+            self._coordTransform.applyReverseInPlace(arg1._rv)
+            return arg1
 
     def __eq__(self, rhs):
         if not isinstance(rhs, CoordTransform): return False

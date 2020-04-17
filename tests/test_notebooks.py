@@ -39,12 +39,14 @@ notebooks = [
     "Aspheric Newtonian Telescope.ipynb",
     "DECam perturbations.ipynb",
     "DECam trace.ipynb",
+    "DESI model details.ipynb",
     "DESI trace.ipynb",
     "Distortion.ipynb",
     "HSC 3D.ipynb",
     "HSC perturbations.ipynb",
     "HSC trace.ipynb",
     "Huygens PSF.ipynb",
+    "LSST Coordinate Systems.ipynb",
     "LSST perturbations.ipynb",
     "LSST trace.ipynb",
     "Newtonian Telescope.ipynb",
@@ -64,7 +66,9 @@ def test_notebook(notebook_name):
 if __name__ == '__main__':
     notebooks.extend([
         "FFT vs Huygens.ipynb",
+        "HSC ghosts.ipynb",
         "LSST donuts.ipynb",
+        "LSST ghosts.ipynb",
         "PH != Pupil.ipynb",
     ])
     for notebook in notebooks:

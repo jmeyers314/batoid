@@ -284,20 +284,23 @@ class Interface(Optic):
         Parameters
         ----------
         r : `batoid.Ray` or `batoid.RayVector`
-            Input ray(s) to trace
+            Input ray(s) to trace, transforming in place.
         reverse : bool
             Trace through optical element in reverse?  Default: False
 
         Returns
         -------
         `batoid.Ray` or `batoid.RayVector`
-            Output ray(s)
+            Reference to transformed input ray(s).
 
         Notes
         -----
-        Returned rays will be expressed in the local coordinate system of the
-        Optic.  See `Ray.toCoordSys` or `RayVector.toCoordSys` to express rays
-        in a different coordinate system.
+        This operation is performed in place; the return value is a reference to
+        the transformed input `Ray` or `RayVector`.
+
+        The transformed rays will be expressed in the local coordinate system of
+        the Optic.  See `Ray.toCoordSys` or `RayVector.toCoordSys` to express
+        rays in a different coordinate system.
 
         Also, you may need to reverse the directions of rays if using this
         method with `reverse=True`.
@@ -306,10 +309,10 @@ class Interface(Optic):
             return r
 
         # refract, reflect, pass-through - depending on subclass
-        r = self.interact(r, reverse=reverse)
+        self.interact(r, reverse=reverse)
 
         if self.obscuration is not None:
-            r = self.obscuration.obscure(r)
+            self.obscuration.obscure(r)
 
         return r
 
@@ -348,43 +351,9 @@ class Interface(Optic):
             result[self.name] = {
                 'name':self.name,
                 'in':r,
-                'out':self.trace(r)
+                'out':self.trace(r.copy())
             }
         return result
-
-    def traceInPlace(self, r):
-        """Trace ray(s) through this optical element in place (result replaces
-        input Ray or RayVector)
-
-        Parameters
-        ----------
-        r : batoid.Ray or batoid.RayVector
-            Input ray(s) to trace
-
-        Returns
-        -------
-        Ray or RayVector
-
-        Notes
-        -----
-        The return Ray or RayVector is present for convenience, but is actually
-        an alias for the input Ray or RayVector that has had its values
-        replaced.
-
-        Returned rays will be expressed in the local coordinate system of the
-        Optic.  See `Ray.toCoordSys` or `RayVector.toCoordSys` to express rays
-        in a different coordinate system.
-        """
-        if self.skip:
-            return r
-
-        # refract, reflect, pass-through - depending on subclass
-        self.interactInPlace(r)
-
-        if self.obscuration is not None:
-            self.obscuration.obscureInPlace(r)
-
-        return r
 
     def traceSplit(self, r, minFlux=1e-3, reverse=False, _verbose=False):
         """Trace ray(s) through this optical element, splitting the return
@@ -432,8 +401,8 @@ class Interface(Optic):
 
         # For now, apply obscuration equally forwards and backwards
         if self.obscuration is not None:
-            self.obscuration.obscureInPlace(rForward)
-            self.obscuration.obscureInPlace(rReverse)
+            self.obscuration.obscure(rForward)
+            self.obscuration.obscure(rReverse)
         if not hasattr(r, 'path'):
             rForward.path = [self.name]
             rReverse.path = [self.name]
@@ -449,9 +418,6 @@ class Interface(Optic):
     def interact(self, r, reverse=False):
         # intersect independent of `reverse`
         return self.surface.intersect(r, coordSys=self.coordSys)
-
-    def interactInPlace(self, r):
-        self.surface.intersectInPlace(r, coordSys=self.coordSys)
 
     def __eq__(self, other):
         if not self.__class__ == other.__class__:
@@ -589,11 +555,6 @@ class RefractiveInterface(Interface):
             m1, m2 = self.inMedium, self.outMedium
         return self.surface.refract(r, m1, m2, coordSys=self.coordSys)
 
-    def interactInPlace(self, r):
-        self.surface.refractInPlace(
-            r, self.inMedium, self.outMedium, coordSys=self.coordSys
-        )
-
     def rSplit(self, r, reverse=False):
         if not reverse:
             reflectedR, refractedR = self.surface.rSplit(
@@ -630,9 +591,6 @@ class Mirror(Interface):
     def interact(self, r, reverse=False):
         # reflect independent of reverse
         return self.surface.reflect(r, coordSys=self.coordSys)
-
-    def interactInPlace(self, r):
-        self.surface.reflectInPlace(r, coordSys=self.coordSys)
 
     def rSplit(self, r, reverse=False):
         if not reverse:
@@ -792,17 +750,20 @@ class CompoundOptic(Optic):
         Parameters
         ----------
         r : `batoid.Ray` or `batoid.RayVector`
-            Input ray(s) to trace
+            Input ray(s) to trace, transforming in place.
         reverse : bool
             Trace through optical element in reverse?  Default: False
 
         Returns
         -------
         `batoid.Ray` or `batoid.RayVector`
-            Output ray(s)
+            Reference to transformed input ray(s).
 
         Notes
         -----
+        This operation is performed in place; the return value is a reference to
+        the transformed input `Ray` or `RayVector`.
+
         Returned rays will be expressed in the local coordinate system of the
         last element of the CompoundOptic.  See `Ray.toCoordSys` or
         `RayVector.toCoordSys` to express rays in a different coordinate
@@ -816,7 +777,7 @@ class CompoundOptic(Optic):
         items = self.items if not reverse else reversed(self.items)
         for item in items:
             if not item.skip:
-                r = item.trace(r, reverse=reverse)
+                item.trace(r, reverse=reverse)
         return r
 
     def traceFull(self, r, _path=None):
@@ -867,6 +828,7 @@ class CompoundOptic(Optic):
                     i += 1
             direction = "forward"
             r_in = r
+            # Do the actual tracing here.
             for i in range(len(_path)-1):
                 currentName = _path[i]
                 nextName = _path[i+1]
@@ -878,29 +840,28 @@ class CompoundOptic(Optic):
                         # refractive interface.  Just do that manually here.
                         direction = "reverse"
                         if item.skip:
-                            r_out = r_in
+                            r_out = r_in.copy()
                         else:
                             r_out = item.surface.reflect(
-                                r_in, coordSys=item.coordSys
+                                r_in.copy(), coordSys=item.coordSys
                             )
                         if item.obscuration is not None:
-                            r_out = item.obscuration.obscure(r_out)
+                            item.obscuration.obscure(r_out)
                     else:
-                        r_out = item.trace(r_in)
+                        r_out = item.trace(r_in.copy())
                 else: # direct == "reverse"
                     if nominalOrder[nextName] > nominalOrder[currentName]:
                         direction = "forward"
                         if item.skip:
-                            r_out = r_in
+                            r_out = r_in.copy()
                         else:
                             r_out = item.surface.reflect(
-                                r_in, coordSys=item.coordSys
+                                r_in.copy(), coordSys=item.coordSys
                             )
                         if item.obscuration is not None:
-                            r_out = item.obscuration.obscure(r_out)
+                            item.obscuration.obscure(r_out)
                     else:
-                        r_out = item.trace(r_in, reverse=True)
-                # r_out = item.trace(r_in)
+                        r_out = item.trace(r_in.copy(), reverse=True)
                 key = item.name+'_0'
                 j = 1
                 while key in result:
@@ -908,17 +869,20 @@ class CompoundOptic(Optic):
                     j += 1
                 result[key] = {
                     'name':item.name,
-                    'in':r_in,
-                    'out':r_out
+                    'in':r_in.copy(),
+                    'out':r_out.copy()
                 }
                 r_in = r_out
             # last item in _path.  Just intersect it.
             currentName = _path[-1]
             item = self[currentName]
             if item.skip:
-                r_out = r_in
+                r_out = r_in.copy()
             else:
-                r_out = item.surface.intersect(r_in, coordSys=item.coordSys)
+                r_out = item.surface.intersect(
+                    r_in.copy(),
+                    coordSys=item.coordSys
+                )
             key = item.name+'_0'
             j = 1
             while key in result:
@@ -926,41 +890,11 @@ class CompoundOptic(Optic):
                 j += 1
             result[key] = {
                 'name':item.name,
-                'in':r_in,
-                'out':r_out
+                'in':r_in.copy(),
+                'out':r_out.copy()
             }
 
         return result
-
-    def traceInPlace(self, r):
-        """Recursively trace ray(s) through this `CompoundOptic` in place
-        (result replaces input `Ray` or `RayVector`)
-
-        Parameters
-        ----------
-        r : `batoid.Ray` or `batoid.RayVector`
-            Input ray(s) to trace
-
-        Returns
-        -------
-        `Ray` or `RayVector`
-
-        Notes
-        -----
-        The return `Ray` or `RayVector` is present for convenience, but is
-        actually an alias for the input `Ray` or `RayVector` that has had its
-        values replaced.
-
-        Returned rays will be expressed in the local coordinate system of the
-        last element of the CompoundOptic.  See `Ray.toCoordSys` or
-        `RayVector.toCoordSys` to express rays in a different coordinate
-        system.
-        """
-        if self.skip:
-            return r
-        for item in self.items:
-            r = item.traceInPlace(r)
-        return r
 
     def traceSplit(self, r, minFlux=1e-3, reverse=False, _verbose=False):
         """Recursively trace ray(s) through this `CompoundOptic`, splitting at
@@ -1035,9 +969,9 @@ class CompoundOptic(Optic):
                 raise RuntimeError("Shouldn't get here!")
 
             for rr in rForward:
-                rr.trimVignettedInPlace(minFlux)
+                rr.trimVignetted(minFlux)
             for rr in rReverse:
-                rr.trimVignettedInPlace(minFlux)
+                rr.trimVignetted(minFlux)
 
             for rr in rForward:
                 if len(rr) > 0:

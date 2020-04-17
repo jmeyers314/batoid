@@ -257,7 +257,7 @@ def test_rayGrid():
     # Check that ray that intersects at origin is initially dist away.
     # Need the ray that is in the middle in both dimensions...
     idx = np.ravel_multi_index((nside//2, nside//2), (nside, nside))
-    rays.propagateInPlace(dist*1.2)
+    rays.propagate(dist*1.2)
     np.testing.assert_equal(rays[idx].r, [0,0,0])
     # but mean position won't be the origin, since lattice implies off-center
     assert np.linalg.norm(np.mean(rays.r, axis=0)) > 0.5
@@ -270,7 +270,7 @@ def test_rayGrid():
     # "Central" ray will not intersect origin in this case, but average of
     # all rays should be the origin
     idx = np.ravel_multi_index((nside//2, nside//2), (nside, nside))
-    rays.propagateInPlace(dist*1.2)
+    rays.propagate(dist*1.2)
     assert np.linalg.norm(rays[idx].r) > 0.1
     np.testing.assert_allclose(np.linalg.norm(np.mean(rays.r, axis=0)), 0.0, rtol=0, atol=1e-14)
 
@@ -281,7 +281,7 @@ def test_rayGrid():
         lattice=False
     )
     idx = np.ravel_multi_index((nside//2, nside//2), (nside, nside))
-    rays.propagateInPlace(dist*1.2)
+    rays.propagate(dist*1.2)
     np.testing.assert_allclose(rays[idx].r, [0,0,0], rtol=0, atol=1e-14)
     np.testing.assert_allclose(np.linalg.norm(np.mean(rays.r, axis=0)), 0.0, rtol=0, atol=1e-14)
 
@@ -373,7 +373,7 @@ def test_pointSourceCircularGrid():
     # Verify that the central ray is pointed at the origin
     # (last ray is central if inner==0.0)
     centerRay = rays[len(rays)-1]
-    centerRay.propagateInPlace(np.sqrt(101))
+    centerRay.propagate(np.sqrt(101))
     np.testing.assert_allclose(centerRay.r, [0,0,0], rtol=0, atol=1e-10)
 
 
@@ -475,7 +475,7 @@ def test_RVasGrid():
 
         # Check distribution of points propagated to entrance pupil
         pupil = batoid.Plane()
-        pupil.intersectInPlace(grid1)
+        pupil.intersect(grid1)
         np.testing.assert_allclose(np.diff(grid1.x)[0], dx)
         np.testing.assert_allclose(np.diff(grid1.y)[0], 0, atol=1e-14)
         np.testing.assert_allclose(np.diff(grid1.x)[nx-1], -dx*(nx-1))
@@ -532,7 +532,7 @@ def test_RVasGrid():
 
         # Check distribution of points propagated to entrance pupil
         pupil = batoid.Plane()
-        pupil.intersectInPlace(grid1)
+        pupil.intersect(grid1)
         np.testing.assert_allclose(np.diff(grid1.x)[0], dx)
         np.testing.assert_allclose(np.diff(grid1.y)[0], 0, atol=1e-14)
         np.testing.assert_allclose(np.diff(grid1.x)[nx-1], -dx*(nx-1))
@@ -556,7 +556,7 @@ def test_RVasGrid():
 
         # Check that projected points are inside region
         pupil = batoid.Plane()
-        pupil.intersectInPlace(rays)
+        pupil.intersect(rays)
         np.testing.assert_allclose(rays.z, 0.0)
         np.testing.assert_array_less(rays.x, 0.5)
         np.testing.assert_array_less(rays.y, 0.5)
@@ -616,7 +616,7 @@ def test_RVasPolar():
 
         # Check distribution of points propagated to entrance pupil
         pupil = batoid.Plane()
-        pupil.intersectInPlace(rays)
+        pupil.intersect(rays)
         np.testing.assert_allclose(rays[len(rays)-1].x, 0, atol=1e-14)
         np.testing.assert_allclose(rays[len(rays)-1].y, 0, atol=1e-14)
         np.testing.assert_allclose(rays[len(rays)-1].z, 0, atol=1e-14)
@@ -656,7 +656,7 @@ def test_RVasSpokes():
         assert len(rays) == spokes*rings
 
         pupil = batoid.Plane()
-        pupil.intersectInPlace(rays)
+        pupil.intersect(rays)
         radii = np.hypot(rays.x, rays.y)
         ths = np.arctan2(rays.y, rays.x)
 
@@ -680,7 +680,7 @@ def test_RVasSpokes():
         )
 
         pupil = batoid.Plane()
-        pupil.intersectInPlace(rays)
+        pupil.intersect(rays)
         radii = np.hypot(rays.x, rays.y)
         ths = np.arctan2(rays.y, rays.x)
 
@@ -708,7 +708,7 @@ def test_RVasSpokes():
         assert len(rays) == spokes*rings
 
         pupil = batoid.Plane()
-        pupil.intersectInPlace(rays)
+        pupil.intersect(rays)
         radii = np.hypot(rays.x, rays.y)
         ths = np.arctan2(rays.y, rays.x)
 
