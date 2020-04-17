@@ -422,7 +422,7 @@ class Interface(Optic):
         """
         if _verbose:
             s = "forward" if not reverse else "reverse"
-            strtemplate = ("traceSplit {s}       {:15s} "
+            strtemplate = ("traceSplit {}       {:15s} "
                            "flux = {:18.8f}   nphot = {:10d}")
             print(strtemplate.format(s, self.name, np.sum(r.flux), len(r)))
         if self.skip:
