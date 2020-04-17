@@ -42,8 +42,8 @@ for angle in angles:
     print("# forward output rays = {}".format(sum(len(rr) for rr in rForward)))
     print("# reverse output rays = {}".format(sum(len(rr) for rr in rReverse)))
     print("input flux          = {}".format(np.sum(rays.flux)))
-    forwardFlux = np.sum(sum(rr.flux) for rr in rForward)
-    reverseFlux = np.sum(sum(rr.flux) for rr in rReverse)
+    forwardFlux = np.sum([np.sum(rr.flux) for rr in rForward])
+    reverseFlux = np.sum([np.sum(rr.flux) for rr in rReverse])
     print("forward output flux = {}".format(forwardFlux))
     print("reverse output flux = {}".format(reverseFlux))
     print("destroyed flux      = {}".format(
