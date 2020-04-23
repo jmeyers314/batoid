@@ -114,7 +114,7 @@ class Interface(Optic):
     """
     def __init__(self, surface, obscuration=None, **kwargs):
         Optic.__init__(self, **kwargs)
-
+        self.path = [self.name]
         self.surface = surface
         self.obscuration = obscuration
 
@@ -681,6 +681,7 @@ class CompoundOptic(Optic):
     def __init__(self, items, **kwargs):
         Optic.__init__(self, **kwargs)
         self.items = tuple(items)
+        self.path = [name for item in self.items for name in item.path]
 
     @lazy_property
     def itemDict(self):
@@ -1352,8 +1353,7 @@ class Lens(CompoundOptic):
         Other parameters to forward to Optic.__init__
     """
     def __init__(self, items, medium, **kwargs):
-        Optic.__init__(self, **kwargs)
-        self.items = tuple(items)
+        CompoundOptic.__init__(self, items, **kwargs)
         self.medium = medium
 
     def __eq__(self, other):
