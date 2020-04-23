@@ -1,52 +1,58 @@
 language: python
+os: linux
+dist: xenial
 
-matrix:
+python:
+  - 3.6
+  - 3.7
+  - 3.8
+
+compiler:
+  - gcc
+
+jobs:
   include:
-    - python: 3.5
-      env:
-        - COMPILER=gcc
-        - CC=gcc
-        - CXX=g++
-
-    - python: 3.6
-      env:
-        - COMPILER=gcc
-        - CC=gcc
-        - CXX=g++
-
-    # Add 3.7 builds by hand.  This is the officially supported method for now.
-    - python: 3.7
-      dist: xenial
-      sudo: true
-      env:
-        - COMPILER=gcc
-        - CC=gcc
-        - CXX=g++
-        - CMAKE_COVER=1
-
-    - python: 3.7
-      dist: xenial
-      sudo: true
+    - python: 3.8
       env:
         - COMPILER=clang
         - CC=clang
         - CXX=clang++
         - LD_LIBRARY_PATH=/usr/local/clang/lib:$LD_LIBRARY_PATH
+      name: Linux clang (Python 3.8)
+
+    - os: osx
+      osx_image: xcode9.4  # python 3.6.5
+      language: shell
+      env:
+        - TRAVIS_PYTHON_VERSION=3.6
+      name: OSX (Python 3.6)
+
+    - os: osx
+      osx_image: xcode11  # python 3.7.4
+      language: shell
+      env:
+        - TRAVIS_PYTHON_VERSION=3.7
+      name: OSX (Python 3.7)
 
 before_install:
   - export EIGEN_DIR=$PWD/eigen/
-  - sudo apt-get install -y libfftw3-dev
-  - pip install -r requirements.txt
-  - pip install -r test_requirements.txt
+  - if [[ $TRAVIS_OS_NAME == "linux" ]]; then sudo apt-get install -y libfftw3-dev; fi
+  - if [[ $TRAVIS_OS_NAME == "osx" ]]; then brew update; brew install fftw; fi
+  - if [[ $TRAVIS_OS_NAME == "osx" ]]; then export PIP=pip3; export PYTHON=python3; else export PIP=pip; export PYTHON=python; fi
+  - if [[ $TRAVIS_OS_NAME == "osx" ]]; then brew install ccache; export PATH="/usr/local/opt/ccache/libexec:$PATH"; fi
 
 cache:
+  ccache: true
+  pip: true
   directories:
     - $HOME/.cache/pip
     - $HOME/Library/Caches/pip
+    - $HOME/Library/Caches/Homebrew
 
 install:
-  - export CMAKE_VERBOSE_MAKEFILE=1
-  - python setup.py develop
+  - $PIP install -r requirements.txt
+  - $PIP install -r test_requirements.txt
+  - CMAKE_VERBOSE_MAKEFILE=1 $PYTHON setup.py develop
 
 script:
   - echo $PWD
@@ -56,3 +62,8 @@ after_success:
   - find ./build -iname "*.gcno" | grep /src/ | xargs -I{} gcov-4.8 {}
   - find ./build -iname "*.gcno" | grep /pysrc/ | xargs -I{} gcov-4.8 {}
   - bash <(curl -s https://codecov.io/bash)
+
+before_cache:
+  - rm -rfv $HOME/.cache/pip/log
+  - rm -rfv $HOME/.cache/pip/http
+  - if [[ $TRAVIS_OS_NAME == "osx" ]]; then brew cleanup; fi
