@@ -745,7 +745,7 @@ class CompoundOptic(Optic):
             del nameDict[name]
         return nameDict
 
-    def trace(self, r, reverse=False):
+    def trace(self, r, reverse=False, path=None):
         """Recursively trace through all subitems of this `CompoundOptic`.
 
         Parameters
@@ -754,6 +754,11 @@ class CompoundOptic(Optic):
             Input ray(s) to trace, transforming in place.
         reverse : bool
             Trace through optical element in reverse?  Default: False
+        path : list of names of Interfaces.
+            Trace through the optical system in this order, as opposed to the
+            natural order.  Useful for investigating particular ghost images.
+            Note that items included in path will not be skipped, even if their
+            skip attribute is true.
 
         Returns
         -------
@@ -773,12 +778,48 @@ class CompoundOptic(Optic):
         Also, you may need to reverse the directions of rays if using this
         method with `reverse=True`.
         """
-        if self.skip:
-            return r  # Should probably make a copy()?
-        items = self.items if not reverse else reversed(self.items)
-        for item in items:
-            if not item.skip:
-                item.trace(r, reverse=reverse)
+        if path is None:
+            if self.skip:
+                return r
+            items = self.items if not reverse else reversed(self.items)
+            for item in items:
+                if not item.skip:
+                    item.trace(r, reverse=reverse)
+        else:
+            # establish nominal order of elements by building dict
+            # of name -> order
+            i = 0
+            nominalOrder = {}
+            for name in path:
+                if name not in nominalOrder.keys():
+                    nominalOrder[name] = i
+                    i += 1
+            direction = "forward"
+            for i in range(len(path)-1):
+                currentName = path[i]
+                nextName = path[i+1]
+                item = self[currentName]
+                # logic to decide when to reverse direction
+                if direction == "forward":
+                    if nominalOrder[nextName] < nominalOrder[currentName]:
+                        direction = "reverse"
+                        item.surface.reflect(r, coordSys=item.coordSys)
+                        if item.obscuration is not None:
+                            item.obscuration.obscure(r)
+                    else:
+                        item.trace(r)
+                else:  # direction == "reverse"
+                    if nominalOrder[nextName] > nominalOrder[currentName]:
+                        direction = "forward"
+                        item.surface.reflect(r, coordSys=item.coordSys)
+                        if item.obscuration is not None:
+                            item.obscuration.obscure(r)
+                    else:
+                        item.trace(r, reverse=True)
+            # last item in path.  Just intersect it.
+            currentName = path[-1]
+            item = self[currentName]
+            item.surface.intersect(r, coordSys=item.coordSys)
         return r
 
     def traceFull(self, r, path=None):
@@ -792,6 +833,8 @@ class CompoundOptic(Optic):
         path : list of names of Interfaces.
             Trace through the optical system in this order, as opposed to the
             natural order.  Useful for investigating particular ghost images.
+            Note that items included in path will not be skipped, even if their
+            skip attribute is true.
 
         Returns
         -------
@@ -843,12 +886,9 @@ class CompoundOptic(Optic):
                         # reversing direction always means reflecting at a
                         # refractive interface.  Just do that manually here.
                         direction = "reverse"
-                        if item.skip:
-                            r_out = r_in.copy()
-                        else:
-                            r_out = item.surface.reflect(
-                                r_in.copy(), coordSys=item.coordSys
-                            )
+                        r_out = item.surface.reflect(
+                            r_in.copy(), coordSys=item.coordSys
+                        )
                         if item.obscuration is not None:
                             item.obscuration.obscure(r_out)
                     else:
@@ -856,12 +896,9 @@ class CompoundOptic(Optic):
                 else: # direct == "reverse"
                     if nominalOrder[nextName] > nominalOrder[currentName]:
                         direction = "forward"
-                        if item.skip:
-                            r_out = r_in.copy()
-                        else:
-                            r_out = item.surface.reflect(
-                                r_in.copy(), coordSys=item.coordSys
-                            )
+                        r_out = item.surface.reflect(
+                            r_in.copy(), coordSys=item.coordSys
+                        )
                         if item.obscuration is not None:
                             item.obscuration.obscure(r_out)
                     else:
@@ -880,13 +917,10 @@ class CompoundOptic(Optic):
             # last item in path.  Just intersect it.
             currentName = path[-1]
             item = self[currentName]
-            if item.skip:
-                r_out = r_in.copy()
-            else:
-                r_out = item.surface.intersect(
-                    r_in.copy(),
-                    coordSys=item.coordSys
-                )
+            r_out = item.surface.intersect(
+                r_in.copy(),
+                coordSys=item.coordSys
+            )
             key = item.name+'_0'
             j = 1
             while key in result:
@@ -1350,30 +1384,13 @@ class Lens(CompoundOptic):
     ----------
     items : list of `batoid.Optic`, len (2,)
         Subitems making up this compound optic.
-    medium : `batoid.Medium`
-        The refractive index medium internal to the lens.
     **kwargs :
-        Other parameters to forward to Optic.__init__
+        Other parameters to forward to CompoundOptic.__init__
     """
-    def __init__(self, items, medium, **kwargs):
+    def __init__(self, items, **kwargs):
         CompoundOptic.__init__(self, items, **kwargs)
-        self.medium = medium
-
-    def __eq__(self, other):
-        if not CompoundOptic.__eq__(self, other):
-            return False
-        return self.medium == other.medium
-
-    def __repr__(self):
-        out = ("{!s}([{!r}, {!r}], {!r}".format(
-            self.__class__.__name__, self.items[0], self.items[1], self.medium
-        ))
-        out += Optic._repr_helper(self)
-        out += ")"
-        return out
-
-    def __hash__(self):
-        return hash((self.medium, CompoundOptic.__hash__(self)))
+        assert len(items) == 2
+        assert items[0].outMedium == items[1].inMedium
 
     def draw2d(self, ax, **kwargs):
         """Specialized draw2d for `Lens` instances.
@@ -1417,288 +1434,6 @@ class Lens(CompoundOptic):
                     horizontalalignment='center', verticalalignment='center')
         else:
             super(Lens, self).draw2d(ax, only=only, **kwargs)
-
-    def withGlobalShift(self, shift):
-        """Return a new `Lens` with its coordinate system shifted (and the
-        coordinate systems of all subitems)
-
-        Parameters
-        ----------
-        shift : array (3,)
-            The coordinate shift, relative to the global coordinate system, to
-            apply to self.coordSys
-
-        Returns
-        -------
-        `Lens`
-            Shifted optic.
-        """
-        newItems = [item.withGlobalShift(shift) for item in self.items]
-        ret = self.__class__.__new__(self.__class__)
-        newDict = dict(self.__dict__)
-        newDict['coordSys'] = self.coordSys.shiftGlobal(shift)
-        del newDict['items']
-        del newDict['medium']
-        ret.__init__(
-            newItems, self.medium,
-            **newDict
-        )
-        return ret
-
-    def withLocalShift(self, shift):
-        """Return a new `Lens` with its coordinate system shifted.
-
-        Parameters
-        ----------
-        shift : array (3,)
-            The coordinate shift, relative to the local coordinate system, to
-            apply to self.coordSys
-
-        Returns
-        -------
-        `Lens`
-            Shifted interface.
-        """
-        # Clearer to apply the rotated global shift.
-        return self.withGlobalShift(np.dot(self.coordSys.rot, shift))
-
-    def withGloballyShiftedOptic(self, name, shift):
-        """Return a new `Lens` with the coordinate system of one of its
-        subitems shifted.
-
-        Parameters
-        ----------
-        name : str
-            The subitem to shift.
-        shift : array (3,)
-            The coordinate shift, relative to the global coordinate system, to
-            apply to the subitem's coordSys.
-
-        Returns
-        -------
-        `Lens`
-            Lens with shifted surface.
-        """
-        # If name is one of items.names, the we use withGlobalShift, and we're
-        # done.  If not, then we need to recurse down to whicever item contains
-        # name.  First verify that name is in self.itemDict
-        if name in self._names:
-            name = self._names[name]
-        if name not in self.itemDict:
-            raise ValueError("Optic {} not found".format(name))
-        if name == self.name:
-            return self.withGlobalShift(shift)
-        # Clip off leading token
-        assert name[:len(self.name)+1] == \
-            self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
-        name = name[len(self.name)+1:]
-        newItems = []
-        newDict = dict(self.__dict__)
-        del newDict['items']
-        del newDict['medium']
-        for i, item in enumerate(self.items):
-            if name.startswith(item.name):
-                if name == item.name:
-                    newItems.append(item.withGlobalShift(shift))
-                else:
-                    newItems.append(item.withGloballyShiftedOptic(name, shift))
-                newItems.extend(self.items[i+1:])
-                return self.__class__(
-                    newItems, self.medium,
-                    **newDict
-                )
-            newItems.append(item)
-        raise RuntimeError(
-            "Error in withGloballyShiftedOptic!, Shouldn't get here!"
-        )
-
-    def withLocallyShiftedOptic(self, name, shift):
-        """Return a new `Lens` with the coordinate system of one of its
-        subitems shifted.
-
-        Parameters
-        ----------
-        name : str
-            The subitem to shift.
-        shift : array (3,)
-            The coordinate shift, relative to the global coordinate system, to
-            apply to the subitem's coordSys.
-
-        Returns
-        -------
-        `Lens`
-            Lens with shifted surface.
-        """
-        # If name is one of items.names, the we use withGlobalShift, and we're
-        # done.  If not, then we need to recurse down to whicever item contains
-        # name.  First verify that name is in self.itemDict
-        if name in self._names:
-            name = self._names[name]
-        if name not in self.itemDict:
-            raise ValueError("Optic {} not found".format(name))
-        if name == self.name:
-            return self.withLocalShift(shift)
-        # Clip off leading token
-        assert name[:len(self.name)+1] == \
-            self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
-        name = name[len(self.name)+1:]
-        newItems = []
-        newDict = dict(self.__dict__)
-        del newDict['items']
-        del newDict['medium']
-        for i, item in enumerate(self.items):
-            if name.startswith(item.name):
-                if name == item.name:
-                    newItems.append(item.withLocalShift(shift))
-                else:
-                    newItems.append(item.withLocallyShiftedOptic(name, shift))
-                newItems.extend(self.items[i+1:])
-                return self.__class__(
-                    newItems, self.medium,
-                    **newDict
-                )
-            newItems.append(item)
-        raise RuntimeError(
-            "Error in withLocallyShiftedOptic!, Shouldn't get here!"
-        )
-
-    def withLocalRotation(self, rot, rotOrigin=None, coordSys=None):
-        """Return a new `Lens` with its coordinate system rotated.
-
-        Parameters
-        ----------
-        rot : array (3,3)
-            Rotation matrix wrt to the local coordinate system to apply.
-        rotOrigin : array (3,)
-            Origin of rotation.  Default: None means use [0,0,0]
-        coordSys : `batoid.CoordSys`
-            Coordinate system of rotOrigin above.  Default: None means use
-            self.coordSys.
-
-        Returns
-        -------
-        `Lens`
-            Rotated lens.
-        """
-        if rotOrigin is None and coordSys is None:
-            coordSys = self.coordSys
-            rotOrigin = [0,0,0]
-        newItems = [item.withLocalRotation(rot, rotOrigin, coordSys)
-                    for item in self.items]
-        newDict = dict(self.__dict__)
-        newDict['coordSys'] = self.coordSys.rotateLocal(
-            rot, rotOrigin, coordSys
-        )
-        del newDict['items']
-        del newDict['medium']
-        ret = self.__class__.__new__(self.__class__)
-        ret.__init__(
-            newItems, self.medium,
-            **newDict
-        )
-        return ret
-
-    def withLocallyRotatedOptic(self, name, rot, rotOrigin=None, coordSys=None):
-        """Return a new `Lens` with the coordinate system of one of its
-        surfaces rotated.
-
-        Parameters
-        ----------
-        name : str
-            The subitem to rotate.
-        rot : array (3,3)
-            Rotation matrix wrt to the subitem's local coordinate system to
-            apply.
-        rotOrigin : array (3,)
-            Origin of rotation.  Default: None means use [0,0,0]
-        coordSys : `batoid.CoordSys`
-            Coordinate system of rotOrigin above.  Default: None means use the
-            coordinate system of the subitem being rotated.
-
-        Returns
-        -------
-        `Lens`
-            Lens with rotated surface.
-        """
-        # If name is one of items.names, the we use withLocalRotation, and
-        # we're done.  If not, then we need to recurse down to whichever item
-        # contains name.  First verify that name is in self.itemDict
-        if name in self._names:
-            name = self._names[name]
-        if name not in self.itemDict:
-            raise ValueError("Optic {} not found".format(name))
-        if name == self.name:
-            return self.withLocalRotation(rot, rotOrigin, coordSys)
-        if rotOrigin is None and coordSys is None:
-            coordSys = self.itemDict[name].coordSys
-            rotOrigin = [0,0,0]
-        # Clip off leading token
-        assert name[:len(self.name)+1] == \
-            self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
-        name = name[len(self.name)+1:]
-        newItems = []
-        newDict = dict(self.__dict__)
-        del newDict['items']
-        del newDict['medium']
-        for i, item in enumerate(self.items):
-            if name.startswith(item.name):
-                if name == item.name:
-                    newItems.append(item.withLocalRotation(
-                        rot, rotOrigin, coordSys
-                    ))
-                else:
-                    newItems.append(item.withLocallyRotatedOptic(
-                        name, rot, rotOrigin, coordSys
-                    ))
-                newItems.extend(self.items[i+1:])
-                return self.__class__(
-                    newItems, self.medium,
-                    **newDict
-                )
-            newItems.append(item)
-        raise RuntimeError(
-            "Error in withLocallyRotatedOptic!, Shouldn't get here!"
-        )
-
-    def withSurface(self, name, surface):
-        """Return a new `Lens` with one of its surfaces replaced.
-
-        Parameters
-        ----------
-        name : str
-            Which surface to replace.
-        surface : `batoid.Surface`
-            New replacement surface.
-
-        Returns
-        -------
-        `Lens`
-            Lens with new surface.
-        """
-        if name in self._names:
-            name = self._names[name]
-        if name not in self.itemDict:
-            raise ValueError("Optic {} not found".format(name))
-        # name is fully qualified, so clip off leading token
-        assert name[:len(self.name)+1] == \
-            self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
-        name = name[len(self.name)+1:]
-        newItems = []
-        newDict = dict(self.__dict__)
-        del newDict['items']
-        for i, item in enumerate(self.items):
-            if name.startswith(item.name):
-                if name == item.name:
-                    newItems.append(item.withSurface(surface))
-                else:
-                    newItems.append(item.withSurface(name, surface))
-                newItems.extend(self.items[i+1:])
-                return self.__class__(
-                    newItems,
-                    **newDict
-                )
-            newItems.append(item)
-        raise RuntimeError("Error in withSurface.  Shouldn't get here!")
 
 
 def getGlobalRays(traceFull, start=None, end=None, globalSys=globalCoordSys):

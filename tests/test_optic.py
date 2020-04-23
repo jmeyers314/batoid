@@ -240,11 +240,14 @@ def test_ne():
             [batoid.Mirror(batoid.Plane()),
              batoid.Baffle(batoid.Plane())]
         ),
+        batoid.CompoundOptic(
+            [batoid.RefractiveInterface(batoid.Plane()),
+             batoid.RefractiveInterface(batoid.Plane())]
+        ),
         batoid.Lens(
             [batoid.RefractiveInterface(batoid.Plane()),
-             batoid.RefractiveInterface(batoid.Plane())],
-            batoid.ConstMedium(1.1)
-        )
+             batoid.RefractiveInterface(batoid.Plane())]
+        ),
     ]
     all_obj_diff(objs)
 
