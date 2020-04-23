@@ -781,7 +781,7 @@ class CompoundOptic(Optic):
                 item.trace(r, reverse=reverse)
         return r
 
-    def traceFull(self, r, _path=None):
+    def traceFull(self, r, path=None):
         """Recursively trace ray(s) through this `CompoundOptic`, returning a
         full history of all surface intersections.
 
@@ -789,6 +789,9 @@ class CompoundOptic(Optic):
         ----------
         r : `batoid.Ray` or `batoid.RayVector`
             Input ray(s) to trace
+        path : list of names of Interfaces.
+            Trace through the optical system in this order, as opposed to the
+            natural order.  Useful for investigating particular ghost images.
 
         Returns
         -------
@@ -810,7 +813,7 @@ class CompoundOptic(Optic):
         `RayVector.toCoordSys`.
         """
         result = OrderedDict()
-        if _path is None:
+        if path is None:
             if not self.skip:
                 r_in = r
                 for item in self.items:
@@ -823,16 +826,16 @@ class CompoundOptic(Optic):
             # of name -> order
             i = 0
             nominalOrder = {}
-            for name in _path:
+            for name in path:
                 if name not in nominalOrder.keys():
                     nominalOrder[name] = i
                     i += 1
             direction = "forward"
             r_in = r
             # Do the actual tracing here.
-            for i in range(len(_path)-1):
-                currentName = _path[i]
-                nextName = _path[i+1]
+            for i in range(len(path)-1):
+                currentName = path[i]
+                nextName = path[i+1]
                 item = self[currentName]
                 # need logic to decide when to reverse direction
                 if direction == "forward":
@@ -874,8 +877,8 @@ class CompoundOptic(Optic):
                     'out':r_out.copy()
                 }
                 r_in = r_out
-            # last item in _path.  Just intersect it.
-            currentName = _path[-1]
+            # last item in path.  Just intersect it.
+            currentName = path[-1]
             item = self[currentName]
             if item.skip:
                 r_out = r_in.copy()
