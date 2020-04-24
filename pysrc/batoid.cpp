@@ -26,7 +26,7 @@ namespace batoid {
     void pyExportCoordSys(py::module&);
     void pyExportCoordTransform(py::module&);
 
-    // GPU stuff
+#ifdef BATOID_GPU
     void pyExportCoordTransform2(py::module&);
     void pyExportSurface2(py::module&);
     void pyExportRayVector2(py::module&);
@@ -40,13 +40,9 @@ namespace batoid {
     void pyExportBicubic2(py::module&);
     void pyExportExtendedAsphere2(py::module&);
     void pyExportObscuration2(py::module&);
-
-#if (PYBIND11_VERSION_MAJOR >= 2) & (PYBIND11_VERSION_MINOR >= 2)
-    PYBIND11_MODULE(_batoid, m) {
-#else
-    PYBIND11_PLUGIN(_batoid) {
-        py::module m("_batoid", "ray tracer");
 #endif
+
+    PYBIND11_MODULE(_batoid, m) {
         pyExportRay(m);
         pyExportRayVector(m);
 
@@ -67,7 +63,7 @@ namespace batoid {
         pyExportCoordSys(m);
         pyExportCoordTransform(m);
 
-        // GPU stuff
+#ifdef BATOID_GPU
         pyExportCoordTransform2(m);
         pyExportSurface2(m);
         pyExportRayVector2(m);
@@ -81,7 +77,7 @@ namespace batoid {
         pyExportBicubic2(m);
         pyExportExtendedAsphere2(m);
         pyExportObscuration2(m);
-
+#endif
         using namespace pybind11::literals;
 
         m.def("rayGrid",
@@ -111,9 +107,5 @@ namespace batoid {
          .def("getMinChunk", &getMinChunk)
          .def("setMinChunk", &setMinChunk)
          .def("setRNGSeed", &setRNGSeed);
-
-#if !((PYBIND11_VERSION_MAJOR >= 2) & (PYBIND11_VERSION_MINOR >= 2))
-        return m.ptr();
-#endif
     }
 }

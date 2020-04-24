@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
 project(_batoid CXX)
-# project(_batoid CXX CUDA)
-set(CMAKE_VERBOSE_MAKEFILE True)
+# set(CMAKE_VERBOSE_MAKEFILE True)
 cmake_policy(SET CMP0063 NEW)  # Compile the static lib with hidden visibility.
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_MACOSX_RPATH 1)
@@ -9,6 +8,7 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE True)
+set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
 find_program(CCACHE_PROGRAM ccache)
 if(CCACHE_PROGRAM)
@@ -21,23 +21,9 @@ if (DEFINED ENV{CMAKE_COVER})
   APPEND_COVERAGE_COMPILER_FLAGS()
 endif()
 
-include(CheckCXXCompilerFlag)
-macro(ADD_CXX_FLAG_IF_AVAIL  TARG  FLAG  FLAG_NAME)
-  if(NOT "${FLAG}" STREQUAL "")
-    check_cxx_compiler_flag("${FLAG}" ${FLAG_NAME})
-    if(${FLAG_NAME})
-      target_compile_options(${TARG} INTERFACE
-        $<$<COMPILE_LANGUAGE:CXX>:${FLAG}>)
-    endif()
-  endif()
-endmacro()
-
-add_library(batoid-compile-flags INTERFACE)
-add_cxx_flag_if_avail(batoid-compile-flags "-Wno-unused-value" CXX_W_NO_UNUSED_VALUE)
-# add_cxx_flag_if_avail(batoid-compile-flags "-O0" CXX_NO_OPTIMIZATION)
-
-include_directories(include eigen)
+include_directories(include SYSTEM eigen)
 add_subdirectory(pybind11)
+
 set(PYSRC_FILES
   pysrc/asphere.cpp
   pysrc/batoid.cpp
@@ -57,21 +43,8 @@ set(PYSRC_FILES
   pysrc/sum.cpp
   pysrc/surface.cpp
   pysrc/table.cpp
-# GPU stuff
-  pysrc/coordtransform2.cpp
-  pysrc/medium2.cpp
-  pysrc/rayVector2.cpp
-  pysrc/surface2.cpp
-  pysrc/paraboloid2.cpp
-  pysrc/plane2.cpp
-  pysrc/sphere2.cpp
-  pysrc/quadric2.cpp
-  pysrc/asphere2.cpp
-  pysrc/bilinear2.cpp
-  pysrc/bicubic2.cpp
-  pysrc/extendedAsphere2.cpp
-  pysrc/obscuration2.cpp
 )
+
 set(SRC_FILES
   src/asphere.cpp
   src/batoid.cpp
@@ -93,21 +66,40 @@ set(SRC_FILES
   src/surface.cpp
   src/table.cpp
   src/utils.cpp
-# GPU stuff
-  src/coordtransform2.cpp
-  src/medium2.cpp
-  src/rayVector2.cpp
-  src/surface2.cpp
-  src/paraboloid2.cpp
-  src/plane2.cpp
-  src/sphere2.cpp
-  src/quadric2.cpp
-  src/asphere2.cpp
-  src/bilinear2.cpp
-  src/bicubic2.cpp
-  src/extendedAsphere2.cpp
-  src/obscuration2.cpp
 )
+
+if (DEFINED ENV{BATOID_GPU})
+  list(APPEND PYSRC_FILES
+    pysrc/coordtransform2.cpp
+    pysrc/medium2.cpp
+    pysrc/rayVector2.cpp
+    pysrc/surface2.cpp
+    pysrc/paraboloid2.cpp
+    pysrc/plane2.cpp
+    pysrc/sphere2.cpp
+    pysrc/quadric2.cpp
+    pysrc/asphere2.cpp
+    pysrc/bilinear2.cpp
+    pysrc/bicubic2.cpp
+    pysrc/extendedAsphere2.cpp
+    pysrc/obscuration2.cpp
+  )
+  list(APPEND SRC_FILES
+    src/coordtransform2.cpp
+    src/medium2.cpp
+    src/rayVector2.cpp
+    src/surface2.cpp
+    src/paraboloid2.cpp
+    src/plane2.cpp
+    src/sphere2.cpp
+    src/quadric2.cpp
+    src/asphere2.cpp
+    src/bilinear2.cpp
+    src/bicubic2.cpp
+    src/extendedAsphere2.cpp
+    src/obscuration2.cpp
+  )
+endif()
 
 set_source_files_properties(
   src/bicubic2.cpp
@@ -115,52 +107,41 @@ set_source_files_properties(
   COMPILE_FLAGS -O0
 )
 
-set(ALL_FILES ${SRC_FILES} ${PYSRC_FILES})
+include(CheckCXXCompilerFlag)
+macro(ADD_CXX_FLAG_IF_AVAIL  TARG  FLAG  FLAG_NAME)
+  if(NOT "${FLAG}" STREQUAL "")
+    check_cxx_compiler_flag("${FLAG}" ${FLAG_NAME})
+    if(${FLAG_NAME})
+      target_compile_options(${TARG} INTERFACE
+        $<$<COMPILE_LANGUAGE:CXX>:${FLAG}>)
+    endif()
+  endif()
+endmacro()
 
-find_package(OpenMP)
-# if(OpenMP_CXX_FOUND)
-#   add_library(omp INTERFACE)
-#   add_library(omp-offload INTERFACE)
-#   target_link_libraries(omp-offload INTERFACE omp "-fopenmp-targets=nvptx64-nvidia-cuda")
-#   # target_link_libraries(omp-offload INTERFACE omp)
-#   target_link_libraries(omp INTERFACE "-fopenmp")
-#   # target_link_libraries(omp INTERFACE ${OpenMP_CXX_LIBRARIES})
-#   target_compile_options(omp INTERFACE
-#     $<$<COMPILE_LANGUAGE:CXX>:${OpenMP_CXX_FLAGS}>
-#   )
-#   check_cxx_compiler_flag("-fopenmp -fopenmp-targets=nvptx64-nvidia-cuda" OMP_OFFLOAD)
-#   if(OMP_OFFLOAD)
-#     target_compile_options(omp-offload INTERFACE
-#       $<$<COMPILE_LANGUAGE:CXX>:-fopenmp-targets=nvptx64-nvidia-cuda>
-#     )
-#     add_library(batoid-offload STATIC ${SRC_FILES})
-#     target_link_libraries(batoid-offload batoid-compile-flags omp-offload)
-#     # set_target_properties(batoid-offload PROPERTIES LINKER_LANGUAGE CUDA)
-#     pybind11_add_module(_batoid ${PYSRC_FILES})
-#     target_link_libraries(_batoid PUBLIC batoid-compile-flags batoid-offload "-fopenmp -fopenmp-targets=nvptx64-nvidia-cuda")
-#   else()
-#     add_library(batoid-omp STATIC ${SRC_FILES})
-#     target_link_libraries(batoid-omp batoid-compile-flags omp)
-#     pybind11_add_module(_batoid ${PYSRC_FILES})
-#     target_link_libraries(_batoid PUBLIC batoid-compile-flags batoid-omp)
-#   endif()
-# else()
-#   add_library(batoid STATIC ${SRC_FILES})
-#   pybind11_add_module(_batoid ${PYSRC_FILES})
-#   target_link_libraries(_batoid PUBLIC batoid-compile-flags batoid)
-# endif()
+add_library(batoid-compile-flags INTERFACE)
+add_cxx_flag_if_avail(batoid-compile-flags "-Wno-unused-value" CXX_W_NO_UNUSED_VALUE)
 
-target_compile_options(batoid-compile-flags INTERFACE
-  $<$<COMPILE_LANGUAGE:CXX>:-fopenmp>
-)
-target_compile_options(batoid-compile-flags INTERFACE
-  $<$<COMPILE_LANGUAGE:CXX>:-fopenmp-targets=nvptx64-nvidia-cuda>
-)
+if (DEFINED ENV{BATOID_GPU})
 
-# add_library(batoid STATIC ${SRC_FILES})
-# target_link_libraries(batoid batoid-compile-flags "-fopenmp -fopenmp-targets=nvptx64-nvidia-cuda")
-# pybind11_add_module(_batoid ${PYSRC_FILES})
-# target_link_libraries(_batoid PUBLIC batoid-compile-flags batoid)
+  add_cxx_flag_if_avail(batoid-compile-flags "-Wno-openmp-mapping" CXX_W_NO_OPENMP_MAPPING)
+  add_cxx_flag_if_avail(batoid-compile-flags "-fopenmp" CXX_FOPENMP)
+  # add_cxx_flag_if_avail doesn't seem to work for fopenmp-targets, so add forcibly
+  # add_cxx_flag_if_avail(batoid-compile-flags "-fopenmp-targets=nvptx64-nvidia-cuda" CXX_FOPENMP_TARGETS)
+  target_compile_options(batoid-compile-flags INTERFACE
+    $<$<COMPILE_LANGUAGE:CXX>:-fopenmp-targets=nvptx64-nvidia-cuda>
+  )
 
-pybind11_add_module(_batoid ${ALL_FILES})
-target_link_libraries(_batoid PUBLIC batoid-compile-flags "-fopenmp -fopenmp-targets=nvptx64-nvidia-cuda")
+  set(ALL_FILES ${SRC_FILES} ${PYSRC_FILES})
+
+  add_definitions(-DBATOID_GPU)
+  pybind11_add_module(_batoid SYSTEM ${ALL_FILES})
+  target_link_libraries(_batoid PUBLIC batoid-compile-flags "-fopenmp -fopenmp-targets=nvptx64-nvidia-cuda")
+
+else()
+
+  add_library(batoid ${SRC_FILES})
+  target_link_libraries(batoid batoid-compile-flags)
+  pybind11_add_module(_batoid SYSTEM ${PYSRC_FILES})
+  target_link_libraries(_batoid batoid-compile-flags batoid)
+
+endif()
