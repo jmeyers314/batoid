@@ -137,6 +137,11 @@ if (DEFINED ENV{BATOID_GPU})
   pybind11_add_module(_batoid SYSTEM ${ALL_FILES})
   target_link_libraries(_batoid PUBLIC batoid-compile-flags "-fopenmp -fopenmp-targets=nvptx64-nvidia-cuda")
 
+  set_target_properties(_batoid
+    PROPERTIES
+    DEFINE_SYMBOL ""
+    )
+
 else()
 
   add_library(batoid ${SRC_FILES})
