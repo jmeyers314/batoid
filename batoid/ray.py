@@ -185,10 +185,10 @@ class Ray:
             origin = zhat*backDist
             coordSys = CoordSys(origin, np.stack([xhat, yhat, zhat]).T)
             transform = CoordTransform(globalCoordSys, coordSys)
-            transform.applyForwardInPlace(ray)
+            transform.applyForward(ray)
             plane = Plane()
-            plane.intersectInPlace(ray)
-            transform.applyReverseInPlace(ray)
+            plane.intersect(ray)
+            transform.applyReverse(ray)
             return Ray(
                 (ray.x, ray.y, ray.z),
                 v, t, wavelength, flux,
@@ -241,8 +241,8 @@ class Ray:
         """
         return self._rv.positionAtTime(t)[0]
 
-    def propagatedToTime(self, t):
-        """Return a Ray propagated to given time.
+    def propagate(self, t):
+        """Propagate Ray to given time.
 
         Parameters
         ----------
@@ -253,17 +253,8 @@ class Ray:
         -------
         Ray
         """
-        return self._rv.propagatedToTime(t)[0]
-
-    def propagateInPlace(self, t):
-        """Propagate Ray to given time.
-
-        Parameters
-        ----------
-        t : float
-            Time (over vacuum speed of light; in meters).
-        """
         self._rv.propagateInPlace(t)
+        return self
 
     def phase(self, r, t):
         """Calculate plane wave phase at given position and time.
@@ -295,17 +286,6 @@ class Ray:
         """
         transform = CoordTransform(self.coordSys, coordSys)
         return transform.applyForward(self)
-
-    def toCoordSysInPlace(self, coordSys):
-        """Transform ray into new coordinate system in place.
-
-        Parameters
-        ----------
-        coordSys: batoid.CoordSys
-            Destination coordinate system.
-        """
-        transform = CoordTransform(self.coordSys, coordSys)
-        transform.applyForwardInPlace(self)
 
     @property
     def coordSys(self):

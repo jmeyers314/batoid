@@ -93,8 +93,8 @@ def test_intersect_vectorized():
         R = random.gauss(25.0, 0.2)
         conic = random.uniform(-2.0, 1.0)
         quad = batoid.Quadric(R, conic)
-        r1s = quad.intersect(r0s)
-        r2s = batoid.RayVector([quad.intersect(r0) for r0 in r0s])
+        r1s = quad.intersect(r0s.copy())
+        r2s = batoid.RayVector([quad.intersect(r0.copy()) for r0 in r0s])
         assert r1s == r2s
 
 
@@ -117,7 +117,7 @@ def test_fail():
     assert ray.failed
 
     ray = batoid.Ray([0,0,-1], [0,0,-1])
-    quad.intersectInPlace(ray)
+    quad.intersect(ray)
     assert ray.failed
 
 

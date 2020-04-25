@@ -1,0 +1,15 @@
+API changes
+-----------
+- Eliminated in-place methods like traceInPlace(), reflectInPlace(), ...
+  Remaining operations on Ray and RayVector (e.g., trace(), reflect(), ...) are
+  now done in place.  A new idiom for performing operations not-in-place is to
+  first make a copy.  E.g., r2 = optic.trace(r1.copy())
+- Eliminate trace methods traceReverse and traceSplitReverse by merging them
+  into trace, traceSplit
+- Changed output format of traceSplit to separate different paths through the
+  optics.
+
+New Features
+------------
+- Added `path` kwarg to trace and traceFull to trace a non-default path through
+  the optics, e.g., to trace ghost images.

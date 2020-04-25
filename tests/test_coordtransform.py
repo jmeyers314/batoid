@@ -71,19 +71,23 @@ def test_composition():
             np.testing.assert_allclose(vec3_ra, vec3_rb)
 
             ray = randomRay()
-            ray_a = transform1to3.applyForward(ray)
-            ray_b = transform2to3.applyForward(transform1to2.applyForward(ray))
+            ray_a = transform1to3.applyForward(ray.copy())
+            assert ray_a != ray
+            ray_b = transform2to3.applyForward(transform1to2.applyForward(ray.copy()))
+            assert ray_b != ray
             assert ray_isclose(ray_a, ray_b), "error with composite transform of Ray"
-            ray_ra = transform1to3.applyReverse(ray)
-            ray_rb = transform1to2.applyReverse(transform2to3.applyReverse(ray))
+            ray_ra = transform1to3.applyReverse(ray.copy())
+            ray_rb = transform1to2.applyReverse(transform2to3.applyReverse(ray.copy()))
             assert ray_isclose(ray_ra, ray_rb), "error with reverse composite transform of Ray"
 
             rv = randomRayVector()
-            rv_a = transform1to3.applyForward(rv)
-            rv_b = transform2to3.applyForward(transform1to2.applyForward(rv))
+            rv_a = transform1to3.applyForward(rv.copy())
+            assert rv_a != rv
+            rv_b = transform2to3.applyForward(transform1to2.applyForward(rv.copy()))
+            assert rv_b != rv
             assert rays_allclose(rv_a, rv_b), "error with composite transform of RayVector"
-            rv_ra = transform1to3.applyReverse(rv)
-            rv_rb = transform1to2.applyReverse(transform2to3.applyReverse(rv))
+            rv_ra = transform1to3.applyReverse(rv.copy())
+            rv_rb = transform1to2.applyReverse(transform2to3.applyReverse(rv.copy()))
             assert rays_allclose(rv_ra, rv_rb), "error with reverse composite transform of RayVector"
 
             # Test with numpy arrays
@@ -106,33 +110,33 @@ def test_composition():
             # Test in-place on Ray
             ray = randomRay()
             ray_copy = ray.copy()
-            transform1to2.applyForwardInPlace(ray)
-            transform2to3.applyForwardInPlace(ray)
-            transform1to3.applyForwardInPlace(ray_copy)
+            transform1to2.applyForward(ray)
+            transform2to3.applyForward(ray)
+            transform1to3.applyForward(ray_copy)
             assert ray_isclose(ray, ray_copy)
 
             # in-place reverse on Ray
             ray = randomRay()
             ray_copy = ray.copy()
-            transform2to3.applyReverseInPlace(ray)
-            transform1to2.applyReverseInPlace(ray)
-            transform1to3.applyReverseInPlace(ray_copy)
+            transform2to3.applyReverse(ray)
+            transform1to2.applyReverse(ray)
+            transform1to3.applyReverse(ray_copy)
             assert ray_isclose(ray, ray_copy)
 
             # Test in-place on RayVector
             rv = randomRayVector()
             rv_copy = rv.copy()
-            transform1to2.applyForwardInPlace(rv)
-            transform2to3.applyForwardInPlace(rv)
-            transform1to3.applyForwardInPlace(rv_copy)
+            transform1to2.applyForward(rv)
+            transform2to3.applyForward(rv)
+            transform1to3.applyForward(rv_copy)
             assert rays_allclose(rv, rv_copy)
 
             # in-place reverse on RayVector
             rv = randomRayVector()
             rv_copy = rv.copy()
-            transform2to3.applyReverseInPlace(rv)
-            transform1to2.applyReverseInPlace(rv)
-            transform1to3.applyReverseInPlace(rv_copy)
+            transform2to3.applyReverse(rv)
+            transform1to2.applyReverse(rv)
+            transform1to3.applyReverse(rv_copy)
             assert rays_allclose(rv, rv_copy)
 
 

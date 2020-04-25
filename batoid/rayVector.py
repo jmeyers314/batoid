@@ -646,10 +646,10 @@ class RayVector:
             origin = zhat*backDist
             cs = CoordSys(origin, np.stack([xhat, yhat, zhat]).T)
             transform = CoordTransform(globalCoordSys, cs)
-            transform.applyForwardInPlace(rays)
+            transform.applyForward(rays)
             plane = Plane()
-            plane.intersectInPlace(rays)
-            transform.applyReverseInPlace(rays)
+            plane.intersect(rays)
+            transform.applyReverse(rays)
             return RayVector.fromArrays(
                 rays.x, rays.y, rays.z, vx, vy, vz, t, w, flux=flux
             )
@@ -745,17 +745,6 @@ class RayVector:
         transform = CoordTransform(self.coordSys, coordSys)
         return transform.applyForward(self)
 
-    def toCoordSysInPlace(self, coordSys):
-        """Transform rays into new coordinate system in place.
-
-        Parameters
-        ----------
-        coordSys: batoid.CoordSys
-            Destination coordinate system.
-        """
-        transform = CoordTransform(self.coordSys, coordSys)
-        transform.applyForwardInPlace(self)
-
     def positionAtTime(self, t):
         """Calculate the positions of the rays at a given time.
 
@@ -771,8 +760,8 @@ class RayVector:
         """
         return self._rv.positionAtTime(t)
 
-    def propagatedToTime(self, t):
-        """Return a RayVector propagated to given time.
+    def propagate(self, t):
+        """Propagate RayVector to given time.
 
         Parameters
         ----------
@@ -783,17 +772,8 @@ class RayVector:
         -------
         RayVector
         """
-        return RayVector._fromCPPRayVector(self._rv.propagatedToTime(t))
-
-    def propagateInPlace(self, t):
-        """Propagate RayVector to given time.
-
-        Parameters
-        ----------
-        t : float
-            Time (over vacuum speed of light; in meters).
-        """
         self._rv.propagateInPlace(t)
+        return self
 
     def trimVignetted(self, minflux=0.0):
         """Return new RayVector with vignetted rays or rays with flux below
@@ -808,17 +788,8 @@ class RayVector:
         -------
         RayVector
         """
-        return RayVector._fromCPPRayVector(self._rv.trimVignetted(minflux))
-
-    def trimVignettedInPlace(self, minflux=0.0):
-        """Remove vignetted rays and rays with flux below a given threshold.
-
-        Parameters
-        ----------
-        minflux : float
-            Minimum flux value to not remove.
-        """
         self._rv.trimVignettedInPlace(minflux)
+        return self
 
     @property
     def coordSys(self):

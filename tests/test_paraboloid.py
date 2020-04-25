@@ -77,8 +77,8 @@ def test_intersect_vectorized():
     for i in range(100):
         R = random.gauss(0.05, 0.01)
         para = batoid.Paraboloid(R)
-        r1s = para.intersect(r0s)
-        r2s = batoid.RayVector([para.intersect(r0) for r0 in r0s])
+        r1s = para.intersect(r0s.copy())
+        r2s = batoid.RayVector([para.intersect(r0.copy()) for r0 in r0s])
         assert r1s == r2s
 
 
@@ -100,7 +100,7 @@ def test_fail():
     assert ray.failed
 
     ray = batoid.Ray([0,0,-1], [0,0,-1])
-    para.intersectInPlace(ray)
+    para.intersect(ray)
     assert ray.failed
 
 

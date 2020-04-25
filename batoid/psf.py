@@ -73,8 +73,8 @@ def huygensPSF(optic, theta_x=None, theta_y=None, wavelength=None, nx=None,
     amplitudes = np.zeros((nxOut*pad_factor, nxOut*pad_factor), dtype=np.complex128)
     out = batoid.Lattice(np.zeros((nxOut*pad_factor, nxOut*pad_factor), dtype=float), primitiveX)
 
-    rays = optic.traceInPlace(rays)
-    rays.trimVignettedInPlace()
+    rays = optic.trace(rays)
+    rays.trimVignetted()
     # Need transpose to conform to numpy [y,x] ordering convention
     xs = out.coords[..., 0].T + np.mean(rays.x)
     ys = out.coords[..., 1].T + np.mean(rays.y)
@@ -136,13 +136,13 @@ def drdth(optic, theta_x, theta_y, wavelength, nx=16, projection='postel'):
         dthyCos[0], dthyCos[1], dthyCos[2],
         nx, wavelength=wavelength, flux=1, medium=optic.inMedium)
 
-    optic.traceInPlace(rays)
-    optic.traceInPlace(rays_x)
-    optic.traceInPlace(rays_y)
+    optic.trace(rays)
+    optic.trace(rays_x)
+    optic.trace(rays_y)
 
-    rays.trimVignettedInPlace()
-    rays_x.trimVignettedInPlace()
-    rays_y.trimVignettedInPlace()
+    rays.trimVignetted()
+    rays_x.trimVignetted()
+    rays_y.trimVignetted()
 
     # meters / radian
     drx_dthx = (np.mean(rays_x.x) - np.mean(rays.x))/dth
@@ -214,11 +214,11 @@ def dkdu(optic, theta_x, theta_y, wavelength, nx=16, projection='postel'):
         nx, wavelength, 1.0, optic.inMedium
     )
 
-    pupilRays = rays.propagatedToTime(0.0)
+    pupilRays = rays.copy().propagate(0.0)
     ux = np.array(pupilRays.x)
     uy = np.array(pupilRays.y)
 
-    optic.traceInPlace(rays)
+    optic.trace(rays)
     w = np.where(1-rays.vignetted)[0]
     ux = ux[w]
     uy = uy[w]
@@ -269,7 +269,7 @@ def wavefront(optic, theta_x, theta_y, wavelength, nx=32, projection='postel', s
     if sphereRadius is None:
         sphereRadius = optic.sphereRadius
 
-    optic.traceInPlace(rays)
+    optic.trace(rays)
     w = np.where(1-rays.vignetted)[0]
     point = np.mean(rays.r[w], axis=0)
 
@@ -278,10 +278,10 @@ def wavefront(optic, theta_x, theta_y, wavelength, nx=32, projection='postel', s
     targetCoordSys = rays.coordSys.shiftLocal(
         point+np.array([0,0,sphereRadius])
     )
-    rays.toCoordSysInPlace(targetCoordSys)
+    rays.toCoordSys(targetCoordSys)
 
     sphere = batoid.Sphere(-sphereRadius)
-    sphere.intersectInPlace(rays)
+    sphere.intersect(rays)
 
     w = np.where(1-rays.vignetted)[0]
     # Should potentially try to make the reference time w.r.t. the chief ray instead of the mean
@@ -359,7 +359,7 @@ def zernike(optic, theta_x, theta_y, wavelength, nx=32, projection='postel', jma
 
     # Propagate to t=optic.backDist where rays are close to being
     # in the entrance pupil.  (TODO: actually intersect EP here?)
-    rays.propagateInPlace(optic.backDist)
+    rays.propagate(optic.backDist)
     orig_x = np.array(rays.x).reshape(nx,nx)
     orig_y = np.array(rays.y).reshape(nx,nx)
 
@@ -384,6 +384,6 @@ def fpPosition(optic, theta_x, theta_y, wavelength, nx=32, projection='postel'):
         dirCos[0], dirCos[1], dirCos[2],
         nx, wavelength, 1.0, optic.inMedium
     )
-    optic.traceInPlace(rays)
-    rays.trimVignettedInPlace()
+    optic.trace(rays)
+    rays.trimVignetted()
     return np.mean(rays.x), np.mean(rays.y)

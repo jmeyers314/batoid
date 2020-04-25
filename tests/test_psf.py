@@ -134,8 +134,8 @@ def test_lsst_psf():
         rays = batoid.circularGrid(10.0, 4.2, 2.55,
                                    dirCos[0], dirCos[1], dirCos[2],
                                    10, 100, 620e-9, 1.0, batoid.Air())
-        telescope.traceInPlace(rays)
-        rays.trimVignettedInPlace()
+        telescope.trace(rays)
+        rays.trimVignetted()
         xs = rays.x - np.mean(rays.x)
         ys = rays.y - np.mean(rays.y)
 
@@ -183,8 +183,8 @@ def test_hsc_psf():
         rays = batoid.circularGrid(20.0, 4.1, 0.9,
                                    dirCos[0], dirCos[1], dirCos[2],
                                    10, 100, 620e-9, 1.0, batoid.ConstMedium(1.0))
-        telescope.traceInPlace(rays)
-        rays.trimVignettedInPlace()
+        telescope.trace(rays)
+        rays.trimVignetted()
         xs = rays.x - np.mean(rays.x)
         ys = rays.y - np.mean(rays.y)
 
@@ -232,8 +232,8 @@ def test_decam_psf():
         rays = batoid.circularGrid(10.0, 1.95, 0.5,
                                    dirCos[0], dirCos[1], dirCos[2],
                                    10, 100, 620e-9, 1.0, batoid.Air())
-        telescope.traceInPlace(rays)
-        rays.trimVignettedInPlace()
+        telescope.trace(rays)
+        rays.trimVignetted()
         xs = rays.x - np.mean(rays.x)
         ys = rays.y - np.mean(rays.y)
 
@@ -263,7 +263,7 @@ def test_decam_psf():
 
 
 if __name__ == '__main__':
-    # test_huygens_psf()
-    # test_lsst_psf()
+    test_huygens_psf()
+    test_lsst_psf()
     test_hsc_psf()
-    # test_decam_psf()
+    test_decam_psf()

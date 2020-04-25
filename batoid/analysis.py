@@ -110,14 +110,14 @@ def huygensPSF(optic, theta_x, theta_y, wavelength,
         primitiveX
     )
 
-    optic.traceInPlace(rays)
+    optic.trace(rays)
     if reference == 'mean':
         w = np.where(1-rays.vignetted)[0]
         point = np.mean(rays.r[w], axis=0)
     elif reference == 'chief':
         cridx = (nx//2)*nx+nx//2 if (nx%2)==0 else (nx*nx-1)//2
         point = rays[cridx].r
-    rays.trimVignettedInPlace()
+    rays.trimVignetted()
     # Need transpose to conform to numpy [y,x] ordering convention
     xs = out.coords[..., 0].T + point[0]
     ys = out.coords[..., 1].T + point[1]
@@ -173,7 +173,7 @@ def wavefront(optic, theta_x, theta_y, wavelength,
     if sphereRadius is None:
         sphereRadius = optic.sphereRadius
 
-    optic.traceInPlace(rays)
+    optic.trace(rays)
     if reference == 'mean':
         w = np.where(1-rays.vignetted)[0]
         point = np.mean(rays.r[w], axis=0)
@@ -185,10 +185,10 @@ def wavefront(optic, theta_x, theta_y, wavelength,
     targetCoordSys = rays.coordSys.shiftLocal(
         point+np.array([0,0,sphereRadius])
     )
-    rays.toCoordSysInPlace(targetCoordSys)
+    rays.toCoordSys(targetCoordSys)
 
     sphere = batoid.Sphere(-sphereRadius)
-    sphere.intersectInPlace(rays)
+    sphere.intersect(rays)
 
     if reference == 'mean':
         w = np.where(1-rays.vignetted)[0]
@@ -221,7 +221,7 @@ def spot(optic, theta_x, theta_y, wavelength,
     )
     if sphereRadius is None:
         sphereRadius = optic.sphereRadius
-    optic.traceInPlace(rays)
+    optic.trace(rays)
     if reference == 'mean':
         w = np.where(1-rays.vignetted)[0]
         point = np.mean(rays.r[w], axis=0)
@@ -233,7 +233,7 @@ def spot(optic, theta_x, theta_y, wavelength,
     targetCoordSys = rays.coordSys.shiftLocal(
         point+np.array([0,0,sphereRadius])
     )
-    rays.toCoordSysInPlace(targetCoordSys)
+    rays.toCoordSys(targetCoordSys)
 
     w = ~rays.vignetted
     return rays.x[w], rays.y[w]
@@ -368,7 +368,7 @@ def zernike(optic, theta_x, theta_y, wavelength,
     )
     # Propagate to entrance pupil to get positions
     epRays = rays.toCoordSys(optic.stopSurface.coordSys)
-    optic.stopSurface.surface.intersectInPlace(epRays)
+    optic.stopSurface.surface.intersect(epRays)
     orig_x = np.array(epRays.x).reshape(nx, nx)
     orig_y = np.array(epRays.y).reshape(nx, nx)
 
@@ -471,7 +471,7 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
 
     # Trace to stopSurface to get points at which to evalue Zernikes
     epRays = rays.toCoordSys(optic.stopSurface.coordSys)
-    optic.stopSurface.surface.intersectInPlace(epRays)
+    optic.stopSurface.surface.intersect(epRays)
 
     basis = galsim.zernike.zernikeBasis(
         jmax, epRays.x, epRays.y,
@@ -482,7 +482,7 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
     if sphereRadius is None:
         sphereRadius = optic.sphereRadius
 
-    optic.traceInPlace(rays)
+    optic.trace(rays)
 
     if np.any(rays.failed):
         raise ValueError(
@@ -499,7 +499,7 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
             medium=optic.inMedium,
             stopSurface=optic.stopSurface
         )
-        optic.traceInPlace(chiefRay)
+        optic.trace(chiefRay)
         point = chiefRay.r
 
     # Place vertex of reference sphere one radius length away from the
@@ -507,17 +507,17 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
     targetCoordSys = rays.coordSys.shiftLocal(
         point+np.array([0,0,sphereRadius])
     )
-    rays.toCoordSysInPlace(targetCoordSys)
+    rays.toCoordSys(targetCoordSys)
 
     sphere = batoid.Sphere(-sphereRadius)
-    sphere.intersectInPlace(rays)
+    sphere.intersect(rays)
 
     if reference == 'mean':
         w = np.where(1-rays.vignetted)[0]
         t0 = np.mean(rays.t[w])
     elif reference == 'chief':
-        chiefRay.toCoordSysInPlace(targetCoordSys)
-        sphere.intersectInPlace(chiefRay)
+        chiefRay.toCoordSys(targetCoordSys)
+        sphere.intersect(chiefRay)
         t0 = chiefRay.t
 
     # Zernike coefficients are flux-weighted dot products of relative phases

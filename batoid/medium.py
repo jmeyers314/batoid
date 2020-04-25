@@ -60,6 +60,31 @@ class TableMedium(Medium):
         self.table = table
         self._medium = _batoid.CPPTableMedium(self.table._table)
 
+    @classmethod
+    def fromTxt(cls, filename):
+        """Load a text file with refractive index information in it.
+        The file should have two columns, the first with wavelength in microns,
+        and the second with the corresponding refractive indices.
+        """
+        import os
+        import yaml
+        import numpy as np
+        from .table import Table
+        try:
+            wavelength, n = np.loadtxt(filename, unpack=True)
+        except IOError:
+            import glob
+            from . import datadir
+            filenames = glob.glob(os.path.join(datadir, "**", "*.txt"))
+            for candidate in filenames:
+                if os.path.basename(candidate) == filename:
+                    wavelength, n = np.loadtxt(candidate, unpack=True)
+                    break
+            else:
+                raise FileNotFoundError(filename)
+        table = Table(wavelength*1e-6, n)
+        return TableMedium(table)
+
     def __repr__(self):
         return "TableMedium({!r})".format(self.table)
 

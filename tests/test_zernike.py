@@ -130,8 +130,8 @@ def test_intersect_vectorized():
         R_inner = np.random.uniform(0.0, 0.8*R_outer)
         zernike = batoid.Zernike(coef, R_outer=R_outer, R_inner=R_inner)
 
-        r1s = zernike.intersect(r0s)
-        r2s = batoid.RayVector([zernike.intersect(r0) for r0 in r0s])
+        r1s = zernike.intersect(r0s.copy())
+        r2s = batoid.RayVector([zernike.intersect(r0.copy()) for r0 in r0s])
         assert r1s == r2s
 
 
@@ -185,7 +185,7 @@ def test_fail():
     assert ray.failed
 
     ray = batoid.Ray([0,0,zernike.sag(0,0)-1], [0,0,-1])
-    zernike.intersectInPlace(ray)
+    zernike.intersect(ray)
     assert ray.failed
 
 

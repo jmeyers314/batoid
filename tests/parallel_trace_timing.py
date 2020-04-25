@@ -7,15 +7,13 @@ import time
 @timer
 def parallel_trace_timing(args):
     if args.nthread is not None:
-        print("setting nthread to {}".format(args.nthread))
         batoid._batoid.setNThread(args.nthread)
     print("Using {} threads".format(batoid._batoid.getNThread()))
 
     if args.minChunk is not None:
-        print("setting minChunk to {:_d}".format(args.minChunk))
         batoid._batoid.setMinChunk(args.minChunk)
     print("Using minChunk of {:_d}".format(batoid._batoid.getMinChunk()))
-    print("Using nside of {:_d}".format(args.nside))
+    print("Using nrad of {:_d}".format(args.nrad))
 
     if args.lsst:
         print("Tracing through LSST optics")
@@ -40,7 +38,7 @@ def parallel_trace_timing(args):
                 theta_x=np.deg2rad(0.3),
                 theta_y=np.deg2rad(0.3),
                 inner=0.5*telescope.pupilSize*telescope.pupilObscuration,
-                nrad=args.nside, naz=args.nside
+                nrad=args.nrad, naz=int(2*np.pi*args.nrad)
             )
         else:
             rays = batoid.RayVector.asPolar(
@@ -49,7 +47,7 @@ def parallel_trace_timing(args):
                 theta_x=np.deg2rad(0.3),
                 theta_y=np.deg2rad(0.3),
                 inner=0.5*telescope.pupilSize*telescope.pupilObscuration,
-                nrad=args.nside, naz=args.nside
+                nrad=args.nrad, naz=int(2*np.pi*args.nrad)
             )
         t1 = time.time()
         building.append(t1-t0)
@@ -58,14 +56,14 @@ def parallel_trace_timing(args):
     nrays = len(rays)
     print("Tracing {:_d} rays.".format(nrays))
     print()
+    print()
     if args.nrepeat > 1:
-        print("Ray generation: {:_} +/- {:_} rays per second".format(
+        print("Generating: {:_} +/- {:_} rays per second".format(
             int(np.mean(nrays/building)),
             int(np.std(nrays/building)/np.sqrt(args.nrepeat))
         ))
     else:
-        print("Ray generation: {:_} rays per second".format(int(nrays/building[0])))
-    print()
+        print("Generating: {:_} rays per second".format(int(nrays/building[0])))
 
     # Optionally perturb the primary mirror using Zernike polynomial
     if args.perturbZ != 0:
@@ -105,60 +103,59 @@ def parallel_trace_timing(args):
 
     copying = []
     tracing = []
-    if args.immutable:
-        print("Immutable trace")
-        t0 = time.time()
+    overall = []
 
-        for _ in range(args.nrepeat):
-            t1 = time.time()
-            rays_in = batoid.RayVector(rays)
-            t2 = time.time()
-            rays_out, _ = telescope.trace(rays_in)
-            t3 = time.time()
-            copying.append(t2-t1)
-            tracing.append(t3-t2)
-        t4 = time.time()
-    else:
-        print("Trace in place")
-        t0 = time.time()
-        copying = []
-        tracing = []
-
-        for _ in range(args.nrepeat):
-            t1 = time.time()
-            rays_out = rays.copy()
-            t2 = time.time()
-            telescope.traceInPlace(rays_out)
-            rays_out.r # force copy back to host
-            rays_out.v
-            rays_out.t
-            rays_out.vignetted
-            rays_out.failed
-            t3 = time.time()
-            copying.append(t2-t1)
-            tracing.append(t3-t2)
-        t4 = time.time()
+    for _ in range(args.nrepeat):
+        t1 = time.time()
+        rays_out = rays.copy()
+        t2 = time.time()
+        telescope.trace(rays_out)
+        rays_out.r # force copy back to host if doing gpu
+        rays_out.v
+        rays_out.t
+        rays_out.vignetted
+        rays_out.failed
+        t3 = time.time()
+        copying.append(t2-t1)
+        tracing.append(t3-t2)
+        overall.append(t3-t1)
     copying = np.array(copying)
     tracing = np.array(tracing)
+    overall = np.array(overall)
 
     if args.nrepeat > 1:
+        print()
         print("copying: {:_} +/- {:_} rays per second".format(
             int(np.mean(nrays/copying)),
             int(np.std(nrays/copying)/np.sqrt(args.nrepeat))
         ))
+        print()
         print("tracing: {:_} +/- {:_} rays per second".format(
             int(np.mean(nrays/tracing)),
             int(np.std(nrays/tracing)/np.sqrt(args.nrepeat))
         ))
+        print()
+        print("overall")
+        print("-------")
+        print("{:_} +/- {:_} rays per second".format(
+            int(np.mean(nrays/overall)),
+            int(np.std(nrays/overall)/np.sqrt(args.nrepeat))
+        ))
+        print()
     else:
+        print()
         print("copying: {:_} rays per second".format(int(nrays/copying)))
+        print()
         print("tracing: {:_} rays per second".format(int(nrays/tracing)))
-    print("overall:")
-    print("{:_} rays per second".format(int(nrays*args.nrepeat/(t4-t0))))
+        print()
+        print("overall")
+        print("-------")
+        print("{:_} +/- {:_} rays per second".format(int(nrays/overall)))
+        print()
 
     if args.plot:
         import matplotlib.pyplot as plt
-        # rays_out.trimVignettedInPlace()
+        rays_out.trimVignetted()
         x = rays_out.x
         y = rays_out.y
         x -= np.mean(x)
@@ -178,7 +175,7 @@ def parallel_trace_timing(args):
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
-    parser.add_argument("--nside", type=int, default=1024)
+    parser.add_argument("--nrad", type=int, default=250)
     parser.add_argument("--nthread", type=int, default=None)
     parser.add_argument("--nrepeat", type=int, default=1)
     parser.add_argument("--minChunk", type=int, default=None)
@@ -187,7 +184,6 @@ if __name__ == '__main__':
     parser.add_argument("--plot", action='store_true')
     parser.add_argument("--lsst", action='store_true')
     parser.add_argument("--decam", action='store_true')
-    parser.add_argument("--immutable", action='store_true')
     parser.add_argument("--gpu", action='store_true')
     args = parser.parse_args()
 

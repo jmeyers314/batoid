@@ -39,17 +39,26 @@ notebooks = [
     "Aspheric Newtonian Telescope.ipynb",
     "DECam perturbations.ipynb",
     "DECam trace.ipynb",
+    "DESI model details.ipynb",
     "DESI trace.ipynb",
     "Distortion.ipynb",
     "HSC 3D.ipynb",
     "HSC perturbations.ipynb",
+    "HSC pupil characterization.ipynb",
     "HSC trace.ipynb",
     "Huygens PSF.ipynb",
+    "LSST Coordinate Systems.ipynb",
     "LSST perturbations.ipynb",
+    "LSST pupil characterization.ipynb",
     "LSST trace.ipynb",
     "Newtonian Telescope.ipynb",
     "Rays.ipynb",
-    "Thin Lens.ipynb"
+    "Thin Lens.ipynb",
+    pytest.param("FFT vs Huygens.ipynb", marks=pytest.mark.slow),
+    pytest.param("HSC ghosts.ipynb", marks=pytest.mark.slow),
+    pytest.param("LSST donuts.ipynb", marks=pytest.mark.slow),
+    pytest.param("LSST ghosts.ipynb", marks=pytest.mark.slow),
+    pytest.param("PH != Pupil.ipynb", marks=pytest.mark.slow)
 ]
 
 
@@ -62,10 +71,5 @@ def test_notebook(notebook_name):
 
 
 if __name__ == '__main__':
-    notebooks.extend([
-        "FFT vs Huygens.ipynb",
-        "LSST donuts.ipynb",
-        "PH != Pupil.ipynb",
-    ])
     for notebook in notebooks:
         test_notebook(notebook)

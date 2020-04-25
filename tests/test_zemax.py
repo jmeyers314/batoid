@@ -52,7 +52,7 @@ def test_HSC_trace():
             s = surface['out']
             v = s.v/np.linalg.norm(s.v)
 
-            s.toCoordSysInPlace(batoid.CoordSys())
+            s.toCoordSys(batoid.CoordSys())
             bt_isec = np.array([s.x, s.y, s.z-16.0])
             zx_isec = arr[HSC_surfaces[i]-1][1:4]/1000
             np.testing.assert_allclose(bt_isec, zx_isec, rtol=0, atol=1e-9) # nanometer agreement
