@@ -51,7 +51,6 @@ set(SRC_FILES
   src/bicubic.cpp
   src/coating.cpp
   src/coordsys.cpp
-  src/dualView.cpp
   src/coordtransform.cpp
   src/medium.cpp
   src/obscuration.cpp
@@ -86,6 +85,7 @@ if (DEFINED ENV{BATOID_GPU})
   )
   list(APPEND SRC_FILES
     src/coordtransform2.cpp
+    src/dualView.cpp
     src/medium2.cpp
     src/rayVector2.cpp
     src/surface2.cpp
@@ -147,6 +147,6 @@ else()
   add_library(batoid ${SRC_FILES})
   target_link_libraries(batoid batoid-compile-flags)
   pybind11_add_module(_batoid SYSTEM ${PYSRC_FILES})
-  target_link_libraries(_batoid batoid-compile-flags batoid)
+  target_link_libraries(_batoid PRIVATE batoid INTERFACE batoid-compile-flags)
 
 endif()
