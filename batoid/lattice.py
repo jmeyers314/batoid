@@ -58,3 +58,10 @@ class Lattice:
     @lazy_property
     def coords(self):
         return primitiveToLattice(self.primitiveVectors, self.array.shape)
+
+    def __eq__(self, rhs):
+        if not isinstance(rhs, Lattice): return False
+        return (
+            np.all(self.array == rhs.array) &
+            np.all(self.primitiveVectors == rhs.primitiveVectors)
+        )

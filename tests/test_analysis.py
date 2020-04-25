@@ -68,5 +68,84 @@ def test_zernikeGQ():
     )
 
 
+@timer
+def test_huygensPSF():
+    telescope = batoid.Optic.fromYaml("LSST_r.yaml")
+
+    # Test that we can infer dy from dx properly
+    psf1 = batoid.analysis.huygensPSF(
+        telescope,
+        np.deg2rad(0.1), np.deg2rad(0.1),
+        620e-9,
+        nx=64,
+        nxOut=32,
+        dx=10e-6,
+    )
+    psf2 = batoid.analysis.huygensPSF(
+        telescope,
+        np.deg2rad(0.1), np.deg2rad(0.1),
+        620e-9,
+        nx=64,
+        nxOut=32,
+        dx=10e-6,
+        dy=10e-6
+    )
+    assert psf1 == psf2
+
+    # Test vector vs scalar dx,dy
+    psf1 = batoid.analysis.huygensPSF(
+        telescope,
+        np.deg2rad(0.1), np.deg2rad(0.1),
+        620e-9,
+        nx=64,
+        nxOut=32,
+        dx=[10e-6, 0],
+        dy=[0, 11e-6]
+    )
+    psf2 = batoid.analysis.huygensPSF(
+        telescope,
+        np.deg2rad(0.1), np.deg2rad(0.1),
+        620e-9,
+        nx=64,
+        nxOut=32,
+        dx=10e-6,
+        dy=11e-6
+    )
+    assert psf1 == psf2
+
+    # Should still work with reference = 'chief'
+    psf3 = batoid.analysis.huygensPSF(
+        telescope,
+        np.deg2rad(0.1), np.deg2rad(0.1),
+        620e-9,
+        nx=64,
+        nxOut=32,
+        dx=[10e-6, 0],
+        dy=[0, 11e-6],
+        reference='chief'
+    )
+    psf4 = batoid.analysis.huygensPSF(
+        telescope,
+        np.deg2rad(0.1), np.deg2rad(0.1),
+        620e-9,
+        nx=64,
+        nxOut=32,
+        dx=10e-6,
+        dy=11e-6,
+        reference='chief'
+    )
+    assert psf1 != psf3
+    assert psf3 == psf4
+
+    # And just cover nx odd
+    psf = batoid.analysis.huygensPSF(
+        telescope,
+        np.deg2rad(0.1), np.deg2rad(0.1),
+        620e-9,
+        nx=63,
+    )
+
+
 if __name__ == '__main__':
     test_zernikeGQ()
+    test_huygensPSF()
