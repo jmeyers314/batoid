@@ -400,7 +400,6 @@ class Interface(Optic):
             print(strtemplate.format(s, self.name, np.sum(r.flux), len(r)))
         if self.skip:
             return r, None
-
         rForward, rReverse = self.rSplit(r, reverse=reverse)
 
         # For now, apply obscuration equally forwards and backwards
@@ -820,10 +819,12 @@ class CompoundOptic(Optic):
                             item.obscuration.obscure(r)
                     else:
                         item.trace(r, reverse=True)
-            # last item in path.  Just intersect it.
+            # last item in path.
             currentName = path[-1]
             item = self[currentName]
-            item.surface.intersect(r, coordSys=item.coordSys)
+            item.interact(r, reverse=direction=="reverse")
+            if item.obscuration is not None:
+                item.obscuration.obscure(r)
         return r
 
     def traceFull(self, r, path=None):
@@ -918,13 +919,15 @@ class CompoundOptic(Optic):
                     'out':r_out.copy()
                 }
                 r_in = r_out
-            # last item in path.  Just intersect it.
+            # last item in path.
             currentName = path[-1]
             item = self[currentName]
-            r_out = item.surface.intersect(
+            r_out = item.interact(
                 r_in.copy(),
-                coordSys=item.coordSys
+                reverse=direction=="reverse"
             )
+            if item.obscuration is not None:
+                item.obscuration.obscure(r_out)
             key = item.name+'_0'
             j = 1
             while key in result:
@@ -1523,7 +1526,6 @@ def drawTrace3d(ax, traceFull, start=None, end=None, **kwargs):
         Global coordinate system to use.
     """
     xyz, raylen = getGlobalRays(traceFull, start, end)
-    lines = []
     for line, nline in zip(xyz, raylen):
         ax.plot(line[0, :nline], line[1, :nline], line[2, :nline], **kwargs)
 

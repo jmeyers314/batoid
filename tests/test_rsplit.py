@@ -24,5 +24,74 @@ def test_rSplit():
         assert refractedRays == refractedRays2
 
 
+@timer
+def test_traceSplit():
+    telescope = batoid.Optic.fromYaml("HSC.yaml")
+    # Make refractive interfaces partially reflective
+    for surface in telescope.itemDict.values():
+        if isinstance(surface, batoid.RefractiveInterface):
+            surface.forwardCoating = batoid.SimpleCoating(0.02, 0.98)
+            surface.reverseCoating = batoid.SimpleCoating(0.02, 0.98)
+        if isinstance(surface, batoid.Detector):
+            surface.forwardCoating = batoid.SimpleCoating(0.02, 0.98)
+    rays = batoid.RayVector.asPolar(
+        telescope,
+        wavelength=620e-9,
+        theta_x=np.deg2rad(0.1), theta_y=0.0,
+        nrad=10, naz=60,
+    )
+    rForward, rReverse = telescope.traceSplit(rays, minFlux=1e-4)
+
+    for r in rForward:
+        r2 = telescope.trace(rays.copy(), path=r.path)
+        r2.trimVignetted()
+        np.testing.assert_array_equal(r.r, r2.r)
+        np.testing.assert_array_equal(r.v, r2.v)
+        np.testing.assert_array_equal(r.t, r2.t)
+
+        tf = telescope.traceFull(rays.copy(), path=r.path)
+        keys = []
+        for item in r.path:
+            j = 0
+            key = f"{item}_{j}"
+            while key in keys:
+                j += 1
+                key = f"{item}_{j}"
+            keys.append(key)
+        assert keys == [k for k in tf.keys()]
+
+        r3 = tf[keys[-1]]['out']
+        r3.trimVignetted()
+        np.testing.assert_array_equal(r.r, r3.r)
+        np.testing.assert_array_equal(r.v, r3.v)
+        np.testing.assert_array_equal(r.t, r3.t)
+
+    for r in rReverse:
+        r2 = telescope.trace(rays.copy(), path=r.path)
+        r2.trimVignetted()
+        np.testing.assert_array_equal(r.r, r2.r)
+        np.testing.assert_array_equal(r.v, r2.v)
+        np.testing.assert_array_equal(r.t, r2.t)
+
+        tf = telescope.traceFull(rays.copy(), path=r.path)
+        keys = []
+        for item in r.path:
+            j = 0
+            key = f"{item}_{j}"
+            while key in keys:
+                j += 1
+                key = f"{item}_{j}"
+            keys.append(key)
+        assert keys == [k for k in tf.keys()]
+
+        r3 = tf[keys[-1]]['out']
+        r3.trimVignetted()
+        np.testing.assert_array_equal(r.r, r3.r)
+        np.testing.assert_array_equal(r.v, r3.v)
+        np.testing.assert_array_equal(r.t, r3.t)
+
+
+
 if __name__ == '__main__':
     test_rSplit()
+    test_traceSplit()

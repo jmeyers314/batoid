@@ -1,7 +1,7 @@
 import batoid
 import numpy as np
 import pytest
-from test_helpers import timer, do_pickle, all_obj_diff
+from test_helpers import timer, do_pickle, all_obj_diff, rays_allclose
 import time
 
 
@@ -19,7 +19,14 @@ def test_optic():
     t_fast = 0.0
     t_slow = 0.0
 
-    telescope = batoid.Optic.fromYaml("HSC.yaml")
+    # Do one with full pathname
+    import os
+    filename = os.path.join(batoid.datadir, "HSC", "HSC.yaml")
+    with np.testing.assert_raises(FileNotFoundError):
+        telescope = batoid.Optic.fromYaml(filename+".gobbledegook")
+    telescope = batoid.Optic.fromYaml(filename)
+
+    # telescope = batoid.Optic.fromYaml("HSC.yaml")
     do_pickle(telescope)
 
     t0 = time.time()
@@ -90,6 +97,27 @@ def test_traceReverse():
         np.testing.assert_allclose(init_rays[idx].vy, -final_rays[idx].vy)
         np.testing.assert_allclose(init_rays[idx].vz, -final_rays[idx].vz)
         np.testing.assert_allclose(final_rays[idx].t, 0)
+
+
+@timer
+def test_withSurface():
+    telescope = batoid.Optic.fromYaml("HSC.yaml")
+    rays = batoid.RayVector.asPolar(
+        telescope,
+        wavelength=620e-9,
+        theta_x=np.deg2rad(0.1), theta_y=0.0,
+        nrad=10, naz=60
+    )
+    trays = telescope.trace(rays.copy())
+    for key, item in telescope.itemDict.items():
+        if not isinstance(item, batoid.Interface):
+            continue
+        # Do a trivial surface replacement
+        surf2 = batoid.Sum([batoid.Plane(), item.surface])
+        telescope2 = telescope.withSurface(key, surf2)
+        assert telescope != telescope2
+        trays2 = telescope.trace(rays.copy())
+        rays_allclose(trays, trays2)
 
 
 @timer
@@ -273,12 +301,13 @@ def test_name():
 
 
 if __name__ == '__main__':
-    test_optic()
-    test_traceFull()
-    test_traceReverse()
-    test_shift()
-    test_rotXYZ_parsing()
-    test_rotation()
-    test_thread()
-    test_ne()
-    test_name()
+    # test_optic()
+    # test_traceFull()
+    # test_traceReverse()
+    test_withSurface()
+    # test_shift()
+    # test_rotXYZ_parsing()
+    # test_rotation()
+    # test_thread()
+    # test_ne()
+    # test_name()
