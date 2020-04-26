@@ -67,6 +67,21 @@ def test_zernikeGQ():
         zSquare, zGQ, rtol=0, atol=tol
     )
 
+    # Try reference == mean
+    # Try off-axis
+    zSquare = batoid.analysis.zernike(
+        telescope, np.deg2rad(0.2), np.deg2rad(0.1), 625e-9,
+        nx=nx, jmax=28, reference='mean', eps=0.61
+    )
+    zGQ = batoid.analysis.zernikeGQ(
+        telescope, np.deg2rad(0.2), np.deg2rad(0.1), 625e-9,
+        rings=rings, jmax=28, reference='mean', eps=0.61
+    )
+    # Z1-3 less reliable, but mostly uninteresting anyway...
+    np.testing.assert_allclose(
+        zSquare[4:], zGQ[4:], rtol=0, atol=tol
+    )
+
 
 @timer
 def test_huygensPSF():
@@ -146,6 +161,51 @@ def test_huygensPSF():
     )
 
 
+@pytest.mark.skipif(not hasGalSim, reason="galsim not found")
+@timer
+def test_doubleZernike():
+    telescope = batoid.Optic.fromYaml("LSST_r.yaml")
+    dz = batoid.analysis.doubleZernike(
+        telescope,
+        np.deg2rad(1.75),
+        625e-9,
+        10,
+        kmax=28,
+        jmax=22
+    )
+
+    # Now evaluate DZ a few places and compare with zernikeGQ
+    size = 20
+    js = np.random.randint(4, 22, size=size)
+    thr = np.deg2rad(np.sqrt(np.random.uniform(0, 1.75**2, size=size)))
+    thth = np.random.uniform(0, 2*np.pi, size=size)
+    thx = thr*np.cos(thth)
+    thy = thr*np.sin(thth)
+
+    for j in js:
+        Z = galsim.zernike.Zernike(dz[:,j], R_inner=0.0, R_outer=np.deg2rad(1.75))
+        for thx_, thy_ in zip(thx, thy):
+            zGQ = batoid.analysis.zernikeGQ(
+                telescope, thx_, thy_,
+                625e-9,
+                jmax=22
+            )
+            np.testing.assert_allclose(Z(thx_, thy_), zGQ[j], rtol=0, atol=1e-4)
+
+    # Check that we get similar results with different number of rings/spokes
+    dz2 = batoid.analysis.doubleZernike(
+        telescope,
+        np.deg2rad(1.75),
+        625e-9,
+        rings=12,
+        spokes=29,
+        kmax=28,
+        jmax=22
+    )
+    np.testing.assert_allclose(dz, dz2, rtol=0, atol=1e-2)
+
+
 if __name__ == '__main__':
     test_zernikeGQ()
     test_huygensPSF()
+    test_doubleZernike()
