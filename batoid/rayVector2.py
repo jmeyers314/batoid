@@ -155,10 +155,10 @@ class RayVector2:
             origin = zhat*backDist
             cs = CoordSys(origin, np.stack([xhat, yhat, zhat]).T)
             transform = CoordTransform2(globalCoordSys, cs)
-            transform.applyForwardInPlace(rays)
+            transform.applyForward(rays)
             plane = Plane2()
-            plane.intersectInPlace(rays)
-            transform.applyReverseInPlace(rays)
+            plane.intersect(rays)
+            transform.applyReverse(rays)
             return RayVector2.fromArrays(
                 rays.x, rays.y, rays.z, vx, vy, vz, t, w, flux=flux
             )
@@ -262,9 +262,9 @@ class RayVector2:
             self.vignetted.copy(), self.failed.copy()
         )
 
-    def toCoordSysInPlace(self, coordSys):
+    def toCoordSys(self, coordSys):
         transform = CoordTransform2(self.coordSys, coordSys)
-        transform.applyForwardInPlace(self)
+        transform.applyForward(self)
 
     def __len__(self):
         return self._rv.t.size;

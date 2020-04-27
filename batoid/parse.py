@@ -252,7 +252,7 @@ if _has_gpu:
                 parse_optic2(itemsConfig[1], coordSys=coordSys, inMedium=medium, outMedium=outMedium)
             ]
             return batoid.optic.Lens(
-                items, medium, name=name, coordSys=coordSys,
+                items, name=name, coordSys=coordSys,
                 inMedium=inMedium, outMedium=outMedium)
         elif typ == 'CompoundOptic':
             itemsConfig = config.pop('items')

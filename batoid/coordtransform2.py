@@ -9,8 +9,8 @@ class CoordTransform2:
             toSys._coordSys
         )
 
-    def applyForwardInPlace(self, r):
+    def applyForward(self, r):
         self._coordTransform.applyForwardInPlace(r._rv)
 
-    def applyReverseInPlace(self, r):
+    def applyReverse(self, r):
         self._coordTransform.applyReverseInPlace(r._rv)

@@ -82,12 +82,12 @@ def test_coordtransform(Nthread=1, Nray=100_000, Nloop=1):
 
     t0 = time.time()
     for _ in range(Nloop):
-        xf1.applyForwardInPlace(rv)
-        xf1.applyReverseInPlace(rv)
+        xf1.applyForward(rv)
+        xf1.applyReverse(rv)
     t1 = time.time()
     for _ in range(Nloop):
-        xf2.applyForwardInPlace(rv2)
-        xf2.applyReverseInPlace(rv2)
+        xf2.applyForward(rv2)
+        xf2.applyReverse(rv2)
     t2 = time.time()
     print("test_coordtransform")
     print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
@@ -129,10 +129,10 @@ def test_intersect_plane(Nthread=1, Nray=100_000, Nloop=1):
 
     t0 = time.time()
     for _ in range(Nloop):
-        plane.intersectInPlace(rv)
+        plane.intersect(rv)
     t1 = time.time()
     for _ in range(Nloop):
-        plane2.intersectInPlace(rv2)
+        plane2.intersect(rv2)
     t2 = time.time()
     print("test_intersect_plane")
     print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
@@ -174,10 +174,10 @@ def test_reflect_plane(Nthread=1, Nray=100_000, Nloop=1):
 
     t0 = time.time()
     for _ in range(Nloop):
-        plane.reflectInPlace(rv)
+        plane.reflect(rv)
     t1 = time.time()
     for _ in range(Nloop):
-        plane2.reflectInPlace(rv2)
+        plane2.reflect(rv2)
     t2 = time.time()
 
     print("test_reflect_plane")
@@ -228,10 +228,10 @@ def test_refract_plane(Nthread=1, Nray=100_000, Nloop=1):
 
     t0 = time.time()
     for _ in range(Nloop):
-        plane.refractInPlace(rv, m1, m2)
+        plane.refract(rv, m1, m2)
     t1 = time.time()
     for _ in range(Nloop):
-        plane2.refractInPlace(rv2, m1gpu, m2gpu)
+        plane2.refract(rv2, m1gpu, m2gpu)
     t2 = time.time()
 
     print("test_refract_plane")
@@ -274,10 +274,10 @@ def test_intersect_sphere(Nthread=1, Nray=100_000, Nloop=1):
 
     t0 = time.time()
     for _ in range(Nloop):
-        sphere.intersectInPlace(rv)
+        sphere.intersect(rv)
     t1 = time.time()
     for _ in range(Nloop):
-        sphere2.intersectInPlace(rv2)
+        sphere2.intersect(rv2)
     t2 = time.time()
     print("test_intersect_sphere")
     print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
@@ -319,10 +319,10 @@ def test_reflect_sphere(Nthread=1, Nray=100_000, Nloop=1):
 
     t0 = time.time()
     for _ in range(Nloop):
-        sphere.reflectInPlace(rv)
+        sphere.reflect(rv)
     t1 = time.time()
     for _ in range(Nloop):
-        sphere2.reflectInPlace(rv2)
+        sphere2.reflect(rv2)
     t2 = time.time()
 
     print("test_reflect_sphere")
@@ -373,10 +373,10 @@ def test_refract_sphere(Nthread=1, Nray=100_000, Nloop=1):
 
     t0 = time.time()
     for _ in range(Nloop):
-        sphere.refractInPlace(rv, m1, m2)
+        sphere.refract(rv, m1, m2)
     t1 = time.time()
     for _ in range(Nloop):
-        sphere2.refractInPlace(rv2, m1gpu, m2gpu)
+        sphere2.refract(rv2, m1gpu, m2gpu)
     t2 = time.time()
 
     print("test_refract_sphere")
@@ -419,10 +419,10 @@ def test_intersect_paraboloid(Nthread=1, Nray=100_000, Nloop=1):
 
     t0 = time.time()
     for _ in range(Nloop):
-        paraboloid.intersectInPlace(rv)
+        paraboloid.intersect(rv)
     t1 = time.time()
     for _ in range(Nloop):
-        paraboloid2.intersectInPlace(rv2)
+        paraboloid2.intersect(rv2)
     t2 = time.time()
     print("test_intersect_paraboloid")
     print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
@@ -464,10 +464,10 @@ def test_reflect_paraboloid(Nthread=1, Nray=100_000, Nloop=1):
 
     t0 = time.time()
     for _ in range(Nloop):
-        paraboloid.reflectInPlace(rv)
+        paraboloid.reflect(rv)
     t1 = time.time()
     for _ in range(Nloop):
-        paraboloid2.reflectInPlace(rv2)
+        paraboloid2.reflect(rv2)
     t2 = time.time()
     print("test_reflect_paraboloid")
     print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
@@ -518,10 +518,10 @@ def test_refract_paraboloid(Nthread=1, Nray=100_000, Nloop=1):
 
     t0 = time.time()
     for _ in range(Nloop):
-        paraboloid.refractInPlace(rv, m1, m2)
+        paraboloid.refract(rv, m1, m2)
     t1 = time.time()
     for _ in range(Nloop):
-        paraboloid2.refractInPlace(rv2, m1gpu, m2gpu)
+        paraboloid2.refract(rv2, m1gpu, m2gpu)
     t2 = time.time()
     print("test_refract_paraboloid")
     print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
@@ -563,10 +563,10 @@ def test_intersect_quadric(Nthread=1, Nray=100_000, Nloop=1):
 
     t0 = time.time()
     for _ in range(Nloop):
-        quadric.intersectInPlace(rv)
+        quadric.intersect(rv)
     t1 = time.time()
     for _ in range(Nloop):
-        quadric2.intersectInPlace(rv2)
+        quadric2.intersect(rv2)
     t2 = time.time()
     print("test_intersect_quadric")
     print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
@@ -608,10 +608,10 @@ def test_reflect_quadric(Nthread=1, Nray=100_000, Nloop=1):
 
     t0 = time.time()
     for _ in range(Nloop):
-        quadric.reflectInPlace(rv)
+        quadric.reflect(rv)
     t1 = time.time()
     for _ in range(Nloop):
-        quadric2.reflectInPlace(rv2)
+        quadric2.reflect(rv2)
     t2 = time.time()
     print("test_reflect_quadric")
     print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
@@ -662,10 +662,10 @@ def test_refract_quadric(Nthread=1, Nray=100_000, Nloop=1):
 
     t0 = time.time()
     for _ in range(Nloop):
-        quadric.refractInPlace(rv, m1, m2)
+        quadric.refract(rv, m1, m2)
     t1 = time.time()
     for _ in range(Nloop):
-        quadric2.refractInPlace(rv2, m1gpu, m2gpu)
+        quadric2.refract(rv2, m1gpu, m2gpu)
     t2 = time.time()
     print("test_refract_quadric")
     print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
@@ -711,10 +711,10 @@ def test_intersect_asphere(Nthread=1, Nray=100_000, Nloop=1):
 
     t0 = time.time()
     for _ in range(Nloop):
-        asphere.intersectInPlace(rv)
+        asphere.intersect(rv)
     t1 = time.time()
     for _ in range(Nloop):
-        asphere2.intersectInPlace(rv2)
+        asphere2.intersect(rv2)
     t2 = time.time()
     print("test_intersect_asphere")
     print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
@@ -760,10 +760,10 @@ def test_reflect_asphere(Nthread=1, Nray=100_000, Nloop=1):
 
     t0 = time.time()
     for _ in range(Nloop):
-        asphere.reflectInPlace(rv)
+        asphere.reflect(rv)
     t1 = time.time()
     for _ in range(Nloop):
-        asphere2.reflectInPlace(rv2)
+        asphere2.reflect(rv2)
     t2 = time.time()
     print("test_reflect_asphere")
     print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
@@ -814,10 +814,10 @@ def test_refract_asphere(Nthread=1, Nray=100_000, Nloop=1):
 
     t0 = time.time()
     for _ in range(Nloop):
-        asphere.refractInPlace(rv, m1, m2)
+        asphere.refract(rv, m1, m2)
     t1 = time.time()
     for _ in range(Nloop):
-        asphere2.refractInPlace(rv2, m1gpu, m2gpu)
+        asphere2.refract(rv2, m1gpu, m2gpu)
     t2 = time.time()
     print("test_refract_asphere")
     print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
@@ -906,10 +906,10 @@ def test_intersect_bicubic(Nthread=1, Nray=100_000, Nloop=1):
 
     t0 = time.time()
     for _ in range(Nloop):
-        surf.intersectInPlace(rv)
+        surf.intersect(rv)
     t1 = time.time()
     for _ in range(Nloop):
-        surf2.intersectInPlace(rv2)
+        surf2.intersect(rv2)
     t2 = time.time()
     print("test_intersect_bicubic")
     print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
@@ -962,10 +962,10 @@ def test_reflect_bicubic(Nthread=1, Nray=100_000, Nloop=1):
 
     t0 = time.time()
     for _ in range(Nloop):
-        surf.reflectInPlace(rv)
+        surf.reflect(rv)
     t1 = time.time()
     for _ in range(Nloop):
-        surf2.reflectInPlace(rv2)
+        surf2.reflect(rv2)
     t2 = time.time()
     print("test_reflect_bicubic")
     print(f"cpu time = {(t1-t0)*1e3:.1f} ms")
@@ -1023,10 +1023,10 @@ def test_refract_bicubic(Nthread=1, Nray=100_000, Nloop=1):
 
     t0 = time.time()
     for _ in range(Nloop):
-        surf.refractInPlace(rv, m1, m2)
+        surf.refract(rv, m1, m2)
     t1 = time.time()
     for _ in range(Nloop):
-        surf2.refractInPlace(rv2, m1gpu, m2gpu)
+        surf2.refract(rv2, m1gpu, m2gpu)
     t2 = time.time()
 
     print("test_refract_bicubic")
@@ -1148,10 +1148,10 @@ def test_obsc(Nthread=1, Nray=100_000, Nloop=1):
         rv2 = rv2_0.copy()
         t0 = time.time()
         for _ in range(Nloop):
-            obsc.obscureInPlace(rv)
+            obsc.obscure(rv)
         t1 = time.time()
         for _ in range(Nloop):
-            obsc2.obscureInPlace(rv2)
+            obsc2.obscure(rv2)
         t2 = time.time()
 
         print(f"{type(obsc)}")

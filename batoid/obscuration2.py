@@ -5,7 +5,7 @@ class Obscuration2:
     def contains(self, x, y):
         return self._obsc.contains(x, y)
 
-    def obscureInPlace(self, r):
+    def obscure(self, r):
         self._obsc.obscureInPlace(r._rv)
 
 
