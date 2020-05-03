@@ -201,10 +201,35 @@ class ObscRay(Obscuration):
         return self._obsc.y
 
 
+class ObscPolygon(Obscuration):
+    """A an arbitrary polygon shaped obscuration.
+
+    Parameters
+    ----------
+    xs : list of float
+        x-coordinates of polygon vertices (in order)
+    ys : list of float
+        y-coordinates of polygon vertices (in order)
+    """
+
+    def __init__(self, xs, ys):
+        self._xs = xs
+        self._ys = ys
+        self._obsc = _batoid.CPPObscPolygon(xs, ys)
+
+    @property
+    def xs(self):
+        return self._obsc._xs
+
+    @property
+    def ys(self):
+        return self._obsc._ys
+
+
 class ObscNegation(Obscuration):
     """A negated obscuration.
 
-    The originally obscured regions become clear, and the original clear
+    The originally obscured regions become clear, and the originally clear
     regions become obscured.
 
     Parameters

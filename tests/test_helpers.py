@@ -79,6 +79,7 @@ def do_pickle(obj, reprable=True):
         from batoid import Table
         from batoid import ConstMedium, TableMedium, SellmeierMedium, Air
         from batoid import ObscCircle, ObscAnnulus, ObscRectangle, ObscRay
+        from batoid import ObscPolygon
         from batoid import ObscNegation, ObscUnion, ObscIntersection
         from batoid import CoordSys, CoordTransform
         from batoid import CompoundOptic, Lens
