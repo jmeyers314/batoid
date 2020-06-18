@@ -240,7 +240,7 @@ def spot(optic, theta_x, theta_y, wavelength,
 
 def fftPSF(optic, theta_x, theta_y, wavelength,
            projection='postel', nx=32, pad_factor=2,
-           sphereRadius=None, reference='mean', _addedWF=None):
+           sphereRadius=None, reference='mean'):
     """Compute PSF using FFT.
 
     Parameters
@@ -287,7 +287,6 @@ def fftPSF(optic, theta_x, theta_y, wavelength,
     expwf[start:stop, start:stop][~wfarr.mask] = \
         np.exp(2j*np.pi*wfarr[~wfarr.mask])
     psf = np.abs(np.fft.fftshift(np.fft.fft2(expwf)))**2
-
     primitiveU = wf.primitiveVectors
     primitiveK = dkdu(
         optic, theta_x, theta_y, wavelength,
