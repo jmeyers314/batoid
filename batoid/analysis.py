@@ -468,8 +468,8 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
         spacing='GQ',
     )
 
-    # Trace to stopSurface to get points at which to evalue Zernikes
-    epRays = rays.toCoordSys(optic.stopSurface.coordSys)
+    # Trace to stopSurface to get points at which to evaluate Zernikes
+    epRays = rays.copy().toCoordSys(optic.stopSurface.coordSys)
     optic.stopSurface.surface.intersect(epRays)
 
     basis = galsim.zernike.zernikeBasis(
