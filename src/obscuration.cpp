@@ -205,6 +205,62 @@ namespace batoid {
     }
 
 
+    ObscPolygon::ObscPolygon(const std::vector<double>& xp, const std::vector<double>& yp) :
+        _xp(xp), _yp(yp) {}
+
+    bool ObscPolygon::contains(double x, double y) const {
+        int size = _xp.size();
+
+        double x1 = _xp[0];
+        double y1 = _yp[0];
+        double xinters = 0.0;
+        bool inside = false;
+        for (int i=1; i<=size; i++) {
+            double x2 = _xp[i % size];
+            double y2 = _yp[i % size];
+            if (y > std::min(y1,y2)) {
+                if (y <= std::max(y1,y2)) {
+                    if (x <= std::max(x1,x2)) {
+                        if (y1 != y2) {
+                            xinters = (y-y1)*(x2-x1)/(y2-y1)+x1;
+                        }
+                        if (x1 == x2 or x <= xinters) {
+                            inside = !inside;
+                        }
+                    }
+                }
+            }
+            x1 = x2;
+            y1 = y2;
+        }
+        return inside;
+    }
+
+    bool ObscPolygon::operator==(const Obscuration& rhs) const {
+        if (const ObscPolygon* other = dynamic_cast<const ObscPolygon*>(&rhs)) {
+            return _xp == other->_xp && _yp == other->_yp;
+        } else return false;
+    }
+
+    std::string ObscPolygon::repr() const {
+        std::ostringstream oss;
+        oss << "ObscPolygon([";
+        std::string separator;
+        for(auto& _xp0 : _xp) {
+            oss << separator << _xp0;
+            separator = ", ";
+        }
+        oss << "], [";
+        separator = "";
+        for(auto& _yp0 : _yp) {
+            oss << separator << _yp0;
+            separator = ", ";
+        }
+        oss << "])";
+        return oss.str();
+    }
+
+
     ObscNegation::ObscNegation(const std::shared_ptr<Obscuration> original) :
         _original(original) {}
 

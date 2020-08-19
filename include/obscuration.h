@@ -77,6 +77,16 @@ namespace batoid {
         const ObscRectangle _rect;
     };
 
+    class ObscPolygon : public Obscuration {
+    public:
+        ObscPolygon(const std::vector<double>& xp, const std::vector<double>& yp);
+        bool contains(double x, double y) const override;
+        bool operator==(const Obscuration& rhs) const override;
+        std::string repr() const override;
+
+        const std::vector<double> _xp, _yp;
+    };
+
     class ObscNegation : public Obscuration {
     public:
         ObscNegation(const std::shared_ptr<Obscuration> original);

@@ -10,7 +10,8 @@ from .table import Table
 from .medium import Medium, ConstMedium, TableMedium
 from .medium import SellmeierMedium, SumitaMedium, Air
 
-from .obscuration import Obscuration, ObscCircle, ObscAnnulus, ObscRectangle, ObscRay
+from .obscuration import Obscuration, ObscCircle, ObscAnnulus, ObscRectangle
+from .obscuration import ObscRay, ObscPolygon
 from .obscuration import ObscUnion, ObscIntersection, ObscNegation
 
 from .coordsys import CoordSys

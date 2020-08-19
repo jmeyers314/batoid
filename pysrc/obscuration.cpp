@@ -3,6 +3,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
+#include <pybind11/numpy.h>
 
 
 namespace py = pybind11;
@@ -11,7 +12,7 @@ using namespace pybind11::literals;
 namespace batoid {
     void pyExportObscuration(py::module& m) {
         py::class_<Obscuration, std::shared_ptr<Obscuration>>(m, "CPPObscuration")
-            .def("contains", &Obscuration::contains)
+            .def("contains", py::vectorize(&Obscuration::contains))
             .def("obscure", (RayVector (Obscuration::*)(const RayVector&) const) &Obscuration::obscure)
             .def("obscureInPlace", (void (Obscuration::*)(RayVector&) const) &Obscuration::obscureInPlace)
             .def("__repr__", &Obscuration::repr);
@@ -135,6 +136,30 @@ namespace batoid {
                     o._theta,
                     o._x0,
                     o._y0
+                ));
+            });
+
+
+        py::class_<ObscPolygon, std::shared_ptr<ObscPolygon>, Obscuration>(m, "CPPObscPolygon")
+            .def(py::init<std::vector<double>, std::vector<double>>(), "init")
+            .def(py::self == py::self)
+            .def(py::self != py::self)
+            .def_readonly("xs", &ObscPolygon::_xp)
+            .def_readonly("ys", &ObscPolygon::_yp)
+            .def(py::pickle(
+                [](const ObscPolygon& o){ return py::make_tuple(o._xp, o._yp); },
+                [](py::tuple t) {
+                    return ObscPolygon(
+                        t[0].cast<std::vector<double>>(),
+                        t[1].cast<std::vector<double>>()
+                    );
+                }
+            ))
+            .def("__hash__", [](const ObscPolygon& o) {
+                return py::hash(py::make_tuple(
+                    "CPPObscPolygon",
+                    py::tuple(py::cast(o._xp)),
+                    py::tuple(py::cast(o._yp))
                 ));
             });
 

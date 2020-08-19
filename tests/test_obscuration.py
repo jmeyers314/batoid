@@ -75,6 +75,46 @@ def test_ObscRay():
 
 
 @timer
+def test_ObscPolygon():
+    import random
+    random.seed(577215)
+
+    # Test equivalency with ObscRectangle
+    for i in range(100):
+        cx = random.gauss(0.0, 1.0)
+        cy = random.gauss(0.0, 1.0)
+        w = random.uniform(0.5, 2.5)
+        h = random.uniform(0.5, 2.5)
+
+        xs = [cx-w/2, cx+w/2, cx+w/2, cx-w/2, cx-w/2]
+        ys = [cy-h/2, cy-h/2, cy+h/2, cy+h/2, cy-h/2]
+        obscPoly = batoid.ObscPolygon(xs, ys)
+        obscRect = batoid.ObscRectangle(w, h, cx, cy, 0.0)
+
+        for i in range(100):
+            x = random.gauss(0.0, 2.0)
+            y = random.gauss(0.0, 2.0)
+            assert obscPoly.contains(x, y) == obscRect.contains(x, y)
+
+    # Try Union of two Rectangles equal to Polygon.
+    # Center of both rectangles at (1, 2)
+    # One is width=4, height=2
+    # Other is width=2, height=4
+    r1 = batoid.ObscRectangle(4, 2, 1, 2)
+    r2 = batoid.ObscRectangle(2, 4, 1, 2)
+    o1 = batoid.ObscUnion([r1, r2])
+    xs = [-2, -1, -1, 1, 1, 2, 2, 1, 1, -1, -1, -2, -2]
+    ys = [1, 1, 2, 2, 1, 1, -1, -1, -2, -2, -1, -1, 1]
+    o2 = batoid.ObscPolygon(np.array(xs)+1, np.array(ys)+2)
+
+    for i in range(10000):
+        x = random.gauss(0.0, 2.0)
+        y = random.gauss(0.0, 2.0)
+        assert o1.contains(x, y) == o2.contains(x, y)
+    do_pickle(o2)
+
+
+@timer
 def test_ObscNegation():
     import random
     random.seed(5772)
@@ -191,6 +231,7 @@ if __name__ == '__main__':
     test_ObscCircle()
     test_ObscAnnulus()
     test_ObscRectangle()
+    test_ObscPolygon()
     test_ObscNegation()
     test_ObscCompound()
     test_ne()

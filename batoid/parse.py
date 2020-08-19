@@ -5,7 +5,9 @@ import numpy as np
 
 def parse_obscuration(config):
     typ = config.pop('type')
-    if typ in ['ObscCircle', 'ObscAnnulus', 'ObscRay', 'ObscRectangle']:
+    if typ in [
+        'ObscCircle', 'ObscAnnulus', 'ObscRay', 'ObscRectangle', 'ObscPolygon'
+    ]:
         evalstr = "batoid.{}(**config)".format(typ)
         return eval(evalstr)
     if typ == 'ObscNegation':

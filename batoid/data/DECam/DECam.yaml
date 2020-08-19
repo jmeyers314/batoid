@@ -8,18 +8,179 @@ opticalSystem:
     # temperature: ...
     # h2o_pressure: ...
   medium: *air  # This dereferences back to the air variable defined above (using the special & character)
-  backDist: 12.0  # distance from global vertex to use to start tracing rays
+  backDist: 15.0  # distance from global vertex to use to start tracing rays
   sphereRadius: 10.0  # reference sphere radius to use for wavefront calculation
-  pupilSize: 3.81  # Pupil fits inside a square with this side length
-  pupilObscuration: 0.1  # Fractional pupil central obscuration
+  pupilSize: 3.942  # Pupil fits inside a square with this side length
+  pupilObscuration: 0.3  # Fractional pupil central obscuration
   stopSurface:
     type: Interface
     name: entrancePupil
     surface:
       type: Plane
     coordSys:
-      z: 0.08512541896228668
+      # z: 0.08512541896228668
+      z: 0.434
   items:
+    -
+      type: Baffle
+      name: ENDCAP_TOP
+      surface:
+        type: Plane
+      coordSys:
+        z: 11.9229 # first attempt
+        # z: 12.0229
+      obscuration:
+        type: ObscCircle
+        radius: 0.8254
+    -
+      type: Baffle
+      name: ENDCAP_BOTTOM
+      surface:
+        type: Plane
+      coordSys:
+        z: 11.3895
+        # z: 11.4895
+      obscuration:
+        type: ObscCircle
+        radius: 0.8254
+    -
+      type: Baffle
+      name: FILTER_OBSTRUCTION
+      surface:
+        type: Plane
+      coordSys:
+        z: 10.2080
+        # z: 10.3080
+      obscuration:
+        type: ObscUnion
+        items:
+          -
+            type: ObscCircle
+            radius: 0.7896
+          -
+            type: ObscPolygon
+            xs: [-0.459, -0.3937, -0.3556, -0.3048, -0.254, -0.2032, -0.1524,
+                 -0.1016, -0.0508, 0.0, 0.0508, 0.1016, 0.1524, 0.2032, 0.254,
+                  0.3048, 0.3556, 0.3937, 0.459, 0.459, 0.3937, 0.3556, 0.3048,
+                  0.254, 0.2032, 0.1524, 0.1016, 0.0508, 0.0, -0.0508, -0.1016,
+                 -0.1524, -0.2032, -0.254, -0.3048, -0.3556, -0.3937, -0.459]
+            ys: [0.8786, 0.8786, 0.902, 0.932, 0.955, 0.975, 0.991, 1.001,
+                 1.006, 1.0119, 1.006, 1.001, 0.991, 0.975, 0.955, 0.932,
+                 0.902, 0.8786, 0.8786, -0.8786, -0.8786, -0.902, -0.932,
+                -0.955, -0.975, -0.991, -1.001, -1.006, -1.0119, -1.006,
+                -1.001, -0.991, -0.975, -0.955, -0.932, -0.902, -0.8786,
+                -0.8786]
+    -
+      type: Baffle
+      name: CAGE_MID
+      surface:
+        type: Plane
+      coordSys:
+        z: 9.646
+        # z: 9.746
+      obscuration:
+        type: ObscCircle
+        radius: 0.7896
+    -
+      type: Baffle
+      name: SPIDER
+      surface:
+        type: Plane
+      coordSys:
+        z: 8.9447
+        # z: 9.0447
+      obscuration:
+        type: ObscUnion
+        items:
+          -
+            type: ObscRectangle
+            width: 0.019
+            height: 5
+            theta: 0.7853981634
+          -
+            type: ObscRectangle
+            width: 0.019
+            height: 5
+            theta: -0.7853981634
+    -
+      type: Baffle
+      name: CAGE_BOT
+      surface:
+        type: Plane
+      coordSys:
+        z: 7.8271
+        # z: 7.9271
+      obscuration:
+        type: ObscCircle
+        radius: 0.7896
+    -
+      type: Baffle
+      name: SHROUD
+      surface:
+        type: Plane
+      coordSys:
+        z: 7.3623
+        # z: 7.4623
+      obscuration:
+        type: ObscCircle
+        radius: 0.8181
+    -
+      type: Baffle
+      name: CHIMNEY_A
+      surface:
+        type: Plane
+      coordSys:
+        z: 3.6530
+        # z: 3.7530
+      obscuration:
+        type: ObscCircle
+        radius: 0.4699
+    -
+      type: Baffle
+      name: CHIMNEY_B
+      surface:
+        type: Plane
+      coordSys:
+        z: 2.5823
+        # z: 2.6823
+      obscuration:
+        type: ObscCircle
+        radius: 0.5334
+    -
+      type: Baffle
+      name: CHIMNEY_C
+      surface:
+        type: Plane
+      coordSys:
+        z: 1.6139
+        # z: 1.7139
+      obscuration:
+        type: ObscCircle
+        radius: 0.6223
+    -
+      type: Baffle
+      name: MASK
+      surface:
+        type: Plane
+      coordSys:
+        z: 0.434
+        # z: 0.534
+      obscuration:
+        type: ObscAnnulus
+        inner: 1.971
+        outer: 2.3
+    # -
+    #   type: Baffle
+    #   name: CHIMNEY_D
+    #   surface:
+    #     type: Plane
+    #     allowReverse: True
+    #   coordSys:
+    #     z: 0.0
+    #     # z: 0.1
+    #   obscuration:
+    #     type: ObscCircle
+    #     radius: 0.6477
     -
       type: Mirror
       name: PM
@@ -29,8 +190,65 @@ opticalSystem:
         conic: -1.0976
       obscuration:
         type: ClearAnnulus
-        outer: 1.905
-        inner: 0.762  # 40% as a guess
+        outer: 2.005
+        inner: 0.6684
+    # -
+    #   type: Baffle
+    #   name: CHIMNEY_D_2
+    #   surface:
+    #     type: Plane
+    #     allowReverse: True
+    #   coordSys:
+    #     z: 0.0
+    #     # z: 0.1
+    #   obscuration:
+    #     type: ObscCircle
+    #     radius: 0.6477
+    -
+      type: Baffle
+      name: MASK_2
+      surface:
+        type: Plane
+      coordSys:
+        z: 0.434
+        # z: 0.534
+      obscuration:
+        type: ObscAnnulus
+        inner: 1.971
+        outer: 2.3
+    -
+      type: Baffle
+      name: CHIMNEY_C_2
+      surface:
+        type: Plane
+      coordSys:
+        z: 1.6139
+        # z: 1.7139
+      obscuration:
+        type: ObscCircle
+        radius: 0.6223
+    -
+      type: Baffle
+      name: CHIMNEY_B_2
+      surface:
+        type: Plane
+      coordSys:
+        z: 2.5823
+        # z: 2.6823
+      obscuration:
+        type: ObscCircle
+        radius: 0.5334
+    -
+      type: Baffle
+      name: CHIMNEY_A_2
+      surface:
+        type: Plane
+      coordSys:
+        z: 3.6530
+        # z: 3.7530
+      obscuration:
+        type: ObscCircle
+        radius: 0.4699
     -
       type: CompoundOptic
       name: DECam
