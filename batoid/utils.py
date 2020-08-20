@@ -1,6 +1,5 @@
 import numpy as np
 from numbers import Real
-from . import _batoid
 
 
 def normalized(*args):

@@ -1,31 +1,34 @@
 #ifndef batoid_dualView_h
 #define batoid_dualView_h
 
-#include <cstdlib>
-#include <omp.h>
+#include <cstdlib>  // for size_t
 
 namespace batoid {
-    enum class DVOwnerType{ host, device };
 
+    // Enum to track whether data is non-stale on the
+    // device or the host.
+    enum class SyncState{ host, device };
+
+    // Class to synchronize an array between host and device.
+    // Uses openmp pragmas, so becomes a noop when openmp is
+    // unavailable.
     template<typename T>
     struct DualView {
     public:
-        // Construct from pre-allocated and owned host memory
-        // Allocate but don't fill device memory
+        // Constructor for when host data is already allocated,
+        // we just want to point to it.
         DualView(
-            T* _hostData,
-            size_t _size,
-            DVOwnerType _owner=DVOwnerType::host,
-            int _dnum=omp_get_default_device(),
-            int _hnum=omp_get_initial_device()
+            T* _data,
+            size_t _size
         );
-        // Own your own host memory
+
+        // Constructor for when we want to freshly allocate
+        // host data.
         DualView(
             size_t _size,
-            DVOwnerType _owner=DVOwnerType::device,
-            int _dnum=omp_get_default_device(),
-            int _hnum=omp_get_initial_device()
+            SyncState _syncState=SyncState::device
         );
+
         ~DualView();
 
         void syncToHost() const;
@@ -34,14 +37,10 @@ namespace batoid {
         bool operator==(const DualView<T>& rhs) const;
         bool operator!=(const DualView<T>& rhs) const;
 
-        mutable DVOwnerType owner;
-
-        T* hostData;
+        mutable SyncState syncState;
+        T* data;
         size_t size;
-        int dnum;  // device index
-        int hnum;  // host index
-        T* deviceData;
-        bool owns;
+        bool ownsHostData;
     };
 }
 

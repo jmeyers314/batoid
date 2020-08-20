@@ -3,61 +3,54 @@
 
 namespace batoid {
     template<typename T>
-    DualView<T>::DualView(T* _hostData, size_t _size, DVOwnerType _owner, int _dnum, int _hnum) :
-        owner(_owner),
-        hostData(_hostData),
-        size(_size),
-        dnum(_dnum),
-        hnum(_hnum),
-        deviceData(static_cast<T*>(omp_target_alloc(size*sizeof(T), dnum))),
-        owns(false)
-    { }
+    DualView<T>::DualView(T* _data, size_t _size) :
+        data(_data), size(_size), syncState(SyncState::host), ownsHostData(false) {
+            #pragma omp target enter data map(alloc:data[:size])
+        }
 
     template<typename T>
-    DualView<T>::DualView(size_t _size, DVOwnerType _owner, int _dnum, int _hnum) :
-        owner(_owner),
-        hostData(new T[_size]),
-        size(_size),
-        dnum(_dnum),
-        hnum(_hnum),
-        deviceData(static_cast<T*>(omp_target_alloc(size*sizeof(T), dnum))),
-        owns(true)
-    { }
+    DualView<T>::DualView(size_t _size, SyncState _syncState) :
+        data(new T[_size]), size(_size), syncState(_syncState), ownsHostData(true) {
+            #pragma omp target enter data map(alloc:data[:size])
+        }
 
     template<typename T>
     DualView<T>::~DualView() {
-        omp_target_free(deviceData, dnum);
-        if (owns) delete[] hostData;
+        #pragma omp target exit data map(delete:data[:size])
+        if (ownsHostData) delete[] data;
     }
 
     template<typename T>
     void DualView<T>::syncToHost() const {
-        if (owner == DVOwnerType::device) {
-            omp_target_memcpy(hostData, deviceData, size*sizeof(T), 0, 0, hnum, dnum);
-            owner = DVOwnerType::host;
+        if (syncState == SyncState::device) {
+            #pragma omp target update from(data[:size])
+            syncState = SyncState::host;
         }
     }
 
     template<typename T>
     void DualView<T>::syncToDevice() const {
-        if (owner == DVOwnerType::host) {
-            omp_target_memcpy(deviceData, hostData, size*sizeof(T), 0, 0, dnum, hnum);
-            owner = DVOwnerType::device;
+        if (syncState == SyncState::host) {
+            #pragma omp target update to(data[:size])
+            syncState = SyncState::device;
         }
     }
 
     template<typename T>
     bool DualView<T>::operator==(const DualView<T>& rhs) const {
-        // Compare on the device
-        bool result{false};
-        syncToDevice();
-        rhs.syncToDevice();
-        T* ptr = deviceData;
-        T* rhs_ptr = rhs.deviceData;
-        #pragma omp target is_device_ptr(ptr, rhs_ptr) map(tofrom:result)
-        {
-            #pragma omp teams distribute parallel for reduction(&:result)
-            for(size_t i=0; i<size; i++) result &= ptr[i] == rhs_ptr[i];
+        // If both DualViews are currently synced to Device, do the comparison there.
+        // Otherwise, copy to host and do comparison there.
+        bool result{true};
+        if (syncState == SyncState::host && rhs.syncState == SyncState::host) {
+            #pragma omp parallel for reduction(&:result)
+            for(size_t i=0; i<size; i++) result &= data[i] == rhs.data[i];
+        } else {
+            syncToDevice();
+            rhs.syncToDevice();
+            T* myData = data;
+            T* rhsData = rhs.data;
+            #pragma omp target teams distribute parallel for reduction(&:result)
+            for(size_t i=0; i<size; i++) result &= myData[i] == rhsData[i];
         }
         return result;
     }
@@ -67,7 +60,9 @@ namespace batoid {
         return !(*this == rhs);
     }
 
+    // instantiate some versions
     template class DualView<double>;
     template class DualView<bool>;
     template class DualView<int>;
+
 }

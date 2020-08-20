@@ -25,87 +25,88 @@ include_directories(include SYSTEM eigen)
 add_subdirectory(pybind11)
 
 set(PYSRC_FILES
-  pysrc/asphere.cpp
+  # pysrc/asphere.cpp
   pysrc/batoid.cpp
-  pysrc/bicubic.cpp
-  pysrc/coating.cpp
-  pysrc/coordsys.cpp
-  pysrc/coordtransform.cpp
-  pysrc/medium.cpp
-  pysrc/obscuration.cpp
-  pysrc/paraboloid.cpp
-  pysrc/plane.cpp
-  pysrc/polynomialSurface.cpp
-  pysrc/quadric.cpp
-  pysrc/ray.cpp
+  # pysrc/bicubic.cpp
+  # pysrc/coating.cpp
+  # pysrc/coordsys.cpp
+  # pysrc/coordtransform.cpp
+  # pysrc/medium.cpp
+  # pysrc/obscuration.cpp
+  # pysrc/paraboloid.cpp
+  # pysrc/plane.cpp
+  # pysrc/polynomialSurface.cpp
+  # pysrc/quadric.cpp
+  # pysrc/ray.cpp
   pysrc/rayVector.cpp
-  pysrc/sphere.cpp
-  pysrc/sum.cpp
-  pysrc/surface.cpp
-  pysrc/table.cpp
+  # pysrc/sphere.cpp
+  # pysrc/sum.cpp
+  # pysrc/surface.cpp
+  # pysrc/table.cpp
 )
 
 set(SRC_FILES
-  src/asphere.cpp
+  # src/asphere.cpp
   src/batoid.cpp
-  src/bicubic.cpp
-  src/coating.cpp
-  src/coordsys.cpp
-  src/coordtransform.cpp
-  src/medium.cpp
-  src/obscuration.cpp
-  src/paraboloid.cpp
-  src/plane.cpp
-  src/polynomialSurface.cpp
-  src/quadric.cpp
-  src/ray.cpp
+  # src/bicubic.cpp
+  # src/coating.cpp
+  # src/coordsys.cpp
+  # src/coordtransform.cpp
+  src/dualView.cpp
+  # src/medium.cpp
+  # src/obscuration.cpp
+  # src/paraboloid.cpp
+  # src/plane.cpp
+  # src/polynomialSurface.cpp
+  # src/quadric.cpp
+  # src/ray.cpp
   src/rayVector.cpp
-  src/sphere.cpp
-  src/sum.cpp
-  src/surface.cpp
-  src/table.cpp
-  src/utils.cpp
+  # src/sphere.cpp
+  # src/sum.cpp
+  # src/surface.cpp
+  # src/table.cpp
+  # src/utils.cpp
 )
 
-if (DEFINED ENV{BATOID_GPU})
-  list(APPEND PYSRC_FILES
-    pysrc/coordtransform2.cpp
-    pysrc/medium2.cpp
-    pysrc/rayVector2.cpp
-    pysrc/surface2.cpp
-    pysrc/paraboloid2.cpp
-    pysrc/plane2.cpp
-    pysrc/sphere2.cpp
-    pysrc/quadric2.cpp
-    pysrc/asphere2.cpp
-    pysrc/bilinear2.cpp
-    pysrc/bicubic2.cpp
-    pysrc/extendedAsphere2.cpp
-    pysrc/obscuration2.cpp
-  )
-  list(APPEND SRC_FILES
-    src/coordtransform2.cpp
-    src/dualView.cpp
-    src/medium2.cpp
-    src/rayVector2.cpp
-    src/surface2.cpp
-    src/paraboloid2.cpp
-    src/plane2.cpp
-    src/sphere2.cpp
-    src/quadric2.cpp
-    src/asphere2.cpp
-    src/bilinear2.cpp
-    src/bicubic2.cpp
-    src/extendedAsphere2.cpp
-    src/obscuration2.cpp
-  )
-endif()
+# if (DEFINED ENV{BATOID_GPU})
+#   list(APPEND PYSRC_FILES
+#     pysrc/coordtransform2.cpp
+#     pysrc/medium2.cpp
+#     pysrc/rayVector2.cpp
+#     pysrc/surface2.cpp
+#     pysrc/paraboloid2.cpp
+#     pysrc/plane2.cpp
+#     pysrc/sphere2.cpp
+#     pysrc/quadric2.cpp
+#     pysrc/asphere2.cpp
+#     pysrc/bilinear2.cpp
+#     pysrc/bicubic2.cpp
+#     pysrc/extendedAsphere2.cpp
+#     pysrc/obscuration2.cpp
+#   )
+#   list(APPEND SRC_FILES
+#     src/coordtransform2.cpp
+#     src/dualView.cpp
+#     src/medium2.cpp
+#     src/rayVector2.cpp
+#     src/surface2.cpp
+#     src/paraboloid2.cpp
+#     src/plane2.cpp
+#     src/sphere2.cpp
+#     src/quadric2.cpp
+#     src/asphere2.cpp
+#     src/bilinear2.cpp
+#     src/bicubic2.cpp
+#     src/extendedAsphere2.cpp
+#     src/obscuration2.cpp
+#   )
+# endif()
 
-set_source_files_properties(
-  src/bicubic2.cpp
-  PROPERTIES
-  COMPILE_FLAGS -O0
-)
+# set_source_files_properties(
+#   src/bicubic2.cpp
+#   PROPERTIES
+#   COMPILE_FLAGS -O0
+# )
 
 include(CheckCXXCompilerFlag)
 macro(ADD_CXX_FLAG_IF_AVAIL  TARG  FLAG  FLAG_NAME)
@@ -140,7 +141,7 @@ if (DEFINED ENV{BATOID_GPU})
   set_target_properties(_batoid
     PROPERTIES
     DEFINE_SYMBOL ""
-    )
+  )
 
 else()
 
