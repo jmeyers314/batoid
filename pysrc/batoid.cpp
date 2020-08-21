@@ -23,7 +23,7 @@ namespace batoid {
     // void pyExportCoating(py::module&);
     // void pyExportMedium(py::module&);
     // void pyExportObscuration(py::module&);
-    // void pyExportCoordSys(py::module&);
+    void pyExportCoordSys(py::module&);
     // void pyExportCoordTransform(py::module&);
 
 // #ifdef BATOID_GPU
@@ -60,7 +60,7 @@ namespace batoid {
         // pyExportCoating(m);
         // pyExportMedium(m);
         // pyExportObscuration(m);
-        // pyExportCoordSys(m);
+        pyExportCoordSys(m);
         // pyExportCoordTransform(m);
 
 // #ifdef BATOID_GPU

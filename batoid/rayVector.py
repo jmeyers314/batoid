@@ -3,8 +3,8 @@ from numbers import Real, Integral
 import numpy as np
 
 from . import _batoid
-# from .constants import globalCoordSys
-# from .coordsys import CoordSys
+from .constants import globalCoordSys
+from .coordSys import CoordSys
 # from .coordtransform import CoordTransform
 # from .coordtransform2 import CoordTransform2
 from .utils import lazy_property
@@ -12,7 +12,7 @@ from .utils import lazy_property
 class RayVector:
     def __init__(
         self, x, y, z, vx, vy, vz, t=0, wavelength=500e-9, flux=1, vignetted=False, failed=False,
-        # coordSys=globalCoordSys
+        coordSys=globalCoordSys
     ):
         """Create RayVector from 1d parameter arrays.  Always makes a copy
         of input arrays.
@@ -69,6 +69,8 @@ class RayVector:
             self._failed.fill(failed)
         else:
             self._failed = np.ascontiguousarray(failed)
+
+        self._initial_coordSys = coordSys
 
     def positionAtTime(self, t):
         out = np.empty_like(self._r)
@@ -272,9 +274,9 @@ class RayVector:
         self._rv.failed.syncToHost()
         return self._failed
 
-    # @property
-    # def coordSys(self):
-    #     return CoordSys._fromCoordSys(self._rv.coordSys)
+    @property
+    def coordSys(self):
+        return CoordSys._fromCoordSys(self._rv.coordSys)
 
     @lazy_property
     def _rv(self):
@@ -282,7 +284,7 @@ class RayVector:
             self._r.ctypes.data, self._v.ctypes.data, self._t.ctypes.data,
             self._wavelength.ctypes.data, self._flux.ctypes.data,
             self._vignetted.ctypes.data, self._failed.ctypes.data,
-            len(self._wavelength)#, self._coordSys._coordSys
+            len(self._wavelength), self._initial_coordSys._coordSys
         )
 
     def copy(self):
@@ -291,7 +293,7 @@ class RayVector:
             self.x.copy(), self.y.copy(), self.z.copy(),
             self.vx.copy(), self.vy.copy(), self.vz.copy(),
             self.t.copy(), self.wavelength.copy(), self.flux.copy(),
-            self.vignetted.copy(), self.failed.copy()
+            self.vignetted.copy(), self.failed.copy(), self.coordSys
         )
 
     # def toCoordSys(self, coordSys):

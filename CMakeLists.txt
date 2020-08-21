@@ -29,7 +29,7 @@ set(PYSRC_FILES
   pysrc/batoid.cpp
   # pysrc/bicubic.cpp
   # pysrc/coating.cpp
-  # pysrc/coordsys.cpp
+  pysrc/coordSys.cpp
   # pysrc/coordtransform.cpp
   # pysrc/medium.cpp
   # pysrc/obscuration.cpp
@@ -50,7 +50,7 @@ set(SRC_FILES
   src/batoid.cpp
   # src/bicubic.cpp
   # src/coating.cpp
-  # src/coordsys.cpp
+  src/coordSys.cpp
   # src/coordtransform.cpp
   src/dualView.cpp
   # src/medium.cpp
