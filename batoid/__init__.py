@@ -3,6 +3,7 @@ from ._version import __version__, __version_info__
 from .rayVector import RayVector
 
 from .coordSys import CoordSys, RotX, RotY, RotZ
+from .coordTransform import CoordTransform
 
 # from .ray import Ray
 # from .rayVector import RayVector, concatenateRayVectors, rayGrid, circularGrid

@@ -30,7 +30,7 @@ set(PYSRC_FILES
   # pysrc/bicubic.cpp
   # pysrc/coating.cpp
   pysrc/coordSys.cpp
-  # pysrc/coordtransform.cpp
+  pysrc/coordTransform.cpp
   # pysrc/medium.cpp
   # pysrc/obscuration.cpp
   # pysrc/paraboloid.cpp
@@ -51,7 +51,7 @@ set(SRC_FILES
   # src/bicubic.cpp
   # src/coating.cpp
   src/coordSys.cpp
-  # src/coordtransform.cpp
+  src/coordTransform.cpp
   src/dualView.cpp
   # src/medium.cpp
   # src/obscuration.cpp
@@ -66,6 +66,7 @@ set(SRC_FILES
   # src/surface.cpp
   # src/table.cpp
   # src/utils.cpp
+  src/vecmath.cpp
 )
 
 # if (DEFINED ENV{BATOID_GPU})

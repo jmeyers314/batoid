@@ -5,9 +5,6 @@
 namespace py = pybind11;
 
 namespace batoid {
-    using vec3 = CoordSys::vec3;
-    using mat3 = CoordSys::mat3;
-
     void pyExportCoordSys(py::module& m) {
         py::class_<CoordSys, std::shared_ptr<CoordSys>>(m, "CPPCoordSys")
             .def(py::init<>())

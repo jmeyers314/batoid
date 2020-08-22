@@ -1,13 +1,10 @@
 #ifndef batoid_coordSys_h
 #define batoid_coordSys_h
 
-#include <array>
+#include "vecmath.h"
 
 namespace batoid {
     struct CoordSys {
-        using vec3 = std::array<double, 3>;
-        using mat3 = std::array<double, 9>;
-
         // explicitly construct the global coordinate system
         CoordSys();
         // Copy-ctor
@@ -54,10 +51,8 @@ namespace batoid {
         vec3 getYHat() const;
         vec3 getZHat() const;
 
-        vec3 m_origin;
-        // Could potentially use Euler angles instead of rotation matrix here to be
-        // more compact?
-        mat3 m_rot;
+        vec3 m_origin;  // Global coordinates of local (0,0,0)
+        mat3 m_rot;  // Each column is global unit vector of local unit vectors.
     };
 
     bool operator==(const CoordSys& cs1, const CoordSys& cs2);

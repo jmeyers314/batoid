@@ -41,6 +41,50 @@ def test_params():
         np.testing.assert_equal(coordSys.yhat, [0,1,0])
         np.testing.assert_equal(coordSys.zhat, [0,0,1])
 
+        coordSys = batoid.CoordSys()
+        coordSys = coordSys.rotateGlobal(rot).shiftGlobal(origin)
+        np.testing.assert_equal(coordSys.origin, origin)
+        np.testing.assert_equal(coordSys.rot, rot)
+        np.testing.assert_equal(coordSys.xhat, rot[:,0])
+        np.testing.assert_equal(coordSys.yhat, rot[:,1])
+        np.testing.assert_equal(coordSys.zhat, rot[:,2])
+
+        coordSys = batoid.CoordSys()
+        coordSys = coordSys.rotateLocal(rot).shiftGlobal(origin)
+        np.testing.assert_equal(coordSys.origin, origin)
+        np.testing.assert_equal(coordSys.rot, rot)
+        np.testing.assert_equal(coordSys.xhat, rot[:,0])
+        np.testing.assert_equal(coordSys.yhat, rot[:,1])
+        np.testing.assert_equal(coordSys.zhat, rot[:,2])
+
+        coordSys = batoid.CoordSys()
+        coordSys = coordSys.shiftLocal(origin).rotateLocal(rot)
+        np.testing.assert_equal(coordSys.origin, origin)
+        np.testing.assert_equal(coordSys.rot, rot)
+        np.testing.assert_equal(coordSys.xhat, rot[:,0])
+        np.testing.assert_equal(coordSys.yhat, rot[:,1])
+        np.testing.assert_equal(coordSys.zhat, rot[:,2])
+
+        coordSys = batoid.CoordSys()
+        coordSys = coordSys.shiftGlobal(origin).rotateLocal(rot)
+        np.testing.assert_equal(coordSys.origin, origin)
+        np.testing.assert_equal(coordSys.rot, rot)
+        np.testing.assert_equal(coordSys.xhat, rot[:,0])
+        np.testing.assert_equal(coordSys.yhat, rot[:,1])
+        np.testing.assert_equal(coordSys.zhat, rot[:,2])
+
+        # Can't simply do a global rotation after a shift, since that will
+        # change the origin too.  Works if we manually specify the rotation
+        # center though
+        coordSys = batoid.CoordSys()
+        coordSys1 = coordSys.shiftGlobal(origin)
+        coordSys = coordSys1.rotateGlobal(rot, origin, coordSys)
+        np.testing.assert_equal(coordSys.origin, origin)
+        np.testing.assert_equal(coordSys.rot, rot)
+        np.testing.assert_equal(coordSys.xhat, rot[:,0])
+        np.testing.assert_equal(coordSys.yhat, rot[:,1])
+        np.testing.assert_equal(coordSys.zhat, rot[:,2])
+
 
 @timer
 def test_shift():
@@ -115,26 +159,107 @@ def test_rotate_identity():
 
 
 @timer
+def test_rotate():
+    rng = np.random.default_rng(57)
+    for _ in range(10):
+        r1 = batoid.RotX(rng.uniform())
+        r2 = batoid.RotY(rng.uniform())
+        r3 = batoid.RotZ(rng.uniform())
+        r4 = batoid.RotX(rng.uniform())
+        r5 = batoid.RotY(rng.uniform())
+        r6 = batoid.RotZ(rng.uniform())
+
+        rot = r6.dot(r5).dot(r4).dot(r3).dot(r2).dot(r1)
+        coordSys = batoid.CoordSys().rotateGlobal(rot)
+        np.testing.assert_equal(coordSys.xhat, rot[:, 0])
+        np.testing.assert_equal(coordSys.yhat, rot[:, 1])
+        np.testing.assert_equal(coordSys.zhat, rot[:, 2])
+        np.testing.assert_equal(coordSys.origin, 0)
+
+        rot1 = r3.dot(r2).dot(r1)
+        rot2 = r6.dot(r5).dot(r4)
+
+        coordSys = batoid.CoordSys().rotateGlobal(rot1).rotateGlobal(rot2)
+        np.testing.assert_allclose(coordSys.xhat, rot[:, 0])
+        np.testing.assert_allclose(coordSys.yhat, rot[:, 1])
+        np.testing.assert_allclose(coordSys.zhat, rot[:, 2])
+        np.testing.assert_equal(coordSys.origin, 0)
+
+        coordSys = batoid.CoordSys(rot=rot1)
+        coordSys2 = coordSys.rotateLocal(batoid.RotX(np.pi/2))
+        # Since second rotation was about the local X, both should have same
+        # xhat
+        np.testing.assert_allclose(coordSys.xhat, coordSys2.xhat)
+        # 90 degree positive rotation then means y -> -z, z -> y
+        np.testing.assert_allclose(coordSys.yhat, -coordSys2.zhat)
+        np.testing.assert_allclose(coordSys.zhat, coordSys2.yhat)
+
+        # Try a loop
+        coordSys = batoid.CoordSys(rot=rot)
+        coordSys = coordSys.rotateGlobal(batoid.RotX(0.1))
+        coordSys = coordSys.rotateGlobal(batoid.RotZ(np.pi))
+        coordSys = coordSys.rotateGlobal(batoid.RotX(0.1))
+        coordSys = coordSys.rotateGlobal(batoid.RotZ(np.pi))
+        # Should be back where we started...
+        np.testing.assert_allclose(coordSys.rot, rot)
+
+        # Miscentered origins
+        origin = rng.uniform(size=3)
+        coordSys = batoid.CoordSys(origin=origin, rot=rot)
+        np.testing.assert_equal(origin, coordSys.origin)
+        coordSys2 = coordSys.rotateGlobal(rot)
+        np.testing.assert_equal(rot@origin, coordSys2.origin)
+        coordSys3 = coordSys.rotateLocal(rot)
+        np.testing.assert_equal(origin, coordSys3.origin)
+
+        # Miscentered rotation axes
+        # Global with center specified is same as local
+        coordSys = batoid.CoordSys(origin=origin, rot=rot)
+        coordSys2 = coordSys.rotateLocal(rot)
+        coordSys3 = coordSys.rotateGlobal(rot, origin, batoid.CoordSys())
+        np.testing.assert_allclose(coordSys2.origin, origin)
+        np.testing.assert_allclose(coordSys2.origin, coordSys3.origin)
+        np.testing.assert_allclose(coordSys2.rot, coordSys3.rot)
+
+
+@timer
 def test_combinations():
     # Test some particular combinations of coord sys transformations
+
+    # +90 around x, followed by shift to (1, 0, 0)
+    # equivalent to shift first, and then rotation +90 about x
+    # latter rotation can be either global or local, since origin is unaffected
+    # (1, 0, 0) -> (1, 0, 0)
+    # by convention for local rotation
+    # and by coincidence (origin is on xaxis) for global rotation
     coordSys = batoid.CoordSys()
     coordSys1 = coordSys.rotateGlobal(batoid.RotX(np.pi/2)).shiftGlobal([1,0,0])
-    coordSys2 = coordSys.shiftGlobal([1,0,0]).rotateGlobal(batoid.RotX(np.pi/2))
+    coordSys2 = coordSys.shiftGlobal([1,0,0]).rotateLocal(batoid.RotX(np.pi/2))
+    coordSys3 = coordSys.shiftGlobal([1,0,0]).rotateGlobal(batoid.RotX(np.pi/2))
     np.testing.assert_allclose(coordSys1.origin, coordSys2.origin)
     np.testing.assert_allclose(coordSys1.rot, coordSys2.rot)
+    np.testing.assert_allclose(coordSys1.origin, coordSys3.origin)
+    np.testing.assert_allclose(coordSys1.rot, coordSys3.rot)
 
+    # +45 around x, followed by sqrt(2) in new y direction, which is the (0, 1, 1)
+    # direction in global coords, followed by -45 about x.
+    # Should be parallel to global coords, but origin at (0, 1, 1)
     coordSys1 = (
-        coordSys
+        batoid.CoordSys()
         .rotateGlobal(batoid.RotX(np.pi/4))
         .shiftLocal([0,np.sqrt(2),0])
-        .rotateGlobal(batoid.RotX(-np.pi/4))
+        .rotateLocal(batoid.RotX(-np.pi/4))
     )
-    coordSys2 = coordSys.shiftLocal([0,1,1])
+    coordSys2 = batoid.CoordSys().shiftLocal([0,1,1])
     np.testing.assert_allclose(coordSys1.origin, coordSys2.origin)
     np.testing.assert_allclose(coordSys1.rot, coordSys2.rot)
 
+    # rotate +90 around point (1, 0, 0) with rot axis parallel to y axis.
+    # moves origin from (0, 0, 0) to (1, 0, 1)
+    coordSys = batoid.CoordSys()
     coordSys1 = coordSys.rotateGlobal(batoid.RotY(np.pi/2), [1,0,0])
     coordSys2 = coordSys.rotateGlobal(batoid.RotY(np.pi/2)).shiftGlobal([1,0,1])
+    # local coords of global (1, 0, 1) are (-1, 0, 1)
     coordSys3 = coordSys.rotateGlobal(batoid.RotY(np.pi/2)).shiftLocal([-1,0,1])
     np.testing.assert_allclose(coordSys1.origin, coordSys2.origin)
     np.testing.assert_allclose(coordSys1.rot, coordSys2.rot)
@@ -148,7 +273,9 @@ def test_ne():
         batoid.CoordSys(),
         batoid.CoordSys([0,0,1]),
         batoid.CoordSys([0,1,0]),
+        batoid.CoordSys([0,0,1], batoid.RotX(0.1)),
         batoid.CoordSys(rot=batoid.RotX(0.1)),
+        batoid.CoordSys(rot=batoid.RotX(0.2)),
     ]
     all_obj_diff(objs)
 
@@ -157,5 +284,6 @@ if __name__ == '__main__':
     test_params()
     test_shift()
     test_rotate_identity()
+    test_rotate()
     test_combinations()
     test_ne()

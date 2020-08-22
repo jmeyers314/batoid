@@ -24,7 +24,7 @@ namespace batoid {
     // void pyExportMedium(py::module&);
     // void pyExportObscuration(py::module&);
     void pyExportCoordSys(py::module&);
-    // void pyExportCoordTransform(py::module&);
+    void pyExportCoordTransform(py::module&);
 
 // #ifdef BATOID_GPU
 //     void pyExportCoordTransform2(py::module&);
@@ -61,7 +61,7 @@ namespace batoid {
         // pyExportMedium(m);
         // pyExportObscuration(m);
         pyExportCoordSys(m);
-        // pyExportCoordTransform(m);
+        pyExportCoordTransform(m);
 
 // #ifdef BATOID_GPU
 //         pyExportCoordTransform2(m);

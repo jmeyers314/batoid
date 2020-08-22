@@ -9,6 +9,7 @@ from .coordSys import CoordSys
 # from .coordtransform2 import CoordTransform2
 from .utils import lazy_property
 
+
 class RayVector:
     def __init__(
         self, x, y, z, vx, vy, vz, t=0, wavelength=500e-9, flux=1, vignetted=False, failed=False,
@@ -37,8 +38,8 @@ class RayVector:
             global coordinate system.
         """
         n = len(x)
-        self._r = np.ascontiguousarray([x, y, z]).T
-        self._v = np.ascontiguousarray([vx, vy, vz]).T
+        self._r = np.ascontiguousarray([x, y, z], dtype=float).T
+        self._v = np.ascontiguousarray([vx, vy, vz], dtype=float).T
 
         if isinstance(t, Real):
             self._t = np.empty_like(x)
@@ -287,13 +288,43 @@ class RayVector:
             len(self._wavelength), self._initial_coordSys._coordSys
         )
 
+    def _syncToHost(self):
+        self._rv.r.syncToHost()
+        self._rv.v.syncToHost()
+        self._rv.t.syncToHost()
+        self._rv.wavelength.syncToHost()
+        self._rv.flux.syncToHost()
+        self._rv.vignetted.syncToHost()
+        self._rv.failed.syncToHost()
+
+    def _syncToDevice(self):
+        self._rv.r.syncToDevice()
+        self._rv.v.syncToDevice()
+        self._rv.t.syncToDevice()
+        self._rv.wavelength.syncToDevice()
+        self._rv.flux.syncToDevice()
+        self._rv.vignetted.syncToDevice()
+        self._rv.failed.syncToDevice()
+
     def copy(self):
         # copy on host side for now...
+        self._syncToHost()
+        x = self._r[:, 0].copy()
+        y = self._r[:, 1].copy()
+        z = self._r[:, 2].copy()
+        vx = self._v[:, 0].copy()
+        vy = self._v[:, 1].copy()
+        vz = self._v[:, 2].copy()
+        t = self._t.copy()
+        wavelength = self._wavelength.copy()
+        flux = self._flux.copy()
+        vignetted = self._vignetted.copy()
+        failed = self._failed.copy()
+
         return RayVector(
-            self.x.copy(), self.y.copy(), self.z.copy(),
-            self.vx.copy(), self.vy.copy(), self.vz.copy(),
-            self.t.copy(), self.wavelength.copy(), self.flux.copy(),
-            self.vignetted.copy(), self.failed.copy(), self.coordSys
+            x, y, z,
+            vx, vy, vz,
+            t, wavelength, flux, vignetted, failed, self.coordSys.copy()
         )
 
     # def toCoordSys(self, coordSys):

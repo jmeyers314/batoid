@@ -135,7 +135,7 @@ class CoordSys:
         CoordSys
         """
         if coordSys is None:
-            coordSys = self
+            coordSys = CoordSys()
         return CoordSys._fromCoordSys(
             self._coordSys.rotateGlobal(
                 rot.ravel(), rotCenter, coordSys._coordSys
@@ -189,3 +189,6 @@ class CoordSys:
             tuple(self.origin.tolist()),
             tuple(self.rot.ravel().tolist())
         ))
+
+    def copy(self):
+        return CoordSys(self.origin, self.rot)
