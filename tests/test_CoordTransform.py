@@ -39,6 +39,11 @@ def test_simple_transform():
     np.testing.assert_allclose(rv.x, rv2.x)
     np.testing.assert_allclose(rv.y, rv2.y)
     np.testing.assert_allclose(rv.z-1, rv2.z)
+    # Repeat using toCoordSys
+    rv3 = rv.copy().toCoordSys(coordSys2)
+    np.testing.assert_allclose(rv.x, rv3.x)
+    np.testing.assert_allclose(rv.y, rv3.y)
+    np.testing.assert_allclose(rv.z-1, rv3.z)
 
     # Example 2
     # First for a single specific point I worked out
@@ -57,6 +62,10 @@ def test_simple_transform():
     np.testing.assert_allclose(rv2.x, 1-rv.z)
     np.testing.assert_allclose(rv2.y, rv.y-1)
     np.testing.assert_allclose(rv2.z, rv.x-1)
+    rv3 = rv.copy().toCoordSys(coordSys2)
+    np.testing.assert_allclose(rv3.x, 1-rv.z)
+    np.testing.assert_allclose(rv3.y, rv.y-1)
+    np.testing.assert_allclose(rv3.z, rv.x-1)
 
 
 @timer
@@ -72,12 +81,15 @@ def test_roundtrip():
         rv0 = randomRayVector(rng, size, coordSys1)
         rv1 = transform.applyForward(rv0.copy())
         rv2 = transform.applyReverse(rv1.copy())
+        rv3 = rv0.copy().toCoordSys(coordSys2).toCoordSys(coordSys1)
 
         assert rv0.coordSys == coordSys1
         assert rv1.coordSys == coordSys2
         assert rv2.coordSys == coordSys1
+        assert rv3.coordSys == coordSys1
 
         assert rays_allclose(rv0, rv2)
+        assert rays_allclose(rv0, rv3)
 
 
 @timer

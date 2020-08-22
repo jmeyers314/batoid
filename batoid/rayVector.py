@@ -5,8 +5,7 @@ import numpy as np
 from . import _batoid
 from .constants import globalCoordSys
 from .coordSys import CoordSys
-# from .coordtransform import CoordTransform
-# from .coordtransform2 import CoordTransform2
+from .coordtransform import CoordTransform
 from .utils import lazy_property
 
 
@@ -327,9 +326,10 @@ class RayVector:
             t, wavelength, flux, vignetted, failed, self.coordSys.copy()
         )
 
-    # def toCoordSys(self, coordSys):
-    #     transform = CoordTransform2(self.coordSys, coordSys)
-    #     transform.applyForward(self)
+    def toCoordSys(self, coordSys):
+        transform = CoordTransform(self.coordSys, coordSys)
+        transform.applyForward(self)
+        return self
 
     def __len__(self):
         return self._rv.t.size;
