@@ -34,14 +34,14 @@ set(PYSRC_FILES
   # pysrc/medium.cpp
   # pysrc/obscuration.cpp
   # pysrc/paraboloid.cpp
-  # pysrc/plane.cpp
+  pysrc/plane.cpp
   # pysrc/polynomialSurface.cpp
   # pysrc/quadric.cpp
   # pysrc/ray.cpp
   pysrc/rayVector.cpp
   # pysrc/sphere.cpp
   # pysrc/sum.cpp
-  # pysrc/surface.cpp
+  pysrc/surface.cpp
   # pysrc/table.cpp
 )
 
@@ -56,14 +56,14 @@ set(SRC_FILES
   # src/medium.cpp
   # src/obscuration.cpp
   # src/paraboloid.cpp
-  # src/plane.cpp
+  src/plane.cpp
   # src/polynomialSurface.cpp
   # src/quadric.cpp
   # src/ray.cpp
   src/rayVector.cpp
   # src/sphere.cpp
   # src/sum.cpp
-  # src/surface.cpp
+  src/surface.cpp
   # src/table.cpp
   # src/utils.cpp
   src/vecmath.cpp

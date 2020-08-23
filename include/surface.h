@@ -1,55 +1,29 @@
 #ifndef batoid_surface_h
 #define batoid_surface_h
 
-#include <vector>
-#include <memory>
-#include <utility>
-#include "ray.h"
 #include "rayVector.h"
-#include "medium.h"
-#include "coating.h"
-#include "coordsys.h"
-
-#include <Eigen/Dense>
-
-using Eigen::Vector3d;
+#include "coordSys.h"
 
 namespace batoid {
     class Surface {
     public:
         virtual ~Surface() {}
 
-        virtual double sag(double, double) const = 0;
-        virtual Vector3d normal(double, double) const = 0;
-        virtual bool timeToIntersect(const Ray& r, double& t) const;
+        virtual Surface* getDevPtr() const = 0;
 
-        RayVector intersect(const RayVector&, const CoordSys* cs=nullptr) const;
-        void intersectInPlace(RayVector&, const CoordSys* cs=nullptr) const;
+        virtual double sag(double x, double y) const = 0;
+        virtual void normal(double x, double y, double& nx, double& ny, double& nz) const = 0;
+        virtual bool timeToIntersect(double x, double y, double z, double vx, double vy, double vz, double& dt) const;
 
-        RayVector reflect(const RayVector&, const Coating* coating=nullptr, const CoordSys* cs=nullptr) const;
-        void reflectInPlace(RayVector&, const Coating* coating=nullptr, const CoordSys* cs=nullptr) const;
+        void intersectInPlace(RayVector& rv, const CoordSys* cs=nullptr) const;
+        // virtual void reflectInPlace(RayVector2&, const CoordSys* cs=nullptr) const = 0;
+        // virtual void refractInPlace(RayVector2&, const Medium2&, const Medium2&, const CoordSys* cs=nullptr) const = 0;
 
-        RayVector refract(const RayVector&, const Medium&, const Medium&, const Coating* coating=nullptr, const CoordSys* cs=nullptr) const;
-        void refractInPlace(RayVector&, const Medium&, const Medium&, const Coating* coating=nullptr, const CoordSys* cs=nullptr) const;
-
-        std::pair<RayVector, RayVector> rSplit(const RayVector&, const Medium&, const Medium&, const Coating&, const CoordSys* cs=nullptr) const;
-        // std::pair<RayVector, RayVector> rSplitProb(const RayVector&, const Medium&, const Medium&, const Coating&, const CoordSys* cs=nullptr) const;
-
-    private:
-        // Single ray methods
-        Ray _justIntersect(const Ray&) const;
-        void _justIntersectInPlace(Ray&) const;
-
-        Ray _justReflect(const Ray&, double& alpha) const;
-        void _justReflectInPlace(Ray&, double& alpha) const;
-
-        Ray _justRefract(const Ray&, const Medium&, const Medium&, double& alpha) const;
-        Ray _justRefract(const Ray&, double, double, double& alpha) const;
-        void _justRefractInPlace(Ray&, const Medium&, const Medium&, double& alpha) const;
-        void _justRefractInPlace(Ray&, double, double, double& alpha) const;
-
-        std::pair<Ray, Ray> _justRSplit(const Ray&, const Medium&, const Medium&, const Coating&) const;
-        std::pair<Ray, Ray> _justRSplit(const Ray&, const double, const double, const Coating&) const;
+    protected:
+        Surface() :
+            _devPtr(nullptr)
+        {}
+        mutable Surface* _devPtr;
     };
 }
 #endif

@@ -5,6 +5,8 @@ from .rayVector import RayVector
 from .coordSys import CoordSys, RotX, RotY, RotZ
 from .coordTransform import CoordTransform
 
+from .surface import Surface, Plane
+
 # from .ray import Ray
 # from .rayVector import RayVector, concatenateRayVectors, rayGrid, circularGrid
 # from .rayVector import uniformCircularGrid, pointSourceCircularGrid
