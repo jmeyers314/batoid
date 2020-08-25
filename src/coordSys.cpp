@@ -1,6 +1,7 @@
 #include "coordSys.h"
 
 namespace batoid {
+    #pragma omp declare target
     CoordSys::CoordSys() :
         m_origin({0,0,0}),
         m_rot({1,0,0,  0,1,0,  0,0,1})
@@ -25,6 +26,7 @@ namespace batoid {
         m_origin({0,0,0}),
         m_rot(rot)
     {}
+    #pragma omp end declare target
 
     CoordSys CoordSys::shiftGlobal(const vec3& dr) const {
         return CoordSys(m_origin+dr, m_rot);
