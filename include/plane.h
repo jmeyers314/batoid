@@ -7,9 +7,8 @@ namespace batoid {
 
     class Plane : public Surface {
     public:
-        Plane(bool allowReverse=false) :
-            _allowReverse(allowReverse)
-        {}
+        Plane(bool allowReverse=false);
+        ~Plane();
 
         virtual Surface* getDevPtr() const override;
 

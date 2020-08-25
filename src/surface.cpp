@@ -3,6 +3,14 @@
 
 namespace batoid {
 
+    #pragma omp declare target
+
+    Surface::Surface() :
+        _devPtr(nullptr)
+    {}
+
+    Surface::~Surface() {}
+
     bool Surface::timeToIntersect(
         double x, double y, double z,
         double vx, double vy, double vz,
@@ -29,6 +37,8 @@ namespace batoid {
         }
         return false;
     }
+
+    #pragma omp end declare target
 
     void Surface::intersectInPlace(RayVector& rv, const CoordSys* cs) const {
         rv.r.syncToDevice();

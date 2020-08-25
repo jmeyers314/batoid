@@ -1,17 +1,14 @@
 #include "plane.h"
 
 namespace batoid {
-    Surface* Plane::getDevPtr() const {
-        if (!_devPtr) {
-            Surface* ptr;
-            #pragma omp target map(from:ptr)
-            {
-                ptr = new Plane(_allowReverse);
-            }
-            _devPtr = ptr;
-        }
-        return _devPtr;
-    }
+
+    #pragma omp declare target
+
+    Plane::Plane(bool allowReverse) :
+        _allowReverse(allowReverse)
+    {}
+
+    Plane::~Plane() {}
 
     double Plane::sag(double x, double y) const {
         return 0.0;
@@ -29,4 +26,20 @@ namespace batoid {
         dt = -z/vz;
         return (_allowReverse || dt >= 0.0);
     }
+
+    #pragma omp end declare target
+
+
+    Surface* Plane::getDevPtr() const {
+        if (!_devPtr) {
+            Surface* ptr;
+            #pragma omp target map(from:ptr)
+            {
+                ptr = new Plane(_allowReverse);
+            }
+            _devPtr = ptr;
+        }
+        return _devPtr;
+    }
+
 }

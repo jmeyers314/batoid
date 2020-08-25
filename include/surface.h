@@ -7,7 +7,7 @@
 namespace batoid {
     class Surface {
     public:
-        virtual ~Surface() {}
+        virtual ~Surface();
 
         virtual Surface* getDevPtr() const = 0;
 
@@ -20,9 +20,7 @@ namespace batoid {
         // virtual void refractInPlace(RayVector2&, const Medium2&, const Medium2&, const CoordSys* cs=nullptr) const = 0;
 
     protected:
-        Surface() :
-            _devPtr(nullptr)
-        {}
+        Surface();
         mutable Surface* _devPtr;
     };
 }
