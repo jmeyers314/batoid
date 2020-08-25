@@ -32,7 +32,6 @@ namespace batoid {
     // For a passive transformation of a fixed vector from one coord sys to another
     // though, we want the opposite transformation: y = R^-1 (x - dr)
     void CoordTransform::applyForwardInPlace(RayVector& rv) const {
-        // assert rv.coordSys == source;
         rv.r.syncToDevice();
         rv.v.syncToDevice();
         size_t size = rv.size;
@@ -60,11 +59,9 @@ namespace batoid {
             vyptr[i] = vy;
             vzptr[i] = vz;
         }
-        rv.setCoordSys(destination);
     }
 
     void CoordTransform::applyReverseInPlace(RayVector& rv) const {
-        // assert rv.coordSys == destination;
         rv.r.syncToDevice();
         rv.v.syncToDevice();
         size_t size = rv.size;
@@ -92,6 +89,5 @@ namespace batoid {
             vyptr[i] = vy;
             vzptr[i] = vz;
         }
-        rv.setCoordSys(source);
     }
 }

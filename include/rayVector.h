@@ -1,10 +1,8 @@
 #ifndef batoid_rayVector_h
 #define batoid_rayVector_h
 
-#include <vector>
 #include <complex>
 #include "dualView.h"
-#include "coordSys.h"
 
 namespace batoid {
     struct RayVector {
@@ -13,8 +11,7 @@ namespace batoid {
             double* r, double* v, double* t,
             double* wavelength, double* flux,
             bool* vignetted, bool* failed,
-            size_t N,
-            const CoordSys& coordSys
+            size_t N
         );
 
         bool operator==(const RayVector& rhs) const;
@@ -24,8 +21,6 @@ namespace batoid {
         void phase(double x, double y, double z, double t, double* out) const;
         void amplitude(double x, double y, double z, double t, std::complex<double>* out) const;
         std::complex<double> sumAmplitude(double x, double y, double z, double t) const;
-        const CoordSys& getCoordSys() const { return _coordSys; }
-        void setCoordSys(const CoordSys& coordSys) { _coordSys = coordSys; }
 
         DualView<double> r;           // 24
         DualView<double> v;           // 48
@@ -35,7 +30,6 @@ namespace batoid {
         DualView<bool> vignetted;     // 73
         DualView<bool> failed;        // 74 cumulative bytes per Ray.
         size_t size;
-        CoordSys _coordSys;
     };
 }
 

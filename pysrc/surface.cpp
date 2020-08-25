@@ -23,7 +23,7 @@ namespace batoid {
             )
 
             // .def("intersect", &Surface::intersect, py::arg(), py::arg()=nullptr)
-            .def("intersectInPlace", &Surface::intersectInPlace, py::arg(), py::arg()=nullptr)
+            // .def("intersectInPlace", &Surface::intersectInPlace, py::arg(), py::arg()=nullptr)
             // .def("reflect", &Surface::reflect, py::arg(), py::arg()=nullptr, py::arg()=nullptr)
             // .def("reflectInPlace", &Surface::reflectInPlace, py::arg(), py::arg()=nullptr, py::arg()=nullptr)
             //

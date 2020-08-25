@@ -5,14 +5,14 @@ import numpy as np
 from . import _batoid
 from .constants import globalCoordSys
 from .coordSys import CoordSys
-from .coordtransform import CoordTransform
+from .coordTransform import CoordTransform
 from .utils import lazy_property
 
 
 class RayVector:
     def __init__(
-        self, x, y, z, vx, vy, vz, t=0, wavelength=500e-9, flux=1, vignetted=False, failed=False,
-        coordSys=globalCoordSys
+        self, x, y, z, vx, vy, vz, t=0, wavelength=500e-9, flux=1,
+        vignetted=False, failed=False, coordSys=globalCoordSys
     ):
         """Create RayVector from 1d parameter arrays.  Always makes a copy
         of input arrays.
@@ -70,7 +70,7 @@ class RayVector:
         else:
             self._failed = np.ascontiguousarray(failed)
 
-        self._initial_coordSys = coordSys
+        self.coordSys = coordSys
 
     def positionAtTime(self, t):
         out = np.empty_like(self._r)
@@ -274,17 +274,13 @@ class RayVector:
         self._rv.failed.syncToHost()
         return self._failed
 
-    @property
-    def coordSys(self):
-        return CoordSys._fromCoordSys(self._rv.coordSys)
-
     @lazy_property
     def _rv(self):
         return _batoid.CPPRayVector(
             self._r.ctypes.data, self._v.ctypes.data, self._t.ctypes.data,
             self._wavelength.ctypes.data, self._flux.ctypes.data,
             self._vignetted.ctypes.data, self._failed.ctypes.data,
-            len(self._wavelength), self._initial_coordSys._coordSys
+            len(self._wavelength)
         )
 
     def _syncToHost(self):

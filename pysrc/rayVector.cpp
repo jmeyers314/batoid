@@ -1,4 +1,3 @@
-#include "dualView.h"
 #include "rayVector.h"
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -38,8 +37,7 @@ namespace batoid {
                     size_t f_ptr,
                     size_t vig_ptr,
                     size_t fail_ptr,
-                    size_t size,
-                    const CoordSys& coordSys
+                    size_t size
                 ){
                     return new RayVector(
                         reinterpret_cast<double*>(r_ptr),
@@ -49,8 +47,7 @@ namespace batoid {
                         reinterpret_cast<double*>(f_ptr),
                         reinterpret_cast<bool*>(vig_ptr),
                         reinterpret_cast<bool*>(fail_ptr),
-                        size,
-                        coordSys
+                        size
                     );
                 }
             ))
@@ -74,7 +71,6 @@ namespace batoid {
             .def(py::self == py::self)
             .def(py::self != py::self)
 
-            .def_property_readonly("coordSys", &RayVector::getCoordSys)
             // Expose dualviews so can access their syncToHost methods
             .def_readonly("r", &RayVector::r)
             .def_readonly("v", &RayVector::v)

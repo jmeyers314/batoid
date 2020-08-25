@@ -59,6 +59,7 @@ class CoordTransform:
         """
         assert self.fromSys == rv.coordSys
         self._coordTransform.applyForwardInPlace(rv._rv)
+        rv.coordSys = self.toSys
         return rv
 
     def applyReverse(self, rv):
@@ -76,6 +77,7 @@ class CoordTransform:
         """
         assert self.toSys == rv.coordSys
         self._coordTransform.applyReverseInPlace(rv._rv)
+        rv.coordSys = self.fromSys
         return rv
 
     def __eq__(self, rhs):
