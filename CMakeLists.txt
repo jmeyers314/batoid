@@ -31,7 +31,7 @@ set(PYSRC_FILES
   # pysrc/coating.cpp
   # pysrc/medium.cpp
   # pysrc/obscuration.cpp
-  # pysrc/paraboloid.cpp
+  pysrc/paraboloid.cpp
   pysrc/plane.cpp
   # pysrc/polynomialSurface.cpp
   # pysrc/quadric.cpp
@@ -51,7 +51,7 @@ set(SRC_FILES
   src/dualView.cpp
   # src/medium.cpp
   # src/obscuration.cpp
-  # src/paraboloid.cpp
+  src/paraboloid.cpp
   src/plane.cpp
   # src/polynomialSurface.cpp
   # src/quadric.cpp

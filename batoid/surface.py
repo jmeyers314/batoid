@@ -217,48 +217,48 @@ class Plane(Surface):
             return "Plane()"
 
 
-# class Paraboloid(Surface):
-#     """Surface of revolution with parabolic cross-section, and where the axis
-#     of revolution is along the axis of the parabola.  The surface sag follows
-#     the equation
-#
-#     .. math::
-#
-#         z(x, y) = z(r) = \\frac{r^2}{2 R}
-#
-#     where :math:`r = \\sqrt{x^2 + y^2}` and `R` is the radius of curvature at
-#     the paraboloid vertex.
-#
-#     Parameters
-#     ----------
-#     R : float
-#         Radius of curvature at paraboloid vertex.
-#     """
-#     def __init__(self, R):
-#         self._surface = _batoid.CPPParaboloid(R)
-#
-#     @property
-#     def R(self):
-#         """Radius of curvature at paraboloid vertex."""
-#         return self._surface.R
-#
-#     def __hash__(self):
-#         return hash(("batoid.Paraboloid", self.R))
-#
-#     def __setstate__(self, R):
-#         self._surface = _batoid.CPPParaboloid(R)
-#
-#     def __getstate__(self):
-#         return self.R
-#
-#     def __eq__(self, rhs):
-#         if not isinstance(rhs, Paraboloid): return False
-#         return self.R == rhs.R
-#
-#     def __repr__(self):
-#         return "Paraboloid({})".format(self.R)
-#
-#
+class Paraboloid(Surface):
+    """Surface of revolution with parabolic cross-section, and where the axis
+    of revolution is along the axis of the parabola.  The surface sag follows
+    the equation
+
+    .. math::
+
+        z(x, y) = z(r) = \\frac{r^2}{2 R}
+
+    where :math:`r = \\sqrt{x^2 + y^2}` and `R` is the radius of curvature at
+    the paraboloid vertex.
+
+    Parameters
+    ----------
+    R : float
+        Radius of curvature at paraboloid vertex.
+    """
+    def __init__(self, R):
+        self._surface = _batoid.CPPParaboloid(R)
+
+    @property
+    def R(self):
+        """Radius of curvature at paraboloid vertex."""
+        return self._surface.R
+
+    def __hash__(self):
+        return hash(("batoid.Paraboloid", self.R))
+
+    def __setstate__(self, R):
+        self._surface = _batoid.CPPParaboloid(R)
+
+    def __getstate__(self):
+        return self.R
+
+    def __eq__(self, rhs):
+        if not isinstance(rhs, Paraboloid): return False
+        return self.R == rhs.R
+
+    def __repr__(self):
+        return f"Paraboloid({self.R})"
+
+
 # class Sphere(Surface):
 #     """Spherical surface.  The surface sag follows the equation:
 #

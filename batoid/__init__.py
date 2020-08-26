@@ -5,7 +5,7 @@ from .rayVector import RayVector
 from .coordSys import CoordSys, RotX, RotY, RotZ
 from .coordTransform import CoordTransform
 
-from .surface import Surface, Plane
+from .surface import Surface, Plane, Paraboloid
 
 from .trace import intersect, applyForwardTransform, applyReverseTransform
 

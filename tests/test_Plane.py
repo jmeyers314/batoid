@@ -51,13 +51,13 @@ def test_normal():
 @timer
 def test_intersect():
     rng = np.random.default_rng(577)
-    size = 10
+    size = 10_000
     planeCoordSys = batoid.CoordSys(origin=[0, 0, -1])
     plane = batoid.Plane()
     x = rng.normal(0.0, 1.0, size=size)
     y = rng.normal(0.0, 1.0, size=size)
     z = np.full_like(x, -100.0)
-    # If we shoot rays straight up, then it's easy to predict the
+    # If we shoot rays straight up, then it's easy to predict the intersection
     vx = np.zeros_like(x)
     vy = np.zeros_like(x)
     vz = np.ones_like(x)
@@ -86,7 +86,7 @@ def test_ne():
     objs = [
         batoid.Plane(),
         batoid.Plane(allowReverse=True),
-        # batoid.Paraboloid(2.0),
+        batoid.Paraboloid(2.0),
     ]
     all_obj_diff(objs)
 
