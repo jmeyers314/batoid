@@ -1,4 +1,3 @@
-from . import _batoid
 import numpy as np
 
 
@@ -26,7 +25,6 @@ class CoordSys:
     the 3D rotation matrix to apply to the global coordinate axes to yield the
     axes of the this coordinate system.
 
-
     Parameters
     ----------
     origin : ndarray of float, shape (3,)
@@ -36,59 +34,35 @@ class CoordSys:
     """
     def __init__(self, origin=None, rot=None):
         if origin is None:
-            if rot is None:
-                self._coordSys = _batoid.CPPCoordSys()
-            else:
-                self._coordSys = _batoid.CPPCoordSys(rot.ravel())
-        else:
-            if rot is None:
-                self._coordSys = _batoid.CPPCoordSys(origin)
-            else:
-                self._coordSys = _batoid.CPPCoordSys(origin, rot.ravel())
-
-    @classmethod
-    def _fromCoordSys(cls, _coordSys):
-        ret = cls.__new__(cls)
-        ret._coordSys = _coordSys
-        return ret
-
-    @property
-    def origin(self):
-        """ndarray of float, shape (3,): Origin of coordinate system in global
-        coordinates.
-        """
-        return np.array(self._coordSys.origin)
-
-    @property
-    def rot(self):
-        """ndarray of float, shape (3, 3): Rotation matrix taking global axes
-        into current system axes.
-        """
-        return np.array(self._coordSys.rot).reshape(3, 3)
+            origin = np.zeros(3, dtype=float)
+        if rot is None:
+            rot = np.eye(3, dtype=float)
+        self.origin = np.array(origin)
+        self.rot = np.array(rot)
 
     @property
     def xhat(self):
         """ndarray of float, shape (3,): Orientation of local x vector in
         global coordinates.
         """
-        return np.array(self._coordSys.xhat)
+        return self.rot[:, 0]
 
     @property
     def yhat(self):
         """ndarray of float, shape (3,): Orientation of local y vector in
         global coordinates.
         """
-        return np.array(self._coordSys.yhat)
+        return self.rot[:, 1]
 
     @property
     def zhat(self):
         """ndarray of float, shape (3,): Orientation of local z vector in
         global coordinates.
         """
-        return np.array(self._coordSys.zhat)
+        return self.rot[:, 2]
 
     def __repr__(self):
-        return f"CoordSys(\n{self.origin}, \n{self.rot})\n"
+        return f"CoordSys({self.origin}, {self.rot})"
 
     def shiftGlobal(self, dr):
         """Return new CoordSys with origin shifted along global axes.
@@ -102,7 +76,7 @@ class CoordSys:
         -------
         CoordSys
         """
-        return CoordSys._fromCoordSys(self._coordSys.shiftGlobal(dr))
+        return CoordSys(self.origin+dr, self.rot)
 
     def shiftLocal(self, dr):
         """Return new CoordSys with origin shifted along local axes.
@@ -116,7 +90,8 @@ class CoordSys:
         -------
         CoordSys
         """
-        return CoordSys._fromCoordSys(self._coordSys.shiftLocal(dr))
+        # Rotate the shift into global coordinates, then do the shift globally
+        return self.shiftGlobal(self.rot@dr)
 
     def rotateGlobal(self, rot, rotCenter=(0,0,0), coordSys=None):
         """Return new CoordSys rotated with respect to global axes.
@@ -136,10 +111,12 @@ class CoordSys:
         """
         if coordSys is None:
             coordSys = CoordSys()
-        return CoordSys._fromCoordSys(
-            self._coordSys.rotateGlobal(
-                rot.ravel(), rotCenter, coordSys._coordSys
-            )
+        # Find rot center in global coordinates
+        globalRotCenter = coordSys.rot@rotCenter + coordSys.origin
+        # Then rotate about this center
+        return CoordSys(
+            rot@(self.origin-globalRotCenter)+globalRotCenter,
+            rot@self.rot
         )
 
     def rotateLocal(self, rot, rotCenter=(0,0,0), coordSys=None):
@@ -160,18 +137,21 @@ class CoordSys:
         """
         if coordSys is None:
             coordSys = self
-        return CoordSys._fromCoordSys(
-            self._coordSys.rotateLocal(
-                rot.ravel(), rotCenter, coordSys._coordSys
-            )
+        # Find rot center in global coordinates
+        globalRotCenter = coordSys.rot@rotCenter + coordSys.origin
+        # first rotate rot into global coords: (self.rot rot self.rot.T),
+        # then apply that: (self.rot rot self.rot.T) self.rot = self.rot rot
+        rTmp = self.rot@rot
+        return CoordSys(
+            rTmp@self.rot.T@(self.origin-globalRotCenter)+globalRotCenter,
+            rTmp
         )
 
     def __getstate__(self):
         return self.origin, self.rot
 
     def __setstate__(self, d):
-        origin, rot = d
-        self._coordSys = _batoid.CPPCoordSys(origin, rot.ravel())
+        self.origin, self.rot = d
 
     def __eq__(self, rhs):
         if not isinstance(rhs, CoordSys): return False

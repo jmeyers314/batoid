@@ -1,18 +1,75 @@
 #include "batoid.h"
-// #include "ray.h"
-// #include "surface.h"
-// #include "medium.h"
-// #include "utils.h"
-// #include "coordsys.h"
-#include <cmath>
-#include <random>
-#include <numeric>
 
 #define PI 3.14159265358979323846264338327950288419716939937510L
 
 namespace batoid {
 
-    void intersect(const Surface& surface, RayVector& rv, CoordTransform* ct) {
+
+    void applyForwardTransform(const vec3 dr, const mat3 drot, RayVector& rv) {
+        rv.r.syncToDevice();
+        rv.v.syncToDevice();
+        size_t size = rv.size;
+        double* xptr = rv.r.data;
+        double* yptr = xptr + size;
+        double* zptr = yptr + size;
+        double* vxptr = rv.v.data;
+        double* vyptr = vxptr + size;
+        double* vzptr = vyptr + size;
+        const double* drptr = dr.data();
+        const double* drotptr = drot.data();
+
+        #pragma omp target teams distribute parallel for \
+            map(to:drptr[:3], drotptr[:9])
+        for(int i=0; i<size; i++) {
+            double dx = xptr[i]-drptr[0];
+            double dy = yptr[i]-drptr[1];
+            double dz = zptr[i]-drptr[2];
+            xptr[i] = dx*drotptr[0] + dy*drotptr[3] + dz*drotptr[6];
+            yptr[i] = dx*drotptr[1] + dy*drotptr[4] + dz*drotptr[7];
+            zptr[i] = dx*drotptr[2] + dy*drotptr[5] + dz*drotptr[8];
+            double vx = vxptr[i]*drotptr[0] + vyptr[i]*drotptr[3] + vzptr[i]*drotptr[6];
+            double vy = vxptr[i]*drotptr[1] + vyptr[i]*drotptr[4] + vzptr[i]*drotptr[7];
+            double vz = vxptr[i]*drotptr[2] + vyptr[i]*drotptr[5] + vzptr[i]*drotptr[8];
+            vxptr[i] = vx;
+            vyptr[i] = vy;
+            vzptr[i] = vz;
+        }
+    }
+
+
+    void applyReverseTransform(const vec3 dr, const mat3 drot, RayVector& rv) {
+        rv.r.syncToDevice();
+        rv.v.syncToDevice();
+        size_t size = rv.size;
+        double* xptr = rv.r.data;
+        double* yptr = xptr + size;
+        double* zptr = yptr + size;
+        double* vxptr = rv.v.data;
+        double* vyptr = vxptr + size;
+        double* vzptr = vyptr + size;
+        const double* drptr = dr.data();
+        const double* drotptr = drot.data();
+
+        #pragma omp target teams distribute parallel for \
+            map(to:drptr[:3], drotptr[:9])
+        for(int i=0; i<size; i++) {
+            double x = xptr[i]*drotptr[0] + yptr[i]*drotptr[1] + zptr[i]*drotptr[2] + drptr[0];
+            double y = xptr[i]*drotptr[3] + yptr[i]*drotptr[4] + zptr[i]*drotptr[5] + drptr[1];
+            double z = xptr[i]*drotptr[6] + yptr[i]*drotptr[7] + zptr[i]*drotptr[8] + drptr[2];
+            xptr[i] = x;
+            yptr[i] = y;
+            zptr[i] = z;
+            double vx = vxptr[i]*drotptr[0] + vyptr[i]*drotptr[1] + vzptr[i]*drotptr[2];
+            double vy = vxptr[i]*drotptr[3] + vyptr[i]*drotptr[4] + vzptr[i]*drotptr[5];
+            double vz = vxptr[i]*drotptr[6] + vyptr[i]*drotptr[7] + vzptr[i]*drotptr[8];
+            vxptr[i] = vx;
+            vyptr[i] = vy;
+            vzptr[i] = vz;
+        }
+    }
+
+
+    void intersect(const Surface& surface, const vec3 dr, const mat3 drot, RayVector& rv) {
         rv.r.syncToDevice();
         rv.v.syncToDevice();
         rv.t.syncToDevice();
@@ -30,32 +87,23 @@ namespace batoid {
         bool* failptr = rv.failed.data;
 
         Surface* surfaceDevPtr = surface.getDevPtr();
-        vec3 dr;
-        mat3 rot;
-        if (ct) {
-            dr = ct->dr;
-            rot = ct->rot;
-        } else {
-            dr = {0,0,0};
-            rot = {1,0,0,  0,1,0,  0,0,1};
-        }
-        double* drptr = dr.data();
-        double* rotptr = rot.data();
+        const double* drptr = dr.data();
+        const double* drotptr = drot.data();
 
         #pragma omp target teams distribute parallel for \
             is_device_ptr(surfaceDevPtr) \
-            map(to:drptr[:3], rotptr[:9])
+            map(to:drptr[:3], drotptr[:9])
         for(int i=0; i<size; i++) {
             // Coordinate transformation
             double dx = xptr[i]-drptr[0];
             double dy = yptr[i]-drptr[1];
             double dz = zptr[i]-drptr[2];
-            double x = dx*rotptr[0] + dy*rotptr[3] + dz*rotptr[6];
-            double y = dx*rotptr[1] + dy*rotptr[4] + dz*rotptr[7];
-            double z = dx*rotptr[2] + dy*rotptr[5] + dz*rotptr[8];
-            double vx = vxptr[i]*rotptr[0] + vyptr[i]*rotptr[3] + vzptr[i]*rotptr[6];
-            double vy = vxptr[i]*rotptr[1] + vyptr[i]*rotptr[4] + vzptr[i]*rotptr[7];
-            double vz = vxptr[i]*rotptr[2] + vyptr[i]*rotptr[5] + vzptr[i]*rotptr[8];
+            double x = dx*drotptr[0] + dy*drotptr[3] + dz*drotptr[6];
+            double y = dx*drotptr[1] + dy*drotptr[4] + dz*drotptr[7];
+            double z = dx*drotptr[2] + dy*drotptr[5] + dz*drotptr[8];
+            double vx = vxptr[i]*drotptr[0] + vyptr[i]*drotptr[3] + vzptr[i]*drotptr[6];
+            double vy = vxptr[i]*drotptr[1] + vyptr[i]*drotptr[4] + vzptr[i]*drotptr[7];
+            double vz = vxptr[i]*drotptr[2] + vyptr[i]*drotptr[5] + vzptr[i]*drotptr[8];
             double t = tptr[i];
             // intersection
             if (!failptr[i]) {

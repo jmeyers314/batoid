@@ -21,7 +21,7 @@ if (DEFINED ENV{CMAKE_COVER})
   APPEND_COVERAGE_COMPILER_FLAGS()
 endif()
 
-include_directories(include SYSTEM eigen)
+include_directories(include)
 add_subdirectory(pybind11)
 
 set(PYSRC_FILES
@@ -29,8 +29,6 @@ set(PYSRC_FILES
   pysrc/batoid.cpp
   # pysrc/bicubic.cpp
   # pysrc/coating.cpp
-  pysrc/coordSys.cpp
-  pysrc/coordTransform.cpp
   # pysrc/medium.cpp
   # pysrc/obscuration.cpp
   # pysrc/paraboloid.cpp
@@ -50,8 +48,6 @@ set(SRC_FILES
   src/batoid.cpp
   # src/bicubic.cpp
   # src/coating.cpp
-  src/coordSys.cpp
-  src/coordTransform.cpp
   src/dualView.cpp
   # src/medium.cpp
   # src/obscuration.cpp
@@ -66,41 +62,10 @@ set(SRC_FILES
   src/surface.cpp
   # src/table.cpp
   # src/utils.cpp
-  src/vecmath.cpp
+  # src/vecmath.cpp
 )
 
 # if (DEFINED ENV{BATOID_GPU})
-#   list(APPEND PYSRC_FILES
-#     pysrc/coordtransform2.cpp
-#     pysrc/medium2.cpp
-#     pysrc/rayVector2.cpp
-#     pysrc/surface2.cpp
-#     pysrc/paraboloid2.cpp
-#     pysrc/plane2.cpp
-#     pysrc/sphere2.cpp
-#     pysrc/quadric2.cpp
-#     pysrc/asphere2.cpp
-#     pysrc/bilinear2.cpp
-#     pysrc/bicubic2.cpp
-#     pysrc/extendedAsphere2.cpp
-#     pysrc/obscuration2.cpp
-#   )
-#   list(APPEND SRC_FILES
-#     src/coordtransform2.cpp
-#     src/dualView.cpp
-#     src/medium2.cpp
-#     src/rayVector2.cpp
-#     src/surface2.cpp
-#     src/paraboloid2.cpp
-#     src/plane2.cpp
-#     src/sphere2.cpp
-#     src/quadric2.cpp
-#     src/asphere2.cpp
-#     src/bilinear2.cpp
-#     src/bicubic2.cpp
-#     src/extendedAsphere2.cpp
-#     src/obscuration2.cpp
-#   )
 # endif()
 
 # set_source_files_properties(

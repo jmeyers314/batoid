@@ -10,8 +10,8 @@ def test_params():
         origin = rng.uniform(size=3)
         rot = (
             batoid.RotX(rng.uniform())
-            .dot(batoid.RotY(rng.uniform()))
-            .dot(batoid.RotZ(rng.uniform()))
+            @batoid.RotY(rng.uniform())
+            @batoid.RotZ(rng.uniform())
         )
         coordSys = batoid.CoordSys(origin, rot)
         np.testing.assert_equal(coordSys.origin, origin)
@@ -127,8 +127,8 @@ def randomCoordSys(rng):
     return batoid.CoordSys(
         rng.uniform(size=3),
         (batoid.RotX(rng.uniform())
-         .dot(batoid.RotY(rng.uniform()))
-         .dot(batoid.RotZ(rng.uniform())))
+         @batoid.RotY(rng.uniform())
+         @batoid.RotZ(rng.uniform()))
     )
 
 
@@ -169,15 +169,15 @@ def test_rotate():
         r5 = batoid.RotY(rng.uniform())
         r6 = batoid.RotZ(rng.uniform())
 
-        rot = r6.dot(r5).dot(r4).dot(r3).dot(r2).dot(r1)
+        rot = r6@r5@r4@r3@r2@r1
         coordSys = batoid.CoordSys().rotateGlobal(rot)
         np.testing.assert_equal(coordSys.xhat, rot[:, 0])
         np.testing.assert_equal(coordSys.yhat, rot[:, 1])
         np.testing.assert_equal(coordSys.zhat, rot[:, 2])
         np.testing.assert_equal(coordSys.origin, 0)
 
-        rot1 = r3.dot(r2).dot(r1)
-        rot2 = r6.dot(r5).dot(r4)
+        rot1 = r3@r2@r1
+        rot2 = r6@r5@r4
 
         coordSys = batoid.CoordSys().rotateGlobal(rot1).rotateGlobal(rot2)
         np.testing.assert_allclose(coordSys.xhat, rot[:, 0])
@@ -251,8 +251,14 @@ def test_combinations():
         .rotateLocal(batoid.RotX(-np.pi/4))
     )
     coordSys2 = batoid.CoordSys().shiftLocal([0,1,1])
-    np.testing.assert_allclose(coordSys1.origin, coordSys2.origin)
-    np.testing.assert_allclose(coordSys1.rot, coordSys2.rot)
+    np.testing.assert_allclose(
+        coordSys1.origin, coordSys2.origin,
+        rtol=0, atol=1e-15
+    )
+    np.testing.assert_allclose(
+        coordSys1.rot, coordSys2.rot,
+        rtol=0, atol=1e-15
+    )
 
     # rotate +90 around point (1, 0, 0) with rot axis parallel to y axis.
     # moves origin from (0, 0, 0) to (1, 0, 1)

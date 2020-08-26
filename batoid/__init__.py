@@ -7,7 +7,7 @@ from .coordTransform import CoordTransform
 
 from .surface import Surface, Plane
 
-from .trace import intersect
+from .trace import intersect, applyForwardTransform, applyReverseTransform
 
 # from .ray import Ray
 # from .rayVector import RayVector, concatenateRayVectors, rayGrid, circularGrid

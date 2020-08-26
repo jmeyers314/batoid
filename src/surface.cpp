@@ -1,5 +1,4 @@
 #include "surface.h"
-#include "coordTransform.h"
 
 namespace batoid {
 

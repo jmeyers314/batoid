@@ -35,7 +35,7 @@ def test_simple_transform():
     coordSys2 = batoid.CoordSys().shiftGlobal([0,0,1])
     rv = randomRayVector(rng, size, coordSys1)
     transform = batoid.CoordTransform(coordSys1, coordSys2)
-    rv2 = transform.applyForward(rv.copy())
+    rv2 = batoid.applyForwardTransform(transform, rv.copy())
     np.testing.assert_allclose(rv.x, rv2.x)
     np.testing.assert_allclose(rv.y, rv2.y)
     np.testing.assert_allclose(rv.z-1, rv2.z)
@@ -53,10 +53,11 @@ def test_simple_transform():
     vx = vy = vz = np.array([0])
     rv = batoid.RayVector(x, y, z, vx, vy, vz)
     transform = batoid.CoordTransform(coordSys1, coordSys2)
-    rv2 = transform.applyForward(rv.copy())
+    rv2 = batoid.applyForwardTransform(transform, rv.copy())
     np.testing.assert_allclose(rv2.r, [[-1, 1, 1]])
 
     # Here's the generalization
+    # Also using alternate syntax for applyForward here.
     rv = randomRayVector(rng, size, coordSys1)
     rv2 = transform.applyForward(rv.copy())
     np.testing.assert_allclose(rv2.x, 1-rv.z)

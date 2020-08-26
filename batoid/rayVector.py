@@ -6,6 +6,7 @@ from . import _batoid
 from .constants import globalCoordSys
 from .coordSys import CoordSys
 from .coordTransform import CoordTransform
+from .trace import applyForwardTransform
 from .utils import lazy_property
 
 
@@ -330,7 +331,7 @@ class RayVector:
 
     def toCoordSys(self, coordSys):
         transform = CoordTransform(self.coordSys, coordSys)
-        transform.applyForward(self)
+        applyForwardTransform(transform, self)
         return self
 
     def __len__(self):

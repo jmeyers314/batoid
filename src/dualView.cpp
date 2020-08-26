@@ -1,5 +1,4 @@
 #include "dualView.h"
-#include <iostream>
 
 namespace batoid {
     template<typename T>

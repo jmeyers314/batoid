@@ -2,7 +2,6 @@
 #define batoid_surface_h
 
 #include "rayVector.h"
-#include "coordSys.h"
 
 namespace batoid {
     class Surface {

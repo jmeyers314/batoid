@@ -25,8 +25,19 @@ def intersect(surface, rv, ct=None):
 
     _batoid.intersect(
         surface._surface,
+        ct.dr, ct.drot.ravel(),
         rv._rv,
-        ct._coordTransform
     )
     rv.coordSys = ct.toSys
+    return rv
+
+
+def applyForwardTransform(ct, rv):
+    _batoid.applyForwardTransform(ct.dr, ct.drot.ravel(), rv._rv)
+    rv.coordSys = ct.toSys
+    return rv
+
+def applyReverseTransform(ct, rv):
+    _batoid.applyReverseTransform(ct.dr, ct.drot.ravel(), rv._rv)
+    rv.coordSys = ct.fromSys
     return rv
