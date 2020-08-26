@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 from . import _batoid
+from .constants import globalCoordSys
 
 
 class Surface(ABC):
@@ -50,31 +51,6 @@ class Surface(ABC):
             return out[0]
         else:
             return out
-
-    def intersect(self, r, coordSys=None):
-        """Calculate intersection of a ray or rays with this surface.  If the
-        intersection is in the past, then set the ray.fail flag.  If the ray
-        intersects at an obscured point, then set the ray.vignetted flag.
-
-        Parameters
-        ----------
-        r : Ray or RayVector
-            Input ray(s) to intersect
-        coordSys : CoordSys, optional
-            If present, then use for the coordinate system of the surface.  If
-            `None` (default), then assume that ray(s) and surface are already
-            expressed in the same coordinate system.
-
-        Returns
-        -------
-        outRays : Ray or RayVector
-            New object corresponding to original ray(s) propagated to the
-            intersection point.
-        """
-        if coordSys is not None:
-            coordSys = coordSys._coordSys
-        self._surface.intersectInPlace(r._rv, coordSys)
-        return r
 
     # def reflect(self, r, coating=None, coordSys=None):
     #     """Calculate intersection of ray(s) with this surface, and immediately

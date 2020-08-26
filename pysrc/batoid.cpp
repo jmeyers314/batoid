@@ -80,6 +80,8 @@ namespace batoid {
 // #endif
         using namespace pybind11::literals;
 
+        m.def("intersect", &intersect);
+
         // m.def("rayGrid",
         //      &rayGrid,
         //      "Make a RayVector in a grid",

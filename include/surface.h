@@ -15,10 +15,6 @@ namespace batoid {
         virtual void normal(double x, double y, double& nx, double& ny, double& nz) const = 0;
         virtual bool timeToIntersect(double x, double y, double z, double vx, double vy, double vz, double& dt) const;
 
-        // void intersectInPlace(RayVector& rv, const CoordSys* cs=nullptr) const;
-        // virtual void reflectInPlace(RayVector2&, const CoordSys* cs=nullptr) const = 0;
-        // virtual void refractInPlace(RayVector2&, const Medium2&, const Medium2&, const CoordSys* cs=nullptr) const = 0;
-
     protected:
         Surface();
         mutable Surface* _devPtr;

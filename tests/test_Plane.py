@@ -52,8 +52,8 @@ def test_normal():
 def test_intersect():
     rng = np.random.default_rng(577)
     size = 10
+    planeCoordSys = batoid.CoordSys(origin=[0, 0, -1])
     plane = batoid.Plane()
-    coordSys = batoid.CoordSys(origin=[0, 0, -1])
     x = rng.normal(0.0, 1.0, size=size)
     y = rng.normal(0.0, 1.0, size=size)
     z = np.full_like(x, -100.0)
@@ -63,8 +63,18 @@ def test_intersect():
     vz = np.ones_like(x)
     rv = batoid.RayVector(x, y, z, vx, vy, vz)
     np.testing.assert_allclose(rv.z, -100.0)
-    rv2 = plane.intersect(rv.copy(), coordSys)
-    assert rv2.coordSys == coordSys
+    coordTransform = batoid.CoordTransform(rv.coordSys, planeCoordSys)
+    rv2 = batoid.intersect(plane, rv.copy(), coordTransform)
+    assert rv2.coordSys == planeCoordSys
+    rv2 = rv2.toCoordSys(batoid.CoordSys())
+    np.testing.assert_allclose(rv2.x, x)
+    np.testing.assert_allclose(rv2.y, y)
+    np.testing.assert_allclose(rv2.z, -1, rtol=0, atol=1e-12)
+
+    # Check default intersect coordTransform
+    rv2 = rv.copy().toCoordSys(planeCoordSys)
+    batoid.intersect(plane, rv2)
+    assert rv2.coordSys == planeCoordSys
     rv2 = rv2.toCoordSys(batoid.CoordSys())
     np.testing.assert_allclose(rv2.x, x)
     np.testing.assert_allclose(rv2.y, y)
@@ -109,6 +119,5 @@ if __name__ == '__main__':
     test_sag()
     test_normal()
     test_intersect()
-    # test_intersect_vectorized()
     # test_ne()
     # test_fail()
