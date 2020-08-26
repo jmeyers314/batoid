@@ -61,7 +61,7 @@ namespace batoid {
             if (!failptr[i]) {
                 double dt;
                 bool success = surfaceDevPtr->timeToIntersect(x, y, z, vx, vy, vz, dt);
-                if (success && dt >= 0) {
+                if (success) {
                     x += vx * dt;
                     y += vy * dt;
                     z += vz * dt;

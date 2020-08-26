@@ -36,6 +36,12 @@ class RayVector:
             Coordinate system in which this ray is expressed.  Default: the
             global coordinate system.
         """
+        x = np.atleast_1d(x)
+        y = np.atleast_1d(y)
+        z = np.atleast_1d(z)
+        vx = np.atleast_1d(vx)
+        vy = np.atleast_1d(vy)
+        vz = np.atleast_1d(vz)
         n = len(x)
         self._r = np.ascontiguousarray([x, y, z], dtype=float).T
         self._v = np.ascontiguousarray([vx, vy, vz], dtype=float).T

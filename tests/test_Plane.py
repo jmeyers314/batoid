@@ -81,43 +81,35 @@ def test_intersect():
     np.testing.assert_allclose(rv2.z, -1, rtol=0, atol=1e-12)
 
 
-# @timer
-# def test_ne():
-#     objs = [
-#         batoid.Plane(),
-#         batoid.Plane(allowReverse=True),
-#         batoid.Paraboloid(2.0),
-#     ]
-#     all_obj_diff(objs)
-#
-#
-# @timer
-# def test_fail():
-#     plane = batoid.Plane()
-#     assert plane.allowReverse == False
-#     ray = batoid.Ray([0,0,-1], [0,0,-1])
-#     ray = plane.intersect(ray)
-#     assert ray.failed
-#
-#     ray = batoid.Ray([0,0,-1], [0,0,-1])
-#     plane.intersect(ray)
-#     assert ray.failed
-#
-#     # These should succeed though if allowReverse is True
-#     plane = batoid.Plane(allowReverse=True)
-#     assert plane.allowReverse == True
-#     ray = batoid.Ray([0,0,-1], [0,0,-1])
-#     ray = plane.intersect(ray)
-#     assert not ray.failed
-#
-#     ray = batoid.Ray([0,0,-1], [0,0,-1])
-#     plane.intersect(ray)
-#     assert not ray.failed
+@timer
+def test_ne():
+    objs = [
+        batoid.Plane(),
+        batoid.Plane(allowReverse=True),
+        # batoid.Paraboloid(2.0),
+    ]
+    all_obj_diff(objs)
+
+
+@timer
+def test_fail():
+    plane = batoid.Plane()
+    assert plane.allowReverse == False
+    # This one should fail, since already passed the plane.
+    rv = batoid.RayVector(0,0,-1,0,0,-1)
+    rv2 = batoid.intersect(plane, rv.copy())
+    np.testing.assert_equal(rv2.failed, np.array([True]))
+
+    # This should succeed though if allowReverse is True
+    plane = batoid.Plane(allowReverse=True)
+    assert plane.allowReverse == True
+    rv2 = batoid.intersect(plane, rv.copy())
+    np.testing.assert_equal(rv2.failed, np.array([False]))
 
 
 if __name__ == '__main__':
     test_sag()
     test_normal()
     test_intersect()
-    # test_ne()
-    # test_fail()
+    test_ne()
+    test_fail()
