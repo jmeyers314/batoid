@@ -1,19 +1,34 @@
 #include "asphere.h"
 #include "quadric.h"
-#include "solve.h"
-#include <cmath>
 
 namespace batoid {
-    Asphere::Asphere(double R, double conic, std::vector<double> coefs) :
-        Quadric(R, conic), _coefs(coefs),
-        _dzdrcoefs(computeDzDrCoefs(coefs)) {}
 
-    std::vector<double> Asphere::computeDzDrCoefs(const std::vector<double>& coefs) {
-        std::vector<double> result;
-        unsigned int i=4;
-        for (const auto& c : coefs) {
-            result.push_back(c*i);
-            i += 2;
+    #pragma omp declare target
+
+    Asphere::Asphere(double R, double conic, const double* coefptr, size_t size) :
+        Quadric(R, conic),
+        _coefs(_copyCoefs(coefptr, size)),
+        _dzdrcoefs(_computeDzDrCoefs(coefptr, size)),
+        _size(size)
+    {}
+
+    Asphere::~Asphere()
+    {
+        delete[] _coefs;
+        delete[] _dzdrcoefs;
+    }
+
+    double* Asphere::_copyCoefs(const double* coefs, const size_t size) {
+        double* out = new double[size];
+        for(int i=0; i<size; i++)
+            out[i] = coefs[i];
+        return out;
+    }
+
+    double* Asphere::_computeDzDrCoefs(const double* coefs, const size_t size) {
+        double* result = new double[size];
+        for(int i=4, j=0; j<size; j++, i += 2) {
+            result[j] = coefs[j]*i;
         }
         return result;
     }
@@ -22,71 +37,75 @@ namespace batoid {
         double r2 = x*x + y*y;
         double rr = r2;
         double result = Quadric::sag(x, y);
-        for (const auto& c : _coefs) {
+        for (int i=0; i<_size; i++) {
             rr *= r2;
-            result += c*rr;
+            result += _coefs[i]*rr;
         }
         return result;
     }
 
-    Vector3d Asphere::normal(double x, double y) const {
+    void Asphere::normal(double x, double y, double& nx, double& ny, double& nz) const {
         double r = std::sqrt(x*x + y*y);
-        if (r == 0.0)
-            return Vector3d(0,0,1);
-        double dzdr1 = dzdr(r);
-        return Vector3d(-dzdr1*x/r, -dzdr1*y/r, 1).normalized();
+        if (r == 0.0) {
+            nx = 0.0;
+            ny = 0.0;
+            nz = 1.0;
+        } else {
+            double dzdr = _dzdr(r);
+            nz = 1/sqrt(1+dzdr*dzdr);
+            nx = -x/r*dzdr*nz;
+            ny = -y/r*dzdr*nz;
+        }
     }
 
-    bool Asphere::timeToIntersect(const Ray& r, double& t) const {
-        // Solve the quadric problem analytically to get a good starting point.
-        if (!Quadric::timeToIntersect(r, t))
-            return false;
-        bool success = Surface::timeToIntersect(r, t);
-        return (success && t >= r.t);
-    }
-
-    // Old Asphere code.  Might be useful if new version is every unstable?
-    // class AsphereResidual {
-    // public:
-    //     AsphereResidual(const Asphere& a, const Ray& r) : _a(a), _r(r) {}
-    //     double operator()(double t) const {
-    //         Vector3d p = _r.positionAtTime(t);
-    //         return _a.sag(p(0), p(1)) - p(2);
-    //     }
-    // private:
-    //     const Asphere& _a;
-    //     const Ray& _r;
-    // };
-    //
-    // bool Asphere::timeToIntersect(const Ray& r, double& t) const {
-    //     // Solve the quadric problem analytically to get a good starting point.
-    //     if (!Quadric::timeToIntersect(r, t))
-    //         return false;
-    //
-    //     AsphereResidual resid(*this, r);
-    //     Solve<AsphereResidual> solve(resid, t, t+1e-2);
-    //     solve.setMethod(Method::Brent);
-    //     solve.setXTolerance(1e-12);
-    //
-    //     try {
-    //         solve.bracket();
-    //         t = solve.root();
-    //     } catch (const SolveError&) {
-    //         return false;
-    //     }
-    //     if (t < r.t) return false;
-    //     return true;
-    // }
-
-    double Asphere::dzdr(double r) const {
-        double result = Quadric::dzdr(r);
+    double Asphere::_dzdr(double r) const {
+        double result = Quadric::_dzdr(r);
         double rr = r*r;
         double rrr = rr*r;
-        for (const auto& c : _dzdrcoefs) {
-            result += c*rrr;
+        for (int i=0; i<_size; i++) {
+            result += _dzdrcoefs[i]*rrr;
             rrr *= rr;
         }
         return result;
+    }
+
+    bool Asphere::timeToIntersect(
+        double x, double y, double z,
+        double vx, double vy, double vz,
+        double& dt
+    ) const {
+        // Solve the quadric problem analytically to get a good starting point.
+        if (!Quadric::timeToIntersect(x, y, z, vx, vy, vz, dt))
+            return false;
+        bool success = Surface::timeToIntersect(x, y, z, vx, vy, vz, dt);
+        return (success && dt >= 0.0);
+    }
+
+    #pragma omp end declare target
+
+    void Asphere::getCoefs(double* out) const {
+        for(int i=0; i<_size; i++)
+            out[i] = _coefs[i];
+    }
+
+    int Asphere::getSize() const {
+        return _size;
+    }
+
+    Surface* Asphere::getDevPtr() const {
+        if (!_devPtr) {
+            Surface* ptr;
+            // omp doesn't seem to find _R and _conic inherited from Quadric, so grab them
+            // explicitly here.
+            double R = getR();
+            double conic = getConic();
+            #pragma omp target map(from:ptr) map(to:_coefs[:_size])
+            {
+                ptr = new Asphere(R, conic, _coefs, _size);
+            }
+            _devPtr = ptr;
+        }
+        return _devPtr;
     }
 
 }

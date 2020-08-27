@@ -25,7 +25,7 @@ include_directories(include)
 add_subdirectory(pybind11)
 
 set(PYSRC_FILES
-  # pysrc/asphere.cpp
+  pysrc/asphere.cpp
   pysrc/batoid.cpp
   # pysrc/bicubic.cpp
   # pysrc/coating.cpp
@@ -44,7 +44,7 @@ set(PYSRC_FILES
 )
 
 set(SRC_FILES
-  # src/asphere.cpp
+  src/asphere.cpp
   src/batoid.cpp
   # src/bicubic.cpp
   # src/coating.cpp

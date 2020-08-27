@@ -21,9 +21,9 @@ namespace batoid {
         double rPz = z+vz*dt;
 
         double sz = sag(rPx, rPy);
+        // Always do exactly 10 iterations.  GPUifies better this way.
         for (int iter=0; iter<10; iter++) {
-            // intersect plane tangent to surface at (rPx, rPy, sz)
-            // use Newton-Raphson iteration to refine
+            // repeatedly intersect plane tangent to surface at (rPx, rPy, sz) with ray
             double nx, ny, nz;
             normal(rPx, rPy, nx, ny, nz);
             dt = (rPx-x)*nx + (rPy-y)*ny + (sz-z)*nz;
@@ -32,9 +32,8 @@ namespace batoid {
             rPy = y+vy*dt;
             rPz = z+vz*dt;
             sz = sag(rPx, rPy);
-            if (std::abs(sz-rPz) < 1e-14) return true;
         }
-        return false;
+        return (std::abs(sz-rPz) < 1e-12);
     }
 
     #pragma omp end declare target

@@ -4,7 +4,8 @@ namespace batoid {
 
     #pragma omp declare target
 
-    Quadric::Quadric(double R, double conic) : _R(R), _conic(conic),
+    Quadric::Quadric(double R, double conic) :
+        _R(R), _conic(conic),
         _Rsq(R*R), _Rinvsq(1./R/R),
         _cp1(conic+1), _cp1inv(1./_cp1),
         _Rcp1(R/_cp1), _RRcp1cp1(R*R/_cp1/_cp1),

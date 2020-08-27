@@ -358,77 +358,86 @@ class Quadric(Surface):
         return f"Quadric({self.R}, {self.conic})"
 
 
-# class Asphere(Surface):
-#     """Surface of revolution where the cross section is a conic section plus an
-#     even polynomial.  Represents the equation
-#
-#     The surface sag follows the equation:
-#
-#     .. math::
-#
-#         z(x, y) = z(r) = \\frac{r^2}{R \\left(1 + \\sqrt{1 - \\frac{r^2}{R^2} (1 + \\kappa)}\\right)} + \\sum_i \\alpha_i r^{2 i}
-#
-#     where :math:`r = \\sqrt{x^2 + y^2}`, `R` is the radius of curvature at the
-#     surface vertex, :math:`\\kappa` is the conic constant, and
-#     :math:`\\left\\{\\alpha_i\\right\\}` are the even polynomial coefficients.
-#     Different ranges of :math:`\\kappa` produce different categories of
-#     surfaces (where alpha==0):
-#
-#         - :math:`\\kappa > 0`      =>  oblate ellipsoid
-#         - :math:`\\kappa = 0`      =>  sphere
-#         - :math:`-1 < \\kappa < 0` =>  prolate ellipsoid
-#         - :math:`\\kappa = -1`    =>  paraboloid
-#         - :math:`\\kappa < -1`     =>  hyperboloid
-#
-#     Parameters
-#     ----------
-#     R : float
-#         Radius of curvature at vertex.
-#     conic : float
-#         Conic constant :math:`\\kappa`.
-#     coefs : list of float
-#         Even polynomial coefficients :math:`\\left\\{\\alpha_i\\right\\}`
-#     """
-#     def __init__(self, R, conic, coefs):
-#         self._surface = _batoid.CPPAsphere(R, conic, coefs)
-#
-#     @property
-#     def R(self):
-#         """Radius of curvature at asphere vertex.
-#         """
-#         return self._surface.R
-#
-#     @property
-#     def conic(self):
-#         """Conic constant.
-#         """
-#         return self._surface.conic
-#
-#     @property
-#     def coefs(self):
-#         """Even polynomial coefficients.
-#         """
-#         return self._surface.coefs
-#
-#     def __hash__(self):
-#         return hash(("batoid.Asphere", self.R, self.conic, tuple(self.coefs)))
-#
-#     def __setstate__(self, args):
-#         self._surface = _batoid.CPPAsphere(*args)
-#
-#     def __getstate__(self):
-#         return self.R, self.conic, self.coefs
-#
-#     def __eq__(self, rhs):
-#         if not isinstance(rhs, Asphere): return False
-#         return (self.R == rhs.R and
-#                 self.conic == rhs.conic and
-#                 self.coefs == rhs.coefs)
-#
-#     def __repr__(self):
-#         return "Asphere({}, {}, {})".format(self.R, self.conic, self.coefs)
-#
-#
+class Asphere(Surface):
+    """Surface of revolution where the cross section is a conic section plus an
+    even polynomial.  Represents the equation
+
+    The surface sag follows the equation:
+
+    .. math::
+
+        z(x, y) = z(r) = \\frac{r^2}{R \\left(1 + \\sqrt{1 - \\frac{r^2}{R^2} (1 + \\kappa)}\\right)} + \\sum_i \\alpha_i r^{2 i}
+
+    where :math:`r = \\sqrt{x^2 + y^2}`, `R` is the radius of curvature at the
+    surface vertex, :math:`\\kappa` is the conic constant, and
+    :math:`\\left\\{\\alpha_i\\right\\}` are the even polynomial coefficients.
+    Different ranges of :math:`\\kappa` produce different categories of
+    surfaces (where alpha==0):
+
+        - :math:`\\kappa > 0`      =>  oblate ellipsoid
+        - :math:`\\kappa = 0`      =>  sphere
+        - :math:`-1 < \\kappa < 0` =>  prolate ellipsoid
+        - :math:`\\kappa = -1`    =>  paraboloid
+        - :math:`\\kappa < -1`     =>  hyperboloid
+
+    Parameters
+    ----------
+    R : float
+        Radius of curvature at vertex.
+    conic : float
+        Conic constant :math:`\\kappa`.
+    coefs : list of float
+        Even polynomial coefficients :math:`\\left\\{\\alpha_i\\right\\}`
+    """
+    def __init__(self, R, conic, coefs):
+        coefs = np.ascontiguousarray(coefs)
+        self._surface = _batoid.CPPAsphere(
+            R, conic, coefs.ctypes.data, len(coefs)
+        )
+
+    @property
+    def R(self):
+        """Radius of curvature at asphere vertex.
+        """
+        return self._surface.R
+
+    @property
+    def conic(self):
+        """Conic constant.
+        """
+        return self._surface.conic
+
+    @property
+    def coefs(self):
+        """Even polynomial coefficients.
+        """
+        size = self._surface.size
+        out = np.empty(size, dtype=float)
+        self._surface.coefs(out.ctypes.data)
+        return out
+
+    def __hash__(self):
+        return hash(("batoid.Asphere", self.R, self.conic, tuple(self.coefs)))
+
+    def __setstate__(self, args):
+        R, conic, coefs = args
+        self._surface = _batoid.CPPAsphere(
+            R, conic, coefs.ctypes.data, len(coefs)
+        )
+
+    def __getstate__(self):
+        return self.R, self.conic, self.coefs
+
+    def __eq__(self, rhs):
+        if not isinstance(rhs, Asphere): return False
+        return (self.R == rhs.R and
+                self.conic == rhs.conic and
+                np.array_equal(self.coefs, rhs.coefs))
+
+    def __repr__(self):
+        return f"Asphere({self.R}, {self.conic}, {self.coefs})"
+
+
 # class Zernike(Surface):
 #     """Surface defined by Zernike polynomials.  The surface sag follows the
 #     equation:

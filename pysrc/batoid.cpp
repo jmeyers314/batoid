@@ -8,9 +8,9 @@ namespace batoid {
     void pyExportRayVector(py::module&);
 
     void pyExportSurface(py::module&);
-    // void pyExportAsphere(py::module&);
-    // void pyExportBicubic(py::module&);
     void pyExportQuadric(py::module&);
+    void pyExportAsphere(py::module&);
+    // void pyExportBicubic(py::module&);
     void pyExportSphere(py::module&);
     // void pyExportSum(py::module&);
     void pyExportParaboloid(py::module&);
@@ -23,13 +23,12 @@ namespace batoid {
     // void pyExportObscuration(py::module&);
 
     PYBIND11_MODULE(_batoid, m) {
-        // pyExportRay(m);
         pyExportRayVector(m);
 
         pyExportSurface(m);
-        // pyExportAsphere(m);
-        // pyExportBicubic(m);
         pyExportQuadric(m);
+        pyExportAsphere(m); // Order Surface, Quadric, Asphere important b/c inheritance
+        // pyExportBicubic(m);
         pyExportSphere(m);
         // pyExportSum(m);
         pyExportParaboloid(m);

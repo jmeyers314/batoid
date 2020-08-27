@@ -1,33 +1,32 @@
 #ifndef batoid_asphere_h
 #define batoid_asphere_h
 
-#include <vector>
-#include <sstream>
-#include <limits>
 #include "surface.h"
-#include "ray.h"
 #include "quadric.h"
-#include <Eigen/Dense>
-
-using Eigen::Vector3d;
 
 namespace batoid {
 
     class Asphere : public Quadric {
     public:
-        Asphere(double R, double conic, std::vector<double> coefs);
+        Asphere(double R, double conic, const double* coefs, size_t size);
+        ~Asphere();
+
+        virtual Surface* getDevPtr() const override;
+
         virtual double sag(double, double) const override;
-        virtual Vector3d normal(double, double) const override;
-        virtual bool timeToIntersect(const Ray& r, double& t) const override;
+        virtual void normal(double x, double y, double& nx, double& ny, double& nz) const override;
+        virtual bool timeToIntersect(double x, double y, double z, double vx, double vy, double vz, double& dt) const override;
 
-        const std::vector<double>& getCoefs() const { return _coefs; }
-
+        void getCoefs(double* out) const;
+        int getSize() const;
     private:
-        const std::vector<double> _coefs;  // Aspheric even polynomial coefficients
-        const std::vector<double> _dzdrcoefs;  // Coefficients for computing dzdr
+        const double* _coefs;
+        const double* _dzdrcoefs;
+        const size_t _size;
 
-        double dzdr(double r) const;
-        static std::vector<double> computeDzDrCoefs(const std::vector<double>& coefs);
+        double _dzdr(double r) const;
+        static double* _copyCoefs(const double* coefs, const size_t size);
+        double* _computeDzDrCoefs(const double* coefs, const size_t size);
     };
 
 }
