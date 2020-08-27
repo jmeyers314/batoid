@@ -85,7 +85,7 @@ def test_normal():
 
 @timer
 def test_intersect():
-    rng = np.random.default_rng(577)
+    rng = np.random.default_rng(5772)
     size = 10_000
     for i in range(10):
         R = rng.normal(0.0, 0.3)

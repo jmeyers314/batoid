@@ -297,67 +297,67 @@ class Sphere(Surface):
         return self.R == rhs.R
 
     def __repr__(self):
-        return f"Sphere({self.R!r})"
+        return f"Sphere({self.R})"
 
 
-# class Quadric(Surface):
-#     """Surface of revolution where the cross section is a conic section.
-#     The surface sag follows the equation:
-#
-#     .. math::
-#
-#         z(x, y) = z(r) = \\frac{r^2}{R \\left(1 + \\sqrt{1 - \\frac{r^2}{R^2} (1 + \\kappa)}\\right)}
-#
-#     where :math:`r = \\sqrt{x^2 + y^2}`, `R` is the radius of curvature at the
-#     surface vertex, and :math:`\\kappa` is the conic constant.  Different
-#     ranges of :math:`\\kappa` indicate different categories of surfaces:
-#
-#         - :math:`\\kappa > 0`      =>  oblate ellipsoid
-#         - :math:`\\kappa = 0`      =>  sphere
-#         - :math:`-1 < \\kappa < 0` =>  prolate ellipsoid
-#         - :math:`\\kappa = -1`    =>  paraboloid
-#         - :math:`\\kappa < -1`     =>  hyperboloid
-#
-#     Parameters
-#     ----------
-#     R : float
-#         Radius of curvature at vertex.
-#     conic : float
-#         Conic constant :math:`\\kappa`
-#     """
-#     def __init__(self, R, conic):
-#         self._surface = _batoid.CPPQuadric(R, conic)
-#
-#     @property
-#     def R(self):
-#         """Radius of curvature at quadric vertex.
-#         """
-#         return self._surface.R
-#
-#     @property
-#     def conic(self):
-#         """Conic constant.
-#         """
-#         return self._surface.conic
-#
-#     def __hash__(self):
-#         return hash(("batoid.Quadric", self.R, self.conic))
-#
-#     def __setstate__(self, args):
-#         self._surface = _batoid.CPPQuadric(*args)
-#
-#     def __getstate__(self):
-#         return (self.R, self.conic)
-#
-#     def __eq__(self, rhs):
-#         if not isinstance(rhs, Quadric): return False
-#         return (self.R == rhs.R and
-#                 self.conic == rhs.conic)
-#
-#     def __repr__(self):
-#         return "Quadric({}, {})".format(self.R, self.conic)
-#
-#
+class Quadric(Surface):
+    """Surface of revolution where the cross section is a conic section.
+    The surface sag follows the equation:
+
+    .. math::
+
+        z(x, y) = z(r) = \\frac{r^2}{R \\left(1 + \\sqrt{1 - \\frac{r^2}{R^2} (1 + \\kappa)}\\right)}
+
+    where :math:`r = \\sqrt{x^2 + y^2}`, `R` is the radius of curvature at the
+    surface vertex, and :math:`\\kappa` is the conic constant.  Different
+    ranges of :math:`\\kappa` indicate different categories of surfaces:
+
+        - :math:`\\kappa > 0`      =>  oblate ellipsoid
+        - :math:`\\kappa = 0`      =>  sphere
+        - :math:`-1 < \\kappa < 0` =>  prolate ellipsoid
+        - :math:`\\kappa = -1`    =>  paraboloid
+        - :math:`\\kappa < -1`     =>  hyperboloid
+
+    Parameters
+    ----------
+    R : float
+        Radius of curvature at vertex.
+    conic : float
+        Conic constant :math:`\\kappa`
+    """
+    def __init__(self, R, conic):
+        self._surface = _batoid.CPPQuadric(R, conic)
+
+    @property
+    def R(self):
+        """Radius of curvature at quadric vertex.
+        """
+        return self._surface.R
+
+    @property
+    def conic(self):
+        """Conic constant.
+        """
+        return self._surface.conic
+
+    def __hash__(self):
+        return hash(("batoid.Quadric", self.R, self.conic))
+
+    def __setstate__(self, args):
+        self._surface = _batoid.CPPQuadric(*args)
+
+    def __getstate__(self):
+        return (self.R, self.conic)
+
+    def __eq__(self, rhs):
+        if not isinstance(rhs, Quadric): return False
+        return (self.R == rhs.R and
+                self.conic == rhs.conic)
+
+    def __repr__(self):
+        return f"Quadric({self.R}, {self.conic})"
+
+
 # class Asphere(Surface):
 #     """Surface of revolution where the cross section is a conic section plus an
 #     even polynomial.  Represents the equation
