@@ -1,24 +1,22 @@
 #ifndef batoid_sphere_h
 #define batoid_sphere_h
 
-#include <sstream>
-#include <limits>
 #include "surface.h"
-#include "ray.h"
-#include <Eigen/Dense>
-
-using Eigen::Vector3d;
 
 namespace batoid {
 
     class Sphere : public Surface {
     public:
         Sphere(double R);
-        virtual double sag(double, double) const override;
-        virtual Vector3d normal(double, double) const override;
-        virtual bool timeToIntersect(const Ray& r, double& t) const override;
+        ~Sphere();
 
-        double getR() const { return _R; }
+        virtual Surface* getDevPtr() const override;
+
+        virtual double sag(double, double) const override;
+        virtual void normal(double x, double y, double& nx, double& ny, double& nz) const override;
+        virtual bool timeToIntersect(double x, double y, double z, double vx, double vy, double vz, double& dt) const override;
+
+        double getR() const {return _R;}
 
     private:
         const double _R;  // Radius of curvature
@@ -26,7 +24,7 @@ namespace batoid {
         const double _Rinv; // 1/R
         const double _Rinvsq; // 1/R/R
 
-        double dzdr(double r) const;
+        double _dzdr(double r) const;
     };
 
 }

@@ -70,11 +70,11 @@ def test_intersect():
     rng = np.random.default_rng(577)
     size = 10_000
     for i in range(10):
-        R = rng.normal(0.0, 0.3)
+        R = 1./rng.normal(0.0, 0.3)
         paraCoordSys = batoid.CoordSys(origin=[0, 0, -1])
         para = batoid.Paraboloid(R)
-        x = rng.normal(0.0, 1.0)
-        y = rng.normal(0.0, 1.0)
+        x = rng.normal(0.0, 1.0, size=size)
+        y = rng.normal(0.0, 1.0, size=size)
         z = np.full_like(x, -100.0)
         # If we shoot rays straight up, then it's easy to predict the intersection
         vx = np.zeros_like(x)
@@ -118,6 +118,10 @@ def test_fail():
     rv = batoid.RayVector(0, 0, -1, 0, 0, -1)
     rv2 = batoid.intersect(para, rv.copy())
     np.testing.assert_equal(rv2.failed, np.array([True]))
+    # This one passes
+    rv = batoid.RayVector(0, 0, -1, 0, 0, +1)
+    rv2 = batoid.intersect(para, rv.copy())
+    np.testing.assert_equal(rv2.failed, np.array([False]))
 
 
 if __name__ == '__main__':

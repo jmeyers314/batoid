@@ -106,6 +106,11 @@ def test_fail():
     rv2 = batoid.intersect(plane, rv.copy())
     np.testing.assert_equal(rv2.failed, np.array([False]))
 
+    # This one passes trivially
+    rv = batoid.RayVector(0, 0, -1, 0, 0, +1)
+    rv2 = batoid.intersect(plane, rv.copy())
+    np.testing.assert_equal(rv2.failed, np.array([False]))
+
 
 if __name__ == '__main__':
     test_sag()

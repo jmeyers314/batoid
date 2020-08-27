@@ -1,8 +1,14 @@
 #include "sphere.h"
-#include "utils.h"
 
 namespace batoid {
-    Sphere::Sphere(double R) : _R(R), _Rsq(R*R), _Rinv(1./R), _Rinvsq(1./R/R) {}
+
+    #pragma omp declare target
+
+    Sphere::Sphere(double R) :
+        _R(R), _Rsq(R*R), _Rinv(1./R), _Rinvsq(1./R/R)
+    {}
+
+    Sphere::~Sphere() {}
 
     double Sphere::sag(double x, double y) const {
         if (_R != 0)
@@ -10,61 +16,81 @@ namespace batoid {
         return 0.0;
     }
 
-    Vector3d Sphere::normal(double x, double y) const {
-        if (_R == 0.0)
-            return Vector3d(0,0,1);
-        double r = std::sqrt(x*x + y*y);
-        if (r == 0)
-            return Vector3d(0,0,1);
-        double dzdr1 = dzdr(r);
-        return Vector3d(-dzdr1*x/r, -dzdr1*y/r, 1).normalized();
+    void Sphere::normal(double x, double y, double& nx, double& ny, double& nz) const {
+        double rsqr = x*x + y*y;
+        if (_R == 0.0 || rsqr == 0.0) {
+            nx = 0.0;
+            ny = 0.0;
+            nz = 1.0;
+        } else {
+            double r = sqrt(rsqr);
+            double dzdr = _dzdr(r);
+            nz = 1/sqrt(1+dzdr*dzdr);
+            nx = -x/r*dzdr*nz;
+            ny = -y/r*dzdr*nz;
+        }
     }
 
-    bool Sphere::timeToIntersect(const Ray& r, double& t) const {
-        double vr2 = r.v[0]*r.v[0] + r.v[1]*r.v[1];
-        double vz2 = r.v[2]*r.v[2];
-        double vrr0 = r.v[0]*r.r[0] + r.v[1]*r.r[1];
-        double r02 = r.r[0]*r.r[0] + r.r[1]*r.r[1];
-        double z0term = (r.r[2]-_R);
+    bool Sphere::timeToIntersect(
+        double x, double y, double z,
+        double vx, double vy, double vz,
+        double& dt
+    ) const {
+        double vr2 = vx*vx + vy*vy;
+        double vz2 = vz*vz;
+        double vrr0 = vx*x + vy*y;
+        double r02 = x*x + y*y;
+        double z0term = z-_R;
 
-        // Quadratic equation coefficients
         double a = vz2 + vr2;
-        double b = 2*r.v[2]*z0term + 2*vrr0;
+        double b = 2*vz*z0term + 2*vrr0;
         double c = z0term*z0term - _Rsq + r02;
 
-        double t1, t2;
-        int n = solveQuadratic(a, b, c, t1, t2);
+        double discriminant = b*b - 4*a*c;
 
-        // Should probably check the solutions here since we obtained the quadratic
-        // formula above by squaring both sides of an equation.
-        if (n == 0) {
-            return false;
-        } else if (n == 1) {
-            if (t1 < 0)
-                return false;
-            t = t1;
+        double dt1;
+        if (b > 0) {
+            dt1 = (-b - sqrt(discriminant)) / (2*a);
         } else {
-            if (t1 < 0) {
-                if (t2 < 0)
-                    return false;
-                else
-                    t = t2;
-            } else {
-                // We need to pick whichever time is most consistent with the sag.
-                Ray r1 = r.propagatedToTime(r.t + t1);
-                Ray r2 = r.propagatedToTime(r.t + t2);
-                double d1 = std::abs(sag(r1.r[0], r1.r[1]) - r1.r[2]);
-                double d2 = std::abs(sag(r2.r[0], r2.r[1]) - r2.r[2]);
-                t = (d1 < d2) ? t1 : t2;
-            }
+            dt1 = 2*c / (-b + sqrt(discriminant));
         }
-        t += r.t;
-        return true;
+        double dt2 = c / (a*dt1);
+
+        if (dt1 > 0) {
+            if (dt2 > 0) {
+                // Both are possible.  Need to pick the solution that gives z closest to 0.0
+                // Can pick based off signs of R and vz.
+                dt = (vz*_R>0) ? std::min(dt1, dt2) : std::max(dt1, dt2);
+                return true;
+            }
+            dt = dt1;
+            return true;
+        }
+        if (dt2 > 0) {
+            dt = dt2;
+            return true;
+        }
+        return false;
     }
 
-    double Sphere::dzdr(double r) const {
+    double Sphere::_dzdr(double r) const {
         double rat = r*_Rinv;
-        return rat/std::sqrt(1-rat*rat);
+        return rat/sqrt(1-rat*rat);
+    }
+
+    #pragma omp end declare target
+
+
+    Surface* Sphere::getDevPtr() const {
+        if (!_devPtr) {
+            Surface* ptr;
+            #pragma omp target map(from:ptr)
+            {
+                ptr = new Sphere(_R);
+            }
+            _devPtr = ptr;
+        }
+        return _devPtr;
     }
 
 }

@@ -259,47 +259,47 @@ class Paraboloid(Surface):
         return f"Paraboloid({self.R})"
 
 
-# class Sphere(Surface):
-#     """Spherical surface.  The surface sag follows the equation:
-#
-#     .. math::
-#
-#         z(x, y) = z(r) = R \\left(1 - \\sqrt{1-\\frac{r^2}{R^2}}\\right)
-#
-#     where :math:`r = \\sqrt{x^2 + y^2}` and `R` is the radius the sphere.  Note
-#     that the center of the sphere is a distance `R` above the vertex.
-#
-#     Parameters
-#     ----------
-#     R : float
-#         Sphere radius.
-#     """
-#     def __init__(self, R):
-#         self._surface = _batoid.CPPSphere(R)
-#
-#     @property
-#     def R(self):
-#         """Sphere radius.
-#         """
-#         return self._surface.R
-#
-#     def __hash__(self):
-#         return hash(("batoid.Sphere", self.R))
-#
-#     def __setstate__(self, R):
-#         self._surface = _batoid.CPPSphere(R)
-#
-#     def __getstate__(self):
-#         return self.R
-#
-#     def __eq__(self, rhs):
-#         if not isinstance(rhs, Sphere): return False
-#         return self.R == rhs.R
-#
-#     def __repr__(self):
-#         return "Sphere({})".format(self.R)
-#
-#
+class Sphere(Surface):
+    """Spherical surface.  The surface sag follows the equation:
+
+    .. math::
+
+        z(x, y) = z(r) = R \\left(1 - \\sqrt{1-\\frac{r^2}{R^2}}\\right)
+
+    where :math:`r = \\sqrt{x^2 + y^2}` and `R` is the radius the sphere.  Note
+    that the center of the sphere is a distance `R` above the vertex.
+
+    Parameters
+    ----------
+    R : float
+        Sphere radius.
+    """
+    def __init__(self, R):
+        self._surface = _batoid.CPPSphere(R)
+
+    @property
+    def R(self):
+        """Sphere radius.
+        """
+        return self._surface.R
+
+    def __hash__(self):
+        return hash(("batoid.Sphere", self.R))
+
+    def __setstate__(self, R):
+        self._surface = _batoid.CPPSphere(R)
+
+    def __getstate__(self):
+        return self.R
+
+    def __eq__(self, rhs):
+        if not isinstance(rhs, Sphere): return False
+        return self.R == rhs.R
+
+    def __repr__(self):
+        return f"Sphere({self.R!r})"
+
+
 # class Quadric(Surface):
 #     """Surface of revolution where the cross section is a conic section.
 #     The surface sag follows the equation:
