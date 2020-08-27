@@ -152,6 +152,48 @@ def test_fail():
     np.testing.assert_equal(rv2.failed, np.array([False]))
 
 
+@timer
+def test_sphere():
+    rng = np.random.default_rng(57721)
+    size = 1000
+    for i in range(100):
+        R = 1/rng.normal(0.0, 0.3)
+        conic = 0.0
+        quad = batoid.Quadric(R, conic)
+        sphere = batoid.Sphere(R)
+        x = rng.uniform(-0.7*R, 0.7*R, size=size)
+        y = rng.uniform(-0.7*R, 0.7*R, size=size)
+        np.testing.assert_allclose(
+            quad.sag(x,y), sphere.sag(x, y),
+            rtol=0, atol=1e-11
+        )
+        np.testing.assert_allclose(
+            quad.normal(x,y), sphere.normal(x, y),
+            rtol=0, atol=1e-11
+        )
+
+
+@timer
+def test_paraboloid():
+    rng = np.random.default_rng(57721)
+    size = 1000
+    for i in range(100):
+        R = 1/rng.normal(0.0, 0.3)
+        conic = -1.0
+        quad = batoid.Quadric(R, conic)
+        para = batoid.Paraboloid(R)
+        x = rng.uniform(-0.7*R, 0.7*R, size=size)
+        y = rng.uniform(-0.7*R, 0.7*R, size=size)
+        np.testing.assert_allclose(
+            quad.sag(x,y), para.sag(x, y),
+            rtol=0, atol=1e-11
+        )
+        np.testing.assert_allclose(
+            quad.normal(x,y), para.normal(x, y),
+            rtol=0, atol=1e-11
+        )
+
+
 if __name__ == '__main__':
     init_gpu()
     test_properties()
@@ -160,3 +202,5 @@ if __name__ == '__main__':
     test_intersect()
     test_ne()
     test_fail()
+    test_sphere()
+    test_paraboloid()
