@@ -26,20 +26,20 @@ class Obscuration:
         """
         return self._obsc.contains(x, y)
 
-    def obscure(self, r):
-        """Mark a `Ray` or `RayVector` for potential vignetting.
-
-        Parameters
-        ----------
-        r : `Ray` or `RayVector`
-            Rays to analyze.
-
-        Returns
-        -------
-        out : `Ray` or `RayVector`
-            Returned object will have appropriate elements marked as vignetted.
-        """
-        self._obsc.obscureInPlace(r._rv)
+    # def obscure(self, r):
+    #     """Mark a `Ray` or `RayVector` for potential vignetting.
+    #
+    #     Parameters
+    #     ----------
+    #     r : `Ray` or `RayVector`
+    #         Rays to analyze.
+    #
+    #     Returns
+    #     -------
+    #     out : `Ray` or `RayVector`
+    #         Returned object will have appropriate elements marked as vignetted.
+    #     """
+    #     self._obsc.obscureInPlace(r._rv)
 
     def __eq__(self, rhs):
         return (type(self) == type(rhs)

@@ -22,18 +22,8 @@ class Medium:
         """
         return self._medium.getN(wavelength)
 
-    def __eq__(self, rhs):
-        return (type(self) == type(rhs)
-                and self._medium == rhs._medium)
-
     def __ne__(self, rhs):
         return not (self == rhs)
-
-    def __hash__(self):
-        return hash((type(self), self._medium))
-
-    def __repr__(self):
-        return repr(self._medium)
 
 
 class ConstMedium(Medium):
@@ -45,48 +35,64 @@ class ConstMedium(Medium):
         The refractive index.
     """
     def __init__(self, n):
+        self.n = n
         self._medium = _batoid.CPPConstMedium(n)
 
+    def __eq__(self, rhs):
+        if type(rhs) == type(self):
+            return self.n == rhs.n
+        return False
 
-class TableMedium(Medium):
-    """A `Medium` with refractive index defined via a lookup table.
+    def __getstate__(self):
+        return self.n
 
-    Parameters
-    ----------
-    table : `batoid.Table`
-        Lookup table for refractive index.
-    """
-    def __init__(self, table):
-        self.table = table
-        self._medium = _batoid.CPPTableMedium(self.table._table)
+    def __setstate__(self, n):
+        self.n = n
+        self._medium = _batoid.CPPConstMedium(n)
 
-    @classmethod
-    def fromTxt(cls, filename):
-        """Load a text file with refractive index information in it.
-        The file should have two columns, the first with wavelength in microns,
-        and the second with the corresponding refractive indices.
-        """
-        import os
-        import yaml
-        import numpy as np
-        from .table import Table
-        try:
-            wavelength, n = np.loadtxt(filename, unpack=True)
-        except IOError:
-            import glob
-            from . import datadir
-            filenames = glob.glob(os.path.join(datadir, "**", "*.txt"))
-            for candidate in filenames:
-                if os.path.basename(candidate) == filename:
-                    wavelength, n = np.loadtxt(candidate, unpack=True)
-                    break
-            else:
-                raise FileNotFoundError(filename)
-        table = Table(wavelength*1e-6, n)
-        return TableMedium(table)
+    def __hash__(self):
+        return hash(("batoid.ConstMedium", self.n))
 
-    def __repr__(self):
-        return "TableMedium({!r})".format(self.table)
+
+# class TableMedium(Medium):
+#     """A `Medium` with refractive index defined via a lookup table.
+#
+#     Parameters
+#     ----------
+#     table : `batoid.Table`
+#         Lookup table for refractive index.
+#     """
+#     def __init__(self, table):
+#         self.table = table
+#         self._medium = _batoid.CPPTableMedium(self.table._table)
+#
+#     @classmethod
+#     def fromTxt(cls, filename):
+#         """Load a text file with refractive index information in it.
+#         The file should have two columns, the first with wavelength in microns,
+#         and the second with the corresponding refractive indices.
+#         """
+#         import os
+#         import yaml
+#         import numpy as np
+#         from .table import Table
+#         try:
+#             wavelength, n = np.loadtxt(filename, unpack=True)
+#         except IOError:
+#             import glob
+#             from . import datadir
+#             filenames = glob.glob(os.path.join(datadir, "**", "*.txt"))
+#             for candidate in filenames:
+#                 if os.path.basename(candidate) == filename:
+#                     wavelength, n = np.loadtxt(candidate, unpack=True)
+#                     break
+#             else:
+#                 raise FileNotFoundError(filename)
+#         table = Table(wavelength*1e-6, n)
+#         return TableMedium(table)
+#
+#     def __repr__(self):
+#         return "TableMedium({!r})".format(self.table)
 
 
 class SellmeierMedium(Medium):
@@ -102,78 +108,89 @@ class SellmeierMedium(Medium):
 
     Parameters
     ----------
-    B1, B2, B3, C1, C2, C3: float
-        Sellmeier coefficients.
+    coefs: array of float
+        Sellmeier coefficients (B1, B2, B3, C1, C2, C3)
     """
-    def __init__(self, B1, B2, B3, C1, C2, C3):
-        self._medium = _batoid.CPPSellmeierMedium(B1, B2, B3, C1, C2, C3)
+    def __init__(self, coefs):
+        self.coefs = tuple(coefs)
+        if len(coefs) != 6:
+            raise ValueError("Incorrect number of coefficients")
+        self._medium = _batoid.CPPSellmeierMedium(*coefs)
 
-    @property
-    def coefs(self):
-        """array of float, shape (6,) : The Sellmeier dispersion formula
-        coefficients [B1, B2, B3, C1, C2, C3].
-        """
-        return self._medium.getCoefs()
+    def __eq__(self, rhs):
+        if type(rhs) == type(self):
+            return self.coefs == rhs.coefs
+        return False
 
+    def __getstate__(self):
+        return self.coefs
 
-class SumitaMedium(Medium):
-    r"""A `Medium` with Sumita dispersion formula.
+    def __setstate__(self, coefs):
+        self.coefs = coefs
+        self._medium = _batoid.CPPSellmeierMedium(*coefs)
 
-    The Sumita formula is
-
-    .. math::
-
-        n = \sqrt{A_0 + A_1 \lambda^2 + \sum_{i=2}^5 A_i \lambda^{-2 (i-1)}}
-
-    where :math:`\lambda` is the vacuum wavelength in microns.
-
-    Parameters
-    ----------
-    A0, A1, A2, A3, A4, A5 : float
-        Sumita coefficients.
-    """
-    def __init__(self, A0, A1, A2, A3, A4, A5):
-        self._medium = _batoid.CPPSumitaMedium(A0, A1, A2, A3, A4, A5)
-
-    @property
-    def coefs(self):
-        """array of float, shape (6,) : The Sumita dispersion formula
-        coefficients [A0, A1, A2, A3, A4, A5].
-        """
-        return self._medium.getCoefs()
+    def __hash__(self):
+        return hash(("batoid.SellmeierMedium", self.coefs))
 
 
-class Air(Medium):
-    """A `Medium` for air.
-
-    Parameters
-    ----------
-    pressure : float, optional
-        Atmospheric pressure in kiloPascals.  [default: 69.328]
-    temperature : float, optional
-        Temperature in Kelvin.  [default: 293.15]
-    h2o_pressure : float, optional
-        Water vapor pressure in kiloPascals.  [default: 1.067]
-
-    Notes
-    -----
-    Uses the formulae given in Filippenko (1982), which appear to come from
-    Edlen (1953), and Coleman, Bozman, and Meggers (1960).  The default values
-    for temperature, pressure and water vapor pressure are expected to be
-    appropriate for LSST at Cerro Pachon, Chile, but they are broadly
-    reasonable for most observatories.
-    """
-    def __init__(self, pressure=69.328, temperature=293.15, h2o_pressure=1.067):
-        self._medium = _batoid.CPPAir(pressure, temperature, h2o_pressure)
-
-    @property
-    def pressure(self):
-        return self._medium.getPressure()
-
-    @property
-    def temperature(self):
-        return self._medium.getTemperature()
-
-    @property
-    def h2o_pressure(self):
-        return self._medium.getH2OPressure()
+# class SumitaMedium(Medium):
+#     r"""A `Medium` with Sumita dispersion formula.
+#
+#     The Sumita formula is
+#
+#     .. math::
+#
+#         n = \sqrt{A_0 + A_1 \lambda^2 + \sum_{i=2}^5 A_i \lambda^{-2 (i-1)}}
+#
+#     where :math:`\lambda` is the vacuum wavelength in microns.
+#
+#     Parameters
+#     ----------
+#     A0, A1, A2, A3, A4, A5 : float
+#         Sumita coefficients.
+#     """
+#     def __init__(self, A0, A1, A2, A3, A4, A5):
+#         self._medium = _batoid.CPPSumitaMedium(A0, A1, A2, A3, A4, A5)
+#
+#     @property
+#     def coefs(self):
+#         """array of float, shape (6,) : The Sumita dispersion formula
+#         coefficients [A0, A1, A2, A3, A4, A5].
+#         """
+#         return self._medium.getCoefs()
+#
+#
+# class Air(Medium):
+#     """A `Medium` for air.
+#
+#     Parameters
+#     ----------
+#     pressure : float, optional
+#         Atmospheric pressure in kiloPascals.  [default: 69.328]
+#     temperature : float, optional
+#         Temperature in Kelvin.  [default: 293.15]
+#     h2o_pressure : float, optional
+#         Water vapor pressure in kiloPascals.  [default: 1.067]
+#
+#     Notes
+#     -----
+#     Uses the formulae given in Filippenko (1982), which appear to come from
+#     Edlen (1953), and Coleman, Bozman, and Meggers (1960).  The default values
+#     for temperature, pressure and water vapor pressure are expected to be
+#     appropriate for LSST at Cerro Pachon, Chile, but they are broadly
+#     reasonable for most observatories.
+#     """
+#     def __init__(self, pressure=69.328, temperature=293.15, h2o_pressure=1.067):
+#         self._medium = _batoid.CPPAir(pressure, temperature, h2o_pressure)
+#
+#     @property
+#     def pressure(self):
+#         return self._medium.getPressure()
+#
+#     @property
+#     def temperature(self):
+#         return self._medium.getTemperature()
+#
+#     @property
+#     def h2o_pressure(self):
+#         return self._medium.getH2OPressure()
