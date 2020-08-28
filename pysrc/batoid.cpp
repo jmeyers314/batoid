@@ -42,9 +42,11 @@ namespace batoid {
 
         using namespace pybind11::literals;
 
-        m.def("intersect", &intersect);
         m.def("applyForwardTransform", &applyForwardTransform);
         m.def("applyReverseTransform", &applyReverseTransform);
+        m.def("intersect", &intersect);
+        m.def("reflect", &reflect);
+        m.def("refract", &refract);
 
         //  .def("getNThread", &getNThread)
         //  .def("setNThread", &setNThread)
