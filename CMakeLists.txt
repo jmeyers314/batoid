@@ -24,38 +24,18 @@ endif()
 include_directories(include)
 add_subdirectory(pybind11)
 
-set(PYSRC_FILES
-  pysrc/asphere.cpp
-  pysrc/batoid.cpp
-  # pysrc/bicubic.cpp
-  # pysrc/coating.cpp
-  # pysrc/medium.cpp
-  # pysrc/obscuration.cpp
-  pysrc/paraboloid.cpp
-  pysrc/plane.cpp
-  # pysrc/polynomialSurface.cpp
-  pysrc/quadric.cpp
-  # pysrc/ray.cpp
-  pysrc/rayVector.cpp
-  pysrc/sphere.cpp
-  # pysrc/sum.cpp
-  pysrc/surface.cpp
-  # pysrc/table.cpp
-)
-
 set(SRC_FILES
   src/asphere.cpp
   src/batoid.cpp
   # src/bicubic.cpp
   # src/coating.cpp
   src/dualView.cpp
-  # src/medium.cpp
   # src/obscuration.cpp
+  src/medium.cpp
   src/paraboloid.cpp
   src/plane.cpp
   # src/polynomialSurface.cpp
   src/quadric.cpp
-  # src/ray.cpp
   src/rayVector.cpp
   src/sphere.cpp
   # src/sum.cpp
@@ -63,6 +43,24 @@ set(SRC_FILES
   # src/table.cpp
   # src/utils.cpp
   # src/vecmath.cpp
+)
+
+set(PYSRC_FILES
+  pysrc/asphere.cpp
+  pysrc/batoid.cpp
+  # pysrc/bicubic.cpp
+  # pysrc/coating.cpp
+  pysrc/medium.cpp
+  # pysrc/obscuration.cpp
+  pysrc/paraboloid.cpp
+  pysrc/plane.cpp
+  # pysrc/polynomialSurface.cpp
+  pysrc/quadric.cpp
+  pysrc/rayVector.cpp
+  pysrc/sphere.cpp
+  # pysrc/sum.cpp
+  pysrc/surface.cpp
+  # pysrc/table.cpp
 )
 
 # if (DEFINED ENV{BATOID_GPU})

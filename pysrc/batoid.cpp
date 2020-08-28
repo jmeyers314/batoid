@@ -19,7 +19,7 @@ namespace batoid {
 
     // void pyExportTable(py::module&);
     // void pyExportCoating(py::module&);
-    // void pyExportMedium(py::module&);
+    void pyExportMedium(py::module&);
     // void pyExportObscuration(py::module&);
 
     PYBIND11_MODULE(_batoid, m) {
@@ -37,7 +37,7 @@ namespace batoid {
 
         // pyExportTable(m);
         // pyExportCoating(m);
-        // pyExportMedium(m);
+        pyExportMedium(m);
         // pyExportObscuration(m);
 
         using namespace pybind11::literals;
