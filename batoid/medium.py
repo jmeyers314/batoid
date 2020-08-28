@@ -133,64 +133,89 @@ class SellmeierMedium(Medium):
         return hash(("batoid.SellmeierMedium", self.coefs))
 
 
-# class SumitaMedium(Medium):
-#     r"""A `Medium` with Sumita dispersion formula.
-#
-#     The Sumita formula is
-#
-#     .. math::
-#
-#         n = \sqrt{A_0 + A_1 \lambda^2 + \sum_{i=2}^5 A_i \lambda^{-2 (i-1)}}
-#
-#     where :math:`\lambda` is the vacuum wavelength in microns.
-#
-#     Parameters
-#     ----------
-#     A0, A1, A2, A3, A4, A5 : float
-#         Sumita coefficients.
-#     """
-#     def __init__(self, A0, A1, A2, A3, A4, A5):
-#         self._medium = _batoid.CPPSumitaMedium(A0, A1, A2, A3, A4, A5)
-#
-#     @property
-#     def coefs(self):
-#         """array of float, shape (6,) : The Sumita dispersion formula
-#         coefficients [A0, A1, A2, A3, A4, A5].
-#         """
-#         return self._medium.getCoefs()
-#
-#
-# class Air(Medium):
-#     """A `Medium` for air.
-#
-#     Parameters
-#     ----------
-#     pressure : float, optional
-#         Atmospheric pressure in kiloPascals.  [default: 69.328]
-#     temperature : float, optional
-#         Temperature in Kelvin.  [default: 293.15]
-#     h2o_pressure : float, optional
-#         Water vapor pressure in kiloPascals.  [default: 1.067]
-#
-#     Notes
-#     -----
-#     Uses the formulae given in Filippenko (1982), which appear to come from
-#     Edlen (1953), and Coleman, Bozman, and Meggers (1960).  The default values
-#     for temperature, pressure and water vapor pressure are expected to be
-#     appropriate for LSST at Cerro Pachon, Chile, but they are broadly
-#     reasonable for most observatories.
-#     """
-#     def __init__(self, pressure=69.328, temperature=293.15, h2o_pressure=1.067):
-#         self._medium = _batoid.CPPAir(pressure, temperature, h2o_pressure)
-#
-#     @property
-#     def pressure(self):
-#         return self._medium.getPressure()
-#
-#     @property
-#     def temperature(self):
-#         return self._medium.getTemperature()
-#
-#     @property
-#     def h2o_pressure(self):
-#         return self._medium.getH2OPressure()
+class SumitaMedium(Medium):
+    r"""A `Medium` with Sumita dispersion formula.
+
+    The Sumita formula is
+
+    .. math::
+
+        n = \sqrt{A_0 + A_1 \lambda^2 + \sum_{i=2}^5 A_i \lambda^{-2 (i-1)}}
+
+    where :math:`\lambda` is the vacuum wavelength in microns.
+
+    Parameters
+    ----------
+    coefs: array of float
+        Sumita coefficients (A0, A1, A2, A3, A4, A5)
+    """
+    def __init__(self, coefs):
+        self.coefs = tuple(coefs)
+        if len(coefs) != 6:
+            raise ValueError("Incorrect number of coefficients")
+        self._medium = _batoid.CPPSumitaMedium(*coefs)
+
+    def __eq__(self, rhs):
+        if type(rhs) == type(self):
+            return self.coefs == rhs.coefs
+        return False
+
+    def __getstate__(self):
+        return self.coefs
+
+    def __setstate__(self, coefs):
+        self.coefs = coefs
+        self._medium = _batoid.CPPSumitaMedium(*coefs)
+
+    def __hash__(self):
+        return hash(("batoid.SumitaMedium", self.coefs))
+
+
+class Air(Medium):
+    """A `Medium` for air.
+
+    Parameters
+    ----------
+    pressure : float, optional
+        Atmospheric pressure in kiloPascals.  [default: 69.328]
+    temperature : float, optional
+        Temperature in Kelvin.  [default: 293.15]
+    h2o_pressure : float, optional
+        Water vapor pressure in kiloPascals.  [default: 1.067]
+
+    Notes
+    -----
+    Uses the formulae given in Filippenko (1982), which appear to come from
+    Edlen (1953), and Coleman, Bozman, and Meggers (1960).  The default values
+    for temperature, pressure and water vapor pressure are expected to be
+    appropriate for LSST at Cerro Pachon, Chile, but they are broadly
+    reasonable for most observatories.
+    """
+    def __init__(self, pressure=69.328, temperature=293.15, h2o_pressure=1.067):
+        self.pressure = pressure
+        self.temperature = temperature
+        self.h2o_pressure = h2o_pressure
+        self._medium = _batoid.CPPAir(pressure, temperature, h2o_pressure)
+
+    def __eq__(self, rhs):
+        if type(rhs) == type(self):
+            return (
+                self.pressure == rhs.pressure
+                and self.temperature == rhs.temperature
+                and self.h2o_pressure == rhs.h2o_pressure
+            )
+        return False
+
+    def __getstate__(self):
+        return self.pressure, self.temperature, self.h2o_pressure
+
+    def __setstate__(self, args):
+        self.pressure, self.temperature, self.h2o_pressure = args
+        self._medium = _batoid.CPPAir(
+            self.pressure, self.temperature, self.h2o_pressure
+        )
+
+    def __hash__(self):
+        return hash((
+            "batoid.Air", self.pressure, self.temperature, self.h2o_pressure
+        ))

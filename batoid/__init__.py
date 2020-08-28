@@ -9,7 +9,7 @@ from .surface import Surface, Plane, Paraboloid, Sphere, Quadric, Asphere
 
 from .trace import intersect, applyForwardTransform, applyReverseTransform
 
-from .medium import ConstMedium, SellmeierMedium
+from .medium import ConstMedium, SellmeierMedium, SumitaMedium, Air
 
 # from .ray import Ray
 # from .rayVector import RayVector, concatenateRayVectors, rayGrid, circularGrid

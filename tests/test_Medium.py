@@ -47,104 +47,72 @@ def test_SellmeierMedium():
     wmicron, ncsv = np.loadtxt(filename, delimiter=',').T
     n = silica.getN(wmicron*1e-6)
     np.testing.assert_allclose(n, ncsv, atol=0, rtol=1e-13)
+    do_pickle(silica)
 
 
-# @timer
-# def test_table_medium():
-#     import random
-#     random.seed(57)
-#
-#     # File from phosim
-#     filename = os.path.join(batoid.datadir, "media", "silica_dispersion.txt")
-#     wave, n = np.genfromtxt(filename).T
-#     wave *= 1e-6    # microns -> meters
-#     table = batoid.Table(wave, n, 'linear')
-#     table_medium = batoid.TableMedium(table)
-#     for i in range(100):
-#         w = random.uniform(0.3e-6, 1.2e-6)
-#         assert table_medium.getN(w) == table(w)
-#     assert table_medium.table == table
-#     do_pickle(table_medium)
-#
-#
-# @timer
-# def test_silica_sellmeier_table():
-#     import random
-#     import time
-#     random.seed(577)
-#
-#     # File from phosim
-#     filename = os.path.join(batoid.datadir, "media", "silica_dispersion.txt")
-#     wave, n = np.genfromtxt(filename).T
-#     wave *= 1e-6    # microns -> meters
-#     table = batoid.Table(wave, n, 'linear')
-#     table_silica = batoid.TableMedium(table)
-#
-#     # Coefficients from
-#     # https://refractiveindex.info/?shelf=main&book=SiO2&page=Malitson
-#     sellmeier_silica = batoid.SellmeierMedium(
-#             0.6961663, 0.4079426, 0.8974794,
-#             0.0684043**2, 0.1162414**2, 9.896161**2)
-#
-#     # Making this a timing test too for fun
-#     ws = []
-#     for i in range(100000):
-#         ws.append(random.uniform(0.3e-6, 1.2e-6))
-#     table_n = []
-#     sellmeier_n = []
-#     t0 = time.time()
-#     for w in ws:
-#         table_n.append(table_silica.getN(w))
-#     t1 = time.time()
-#     for w in ws:
-#         sellmeier_n.append(sellmeier_silica.getN(w))
-#     t2 = time.time()
-#     print("TableMedium took {} s".format(t1-t0))
-#     print("SellmeierMedium took {} s".format(t2-t1))
-#     np.testing.assert_allclose(table_n, sellmeier_n, atol=1e-6, rtol=0)
-#     do_pickle(sellmeier_silica)
-#
-#
-# @timer
-# def test_air():
-#     # Just spot check some comparisons with GalSim.
-#     ws = [0.3, 0.5, 0.7, 0.9, 1.1]
-#     gsn = [ 1.00019563,  1.00018713,  1.00018498,  1.00018412,  1.00018369]
-#     air = batoid.Air()
-#     for w, n in zip(ws, gsn):
-#         np.testing.assert_allclose(n, air.getN(w*1e-6), rtol=0, atol=1e-8)
-#     do_pickle(air)
-#
-#
-# @timer
-# def test_ne():
-#     filename = os.path.join(batoid.datadir, "media", "silica_dispersion.txt")
-#     wave, n = np.genfromtxt(filename).T
-#     wave *= 1e-6    # microns -> meters
-#     table = batoid.Table(wave, n, 'linear')
-#     table2 = batoid.Table(wave*1.01, n, 'linear')
-#
-#     objs = [
-#         batoid.ConstMedium(1.0),
-#         batoid.ConstMedium(1.1),
-#         batoid.TableMedium(table),
-#         batoid.TableMedium(table2),
-#         batoid.SellmeierMedium(
-#             0.6961663, 0.4079426, 0.8974794,
-#             0.0684043**2, 0.1162414**2, 9.896161**2),
-#         batoid.SellmeierMedium(
-#             0.4079426, 0.6961663, 0.8974794,
-#             0.0684043**2, 0.1162414**2, 9.896161**2),
-#         batoid.Air(),
-#         batoid.Air(pressure=100)
-#     ]
-#     all_obj_diff(objs)
+@timer
+def test_SumitaMedium():
+    rng = np.random.default_rng(57)
+    # K-BK-7 coefficients
+    # https://refractiveindex.info/?shelf=glass&book=SUMITA-BK&page=K-BK7
+    A0 = 2.2705778
+    A1 = -0.010059376
+    A2 = 0.010414999
+    A3 = 0.00028872517
+    A4 = -2.2214495e-5
+    A5 = 1.4258559e-6
+    kbk7 = batoid.SumitaMedium([A0, A1, A2, A3, A4, A5])
+
+    wavelengths = rng.uniform(300e-9, 1100e-9, size=1000)
+    indices = kbk7.getN(wavelengths)
+    for w, index in zip(wavelengths, indices):
+        assert kbk7.getN(w) == index
+
+    # CSV also from refractiveindex.info
+    filename = os.path.join(
+        os.path.dirname(__file__),
+        "testdata",
+        "kbk7.csv"
+    )
+    wmicron, ncsv = np.loadtxt(filename, delimiter=',').T
+    n = kbk7.getN(wmicron*1e-6)
+    np.testing.assert_allclose(n, ncsv, atol=0, rtol=1e-13)
+    do_pickle(kbk7)
+
+
+@timer
+def test_air():
+    # Just spot check some comparisons with GalSim.
+    ws = [0.3, 0.5, 0.7, 0.9, 1.1]
+    gsn = [ 1.00019563,  1.00018713,  1.00018498,  1.00018412,  1.00018369]
+    air = batoid.Air()
+    for w, n in zip(ws, gsn):
+        np.testing.assert_allclose(n, air.getN(w*1e-6), rtol=0, atol=1e-8)
+    n = air.getN(np.array(ws)*1e-6)
+    np.testing.assert_allclose(n, gsn, atol=1e-8)
+    do_pickle(air)
+
+
+@timer
+def test_ne():
+    objs = [
+        batoid.ConstMedium(1.0),
+        batoid.ConstMedium(1.1),
+        batoid.SellmeierMedium([
+            0.6961663, 0.4079426, 0.8974794,
+            0.0684043**2, 0.1162414**2, 9.896161**2]),
+        batoid.SellmeierMedium([
+            0.4079426, 0.6961663, 0.8974794,
+            0.0684043**2, 0.1162414**2, 9.896161**2]),
+        batoid.Air(),
+        batoid.Air(pressure=100)
+    ]
+    all_obj_diff(objs)
 
 
 if __name__ == '__main__':
     test_ConstMedium()
     test_SellmeierMedium()
-    # test_table_medium()
-    # test_silica_sellmeier_table()
-    # test_air()
-    # test_ne()
+    test_SumitaMedium()
+    test_air()
+    test_ne()
