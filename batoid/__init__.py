@@ -7,9 +7,16 @@ from .coordTransform import CoordTransform
 
 from .surface import Surface, Plane, Paraboloid, Sphere, Quadric, Asphere
 
-from .trace import intersect, applyForwardTransform, applyReverseTransform
+from .trace import (
+    intersect, applyForwardTransform, applyReverseTransform, obscure
+)
 
 from .medium import ConstMedium, SellmeierMedium, SumitaMedium, Air
+
+from .obscuration import (
+    ObscCircle, ObscAnnulus, ObscRectangle, ObscRay, ObscPolygon, ObscNegation,
+    ObscUnion, ObscIntersection
+)
 
 # from .ray import Ray
 # from .rayVector import RayVector, concatenateRayVectors, rayGrid, circularGrid

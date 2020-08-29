@@ -2,6 +2,7 @@
 #include <memory>
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
+#include <pybind11/stl.h>
 
 
 namespace py = pybind11;
@@ -14,36 +15,61 @@ namespace batoid {
 
 
         py::class_<ObscCircle, std::shared_ptr<ObscCircle>, Obscuration>(m, "CPPObscCircle")
-            .def(py::init<double,double,double>(), "init", "radius"_a, "x"_a=0.0, "y"_a=0.0);
+            .def(py::init<double,double,double>());
 
 
         py::class_<ObscAnnulus, std::shared_ptr<ObscAnnulus>, Obscuration>(m, "CPPObscAnnulus")
-            .def(py::init<double,double,double,double>(), "init", "inner"_a, "outer"_a, "x"_a=0.0, "y"_a=0.0);
+            .def(py::init<double,double,double,double>());
 
 
-        // py::class_<ObscRectangle, std::shared_ptr<ObscRectangle>, Obscuration>(m, "CPPObscRectangle")
-        //     .def(py::init<double,double,double,double,double>(), "init",
-        //          "width"_a, "height"_a, "x"_a=0.0, "y"_a=0.0, "theta"_a=0.0)
-        //
-        //
-        // py::class_<ObscRay, std::shared_ptr<ObscRay>, Obscuration>(m, "CPPObscRay")
-        //     .def(py::init<double,double,double,double>(), "init",
-        //          "width"_a, "theta"_a, "x"_a=0.0, "y"_a=0.0)
-        //
-        //
-        // py::class_<ObscPolygon, std::shared_ptr<ObscPolygon>, Obscuration>(m, "CPPObscPolygon")
-        //     .def(py::init<std::vector<double>, std::vector<double>>(), "init")
-        //
-        //
-        // py::class_<ObscNegation, std::shared_ptr<ObscNegation>, Obscuration>(m, "CPPObscNegation")
-        //     .def(py::init<std::shared_ptr<Obscuration>>(), "init", "original"_a)
-        //
-        //
-        // py::class_<ObscUnion, std::shared_ptr<ObscUnion>, Obscuration>(m, "CPPObscUnion")
-        //     .def(py::init<std::vector<std::shared_ptr<Obscuration>>>(), "init", "items"_a)
-        //
-        //
-        // py::class_<ObscIntersection, std::shared_ptr<ObscIntersection>, Obscuration>(m, "CPPObscIntersection")
-        //     .def(py::init<std::vector<std::shared_ptr<Obscuration>>>(), "init", "items"_a)
+        py::class_<ObscRectangle, std::shared_ptr<ObscRectangle>, Obscuration>(m, "CPPObscRectangle")
+            .def(py::init<double,double,double,double,double>());
+
+
+        py::class_<ObscRay, std::shared_ptr<ObscRay>, Obscuration>(m, "CPPObscRay")
+            .def(py::init<double,double,double,double>());
+
+
+        py::class_<ObscPolygon, std::shared_ptr<ObscPolygon>, Obscuration>(m, "CPPObscPolygon")
+            .def(py::init(
+                [](
+                    size_t xp,
+                    size_t yp,
+                    size_t size
+                ){
+                    return new ObscPolygon(
+                        reinterpret_cast<double*>(xp),
+                        reinterpret_cast<double*>(yp),
+                        size
+                    );
+                }
+            ));
+
+
+        py::class_<ObscNegation, std::shared_ptr<ObscNegation>, Obscuration>(m, "CPPObscNegation")
+            .def(py::init<Obscuration*>());
+
+
+        py::class_<ObscUnion, std::shared_ptr<ObscUnion>, Obscuration>(m, "CPPObscUnion")
+            .def(py::init(
+                [](const std::vector<std::shared_ptr<Obscuration>>& obscs) {
+                    Obscuration** _obscs = new Obscuration*[obscs.size()];
+                    for (int i=0; i<obscs.size(); i++) {
+                        _obscs[i] = obscs[i].get();
+                    }
+                    return new ObscUnion(_obscs, obscs.size());
+                }
+            ));
+
+        py::class_<ObscIntersection, std::shared_ptr<ObscIntersection>, Obscuration>(m, "CPPObscIntersection")
+            .def(py::init(
+                [](const std::vector<std::shared_ptr<Obscuration>>& obscs) {
+                    Obscuration** _obscs = new Obscuration*[obscs.size()];
+                    for (int i=0; i<obscs.size(); i++) {
+                        _obscs[i] = obscs[i].get();
+                    }
+                    return new ObscIntersection(_obscs, obscs.size());
+                }
+            ));
     }
 }

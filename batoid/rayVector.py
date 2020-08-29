@@ -10,6 +10,14 @@ from .trace import applyForwardTransform
 from .utils import lazy_property
 
 
+def reshape_arrays(arrays, shape, dtype=float):
+    for i in range(len(arrays)):
+        array = arrays[i]
+        if not hasattr(array, 'shape') or array.shape != shape:
+            arrays[i] = np.array(np.broadcast_to(array, shape))
+        arrays[i] = np.ascontiguousarray(arrays[i], dtype=dtype)
+    return arrays
+
 class RayVector:
     def __init__(
         self, x, y, z, vx, vy, vz, t=0, wavelength=500e-9, flux=1,
@@ -37,45 +45,27 @@ class RayVector:
             Coordinate system in which this ray is expressed.  Default: the
             global coordinate system.
         """
-        x = np.atleast_1d(x)
-        y = np.atleast_1d(y)
-        z = np.atleast_1d(z)
-        vx = np.atleast_1d(vx)
-        vy = np.atleast_1d(vy)
-        vz = np.atleast_1d(vz)
-        n = len(x)
+
+        shape = np.broadcast(
+            x, y, z, vx, vy, vz, t, wavelength, flux, vignetted, failed
+        ).shape
+        x, y, z, vx, vy, vz, t, wavelength, flux = reshape_arrays(
+            [x, y, z, vx, vy, vz, t, wavelength, flux],
+            shape
+        )
+        vignetted, failed = reshape_arrays(
+            [vignetted, failed],
+            shape,
+            bool
+        )
+
         self._r = np.ascontiguousarray([x, y, z], dtype=float).T
         self._v = np.ascontiguousarray([vx, vy, vz], dtype=float).T
-
-        if isinstance(t, Real):
-            self._t = np.empty_like(x)
-            self._t.fill(t)
-        else:
-            self._t = np.ascontiguousarray(t)
-
-        if isinstance(wavelength, Real):
-            self._wavelength = np.empty_like(x)
-            self._wavelength.fill(wavelength)
-        else:
-            self._wavelength = np.ascontiguousarray(wavelength)
-
-        if isinstance(flux, Real):
-            self._flux = np.empty_like(x)
-            self._flux.fill(flux)
-        else:
-            self._flux = np.ascontiguousarray(flux)
-
-        if isinstance(vignetted, bool):
-            self._vignetted = np.empty_like(x, dtype=bool)
-            self._vignetted.fill(vignetted)
-        else:
-            self._vignetted = np.ascontiguousarray(vignetted)
-
-        if isinstance(failed, bool):
-            self._failed = np.empty_like(x, dtype=bool)
-            self._failed.fill(failed)
-        else:
-            self._failed = np.ascontiguousarray(failed)
+        self._t = t
+        self._wavelength = wavelength
+        self._flux = flux
+        self._vignetted = vignetted
+        self._failed = failed
 
         self.coordSys = coordSys
 

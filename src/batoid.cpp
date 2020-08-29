@@ -301,4 +301,21 @@ namespace batoid {
             }
         }
     }
+
+    void obscure(const Obscuration& obsc, RayVector& rv) {
+        rv.r.syncToDevice();
+        rv.vignetted.syncToDevice();
+        size_t size = rv.size;
+        double* xptr = rv.r.data;
+        double* yptr = xptr + size;
+        double* zptr = yptr + size;
+        bool* vigptr = rv.vignetted.data;
+
+        Obscuration* obscDevPtr = obsc.getDevPtr();
+
+        #pragma omp target teams distribute parallel for is_device_ptr(obscDevPtr)
+        for(int i=0; i<size; i++) {
+            vigptr[i] |= obscDevPtr->contains(xptr[i], yptr[i]);
+        }
+    }
 }

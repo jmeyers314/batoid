@@ -20,7 +20,7 @@ namespace batoid {
     // void pyExportTable(py::module&);
     // void pyExportCoating(py::module&);
     void pyExportMedium(py::module&);
-    // void pyExportObscuration(py::module&);
+    void pyExportObscuration(py::module&);
 
     PYBIND11_MODULE(_batoid, m) {
         pyExportRayVector(m);
@@ -38,7 +38,7 @@ namespace batoid {
         // pyExportTable(m);
         // pyExportCoating(m);
         pyExportMedium(m);
-        // pyExportObscuration(m);
+        pyExportObscuration(m);
 
         using namespace pybind11::literals;
 
@@ -47,6 +47,7 @@ namespace batoid {
         m.def("intersect", &intersect);
         m.def("reflect", &reflect);
         m.def("refract", &refract);
+        m.def("obscure", &obscure);
 
         //  .def("getNThread", &getNThread)
         //  .def("setNThread", &setNThread)

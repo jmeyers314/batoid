@@ -41,3 +41,7 @@ def applyReverseTransform(ct, rv):
     _batoid.applyReverseTransform(ct.dr, ct.drot.ravel(), rv._rv)
     rv.coordSys = ct.fromSys
     return rv
+
+def obscure(obsc, rv):
+    _batoid.obscure(obsc._obsc, rv._rv);
+    return rv

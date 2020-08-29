@@ -5,6 +5,7 @@
 #include "rayVector.h"
 #include "surface.h"
 #include "medium.h"
+#include "obscuration.h"
 
 namespace batoid {
     using vec3 = std::array<double, 3>;
@@ -18,7 +19,7 @@ namespace batoid {
         const Surface& surface, const vec3 dr, const mat3 drot,
         const Medium& m1, const Medium& m2, RayVector& rv
     );
-    // void obscure(const Obscuration& obsc, RayVector& rv);
+    void obscure(const Obscuration& obsc, RayVector& rv);
     // void rSplit(
     //     const Surface& surface, const vec3 dr, const mat3 drot, const RayVector& rv,
     //     RayVector& reflected, RayVector& refracted, const Coating* coating

@@ -1,6 +1,8 @@
 #ifndef batoid_obscuration_h
 #define batoid_obscuration_h
 
+#include <cstdlib>  // for size_t
+
 namespace batoid {
     class Obscuration {
     public:
@@ -43,70 +45,97 @@ namespace batoid {
         const double _inner, _outer, _x0, _y0;
     };
 
-    // class ObscRectangle : public Obscuration {
-    // public:
-    //     ObscRectangle(double width, double height, double x0=0.0, double y0=0.0, double theta=0.0);
-    //     bool contains(double x, double y) const override;
-    //     bool operator==(const Obscuration& rhs) const override;
-    //     std::string repr() const override;
-    //
-    //     const double _width, _height, _x0, _y0, _theta;
-    // private:
-    //     Vector2d _A, _B, _C, _AB, _BC;
-    //     double _ABAB, _BCBC;
-    // };
-    //
-    // class ObscRay : public Obscuration {
-    // public:
-    //     ObscRay(double width, double theta, double x0=0.0, double y0=0.0);
-    //     bool contains(double x, double y) const override;
-    //     bool operator==(const Obscuration& rhs) const override;
-    //     std::string repr() const override;
-    //
-    //     const double _width, _theta, _x0, _y0;
-    // private:
-    //     const ObscRectangle _rect;
-    // };
-    //
-    // class ObscPolygon : public Obscuration {
-    // public:
-    //     ObscPolygon(const std::vector<double>& xp, const std::vector<double>& yp);
-    //     bool contains(double x, double y) const override;
-    //     bool operator==(const Obscuration& rhs) const override;
-    //     std::string repr() const override;
-    //
-    //     const std::vector<double> _xp, _yp;
-    // };
-    //
-    // class ObscNegation : public Obscuration {
-    // public:
-    //     ObscNegation(const std::shared_ptr<Obscuration> original);
-    //     bool contains(double x, double y) const override;
-    //     bool operator==(const Obscuration& rhs) const override;
-    //     std::string repr() const override;
-    //
-    //     const std::shared_ptr<Obscuration> _original;
-    // };
-    //
-    // class ObscUnion : public Obscuration {
-    // public:
-    //     ObscUnion(const std::vector<std::shared_ptr<Obscuration>> obscVec);
-    //     bool contains(double x, double y) const override;
-    //     bool operator==(const Obscuration& rhs) const override;
-    //     std::string repr() const override;
-    //
-    //     const std::vector<std::shared_ptr<Obscuration>> _obscVec;
-    // };
-    //
-    // class ObscIntersection : public Obscuration {
-    // public:
-    //     ObscIntersection(const std::vector<std::shared_ptr<Obscuration>> obscVec);
-    //     bool contains(double x, double y) const override;
-    //     bool operator==(const Obscuration& rhs) const override;
-    //     std::string repr() const override;
-    //
-    //     const std::vector<std::shared_ptr<Obscuration>> _obscVec;
-    // };
+
+    class ObscRectangle : public Obscuration {
+    public:
+        ObscRectangle(double width, double height, double x0=0.0, double y0=0.0, double theta=0.0);
+        ~ObscRectangle();
+
+        bool contains(double x, double y) const override;
+
+        Obscuration* getDevPtr() const override;
+
+    private:
+        const double _width, _height, _x0, _y0, _theta;
+        const double _sth, _cth;
+    };
+
+
+    class ObscRay : public Obscuration {
+    public:
+        ObscRay(double width, double theta, double x0=0.0, double y0=0.0);
+        ~ObscRay();
+
+        bool contains(double x, double y) const override;
+
+        Obscuration* getDevPtr() const override;
+
+    private:
+        const double _width, _theta, _x0, _y0;
+        const double _sth, _cth;
+    };
+
+
+    class ObscPolygon : public Obscuration {
+    public:
+        ObscPolygon(const double* xp, const double* yp, const size_t size);
+        ~ObscPolygon();
+
+        bool contains(double x, double y) const override;
+
+        Obscuration* getDevPtr() const override;
+
+    private:
+        const double* _xp;
+        const double* _yp;
+        const size_t _size;
+
+        static double* _copyArr(const double* coefs, const size_t size);
+    };
+
+
+    class ObscNegation : public Obscuration {
+    public:
+        ObscNegation(Obscuration* original);
+        ~ObscNegation();
+
+        bool contains(double x, double y) const override;
+
+        Obscuration* getDevPtr() const override;
+
+    private:
+        const Obscuration* _original;
+    };
+
+
+    class ObscUnion : public Obscuration {
+    public:
+        ObscUnion(Obscuration** obscs, size_t nobsc);
+        ~ObscUnion();
+
+        bool contains(double x, double y) const override;
+
+        Obscuration* getDevPtr() const override;
+
+    private:
+        Obscuration** _obscs;
+        size_t _nobsc;
+    };
+
+
+    class ObscIntersection : public Obscuration {
+    public:
+        ObscIntersection(Obscuration** obscs, size_t nobsc);
+        ~ObscIntersection();
+
+        bool contains(double x, double y) const override;
+
+        Obscuration* getDevPtr() const override;
+
+    private:
+        Obscuration** _obscs;
+        size_t _nobsc;
+    };
 }
 
 #endif
