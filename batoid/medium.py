@@ -53,6 +53,8 @@ class ConstMedium(Medium):
     def __hash__(self):
         return hash(("batoid.ConstMedium", self.n))
 
+    def __repr__(self):
+        return f"ConstMedium({self.n})"
 
 # class TableMedium(Medium):
 #     """A `Medium` with refractive index defined via a lookup table.
@@ -132,6 +134,9 @@ class SellmeierMedium(Medium):
     def __hash__(self):
         return hash(("batoid.SellmeierMedium", self.coefs))
 
+    def __repr__(self):
+        return f"SellmeierMedium({self.coefs})"
+
 
 class SumitaMedium(Medium):
     r"""A `Medium` with Sumita dispersion formula.
@@ -169,6 +174,9 @@ class SumitaMedium(Medium):
 
     def __hash__(self):
         return hash(("batoid.SumitaMedium", self.coefs))
+
+    def __repr__(self):
+        return f"SumitaMedium({self.coefs})"
 
 
 class Air(Medium):
@@ -219,3 +227,6 @@ class Air(Medium):
         return hash((
             "batoid.Air", self.pressure, self.temperature, self.h2o_pressure
         ))
+
+    def __repr__(self):
+        return f"Air({self.pressure}, {self.temperature}, {self.h2o_pressure})"

@@ -172,3 +172,6 @@ class CoordSys:
 
     def copy(self):
         return CoordSys(self.origin, self.rot)
+
+    def __repr__(self):
+        return f"CoordSys({self.origin!r}, {self.rot!r})"

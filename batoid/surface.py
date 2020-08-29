@@ -435,7 +435,7 @@ class Asphere(Surface):
                 np.array_equal(self.coefs, rhs.coefs))
 
     def __repr__(self):
-        return f"Asphere({self.R}, {self.conic}, {self.coefs})"
+        return f"Asphere({self.R}, {self.conic}, {self.coefs!r})"
 
 
 # class Zernike(Surface):
