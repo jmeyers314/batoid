@@ -76,6 +76,9 @@ namespace batoid {
     ) const {
         // Solve the quadric problem analytically to get a good starting point.
         if (!Quadric::timeToIntersect(x, y, z, vx, vy, vz, dt))
+            // This isn't quite right.  It's possible that quadric intersection is negative, but
+            // asphere coefficients make true time to intersect positive.  But this is rare enough
+            // at the moment we ignore it.
             return false;
         bool success = Surface::timeToIntersect(x, y, z, vx, vy, vz, dt);
         return (success && dt >= 0.0);

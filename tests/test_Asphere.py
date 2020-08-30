@@ -115,7 +115,7 @@ def test_normal():
 @timer
 def test_intersect():
     rng = np.random.default_rng(5772)
-    size = 1
+    size = 10_000
     for i in range(100):
         R = 1./rng.normal(0.0, 0.3)  # negative allowed
         conic = rng.uniform(-2.0, 1.0)
@@ -123,16 +123,16 @@ def test_intersect():
         coefs = [rng.normal(0, 1e-8) for i in range(ncoef)]
         asphere = batoid.Asphere(R, conic, coefs)
         asphereCoordSys = batoid.CoordSys(origin=[0, 0, -1])
-        lim = min(0.7*abs(R)/np.sqrt(1+conic) if conic > -1 else 10, 10)
+        lim = min(0.7*abs(R)/np.sqrt(1+conic) if conic > -1 else 5, 5)
         x = rng.uniform(-lim, lim, size=size)
         y = rng.uniform(-lim, lim, size=size)
-        z = np.full_like(x, -100.0)
+        z = np.full_like(x, -10000.0)
         # If we shoot rays straight up, then it's easy to predict the intersection
         vx = np.zeros_like(x)
         vy = np.zeros_like(x)
         vz = np.ones_like(x)
         rv = batoid.RayVector(x, y, z, vx, vy, vz)
-        np.testing.assert_allclose(rv.z, -100.0)
+        np.testing.assert_allclose(rv.z, -10000.0)
         rv2 = batoid.intersect(asphere, rv.copy(), asphereCoordSys)
         assert rv2.coordSys == asphereCoordSys
 
