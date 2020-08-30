@@ -43,6 +43,17 @@ class CoordTransform:
         from .trace import applyReverseTransform
         return applyReverseTransform(self, rv)
 
+    def applyForwardArray(self, x, y, z):
+        r = np.array([x, y, z]).T
+        r -= self.dr
+        return self.drot.T@r.T
+
+    def applyReverseArray(self, x, y, z):
+        r = np.array([x, y, z])
+        r = (self.drot@r).T
+        r += self.dr
+        return r.T
+
     def __repr__(self):
         return f"CoordTransform({self.fromSys!r}, {self.toSys!r})"
 
