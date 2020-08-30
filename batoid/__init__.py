@@ -8,7 +8,8 @@ from .coordTransform import CoordTransform
 from .surface import Surface, Plane, Paraboloid, Sphere, Quadric, Asphere
 
 from .trace import (
-    intersect, applyForwardTransform, applyReverseTransform, obscure
+    intersect, applyForwardTransform, applyReverseTransform, obscure,
+    reflect, refract
 )
 
 from .medium import ConstMedium, SellmeierMedium, SumitaMedium, Air

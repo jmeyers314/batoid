@@ -1,6 +1,6 @@
 import batoid
 import numpy as np
-from test_helpers import timer, do_pickle, all_obj_diff, init_gpu
+from test_helpers import timer, do_pickle, all_obj_diff, init_gpu, rays_allclose
 
 
 @timer
@@ -158,6 +158,96 @@ def test_intersect():
 
 
 @timer
+def test_reflect():
+    rng = np.random.default_rng(57721)
+    size = 10_000
+    for i in range(100):
+        R = 1./rng.normal(0.0, 0.3)  # negative allowed
+        conic = rng.uniform(-2.0, 1.0)
+        ncoef = rng.choice(5)
+        coefs = [rng.normal(0, 1e-8) for i in range(ncoef)]
+        asphere = batoid.Asphere(R, conic, coefs)
+        lim = min(0.7*abs(R)/np.sqrt(1+conic) if conic > -1 else 5, 5)
+        x = rng.uniform(-lim, lim, size=size)
+        y = rng.uniform(-lim, lim, size=size)
+        z = np.full_like(x, -10000.0)
+        vx = rng.uniform(-1e-5, 1e-5, size=size)
+        vy = rng.uniform(-1e-5, 1e-5, size=size)
+        vz = np.full_like(x, 1)
+        rv = batoid.RayVector(x, y, z, vx, vy, vz, t=0)
+        rvr = batoid.reflect(asphere, rv.copy())
+        rvr2 = asphere.reflect(rv.copy())
+        assert rays_allclose(rvr, rvr2)
+        # print(f"{np.sum(rvr.failed)/len(rvr)*100:.2f}% failed")
+        normal = asphere.normal(rvr.x, rvr.y)
+
+        # Test law of reflection
+        a0 = np.einsum("ad,ad->a", normal, rv.v)[~rvr.failed]
+        a1 = np.einsum("ad,ad->a", normal, -rvr.v)[~rvr.failed]
+        np.testing.assert_allclose(
+            a0, a1,
+            rtol=0, atol=1e-12
+        )
+
+        # Test that rv.v, rvr.v and normal are all in the same plane
+        np.testing.assert_allclose(
+            np.einsum(
+                "ad,ad->a",
+                np.cross(normal, rv.v),
+                rv.v
+            )[~rvr.failed],
+            0.0,
+            rtol=0, atol=1e-12
+        )
+
+
+@timer
+def test_refract():
+    rng = np.random.default_rng(577215)
+    size = 10_000
+    for i in range(100):
+        R = 1./rng.normal(0.0, 0.3)  # negative allowed
+        conic = rng.uniform(-2.0, 1.0)
+        ncoef = rng.choice(5)
+        coefs = [rng.normal(0, 1e-8) for i in range(ncoef)]
+        asphere = batoid.Asphere(R, conic, coefs)
+        m0 = batoid.ConstMedium(rng.normal(1.2, 0.01))
+        m1 = batoid.ConstMedium(rng.normal(1.3, 0.01))
+        lim = min(0.7*abs(R)/np.sqrt(1+conic) if conic > -1 else 5, 5)
+        x = rng.uniform(-lim, lim, size=size)
+        y = rng.uniform(-lim, lim, size=size)
+        z = np.full_like(x, -10000.0)
+        vx = rng.uniform(-1e-5, 1e-5, size=size)
+        vy = rng.uniform(-1e-5, 1e-5, size=size)
+        vz = np.sqrt(1-vx*vx-vy*vy)/m0.n
+        rv = batoid.RayVector(x, y, z, vx, vy, vz, t=0)
+        rvr = batoid.refract(asphere, rv.copy(), m0, m1)
+        rvr2 = asphere.refract(rv.copy(), m0, m1)
+        assert rays_allclose(rvr, rvr2)
+        # print(f"{np.sum(rvr.failed)/len(rvr)*100:.2f}% failed")
+        normal = asphere.normal(rvr.x, rvr.y)
+
+        # Test Snell's law
+        s0 = np.sum(np.cross(normal, rv.v*m0.n)[~rvr.failed], axis=-1)
+        s1 = np.sum(np.cross(normal, rvr.v*m1.n)[~rvr.failed], axis=-1)
+        np.testing.assert_allclose(
+            m0.n*s0, m1.n*s1,
+            rtol=0, atol=1e-9
+        )
+
+        # Test that rv.v, rvr.v and normal are all in the same plane
+        np.testing.assert_allclose(
+            np.einsum(
+                "ad,ad->a",
+                np.cross(normal, rv.v),
+                rv.v
+            )[~rvr.failed],
+            0.0,
+            rtol=0, atol=1e-12
+        )
+
+
+@timer
 def test_ne():
     objs = [
         batoid.Asphere(10.0, 1.0, []),
@@ -190,5 +280,7 @@ if __name__ == '__main__':
     test_sag()
     test_normal()
     test_intersect()
+    test_reflect()
+    test_refract()
     test_ne()
     test_fail()

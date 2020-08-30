@@ -40,11 +40,42 @@ def applyForwardTransform(ct, rv):
     rv.coordSys = ct.toSys
     return rv
 
+
 def applyReverseTransform(ct, rv):
     _batoid.applyReverseTransform(ct.dr, ct.drot.ravel(), rv._rv)
     rv.coordSys = ct.fromSys
     return rv
 
+
 def obscure(obsc, rv):
     _batoid.obscure(obsc._obsc, rv._rv);
+    return rv
+
+
+def reflect(surface, rv, coordSys=None):
+    if coordSys is None:
+        coordSys = rv.coordSys
+    ct = CoordTransform(rv.coordSys, coordSys)
+
+    _batoid.reflect(
+        surface._surface,
+        ct.dr, ct.drot.ravel(),
+        rv._rv,
+    )
+    rv.coordSys = coordSys
+    return rv
+
+
+def refract(surface, rv, m1, m2, coordSys=None):
+    if coordSys is None:
+        coordSys = rv.coordSys
+    ct = CoordTransform(rv.coordSys, coordSys)
+
+    _batoid.refract(
+        surface._surface,
+        ct.dr, ct.drot.ravel(),
+        m1._medium, m2._medium,
+        rv._rv,
+    )
+    rv.coordSys = coordSys
     return rv

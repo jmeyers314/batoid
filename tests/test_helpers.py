@@ -2,21 +2,6 @@ import numpy as np
 import batoid
 
 
-def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
-    return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
-
-
-def ray_isclose(ray1, ray2, atol=1e-14):
-    return (
-        np.allclose(ray1.r, ray2.r, rtol=0, atol=atol)
-        and np.allclose(ray1.v, ray2.v, rtol=0, atol=atol)
-        and np.allclose(ray1.t, ray2.t, rtol=0, atol=atol)
-        and np.allclose(ray1.wavelength, ray2.wavelength, rtol=0, atol=atol)
-        and ray1.vignetted == ray2.vignetted
-        and ray1.failed == ray2.failed
-    )
-
-
 def rays_allclose(rv1, rv2, atol=1e-14):
     return (
         np.allclose(rv1.r, rv2.r, rtol=0, atol=atol)

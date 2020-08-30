@@ -4,6 +4,7 @@ import numpy as np
 
 from . import _batoid
 from .constants import globalCoordSys
+from .trace import reflect, refract
 
 
 class Surface(ABC):
@@ -52,68 +53,52 @@ class Surface(ABC):
         else:
             return out
 
-    # def reflect(self, r, coating=None, coordSys=None):
-    #     """Calculate intersection of ray(s) with this surface, and immediately
-    #     reflect the ray(s) at the point(s) of intersection.
-    #
-    #     Parameters
-    #     ----------
-    #     r : Ray or RayVector
-    #         Ray(s) to reflect.
-    #     coating : Coating, optional
-    #         Coating object to control reflection coefficient.
-    #     coordSys : CoordSys, optional
-    #         If present, then use for the coordinate system of the surface.  If
-    #         `None` (default), then assume that ray(s) and surface are already
-    #         expressed in the same coordinate system.
-    #
-    #     Returns
-    #     -------
-    #     outRays : Ray or RayVector
-    #         New object corresponding to original ray(s) propagated and
-    #         reflected.
-    #     """
-    #     if coating is not None:
-    #         coating = coating._coating
-    #     if coordSys is not None:
-    #         coordSys = coordSys._coordSys
-    #     self._surface.reflectInPlace(r._rv, coating, coordSys)
-    #     return r
-    #
-    # def refract(self, r, inMedium, outMedium, coating=None, coordSys=None):
-    #     """Calculate intersection of ray(s) with this surface, and immediately
-    #     refract the ray(s) through the surface at the point(s) of intersection.
-    #
-    #     Parameters
-    #     ----------
-    #     r : Ray or RayVector
-    #         Ray(s) to refract.
-    #     inMedium : Medium
-    #         Refractive medium on the incoming side of the surface.
-    #     outMedium : Medium
-    #         Refractive medium on the outgoing side of the surface.
-    #     coating : Coating, optional
-    #         Coating object to control transmission coefficient.
-    #     coordSys : CoordSys, optional
-    #         If present, then use for the coordinate system of the surface.  If
-    #         `None` (default), then assume that ray(s) and surface are already
-    #         expressed in the same coordinate system.
-    #
-    #     Returns
-    #     -------
-    #     outRays : Ray or RayVector
-    #         New object corresponding to original ray(s) propagated and
-    #         refracted.
-    #     """
-    #     if coating is not None:
-    #         coating = coating._coating
-    #     if coordSys is not None:
-    #         coordSys = coordSys._coordSys
-    #     self._surface.refractInPlace(
-    #         r._rv, inMedium._medium, outMedium._medium, coating, coordSys
-    #     )
-    #     return r
-    #
+    def reflect(self, rv, coordSys=None):
+        """Calculate intersection of ray(s) with this surface, and immediately
+        reflect the ray(s) at the point(s) of intersection.
+
+        Parameters
+        ----------
+        rv : RayVector
+            Ray(s) to reflect.
+        coordSys : CoordSys, optional
+            If present, then use for the coordinate system of the surface.  If
+            `None` (default), then assume that ray(s) and surface are already
+            expressed in the same coordinate system.
+
+        Returns
+        -------
+        outRays : Ray or RayVector
+            New object corresponding to original ray(s) propagated and
+            reflected.
+        """
+        return reflect(self, rv, coordSys)
+
+    def refract(self, rv, inMedium, outMedium, coordSys=None):
+        """Calculate intersection of ray(s) with this surface, and immediately
+        refract the ray(s) through the surface at the point(s) of intersection.
+
+        Parameters
+        ----------
+        rv : RayVector
+            Ray(s) to refract.
+        inMedium : Medium
+            Refractive medium on the incoming side of the surface.
+        outMedium : Medium
+            Refractive medium on the outgoing side of the surface.
+        coordSys : CoordSys, optional
+            If present, then use for the coordinate system of the surface.  If
+            `None` (default), then assume that ray(s) and surface are already
+            expressed in the same coordinate system.
+
+        Returns
+        -------
+        outRays : Ray or RayVector
+            New object corresponding to original ray(s) propagated and
+            refracted.
+        """
+        return refract(self, rv, inMedium, outMedium, coordSys)
+
     # def rSplit(self, r, inMedium, outMedium, coating, coordSys=None):
     #     """Calculate intersection of rays with this surface, and immediately
     #     split the rays into reflected and refracted rays, with appropriate
