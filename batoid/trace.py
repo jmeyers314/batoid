@@ -1,8 +1,9 @@
 from . import _batoid
+from .coordSys import CoordSys
 from .coordTransform import CoordTransform
 
 
-def intersect(surface, rv, ct=None):
+def intersect(surface, rv, coordSys=None):
     """Calculate intersection of rays with surface.
 
     Parameters
@@ -11,8 +12,9 @@ def intersect(surface, rv, ct=None):
         Surface to intersect.
     rv : RayVector
         Ray(s) to intersect.
-    ct : CoordTransform, optional
-        Coordinate transform from rv sys to surface coordsys.
+    coordSys : CoordSys, optional
+        Transform rays into this coordinate system before computing
+        intersection.
 
     Returns
     -------
@@ -20,15 +22,16 @@ def intersect(surface, rv, ct=None):
         Reference to transformed input ray vector, which has been modified in
         place.
     """
-    if ct is None:
-        ct = CoordTransform(rv.coordSys, rv.coordSys)
+    if coordSys is None:
+        coordSys = rv.coordSys
+    ct = CoordTransform(rv.coordSys, coordSys)
 
     _batoid.intersect(
         surface._surface,
         ct.dr, ct.drot.ravel(),
         rv._rv,
     )
-    rv.coordSys = ct.toSys
+    rv.coordSys = coordSys
     return rv
 
 

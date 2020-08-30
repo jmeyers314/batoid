@@ -109,8 +109,7 @@ def test_intersect():
         vz = np.ones_like(x)
         rv = batoid.RayVector(x, y, z, vx, vy, vz)
         np.testing.assert_allclose(rv.z, -100.0)
-        coordTransform = batoid.CoordTransform(rv.coordSys, quadCoordSys)
-        rv2 = batoid.intersect(quad, rv.copy(), coordTransform)
+        rv2 = batoid.intersect(quad, rv.copy(), quadCoordSys)
         assert rv2.coordSys == quadCoordSys
 
         rv2 = rv2.toCoordSys(batoid.CoordSys())

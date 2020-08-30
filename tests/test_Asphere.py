@@ -133,8 +133,7 @@ def test_intersect():
         vz = np.ones_like(x)
         rv = batoid.RayVector(x, y, z, vx, vy, vz)
         np.testing.assert_allclose(rv.z, -100.0)
-        coordTransform = batoid.CoordTransform(rv.coordSys, asphereCoordSys)
-        rv2 = batoid.intersect(asphere, rv.copy(), coordTransform)
+        rv2 = batoid.intersect(asphere, rv.copy(), asphereCoordSys)
         assert rv2.coordSys == asphereCoordSys
 
         rv2 = rv2.toCoordSys(batoid.CoordSys())
