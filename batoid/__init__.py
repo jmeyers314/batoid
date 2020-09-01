@@ -5,7 +5,9 @@ from .rayVector import RayVector
 from .coordSys import CoordSys, RotX, RotY, RotZ
 from .coordTransform import CoordTransform
 
-from .surface import Surface, Plane, Paraboloid, Sphere, Quadric, Asphere
+from .surface import (
+    Surface, Plane, Paraboloid, Sphere, Quadric, Asphere, Bicubic
+)
 
 from .trace import (
     intersect, applyForwardTransform, applyReverseTransform, obscure,

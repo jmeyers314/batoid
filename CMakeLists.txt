@@ -27,7 +27,7 @@ add_subdirectory(pybind11)
 set(SRC_FILES
   src/asphere.cpp
   src/batoid.cpp
-  # src/bicubic.cpp
+  src/bicubic.cpp
   # src/coating.cpp
   src/dualView.cpp
   src/medium.cpp
@@ -48,7 +48,7 @@ set(SRC_FILES
 set(PYSRC_FILES
   pysrc/asphere.cpp
   pysrc/batoid.cpp
-  # pysrc/bicubic.cpp
+  pysrc/bicubic.cpp
   # pysrc/coating.cpp
   pysrc/medium.cpp
   pysrc/obscuration.cpp
@@ -66,11 +66,11 @@ set(PYSRC_FILES
 # if (DEFINED ENV{BATOID_GPU})
 # endif()
 
-# set_source_files_properties(
-#   src/bicubic2.cpp
-#   PROPERTIES
-#   COMPILE_FLAGS -O0
-# )
+set_source_files_properties(
+  src/bicubic.cpp
+  PROPERTIES
+  COMPILE_FLAGS -O0
+)
 
 include(CheckCXXCompilerFlag)
 macro(ADD_CXX_FLAG_IF_AVAIL  TARG  FLAG  FLAG_NAME)

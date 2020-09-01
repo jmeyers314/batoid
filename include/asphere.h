@@ -26,7 +26,7 @@ namespace batoid {
 
         double _dzdr(double r) const;
         static double* _copyCoefs(const double* coefs, const size_t size);
-        double* _computeDzDrCoefs(const double* coefs, const size_t size);
+        static double* _computeDzDrCoefs(const double* coefs, const size_t size);
     };
 
 }

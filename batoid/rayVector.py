@@ -332,3 +332,10 @@ class RayVector:
 
     def __ne__(self, rhs):
         return self._rv != rhs._rv
+
+    def __repr__(self):
+        out = f"RayVector({self.x!r}, {self.y!r}, {self.z!r}"
+        out += f", {self.vx!r}, {self.vy!r}, {self.vz!r}"
+        out += f", {self.t!r}, {self.wavelength!r}, {self.flux!r}"
+        out += f", {self.vignetted!r}, {self.failed!r}, {self.coordSys!r})"
+        return out

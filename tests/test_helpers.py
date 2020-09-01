@@ -3,13 +3,26 @@ import batoid
 
 
 def rays_allclose(rv1, rv2, atol=1e-14):
-    return (
-        np.allclose(rv1.r, rv2.r, rtol=0, atol=atol)
-        and np.allclose(rv1.v, rv2.v, rtol=0, atol=atol)
-        and np.allclose(rv1.t, rv2.t, rtol=0, atol=atol)
-        and np.allclose(rv1.wavelength, rv2.wavelength, rtol=0, atol=atol)
-        and np.all(rv1.vignetted == rv2.vignetted)
-        and np.all(rv1.failed == rv2.failed)
+    np.testing.assert_allclose(
+        rv1.r, rv2.r, rtol=0, atol=atol
+    )
+    np.testing.assert_allclose(
+        rv1.v, rv2.v, rtol=0, atol=atol
+    )
+    np.testing.assert_allclose(
+        rv1.t, rv2.t, rtol=0, atol=atol
+    )
+    np.testing.assert_allclose(
+        rv1.wavelength, rv2.wavelength, rtol=0, atol=atol
+    )
+    np.testing.assert_allclose(
+        rv1.flux, rv2.flux, rtol=0, atol=atol
+    )
+    np.testing.assert_array_equal(
+        rv1.vignetted, rv2.vignetted
+    )
+    np.testing.assert_array_equal(
+        rv1.failed, rv2.failed
     )
 
 
@@ -65,15 +78,11 @@ def do_pickle(obj, reprable=True):
         from batoid import (
             RayVector,
             Plane, Paraboloid, Sphere, Quadric, Asphere,
-    #     from batoid import Bicubic, Zernike, Sum
-    #     from batoid import Table
+            Bicubic,
             ConstMedium, SellmeierMedium, SumitaMedium, Air,
             ObscCircle, ObscAnnulus, ObscRectangle, ObscRay, ObscPolygon,
             ObscNegation, ObscUnion, ObscIntersection,
             CoordSys, CoordTransform
-    #     from batoid import CompoundOptic, Lens
-    #     from batoid import RefractiveInterface, Mirror, Detector, Baffle
-    #     from batoid import SimpleCoating
         )
         # While eval(repr(obj)) == obj is the python repr gold standard, it can
         # be pretty ugly for exact reproduction of doubles.  Here, we strive for

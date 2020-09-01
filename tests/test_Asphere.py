@@ -154,7 +154,6 @@ def test_intersect():
         vx = np.zeros_like(x)
         vy = np.zeros_like(x)
         vz = np.ones_like(x)
-        # rv = batoid.RayVector(x[6], y[6], z[6], vx[6], vy[6], vz[6])
         rv = batoid.RayVector(x, y, z, vx, vy, vz)
         np.testing.assert_allclose(rv.z, -10.0)
         rv2 = batoid.intersect(asphere, rv.copy(), asphereCoordSys)

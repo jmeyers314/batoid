@@ -5,19 +5,6 @@ namespace batoid {
 
     #pragma omp declare target
 
-    Asphere::Asphere(double R, double conic, const double* coefptr, size_t size) :
-        Quadric(R, conic),
-        _coefs(_copyCoefs(coefptr, size)),
-        _dzdrcoefs(_computeDzDrCoefs(coefptr, size)),
-        _size(size)
-    {}
-
-    Asphere::~Asphere()
-    {
-        delete[] _coefs;
-        delete[] _dzdrcoefs;
-    }
-
     double* Asphere::_copyCoefs(const double* coefs, const size_t size) {
         double* out = new double[size];
         for(int i=0; i<size; i++)
@@ -31,6 +18,19 @@ namespace batoid {
             result[j] = coefs[j]*i;
         }
         return result;
+    }
+
+    Asphere::Asphere(double R, double conic, const double* coefptr, size_t size) :
+        Quadric(R, conic),
+        _coefs(_copyCoefs(coefptr, size)),
+        _dzdrcoefs(_computeDzDrCoefs(coefptr, size)),
+        _size(size)
+    {}
+
+    Asphere::~Asphere()
+    {
+        delete[] _coefs;
+        delete[] _dzdrcoefs;
     }
 
     double Asphere::sag(double x, double y) const {
