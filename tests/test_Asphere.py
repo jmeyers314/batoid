@@ -202,7 +202,7 @@ def test_reflect():
         vx = rng.uniform(-1e-5, 1e-5, size=size)
         vy = rng.uniform(-1e-5, 1e-5, size=size)
         vz = np.full_like(x, 1)
-        rv = batoid.RayVector(x, y, z, vx, vy, vz, t=0)
+        rv = batoid.RayVector(x, y, z, vx, vy, vz)
         rvr = batoid.reflect(asphere, rv.copy())
         rvr2 = asphere.reflect(rv.copy())
         assert rays_allclose(rvr, rvr2)

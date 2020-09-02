@@ -78,7 +78,7 @@ def do_pickle(obj, reprable=True):
         from batoid import (
             RayVector,
             Plane, Paraboloid, Sphere, Quadric, Asphere,
-            Bicubic,
+            Bicubic, Sum,
             ConstMedium, SellmeierMedium, SumitaMedium, Air,
             ObscCircle, ObscAnnulus, ObscRectangle, ObscRay, ObscPolygon,
             ObscNegation, ObscUnion, ObscIntersection,

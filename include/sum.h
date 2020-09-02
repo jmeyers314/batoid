@@ -1,26 +1,24 @@
 #ifndef batoid_sum_h
 #define batoid_sum_h
 
-#include <vector>
 #include "surface.h"
-#include "ray.h"
-
-using Eigen::Vector3d;
 
 namespace batoid {
 
     class Sum : public Surface {
     public:
-        Sum(const std::vector<std::shared_ptr<Surface>> surfaces);
+        Sum(Surface** surfaces, size_t nsurf);
+        ~Sum();
+
+        virtual Surface* getDevPtr() const override;
 
         virtual double sag(double, double) const override;
-        virtual Vector3d normal(double, double) const override;
-        virtual bool timeToIntersect(const Ray& r, double& t) const override;
-
-        const std::vector<std::shared_ptr<Surface>>& getSurfaces() const { return _surfaces; }
+        virtual void normal(double x, double y, double& nx, double& ny, double& nz) const override;
+        virtual bool timeToIntersect(double x, double y, double z, double vx, double vy, double vz, double& dt) const override;
 
     private:
-        const std::vector<std::shared_ptr<Surface>> _surfaces;
+        Surface** _surfaces;
+        size_t _nsurf;
     };
 
 }

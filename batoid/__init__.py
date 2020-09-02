@@ -6,7 +6,7 @@ from .coordSys import CoordSys, RotX, RotY, RotZ
 from .coordTransform import CoordTransform
 
 from .surface import (
-    Surface, Plane, Paraboloid, Sphere, Quadric, Asphere, Bicubic
+    Surface, Plane, Paraboloid, Sphere, Quadric, Asphere, Bicubic, Sum
 )
 
 from .trace import (

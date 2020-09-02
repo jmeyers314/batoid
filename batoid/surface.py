@@ -633,49 +633,43 @@ class Bicubic(Surface):
         return out
 
 
-# class Sum(Surface):
-#     """Composite surface combining two or more other Surfaces through addition.
-#     The surface sag follows the equation:
-#
-#     .. math::
-#
-#         z(x, y) = \\sum_i S_i(x, y)
-#
-#     where :math:`S_i` is the ith input `Surface`.
-#
-#     Note that Sum-Ray intersection calculations will use the intersection of the
-#     ray with the first surface in the list as an initial guess for the
-#     intersection with the full Sum surface.  Thus it is usually a good idea to
-#     place any surface with an analytic intersection (Quadric or simpler) first
-#     in the list, and any small perturbations around that surface after.
-#
-#     Parameters
-#     ----------
-#     surfaces : list of Surface
-#         `Surface` s to add together.
-#     """
-#     def __init__(self, surfaces):
-#         self._surfaces = surfaces
-#         self._surface = _batoid.CPPSum([s._surface for s in surfaces])
-#
-#     @property
-#     def surfaces(self):
-#         """List of constituent `Surface` s."""
-#         return self._surfaces
-#
-#     def __hash__(self):
-#         return hash(("batoid.Sum", tuple(self.surfaces)))
-#
-#     def __setstate__(self, args):
-#         self._surfaces = args
-#         self._surface = _batoid.CPPSum([s._surface for s in args])
-#
-#     def __getstate__(self):
-#         return self.surfaces
-#
-#     def __eq__(self, rhs):
-#         if not isinstance(rhs, Sum): return False
-#         return self.surfaces == rhs.surfaces
-#
-#     def __repr__(self):
-#         return "Sum({})".format(self.surfaces)
+class Sum(Surface):
+    """Composite surface combining two or more other Surfaces through addition.
+    The surface sag follows the equation:
+
+    .. math::
+
+        z(x, y) = \\sum_i S_i(x, y)
+
+    where :math:`S_i` is the ith input `Surface`.
+
+    Note that Sum-Ray intersection calculations will use the intersection of the
+    ray with the first surface in the list as an initial guess for the
+    intersection with the full Sum surface.  Thus it is usually a good idea to
+    place any surface with an analytic intersection (Quadric or simpler) first
+    in the list, and any small perturbations around that surface after.
+
+    Parameters
+    ----------
+    surfaces : list of Surface
+        `Surface` s to add together.
+    """
+    def __init__(self, surfaces):
+        self.surfaces = surfaces
+        self._surface = _batoid.CPPSum([s._surface for s in surfaces])
+
+    def __hash__(self):
+        return hash(("batoid.Sum", tuple(self.surfaces)))
+
+    def __setstate__(self, surfaces):
+        self.__init__(surfaces)
+
+    def __getstate__(self):
+        return self.surfaces
+
+    def __eq__(self, rhs):
+        if not isinstance(rhs, Sum): return False
+        return self.surfaces == rhs.surfaces
+
+    def __repr__(self):
+        return f"Sum({self.surfaces})"
