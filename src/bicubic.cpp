@@ -23,7 +23,7 @@ namespace batoid {
     Bicubic::~Bicubic() {
         if (_devPtr) {
             Surface* ptr = _devPtr;
-            #pragma omp target map(to:ptr)
+            #pragma omp target is_device_ptr(ptr)
             {
                 delete ptr;
             }
@@ -34,7 +34,7 @@ namespace batoid {
             const double* dzdy = _dzdy;
             const double* d2zdxdy = _d2zdxdy;
             #pragma omp target exit data \
-            map(release:z[:size], dzdx[:size], dzdy[:size], d2zdxdy[:size])
+                map(release:z[:size], dzdx[:size], dzdy[:size], d2zdxdy[:size])
         }
     }
 

@@ -34,7 +34,7 @@ set(SRC_FILES
   src/obscuration.cpp
   src/paraboloid.cpp
   src/plane.cpp
-  # src/polynomialSurface.cpp
+  src/polynomialSurface.cpp
   src/quadric.cpp
   src/rayVector.cpp
   src/sphere.cpp
@@ -54,7 +54,7 @@ set(PYSRC_FILES
   pysrc/obscuration.cpp
   pysrc/paraboloid.cpp
   pysrc/plane.cpp
-  # pysrc/polynomialSurface.cpp
+  pysrc/polynomialSurface.cpp
   pysrc/quadric.cpp
   pysrc/rayVector.cpp
   pysrc/sphere.cpp
@@ -66,11 +66,11 @@ set(PYSRC_FILES
 # if (DEFINED ENV{BATOID_GPU})
 # endif()
 
-set_source_files_properties(
-  src/bicubic.cpp
-  PROPERTIES
-  COMPILE_FLAGS -O0
-)
+# set_source_files_properties(
+#   src/bicubic.cpp
+#   PROPERTIES
+#   COMPILE_FLAGS -O0
+# )
 
 include(CheckCXXCompilerFlag)
 macro(ADD_CXX_FLAG_IF_AVAIL  TARG  FLAG  FLAG_NAME)

@@ -1,6 +1,6 @@
 import numpy as np
 import batoid
-from test_helpers import ray_isclose, rays_allclose, timer, do_pickle, init_gpu
+from test_helpers import rays_allclose, timer, do_pickle, init_gpu
 
 
 def randomCoordSys(rng):
@@ -104,8 +104,8 @@ def test_roundtrip():
         assert rv2.coordSys == coordSys1
         assert rv3.coordSys == coordSys1
 
-        assert rays_allclose(rv0, rv2)
-        assert rays_allclose(rv0, rv3)
+        rays_allclose(rv0, rv2)
+        rays_allclose(rv0, rv3)
 
         x, y, z = transform.applyForwardArray(rv0.x, rv0.y, rv0.z)
         x, y, z = transform.applyReverseArray(x, y, z)
@@ -143,7 +143,7 @@ def test_composition():
             rv_b = transform2to3.applyForward(transform1to2.applyForward(rv.copy()))
             assert rv_b != rv
             assert rv_b.coordSys == coordSys3
-            assert rays_allclose(rv_a, rv_b), "error with composite transform of RayVector"
+            rays_allclose(rv_a, rv_b), "error with composite transform of RayVector"
 
             rv = randomRayVector(rng, size, coordSys3)
             rv_a = transform1to3.applyReverse(rv.copy())
@@ -152,7 +152,7 @@ def test_composition():
             rv_b = transform1to2.applyReverse(transform2to3.applyReverse(rv.copy()))
             assert rv_b != rv
             assert rv_b.coordSys == coordSys1
-            assert rays_allclose(rv_a, rv_b), "error with reverse composite transform of RayVector"
+            rays_allclose(rv_a, rv_b), "error with reverse composite transform of RayVector"
 
 
 if __name__ == '__main__':

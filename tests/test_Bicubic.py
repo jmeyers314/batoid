@@ -1,6 +1,5 @@
 import batoid
 import numpy as np
-import pytest
 from test_helpers import timer, do_pickle, all_obj_diff, rays_allclose, init_gpu
 
 

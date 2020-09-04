@@ -423,84 +423,73 @@ class Asphere(Surface):
         return f"Asphere({self.R}, {self.conic}, {self.coefs!r})"
 
 
-# class Zernike(Surface):
-#     """Surface defined by Zernike polynomials.  The surface sag follows the
-#     equation:
-#
-#     .. math::
-#
-#         z(x, y) = \\sum_j a_j Z_j\\left(\\epsilon; \\frac{x}{R_{outer}}, \\frac{y}{R_{outer}}\\right)
-#
-#     where :math:`Z_j(\\epsilon, u, v)` are the annular Zernike polynomials
-#     (Mahajan) with central obscuration
-#     :math:`\\epsilon = \\frac{R_{inner}}{R_{outer}}`
-#     indexed by the Noll (1976) convention, :math:`R_{outer}` is the outer
-#     radius of the annulus, :math:`R_{inner}` is the inner radius of the
-#     annulus, and :math:`\\left\\{a_j\\right\\}` are the annular
-#     coefficients.
-#
-#     Note that the Noll convention starts at j=1, so the :math:`a_0` =
-#     ``coef[0]`` value has no effect on the surface.
-#
-#     Parameters
-#     ----------
-#     coef : list of float
-#         Annular Zernike polynomial coefficients.
-#     R_outer : float
-#         Outer radius of annulus.
-#     R_inner : float
-#         Inner radius of annulus.
-#     """
-#     def __init__(self, coef, R_outer=1.0, R_inner=0.0):
-#         import galsim
-#
-#         self._coef = np.asarray(coef)
-#         self._R_outer = float(R_outer)
-#         self._R_inner = float(R_inner)
-#         self.Z = galsim.zernike.Zernike(coef, R_outer, R_inner)
-#         pcoef = self.Z._coef_array_xy
-#         self._surface = _batoid.CPPPolynomialSurface(pcoef)
-#
-#     @property
-#     def coef(self):
-#         """Annular Zernike polynomial coefficients.
-#         """
-#         return self._coef
-#
-#     @property
-#     def R_outer(self):
-#         """Outer radius of annulus.
-#         """
-#         return self._R_outer
-#
-#     @property
-#     def R_inner(self):
-#         """Outer radius of annulus.
-#         """
-#         return self._R_inner
-#
-#     def __hash__(self):
-#         return hash((
-#             "batoid.Zernike",
-#             tuple(self.coef), self.R_outer, self.R_inner
-#         ))
-#
-#     def __setstate__(self, args):
-#         self.__init__(*args)
-#
-#     def __getstate__(self):
-#         return self.coef, self.R_outer, self.R_inner
-#
-#     def __eq__(self, rhs):
-#         if not isinstance(rhs, Zernike): return False
-#         return (np.array_equal(self.coef, rhs.coef) and
-#                 self.R_outer == rhs.R_outer and
-#                 self.R_inner == rhs.R_inner)
-#
-#     def __repr__(self):
-#         return "Zernike({!r}, {!r}, {!r})".format(
-#             self.coef, self.R_outer, self.R_inner
-#         )
+class Zernike(Surface):
+    """Surface defined by Zernike polynomials.  The surface sag follows the
+    equation:
+
+    .. math::
+
+        z(x, y) = \\sum_j a_j Z_j\\left(\\epsilon; \\frac{x}{R_{outer}}, \\frac{y}{R_{outer}}\\right)
+
+    where :math:`Z_j(\\epsilon, u, v)` are the annular Zernike polynomials
+    (Mahajan) with central obscuration
+    :math:`\\epsilon = \\frac{R_{inner}}{R_{outer}}`
+    indexed by the Noll (1976) convention, :math:`R_{outer}` is the outer
+    radius of the annulus, :math:`R_{inner}` is the inner radius of the
+    annulus, and :math:`\\left\\{a_j\\right\\}` are the annular
+    coefficients.
+
+    Note that the Noll convention starts at j=1, so the :math:`a_0` =
+    ``coef[0]`` value has no effect on the surface.
+
+    Parameters
+    ----------
+    coef : list of float
+        Annular Zernike polynomial coefficients.
+    R_outer : float
+        Outer radius of annulus.
+    R_inner : float
+        Inner radius of annulus.
+    """
+    def __init__(self, coef, R_outer=1.0, R_inner=0.0):
+        import galsim
+
+        self.coef = np.array(coef, dtype=float, order="C")
+        self.R_outer = float(R_outer)
+        self.R_inner = float(R_inner)
+        self.Z = galsim.zernike.Zernike(coef, R_outer, R_inner)
+        self._xycoef = self.Z._coef_array_xy
+        self._xycoef_gradx = self.Z.gradX._coef_array_xy
+        self._xycoef_grady = self.Z.gradY._coef_array_xy
+
+        self._surface = _batoid.CPPPolynomialSurface(
+            self._xycoef.ctypes.data,
+            self._xycoef_gradx.ctypes.data,
+            self._xycoef_grady.ctypes.data,
+            self._xycoef.shape[0],
+            self._xycoef.shape[1]
+        )
+
+    def __hash__(self):
+        return hash((
+            "batoid.Zernike",
+            tuple(self.coef), self.R_outer, self.R_inner
+        ))
+
+    def __setstate__(self, args):
+        self.__init__(*args)
+
+    def __getstate__(self):
+        return self.coef, self.R_outer, self.R_inner
+
+    def __eq__(self, rhs):
+        if not isinstance(rhs, Zernike): return False
+        return (np.array_equal(self.coef, rhs.coef) and
+                self.R_outer == rhs.R_outer and
+                self.R_inner == rhs.R_inner)
+
+    def __repr__(self):
+        return f"Zernike({self.coef!r}, {self.R_outer}, {self.R_inner})"
 
 
 class Bicubic(Surface):

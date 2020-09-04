@@ -18,7 +18,6 @@ namespace batoid {
 
         virtual double sag(double, double) const override;
         virtual void normal(double x, double y, double& nx, double& ny, double& nz) const override;
-        // virtual bool timeToIntersect(double x, double y, double z, double vx, double vy, double vz, double& dt) const override;
 
     private:
         const double _x0, _y0;

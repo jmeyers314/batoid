@@ -325,7 +325,7 @@ class RayVector:
         return self
 
     def __len__(self):
-        return self._rv.t.size;
+        return self._rv.t.size
 
     def __eq__(self, rhs):
         return self._rv == rhs._rv

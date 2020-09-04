@@ -115,7 +115,7 @@ def test_reflect():
         rv = batoid.RayVector(x, y, z, vx, vy, vz)
         rvr = batoid.reflect(para, rv.copy())
         rvr2 = para.reflect(rv.copy())
-        assert rays_allclose(rvr, rvr2)
+        rays_allclose(rvr, rvr2)
         # print(f"{np.sum(rvr.failed)/len(rvr)*100:.2f}% failed")
         normal = para.normal(rvr.x, rvr.y)
 
@@ -157,7 +157,7 @@ def test_refract():
         rv = batoid.RayVector(x, y, z, vx, vy, vz)
         rvr = batoid.refract(para, rv.copy(), m0, m1)
         rvr2 = para.refract(rv.copy(), m0, m1)
-        assert rays_allclose(rvr, rvr2)
+        rays_allclose(rvr, rvr2)
         # print(f"{np.sum(rvr.failed)/len(rvr)*100:.2f}% failed")
         normal = para.normal(rvr.x, rvr.y)
 
