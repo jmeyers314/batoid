@@ -3,11 +3,12 @@ from numbers import Real, Integral
 import numpy as np
 
 from . import _batoid
-from .constants import globalCoordSys
+from .constants import globalCoordSys, vacuum
 from .coordSys import CoordSys
 from .coordTransform import CoordTransform
-from .trace import applyForwardTransform
-from .utils import lazy_property
+from .trace import applyForwardTransform, intersect
+from .utils import lazy_property, fieldToDirCos
+from .surface import Plane
 
 
 def reshape_arrays(arrays, shape, dtype=float):
@@ -90,121 +91,114 @@ class RayVector:
     def sumAmplitude(self, r, t):
         return self._rv.sumAmplitude(r[0], r[1], r[2], t)
 
-    # @classmethod
-    # def asPolar(
-    #     cls,
-    #     optic=None, backDist=None, medium=None, stopSurface=None,
-    #     wavelength=None,
-    #     outer=None, inner=0.0,
-    #     source=None, dirCos=None,
-    #     theta_x=None, theta_y=None, projection='postel',
-    #     nrad=None, naz=None,
-    #     flux=1,
-    #     nrandom=None
-    # ):
-    #     from .optic import Interface
-    #     from .surface2 import Plane2
-    #     from .constants import vacuum2
-    #
-    #     if optic is not None:
-    #         if backDist is None:
-    #             backDist = optic.backDist
-    #         if medium is None:
-    #             medium = optic.inMedium
-    #         if stopSurface is None:
-    #             stopSurface = optic.stopSurface
-    #         if outer is None:
-    #             outer = optic.pupilSize/2
-    #
-    #     if backDist is None:
-    #         backDist = 40.0
-    #     if stopSurface is None:
-    #         stopSurface = Interface(Plane2())
-    #     if medium is None:
-    #         medium = vacuum2
-    #
-    #     if dirCos is None and source is None:
-    #         dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
-    #
-    #     if wavelength is None:
-    #         raise ValueError("Missing wavelength keyword")
-    #
-    #     if nrandom is None:
-    #         ths = []
-    #         rs = []
-    #         for r in np.linspace(outer, inner, nrad):
-    #             if r == 0:
-    #                 break
-    #             nphi = int((naz*r/outer)//6)*6
-    #             if nphi == 0:
-    #                 nphi = 6
-    #             ths.append(np.linspace(0, 2*np.pi, nphi, endpoint=False))
-    #             rs.append(np.ones(nphi)*r)
-    #         # Point in center is a special case
-    #         if inner == 0.0:
-    #             ths[-1] = np.array([0.0])
-    #             rs[-1] = np.array([0.0])
-    #         r = np.concatenate(rs)
-    #         th = np.concatenate(ths)
-    #     else:
-    #         r = np.sqrt(np.random.uniform(inner**2, outer**2, size=nrandom))
-    #         th = np.random.uniform(0, 2*np.pi, size=nrandom)
-    #     x = r*np.cos(th)
-    #     y = r*np.sin(th)
-    #     z = stopSurface.surface.sag(x, y)
-    #     transform = CoordTransform(stopSurface.coordSys, globalCoordSys)
-    #     x, y, z = transform.applyForward(x, y, z)
-    #     t = np.zeros_like(x)
-    #     w = np.empty_like(x)
-    #     w.fill(wavelength)
-    #     n = medium.getN(wavelength)
-    #
-    #     return cls._finish(backDist, source, dirCos, n, x, y, z, t, w, flux)
-    #
-    # @classmethod
-    # def _finish(cls, backDist, source, dirCos, n, x, y, z, t, w, flux):
-    #     """Map rays backwards to their source position."""
-    #     from .surface2 import Plane2
-    #     if source is None:
-    #         v = np.array(dirCos, dtype=float)
-    #         v /= n*np.sqrt(np.dot(v, v))
-    #         vx = np.empty_like(x)
-    #         vx.fill(v[0])
-    #         vy = np.empty_like(x)
-    #         vy.fill(v[1])
-    #         vz = np.empty_like(x)
-    #         vz.fill(v[2])
-    #         # Now need to raytrace backwards to the plane dist units away.
-    #         rays = RayVector2.fromArrays(
-    #             x, y, z, -vx, -vy, -vz, t, w, flux=flux
-    #         )
-    #
-    #         zhat = -n*v
-    #         xhat = np.cross(np.array([1.0, 0.0, 0.0]), zhat)
-    #         xhat /= np.sqrt(np.dot(xhat, xhat))
-    #         yhat = np.cross(xhat, zhat)
-    #         origin = zhat*backDist
-    #         cs = CoordSys(origin, np.stack([xhat, yhat, zhat]).T)
-    #         transform = CoordTransform2(globalCoordSys, cs)
-    #         transform.applyForward(rays)
-    #         plane = Plane2()
-    #         plane.intersect(rays)
-    #         transform.applyReverse(rays)
-    #         return RayVector2.fromArrays(
-    #             rays.x, rays.y, rays.z, vx, vy, vz, t, w, flux=flux
-    #         )
-    #     else:
-    #         vx = x - source[0]
-    #         vy = y - source[1]
-    #         vz = z - source[2]
-    #         v = np.stack([vx, vy, vz])
-    #         v /= n*np.einsum('ab,ab->b', v, v)
-    #         x.fill(source[0])
-    #         y.fill(source[1])
-    #         z.fill(source[2])
-    #         return RayVector2.fromArrays(
-    #             x, y, z, v[0], v[1], v[2], t, w, flux=flux
-    #         )
+    @classmethod
+    def asPolar(
+        cls,
+        optic=None, backDist=None, medium=None, stopSurface=None,
+        wavelength=None,
+        outer=None, inner=0.0,
+        source=None, dirCos=None,
+        theta_x=None, theta_y=None, projection='postel',
+        nrad=None, naz=None,
+        flux=1,
+        nrandom=None
+    ):
+        from .optic import Interface
+
+        if optic is not None:
+            if backDist is None:
+                backDist = optic.backDist
+            if medium is None:
+                medium = optic.inMedium
+            if stopSurface is None:
+                stopSurface = optic.stopSurface
+            if outer is None:
+                outer = optic.pupilSize/2
+
+        if backDist is None:
+            backDist = 40.0
+        if stopSurface is None:
+            stopSurface = Interface(Plane())
+        if medium is None:
+            medium = vacuum
+
+        if dirCos is None and source is None:
+            dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
+
+        if wavelength is None:
+            raise ValueError("Missing wavelength keyword")
+
+        if nrandom is None:
+            ths = []
+            rs = []
+            for r in np.linspace(outer, inner, nrad):
+                if r == 0:
+                    break
+                nphi = int((naz*r/outer)//6)*6
+                if nphi == 0:
+                    nphi = 6
+                ths.append(np.linspace(0, 2*np.pi, nphi, endpoint=False))
+                rs.append(np.ones(nphi)*r)
+            # Point in center is a special case
+            if inner == 0.0:
+                ths[-1] = np.array([0.0])
+                rs[-1] = np.array([0.0])
+            r = np.concatenate(rs)
+            th = np.concatenate(ths)
+        else:
+            r = np.sqrt(np.random.uniform(inner**2, outer**2, size=nrandom))
+            th = np.random.uniform(0, 2*np.pi, size=nrandom)
+        x = r*np.cos(th)
+        y = r*np.sin(th)
+        z = stopSurface.surface.sag(x, y)
+        transform = CoordTransform(stopSurface.coordSys, globalCoordSys)
+        x, y, z = transform.applyForwardArray(x, y, z)
+        t = np.zeros_like(x)
+        w = np.empty_like(x)
+        w.fill(wavelength)
+        n = medium.getN(wavelength)
+
+        return cls._finish(backDist, source, dirCos, n, x, y, z, t, w, flux)
+
+    @classmethod
+    def _finish(cls, backDist, source, dirCos, n, x, y, z, t, w, flux):
+        """Map rays backwards to their source position."""
+        if source is None:
+            v = np.array(dirCos, dtype=float)
+            v /= n*np.sqrt(np.dot(v, v))
+            vx = np.empty_like(x)
+            vx.fill(v[0])
+            vy = np.empty_like(x)
+            vy.fill(v[1])
+            vz = np.empty_like(x)
+            vz.fill(v[2])
+            # Now need to raytrace backwards to the plane dist units away.
+            rays = RayVector(x, y, z, -vx, -vy, -vz, t, w, flux=flux)
+
+            zhat = -n*v
+            xhat = np.cross(np.array([1.0, 0.0, 0.0]), zhat)
+            xhat /= np.sqrt(np.dot(xhat, xhat))
+            yhat = np.cross(xhat, zhat)
+            origin = zhat*backDist
+            cs = CoordSys(origin, np.stack([xhat, yhat, zhat]).T)
+            transform = CoordTransform(globalCoordSys, cs)
+            transform.applyForward(rays)
+            plane = Plane()
+            intersect(plane, rays)
+            transform.applyReverse(rays)
+            return RayVector(
+                rays.x, rays.y, rays.z, vx, vy, vz, t, w, flux=flux
+            )
+        else:
+            vx = x - source[0]
+            vy = y - source[1]
+            vz = z - source[2]
+            v = np.stack([vx, vy, vz])
+            v /= n*np.einsum('ab,ab->b', v, v)
+            x.fill(source[0])
+            y.fill(source[1])
+            z.fill(source[2])
+            return RayVector(x, y, z, v[0], v[1], v[2], t, w, flux=flux)
 
     @property
     def r(self):

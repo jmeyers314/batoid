@@ -4,7 +4,7 @@ import numpy as np
 
 from . import _batoid
 from .constants import globalCoordSys
-from .trace import reflect, refract
+from .trace import intersect, reflect, refract
 
 
 class Surface(ABC):
@@ -52,6 +52,9 @@ class Surface(ABC):
             return out[0]
         else:
             return out
+
+    def intersect(self, rv, coordSys=None):
+        return intersect(self, rv, coordSys)
 
     def reflect(self, rv, coordSys=None):
         """Calculate intersection of ray(s) with this surface, and immediately

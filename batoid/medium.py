@@ -113,7 +113,13 @@ class SellmeierMedium(Medium):
     coefs: array of float
         Sellmeier coefficients (B1, B2, B3, C1, C2, C3)
     """
-    def __init__(self, coefs):
+    def __init__(self, *args, **kwargs):
+        if len(args) == 6:
+            coefs = args
+        elif len(args) == 1:
+            coefs = args[0]
+        elif kwargs:
+            coefs = [kwargs[k] for k in ['B1', 'B2', 'B3', 'C1', 'C2', 'C3']]
         self.coefs = tuple(coefs)
         if len(coefs) != 6:
             raise ValueError("Incorrect number of coefficients")
@@ -154,7 +160,13 @@ class SumitaMedium(Medium):
     coefs: array of float
         Sumita coefficients (A0, A1, A2, A3, A4, A5)
     """
-    def __init__(self, coefs):
+    def __init__(self, *args, **kwargs):
+        if len(args) == 6:
+            coefs = args
+        elif len(args) == 1:
+            coefs = args[0]
+        elif kwargs:
+            coefs = [kwargs[k] for k in ['A0', 'A1', 'A2', 'A3', 'A4', 'A5']]
         self.coefs = tuple(coefs)
         if len(coefs) != 6:
             raise ValueError("Incorrect number of coefficients")

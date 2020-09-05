@@ -6,49 +6,32 @@ import time
 
 @timer
 def parallel_trace_timing(args):
-    if args.nthread is not None:
-        batoid._batoid.setNThread(args.nthread)
-    print("Using {} threads".format(batoid._batoid.getNThread()))
-
-    if args.minChunk is not None:
-        batoid._batoid.setMinChunk(args.minChunk)
-    print("Using minChunk of {:_d}".format(batoid._batoid.getMinChunk()))
     print("Using nrad of {:_d}".format(args.nrad))
 
     if args.lsst:
         print("Tracing through LSST optics")
-        telescope = batoid.Optic.fromYaml("LSST_r.yaml", gpu=args.gpu)
+        telescope = batoid.Optic.fromYaml("LSST_r.yaml")
         pm = 'M1'
     elif args.decam:
         print("Tracing through DECam optics")
-        telescope = batoid.Optic.fromYaml("DECam.yaml", gpu=args.gpu)
+        telescope = batoid.Optic.fromYaml("DECam.yaml")
         pm = 'PM'
     else:
         print("Tracing through HSC optics")
-        telescope = batoid.Optic.fromYaml("HSC.yaml", gpu=args.gpu)
+        telescope = batoid.Optic.fromYaml("HSC.yaml")
         pm = 'PM'
 
     building = []
     for _ in range(args.nrepeat):
         t0 = time.time()
-        if args.gpu:
-            rays = batoid.RayVector2.asPolar(
-                optic=telescope,
-                wavelength=620e-9,
-                theta_x=np.deg2rad(0.3),
-                theta_y=np.deg2rad(0.3),
-                inner=0.5*telescope.pupilSize*telescope.pupilObscuration,
-                nrad=args.nrad, naz=int(2*np.pi*args.nrad)
-            )
-        else:
-            rays = batoid.RayVector.asPolar(
-                optic=telescope,
-                wavelength=620e-9,
-                theta_x=np.deg2rad(0.3),
-                theta_y=np.deg2rad(0.3),
-                inner=0.5*telescope.pupilSize*telescope.pupilObscuration,
-                nrad=args.nrad, naz=int(2*np.pi*args.nrad)
-            )
+        rays = batoid.RayVector.asPolar(
+            optic=telescope,
+            wavelength=620e-9,
+            theta_x=np.deg2rad(0.3),
+            theta_y=np.deg2rad(0.3),
+            inner=0.5*telescope.pupilSize*telescope.pupilObscuration,
+            nrad=args.nrad, naz=int(2*np.pi*args.nrad)
+        )
         t1 = time.time()
         building.append(t1-t0)
     building = np.array(building)
@@ -74,32 +57,15 @@ def parallel_trace_timing(args):
 
     # Optionally perturb primary mirror using bicubic spline
     if args.perturbBC != 0:
-        if args.gpu:
-            orig = telescope[pm].surface
-            rad = telescope.pupilSize/2 * 1.1
-            xs = np.linspace(-rad, rad, 100)
-            ys = np.linspace(-rad, rad, 100)
-            def f(x, y):
-                return args.perturbBC*(np.cos(x) + np.sin(y))
-            zs = f(*np.meshgrid(xs, ys))
-            bc = batoid.Bicubic(xs, ys, zs)
-            coefs = orig.coefs if hasattr(orig, 'coefs') else []
-            telescope[pm].surface = batoid.ExtendedAsphere2(
-                orig.R,
-                orig.conic,
-                coefs,
-                xs, ys, zs,
-            )
-        else:
-            orig = telescope[pm].surface
-            rad = telescope.pupilSize/2 * 1.1
-            xs = np.linspace(-rad, rad, 100)
-            ys = np.linspace(-rad, rad, 100)
-            def f(x, y):
-                return args.perturbBC*(np.cos(x) + np.sin(y))
-            zs = f(*np.meshgrid(xs, ys))
-            bc = batoid.Bicubic(xs, ys, zs)
-            telescope[pm].surface = batoid.Sum([orig, bc])
+        orig = telescope[pm].surface
+        rad = telescope.pupilSize/2 * 1.1
+        xs = np.linspace(-rad, rad, 100)
+        ys = np.linspace(-rad, rad, 100)
+        def f(x, y):
+            return args.perturbBC*(np.cos(x) + np.sin(y))
+        zs = f(*np.meshgrid(xs, ys))
+        bc = batoid.Bicubic(xs, ys, zs)
+        telescope[pm].surface = batoid.Sum([orig, bc])
 
     copying = []
     tracing = []
@@ -113,6 +79,7 @@ def parallel_trace_timing(args):
         rays_out.r # force copy back to host if doing gpu
         rays_out.v
         rays_out.t
+        rays_out.flux
         rays_out.vignetted
         rays_out.failed
         t3 = time.time()
@@ -150,14 +117,15 @@ def parallel_trace_timing(args):
         print()
         print("overall")
         print("-------")
-        print("{:_} +/- {:_} rays per second".format(int(nrays/overall)))
+        print("{:_} rays per second".format(int(nrays/overall)))
         print()
 
-    if args.plot:
+    if args.plot or args.show:
         import matplotlib.pyplot as plt
-        rays_out.trimVignetted()
-        x = rays_out.x
-        y = rays_out.y
+        # rays_out.trimVignetted()
+        w = ~rays_out.vignetted
+        x = rays_out.x[w]
+        y = rays_out.y[w]
         x -= np.mean(x)
         y -= np.mean(y)
         x *= 1e6
@@ -168,7 +136,7 @@ def parallel_trace_timing(args):
         plt.xlabel("x (microns)")
         plt.ylabel("y (microns)")
         plt.savefig("parallel_trace_timing.png")
-        if not args.gpu:
+        if args.show:
             plt.show()
 
 
@@ -176,15 +144,13 @@ if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
     parser.add_argument("--nrad", type=int, default=250)
-    parser.add_argument("--nthread", type=int, default=None)
     parser.add_argument("--nrepeat", type=int, default=1)
-    parser.add_argument("--minChunk", type=int, default=None)
     parser.add_argument("--perturbZ", type=int, default=0)
     parser.add_argument("--perturbBC", type=float, default=0.0)
     parser.add_argument("--plot", action='store_true')
+    parser.add_argument("--show", action='store_true')
     parser.add_argument("--lsst", action='store_true')
     parser.add_argument("--decam", action='store_true')
-    parser.add_argument("--gpu", action='store_true')
     args = parser.parse_args()
 
     parallel_trace_timing(args)

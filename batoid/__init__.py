@@ -15,7 +15,7 @@ from .trace import (
     reflect, refract
 )
 
-from .medium import ConstMedium, SellmeierMedium, SumitaMedium, Air
+from .medium import Medium, ConstMedium, SellmeierMedium, SumitaMedium, Air
 
 from .obscuration import (
     ObscCircle, ObscAnnulus, ObscRectangle, ObscRay, ObscPolygon, ObscNegation,
@@ -23,6 +23,13 @@ from .obscuration import (
 )
 
 from .coating import SimpleCoating
+
+from .optic import Optic, CompoundOptic, Lens
+from .optic import Interface, RefractiveInterface, Mirror, Detector, Baffle
+from .optic import drawTrace2d, drawTrace3d
+
+import os
+datadir = os.path.join(os.path.dirname(__file__), "data")
 
 # from .ray import Ray
 # from .rayVector import RayVector, concatenateRayVectors, rayGrid, circularGrid
@@ -47,9 +54,6 @@ from .coating import SimpleCoating
 #
 # from .coordsys import RotX, RotY, RotZ
 #
-# from .optic import Optic, CompoundOptic, Lens
-# from .optic import Interface, RefractiveInterface, Mirror, Detector, Baffle
-# from .optic import drawTrace2d, drawTrace3d
 #
 # from .lattice import Lattice
 #
@@ -81,9 +85,7 @@ from .coating import SimpleCoating
 #
 # from ._batoid import setNThread, getNThread, setMinChunk, getMinChunk
 #
-# import os
-# datadir = os.path.join(os.path.dirname(__file__), "data")
-#
+
 #
 #
 # __all__ = []
