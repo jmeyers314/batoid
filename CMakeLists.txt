@@ -63,9 +63,6 @@ set(PYSRC_FILES
   # pysrc/table.cpp
 )
 
-# if (DEFINED ENV{BATOID_GPU})
-# endif()
-
 # set_source_files_properties(
 #   src/bicubic.cpp
 #   PROPERTIES
@@ -110,7 +107,12 @@ if (DEFINED ENV{BATOID_GPU})
 else()
 
   add_library(batoid ${SRC_FILES})
-  target_link_libraries(batoid batoid-compile-flags)
+  find_package(OpenMP)
+  if(OpenMP_CXX_FOUND)
+    target_link_libraries(batoid batoid-compile-flags OpenMP::OpenMP_CXX)
+  else()
+    target_link_libraries(batoid batoid-compile-flags)
+  endif()
   pybind11_add_module(_batoid SYSTEM ${PYSRC_FILES})
   target_link_libraries(_batoid PRIVATE batoid INTERFACE batoid-compile-flags)
 
