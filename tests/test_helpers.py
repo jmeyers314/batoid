@@ -82,7 +82,8 @@ def do_pickle(obj, reprable=True):
             ConstMedium, SellmeierMedium, SumitaMedium, Air,
             ObscCircle, ObscAnnulus, ObscRectangle, ObscRay, ObscPolygon,
             ObscNegation, ObscUnion, ObscIntersection,
-            CoordSys, CoordTransform
+            CoordSys, CoordTransform,
+            SimpleCoating
         )
         # While eval(repr(obj)) == obj is the python repr gold standard, it can
         # be pretty ugly for exact reproduction of doubles.  Here, we strive for

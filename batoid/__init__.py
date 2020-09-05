@@ -6,7 +6,7 @@ from .coordSys import CoordSys, RotX, RotY, RotZ
 from .coordTransform import CoordTransform
 
 from .surface import (
-    Surface, Plane, Paraboloid, Sphere, Quadric, Asphere, Bicubic, Sum, 
+    Surface, Plane, Paraboloid, Sphere, Quadric, Asphere, Bicubic, Sum,
     Zernike
 )
 
@@ -21,6 +21,8 @@ from .obscuration import (
     ObscCircle, ObscAnnulus, ObscRectangle, ObscRay, ObscPolygon, ObscNegation,
     ObscUnion, ObscIntersection
 )
+
+from .coating import SimpleCoating
 
 # from .ray import Ray
 # from .rayVector import RayVector, concatenateRayVectors, rayGrid, circularGrid

@@ -18,7 +18,7 @@ namespace batoid {
     void pyExportPolynomialSurface(py::module&);
 
     // void pyExportTable(py::module&);
-    // void pyExportCoating(py::module&);
+    void pyExportCoating(py::module&);
     void pyExportMedium(py::module&);
     void pyExportObscuration(py::module&);
 
@@ -36,7 +36,7 @@ namespace batoid {
         pyExportPolynomialSurface(m);
 
         // pyExportTable(m);
-        // pyExportCoating(m);
+        pyExportCoating(m);
         pyExportMedium(m);
         pyExportObscuration(m);
 
