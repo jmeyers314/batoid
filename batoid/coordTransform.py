@@ -36,19 +36,77 @@ class CoordTransform:
         return not (self == rhs)
 
     def applyForward(self, rv):
+        """Apply forward-direction transformation to RayVector.
+
+        Parameters
+        ----------
+        rv : RayVector
+            Rays to transform.
+
+        Returns
+        -------
+        transformed : RayVector
+            Reference to input RayVector transformed in place.
+        """
         from .trace import applyForwardTransform
         return applyForwardTransform(self, rv)
 
     def applyReverse(self, rv):
+        """Apply reverse-direction transformation to RayVector.
+
+        Parameters
+        ----------
+        rv : RayVector
+            Rays to transform.
+
+        Returns
+        -------
+        transformed : RayVector
+            Reference to input RayVector transformed in place.
+        """
         from .trace import applyReverseTransform
         return applyReverseTransform(self, rv)
 
     def applyForwardArray(self, x, y, z):
+        """Apply forward-direction transformation to ndarrays.
+
+        Parameters
+        ----------
+        x, y, z : ndarray
+            Coordinates to transform.
+
+        Returns
+        -------
+        xyz : ndarray
+            Transformed coordinates.
+
+        Notes
+        -----
+        Unlike applyForward, this method does not transform in-place, but
+        returns a newly created ndarray.
+        """
         r = np.array([x, y, z]).T
         r -= self.dr
         return self.drot.T@r.T
 
     def applyReverseArray(self, x, y, z):
+        """Apply reverse-direction transformation to ndarrays.
+
+        Parameters
+        ----------
+        x, y, z : ndarray
+            Coordinates to transform.
+
+        Returns
+        -------
+        xyz : ndarray
+            Transformed coordinates.
+
+        Notes
+        -----
+        Unlike applyReverse, this method does not transform in-place, but
+        returns a newly created ndarray.
+        """
         r = np.array([x, y, z])
         r = (self.drot@r).T
         r += self.dr
