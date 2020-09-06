@@ -1,7 +1,7 @@
 #include "medium.h"
 #include <new>
 #include <cmath>
-
+#include <cstdio>
 
 namespace batoid {
 
@@ -39,6 +39,65 @@ namespace batoid {
         return ptr;
     }
 
+
+    #pragma omp declare target
+
+        TableMedium::TableMedium(
+            const double* args, const double* vals, const size_t size
+        ) :
+            Medium(), _args(args), _vals(vals), _size(size)
+        {}
+
+        TableMedium::~TableMedium() {
+            if (_devPtr) {
+                Medium* ptr = _devPtr;
+                #pragma omp target is_device_ptr(ptr)
+                {
+                    delete ptr;
+                }
+                const double* args = _args;
+                const double* vals = _vals;
+                #pragma omp target exit data \
+                    map(release:args[:_size], vals[:_size])
+            }
+        }
+
+        double TableMedium::getN(double wavelength) const {
+            // Linear search.  Better for GPU's?  and not that painful for small arrays?
+            if (wavelength < _args[0])
+                return NAN;
+            if (wavelength > _args[_size-1])
+                return NAN;
+            int upperIdx;
+            for(upperIdx=1; upperIdx<_size; upperIdx++) {
+                if (wavelength < _args[upperIdx])
+                    break;
+            }
+            double out = (wavelength - _args[upperIdx-1]);
+            out *= (_vals[upperIdx] - _vals[upperIdx-1]);
+            out /= (_args[upperIdx] - _args[upperIdx-1]);
+            out += _vals[upperIdx-1];
+            return out;
+        }
+
+    #pragma omp end declare target
+
+    Medium* TableMedium::getDevPtr() const {
+        if (!_devPtr) {
+            Medium* ptr;
+            // Allocate arrays on device
+            const double* args = _args;
+            const double* vals = _vals;
+            #pragma omp target enter data \
+                map(to:args[:_size], vals[:_size])
+            #pragma omp target map(from:ptr)
+            {
+                ptr = new TableMedium(args, vals, _size);
+            }
+            _devPtr = ptr;
+        }
+        return _devPtr;
+    }
 
     #pragma omp declare target
 

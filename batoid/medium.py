@@ -1,3 +1,4 @@
+import numpy as np
 from . import _batoid
 
 
@@ -56,45 +57,69 @@ class ConstMedium(Medium):
     def __repr__(self):
         return f"ConstMedium({self.n})"
 
-# class TableMedium(Medium):
-#     """A `Medium` with refractive index defined via a lookup table.
-#
-#     Parameters
-#     ----------
-#     table : `batoid.Table`
-#         Lookup table for refractive index.
-#     """
-#     def __init__(self, table):
-#         self.table = table
-#         self._medium = _batoid.CPPTableMedium(self.table._table)
-#
-#     @classmethod
-#     def fromTxt(cls, filename):
-#         """Load a text file with refractive index information in it.
-#         The file should have two columns, the first with wavelength in microns,
-#         and the second with the corresponding refractive indices.
-#         """
-#         import os
-#         import yaml
-#         import numpy as np
-#         from .table import Table
-#         try:
-#             wavelength, n = np.loadtxt(filename, unpack=True)
-#         except IOError:
-#             import glob
-#             from . import datadir
-#             filenames = glob.glob(os.path.join(datadir, "**", "*.txt"))
-#             for candidate in filenames:
-#                 if os.path.basename(candidate) == filename:
-#                     wavelength, n = np.loadtxt(candidate, unpack=True)
-#                     break
-#             else:
-#                 raise FileNotFoundError(filename)
-#         table = Table(wavelength*1e-6, n)
-#         return TableMedium(table)
-#
-#     def __repr__(self):
-#         return "TableMedium({!r})".format(self.table)
+
+class TableMedium(Medium):
+    """A `Medium` with refractive index defined via a lookup table.
+
+    Parameters
+    ----------
+    table : `batoid.Table`
+        Lookup table for refractive index.
+    """
+    def __init__(self, wavelengths, ns):
+        self.wavelengths = np.array(wavelengths)
+        self.ns = np.array(ns)
+        self._medium = _batoid.CPPTableMedium(
+            self.wavelengths.ctypes.data,
+            self.ns.ctypes.data,
+            len(self.wavelengths)
+        )
+
+    @classmethod
+    def fromTxt(cls, filename):
+        """Load a text file with refractive index information in it.
+        The file should have two columns, the first with wavelength in microns,
+        and the second with the corresponding refractive indices.
+        """
+        import os
+        import yaml
+        import numpy as np
+        from .table import Table
+        try:
+            wavelength, n = np.loadtxt(filename, unpack=True)
+        except IOError:
+            import glob
+            from . import datadir
+            filenames = glob.glob(os.path.join(datadir, "**", "*.txt"))
+            for candidate in filenames:
+                if os.path.basename(candidate) == filename:
+                    wavelength, n = np.loadtxt(candidate, unpack=True)
+                    break
+            else:
+                raise FileNotFoundError(filename)
+        return TableMedium(wavelength*1e-6, n)
+
+    def __eq__(self, rhs):
+        if type(rhs) == type(self):
+            return (
+                np.array_equal(self.wavelengths, rhs.wavelengths)
+                and np.array_equal(self.ns, rhs.ns)
+            )
+        return False
+
+    def __getstate__(self):
+        return self.wavelengths, self.ns
+
+    def __setstate__(self, args):
+        self.__init__(*args)
+
+    def __hash__(self):
+        return hash((
+            "batoid.TableMedium", tuple(self.wavelengths), tuple(self.ns)
+        ))
+
+    def __repr__(self):
+        return f"TableMedium({self.wavelengths!r}, {self.ns!r})"
 
 
 class SellmeierMedium(Medium):

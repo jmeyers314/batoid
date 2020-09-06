@@ -168,10 +168,7 @@ def parse_medium(config):
     # before parsing
     config = dict(**config)
     typ = config.pop('type')
-    if typ == 'TableMedium':
-        table = parse_table(config['table'])
-        return batoid.TableMedium(table=table)
-    # Sellmeier, ConstMedium, SumitaMedium, Air end up here...
+    # TableMedium, Sellmeier, ConstMedium, SumitaMedium, Air end up here...
     evalstr = "batoid.{}(**config)".format(typ)
     return eval(evalstr)
 

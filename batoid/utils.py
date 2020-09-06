@@ -1,5 +1,4 @@
 import numpy as np
-from numbers import Real
 
 
 def normalized(*args):

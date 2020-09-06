@@ -6,7 +6,7 @@ from . import _batoid
 from .constants import globalCoordSys, vacuum
 from .coordSys import CoordSys
 from .coordTransform import CoordTransform
-from .trace import applyForwardTransform, intersect
+from .trace import applyForwardTransform
 from .utils import lazy_property, fieldToDirCos
 from .surface import Plane
 
@@ -184,7 +184,7 @@ class RayVector:
             transform = CoordTransform(globalCoordSys, cs)
             transform.applyForward(rays)
             plane = Plane()
-            intersect(plane, rays)
+            plane.intersect(rays)
             transform.applyReverse(rays)
             return RayVector(
                 rays.x, rays.y, rays.z, vx, vy, vz, t, w, flux=flux

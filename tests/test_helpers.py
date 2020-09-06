@@ -79,7 +79,7 @@ def do_pickle(obj, reprable=True):
             RayVector,
             Plane, Paraboloid, Sphere, Quadric, Asphere,
             Bicubic, Sum, Zernike,
-            ConstMedium, SellmeierMedium, SumitaMedium, Air,
+            ConstMedium, TableMedium, SellmeierMedium, SumitaMedium, Air,
             ObscCircle, ObscAnnulus, ObscRectangle, ObscRay, ObscPolygon,
             ObscNegation, ObscUnion, ObscIntersection,
             CoordSys, CoordTransform,

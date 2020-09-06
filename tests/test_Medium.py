@@ -21,6 +21,28 @@ def test_ConstMedium():
 
 
 @timer
+def test_TableMedium():
+    rng = np.random.default_rng(57)
+    for i in range(100):
+        ws = np.linspace(300e-9, 1100e-9, 6)
+        ns = rng.uniform(1.0, 1.5, size=6)
+        table_medium = batoid.TableMedium(ws, ns)
+        testws = rng.uniform(300e-9, 1100e-9, size=100)
+        for w in testws:
+            np.testing.assert_allclose(
+                table_medium.getN(w),
+                np.interp(w, ws, ns),
+                rtol=0, atol=1e-14
+            )
+        np.testing.assert_allclose(
+            table_medium.getN(testws),
+            np.interp(testws, ws, ns),
+            rtol=0, atol=1e-14
+        )
+    do_pickle(table_medium)
+
+
+@timer
 def test_SellmeierMedium():
     rng = np.random.default_rng(57)
     # Silica coefficients
@@ -112,6 +134,7 @@ def test_ne():
 
 if __name__ == '__main__':
     test_ConstMedium()
+    test_TableMedium()
     test_SellmeierMedium()
     test_SumitaMedium()
     test_air()

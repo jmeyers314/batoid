@@ -16,21 +16,20 @@ namespace batoid {
             .def(py::init<double>());
 
 
-        // py::class_<TableMedium, std::shared_ptr<TableMedium>, Medium>(m, "CPPTableMedium")
-        //     .def(py::init<std::shared_ptr<Table<double,double>>>())
-        //     .def_property_readonly("table", &TableMedium::getTable)
-        //     .def(py::self == py::self)
-        //     .def(py::self != py::self)
-        //     .def(py::pickle(
-        //         [](const TableMedium& tm) { return py::make_tuple(*tm.getTable()); },
-        //         [](py::tuple t) { return TableMedium(t[0].cast<std::shared_ptr<Table<double,double>>>()); }
-        //     ))
-        //     .def("__hash__", [](const TableMedium& tm) {
-        //         return py::hash(py::make_tuple(
-        //             "CPPTableMedium",
-        //             *tm.getTable()
-        //         ));
-        //     });
+        py::class_<TableMedium, std::shared_ptr<TableMedium>, Medium>(m, "CPPTableMedium")
+            .def(py::init(
+                [](
+                    size_t w,
+                    size_t n,
+                    size_t size
+                ){
+                    return new TableMedium(
+                        reinterpret_cast<double*>(w),
+                        reinterpret_cast<double*>(n),
+                        size
+                    );
+                }
+            ));
 
 
         py::class_<SellmeierMedium, std::shared_ptr<SellmeierMedium>, Medium>(m, "CPPSellmeierMedium")

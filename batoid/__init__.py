@@ -15,7 +15,9 @@ from .trace import (
     reflect, refract
 )
 
-from .medium import Medium, ConstMedium, SellmeierMedium, SumitaMedium, Air
+from .medium import (
+    Medium, ConstMedium, TableMedium, SellmeierMedium, SumitaMedium, Air
+)
 
 from .obscuration import (
     ObscCircle, ObscAnnulus, ObscRectangle, ObscRay, ObscPolygon, ObscNegation,

@@ -1,6 +1,8 @@
 #ifndef batoid_medium_h
 #define batoid_medium_h
 
+#include <cstdlib>
+
 
 namespace batoid {
     class Medium {
@@ -25,20 +27,26 @@ namespace batoid {
         double getN(double wavelength) const override;
 
         Medium* getDevPtr() const override;
+
     private:
         const double _n;
     };
 
 
-    // class TableMedium : public Medium {
-    // public:
-    //     TableMedium(std::shared_ptr<Table<double,double>> table);
-    //     double getN(double wavelength) const override;
-    //     std::shared_ptr<Table<double,double>> getTable() const;
-    //     std::string repr() const override;
-    // private:
-    //     const std::shared_ptr<Table<double,double>> _table;
-    // };
+    class TableMedium : public Medium {
+    public:
+        TableMedium(const double* args, const double* vals, const size_t size);
+        ~TableMedium();
+
+        double getN(double wavelength) const override;
+
+        Medium* getDevPtr() const override;
+
+    private:
+        const double* _args;
+        const double* _vals;
+        const size_t _size;
+    };
 
 
     class SellmeierMedium : public Medium {
@@ -49,6 +57,7 @@ namespace batoid {
         double getN(double wavelength) const override;
 
         Medium* getDevPtr() const override;
+
     private:
         const double _B1, _B2, _B3, _C1, _C2, _C3;
     };
@@ -62,6 +71,7 @@ namespace batoid {
         double getN(double wavelength) const override;
 
         Medium* getDevPtr() const override;
+
     private:
             const double _A0, _A1, _A2, _A3, _A4, _A5;
     };
@@ -75,6 +85,7 @@ namespace batoid {
         double getN(double wavelength) const override;
 
         Medium* getDevPtr() const override;
+
     private:
         const double _pressure, _temperature, _h2o_pressure; // input vars
         const double _P, _T, _W;  // same, but transformed to better units
