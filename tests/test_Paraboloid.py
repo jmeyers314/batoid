@@ -182,6 +182,26 @@ def test_refract():
 
 
 @timer
+def test_reflect_to_focus():
+    rng = np.random.default_rng(5772156)
+    size = 10_000
+    for i in range(100):
+        R = rng.normal(0, 3.0)
+        para = batoid.Paraboloid(R)
+        x = rng.normal(size=size)
+        y = rng.normal(size=size)
+        rv = batoid.RayVector(x, y, -1000, 0, 0, 1)
+        para.reflect(rv)
+        # Now, see if rays pass through paraboloid focus at (0, 0, R/2)
+        # Solve 0 = x + vx (t - t0) for t, then propagate to that t
+        t = rv.t[0] - rv.r[0,0]/rv.v[0,0]
+        focus = rv.positionAtTime(t)
+        np.testing.assert_allclose(focus[:,0], 0, atol=1e-12)
+        np.testing.assert_allclose(focus[:,1], 0, atol=1e-12)
+        np.testing.assert_allclose(focus[:,2], R/2, atol=1e-12)
+
+
+@timer
 def test_ne():
     objs = [
         batoid.Paraboloid(1.0),
@@ -212,5 +232,6 @@ if __name__ == '__main__':
     test_intersect()
     test_reflect()
     test_refract()
+    test_reflect_to_focus()
     test_ne()
     test_fail()
