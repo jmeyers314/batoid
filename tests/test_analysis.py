@@ -1,17 +1,9 @@
-import pytest
 import numpy as np
+import galsim
 import batoid
 from test_helpers import timer
 
 
-hasGalSim = True
-try:
-    import galsim
-except ImportError:
-    hasGalSim = False
-
-
-@pytest.mark.skipif(not hasGalSim, reason="galsim not found")
 @timer
 def test_zernikeGQ():
     if __name__ == '__main__':
@@ -24,7 +16,9 @@ def test_zernikeGQ():
         tol=1e-3
     telescope = batoid.Optic.fromYaml("LSST_r.yaml")
     telescope.clearObscuration()
-    telescope['LSST.M1'].obscuration = batoid.ObscNegation(batoid.ObscCircle(4.18))
+    telescope['LSST.M1'].obscuration = batoid.ObscNegation(
+        batoid.ObscCircle(4.18)
+    )
     zSquare = batoid.analysis.zernike(
         telescope, 0.0, 0.0, 625e-9,
         nx=nx, jmax=28, reference='chief'
@@ -39,7 +33,9 @@ def test_zernikeGQ():
     )
 
     # Repeat with annular Zernikes
-    telescope['LSST.M1'].obscuration = batoid.ObscNegation(batoid.ObscAnnulus(0.61*4.18, 4.18))
+    telescope['LSST.M1'].obscuration = batoid.ObscNegation(
+        batoid.ObscAnnulus(0.61*4.18, 4.18)
+    )
     zSquare = batoid.analysis.zernike(
         telescope, 0.0, 0.0, 625e-9,
         nx=nx, jmax=28, reference='chief', eps=0.61
@@ -153,7 +149,7 @@ def test_huygensPSF():
     assert psf3 == psf4
 
     # And just cover nx odd
-    psf = batoid.analysis.huygensPSF(
+    batoid.analysis.huygensPSF(
         telescope,
         np.deg2rad(0.1), np.deg2rad(0.1),
         620e-9,
@@ -161,7 +157,6 @@ def test_huygensPSF():
     )
 
 
-@pytest.mark.skipif(not hasGalSim, reason="galsim not found")
 @timer
 def test_doubleZernike():
     telescope = batoid.Optic.fromYaml("LSST_r.yaml")
@@ -183,7 +178,11 @@ def test_doubleZernike():
     thy = thr*np.sin(thth)
 
     for j in js:
-        Z = galsim.zernike.Zernike(dz[:,j], R_inner=0.0, R_outer=np.deg2rad(1.75))
+        Z = galsim.zernike.Zernike(
+            dz[:,j],
+            R_inner=0.0,
+            R_outer=np.deg2rad(1.75)
+        )
         for thx_, thy_ in zip(thx, thy):
             zGQ = batoid.analysis.zernikeGQ(
                 telescope, thx_, thy_,

@@ -2,7 +2,72 @@ import numpy as np
 import batoid
 
 from .utils import bilinear_fit, fieldToDirCos
-from .psf import dkdu, reciprocalLatticeVectors
+
+
+def _reciprocalLatticeVectors(a1, a2, N):
+    norm = 2*np.pi/(a1[0]*a2[1] - a1[1]*a2[0])/N
+    b1 = norm*np.array([a2[1], a2[0]])
+    b2 = norm*np.array([a1[1], a1[0]])
+    return b1, b2
+
+
+def dkdu(
+    optic, theta_x, theta_y, wavelength, nrad=16, naz=16, projection='postel'
+):
+    """Calculate derivative of outgoing ray k-vector with respect to incoming
+    ray pupil coordinate.
+
+    Parameters
+    ----------
+    optic : batoid.Optic
+        Optical system
+    theta_x, theta_y : float
+        Field angle in radians
+    wavelength : float
+        Wavelength in meters
+    nx : int, optional
+        Size of ray grid to use.
+    projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}
+        Projection used to convert field angle to direction cosines.
+
+    Returns
+    -------
+    dkdu : (2, 2), ndarray
+        Jacobian transformation matrix for converting between (kx, ky) of rays
+        impacting the focal plane and initial pupil plane coordinate.
+    """
+    outer = optic.pupilSize/2
+    inner = 0.0
+
+    ths = []
+    rs = []
+    for r in np.linspace(outer, inner, nrad):
+        if r == 0:
+            break
+        nphi = int((naz*r/outer)//6)*6
+        if nphi == 0:
+            nphi = 6
+        ths.append(np.linspace(0, 2*np.pi, nphi, endpoint=False))
+        rs.append(np.ones(nphi)*r)
+    # Point in center is a special case
+    if inner == 0.0:
+        ths[-1] = np.array([0.0])
+        rs[-1] = np.array([0.0])
+    r = np.concatenate(rs)
+    th = np.concatenate(ths)
+    ux = r*np.cos(th)
+    uy = r*np.sin(th)
+
+    rays = batoid.RayVector.fromStop(
+        ux, uy, optic=optic,
+        wavelength=wavelength,
+        theta_x=theta_x, theta_y=theta_y, projection=projection,
+    )
+
+    optic.trace(rays)
+    w = ~rays.vignetted
+    soln = bilinear_fit(ux[w], uy[w], rays.kx[w], rays.ky[w])
+    return soln[1:]
 
 
 def huygensPSF(optic, theta_x, theta_y, wavelength,
@@ -78,7 +143,7 @@ def huygensPSF(optic, theta_x, theta_y, wavelength,
         ).dot(primitiveU)
         pad_factor = 2
         primitiveX = np.vstack(
-            reciprocalLatticeVectors(
+            _reciprocalLatticeVectors(
                 primitiveK[0], primitiveK[1], pad_factor*nx
             )
         )
@@ -116,15 +181,14 @@ def huygensPSF(optic, theta_x, theta_y, wavelength,
         point = np.mean(rays.r[w], axis=0)
     elif reference == 'chief':
         cridx = (nx//2)*nx+nx//2 if (nx%2)==0 else (nx*nx-1)//2
-        point = rays[cridx].r
-    rays.trimVignetted()
+        point = rays.r[cridx]
     # Need transpose to conform to numpy [y,x] ordering convention
     xs = out.coords[..., 0].T + point[0]
     ys = out.coords[..., 1].T + point[1]
     zs = np.zeros_like(xs)
 
     points = np.concatenate([aux[..., None] for aux in (xs, ys, zs)], axis=-1)
-    time = rays[0].t
+    time = rays.t[0]
     for idx in np.ndindex(amplitudes.shape):
         amplitudes[idx] = rays.sumAmplitude(points[idx], time)
     out.array = np.abs(amplitudes)**2
@@ -179,7 +243,7 @@ def wavefront(optic, theta_x, theta_y, wavelength,
         point = np.mean(rays.r[w], axis=0)
     elif reference == 'chief':
         cridx = (nx//2)*nx+nx//2 if (nx%2)==0 else (nx*nx-1)//2
-        point = rays[cridx].r
+        point = rays.r[cridx]
     # Place vertex of reference sphere one radius length away from the
     # intersection point.  So transform our rays into that coordinate system.
     targetCoordSys = rays.coordSys.shiftLocal(
@@ -194,7 +258,7 @@ def wavefront(optic, theta_x, theta_y, wavelength,
         w = np.where(1-rays.vignetted)[0]
         t0 = np.mean(rays.t[w])
     elif reference == 'chief':
-        t0 = rays[cridx].t
+        t0 = rays.t[cridx]
     arr = np.ma.masked_array(
         (t0-rays.t)/wavelength,
         mask=rays.vignetted
@@ -293,7 +357,7 @@ def fftPSF(optic, theta_x, theta_y, wavelength,
         projection=projection
     ).dot(primitiveU)
     primitiveX = np.vstack(
-        reciprocalLatticeVectors(primitiveK[0], primitiveK[1], pad_size)
+        _reciprocalLatticeVectors(primitiveK[0], primitiveK[1], pad_size)
     )
 
     return batoid.Lattice(psf, primitiveX)
@@ -491,7 +555,7 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
         w = np.where(1-rays.vignetted)[0]
         point = np.mean(rays.r[w], axis=0)
     elif reference == 'chief':
-        chiefRay = batoid.Ray.fromStop(
+        chiefRay = batoid.RayVector.fromStop(
             0.0, 0.0,
             backDist=optic.backDist, wavelength=wavelength,
             dirCos=dirCos,
@@ -499,7 +563,7 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
             stopSurface=optic.stopSurface
         )
         optic.trace(chiefRay)
-        point = chiefRay.r
+        point = chiefRay.r[0]
 
     # Place vertex of reference sphere one radius length away from the
     # intersection point.  So transform our rays into that coordinate system.

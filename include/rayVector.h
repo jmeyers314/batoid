@@ -20,7 +20,7 @@ namespace batoid {
         void propagateInPlace(double t);
         void phase(double x, double y, double z, double t, double* out) const;
         void amplitude(double x, double y, double z, double t, std::complex<double>* out) const;
-        std::complex<double> sumAmplitude(double x, double y, double z, double t) const;
+        std::complex<double> sumAmplitude(double x, double y, double z, double t, bool ignoreVignetted=true) const;
 
         DualView<double> r;           // 24
         DualView<double> v;           // 48

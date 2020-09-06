@@ -118,12 +118,15 @@ namespace batoid {
     }
 
 
-    std::complex<double> RayVector::sumAmplitude(double _x, double _y, double _z, double _t) const {
+    std::complex<double> RayVector::sumAmplitude(double _x, double _y, double _z, double _t, bool ignoreVignetted) const {
         const double PI = 3.14159265358979323846;
         r.syncToDevice();
         v.syncToDevice();
         t.syncToDevice();
         wavelength.syncToDevice();
+        flux.syncToDevice();
+        vignetted.syncToDevice();
+        failed.syncToDevice();
 
         // phi = k.(r-r0) - (t-t0)omega
         // k = 2 pi v / lambda |v|^2
@@ -133,6 +136,9 @@ namespace batoid {
         double* vxptr = v.data;
         double* tptr = t.data;
         double* wptr = wavelength.data;
+        double* fluxptr = flux.data;
+        bool* vigptr = vignetted.data;
+        bool* failptr = failed.data;
         double real=0;
         double imag=0;
         #pragma omp target teams distribute parallel for reduction(+:real,imag)
@@ -150,8 +156,8 @@ namespace batoid {
             phase -= _t-tptr[i];
             phase *= 2 * PI / wptr[i];
 
-            real += std::cos(phase);
-            imag += std::sin(phase);
+            real += std::cos(phase)*fluxptr[i]*(1-failptr[i])*(ignoreVignetted ? 1-vigptr[i]: 1.0);
+            imag += std::sin(phase)*fluxptr[i]*(1-failptr[i])*(ignoreVignetted ? 1-vigptr[i]: 1.0);
         }
         return std::complex<double>(real, imag);
     }

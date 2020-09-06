@@ -139,7 +139,7 @@ class RayVector:
         self._rv.amplitude(r[0], r[1], r[2], t, out.ctypes.data)
         return out
 
-    def sumAmplitude(self, r, t):
+    def sumAmplitude(self, r, t, ignoreVignetted=True):
         """Calculate the sum of (scalar) complex electric-field amplitudes of
         all rays at given position and time.
 
@@ -154,7 +154,7 @@ class RayVector:
         -------
         complex
         """
-        return self._rv.sumAmplitude(r[0], r[1], r[2], t)
+        return self._rv.sumAmplitude(r[0], r[1], r[2], t, ignoreVignetted)
 
     @classmethod
     def asGrid(
@@ -744,6 +744,124 @@ class RayVector:
             t = 0
             return RayVector(x, y, z, v[0], v[1], v[2], t, w, flux=flux)
 
+    @classmethod
+    def fromStop(
+        cls, x, y,
+        optic=None, backDist=None, medium=None, stopSurface=None,
+        wavelength=None,
+        source=None, dirCos=None,
+        theta_x=None, theta_y=None, projection='postel',
+        flux=1, coordSys=globalCoordSys
+    ):
+        """Create rays that intersects the "stop" surface at given points.
+
+        The algorithm used here starts by placing the rays on the "stop"
+        surface, and then backing them up such that they are in front of any
+        surfaces of the optic they're intended to trace.
+
+        The stop surface of most large telescopes is the plane perpendicular to
+        the optic axis and flush with the rim of the primary mirror.  This
+        plane is usually also the entrance pupil since there are no earlier
+        refractive or reflective surfaces.  However, since this plane is a bit
+        difficult to locate automatically, the default stop surface in batoid
+        is the global x-y plane.
+
+        If a telescope has an stopSurface attribute in its yaml file, then this
+        is usually a good choice to use in this function.  Using a curved
+        surface for the stop surface is allowed, but is usually a bad idea as
+        this may lead to a non-uniformly illuminated pupil and is inconsistent
+        with, say, an incoming uniform spherical wave or uniform plane wave.
+
+        Parameters
+        ----------
+        x, y : ndarray
+            X/Y coordinates on the stop surface where the rays would intersect
+            if not refracted or reflected first.
+        optic : `batoid.Optic`, optional
+            If present, then try to extract values for ``backDist``,
+            ``medium``, and ``stopSurface`` from the Optic.  Note that values
+            explicitly passed here as keyword arguments override those
+            extracted from ``optic``.
+        backDist : float, optional
+            Map rays backwards from the stop surface to the plane that is
+            perpendicular to the rays and ``backDist`` meters from the point
+            (0, 0, z(0,0)) on the stop surface.  This should generally be set
+            large enough that any obscurations or phantom surfaces occuring
+            before the stop surface are now "in front" of the ray.  If this
+            keyword is set to ``None`` and the ``optic`` keyword is set, then
+            infer a value from ``optic.backDist``.  If both this keyword and
+            ``optic`` are ``None``, then use a default of 40 meters, which
+            should be sufficiently large for foreseeable telescopes.
+        medium : `batoid.Medium`, optional
+            Initial medium of rays.  If this keyword is set to ``None`` and
+            the ``optic`` keyword is set, then infer a value from
+            ``optic.inMedium``.  If both this keyword and ``optic`` are
+            ``None``, then use a default of vacuum.
+        stopSurface : batoid.Interface, optional
+            Surface defining the system stop.  If this keyword is set to
+            ``None`` and the ``optic`` keyword is set, then infer a value from
+            ``optic.stopSurface``.  If both this keyword and ``optic`` are
+            ``None``, then use a default ``Interface(Plane())``, which is the
+            global x-y plane.
+        wavelength : float
+            Vacuum wavelength of rays in meters.
+        source : None or ndarray of float, shape (3,), optional
+            Where the rays originate.  If None, then the rays originate an
+            infinite distance away, in which case the ``dirCos`` kwarg must also
+            be specified to set the direction of ray propagation.  If an
+            ndarray, then the rays originates from this point in global
+            coordinates and the ``dirCos`` kwarg is ignored.
+        dirCos : ndarray of float, shape (3,), optional
+            If source is None, then indicates the direction of ray propagation.
+            If source is not None, then this is ignored.
+        theta_x, theta_y : float, optional
+            Field angle in radians.  If source is None, then this indicates the
+            initial direction of propagation of the rays.  If source is not
+            None, then this is ignored.  Uses `utils.fieldToDirCos` to convert
+            to direction cosines.  Also see ``dirCos`` as an alternative to
+            this keyword.
+        projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}, optional
+            Projection used to convert field angle to direction cosines.
+        flux : float, optional
+            Flux of rays.  Default is 1.0.
+        coordSys : CoordSys
+            Coordinate system in which rays are expressed.  Default: the global
+            coordinate system.
+        """
+        from .optic import Interface
+        from .surface import Plane
+
+        if optic is not None:
+            if backDist is None:
+                backDist = optic.backDist
+            if medium is None:
+                medium = optic.inMedium
+            if stopSurface is None:
+                stopSurface = optic.stopSurface
+
+        if backDist is None:
+            backDist = 40.0
+        if stopSurface is None:
+            stopSurface = Interface(Plane())
+        if medium is None:
+            medium = vacuum
+
+        if dirCos is None and source is None:
+            dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
+
+        if wavelength is None:
+            raise ValueError("Missing wavelength keyword")
+
+        z = stopSurface.surface.sag(x, y)
+        transform = CoordTransform(stopSurface.coordSys, globalCoordSys)
+        x, y, z = transform.applyForwardArray(x, y, z)
+
+        w = np.empty_like(x)
+        w.fill(wavelength)
+        n = medium.getN(wavelength)
+
+        return cls._finish(backDist, source, dirCos, n, x, y, z, w, flux)
+
     @property
     def r(self):
         """ndarray of float, shape (n, 3): Positions of rays in meters."""
@@ -843,8 +961,8 @@ class RayVector:
         :math:`\lambda` is the wavelength.
         """
         out = 2*np.pi*np.array(self.v)
-        out /= self.wavelength
-        out /= np.sum(self.v*self.v, axis=-1)
+        out /= self.wavelength[:, None]
+        out /= np.sum(self.v*self.v, axis=-1)[:, None]
         return out
 
     @property
