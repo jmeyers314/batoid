@@ -4,8 +4,45 @@ from test_helpers import timer, init_gpu
 
 
 @timer
-def test_positionAtTime():
+def test_properties():
     rng = np.random.default_rng(5)
+    size = 10
+    for i in range(100):
+        x = rng.normal(size=size)
+        y = rng.normal(size=size)
+        z = rng.normal(size=size)
+        vx = rng.normal(size=size)
+        vy = rng.normal(size=size)
+        vz = rng.normal(size=size)
+        t = rng.normal(size=size)
+        w = rng.normal(size=size)
+        fx = rng.normal(size=size)
+        vig = rng.choice([True, False], size=size)
+        fa = rng.choice([True, False], size=size)
+        cs = batoid.CoordSys(
+            origin=rng.normal(size=3),
+            rot=batoid.RotX(rng.normal())@batoid.RotY(rng.normal())
+        )
+
+        rv = batoid.RayVector(x, y, z, vx, vy, vz, t, w, fx, vig, fa, cs)
+
+        np.testing.assert_array_equal(rv.x, x)
+        np.testing.assert_array_equal(rv.y, y)
+        np.testing.assert_array_equal(rv.z, z)
+        np.testing.assert_array_equal(rv.vx, vx)
+        np.testing.assert_array_equal(rv.vy, vy)
+        np.testing.assert_array_equal(rv.vz, vz)
+        np.testing.assert_array_equal(rv.t, t)
+        np.testing.assert_array_equal(rv.wavelength, w)
+        np.testing.assert_array_equal(rv.flux, fx)
+        np.testing.assert_array_equal(rv.vignetted, vig)
+        np.testing.assert_array_equal(rv.failed, fa)
+        assert rv.coordSys == cs
+
+
+@timer
+def test_positionAtTime():
+    rng = np.random.default_rng(57)
     size = 10_000
     x = rng.uniform(-1, 1, size=size)
     y = rng.uniform(-1, 1, size=size)
@@ -52,7 +89,7 @@ def test_positionAtTime():
 
 @timer
 def test_propagate():
-    rng = np.random.default_rng(57)
+    rng = np.random.default_rng(577)
     size = 10_000
 
     x = rng.uniform(-1, 1, size=size)
@@ -104,7 +141,7 @@ def test_propagate():
 
 @timer
 def test_phase():
-    rng = np.random.default_rng(577)
+    rng = np.random.default_rng(5772)
     size = 10_000
 
     for n in [1.0, 1.3]:
@@ -158,19 +195,18 @@ def test_phase():
             wi = rvi.wavelength[0]
             r1 = rvi.positionAtTime(ti + 5123456789*wi)[0]
             a = rvi.amplitude(r1, ti)
-            # print(a)
-            np.testing.assert_allclose(a.real, 1.0, rtol=0, atol=1e-5)
-            np.testing.assert_allclose(a.imag, 0.0, rtol=0, atol=1e-5)
-            # # Half wavelength
+            np.testing.assert_allclose(a.real, 1.0, rtol=0, atol=2e-5)
+            np.testing.assert_allclose(a.imag, 0.0, rtol=0, atol=2e-5)
+            # Half wavelength
             r1 = rvi.positionAtTime(ti + 6987654321.5*wi)[0]
             a = rvi.amplitude(r1, ti)
-            np.testing.assert_allclose(a.real, -1.0, rtol=0, atol=1e-5)
-            np.testing.assert_allclose(a.imag, 0.0, rtol=0, atol=1e-5)
+            np.testing.assert_allclose(a.real, -1.0, rtol=0, atol=2e-5)
+            np.testing.assert_allclose(a.imag, 0.0, rtol=0, atol=2e-5)
             # Quarter wavelength
             r1 = rvi.positionAtTime(ti + 0.25*wi)[0]
             a = rvi.amplitude(r1, ti)
-            np.testing.assert_allclose(a.real, 0.0, rtol=0, atol=1e-5)
-            np.testing.assert_allclose(a.imag, 1.0, rtol=0, atol=1e-5)
+            np.testing.assert_allclose(a.real, 0.0, rtol=0, atol=2e-5)
+            np.testing.assert_allclose(a.imag, 1.0, rtol=0, atol=2e-5)
             # Three-quarters wavelength
             r1 = rvi.positionAtTime(ti + 7182738495.75*wi)[0]
             a = rvi.amplitude(r1, ti)
@@ -206,7 +242,7 @@ def test_phase():
 @timer
 def test_sumAmplitude():
     import time
-    rng = np.random.default_rng(5772)
+    rng = np.random.default_rng(57721)
     size = 10_000
 
     for n in [1.0, 1.3]:
@@ -243,7 +279,7 @@ def test_sumAmplitude():
 @timer
 def test_equals():
     import time
-    rng = np.random.default_rng(5772)
+    rng = np.random.default_rng(577215)
     size = 10_000
 
     x = rng.uniform(-1, 1, size=size)
@@ -298,6 +334,7 @@ def test_equals():
 
 if __name__ == '__main__':
     init_gpu()
+    test_properties()
     test_positionAtTime()
     test_propagate()
     test_phase()
