@@ -38,10 +38,19 @@ namespace batoid {
         double a = (vx*vx + vy*vy)*_2Rinv;
         double b = (x*vx + y*vy)*_Rinv - vz;
         double c = (x*x + y*y)*_2Rinv - z;
+        double dt1;
+
+        if (a == 0) {  // TODO: determine better tolerance for zero float here
+            dt1 = -c/b;
+            if (dt1 > 0) {
+                dt = dt1;
+                return true;
+            }
+            return false;
+        }
 
         double discriminant = b*b - 4*a*c;
 
-        double dt1;
         if (b > 0) {
             dt1 = (-b - sqrt(discriminant)) / (2*a);
         } else {

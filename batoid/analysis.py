@@ -70,9 +70,11 @@ def dkdu(
     return soln[1:]
 
 
-def huygensPSF(optic, theta_x, theta_y, wavelength,
-               projection='postel', nx=None, dx=None, dy=None,
-               nxOut=None, reference='mean'):
+def huygensPSF(
+    optic, theta_x, theta_y, wavelength,
+    projection='postel', nx=None, dx=None, dy=None,
+    nxOut=None, reference='mean'
+):
     r"""Compute a PSF via the Huygens construction.
 
     Parameters
@@ -195,9 +197,11 @@ def huygensPSF(optic, theta_x, theta_y, wavelength,
     return out
 
 
-def wavefront(optic, theta_x, theta_y, wavelength,
-              projection='postel', nx=32,
-              sphereRadius=None, reference='mean'):
+def wavefront(
+    optic, theta_x, theta_y, wavelength,
+    projection='postel', nx=32,
+    sphereRadius=None, reference='mean'
+):
     """Compute wavefront.
 
     Parameters
@@ -276,8 +280,10 @@ def wavefront(optic, theta_x, theta_y, wavelength,
     return batoid.Lattice(arr, primitiveVectors)
 
 
-def spot(optic, theta_x, theta_y, wavelength,
-         projection='postel', nx=32, reference='mean', sphereRadius=None):
+def spot(
+    optic, theta_x, theta_y, wavelength,
+    projection='postel', nx=32, reference='mean', sphereRadius=None
+):
     dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
     rays = batoid.RayVector.asGrid(
         optic=optic, wavelength=wavelength,
@@ -302,9 +308,11 @@ def spot(optic, theta_x, theta_y, wavelength,
     w = ~rays.vignetted
     return rays.x[w], rays.y[w]
 
-def fftPSF(optic, theta_x, theta_y, wavelength,
-           projection='postel', nx=32, pad_factor=2,
-           sphereRadius=None, reference='mean'):
+def fftPSF(
+    optic, theta_x, theta_y, wavelength,
+    projection='postel', nx=32, pad_factor=2,
+    sphereRadius=None, reference='mean'
+):
     """Compute PSF using FFT.
 
     Parameters
@@ -363,9 +371,11 @@ def fftPSF(optic, theta_x, theta_y, wavelength,
     return batoid.Lattice(psf, primitiveX)
 
 
-def zernike(optic, theta_x, theta_y, wavelength,
-            projection='postel', nx=32,
-            sphereRadius=None, reference='mean', jmax=22, eps=0.0):
+def zernike(
+    optic, theta_x, theta_y, wavelength,
+    projection='postel', nx=32,
+    sphereRadius=None, reference='mean', jmax=22, eps=0.0
+):
     """Compute Zernike polynomial decomposition of the wavefront.
 
     This calculation propagates a square grid of rays to the exit pupil
@@ -451,10 +461,12 @@ def zernike(optic, theta_x, theta_y, wavelength,
     return np.array(coefs)
 
 
-def zernikeGQ(optic, theta_x, theta_y, wavelength,
-              projection='postel', rings=6, spokes=None,
-              sphereRadius=None, reference='mean',
-              jmax=22, eps=0.0):
+def zernikeGQ(
+    optic, theta_x, theta_y, wavelength,
+    projection='postel', rings=6, spokes=None,
+    sphereRadius=None, reference='mean',
+    jmax=22, eps=0.0
+):
     r"""Compute Zernike polynomial decomposition of the wavefront.
 
     This calculation uses Gaussian Quadrature points and weights to compute the
@@ -589,8 +601,10 @@ def zernikeGQ(optic, theta_x, theta_y, wavelength,
     return np.dot(basis, (t0-rays.t)/wavelength*rays.flux)/area
 
 
-def doubleZernike(optic, field, wavelength, rings=6, spokes=None, kmax=22,
-                  **kwargs):
+def doubleZernike(
+    optic, field, wavelength, rings=6, spokes=None, kmax=22,
+    **kwargs
+):
     r"""Compute double Zernike polynomial decomposition of the wavefront.
 
     The double Zernike decomposition describes both the focal and pupil

@@ -1,7 +1,7 @@
 import numpy as np
 import galsim
 import batoid
-from test_helpers import timer
+from test_helpers import timer, init_gpu
 
 
 @timer
@@ -204,7 +204,158 @@ def test_doubleZernike():
     np.testing.assert_allclose(dz, dz2, rtol=0, atol=1e-2)
 
 
+@timer
+def test_huygens_paraboloid(plot=False):
+    if __name__ == '__main__':
+        obscurations = [0.0, 0.25, 0.5, 0.75]
+    else:
+        obscurations = [0.25]
+
+    print("Testing HuygensPSF")
+    # Just do a single parabolic mirror test
+    focalLength = 1.5
+    diam = 0.3
+    R = 2*focalLength
+    for obscuration in obscurations:
+        telescope = batoid.CompoundOptic(
+            items = [
+                batoid.Mirror(
+                    batoid.Paraboloid(R),
+                    name="Mirror",
+                    obscuration=batoid.ObscNegation(
+                        batoid.ObscAnnulus(0.5*obscuration*diam, 0.5*diam)
+                    )
+                ),
+                batoid.Detector(
+                    batoid.Plane(),
+                    name="detector",
+                    coordSys=batoid.CoordSys(origin=[0, 0, focalLength])
+                )
+            ],
+            pupilSize=diam,
+            backDist=10.0,
+            inMedium=batoid.ConstMedium(1.0)
+        )
+
+        airy_size = 1.22*500e-9/diam * 206265
+        print()
+        print("Airy radius: {:4.2f} arcsec".format(airy_size))
+
+        # Start with the HuygensPSF
+        npix = 96
+        size = 3.0 # arcsec
+        dsize = size/npix
+        dsize_X = dsize*focalLength/206265  # meters
+
+        psf = batoid.huygensPSF(
+            telescope, 0.0, 0.0, 500e-9,
+            nx=npix, dx=dsize_X, dy=dsize_X
+        )
+        psf.array /= np.max(psf.array)
+
+        scale = np.sqrt(np.abs(np.linalg.det(psf.primitiveVectors)))  # meters
+        scale *= 206265/focalLength  # arcsec
+        obj = galsim.Airy(lam=500, diam=diam, obscuration=obscuration)
+        # Need to shift by half a pixel.
+        obj = obj.shift(scale/2, scale/2)
+        im = obj.drawImage(nx=npix, ny=npix, scale=scale, method='no_pixel')
+        arr = im.array/np.max(im.array)
+        gs_mom = galsim.hsm.FindAdaptiveMom(im)
+
+        psfim = galsim.Image(psf.array)
+        jt_mom = galsim.hsm.FindAdaptiveMom(psfim)
+
+        print("GalSim shape: ", gs_mom.observed_shape)
+        print("batoid shape: ", jt_mom.observed_shape)
+        print("GalSim centroid:  ", gs_mom.moments_centroid)
+        print("batoid centroid:  ", jt_mom.moments_centroid)
+        print("GalSim size: ", gs_mom.moments_sigma)
+        print("batoid size: ", jt_mom.moments_sigma)
+        print("GalSim rho4: ", gs_mom.moments_rho4)
+        print("batoid rho4: ", jt_mom.moments_rho4)
+
+        np.testing.assert_allclose(
+            gs_mom.observed_shape.g1,
+            jt_mom.observed_shape.g1,
+            rtol=0.0, atol=3e-3
+        )
+        np.testing.assert_allclose(
+            gs_mom.observed_shape.g2,
+            jt_mom.observed_shape.g2,
+            rtol=0.0, atol=3e-3
+        )
+        np.testing.assert_allclose(
+            gs_mom.moments_centroid.x,
+            jt_mom.moments_centroid.x,
+            rtol=0.0, atol=1e-9
+        )
+        np.testing.assert_allclose(
+            gs_mom.moments_centroid.y,
+            jt_mom.moments_centroid.y,
+            rtol=0.0, atol=1e-9
+        )
+        np.testing.assert_allclose(
+            gs_mom.moments_sigma,
+            jt_mom.moments_sigma,
+            rtol=1e-2  # why not better?!
+        )
+        np.testing.assert_allclose(
+            gs_mom.moments_rho4,
+            jt_mom.moments_rho4,
+            rtol=2e-2
+        )
+
+        if plot:
+            size = scale*npix
+            import matplotlib.pyplot as plt
+            fig = plt.figure(figsize=(15, 4))
+            ax1 = fig.add_subplot(131)
+            im1 = ax1.imshow(
+                np.log10(arr),
+                extent=np.r_[-1,1,-1,1]*size/2,
+                vmin=-7, vmax=0
+            )
+            plt.colorbar(im1, ax=ax1, label=r'$\log_{10}$ flux')
+            ax1.set_title('GalSim')
+            ax1.set_xlabel("arcsec")
+            ax1.set_ylabel("arcsec")
+
+            sizeX = dsize_X * npix * 1e6  # microns
+            ax2 = fig.add_subplot(132)
+            im2 = ax2.imshow(
+                np.log10(psf.array),
+                extent=np.r_[-1,1,-1,1]*sizeX/2,
+                vmin=-7, vmax=0
+            )
+            plt.colorbar(im2, ax=ax2, label=r'$\log_{10}$ flux')
+            ax2.set_title('batoid')
+            ax2.set_xlabel(r"$\mu m$")
+            ax2.set_ylabel(r"$\mu m$")
+
+            ax3 = fig.add_subplot(133)
+            im3 = ax3.imshow(
+                (psf.array-arr)/np.max(arr),
+                vmin=-0.01, vmax=0.01,
+                cmap='seismic'
+            )
+            plt.colorbar(im3, ax=ax3, label="(batoid-GalSim)/max(GalSim)")
+            ax3.set_title('resid')
+            ax3.set_xlabel(r"$\mu m$")
+            ax3.set_ylabel(r"$\mu m$")
+
+            fig.tight_layout()
+
+            plt.show()
+
+
 if __name__ == '__main__':
+    from argparse import ArgumentParser
+    parser = ArgumentParser()
+    parser.add_argument("--plot", action='store_true')
+    args = parser.parse_args()
+
+    init_gpu()
     test_zernikeGQ()
     test_huygensPSF()
     test_doubleZernike()
+    test_huygens_paraboloid(args.plot)
