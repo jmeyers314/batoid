@@ -157,7 +157,7 @@ class Interface(Optic):
             x = self.inRadius * cth
             y = self.inRadius * sth
             z = self.surface.sag(x, y)
-            x, y, z = transform.applyForward(x, y, z)
+            x, y, z = transform.applyForwardArray(x, y, z)
             ax.plot(x, y, z, **kwargs)
 
         #outer circle
@@ -166,31 +166,31 @@ class Interface(Optic):
         x = self.outRadius * cth
         y = self.outRadius * sth
         z = self.surface.sag(x, y)
-        x, y, z = transform.applyForward(x, y, z)
+        x, y, z = transform.applyForwardArray(x, y, z)
         ax.plot(x, y, z, **kwargs)
 
         #next, a line at X=0
         y = np.linspace(-self.outRadius, -self.inRadius)
         x = np.zeros_like(y)
         z = self.surface.sag(x, y)
-        x, y, z = transform.applyForward(x, y, z)
+        x, y, z = transform.applyForwardArray(x, y, z)
         ax.plot(x, y, z, **kwargs)
         y = np.linspace(self.inRadius, self.outRadius)
         x = np.zeros_like(y)
         z = self.surface.sag(x, y)
-        x, y, z = transform.applyForward(x, y, z)
+        x, y, z = transform.applyForwardArray(x, y, z)
         ax.plot(x, y, z, **kwargs)
 
         #next, a line at Y=0
         x = np.linspace(-self.outRadius, -self.inRadius)
         y = np.zeros_like(x)
         z = self.surface.sag(x, y)
-        x, y, z = transform.applyForward(x, y, z)
+        x, y, z = transform.applyForwardArray(x, y, z)
         ax.plot(x, y, z, **kwargs)
         x = np.linspace(self.inRadius, self.outRadius)
         y = np.zeros_like(x)
         z = self.surface.sag(x, y)
-        x, y, z = transform.applyForward(x, y, z)
+        x, y, z = transform.applyForwardArray(x, y, z)
         ax.plot(x, y, z, **kwargs)
 
     def getXZSlice(self, nslice=0):
@@ -233,7 +233,7 @@ class Interface(Optic):
         z = self.surface.sag(x, y)
         # Transform slice to global coordinates.
         transform = CoordTransform(self.coordSys, globalCoordSys)
-        xneg, yneg, zneg = transform.applyForward(x, y, z)
+        xneg, yneg, zneg = transform.applyForwardArray(x, y, z)
         if np.any(yneg != 0):
             print('WARNING: getXZSlice used for rotated surface "{0}".'
                 .format(self.name)
@@ -243,7 +243,7 @@ class Interface(Optic):
         x = x[::-1]
         z[:] = self.surface.sag(x, y)
         # Transform slice to global coordinates.
-        xpos, ypos, zpos = transform.applyForward(x, y, z)
+        xpos, ypos, zpos = transform.applyForwardArray(x, y, z)
         if np.any(ypos != 0):
             print('WARNING: getXZSlice used for rotated surface "{0}".'
                 .format(self.name)
@@ -1485,7 +1485,7 @@ def getGlobalRays(traceFull, start=None, end=None, globalSys=globalCoordSys):
     # First point on each ray is where it enters the start surface.
     transform = CoordTransform(traceFull[start]['in'].coordSys, globalSys)
     xyz[:, :, 0] = np.stack(
-        transform.applyForward(*traceFull[start]['in'].r.T), axis=1
+        transform.applyForwardArray(*traceFull[start]['in'].r.T), axis=1
     )
     # Keep track of the number of visible points on each ray.
     raylen = np.ones(nray, dtype=int)
@@ -1494,7 +1494,7 @@ def getGlobalRays(traceFull, start=None, end=None, globalSys=globalCoordSys):
         # Add a point for where each ray leaves this surface.
         transform = CoordTransform(surface['out'].coordSys, globalSys)
         xyz[:, :, i + 1] = np.stack(
-            transform.applyForward(*surface['out'].r.T), axis=1
+            transform.applyForwardArray(*surface['out'].r.T), axis=1
         )
         # Keep track of rays which are still visible.
         visible = ~surface['out'].vignetted
