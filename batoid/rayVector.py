@@ -1068,3 +1068,15 @@ class RayVector:
         out += f", {self.t!r}, {self.wavelength!r}, {self.flux!r}"
         out += f", {self.vignetted!r}, {self.failed!r}, {self.coordSys!r})"
         return out
+
+    def __getstate__(self):
+        return (
+            self.r, self.v, self.t,
+            self.wavelength, self.flux,
+            self.vignetted, self.failed, self.coordSys
+        )
+
+    def __setstate__(self, args):
+        (self._r, self._v, self._t,
+         self._wavelength, self._flux, self._vignetted,
+         self._failed, self.coordSys) = args

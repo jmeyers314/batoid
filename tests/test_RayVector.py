@@ -1,6 +1,6 @@
 import batoid
 import numpy as np
-from test_helpers import timer, init_gpu, rays_allclose, checkAngle
+from test_helpers import timer, init_gpu, rays_allclose, checkAngle, do_pickle
 
 
 @timer
@@ -38,6 +38,9 @@ def test_properties():
         np.testing.assert_array_equal(rv.vignetted, vig)
         np.testing.assert_array_equal(rv.failed, fa)
         assert rv.coordSys == cs
+
+        rv._syncToDevice()
+        do_pickle(rv)
 
 
 @timer
