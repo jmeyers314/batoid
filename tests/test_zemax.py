@@ -2,23 +2,12 @@
 import os
 
 import pytest
+import galsim
 import numpy as np
+from scipy.optimize import least_squares
+
 import batoid
-from test_helpers import timer
-import yaml
-
-hasGalSim = True
-try:
-    import galsim
-except ImportError:
-    hasGalSim = False
-
-hasLMFit = True
-try:
-    import lmfit
-except ImportError:
-    hasLMFit = False
-
+from test_helpers import timer, init_gpu
 
 directory = os.path.dirname(__file__)
 
@@ -27,37 +16,46 @@ directory = os.path.dirname(__file__)
 def test_HSC_trace():
     telescope = batoid.Optic.fromYaml("HSC_old.yaml")
 
-    # Zemax has a number of virtual surfaces that we don't trace in batoid.  Also, the HSC.yaml
-    # above includes Baffle surfaces not in Zemax.  The following lists select out the surfaces in
-    # common to both models.
-    HSC_surfaces = [3, 6, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 24, 25, 28, 29, 31]
+    # Zemax has a number of virtual surfaces that we don't trace in batoid.
+    # Also, the HSC.yaml above includes Baffle surfaces not in Zemax.  The
+    # following lists select out the surfaces in common to both models.
+    HSC_surfaces = [
+        3, 6, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 24, 25, 28, 29,
+        31
+    ]
     surface_names = ['PM', 'G1_entrance', 'G1_exit', 'G2_entrance', 'G2_exit',
                      'ADC1_entrance', 'ADC1_exit', 'ADC2_entrance', 'ADC2_exit',
                      'G3_entrance', 'G3_exit', 'G4_entrance', 'G4_exit',
                      'G5_entrance', 'G5_exit', 'F_entrance', 'F_exit',
                      'W_entrance', 'W_exit', 'D']
 
-    for fn in ["HSC_raytrace_1.txt", "HSC_raytrace_2.txt", "HSC_raytrace_3.txt"]:
+    for fn in [
+        "HSC_raytrace_1.txt", "HSC_raytrace_2.txt", "HSC_raytrace_3.txt"
+    ]:
         filename = os.path.join(directory, "testdata", fn)
         with open(filename) as f:
             arr = np.loadtxt(f, skiprows=22, usecols=list(range(0, 12)))
         arr0 = arr[0]
-        ray = batoid.Ray((arr0[1]/1000, arr0[2]/1000, 16.0), (arr0[4], arr0[5], -arr0[6]),
-                         t=0, wavelength=750e-9)
-        tf = telescope.traceFull(ray)
+        rv = batoid.RayVector(
+            arr0[1]/1000, arr0[2]/1000, 16.0,
+            arr0[4], arr0[5], -arr0[6],
+            t=0, wavelength=750e-9
+        )
+        tf = telescope.traceFull(rv)
 
         i = 0
         for name in surface_names:
             surface = tf[name]
-            s = surface['out']
-            v = s.v/np.linalg.norm(s.v)
+            srv = surface['out']
 
-            s.toCoordSys(batoid.CoordSys())
-            bt_isec = np.array([s.x, s.y, s.z-16.0])
+            srv.toCoordSys(batoid.CoordSys())
+            bt_isec = np.array([srv.x, srv.y, srv.z-16.0]).T[0]
             zx_isec = arr[HSC_surfaces[i]-1][1:4]/1000
-            np.testing.assert_allclose(bt_isec, zx_isec, rtol=0, atol=1e-9) # nanometer agreement
+            # nanometer agreement
+            np.testing.assert_allclose(bt_isec, zx_isec, rtol=0, atol=1e-9)
 
-            bt_angle = np.array([v[0], v[1], v[2]])
+            v = srv.v/np.linalg.norm(srv.v)
+            bt_angle = v[0]
             zx_angle = arr[HSC_surfaces[i]-1][4:7]
             # direction cosines agree to 1e-9
             np.testing.assert_allclose(bt_angle, zx_angle, rtol=0, atol=1e-9)
@@ -65,8 +63,6 @@ def test_HSC_trace():
             i += 1
 
 
-@pytest.mark.skipif(not hasGalSim, reason="galsim not found")
-@pytest.mark.skipif(not hasLMFit, reason="lmfit not found")
 @pytest.mark.slow
 @timer
 def test_HSC_huygensPSF():
@@ -80,11 +76,15 @@ def test_HSC_huygensPSF():
     thx = np.deg2rad(0.0)
     thy = np.deg2rad(0.75)
     wavelength = 750e-9
-    nx = 512
+    nx = 128
     dx = 0.25e-6
     print("computing Huygens PSF")
-    hPSF = batoid.huygensPSF(telescope, thx, thy, wavelength, nx=nx, projection='zemax',
-                             dx=dx, nxOut=256)
+    hPSF = batoid.huygensPSF(
+        telescope,
+        thx, thy, projection='zemax',
+        wavelength=wavelength,
+        nx=nx, dx=dx, nxOut=256
+    )
     print("Done")
 
     # Normalize images
@@ -95,36 +95,48 @@ def test_HSC_huygensPSF():
     hPSF.array /= Zmax
 
     # Use GalSim InterpolateImage to align and subtract
-    ii = galsim.InterpolatedImage(galsim.Image(hPSF.array, scale=0.25), normalization='sb')
+    ii = galsim.InterpolatedImage(
+        galsim.Image(hPSF.array, scale=0.25),
+        normalization='sb'
+    )
 
     # Now setup an optimizer to fit for x/y shift
-    def resid(params):
-        p = params.valuesdict()
-        model = ii.shift(p['dx'], p['dy'])*np.exp(p['dlogflux'])
-        img = model.drawImage(method='sb', scale=0.25, nx=256, ny=256)
+    def modelimg(params, ii=ii):
+        dx, dy, dlogflux = params
+        model = ii.shift(dx, dy)*np.exp(dlogflux)
+        return model.drawImage(method='sb', scale=0.25, nx=256, ny=256)
+
+    def resid(params, ii=ii, Zarr=Zarr):
+        img = modelimg(params, ii=ii)
         r = (img.array - Zarr).ravel()
         return r
-    params = lmfit.Parameters()
-    params.add('dx', value=0.0)
-    params.add('dy', value=0.0)
-    params.add('dlogflux', value=0.0)
-    print("Aligning")
-    opt = lmfit.minimize(resid, params)
-    print("Done")
 
-    p = opt.params.valuesdict()
-    model = ii.shift(p['dx'], p['dy'])*np.exp(p['dlogflux'])
-    optImg = model.drawImage(method='sb', scale=0.25, nx=256, ny=256)
+    kwargs = dict(ii=ii, Zarr=Zarr)
+    print("Aligning")
+    result = least_squares(resid, np.array([0.0, 0.0, 0.0]), kwargs=kwargs)
+    optImg = modelimg(result.x, ii=ii)
+    print("Done")
 
     np.testing.assert_allclose(Zarr, optImg.array, rtol=0, atol=3e-2)
     Zmom = galsim.hsm.FindAdaptiveMom(galsim.Image(Zarr, scale=0.25))
     bmom = galsim.hsm.FindAdaptiveMom(optImg)
-    np.testing.assert_allclose(Zmom.observed_shape.g1, bmom.observed_shape.g1, rtol=0, atol=0.01)
-    np.testing.assert_allclose(Zmom.observed_shape.g2, bmom.observed_shape.g2, rtol=0, atol=1e-7)
-    np.testing.assert_allclose(Zmom.moments_sigma, bmom.moments_sigma, rtol=0, atol=0.1)
+    np.testing.assert_allclose(
+        Zmom.observed_shape.g1,
+        bmom.observed_shape.g1,
+        rtol=0, atol=0.01
+    )
+    np.testing.assert_allclose(
+        Zmom.observed_shape.g2,
+        bmom.observed_shape.g2,
+        rtol=0, atol=1e-7
+    )
+    np.testing.assert_allclose(
+        Zmom.moments_sigma,
+        bmom.moments_sigma,
+        rtol=0, atol=0.1
+    )
 
 
-@pytest.mark.skipif(not hasGalSim, reason="galsim not found")
 @timer
 def test_HSC_wf():
     fn = os.path.join(directory, "testdata", "HSC_wavefront.txt")
@@ -142,8 +154,9 @@ def test_HSC_wf():
 
     Zwf = np.ma.MaskedArray(data=Zwf, mask=Zwf==0)  # Turn Zwf into masked array
 
-    # There are unimportant differences in piston, tip, and tilt terms.  So instead of comparing
-    # the wavefront directly, we'll compare Zernike coefficients for j >= 4.
+    # There are unimportant differences in piston, tip, and tilt terms.  So
+    # instead of comparing the wavefront directly, we'll compare Zernike
+    # coefficients for j >= 4.
     x = np.linspace(-1, 1, nx, endpoint=False)
     x, y = np.meshgrid(x, x)
     w = ~Zwf.mask  # Use the same mask for both Zemax and batoid
@@ -159,7 +172,6 @@ def test_HSC_wf():
     np.testing.assert_allclose(Zcoefs[11:], Bcoefs[11:], rtol=0, atol=0.01)
 
 
-@pytest.mark.skipif(not hasGalSim, reason="galsim not found")
 @timer
 def test_HSC_zernike():
     ZZernike = [0]
@@ -178,23 +190,23 @@ def test_HSC_zernike():
 
     bZernike = batoid.zernike(
         telescope, thx, thy, wavelength, jmax=37, nx=nx,
-        projection='gnomonic')
-    # revisit this with projection='zemax' once we're referencing the wavefront
-    # to the chief ray...
-
+        projection='zemax', reference='chief'
+    )
 
     print()
-    print("j      Zemax    batoid")
-    print("----------------------")
+    print("j      Zemax    batoid    diff")
+    print("------------------------------")
     for j in range(1, 38):
-        print("{:<4d} {:8.4f} {:8.4f}".format(j, ZZernike[j], bZernike[j]))
+        print(
+            f"{j:<4d} {ZZernike[j]:8.4f} {bZernike[j]:8.4f} "
+            f"{ZZernike[j]-bZernike[j]:8.4f}"
+        )
 
     # Don't care about piston, tip, or tilt.
-    np.testing.assert_allclose(ZZernike[4:], bZernike[4:], rtol=0, atol=1e-3)
-    np.testing.assert_allclose(ZZernike[11:], bZernike[11:], rtol=0, atol=2e-4)
+    np.testing.assert_allclose(ZZernike[4:], bZernike[4:], rtol=0, atol=1e-2)
+    np.testing.assert_allclose(ZZernike[11:], bZernike[11:], rtol=0, atol=3e-3)
 
 
-@pytest.mark.skipif(not hasGalSim, reason="galsim not found")
 @timer
 def test_LSST_wf(plot=False):
     thxs = [0.0, 0.0, 0.0, 1.176]
@@ -220,7 +232,8 @@ def test_LSST_wf(plot=False):
             telescope, thx, thy, wavelength, nx=nx,
             reference='chief', projection='zemax'
         )
-        Zwf = np.ma.MaskedArray(data=Zwf, mask=Zwf==0)  # Turn Zwf into masked array
+        # Turn Zwf into masked array
+        Zwf = np.ma.MaskedArray(data=Zwf, mask=Zwf==0)
 
         if plot:
             import matplotlib.pyplot as plt
@@ -243,8 +256,6 @@ def test_LSST_wf(plot=False):
             atol=1e-11, rtol=0)  # 10 picometer tolerance!
 
 
-@pytest.mark.skipif(not hasGalSim, reason="galsim not found")
-@pytest.mark.skipif(not hasLMFit, reason="lmfit not found")
 @timer
 def test_LSST_fftPSF(plot=False):
     thxs = [0.0, 0.0, 0.0, 1.176]
@@ -281,23 +292,19 @@ def test_LSST_fftPSF(plot=False):
         )
 
         # Now setup an optimizer to fit for x/y shift
-        def resid(params):
-            p = params.valuesdict()
-            model = ii.shift(p['dx'], p['dy'])*np.exp(p['dlogflux'])
-            img = model.drawImage(method='sb', scale=1.0, nx=64, ny=64)
+        def modelimg(params, ii=ii):
+            dx, dy, dlogflux = params
+            model = ii.shift(dx, dy)*np.exp(dlogflux)
+            return model.drawImage(method='sb', scale=1.0, nx=64, ny=64)
+
+        def resid(params, ii=ii, Zpsf=Zpsf):
+            img = modelimg(params, ii=ii)
             r = (img.array - Zpsf).ravel()
             return r
-        params = lmfit.Parameters()
-        params.add('dx', value=0.0)
-        params.add('dy', value=0.0)
-        params.add('dlogflux', value=0.0)
-        print("Aligning")
-        opt = lmfit.minimize(resid, params)
-        print("Done")
 
-        p = opt.params.valuesdict()
-        model = ii.shift(p['dx'], p['dy'])*np.exp(p['dlogflux'])
-        optImg = model.drawImage(method='sb', scale=1.0, nx=64, ny=64)
+        kwargs = dict(ii=ii, Zpsf=Zpsf)
+        result = least_squares(resid, np.array([0.0, 0.0, 0.0]), kwargs=kwargs)
+        optImg = modelimg(result.x, ii=ii)
 
         if plot:
             import matplotlib.pyplot as plt
@@ -312,8 +319,6 @@ def test_LSST_fftPSF(plot=False):
             plt.show()
 
 
-@pytest.mark.skipif(not hasGalSim, reason="galsim not found")
-@pytest.mark.skipif(not hasLMFit, reason="lmfit not found")
 @pytest.mark.slow
 @timer
 def test_LSST_huygensPSF(plot=False):
@@ -341,7 +346,8 @@ def test_LSST_huygensPSF(plot=False):
         wavelength = 500e-9
 
         bpsf = batoid.analysis.huygensPSF(
-            telescope, thx, thy, wavelength, nx=1024,
+            telescope, thx, thy, wavelength, nx=128,
+            # telescope, thx, thy, wavelength, nx=1024,
             reference='chief', projection='zemax',
             dx=0.289e-6, nxOut=64
         )
@@ -354,24 +360,21 @@ def test_LSST_huygensPSF(plot=False):
         )
 
         # Now setup an optimizer to fit for x/y shift
-        def resid(params):
-            p = params.valuesdict()
-            model = ii.shift(p['dx'], p['dy'])*np.exp(p['dlogflux'])
-            img = model.drawImage(method='sb', scale=1.0, nx=64, ny=64)
+        def modelimg(params, ii=ii):
+            dx, dy, dlogflux = params
+            model = ii.shift(dx, dy)*np.exp(dlogflux)
+            return model.drawImage(method='sb', scale=1.0, nx=64, ny=64)
+
+        def resid(params, ii=ii, Zpsf=Zpsf):
+            img = modelimg(params, ii=ii)
             r = (img.array - Zpsf).ravel()
             return r
-        params = lmfit.Parameters()
-        params.add('dx', value=0.0)
-        params.add('dy', value=0.0)
-        params.add('dlogflux', value=0.0)
-        print("Aligning")
-        opt = lmfit.minimize(resid, params)
-        print("Done")
-        print(opt.params)
 
-        p = opt.params.valuesdict()
-        model = ii.shift(p['dx'], p['dy'])*np.exp(p['dlogflux'])
-        optImg = model.drawImage(method='sb', scale=1.0, nx=64, ny=64)
+        kwargs = dict(ii=ii, Zpsf=Zpsf)
+        print("Aligning")
+        result = least_squares(resid, np.array([0.0, 0.0, 0.0]), kwargs=kwargs)
+        optImg = modelimg(result.x, ii=ii)
+        print("Done")
 
         if plot:
             import matplotlib.pyplot as plt
@@ -414,7 +417,7 @@ def test_LSST_trace():
             np.deg2rad(Hy*1.75),
             projection='zemax'
         )
-        ray = batoid.Ray.fromStop(
+        ray = batoid.RayVector.fromStop(
             Px*4.18, Py*4.18,
             optic=telescope,
             wavelength=500e-9,
@@ -458,6 +461,7 @@ if __name__ == '__main__':
     parser.add_argument("--plotHuygens", action='store_true')
     args = parser.parse_args()
 
+    init_gpu()
     test_HSC_trace()
     test_HSC_huygensPSF()
     test_HSC_wf()

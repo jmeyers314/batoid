@@ -156,8 +156,10 @@ namespace batoid {
             phase -= _t-tptr[i];
             phase *= 2 * PI / wptr[i];
 
-            real += std::cos(phase)*fluxptr[i]*(1-failptr[i])*(ignoreVignetted ? 1-vigptr[i]: 1.0);
-            imag += std::sin(phase)*fluxptr[i]*(1-failptr[i])*(ignoreVignetted ? 1-vigptr[i]: 1.0);
+            if (!failptr[i] && !(ignoreVignetted && vigptr[i])) {
+                real += std::cos(phase)*fluxptr[i];
+                imag += std::sin(phase)*fluxptr[i];
+            }
         }
         return std::complex<double>(real, imag);
     }

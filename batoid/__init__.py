@@ -41,5 +41,6 @@ from . import parse
 from . import utils
 from .constants import globalCoordSys, vacuum
 
-from . import analysis
+# from . import analysis
+from .analysis import huygensPSF, wavefront, zernike, zernikeGQ
 # from . import plotUtils
