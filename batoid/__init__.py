@@ -12,7 +12,7 @@ from .surface import (
 
 from .trace import (
     intersect, applyForwardTransform, applyReverseTransform, obscure,
-    reflect, refract
+    reflect, refract, rSplit
 )
 
 from .medium import (

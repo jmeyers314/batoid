@@ -4,7 +4,7 @@ import numpy as np
 
 from . import _batoid
 from .constants import globalCoordSys
-from .trace import intersect, reflect, refract
+from .trace import intersect, rSplit, reflect, refract
 
 
 class Surface(ABC):
@@ -53,10 +53,10 @@ class Surface(ABC):
         else:
             return out
 
-    def intersect(self, rv, coordSys=None):
-        return intersect(self, rv, coordSys)
+    def intersect(self, rv, coordSys=None, coating=None):
+        return intersect(self, rv, coordSys, coating)
 
-    def reflect(self, rv, coordSys=None):
+    def reflect(self, rv, coordSys=None, coating=None):
         """Calculate intersection of ray(s) with this surface, and immediately
         reflect the ray(s) at the point(s) of intersection.
 
@@ -68,6 +68,8 @@ class Surface(ABC):
             If present, then use for the coordinate system of the surface.  If
             `None` (default), then assume that ray(s) and surface are already
             expressed in the same coordinate system.
+        coating : Coating, optional
+            Apply this coating upon surface intersection.
 
         Returns
         -------
@@ -75,9 +77,9 @@ class Surface(ABC):
             New object corresponding to original ray(s) propagated and
             reflected.
         """
-        return reflect(self, rv, coordSys)
+        return reflect(self, rv, coordSys, coating)
 
-    def refract(self, rv, inMedium, outMedium, coordSys=None):
+    def refract(self, rv, inMedium, outMedium, coordSys=None, coating=None):
         """Calculate intersection of ray(s) with this surface, and immediately
         refract the ray(s) through the surface at the point(s) of intersection.
 
@@ -93,6 +95,8 @@ class Surface(ABC):
             If present, then use for the coordinate system of the surface.  If
             `None` (default), then assume that ray(s) and surface are already
             expressed in the same coordinate system.
+        coating : Coating, optional
+            Apply this coating upon surface intersection.
 
         Returns
         -------
@@ -100,75 +104,38 @@ class Surface(ABC):
             New object corresponding to original ray(s) propagated and
             refracted.
         """
-        return refract(self, rv, inMedium, outMedium, coordSys)
+        return refract(self, rv, inMedium, outMedium, coordSys, coating)
 
-    # def rSplit(self, r, inMedium, outMedium, coating, coordSys=None):
-    #     """Calculate intersection of rays with this surface, and immediately
-    #     split the rays into reflected and refracted rays, with appropriate
-    #     fluxes.
-    #
-    #     Parameters
-    #     ----------
-    #     r : RayVector
-    #         Rays to refract.
-    #     inMedium : Medium
-    #         Refractive medium on the incoming side of the surface.
-    #     outMedium : Medium
-    #         Refractive medium on the outgoing side of the surface.
-    #     coating : Coating
-    #         Coating object to control transmission coefficient.
-    #     coordSys : CoordSys, optional
-    #         If present, then use for the coordinate system of the surface.  If
-    #         `None` (default), then assume that ray(s) and surface are already
-    #         expressed in the same coordinate system.
-    #
-    #     Returns
-    #     -------
-    #     reflectedRays, refractedRays : RayVector
-    #         New objects corresponding to original rays propagated and
-    #         reflected/refracted.
-    #     """
-    #     from .ray import Ray
-    #     from .rayVector import RayVector
-    #     if coordSys is not None:
-    #         coordSys = coordSys._coordSys
-    #     reflectedRays, refractedRays = self._surface.rSplit(
-    #         r._rv, inMedium._medium, outMedium._medium, coating._coating,
-    #         coordSys
-    #     )
-    #     if isinstance(r, Ray):
-    #         return (
-    #             Ray._fromCPPRayVector(reflectedRays),
-    #             Ray._fromCPPRayVector(refractedRays)
-    #         )
-    #     else:
-    #         return (
-    #             RayVector._fromCPPRayVector(reflectedRays),
-    #             RayVector._fromCPPRayVector(refractedRays)
-    #         )
-    #
-    # @abstractmethod
-    # def __hash__(self):
-    #     raise NotImplementedError
-    #
-    # @abstractmethod
-    # def __setstate__(self, state):
-    #     raise NotImplementedError
-    #
-    # @abstractmethod
-    # def __getstate__(self):
-    #     raise NotImplementedError
-    #
-    # @abstractmethod
-    # def __repr__(self):
-    #     raise NotImplementedError
-    #
-    # @abstractmethod
-    # def __eq__(self, rhs):
-    #     raise NotImplementedError
-    #
-    # def __ne__(self, rhs):
-    #     return not (self == rhs)
+    def rSplit(self, rv, inMedium, outMedium, coating, coordSys=None):
+        """Calculate intersection of rays with this surface, and immediately
+        split the rays into reflected and refracted rays, with appropriate
+        fluxes.
+
+        Parameters
+        ----------
+        rv : RayVector
+            Rays to refract.
+        inMedium : Medium
+            Refractive medium on the incoming side of the surface.
+        outMedium : Medium
+            Refractive medium on the outgoing side of the surface.
+        coating : Coating
+            Coating object to control transmission coefficient.
+        coordSys : CoordSys, optional
+            If present, then use for the coordinate system of the surface.  If
+            `None` (default), then assume that ray(s) and surface are already
+            expressed in the same coordinate system.
+
+        Returns
+        -------
+        reflectedRays, refractedRays : RayVector
+            New objects corresponding to original rays propagated and
+            reflected/refracted.
+        """
+        return rSplit(self, rv, inMedium, outMedium, coating, coordSys)
+
+    def __ne__(self, rhs):
+        return not (self == rhs)
 
 
 class Plane(Surface):

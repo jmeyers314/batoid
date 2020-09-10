@@ -15,7 +15,7 @@ namespace batoid {
 
     template<typename T>
     DualView<T>::~DualView() {
-        #pragma omp target exit data map(delete:data[:size])
+        #pragma omp target exit data map(release:data[:size])
         if (ownsHostData) delete[] data;
     }
 

@@ -67,12 +67,39 @@ namespace batoid {
     }
 
 
-    void intersect(const Surface& surface, const vec3 dr, const mat3 drot, RayVector& rv) {
+    void obscure(const Obscuration& obsc, RayVector& rv) {
+        rv.r.syncToDevice();
+        rv.vignetted.syncToDevice();
+        size_t size = rv.size;
+        double* xptr = rv.r.data;
+        double* yptr = xptr + size;
+        double* zptr = yptr + size;
+        bool* vigptr = rv.vignetted.data;
+
+        Obscuration* obscDevPtr = obsc.getDevPtr();
+
+        #pragma omp target teams distribute parallel for is_device_ptr(obscDevPtr)
+        for(int i=0; i<size; i++) {
+            vigptr[i] |= obscDevPtr->contains(xptr[i], yptr[i]);
+        }
+    }
+
+
+    void intersect(
+        const Surface& surface,
+        const vec3 dr, const mat3 drot,
+        RayVector& rv,
+        const Coating* coating
+    ) {
         rv.r.syncToDevice();
         rv.v.syncToDevice();
         rv.t.syncToDevice();
         rv.vignetted.syncToDevice();
         rv.failed.syncToDevice();
+        if (coating) {
+            rv.wavelength.syncToDevice();
+            rv.flux.syncToDevice();
+        }
         size_t size = rv.size;
         double* xptr = rv.r.data;
         double* yptr = xptr + size;
@@ -81,15 +108,20 @@ namespace batoid {
         double* vyptr = vxptr + size;
         double* vzptr = vyptr + size;
         double* tptr = rv.t.data;
+        double* wptr = rv.wavelength.data;
+        double* fluxptr = rv.flux.data;
         bool* vigptr = rv.vignetted.data;
         bool* failptr = rv.failed.data;
 
         Surface* surfaceDevPtr = surface.getDevPtr();
         const double* drptr = dr.data();
         const double* drotptr = drot.data();
+        Coating* coatingDevPtr = nullptr;
+        if (coating)
+            coatingDevPtr = coating->getDevPtr();
 
         #pragma omp target teams distribute parallel for \
-            is_device_ptr(surfaceDevPtr) \
+            is_device_ptr(surfaceDevPtr, coatingDevPtr) \
             map(to:drptr[:3], drotptr[:9])
         for(int i=0; i<size; i++) {
             // Coordinate transformation
@@ -119,6 +151,19 @@ namespace batoid {
                     vyptr[i] = vy;
                     vzptr[i] = vz;
                     tptr[i] = t;
+                    if (coatingDevPtr) {
+                        double nx, ny, nz;
+                        surfaceDevPtr->normal(x, y, nx, ny, nz);
+                        double n1 = vx*vx;
+                        n1 += vy*vy;
+                        n1 += vz*vz;
+                        n1 = 1/sqrt(n1);
+                        double alpha = vx*nx;
+                        alpha += vy*ny;
+                        alpha += vz*nz;
+                        alpha *= n1;
+                        fluxptr[i] *= coatingDevPtr->getTransmit(wptr[i], alpha);
+                    }
                 } else {
                     failptr[i] = true;
                     vigptr[i] = true;
@@ -128,12 +173,21 @@ namespace batoid {
     }
 
 
-    void reflect(const Surface& surface, const vec3 dr, const mat3 drot, RayVector& rv) {
+    void reflect(
+        const Surface& surface,
+        const vec3 dr, const mat3 drot,
+        RayVector& rv,
+        const Coating* coating
+    ) {
         rv.r.syncToDevice();
         rv.v.syncToDevice();
         rv.t.syncToDevice();
         rv.vignetted.syncToDevice();
         rv.failed.syncToDevice();
+        if (coating) {
+            rv.wavelength.syncToDevice();
+            rv.flux.syncToDevice();
+        }
         size_t size = rv.size;
         double* xptr = rv.r.data;
         double* yptr = xptr + size;
@@ -142,15 +196,20 @@ namespace batoid {
         double* vyptr = vxptr + size;
         double* vzptr = vyptr + size;
         double* tptr = rv.t.data;
+        double* wptr = rv.wavelength.data;
+        double* fluxptr = rv.flux.data;
         bool* vigptr = rv.vignetted.data;
         bool* failptr = rv.failed.data;
 
         Surface* surfaceDevPtr = surface.getDevPtr();
         const double* drptr = dr.data();
         const double* drotptr = drot.data();
+        Coating* coatingDevPtr = nullptr;
+        if (coating)
+            coatingDevPtr = coating->getDevPtr();
 
         #pragma omp target teams distribute parallel for \
-            is_device_ptr(surfaceDevPtr) \
+            is_device_ptr(surfaceDevPtr, coatingDevPtr) \
             map(to:drptr[:3], drotptr[:9])
         for(int i=0; i<size; i++) {
             // Coordinate transformation
@@ -193,6 +252,16 @@ namespace batoid {
                     vyptr[i] = vy;
                     vzptr[i] = vz;
                     tptr[i] = t;
+                    if (coatingDevPtr) {
+                        double nx, ny, nz;
+                        surfaceDevPtr->normal(x, y, nx, ny, nz);
+                        double n1 = vx*vx;
+                        n1 += vy*vy;
+                        n1 += vz*vz;
+                        n1 = 1/sqrt(n1);
+                        alpha *= n1;
+                        fluxptr[i] *= coatingDevPtr->getReflect(wptr[i], alpha);
+                    }
                 } else {
                     failptr[i] = true;
                     vigptr[i] = true;
@@ -206,7 +275,8 @@ namespace batoid {
         const Surface& surface,
         const vec3 dr, const mat3 drot,
         const Medium& m1, const Medium& m2,
-        RayVector& rv
+        RayVector& rv,
+        const Coating* coating
     ) {
         rv.r.syncToDevice();
         rv.v.syncToDevice();
@@ -214,6 +284,9 @@ namespace batoid {
         rv.vignetted.syncToDevice();
         rv.failed.syncToDevice();
         rv.wavelength.syncToDevice();
+        if (coating) {
+            rv.flux.syncToDevice();
+        }
         size_t size = rv.size;
         double* xptr = rv.r.data;
         double* yptr = xptr + size;
@@ -222,17 +295,21 @@ namespace batoid {
         double* vyptr = vxptr + size;
         double* vzptr = vyptr + size;
         double* tptr = rv.t.data;
+        double* wptr = rv.wavelength.data;
+        double* fluxptr = rv.flux.data;
         bool* vigptr = rv.vignetted.data;
         bool* failptr = rv.failed.data;
 
         Surface* surfaceDevPtr = surface.getDevPtr();
         const double* drptr = dr.data();
         const double* drotptr = drot.data();
-        double* wptr = rv.wavelength.data;
         Medium* mDevPtr = m2.getDevPtr();
+        Coating* coatingDevPtr = nullptr;
+        if (coating)
+            coatingDevPtr = coating->getDevPtr();
 
         #pragma omp target teams distribute parallel for \
-            is_device_ptr(surfaceDevPtr, mDevPtr) \
+            is_device_ptr(surfaceDevPtr, mDevPtr, coatingDevPtr) \
             map(to:drptr[:3], drotptr[:9])
         for(int i=0; i<size; i++) {
             // Coordinate transformation
@@ -292,6 +369,9 @@ namespace batoid {
                     yptr[i] = y;
                     zptr[i] = z;
                     tptr[i] = t;
+                    if (coatingDevPtr) {
+                        fluxptr[i] *= coatingDevPtr->getTransmit(wptr[i], alpha);
+                    }
                 } else {
                     failptr[i] = true;
                     vigptr[i] = true;
@@ -300,20 +380,154 @@ namespace batoid {
         }
     }
 
-    void obscure(const Obscuration& obsc, RayVector& rv) {
+    void rSplit(
+        const Surface& surface,
+        const vec3 dr, const mat3 drot,
+        const Medium& m1, const Medium& m2,
+        const Coating& coating,
+        RayVector& rv, RayVector& rvSplit
+    ) {
         rv.r.syncToDevice();
+        rv.v.syncToDevice();
+        rv.t.syncToDevice();
+        rv.wavelength.syncToDevice();
+        rv.flux.syncToDevice();
         rv.vignetted.syncToDevice();
+        rv.failed.syncToDevice();
+        rvSplit.r.syncState = SyncState::device;
+        rvSplit.v.syncState = SyncState::device;
+        rvSplit.t.syncState = SyncState::device;
+        rvSplit.wavelength.syncState = SyncState::device;
+        rvSplit.flux.syncState = SyncState::device;
+        rvSplit.vignetted.syncState = SyncState::device;
+        rvSplit.failed.syncState = SyncState::device;
+
+        // Original RayVector will get replaced with refraction
         size_t size = rv.size;
         double* xptr = rv.r.data;
         double* yptr = xptr + size;
         double* zptr = yptr + size;
+        double* vxptr = rv.v.data;
+        double* vyptr = vxptr + size;
+        double* vzptr = vyptr + size;
+        double* tptr = rv.t.data;
+        double* wptr = rv.wavelength.data;
+        double* fluxptr = rv.flux.data;
         bool* vigptr = rv.vignetted.data;
+        bool* failptr = rv.failed.data;
 
-        Obscuration* obscDevPtr = obsc.getDevPtr();
+        // rvSplit will contain reflection
+        double* xptr2 = rvSplit.r.data;
+        double* yptr2 = xptr2 + size;
+        double* zptr2 = yptr2 + size;
+        double* vxptr2 = rvSplit.v.data;
+        double* vyptr2 = vxptr2 + size;
+        double* vzptr2 = vyptr2 + size;
+        double* tptr2 = rvSplit.t.data;
+        double* wptr2 = rvSplit.wavelength.data;
+        double* fluxptr2 = rvSplit.flux.data;
+        bool* vigptr2 = rvSplit.vignetted.data;
+        bool* failptr2 = rvSplit.failed.data;
 
-        #pragma omp target teams distribute parallel for is_device_ptr(obscDevPtr)
+        Surface* surfaceDevPtr = surface.getDevPtr();
+        const double* drptr = dr.data();
+        const double* drotptr = drot.data();
+        Medium* mDevPtr = m2.getDevPtr();
+        Coating* cDevPtr = coating.getDevPtr();
+
+        // printf("surfaceDevPtr = %p\n", surfaceDevPtr);
+        // printf("mDevPtr = %p\n", mDevPtr);
+        // printf("cDevPtr = %p\n", cDevPtr);
+
+        #pragma omp target teams distribute parallel for \
+            is_device_ptr(surfaceDevPtr, mDevPtr, cDevPtr) \
+            map(to:drptr[:3], drotptr[:9])
         for(int i=0; i<size; i++) {
-            vigptr[i] |= obscDevPtr->contains(xptr[i], yptr[i]);
+            // if (i == 0)
+            //     printf("device  i=%d\n", i);
+            // Coordinate transformation
+            double dx = xptr[i]-drptr[0];
+            double dy = yptr[i]-drptr[1];
+            double dz = zptr[i]-drptr[2];
+            double x = dx*drotptr[0] + dy*drotptr[3] + dz*drotptr[6];
+            double y = dx*drotptr[1] + dy*drotptr[4] + dz*drotptr[7];
+            double z = dx*drotptr[2] + dy*drotptr[5] + dz*drotptr[8];
+            double vx = vxptr[i]*drotptr[0] + vyptr[i]*drotptr[3] + vzptr[i]*drotptr[6];
+            double vy = vxptr[i]*drotptr[1] + vyptr[i]*drotptr[4] + vzptr[i]*drotptr[7];
+            double vz = vxptr[i]*drotptr[2] + vyptr[i]*drotptr[5] + vzptr[i]*drotptr[8];
+            double t = tptr[i];
+            if (!failptr[i]) {
+                // intersection
+                double dt;
+                bool success = surfaceDevPtr->timeToIntersect(x, y, z, vx, vy, vz, dt);
+                if (success) {
+                    // propagation
+                    x += vx * dt;
+                    y += vy * dt;
+                    z += vz * dt;
+                    t += dt;
+
+                    // Calculations common to reflect/refract
+                    // We can get n1 from the velocity, rather than computing through Medium1...
+                    double n1 = vx*vx;
+                    n1 += vy*vy;
+                    n1 += vz*vz;
+                    n1 = 1/sqrt(n1);
+                    double nvx = vx*n1;
+                    double nvy = vy*n1;
+                    double nvz = vz*n1;
+                    double nx, ny, nz;
+                    surfaceDevPtr->normal(x, y, nx, ny, nz);
+                    double alpha = nvx*nx;
+                    alpha += nvy*ny;
+                    alpha += nvz*nz;
+                    if (alpha > 0) {
+                        nx *= -1;
+                        ny *= -1;
+                        nz *= -1;
+                        alpha *= -1;
+                    }
+
+                    // Flux coefficients
+                    double reflect, transmit;
+                    cDevPtr->getCoefs(wptr[i], alpha, reflect, transmit);
+
+                    // Reflection
+                    xptr2[i] = x;
+                    yptr2[i] = y;
+                    zptr2[i] = z;
+                    vxptr2[i] = vx - 2*alpha*nx/n1;
+                    vyptr2[i] = vy - 2*alpha*ny/n1;
+                    vzptr2[i] = vz - 2*alpha*nz/n1;
+                    tptr2[i] = t;
+                    wptr2[i] = wptr[i];
+                    fluxptr2[i] = fluxptr[i]*reflect;
+                    vigptr2[i] = vigptr[i];
+                    failptr2[i] = failptr[i];
+
+                    // refraction
+                    double n2 = mDevPtr->getN(wptr[i]);
+                    double eta = n1/n2;
+                    double sinsqr = eta*eta*(1-alpha*alpha);
+                    double nfactor = eta*alpha + sqrt(1-sinsqr);
+                    xptr[i] = x;
+                    yptr[i] = y;
+                    zptr[i] = z;
+                    vxptr[i] = eta*nvx - nfactor*nx;
+                    vyptr[i] = eta*nvy - nfactor*ny;
+                    vzptr[i] = eta*nvz - nfactor*nz;
+                    vxptr[i] /= n2;
+                    vyptr[i] /= n2;
+                    vzptr[i] /= n2;
+                    tptr[i] = t;
+                    fluxptr[i] *= transmit;
+                } else {
+                    vigptr[i] = true;
+                    failptr[i] = true;
+                    vigptr2[i] = true;
+                    failptr2[i] = true;
+                }
+            }
         }
     }
 }

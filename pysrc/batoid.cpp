@@ -17,7 +17,6 @@ namespace batoid {
     void pyExportPlane(py::module&);
     void pyExportPolynomialSurface(py::module&);
 
-    // void pyExportTable(py::module&);
     void pyExportCoating(py::module&);
     void pyExportMedium(py::module&);
     void pyExportObscuration(py::module&);
@@ -35,7 +34,6 @@ namespace batoid {
         pyExportPlane(m);
         pyExportPolynomialSurface(m);
 
-        // pyExportTable(m);
         pyExportCoating(m);
         pyExportMedium(m);
         pyExportObscuration(m);
@@ -48,11 +46,6 @@ namespace batoid {
         m.def("reflect", &reflect);
         m.def("refract", &refract);
         m.def("obscure", &obscure);
-
-        //  .def("getNThread", &getNThread)
-        //  .def("setNThread", &setNThread)
-        //  .def("getMinChunk", &getMinChunk)
-        //  .def("setMinChunk", &setMinChunk)
-        //  .def("setRNGSeed", &setRNGSeed);
+        m.def("rSplit", &rSplit);
     }
 }

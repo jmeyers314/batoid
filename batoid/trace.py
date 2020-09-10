@@ -3,38 +3,6 @@ from .coordSys import CoordSys
 from .coordTransform import CoordTransform
 
 
-def intersect(surface, rv, coordSys=None):
-    """Calculate intersection of rays with surface.
-
-    Parameters
-    ----------
-    surface: Surface
-        Surface to intersect.
-    rv : RayVector
-        Ray(s) to intersect.
-    coordSys : CoordSys, optional
-        Transform rays into this coordinate system before computing
-        intersection.
-
-    Returns
-    -------
-    out : RayVector
-        Reference to transformed input ray vector, which has been modified in
-        place.
-    """
-    if coordSys is None:
-        coordSys = rv.coordSys
-    ct = CoordTransform(rv.coordSys, coordSys)
-
-    _batoid.intersect(
-        surface._surface,
-        ct.dr, ct.drot.ravel(),
-        rv._rv,
-    )
-    rv.coordSys = coordSys
-    return rv
-
-
 def applyForwardTransform(ct, rv):
     _batoid.applyForwardTransform(ct.dr, ct.drot.ravel(), rv._rv)
     rv.coordSys = ct.toSys
@@ -52,30 +20,85 @@ def obscure(obsc, rv):
     return rv
 
 
-def reflect(surface, rv, coordSys=None):
+def intersect(surface, rv, coordSys=None, coating=None):
+    """Calculate intersection of rays with surface.
+
+    Parameters
+    ----------
+    surface: Surface
+        Surface to intersect.
+    rv : RayVector
+        Ray(s) to intersect.
+    coordSys : CoordSys, optional
+        Transform rays into this coordinate system before computing
+        intersection.
+    coating : Coating, optional
+        Apply this coating upon surface intersection.
+
+    Returns
+    -------
+    out : RayVector
+        Reference to transformed input ray vector, which has been modified in
+        place.
+    """
     if coordSys is None:
         coordSys = rv.coordSys
     ct = CoordTransform(rv.coordSys, coordSys)
+    _coating = coating._coating if coating else None
 
-    _batoid.reflect(
+    _batoid.intersect(
         surface._surface,
         ct.dr, ct.drot.ravel(),
-        rv._rv,
+        rv._rv, _coating
     )
     rv.coordSys = coordSys
     return rv
 
 
-def refract(surface, rv, m1, m2, coordSys=None):
+def reflect(surface, rv, coordSys=None, coating=None):
     if coordSys is None:
         coordSys = rv.coordSys
     ct = CoordTransform(rv.coordSys, coordSys)
+    _coating = coating._coating if coating else None
+
+    _batoid.reflect(
+        surface._surface,
+        ct.dr, ct.drot.ravel(),
+        rv._rv, _coating
+    )
+    rv.coordSys = coordSys
+    return rv
+
+
+def refract(surface, rv, m1, m2, coordSys=None, coating=None):
+    if coordSys is None:
+        coordSys = rv.coordSys
+    ct = CoordTransform(rv.coordSys, coordSys)
+    _coating = coating._coating if coating else None
 
     _batoid.refract(
         surface._surface,
         ct.dr, ct.drot.ravel(),
         m1._medium, m2._medium,
-        rv._rv,
+        rv._rv, _coating
     )
     rv.coordSys = coordSys
     return rv
+
+
+def rSplit(surface, rv, inMedium, outMedium, coating, coordSys=None):
+    if coordSys is None:
+        coordSys = rv.coordSys
+    ct = CoordTransform(rv.coordSys, coordSys)
+
+    rvSplit = rv.copy()
+    _batoid.rSplit(
+        surface._surface,
+        ct.dr, ct.drot.ravel(),
+        inMedium._medium, outMedium._medium,
+        coating._coating,
+        rv._rv, rvSplit._rv
+    )
+    rv.coordSys = coordSys
+    rvSplit.coordSys = coordSys
+    return rv, rvSplit

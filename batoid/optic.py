@@ -7,6 +7,7 @@ from .obscuration import ObscNegation, ObscCircle, ObscAnnulus
 from .constants import globalCoordSys, vacuum
 from .coordTransform import CoordTransform
 from .utils import lazy_property
+from .rayVector import RayVector
 
 
 class Optic:
@@ -390,24 +391,40 @@ class Interface(Optic):
         """
         if _verbose:
             s = "forward" if not reverse else "reverse"
-            strtemplate = ("traceSplit {}       {:15s} "
+            strtemplate = ("traceSplit {}       {:30s} "
                            "flux = {:18.8f}   nphot = {:10d}")
             print(strtemplate.format(s, self.name, np.sum(r.flux), len(r)))
         if self.skip:
-            return r, None
-        rForward, rReverse = self.rSplit(r, reverse=reverse)
+            if reverse:
+                return None, r
+            else:
+                return r, None
+        refracted, reflected = self.rSplit(r, reverse=reverse)
 
         # For now, apply obscuration equally forwards and backwards
         if self.obscuration is not None:
-            self.obscuration.obscure(rForward)
-            self.obscuration.obscure(rReverse)
+            if refracted is not None:
+                self.obscuration.obscure(refracted)
+            if reflected is not None:
+                self.obscuration.obscure(reflected)
         if not hasattr(r, 'path'):
-            rForward.path = [self.name]
-            rReverse.path = [self.name]
+            if refracted is not None:
+                refracted.path = [self.name]
+            if reflected is not None:
+                reflected.path = [self.name]
         else:
-            rForward.path = r.path+[self.name]
-            rReverse.path = r.path+[self.name]
-        return [rForward], [rReverse]
+            currentPath = list(r.path)
+            if refracted is not None:
+                refracted.path = currentPath+[self.name]
+            if reflected is not None:
+                reflected.path = currentPath+[self.name]
+
+        rForward, rReverse = [refracted], [reflected]
+        if reverse:
+            rForward, rReverse = rReverse, rForward
+        if isinstance(self, Mirror):
+            rForward, rReverse = rReverse, rForward
+        return rForward, rReverse
 
     def clearObscuration(self, unless=()):
         if self.name not in unless:
@@ -420,12 +437,14 @@ class Interface(Optic):
     def __eq__(self, other):
         if not self.__class__ == other.__class__:
             return False
-        return (self.surface == other.surface and
-                self.obscuration == other.obscuration and
-                self.name == other.name and
-                self.inMedium == other.inMedium and
-                self.outMedium == other.outMedium and
-                self.coordSys == other.coordSys)
+        return (
+            self.surface == other.surface and
+            self.obscuration == other.obscuration and
+            self.name == other.name and
+            self.inMedium == other.inMedium and
+            self.outMedium == other.outMedium and
+            self.coordSys == other.coordSys
+        )
 
     def __ne__(self, other):
         return not (self == other)
@@ -554,22 +573,17 @@ class RefractiveInterface(Interface):
         return self.surface.refract(r, m1, m2, coordSys=self.coordSys)
 
     def rSplit(self, r, reverse=False):
-        if not reverse:
-            reflectedR, refractedR = self.surface.rSplit(
-                r, self.inMedium, self.outMedium, self.forwardCoating,
-                coordSys=self.coordSys
-            )
-            return refractedR, reflectedR
+        # always return in order: refracted, reflected
+        if reverse:
+            m1 = self.outMedium
+            m2 = self.inMedium
+            coating = self.forwardCoating
         else:
-            reflectedR, refractedR = self.surface.rSplit(
-                r, self.outMedium, self.inMedium, self.reverseCoating,
-                coordSys=self.coordSys
-            )
-            # rays coming into a refractive interface from reverse direction,
-            # means that the refracted rays are going in the reverse direction,
-            # and the reflected rays are going in the forward direction.
-            # so return reflected (forward) first.
-            return reflectedR, refractedR
+            m1 = self.inMedium
+            m2 = self.outMedium
+            coating = self.reverseCoating
+
+        return self.surface.rSplit(r, m1, m2, coating, coordSys=self.coordSys)
 
 
 class Mirror(Interface):
@@ -587,22 +601,12 @@ class Mirror(Interface):
         )
 
     def interact(self, r, reverse=False):
-        # reflect independent of reverse
+        # reflect is independent of reverse
         return self.surface.reflect(r, coordSys=self.coordSys)
 
     def rSplit(self, r, reverse=False):
-        if not reverse:
-            reflectedR, refractedR = self.surface.rSplit(
-                r, self.inMedium, self.outMedium, self.forwardCoating,
-                coordSys=self.coordSys
-            )
-            return reflectedR, refractedR
-        else:
-            reflectedR, refractedR = self.surface.rSplit(
-                r, self.outMedium, self.inMedium, self.reverseCoating,
-                coordSys=self.coordSys
-            )
-            return refractedR, reflectedR
+        # reflect is independent of reverse
+        return None, self.surface.reflect(r, coordSys=self.coordSys)
 
 
 class Detector(Interface):
@@ -620,18 +624,11 @@ class Detector(Interface):
         self.reverseCoating = None
 
     def rSplit(self, r, reverse=False):
-        if not reverse:
-            reflectedR, refractedR = self.surface.rSplit(
-                r, self.inMedium, self.outMedium, self.forwardCoating,
-                coordSys=self.coordSys
-            )
-            return refractedR, reflectedR
-        else:
-            reflectedR, refractedR = self.surface.rSplit(
-                r, self.outMedium, self.inMedium, self.reverseCoating,
-                coordSys=self.coordSys
-            )
-            return reflectedR, refractedR
+        assert reverse == False
+        return self.surface.rSplit(
+            r, self.inMedium, self.outMedium, self.forwardCoating,
+            coordSys=self.coordSys
+        )
 
 
 class Baffle(Interface):
@@ -650,19 +647,7 @@ class Baffle(Interface):
         )
 
     def rSplit(self, r, reverse=False):
-        if not reverse:
-            reflectedR, refractedR = self.surface.rSplit(
-                r, self.inMedium, self.outMedium, self.forwardCoating,
-                coordSys=self.coordSys
-            )
-            return refractedR, reflectedR
-        else:
-            reflectedR, refractedR = self.surface.rSplit(
-                r, self.outMedium, self.inMedium, self.reverseCoating,
-                coordSys=self.coordSys
-            )
-            return reflectedR, refractedR
-
+        return self.surface.intersect(r, self.coordSys), None
 
 class CompoundOptic(Optic):
     """An `Optic` containing two or more `Optic` s as subitems.
@@ -729,7 +714,7 @@ class CompoundOptic(Optic):
     def _names(self):
         nameDict = {}
         duplicates = set()
-        for k, v in self.itemDict.items():
+        for k in self.itemDict.keys():
             tokens = k.split('.')
             shortNames = [tokens[-1]]
             for token in reversed(tokens[:-1]):
@@ -793,33 +778,29 @@ class CompoundOptic(Optic):
                     nominalOrder[name] = i
                     i += 1
             direction = "forward"
-            for i in range(len(path)-1):
+            for i in range(len(path)):
+            # for i in range(len(path)-1):
                 currentName = path[i]
-                nextName = path[i+1]
                 item = self[currentName]
                 # logic to decide when to reverse direction
-                if direction == "forward":
+                if i == len(path)-1:
+                    if nominalOrder[path[i]] == 0:
+                        nextDirection = "reverse"
+                    else:
+                        nextDirection = direction
+                else:
+                    nextName = path[i+1]
                     if nominalOrder[nextName] < nominalOrder[currentName]:
-                        direction = "reverse"
-                        item.surface.reflect(r, coordSys=item.coordSys)
-                        if item.obscuration is not None:
-                            item.obscuration.obscure(r)
+                        nextDirection = "reverse"
                     else:
-                        item.trace(r)
-                else:  # direction == "reverse"
-                    if nominalOrder[nextName] > nominalOrder[currentName]:
-                        direction = "forward"
-                        item.surface.reflect(r, coordSys=item.coordSys)
-                        if item.obscuration is not None:
-                            item.obscuration.obscure(r)
-                    else:
-                        item.trace(r, reverse=True)
-            # last item in path.
-            currentName = path[-1]
-            item = self[currentName]
-            item.interact(r, reverse=direction=="reverse")
-            if item.obscuration is not None:
-                item.obscuration.obscure(r)
+                        nextDirection = "forward"
+                if direction == nextDirection:
+                    item.trace(r, reverse=(direction=="reverse"))
+                else:
+                    direction = nextDirection
+                    item.surface.reflect(r, coordSys=item.coordSys)
+                    if item.obscuration:
+                        item.obscuration.obscure(r)
         return r
 
     def traceFull(self, r, path=None):
@@ -876,64 +857,44 @@ class CompoundOptic(Optic):
             direction = "forward"
             r_in = r
             # Do the actual tracing here.
-            for i in range(len(path)-1):
+            for i in range(len(path)):
                 currentName = path[i]
-                nextName = path[i+1]
                 item = self[currentName]
-                # need logic to decide when to reverse direction
-                if direction == "forward":
+                # logic to decide when to reverse direction
+                if i == len(path)-1:
+                    if nominalOrder[path[i]] == 0:
+                        nextDirection = "reverse"
+                    else:
+                        nextDirection = direction
+                else:
+                    nextName = path[i+1]
                     if nominalOrder[nextName] < nominalOrder[currentName]:
-                        # reversing direction always means reflecting at a
-                        # refractive interface.  Just do that manually here.
-                        direction = "reverse"
-                        r_out = item.surface.reflect(
-                            r_in.copy(), coordSys=item.coordSys
-                        )
-                        if item.obscuration is not None:
-                            item.obscuration.obscure(r_out)
+                        nextDirection = "reverse"
                     else:
-                        r_out = item.trace(r_in.copy())
-                else: # direct == "reverse"
-                    if nominalOrder[nextName] > nominalOrder[currentName]:
-                        direction = "forward"
-                        r_out = item.surface.reflect(
-                            r_in.copy(), coordSys=item.coordSys
-                        )
-                        if item.obscuration is not None:
-                            item.obscuration.obscure(r_out)
-                    else:
-                        r_out = item.trace(r_in.copy(), reverse=True)
+                        nextDirection = "forward"
+                # trace
+                if direction == nextDirection:
+                    r_out = item.trace(r_in.copy(), reverse=(direction=="reverse"))
+                else:
+                    direction = nextDirection
+                    r_out = item.surface.reflect(
+                        r_in.copy(), coordSys=item.coordSys
+                    )
+                    if item.obscuration:
+                        item.obscuration.obscure(r_out)
+                # determine output key
                 key = item.name+'_0'
                 j = 1
                 while key in result:
                     key = item.name+'_{}'.format(j)
                     j += 1
+                # output
                 result[key] = {
                     'name':item.name,
                     'in':r_in.copy(),
                     'out':r_out.copy()
                 }
                 r_in = r_out
-            # last item in path.
-            currentName = path[-1]
-            item = self[currentName]
-            r_out = item.interact(
-                r_in.copy(),
-                reverse=direction=="reverse"
-            )
-            if item.obscuration is not None:
-                item.obscuration.obscure(r_out)
-            key = item.name+'_0'
-            j = 1
-            while key in result:
-                key = item.name+'_{}'.format(j)
-                j += 1
-            result[key] = {
-                'name':item.name,
-                'in':r_in.copy(),
-                'out':r_out.copy()
-            }
-
         return result
 
     def traceSplit(self, r, minFlux=1e-3, reverse=False, _verbose=False):
@@ -980,11 +941,14 @@ class CompoundOptic(Optic):
         """
         if _verbose:
             s = "reverse" if reverse else "forward"
-            strtemplate = ("traceSplit {}       {:15s} "
+            strtemplate = ("traceSplit {}       {:30s} "
                            "flux = {:18.8f}   nphot = {:10d}")
             print(strtemplate.format(s, self.name, np.sum(r.flux), len(r)))
         if self.skip:
-            return r, None
+            if reverse:
+                return None, r
+            else:
+                return r, None
 
         if not reverse:
             workQueue = [(r, "forward", 0)]
@@ -995,37 +959,41 @@ class CompoundOptic(Optic):
         outRReverse = []
 
         while workQueue:
-            rays, direction, itemIndex = workQueue.pop()
-            item = self.items[itemIndex]
-            if direction == "forward":
-                rForward, rReverse = item.traceSplit(
-                    rays, minFlux=minFlux, _verbose=_verbose
-                )
-            elif direction == "reverse":
-                rForward, rReverse = item.traceSplit(
-                    rays, minFlux=minFlux, reverse=True, _verbose=_verbose
-                )
-            else:
-                raise RuntimeError("Shouldn't get here!")
+            rays, direction, opticIndex = workQueue.pop()
+            optic = self.items[opticIndex]
+            rForward, rReverse = optic.traceSplit(
+                rays, minFlux=minFlux, reverse=(direction=="reverse"),
+                _verbose=_verbose
+            )
+            #  Clear away any None's returned
+            rForward = [i for i in rForward if i]
+            rReverse = [i for i in rReverse if i]
 
-            for rr in rForward:
-                rr.trimVignetted(minFlux)
-            for rr in rReverse:
-                rr.trimVignetted(minFlux)
+            # Remove vignetted rays and rays with flux below threshold
+            for rList in [rForward, rReverse]:
+                for i, rr in enumerate(rList):
+                    w = ~rr.vignetted & (rr.flux >= minFlux)
+                    rList[i] = RayVector(
+                        rr.x[w], rr.y[w], rr.z[w],
+                        rr.vx[w], rr.vy[w], rr.vz[w],
+                        rr.t[w], rr.wavelength[w], rr.flux[w],
+                        rr.vignetted[w], rr.failed[w],
+                        rr.coordSys
+                    )
+                    rList[i].path = rr.path
 
             for rr in rForward:
                 if len(rr) > 0:
-                    if itemIndex == len(self.items)-1:
+                    if opticIndex == len(self.items)-1:
                         outRForward.append(rr)
                     else:
-                        workQueue.append((rr, "forward", itemIndex+1))
+                        workQueue.append((rr, "forward", opticIndex+1))
             for rr in rReverse:
                 if len(rr) > 0:
-                    if itemIndex == 0:
+                    if opticIndex == 0:
                         outRReverse.append(rr)
                     else:
-                        workQueue.append((rr, "reverse", itemIndex-1))
-
+                        workQueue.append((rr, "reverse", opticIndex-1))
         return outRForward, outRReverse
 
     def draw3d(self, ax, **kwargs):
