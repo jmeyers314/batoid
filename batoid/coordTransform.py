@@ -85,7 +85,7 @@ class CoordTransform:
         Unlike applyForward, this method does not transform in-place, but
         returns a newly created ndarray.
         """
-        r = np.array([x, y, z]).T
+        r = np.array([x, y, z], dtype=float).T
         r -= self.dr
         return self.drot.T@r.T
 
@@ -107,7 +107,7 @@ class CoordTransform:
         Unlike applyReverse, this method does not transform in-place, but
         returns a newly created ndarray.
         """
-        r = np.array([x, y, z])
+        r = np.array([x, y, z], dtype=float)
         r = (self.drot@r).T
         r += self.dr
         return r.T

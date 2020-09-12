@@ -82,7 +82,6 @@ class TableMedium(Medium):
         and the second with the corresponding refractive indices.
         """
         import os
-        import yaml
         import numpy as np
         from .table import Table
         try:

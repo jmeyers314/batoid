@@ -1,6 +1,5 @@
 from matplotlib.figure import Figure
 from matplotlib.gridspec import GridSpec
-from matplotlib.pyplot import subplots
 
 
 def zernikePyramid(xs, ys, zs, figsize=(13, 8), vmin=-1, vmax=1, vdim=True,

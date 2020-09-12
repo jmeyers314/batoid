@@ -1,6 +1,6 @@
 from ._version import __version__, __version_info__
 
-from .rayVector import RayVector
+from .rayVector import RayVector, concatenateRayVectors
 
 from .coordSys import CoordSys, RotX, RotY, RotZ
 from .coordTransform import CoordTransform
@@ -35,12 +35,11 @@ from .lattice import Lattice
 import os
 datadir = os.path.join(os.path.dirname(__file__), "data")
 
-# from .psf import huygensPSF, wavefront, fftPSF, zernike, fpPosition
-
 from . import parse
 from . import utils
 from .constants import globalCoordSys, vacuum
 
-# from . import analysis
-from .analysis import huygensPSF, wavefront, zernike, zernikeGQ
-# from . import plotUtils
+from .analysis import (
+    huygensPSF, fftPSF, wavefront, zernike, zernikeGQ, drdth, dthdr, spot
+)
+from . import plotUtils

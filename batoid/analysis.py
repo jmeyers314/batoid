@@ -70,6 +70,121 @@ def dkdu(
     return soln[1:]
 
 
+def drdth(
+    optic, theta_x, theta_y, wavelength, nrad=50, naz=300, projection='postel'
+):
+    """Calculate derivative of focal plane coord with respect to field angle.
+
+    Parameters
+    ----------
+    optic : batoid.Optic
+        Optical system
+    theta_x, theta_y : float
+        Field angle in radians
+    wavelength : float
+        Wavelength in meters
+    nrad : int, optional
+        Number of ray radii to use.  (see RayVector.asPolar())
+    naz : int, optional
+        Approximate number of azimuthal angles in outermost ring.  (see
+        RayVector.asPolar())
+    projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}
+        Projection used to convert field angle to direction cosines.
+
+    Returns
+    -------
+    drdth : (2, 2), ndarray
+        Jacobian transformation matrix for converting between (theta_x, theta_y)
+        and (x, y) on the focal plane.
+
+    Notes
+    -----
+        This is the Jacobian of pixels -> tangent plane, (and importantly, not
+        pixels -> ra/dec).  It should be *close* to the inverse plate scale
+        though, especially near the center of the tangent plane projection.
+    """
+    # We just use a finite difference approach here.
+    dth = 1e-5
+
+    # Make direction cosine vectors
+    nominalCos = fieldToDirCos(theta_x, theta_y, projection=projection)
+    dthxCos = fieldToDirCos(theta_x + dth, theta_y, projection=projection)
+    dthyCos = fieldToDirCos(theta_x, theta_y + dth, projection=projection)
+
+    rays = batoid.RayVector.asPolar(
+        optic=optic, wavelength=wavelength,
+        dirCos=nominalCos,
+        nrad=nrad, naz=naz
+    )
+    rays_x = batoid.RayVector.asPolar(
+        optic=optic, wavelength=wavelength,
+        dirCos=dthxCos,
+        nrad=nrad, naz=naz
+    )
+    rays_y = batoid.RayVector.asPolar(
+        optic=optic, wavelength=wavelength,
+        dirCos=dthyCos,
+        nrad=nrad, naz=naz
+    )
+
+    optic.trace(rays)
+    optic.trace(rays_x)
+    optic.trace(rays_y)
+
+    mx = np.mean(rays.x[~rays.vignetted])
+    my = np.mean(rays.y[~rays.vignetted])
+
+    # meters / radian
+    drx_dthx = (np.mean(rays_x.x[~rays_x.vignetted]) - mx)/dth
+    drx_dthy = (np.mean(rays_y.x[~rays_y.vignetted]) - mx)/dth
+    dry_dthx = (np.mean(rays_x.y[~rays_x.vignetted]) - my)/dth
+    dry_dthy = (np.mean(rays_y.y[~rays_y.vignetted]) - my)/dth
+
+    return np.array([[drx_dthx, drx_dthy], [dry_dthx, dry_dthy]])
+
+
+def dthdr(
+    optic, theta_x, theta_y, wavelength, nrad=50, naz=300, projection='postel'
+):
+    """Calculate derivative of field angle with respect to focal plane
+    coordinate.
+
+    Parameters
+    ----------
+    optic : batoid.Optic
+        Optical system
+    theta_x, theta_y : float
+        Field angle in radians
+    wavelength : float
+        Wavelength in meters
+    nrad : int, optional
+        Number of ray radii to use.  (see RayVector.asPolar())
+    naz : int, optional
+        Approximate number of azimuthal angles in outermost ring.  (see
+        RayVector.asPolar())
+    projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}
+        Projection used to convert field angle to direction cosines.
+
+    Returns
+    -------
+    dthdr : (2, 2), ndarray
+        Jacobian transformation matrix for converting between (x, y) on the
+        focal plane and field angle (theta_x, theta_y).
+
+    Notes
+    -----
+        This is the Jacobian of tangent plane -> pixels, (and importantly, not
+        ra/dec -> pixels). It should be *close* to the plate scale though,
+        especially near the center of the tangent plane projection.
+    """
+    return np.linalg.inv(
+        drdth(
+            optic, theta_x, theta_y, wavelength,
+            nrad=nrad, naz=naz, projection=projection
+        )
+    )
+
+
 def huygensPSF(
     optic, theta_x, theta_y, wavelength,
     projection='postel', nx=None, dx=None, dy=None,

@@ -1080,3 +1080,28 @@ class RayVector:
         (self._r, self._v, self._t,
          self._wavelength, self._flux, self._vignetted,
          self._failed, self.coordSys) = args
+
+    def __getitem__(self, key):
+        return RayVector(
+            self.x[key], self.y[key], self.z[key],
+            self.vx[key], self.vy[key], self.vz[key],
+            self.t[key], self.wavelength[key], self.flux[key],
+            self.vignetted[key], self.failed[key],
+            self.coordSys
+        )
+
+def concatenateRayVectors(rvs):
+    return RayVector(
+        np.hstack([rv.x for rv in rvs]),
+        np.hstack([rv.y for rv in rvs]),
+        np.hstack([rv.z for rv in rvs]),
+        np.hstack([rv.vx for rv in rvs]),
+        np.hstack([rv.vy for rv in rvs]),
+        np.hstack([rv.vz for rv in rvs]),
+        np.hstack([rv.t for rv in rvs]),
+        np.hstack([rv.wavelength for rv in rvs]),
+        np.hstack([rv.flux for rv in rvs]),
+        np.hstack([rv.vignetted for rv in rvs]),
+        np.hstack([rv.failed for rv in rvs]),
+        rvs[0].coordSys
+    )
