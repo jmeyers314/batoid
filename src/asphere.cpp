@@ -5,13 +5,6 @@ namespace batoid {
 
     #pragma omp declare target
 
-    double* Asphere::_copyCoefs(const double* coefs, const size_t size) {
-        double* out = new double[size];
-        for(int i=0; i<size; i++)
-            out[i] = coefs[i];
-        return out;
-    }
-
     double* Asphere::_computeDzDrCoefs(const double* coefs, const size_t size) {
         double* result = new double[size];
         for(int i=4, j=0; j<size; j++, i += 2) {
@@ -20,16 +13,25 @@ namespace batoid {
         return result;
     }
 
-    Asphere::Asphere(double R, double conic, const double* coefptr, size_t size) :
+    Asphere::Asphere(double R, double conic, const double* coefs, size_t size) :
         Quadric(R, conic),
-        _coefs(_copyCoefs(coefptr, size)),
-        _dzdrcoefs(_computeDzDrCoefs(coefptr, size)),
+        _coefs(coefs),
+        _dzdrcoefs(_computeDzDrCoefs(coefs, size)),
         _size(size)
     {}
 
     Asphere::~Asphere()
     {
-        delete[] _coefs;
+        if (_devPtr) {
+            Surface* ptr = _devPtr;
+            #pragma omp target is_device_ptr(ptr)
+            {
+                delete ptr;
+            }
+            const size_t size = _size;
+            const double* coefs = _coefs;
+            #pragma omp target exit data map(release:coefs[:size])
+        }
         delete[] _dzdrcoefs;
     }
 
@@ -85,23 +87,15 @@ namespace batoid {
 
     #pragma omp end declare target
 
-    void Asphere::getCoefs(double* out) const {
-        for(int i=0; i<_size; i++)
-            out[i] = _coefs[i];
-    }
-
-    int Asphere::getSize() const {
-        return _size;
-    }
-
     Surface* Asphere::getDevPtr() const {
         if (!_devPtr) {
             Surface* ptr;
-            double R = _R;
-            double conic = _conic;
-            #pragma omp target map(from:ptr) map(to:_coefs[:_size])
+            // Allocate coef array on device
+            const double* coefs = _coefs;
+            #pragma omp target enter data map(to:coefs[:_size])
+            #pragma omp target map(from:ptr)
             {
-                ptr = new Asphere(R, conic, _coefs, _size);
+                ptr = new Asphere(_R, _conic, coefs, _size);
             }
             _devPtr = ptr;
         }

@@ -24,15 +24,12 @@ namespace batoid {
             double& dt
         ) const override;
 
-        void getCoefs(double* out) const;
-        int getSize() const;
     private:
         const double* _coefs;
         const double* _dzdrcoefs;
         const size_t _size;
 
         double _dzdr(double r) const;
-        static double* _copyCoefs(const double* coefs, const size_t size);
         static double* _computeDzDrCoefs(const double* coefs, const size_t size);
     };
 

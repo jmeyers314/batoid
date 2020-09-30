@@ -40,9 +40,6 @@ set(SRC_FILES
   src/sphere.cpp
   src/sum.cpp
   src/surface.cpp
-  # src/table.cpp
-  # src/utils.cpp
-  # src/vecmath.cpp
 )
 
 set(PYSRC_FILES
@@ -60,14 +57,7 @@ set(PYSRC_FILES
   pysrc/sphere.cpp
   pysrc/sum.cpp
   pysrc/surface.cpp
-  # pysrc/table.cpp
 )
-
-# set_source_files_properties(
-#   src/bicubic.cpp
-#   PROPERTIES
-#   COMPILE_FLAGS -O0
-# )
 
 include(CheckCXXCompilerFlag)
 macro(ADD_CXX_FLAG_IF_AVAIL  TARG  FLAG  FLAG_NAME)
