@@ -150,12 +150,27 @@ def test_intersect():
         x = rng.uniform(-lim, lim, size=size)
         y = rng.uniform(-lim, lim, size=size)
         z = np.full_like(x, -10.0)
-        # If we shoot rays straight up, then it's easy to predict the intersection
+        # If we shoot rays straight up, then it's easy to predict the
+        # intersection
         vx = np.zeros_like(x)
         vy = np.zeros_like(x)
         vz = np.ones_like(x)
         rv = batoid.RayVector(x, y, z, vx, vy, vz)
         np.testing.assert_allclose(rv.z, -10.0)
+        rv2 = batoid.intersect(asphere, rv.copy(), asphereCoordSys)
+        assert rv2.coordSys == asphereCoordSys
+
+        rv2 = rv2.toCoordSys(batoid.CoordSys())
+        np.testing.assert_allclose(rv2.x, x)
+        np.testing.assert_allclose(rv2.y, y)
+        np.testing.assert_allclose(
+            rv2.z, asphere.sag(x, y)-1,
+            rtol=0, atol=1e-12
+        )
+
+        # Straight down works too.
+        rv2 = rv.copy()
+        rv2.vz[:] *= -1
         rv2 = batoid.intersect(asphere, rv.copy(), asphereCoordSys)
         assert rv2.coordSys == asphereCoordSys
 
@@ -296,13 +311,12 @@ def test_ne():
 
 @timer
 def test_fail():
-    asphere = batoid.Asphere(1.0, 1.0, [1.0, 1.0])
-    # This one should fail, since already passed the quadric.
-    rv = batoid.RayVector(0, 0, -1, 0, 0, -1)
+    asphere = batoid.Asphere(1.0, 0.0, [])
+    rv = batoid.RayVector(0, 10, 0, 0, 0, -1)  # Too far to the side
     rv2 = batoid.intersect(asphere, rv.copy())
     np.testing.assert_equal(rv2.failed, np.array([True]))
     # This one passes
-    rv = batoid.RayVector(0, 0, -1, 0, 0, +1)
+    rv = batoid.RayVector(0, 0, -1, 0, 0, 1)
     rv2 = batoid.intersect(asphere, rv.copy())
     np.testing.assert_equal(rv2.failed, np.array([False]))
 

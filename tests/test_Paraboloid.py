@@ -214,12 +214,11 @@ def test_ne():
 @timer
 def test_fail():
     para = batoid.Paraboloid(1.0)
-    # This one should fail, since already passed the paraboloid.
-    rv = batoid.RayVector(0, 0, -1, 0, 0, -1)
+    rv = batoid.RayVector(0, 0, -10, 0, 0.99, np.sqrt(1-0.99**2))  # Too shallow
     rv2 = batoid.intersect(para, rv.copy())
     np.testing.assert_equal(rv2.failed, np.array([True]))
     # This one passes
-    rv = batoid.RayVector(0, 0, -1, 0, 0, +1)
+    rv = batoid.RayVector(0, 0, -1, 0, 0, -1)
     rv2 = batoid.intersect(para, rv.copy())
     np.testing.assert_equal(rv2.failed, np.array([False]))
 

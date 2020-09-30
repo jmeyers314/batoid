@@ -292,13 +292,12 @@ def test_ne():
 
 @timer
 def test_fail():
-    zernike = batoid.Zernike([0,0,0,0,1])
-    # This one should fail, since already passed the quadric.
-    rv = batoid.RayVector(0, 0, -2, 0, 0, -1)
+    zernike = batoid.Zernike([0,0,0,0,1])  # basically a paraboloid
+    rv = batoid.RayVector(0, 0, -10, 0, 0.99, np.sqrt(1-0.99**2))  # Too shallow
     rv2 = batoid.intersect(zernike, rv.copy())
     np.testing.assert_equal(rv2.failed, np.array([True]))
     # This one passes
-    rv = batoid.RayVector(0, 0, -2, 0, 0, +1)
+    rv = batoid.RayVector(0, 0, -1, 0, 0, -1)
     rv2 = batoid.intersect(zernike, rv.copy())
     np.testing.assert_equal(rv2.failed, np.array([False]))
 

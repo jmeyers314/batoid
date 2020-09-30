@@ -88,7 +88,10 @@ namespace batoid {
         return oneDSpline(yfrac, val0, val1, der0*_dy, der1*_dy);
     }
 
-    void Bicubic::normal(double x, double y, double& nx, double& ny, double& nz) const {
+    void Bicubic::normal(
+        double x, double y,
+        double& nx, double& ny, double& nz
+    ) const {
         int ix = int(std::floor((x-_x0)/_dx));
         int iy = int(std::floor((y-_y0)/_dy));
         if ((ix >= _nx) or (ix < 0) or (iy >= _ny) or (iy < 0)) {

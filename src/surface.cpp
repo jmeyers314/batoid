@@ -33,7 +33,7 @@ namespace batoid {
             rPz = z+vz*dt;
             sz = sag(rPx, rPy);
         }
-        return ((std::abs(sz-rPz) < 1e-12) && (dt > 0));
+        return (std::abs(sz-rPz) < 1e-12);
     }
 
     #pragma omp end declare target

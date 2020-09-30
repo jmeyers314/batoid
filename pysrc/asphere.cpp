@@ -21,12 +21,6 @@ namespace batoid {
                         size
                     );
                 }
-            ))
-            .def("coefs",
-                [](const Asphere& asphere, size_t coefptr) {
-                    asphere.getCoefs(reinterpret_cast<double*>(coefptr));
-                }
-            )
-            .def_property_readonly("size", &Asphere::getSize);
+            ));
     }
 }

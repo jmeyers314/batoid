@@ -63,7 +63,6 @@ def test_HSC_trace():
             i += 1
 
 
-@pytest.mark.slow
 @timer
 def test_HSC_huygensPSF():
     fn = os.path.join(directory, "testdata", "HSC_huygensPSF.txt")
@@ -228,7 +227,9 @@ def test_LSST_wf(plot=False):
         wavelength = 500e-9
         nx = 32
 
-        bwf = batoid.analysis.wavefront(
+        # import ipdb; ipdb.set_trace()
+
+        bwf = batoid.wavefront(
             telescope, thx, thy, wavelength, nx=nx,
             reference='chief', projection='zemax'
         )
@@ -278,7 +279,7 @@ def test_LSST_fftPSF(plot=False):
         wavelength = 500e-9
         nx = 32
 
-        bpsf = batoid.analysis.fftPSF(
+        bpsf = batoid.fftPSF(
             telescope, thx, thy, wavelength, nx=nx,
             reference='chief', projection='zemax'
         )
@@ -345,7 +346,7 @@ def test_LSST_huygensPSF(plot=False):
         thy = np.deg2rad(thy)
         wavelength = 500e-9
 
-        bpsf = batoid.analysis.huygensPSF(
+        bpsf = batoid.huygensPSF(
             telescope, thx, thy, wavelength, nx=128,
             # telescope, thx, thy, wavelength, nx=1024,
             reference='chief', projection='zemax',

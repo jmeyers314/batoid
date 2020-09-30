@@ -18,7 +18,10 @@ namespace batoid {
         return 0.0;
     }
 
-    void Paraboloid::normal(double x, double y, double& nx, double& ny, double& nz) const {
+    void Paraboloid::normal(
+        double x, double y,
+        double& nx, double& ny, double& nz
+    ) const {
         if (_R == 0) {
             nx = 0.0;
             ny = 0.0;
@@ -40,16 +43,16 @@ namespace batoid {
         double c = (x*x + y*y)*_2Rinv - z;
         double dt1;
 
-        if (a == 0) {  // TODO: determine better tolerance for zero float here
-            dt1 = -c/b;
-            if (dt1 > 0) {
-                dt = dt1;
-                return true;
-            }
-            return false;
+        if (a == 0) {
+            // Ray is heading straight at optic axis.
+            dt = -c/b;
+            return true;
         }
 
         double discriminant = b*b - 4*a*c;
+
+        if (discriminant < 0)
+            return false;
 
         if (b > 0) {
             dt1 = (-b - sqrt(discriminant)) / (2*a);
@@ -58,15 +61,11 @@ namespace batoid {
         }
         double dt2 = c / (a*dt1);
 
-        if (dt1 > 0) {
-            dt = dt1;
-            return true;
-        }
-        if (dt2 > 0) {
-            dt = dt2;
-            return true;
-        }
-        return false;
+        // If vz down and paraboloid concave up, then pick greatest time;
+        // I.e., intersection closest to the origin.
+        // All other cases follow from symmetry
+        dt = (vz*_R < 0) ? std::max(dt1, dt2) : std::min(dt1, dt2);
+        return true;
     }
 
     #pragma omp end declare target

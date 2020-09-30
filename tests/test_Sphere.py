@@ -213,12 +213,11 @@ def test_ne():
 @timer
 def test_fail():
     sphere = batoid.Sphere(1.0)
-    # This one should fail, since already passed the sphere.
-    rv = batoid.RayVector(0, 0, -1, 0, 0, -1)
+    rv = batoid.RayVector(0, 10, 0, 0, 0, -1)  # Too far to side
     rv2 = batoid.intersect(sphere, rv.copy())
     np.testing.assert_equal(rv2.failed, np.array([True]))
     # This one passes
-    rv = batoid.RayVector(0, 0, -1, 0, 0, +1)
+    rv = batoid.RayVector(0, 0, 0, 0, 0, -1)
     rv2 = batoid.intersect(sphere, rv.copy())
     np.testing.assert_equal(rv2.failed, np.array([False]))
 

@@ -14,8 +14,15 @@ namespace batoid {
         virtual Surface* getDevPtr() const override;
 
         virtual double sag(double, double) const override;
-        virtual void normal(double x, double y, double& nx, double& ny, double& nz) const override;
-        virtual bool timeToIntersect(double x, double y, double z, double vx, double vy, double vz, double& dt) const override;
+        virtual void normal(
+            double x, double y,
+            double& nx, double& ny, double& nz
+        ) const override;
+        virtual bool timeToIntersect(
+            double x, double y, double z,
+            double vx, double vy, double vz,
+            double& dt
+        ) const override;
 
         void getCoefs(double* out) const;
         int getSize() const;

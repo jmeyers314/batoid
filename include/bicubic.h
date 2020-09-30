@@ -17,7 +17,10 @@ namespace batoid {
         virtual Surface* getDevPtr() const override;
 
         virtual double sag(double, double) const override;
-        virtual void normal(double x, double y, double& nx, double& ny, double& nz) const override;
+        virtual void normal(
+            double x, double y,
+            double& nx, double& ny, double& nz
+        ) const override;
 
     private:
         const double _x0, _y0;

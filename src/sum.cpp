@@ -23,7 +23,10 @@ namespace batoid {
         return result;
     }
 
-    void Sum::normal(double x, double y, double& nx, double& ny, double& nz) const {
+    void Sum::normal(
+        double x, double y,
+        double& nx, double& ny, double& nz
+    ) const {
         nx = 0.0;
         ny = 0.0;
         for (int i=0; i<_nsurf; i++) {
@@ -37,12 +40,15 @@ namespace batoid {
         ny *= nz;
     }
 
-    bool Sum::timeToIntersect(double x, double y, double z, double vx, double vy, double vz, double& dt) const {
+    bool Sum::timeToIntersect(
+        double x, double y, double z,
+        double vx, double vy, double vz,
+        double& dt
+    ) const {
         // Use first surface as an initial guess
         if (!_surfaces[0]->timeToIntersect(x, y, z, vx, vy, vz, dt))
             return false;
-        bool success = Surface::timeToIntersect(x, y, z, vx, vy, vz, dt);
-        return (success && dt >= 0.0);
+        return Surface::timeToIntersect(x, y, z, vx, vy, vz, dt);
     }
 
     #pragma omp end declare target

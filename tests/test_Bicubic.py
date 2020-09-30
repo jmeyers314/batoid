@@ -418,12 +418,11 @@ def test_fail():
     zs = f(*np.meshgrid(xs, ys))
     bc = batoid.Bicubic(xs, ys, zs)
 
-    # This one should fail, since already passed the bicubic.
-    rv = batoid.RayVector(0, 0, -10, 0, 0, -1)
+    rv = batoid.RayVector(0, 10, 0, 0, 0, -1)  # Too far to side
     rv2 = batoid.intersect(bc, rv.copy())
     np.testing.assert_equal(rv2.failed, np.array([True]))
     # This one passes
-    rv = batoid.RayVector(0, 0, -10, 0, 0, +1)
+    rv = batoid.RayVector(0, 0, 0, 0, 0, -1)
     rv2 = batoid.intersect(bc, rv.copy())
     np.testing.assert_equal(rv2.failed, np.array([False]))
 

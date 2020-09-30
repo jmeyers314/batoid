@@ -54,7 +54,8 @@ def test_traceReverse():
     telescope = batoid.Optic.fromYaml("HSC.yaml")
 
     init_rays = batoid.RayVector.asGrid(
-        backDist=20, lx=12, nx=128,
+        # backDist=20, lx=8.3, nx=128,
+        backDist=25, lx=8.3, nx=6,
         theta_x=0.005, theta_y=0.005,
         wavelength=500e-9,
         medium = batoid.ConstMedium(1.0)
@@ -63,18 +64,50 @@ def test_traceReverse():
 
     # Now, turn the result rays around and trace backwards
     forward_rays.propagate(40.0)
-    reverse_rays = batoid.RayVector(
-        forward_rays.x,
-        forward_rays.y,
-        forward_rays.z,
-        -forward_rays.vx,
-        -forward_rays.vy,
-        -forward_rays.vz,
-        -forward_rays.t.copy(),
-        forward_rays.wavelength.copy(),
-    )
+    reverse_rays = forward_rays.copy()
+    reverse_rays.v[:] *= -1
+    reverse_rays.t[:] *= -1
+    # reverse_rays = batoid.RayVector(
+    #     forward_rays.x,
+    #     forward_rays.y,
+    #     forward_rays.z,
+    #     -forward_rays.vx,
+    #     -forward_rays.vy,
+    #     -forward_rays.vz,
+    #     -forward_rays.t.copy(),
+    #     forward_rays.wavelength.copy(),
+    # )
 
     final_rays = telescope.trace(reverse_rays.copy(), reverse=True)
+    # tff = telescope.traceFull(init_rays.copy())
+    # tfr = telescope.traceFull(reverse_rays.copy(), reverse=True)
+
+    # import matplotlib.pyplot as plt
+    # for k, v in tff.items():
+    #     fig, ax = plt.subplots(nrows=1, ncols=1)
+    #     w = ~v['out'].vignetted
+    #     ax.scatter(v['out'].x[w], v['out'].y[w])
+    #     ax.set_title(k)
+    #     plt.show()
+
+    # w = ~tff['D']['out'].vignetted
+    # print(tff['D']['out'].vignetted)
+    # for k in tfr.keys():
+    #     print(k, tfr[k]['in'].x[w])
+    #     print(k, tfr[k]['out'].x[w])
+    #     print()
+    #     print(k, tff[k]['out'].x[w])
+    #     print()
+    #     print()
+    #     print()
+
+    # print(tfr['PM']['in'])
+    # print()
+    # print()
+    # print(tfr['PM']['out'])
+
+    # import ipdb; ipdb.set_trace()
+
     # propagate all the way to t=0
     final_rays.propagate(0.0)
     final_rays.toCoordSys(batoid.globalCoordSys)

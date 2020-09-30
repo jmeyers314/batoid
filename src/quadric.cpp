@@ -50,6 +50,9 @@ namespace batoid {
 
         double discriminant = b*b - 4*a*c;
 
+        if (discriminant < 0)
+            return false;
+
         double dt1;
         if (b > 0) {
             dt1 = (-b - sqrt(discriminant)) / (2*a);
@@ -58,21 +61,11 @@ namespace batoid {
         }
         double dt2 = c / (a*dt1);
 
-        if (dt1 > 0) {
-            if (dt2 > 0) {
-                // Both are possible.  Need to pick the solution that gives z closest to 0.0
-                // Can pick based off signs of R, vz, 1+_conic.
-                dt = (vz*_Rcp1>0) ? std::min(dt1, dt2) : std::max(dt1, dt2);
-                return true;
-            }
-            dt = dt1;
-            return true;
-        }
-        if (dt2 > 0) {
-            dt = dt2;
-            return true;
-        }
-        return false;
+        // New strategy, just always pick smaller abs(z).
+        double z1 = z + vz*dt1;
+        double z2 = z + vz*dt2;
+        dt = (abs(z1) < abs(z2)) ? dt1 : dt2;
+        return true;
     }
 
     double Quadric::_dzdr(double r) const {

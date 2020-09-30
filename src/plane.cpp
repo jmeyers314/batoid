@@ -4,9 +4,7 @@ namespace batoid {
 
     #pragma omp declare target
 
-    Plane::Plane(bool allowReverse) :
-        _allowReverse(allowReverse)
-    {}
+    Plane::Plane() {}
 
     Plane::~Plane() {}
 
@@ -23,8 +21,10 @@ namespace batoid {
     bool Plane::timeToIntersect(
         double x, double y, double z, double vx, double vy, double vz, double& dt
     ) const {
+        if (vz == 0)
+            return false;
         dt = -z/vz;
-        return (_allowReverse || dt >= 0.0);
+        return true;
     }
 
     #pragma omp end declare target
@@ -35,7 +35,7 @@ namespace batoid {
             Surface* ptr;
             #pragma omp target map(from:ptr)
             {
-                ptr = new Plane(_allowReverse);
+                ptr = new Plane();
             }
             _devPtr = ptr;
         }

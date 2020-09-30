@@ -48,6 +48,9 @@ namespace batoid {
 
         double discriminant = b*b - 4*a*c;
 
+        if (discriminant < 0)
+            return false;
+
         double dt1;
         if (b > 0) {
             dt1 = (-b - sqrt(discriminant)) / (2*a);
@@ -56,21 +59,9 @@ namespace batoid {
         }
         double dt2 = c / (a*dt1);
 
-        if (dt1 > 0) {
-            if (dt2 > 0) {
-                // Both are possible.  Need to pick the solution that gives z closest to 0.0
-                // Can pick based off signs of R and vz.
-                dt = (vz*_R>0) ? std::min(dt1, dt2) : std::max(dt1, dt2);
-                return true;
-            }
-            dt = dt1;
-            return true;
-        }
-        if (dt2 > 0) {
-            dt = dt2;
-            return true;
-        }
-        return false;
+        // If vz < 0, R > 0, want greatest time.
+        dt = (vz*_R < 0) ? std::max(dt1, dt2) : std::min(dt1, dt2);
+        return true;
     }
 
     double Sphere::_dzdr(double r) const {

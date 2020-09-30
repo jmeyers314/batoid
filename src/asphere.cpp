@@ -44,7 +44,10 @@ namespace batoid {
         return result;
     }
 
-    void Asphere::normal(double x, double y, double& nx, double& ny, double& nz) const {
+    void Asphere::normal(
+        double x, double y,
+        double& nx, double& ny, double& nz
+    ) const {
         double r = std::sqrt(x*x + y*y);
         if (r == 0.0) {
             nx = 0.0;
@@ -76,12 +79,8 @@ namespace batoid {
     ) const {
         // Solve the quadric problem analytically to get a good starting point.
         if (!Quadric::timeToIntersect(x, y, z, vx, vy, vz, dt))
-            // This isn't quite right.  It's possible that quadric intersection is negative, but
-            // asphere coefficients make true time to intersect positive.  But this is rare enough
-            // at the moment we ignore it.
             return false;
-        bool success = Surface::timeToIntersect(x, y, z, vx, vy, vz, dt);
-        return (success && dt >= 0.0);
+        return Surface::timeToIntersect(x, y, z, vx, vy, vz, dt);
     }
 
     #pragma omp end declare target
@@ -98,10 +97,8 @@ namespace batoid {
     Surface* Asphere::getDevPtr() const {
         if (!_devPtr) {
             Surface* ptr;
-            // omp doesn't seem to find _R and _conic inherited from Quadric, so grab them
-            // explicitly here.
-            double R = getR();
-            double conic = getConic();
+            double R = _R;
+            double conic = _conic;
             #pragma omp target map(from:ptr) map(to:_coefs[:_size])
             {
                 ptr = new Asphere(R, conic, _coefs, _size);

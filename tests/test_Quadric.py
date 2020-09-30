@@ -226,13 +226,12 @@ def test_ne():
 
 @timer
 def test_fail():
-    quad = batoid.Quadric(1.0, 1.0)
-    # This one should fail, since already passed the quadric.
-    rv = batoid.RayVector(0, 0, -1, 0, 0, -1)
+    quad = batoid.Quadric(1.0, 0.0)
+    rv = batoid.RayVector(0, 10, 0, 0, 0, -1)  # Too far to side
     rv2 = batoid.intersect(quad, rv.copy())
     np.testing.assert_equal(rv2.failed, np.array([True]))
     # This one passes
-    rv = batoid.RayVector(0, 0, -1, 0, 0, +1)
+    rv = batoid.RayVector(0, 0, -1, 0, 0, -1)
     rv2 = batoid.intersect(quad, rv.copy())
     np.testing.assert_equal(rv2.failed, np.array([False]))
 

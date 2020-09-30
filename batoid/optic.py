@@ -316,7 +316,7 @@ class Interface(Optic):
 
         return r
 
-    def traceFull(self, r):
+    def traceFull(self, r, reverse=False):
         """Trace ray(s) through this optical element, returning a full history
         of all surface intersections.
 
@@ -324,6 +324,8 @@ class Interface(Optic):
         ----------
         r : `batoid.Ray` or `batoid.RayVector`
             Input ray(s) to trace
+        reverse : bool
+            Trace through optical element in reverse?  Default: False
 
         Returns
         -------
@@ -351,7 +353,7 @@ class Interface(Optic):
             result[self.name] = {
                 'name':self.name,
                 'in':r,
-                'out':self.trace(r.copy())
+                'out':self.trace(r.copy(), reverse=reverse)
             }
         return result
 
@@ -803,7 +805,7 @@ class CompoundOptic(Optic):
                         item.obscuration.obscure(r)
         return r
 
-    def traceFull(self, r, path=None):
+    def traceFull(self, r, reverse=False, path=None):
         """Recursively trace ray(s) through this `CompoundOptic`, returning a
         full history of all surface intersections.
 
@@ -811,6 +813,8 @@ class CompoundOptic(Optic):
         ----------
         r : `batoid.Ray` or `batoid.RayVector`
             Input ray(s) to trace
+        reverse : bool
+            Trace through optical element in reverse?  Default: False
         path : list of names of Interfaces.
             Trace through the optical system in this order, as opposed to the
             natural order.  Useful for investigating particular ghost images.
@@ -840,8 +844,9 @@ class CompoundOptic(Optic):
         if path is None:
             if not self.skip:
                 r_in = r
-                for item in self.items:
-                    tf = item.traceFull(r_in)
+                items = self.items if not reverse else reversed(self.items)
+                for item in items:
+                    tf = item.traceFull(r_in, reverse=reverse)
                     for k, v in tf.items():
                         result[k] = v
                         r_in = v['out']

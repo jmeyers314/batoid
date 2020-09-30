@@ -300,8 +300,7 @@ def test_ne():
 @timer
 def test_fail():
     sum = batoid.Sum([batoid.Plane(), batoid.Sphere(1.0)])
-    # This one should fail, since already passed the quadric.
-    rv = batoid.RayVector(0, 0, -1, 0, 0, -1)
+    rv = batoid.RayVector(0, 10, 0, 0, 0, -1)  # Too far to side
     rv2 = batoid.intersect(sum, rv.copy())
     np.testing.assert_equal(rv2.failed, np.array([True]))
     # This one passes

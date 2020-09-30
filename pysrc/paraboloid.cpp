@@ -8,7 +8,6 @@ using namespace pybind11::literals;
 namespace batoid {
     void pyExportParaboloid(py::module& m) {
         py::class_<Paraboloid, std::shared_ptr<Paraboloid>, Surface>(m, "CPPParaboloid")
-            .def(py::init<double>(), "init", "R"_a)
-            .def_property_readonly("R", &Paraboloid::getR);
+            .def(py::init<double>(), "init", "R"_a);
     }
 }

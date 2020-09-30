@@ -145,30 +145,22 @@ class Plane(Surface):
 
         z(x, y) = 0
     """
-    def __init__(self, allowReverse=False):
-        self._surface = _batoid.CPPPlane(allowReverse)
-
-    @property
-    def allowReverse(self):
-        return self._surface.allowReverse
+    def __init__(self):
+        self._surface = _batoid.CPPPlane()
 
     def __hash__(self):
-        return hash(("batoid.Plane", self.allowReverse))
+        return hash("batoid.Plane")
 
-    def __setstate__(self, allowReverse):
-        self._surface = _batoid.CPPPlane(allowReverse)
+    def __setstate__(self):
+        self._surface = _batoid.CPPPlane()
 
     def __getstate__(self):
-        return self.allowReverse
+        return None
 
     def __eq__(self, rhs):
-        if not isinstance(rhs, Plane): return False
-        return self.allowReverse == rhs.allowReverse
+        return isinstance(rhs, Plane)
 
     def __repr__(self):
-        if self.allowReverse:
-            return "Plane(allowReverse=True)"
-        else:
             return "Plane()"
 
 
@@ -190,18 +182,14 @@ class Paraboloid(Surface):
         Radius of curvature at paraboloid vertex.
     """
     def __init__(self, R):
+        self.R = R
         self._surface = _batoid.CPPParaboloid(R)
-
-    @property
-    def R(self):
-        """Radius of curvature at paraboloid vertex."""
-        return self._surface.R
 
     def __hash__(self):
         return hash(("batoid.Paraboloid", self.R))
 
     def __setstate__(self, R):
-        self._surface = _batoid.CPPParaboloid(R)
+        self.__init__(R)
 
     def __getstate__(self):
         return self.R
@@ -230,19 +218,14 @@ class Sphere(Surface):
         Sphere radius.
     """
     def __init__(self, R):
+        self.R = R
         self._surface = _batoid.CPPSphere(R)
-
-    @property
-    def R(self):
-        """Sphere radius.
-        """
-        return self._surface.R
 
     def __hash__(self):
         return hash(("batoid.Sphere", self.R))
 
     def __setstate__(self, R):
-        self._surface = _batoid.CPPSphere(R)
+        self.__init__(R)
 
     def __getstate__(self):
         return self.R
@@ -281,25 +264,15 @@ class Quadric(Surface):
         Conic constant :math:`\\kappa`
     """
     def __init__(self, R, conic):
+        self.R = R
+        self.conic = conic
         self._surface = _batoid.CPPQuadric(R, conic)
-
-    @property
-    def R(self):
-        """Radius of curvature at quadric vertex.
-        """
-        return self._surface.R
-
-    @property
-    def conic(self):
-        """Conic constant.
-        """
-        return self._surface.conic
 
     def __hash__(self):
         return hash(("batoid.Quadric", self.R, self.conic))
 
     def __setstate__(self, args):
-        self._surface = _batoid.CPPQuadric(*args)
+        self.__init__(*args)
 
     def __getstate__(self):
         return (self.R, self.conic)
@@ -345,40 +318,18 @@ class Asphere(Surface):
         Even polynomial coefficients :math:`\\left\\{\\alpha_i\\right\\}`
     """
     def __init__(self, R, conic, coefs):
-        coefs = np.ascontiguousarray(coefs)
+        self.R = R
+        self.conic = conic
+        self.coefs = np.ascontiguousarray(coefs)
         self._surface = _batoid.CPPAsphere(
-            R, conic, coefs.ctypes.data, len(coefs)
+            R, conic, self.coefs.ctypes.data, len(coefs)
         )
-
-    @property
-    def R(self):
-        """Radius of curvature at asphere vertex.
-        """
-        return self._surface.R
-
-    @property
-    def conic(self):
-        """Conic constant.
-        """
-        return self._surface.conic
-
-    @property
-    def coefs(self):
-        """Even polynomial coefficients.
-        """
-        size = self._surface.size
-        out = np.empty(size, dtype=float)
-        self._surface.coefs(out.ctypes.data)
-        return out
 
     def __hash__(self):
         return hash(("batoid.Asphere", self.R, self.conic, tuple(self.coefs)))
 
     def __setstate__(self, args):
-        R, conic, coefs = args
-        self._surface = _batoid.CPPAsphere(
-            R, conic, coefs.ctypes.data, len(coefs)
-        )
+        self.__init__(*args)
 
     def __getstate__(self):
         return self.R, self.conic, self.coefs
