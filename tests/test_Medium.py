@@ -1,3 +1,4 @@
+from batoid.medium import SumitaMedium, TableMedium
 import os
 import numpy as np
 import batoid
@@ -41,6 +42,26 @@ def test_TableMedium():
         )
     do_pickle(table_medium)
 
+    # Test load from file
+    filename = os.path.join(
+        os.path.dirname(__file__),
+        "testdata",
+        "silicaDispersion.csv"
+    )
+    medium1 = batoid.TableMedium.fromTxt(
+        filename, delimiter=','
+    )
+    wmicron, ncsv = np.loadtxt(filename, delimiter=',').T
+    medium2 = batoid.TableMedium(wmicron*1e-6, ncsv)
+    assert medium1 == medium2
+
+    # Load from datadir
+    medium3 = batoid.TableMedium.fromTxt("silica_dispersion.txt")
+
+    # Raises on bad input
+    with np.testing.assert_raises(FileNotFoundError):
+        medium4 = batoid.TableMedium.fromTxt("blah.txt")
+
 
 @timer
 def test_SellmeierMedium():
@@ -54,6 +75,14 @@ def test_SellmeierMedium():
     C2 = 0.013512063073959999
     C3 = 97.93400253792099
     silica = batoid.SellmeierMedium([B1, B2, B3, C1, C2, C3])
+    silica2 = batoid.SellmeierMedium(B1, B2, B3, C1, C2, C3)
+    silica3 = batoid.SellmeierMedium(C1=C1, C2=C2, C3=C3, B1=B1, B2=B2, B3=B3)
+    assert silica == silica2
+    assert silica == silica3
+    with np.testing.assert_raises(TypeError):
+        batoid.SellmeierMedium(B1)
+    with np.testing.assert_raises(ValueError):
+        batoid.SellmeierMedium(B1, B2, B3, C1, C2, C3, B1)
 
     wavelengths = rng.uniform(300e-9, 1100e-9, size=1000)
     indices = silica.getN(wavelengths)
@@ -84,6 +113,14 @@ def test_SumitaMedium():
     A4 = -2.2214495e-5
     A5 = 1.4258559e-6
     kbk7 = batoid.SumitaMedium([A0, A1, A2, A3, A4, A5])
+    kbk7_2 = batoid.SumitaMedium(A0, A1, A2, A3, A4, A5)
+    kbk7_3 = batoid.SumitaMedium(A0=A0, A1=A1, A2=A2, A3=A3, A4=A4, A5=A5)
+    assert kbk7 == kbk7_2
+    assert kbk7 == kbk7_3
+    with np.testing.assert_raises(TypeError):
+        batoid.SumitaMedium(A0)
+    with np.testing.assert_raises(ValueError):
+        batoid.SumitaMedium(A0, A1, A2, A3, A4, A5, A0)
 
     wavelengths = rng.uniform(300e-9, 1100e-9, size=1000)
     indices = kbk7.getN(wavelengths)
@@ -120,12 +157,21 @@ def test_ne():
     objs = [
         batoid.ConstMedium(1.0),
         batoid.ConstMedium(1.1),
+        batoid.TableMedium([1, 2, 3], [3, 4, 3]),
         batoid.SellmeierMedium([
             0.6961663, 0.4079426, 0.8974794,
             0.0684043**2, 0.1162414**2, 9.896161**2]),
         batoid.SellmeierMedium([
             0.4079426, 0.6961663, 0.8974794,
             0.0684043**2, 0.1162414**2, 9.896161**2]),
+        batoid.SumitaMedium([
+            2.2705778, -0.010059376, 0.010414999,
+            0.00028872517, -2.2214495e-5, 1.4258559e-6
+        ]),
+        batoid.SumitaMedium([
+            -0.010059376, 2.2705778, 0.010414999,
+            0.00028872517, -2.2214495e-5, 1.4258559e-6
+        ]),
         batoid.Air(),
         batoid.Air(pressure=100)
     ]

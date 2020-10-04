@@ -76,23 +76,21 @@ class TableMedium(Medium):
         )
 
     @classmethod
-    def fromTxt(cls, filename):
+    def fromTxt(cls, filename, **kwargs):
         """Load a text file with refractive index information in it.
         The file should have two columns, the first with wavelength in microns,
         and the second with the corresponding refractive indices.
         """
         import os
-        import numpy as np
-        from .table import Table
         try:
-            wavelength, n = np.loadtxt(filename, unpack=True)
+            wavelength, n = np.loadtxt(filename, unpack=True, **kwargs)
         except IOError:
             import glob
             from . import datadir
             filenames = glob.glob(os.path.join(datadir, "**", "*.txt"))
             for candidate in filenames:
                 if os.path.basename(candidate) == filename:
-                    wavelength, n = np.loadtxt(candidate, unpack=True)
+                    wavelength, n = np.loadtxt(candidate, unpack=True, **kwargs)
                     break
             else:
                 raise FileNotFoundError(filename)
@@ -139,14 +137,16 @@ class SellmeierMedium(Medium):
     """
     def __init__(self, *args, **kwargs):
         if len(args) == 6:
-            coefs = args
+            coefs = tuple(args)
         elif len(args) == 1:
-            coefs = args[0]
+            coefs = tuple(args[0])
         elif kwargs:
-            coefs = [kwargs[k] for k in ['B1', 'B2', 'B3', 'C1', 'C2', 'C3']]
-        self.coefs = tuple(coefs)
-        if len(coefs) != 6:
-            raise ValueError("Incorrect number of coefficients")
+            coefs = tuple([
+                kwargs[k] for k in ['B1', 'B2', 'B3', 'C1', 'C2', 'C3']
+            ])
+        else:
+            raise ValueError("Incorrect number of arguments")
+        self.coefs = coefs
         self._medium = _batoid.CPPSellmeierMedium(*coefs)
 
     def __eq__(self, rhs):
@@ -186,14 +186,16 @@ class SumitaMedium(Medium):
     """
     def __init__(self, *args, **kwargs):
         if len(args) == 6:
-            coefs = args
+            coefs = tuple(args)
         elif len(args) == 1:
-            coefs = args[0]
+            coefs = tuple(args[0])
         elif kwargs:
-            coefs = [kwargs[k] for k in ['A0', 'A1', 'A2', 'A3', 'A4', 'A5']]
-        self.coefs = tuple(coefs)
-        if len(coefs) != 6:
-            raise ValueError("Incorrect number of coefficients")
+            coefs = tuple([
+                kwargs[k] for k in ['A0', 'A1', 'A2', 'A3', 'A4', 'A5']
+            ])
+        else:
+            raise ValueError("Incorrect number of arguments")
+        self.coefs = coefs
         self._medium = _batoid.CPPSumitaMedium(*coefs)
 
     def __eq__(self, rhs):

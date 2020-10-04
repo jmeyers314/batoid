@@ -95,3 +95,4 @@ ENV/
 *.png
 *.pdf
 .vscode
+pytest_session.txt
