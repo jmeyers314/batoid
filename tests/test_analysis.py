@@ -101,7 +101,8 @@ def test_huygensPSF():
         dx=10e-6,
         dy=10e-6
     )
-    assert psf1 == psf2
+    assert np.array_equal(psf1.primitiveVectors, psf2.primitiveVectors)
+    np.testing.assert_allclose(psf1.array, psf2.array, rtol=1e-14, atol=1e-15)
 
     # Test vector vs scalar dx,dy
     psf1 = batoid.analysis.huygensPSF(
@@ -122,7 +123,8 @@ def test_huygensPSF():
         dx=10e-6,
         dy=11e-6
     )
-    assert psf1 == psf2
+    assert np.array_equal(psf1.primitiveVectors, psf2.primitiveVectors)
+    np.testing.assert_allclose(psf1.array, psf2.array, rtol=1e-14, atol=1e-15)
 
     # Should still work with reference = 'chief'
     psf3 = batoid.analysis.huygensPSF(
@@ -145,8 +147,11 @@ def test_huygensPSF():
         dy=11e-6,
         reference='chief'
     )
-    assert psf1 != psf3
-    assert psf3 == psf4
+    assert np.array_equal(psf1.primitiveVectors, psf3.primitiveVectors)
+    assert not np.allclose(psf1.array, psf3.array, rtol=1e-14, atol=1e-15)
+
+    assert np.array_equal(psf3.primitiveVectors, psf4.primitiveVectors)
+    np.testing.assert_allclose(psf3.array, psf4.array, rtol=1e-14, atol=1e-15)
 
     # And just cover nx odd
     batoid.analysis.huygensPSF(
