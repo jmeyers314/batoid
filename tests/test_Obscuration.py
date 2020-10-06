@@ -1,3 +1,4 @@
+from batoid.obscuration import ObscPolygon
 import batoid
 import numpy as np
 from test_helpers import timer, do_pickle, all_obj_diff
@@ -257,14 +258,14 @@ def test_ObscNegation():
             rv.vignetted
         )
 
-#         # also test config parsing of "ClearCircle"
-#         config = {'type':'ClearCircle', 'x':cx, 'y':cy, 'radius':r}
-#         obsc = batoid.parse.parse_obscuration(config)
-#         do_pickle(obsc)
-#         for i in range(100):
-#             x = rng.normal(0.0, 1.0)
-#             y = rng.normal(0.0, 1.0)
-#             assert obsc.contains(x, y) == (np.hypot(x-cx, y-cy) > r)
+        # also test config parsing of "ClearCircle"
+        config = {'type':'ClearCircle', 'x':cx, 'y':cy, 'radius':r}
+        obsc = batoid.parse.parse_obscuration(config)
+        do_pickle(obsc)
+        for i in range(100):
+            x = rng.normal(0.0, 1.0)
+            y = rng.normal(0.0, 1.0)
+            assert obsc.contains(x, y) == (np.hypot(x-cx, y-cy) > r)
 
 
 @timer
@@ -337,6 +338,10 @@ def test_ObscCompound():
             rv.vignetted
         )
 
+    with np.testing.assert_raises(ValueError):
+        batoid.ObscUnion()
+    with np.testing.assert_raises(ValueError):
+        batoid.ObscIntersection()
 
 
 @timer
@@ -354,6 +359,7 @@ def test_ne():
         batoid.ObscRay(1.0, 2.0),
         batoid.ObscRay(1.0, 2.0, 0.1, 0.1),
         batoid.ObscNegation(batoid.ObscCircle(1.0)),
+        batoid.ObscPolygon([0,1,1,0],[0,0,1,1]),
         batoid.ObscUnion([batoid.ObscCircle(1.0)]),
         batoid.ObscUnion([
             batoid.ObscCircle(1.0),

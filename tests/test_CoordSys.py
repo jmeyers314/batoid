@@ -276,6 +276,7 @@ def test_combinations():
 @timer
 def test_ne():
     objs = [
+        batoid.CoordTransform(batoid.CoordSys(), batoid.CoordSys()),
         batoid.CoordSys(),
         batoid.CoordSys([0,0,1]),
         batoid.CoordSys([0,1,0]),

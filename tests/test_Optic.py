@@ -28,7 +28,23 @@ def test_optic():
     telescope = batoid.Optic.fromYaml("HSC.yaml")
     do_pickle(telescope)
 
-    telescope.trace(rays)
+    rays1 = telescope.trace(rays.copy())
+
+    # Try tracing but skipping the baffles
+    for k, v in telescope.itemDict.items():
+        if isinstance(v, batoid.Baffle):
+            v.skip = True
+    rays2 = telescope.trace(rays.copy())
+    # rays2 will have fewer rays vignetted rays
+    assert np.sum(rays2.vignetted) < np.sum(rays1.vignetted)
+    # every place where rays2 is vignetted, is also vignetted in rays1
+    w = rays2.vignetted
+    assert np.all(rays1.vignetted[w])
+    # and every place rays1 is not vignetted has some coords as in rays2
+    w = ~rays1.vignetted
+    np.testing.assert_allclose(rays1.r[w], rays2.r[w])
+    np.testing.assert_allclose(rays1.v[w], rays2.v[w])
+    np.testing.assert_allclose(rays1.t[w], rays2.t[w])
 
 
 @timer
@@ -67,47 +83,8 @@ def test_traceReverse():
     reverse_rays = forward_rays.copy()
     reverse_rays.v[:] *= -1
     reverse_rays.t[:] *= -1
-    # reverse_rays = batoid.RayVector(
-    #     forward_rays.x,
-    #     forward_rays.y,
-    #     forward_rays.z,
-    #     -forward_rays.vx,
-    #     -forward_rays.vy,
-    #     -forward_rays.vz,
-    #     -forward_rays.t.copy(),
-    #     forward_rays.wavelength.copy(),
-    # )
 
     final_rays = telescope.trace(reverse_rays.copy(), reverse=True)
-    # tff = telescope.traceFull(init_rays.copy())
-    # tfr = telescope.traceFull(reverse_rays.copy(), reverse=True)
-
-    # import matplotlib.pyplot as plt
-    # for k, v in tff.items():
-    #     fig, ax = plt.subplots(nrows=1, ncols=1)
-    #     w = ~v['out'].vignetted
-    #     ax.scatter(v['out'].x[w], v['out'].y[w])
-    #     ax.set_title(k)
-    #     plt.show()
-
-    # w = ~tff['D']['out'].vignetted
-    # print(tff['D']['out'].vignetted)
-    # for k in tfr.keys():
-    #     print(k, tfr[k]['in'].x[w])
-    #     print(k, tfr[k]['out'].x[w])
-    #     print()
-    #     print(k, tff[k]['out'].x[w])
-    #     print()
-    #     print()
-    #     print()
-
-    # print(tfr['PM']['in'])
-    # print()
-    # print()
-    # print(tfr['PM']['out'])
-
-    # import ipdb; ipdb.set_trace()
-
     # propagate all the way to t=0
     final_rays.propagate(0.0)
     final_rays.toCoordSys(batoid.globalCoordSys)
@@ -159,6 +136,23 @@ def test_shift():
     shifted = telescope.withGloballyShiftedOptic("G1", shift)
     shifted = shifted.withGloballyShiftedOptic("G1", -shift)
     assert shifted == telescope
+    # Try local shifts
+    assert telescope.withLocalShift(shift).withLocalShift(-shift) == telescope
+    assert (
+        telescope.withGloballyShiftedOptic(telescope.name, shift)
+        == telescope.withGlobalShift(shift)
+    )
+    for item in telescope.itemDict:
+        shifted = telescope.withLocallyShiftedOptic(item, shift)
+        shifted = shifted.withLocallyShiftedOptic(item, -shift)
+        assert telescope == shifted
+    shifted = telescope.withLocallyShiftedOptic("G1", shift)
+    shifted = shifted.withLocallyShiftedOptic("G1", -shift)
+    assert shifted == telescope
+    assert (
+        telescope.withLocallyShiftedOptic(telescope.name, shift)
+        == telescope.withLocalShift(shift)
+    )
 
 
 @timer
@@ -179,61 +173,73 @@ def test_rotXYZ_parsing():
         telescope = batoid.parse.parse_optic(config['opticalSystem'])
 
 
-# @timer
-# def test_rotation():
-#     rng = np.random.default_rng(57)
+@timer
+def test_rotation():
+    rng = np.random.default_rng(57)
 
-#     telescope = batoid.Optic.fromYaml("HSC.yaml")
+    telescope = batoid.Optic.fromYaml("HSC.yaml")
 
-#     rot = batoid.RotX(rng.uniform(low=0.0, high=2*np.pi))
-#     rot = rot.dot(batoid.RotY(rng.uniform(low=0.0, high=2*np.pi)))
-#     rot = rot.dot(batoid.RotZ(rng.uniform(low=0.0, high=2*np.pi)))
-#     rotInv = np.linalg.inv(rot)
+    rot = batoid.RotX(rng.uniform(low=0.0, high=2*np.pi))
+    rot = rot.dot(batoid.RotY(rng.uniform(low=0.0, high=2*np.pi)))
+    rot = rot.dot(batoid.RotZ(rng.uniform(low=0.0, high=2*np.pi)))
+    rotInv = np.linalg.inv(rot)
 
-#     # It's hard to test the two telescopes for equality due to rounding errors,
-#     # so we test by comparing zernikes
-#     rotTel = telescope.withLocalRotation(rot).withLocalRotation(rotInv)
+    # It's hard to test the two telescopes for equality due to rounding errors,
+    # so we test by comparing zernikes
+    rotTel = telescope.withLocalRotation(rot).withLocalRotation(rotInv)
 
-#     theta_x = rng.uniform(-0.005, 0.005)
-#     theta_y = rng.uniform(-0.005, 0.005)
-#     wavelength = 750e-9
+    theta_x = rng.uniform(-0.005, 0.005)
+    theta_y = rng.uniform(-0.005, 0.005)
+    wavelength = 750e-9
 
-#     np.testing.assert_allclose(
-#         batoid.psf.zernike(telescope, theta_x, theta_y, wavelength),
-#         batoid.psf.zernike(rotTel, theta_x, theta_y, wavelength),
-#         atol=1e-5
-#     )
+    for k in telescope.itemDict.keys():
+        np.testing.assert_allclose(
+            telescope[k].coordSys.origin,
+            rotTel[k].coordSys.origin,
+            rtol=0, atol=1e-14
+        )
+        np.testing.assert_allclose(
+            telescope[k].coordSys.rot,
+            rotTel[k].coordSys.rot,
+            rtol=0, atol=1e-14
+        )
 
-#     for item in telescope.itemDict:
-#         rotTel = telescope.withLocallyRotatedOptic(item, rot)
-#         rotTel = rotTel.withLocallyRotatedOptic(item, rotInv)
-#         rotTel2 = telescope.withLocallyRotatedOptic(item, np.eye(3))
-#         theta_x = rng.uniform(-0.005, 0.005)
-#         theta_y = rng.uniform(-0.005, 0.005)
-#         np.testing.assert_allclose(
-#             batoid.psf.zernike(telescope, theta_x, theta_y, wavelength),
-#             batoid.psf.zernike(rotTel, theta_x, theta_y, wavelength),
-#             atol=1e-5
-#         )
-#         np.testing.assert_allclose(
-#             batoid.psf.zernike(telescope, theta_x, theta_y, wavelength),
-#             batoid.psf.zernike(rotTel2, theta_x, theta_y, wavelength),
-#             atol=1e-5
-#         )
-#     # Test with non-fully-qualified name
-#     rotTel = telescope.withLocallyRotatedOptic('G1', rot)
-#     rotTel = rotTel.withLocallyRotatedOptic('G1', rotInv)
-#     rotTel2 = rotTel.withLocallyRotatedOptic('G1', np.eye(3))
-#     np.testing.assert_allclose(
-#         batoid.psf.zernike(telescope, theta_x, theta_y, wavelength),
-#         batoid.psf.zernike(rotTel, theta_x, theta_y, wavelength),
-#         atol=1e-5
-#     )
-#     np.testing.assert_allclose(
-#         batoid.psf.zernike(telescope, theta_x, theta_y, wavelength),
-#         batoid.psf.zernike(rotTel2, theta_x, theta_y, wavelength),
-#         atol=1e-5
-#     )
+    np.testing.assert_allclose(
+        batoid.zernikeGQ(telescope, theta_x, theta_y, wavelength),
+        batoid.zernikeGQ(rotTel, theta_x, theta_y, wavelength),
+        atol=1e-8
+    )
+
+    for item in telescope.itemDict:
+        rotTel = telescope.withLocallyRotatedOptic(item, rot)
+        rotTel = rotTel.withLocallyRotatedOptic(item, rotInv)
+        rotTel2 = telescope.withLocallyRotatedOptic(item, np.eye(3))
+        theta_x = rng.uniform(-0.005, 0.005)
+        theta_y = rng.uniform(-0.005, 0.005)
+        np.testing.assert_allclose(
+            batoid.zernikeGQ(telescope, theta_x, theta_y, wavelength),
+            batoid.zernikeGQ(rotTel, theta_x, theta_y, wavelength),
+            atol=1e-8
+        )
+        np.testing.assert_allclose(
+            batoid.zernikeGQ(telescope, theta_x, theta_y, wavelength),
+            batoid.zernikeGQ(rotTel2, theta_x, theta_y, wavelength),
+            atol=1e-8
+        )
+    # Test with non-fully-qualified name
+    rotTel = telescope.withLocallyRotatedOptic('G1', rot)
+    rotTel = rotTel.withLocallyRotatedOptic('G1', rotInv)
+    rotTel2 = rotTel.withLocallyRotatedOptic('G1', np.eye(3))
+    np.testing.assert_allclose(
+        batoid.zernikeGQ(telescope, theta_x, theta_y, wavelength),
+        batoid.zernikeGQ(rotTel, theta_x, theta_y, wavelength),
+        atol=1e-8
+    )
+    np.testing.assert_allclose(
+        batoid.zernikeGQ(telescope, theta_x, theta_y, wavelength),
+        batoid.zernikeGQ(rotTel2, theta_x, theta_y, wavelength),
+        atol=1e-8
+    )
 
 
 @timer
@@ -299,6 +305,6 @@ if __name__ == '__main__':
     test_withSurface()
     test_shift()
     test_rotXYZ_parsing()
-    # test_rotation()
+    test_rotation()
     test_ne()
     test_name()

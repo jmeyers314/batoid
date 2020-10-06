@@ -305,9 +305,6 @@ class Interface(Optic):
         Also, you may need to reverse the directions of rays if using this
         method with `reverse=True`.
         """
-        if self.skip:
-            return r
-
         # refract, reflect, pass-through - depending on subclass
         self.interact(r, reverse=reverse)
 
@@ -764,8 +761,6 @@ class CompoundOptic(Optic):
         method with `reverse=True`.
         """
         if path is None:
-            if self.skip:
-                return r
             items = self.items if not reverse else reversed(self.items)
             for item in items:
                 if not item.skip:

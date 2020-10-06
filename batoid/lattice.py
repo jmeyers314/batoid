@@ -65,3 +65,13 @@ class Lattice:
             np.all(self.array == rhs.array) &
             np.all(self.primitiveVectors == rhs.primitiveVectors)
         )
+
+    def __hash__(self):
+        return hash((
+            "Lattice",
+            tuple(self.array.ravel()),
+            tuple(self.primitiveVectors.ravel())
+        ))
+
+    def __repr__(self):
+        return f"Lattice({self.array!r}, {self.primitiveVectors!r})"

@@ -1,6 +1,6 @@
 import numpy as np
 import batoid
-from test_helpers import rays_allclose, timer, do_pickle, init_gpu
+from test_helpers import rays_allclose, timer, do_pickle, init_gpu, all_obj_diff
 
 
 def randomCoordSys(rng):
@@ -155,8 +155,22 @@ def test_composition():
             rays_allclose(rv_a, rv_b), "error with reverse composite transform of RayVector"
 
 
+@timer
+def test_ne():
+    objs = [
+        batoid.CoordSys(),
+        batoid.CoordTransform(batoid.CoordSys(), batoid.CoordSys()),
+        batoid.CoordTransform(
+            batoid.CoordSys(),
+            batoid.CoordSys(origin=(0,0,1))
+        )
+    ]
+    all_obj_diff(objs)
+
+
 if __name__ == '__main__':
     init_gpu()
     test_simple_transform()
     test_roundtrip()
     test_composition()
+    test_ne()

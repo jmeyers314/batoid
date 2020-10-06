@@ -151,11 +151,11 @@ class Plane(Surface):
     def __hash__(self):
         return hash("batoid.Plane")
 
-    def __setstate__(self):
-        self._surface = _batoid.CPPPlane()
+    def __setstate__(self, tup):
+        self.__init__()
 
     def __getstate__(self):
-        return None
+        return ()
 
     def __eq__(self, rhs):
         return isinstance(rhs, Plane)

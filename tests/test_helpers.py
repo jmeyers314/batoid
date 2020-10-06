@@ -85,7 +85,8 @@ def do_pickle(obj, reprable=True):
             CoordSys, CoordTransform,
             SimpleCoating,
             Optic, CompoundOptic, Baffle, Mirror, Lens, RefractiveInterface,
-            Detector
+            Detector,
+            Lattice
         )
         # While eval(repr(obj)) == obj is the python repr gold standard, it can
         # be pretty ugly for exact reproduction of doubles.  Here, we strive for

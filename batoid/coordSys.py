@@ -61,9 +61,6 @@ class CoordSys:
         """
         return self.rot[:, 2]
 
-    def __repr__(self):
-        return f"CoordSys({self.origin}, {self.rot})"
-
     def shiftGlobal(self, dr):
         """Return new CoordSys with origin shifted along global axes.
 
