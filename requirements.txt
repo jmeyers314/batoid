@@ -1,4 +1,6 @@
 pyyaml
 numpy>=1.18
+scipy
 pybind11
+galsim
 

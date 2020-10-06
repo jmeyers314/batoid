@@ -64,7 +64,7 @@ namespace batoid {
         // New strategy, just always pick smaller abs(z).
         double z1 = z + vz*dt1;
         double z2 = z + vz*dt2;
-        dt = (abs(z1) < abs(z2)) ? dt1 : dt2;
+        dt = (std::abs(z1) < std::abs(z2)) ? dt1 : dt2;
         return true;
     }
 
