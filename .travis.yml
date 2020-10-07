@@ -46,9 +46,8 @@ cache:
   ccache: true
   pip: true
   directories:
-    - $HOME/.cache/pip
-    - $HOME/Library/Caches/pip
     - $HOME/Library/Caches/Homebrew
+    - /usr/local/Cellar/
 
 install:
   # Update pip executable. (Needs sudo on some systems.)
