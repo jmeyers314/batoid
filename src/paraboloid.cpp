@@ -2,7 +2,9 @@
 
 namespace batoid {
 
-    #pragma omp declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp declare target
+    #endif
 
     Paraboloid::Paraboloid(double R) :
         _R(R), _Rinv(1./R), _2Rinv(1./2/R)
@@ -68,19 +70,24 @@ namespace batoid {
         return true;
     }
 
-    #pragma omp end declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp end declare target
+    #endif
 
-
-    Surface* Paraboloid::getDevPtr() const {
-        if (!_devPtr) {
-            Surface* ptr;
-            #pragma omp target map(from:ptr)
-            {
-                ptr = new Paraboloid(_R);
+    const Surface* Paraboloid::getDevPtr() const {
+        #if defined _OPENMP && _OPENMP >= 201511
+            if (!_devPtr) {
+                Surface* ptr;
+                #pragma omp target map(from:ptr)
+                {
+                    ptr = new Paraboloid(_R);
+                }
+                _devPtr = ptr;
             }
-            _devPtr = ptr;
-        }
-        return _devPtr;
+            return _devPtr;
+        #else
+            return this;
+        #endif
     }
 
 }

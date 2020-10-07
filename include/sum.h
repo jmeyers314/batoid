@@ -7,10 +7,10 @@ namespace batoid {
 
     class Sum : public Surface {
     public:
-        Sum(Surface** surfaces, size_t nsurf);
+        Sum(const Surface** surfaces, size_t nsurf);
         ~Sum();
 
-        virtual Surface* getDevPtr() const override;
+        virtual const Surface* getDevPtr() const override;
 
         virtual double sag(double, double) const override;
         virtual void normal(
@@ -24,7 +24,7 @@ namespace batoid {
         ) const override;
 
     private:
-        Surface** _surfaces;
+        const Surface** _surfaces;
         size_t _nsurf;
     };
 

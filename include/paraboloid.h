@@ -10,7 +10,7 @@ namespace batoid {
         Paraboloid(double R);
         ~Paraboloid();
 
-        virtual Surface* getDevPtr() const override;
+        virtual const Surface* getDevPtr() const override;
 
         virtual double sag(double, double) const override;
         virtual void normal(

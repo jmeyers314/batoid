@@ -2,7 +2,9 @@
 
 namespace batoid {
 
-    #pragma omp declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp declare target
+    #endif
 
     Plane::Plane() {}
 
@@ -27,19 +29,25 @@ namespace batoid {
         return true;
     }
 
-    #pragma omp end declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp end declare target
+    #endif
 
 
-    Surface* Plane::getDevPtr() const {
-        if (!_devPtr) {
-            Surface* ptr;
-            #pragma omp target map(from:ptr)
-            {
-                ptr = new Plane();
+    const Surface* Plane::getDevPtr() const {
+        #if defined _OPENMP && _OPENMP >= 201511
+            if (!_devPtr) {
+                Surface* ptr;
+                #pragma omp target map(from:ptr)
+                {
+                    ptr = new Plane();
+                }
+                _devPtr = ptr;
             }
-            _devPtr = ptr;
-        }
-        return _devPtr;
+            return _devPtr;
+        #else
+            return this;
+        #endif
     }
 
 }

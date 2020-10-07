@@ -5,7 +5,9 @@
 
 namespace batoid {
 
-    #pragma omp declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp declare target
+    #endif
 
         Medium::Medium() :
             _devPtr(nullptr)
@@ -24,23 +26,31 @@ namespace batoid {
             return _n;
         }
 
-    #pragma omp end declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp end declare target
+    #endif
 
 
-    Medium* ConstMedium::getDevPtr() const {
-        if (_devPtr)
-            return _devPtr;
-        Medium* ptr;
-        #pragma omp target map(from:ptr)
-        {
-            ptr = new ConstMedium(_n);
-        }
-        _devPtr = ptr;
-        return ptr;
+    const Medium* ConstMedium::getDevPtr() const {
+        #if defined _OPENMP && _OPENMP >= 201511
+            if (_devPtr)
+                return _devPtr;
+            Medium* ptr;
+            #pragma omp target map(from:ptr)
+            {
+                ptr = new ConstMedium(_n);
+            }
+            _devPtr = ptr;
+            return ptr;
+        #else
+            return this;
+        #endif
     }
 
 
-    #pragma omp declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp declare target
+    #endif
 
         TableMedium::TableMedium(
             const double* args, const double* vals, const size_t size
@@ -49,17 +59,19 @@ namespace batoid {
         {}
 
         TableMedium::~TableMedium() {
-            if (_devPtr) {
-                Medium* ptr = _devPtr;
-                #pragma omp target is_device_ptr(ptr)
-                {
-                    delete ptr;
+            #if defined _OPENMP && _OPENMP >= 201511
+                if (_devPtr) {
+                    Medium* ptr = _devPtr;
+                    #pragma omp target is_device_ptr(ptr)
+                    {
+                        delete ptr;
+                    }
+                    const double* args = _args;
+                    const double* vals = _vals;
+                    #pragma omp target exit data \
+                        map(release:args[:_size], vals[:_size])
                 }
-                const double* args = _args;
-                const double* vals = _vals;
-                #pragma omp target exit data \
-                    map(release:args[:_size], vals[:_size])
-            }
+            #endif
         }
 
         double TableMedium::getN(double wavelength) const {
@@ -80,26 +92,34 @@ namespace batoid {
             return out;
         }
 
-    #pragma omp end declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp end declare target
+    #endif
 
-    Medium* TableMedium::getDevPtr() const {
-        if (!_devPtr) {
-            Medium* ptr;
-            // Allocate arrays on device
-            const double* args = _args;
-            const double* vals = _vals;
-            #pragma omp target enter data \
-                map(to:args[:_size], vals[:_size])
-            #pragma omp target map(from:ptr)
-            {
-                ptr = new TableMedium(args, vals, _size);
+    const Medium* TableMedium::getDevPtr() const {
+        #if defined _OPENMP && _OPENMP >= 201511
+            if (!_devPtr) {
+                Medium* ptr;
+                // Allocate arrays on device
+                const double* args = _args;
+                const double* vals = _vals;
+                #pragma omp target enter data \
+                    map(to:args[:_size], vals[:_size])
+                #pragma omp target map(from:ptr)
+                {
+                    ptr = new TableMedium(args, vals, _size);
+                }
+                _devPtr = ptr;
             }
-            _devPtr = ptr;
-        }
-        return _devPtr;
+            return _devPtr;
+        #else
+            return this;
+        #endif
     }
 
-    #pragma omp declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp declare target
+    #endif
 
         SellmeierMedium::SellmeierMedium(
             double B1, double B2, double B3,
@@ -116,23 +136,31 @@ namespace batoid {
             return std::sqrt(1.0 + _B1*x/(x-_C1) + _B2*x/(x-_C2) + _B3*x/(x-_C3));
         }
 
-    #pragma omp end declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp end declare target
+    #endif
 
 
-    Medium* SellmeierMedium::getDevPtr() const {
-        if (_devPtr)
-            return _devPtr;
-        Medium* ptr;
-        #pragma omp target map(from:ptr)
-        {
-            ptr = new SellmeierMedium(_B1, _B2, _B3, _C1, _C2, _C3);
-        }
-        _devPtr = ptr;
-        return ptr;
+    const Medium* SellmeierMedium::getDevPtr() const {
+        #if defined _OPENMP && _OPENMP >= 201511
+            if (_devPtr)
+                return _devPtr;
+            Medium* ptr;
+            #pragma omp target map(from:ptr)
+            {
+                ptr = new SellmeierMedium(_B1, _B2, _B3, _C1, _C2, _C3);
+            }
+            _devPtr = ptr;
+            return ptr;
+        #else
+            return this;
+        #endif
     }
 
 
-    #pragma omp declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp declare target
+    #endif
 
         SumitaMedium::SumitaMedium(
             double A0, double A1, double A2,
@@ -150,18 +178,24 @@ namespace batoid {
             return std::sqrt(_A0 + _A1*x + y*(_A2 + y*(_A3 + y*(_A4 + y*_A5))));
         }
 
-    #pragma omp end declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp end declare target
+    #endif
 
-    Medium* SumitaMedium::getDevPtr() const {
-        if (_devPtr)
-            return _devPtr;
-        Medium* ptr;
-        #pragma omp target map(from:ptr)
-        {
-            ptr = new SumitaMedium(_A0, _A1, _A2, _A3, _A4, _A5);
-        }
-        _devPtr = ptr;
-        return ptr;
+    const Medium* SumitaMedium::getDevPtr() const {
+        #if defined _OPENMP && _OPENMP >= 201511
+            if (_devPtr)
+                return _devPtr;
+            Medium* ptr;
+            #pragma omp target map(from:ptr)
+            {
+                ptr = new SumitaMedium(_A0, _A1, _A2, _A3, _A4, _A5);
+            }
+            _devPtr = ptr;
+            return ptr;
+        #else
+            return this;
+        #endif
     }
 
 
@@ -177,7 +211,9 @@ namespace batoid {
     // @param pressure       Air pressure in kiloPascals.
     // @param temperature    Temperature in Kelvins.
     // @param H2O_pressure   Water vapor pressure in kiloPascals.
-    #pragma omp declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp declare target
+    #endif
 
         Air::Air(double pressure, double temperature, double h2o_pressure) :
             _pressure(pressure), _temperature(temperature), _h2o_pressure(h2o_pressure),
@@ -196,18 +232,24 @@ namespace batoid {
             return 1+n_minus_one;
         }
 
-    #pragma omp end declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp end declare target
+    #endif
 
-    Medium* Air::getDevPtr() const {
-        if (_devPtr)
-            return _devPtr;
-        Medium* ptr;
-        #pragma omp target map(from:ptr)
-        {
-            ptr = new Air(_pressure, _temperature, _h2o_pressure);
-        }
-        _devPtr = ptr;
-        return ptr;
+    const Medium* Air::getDevPtr() const {
+        #if defined _OPENMP && _OPENMP >= 201511
+            if (_devPtr)
+                return _devPtr;
+            Medium* ptr;
+            #pragma omp target map(from:ptr)
+            {
+                ptr = new Air(_pressure, _temperature, _h2o_pressure);
+            }
+            _devPtr = ptr;
+            return ptr;
+        #else
+            return this;
+        #endif
     }
 
 }

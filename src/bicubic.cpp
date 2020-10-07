@@ -4,7 +4,9 @@
 namespace batoid {
 
 
-    #pragma omp declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp declare target
+    #endif
 
     Bicubic::Bicubic(
         double x0, double y0, double dx, double dy,
@@ -21,21 +23,23 @@ namespace batoid {
     {}
 
     Bicubic::~Bicubic() {
-        if (_devPtr) {
-            Surface* ptr = _devPtr;
-            #pragma omp target is_device_ptr(ptr)
-            {
-                delete ptr;
-            }
+        #if defined _OPENMP && _OPENMP >= 201511
+            if (_devPtr) {
+                Surface* ptr = _devPtr;
+                #pragma omp target is_device_ptr(ptr)
+                {
+                    delete ptr;
+                }
 
-            const size_t size = _nx * _ny;
-            const double* z = _z;
-            const double* dzdx = _dzdx;
-            const double* dzdy = _dzdy;
-            const double* d2zdxdy = _d2zdxdy;
-            #pragma omp target exit data \
-                map(release:z[:size], dzdx[:size], dzdy[:size], d2zdxdy[:size])
-        }
+                const size_t size = _nx * _ny;
+                const double* z = _z;
+                const double* dzdx = _dzdx;
+                const double* dzdy = _dzdy;
+                const double* d2zdxdy = _d2zdxdy;
+                #pragma omp target exit data \
+                    map(release:z[:size], dzdx[:size], dzdy[:size], d2zdxdy[:size])
+            }
+        #endif
     }
 
     double oneDSpline(double x, double val0, double val1, double der0, double der1) {
@@ -165,24 +169,30 @@ namespace batoid {
         nz = norm;
     }
 
-    #pragma omp end declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp end declare target
+    #endif
 
-    Surface* Bicubic::getDevPtr() const {
-        if (!_devPtr) {
-            Surface* ptr;
-            // Allocate arrays on device
-            const size_t size = _nx*_ny;
-            const double* z = _z;
-            const double* dzdx = _dzdx;
-            const double* dzdy = _dzdy;
-            const double* d2zdxdy = _d2zdxdy;
-            #pragma omp target enter data map(to:z[:size], dzdx[:size], dzdy[:size], d2zdxdy[:size])
-            #pragma omp target map(from:ptr)
-            {
-                ptr = new Bicubic(_x0, _y0, _dx, _dy, z, dzdx, dzdy, d2zdxdy, _nx, _ny);
+    const Surface* Bicubic::getDevPtr() const {
+        #if defined _OPENMP && _OPENMP >= 201511
+            if (!_devPtr) {
+                Surface* ptr;
+                // Allocate arrays on device
+                const size_t size = _nx*_ny;
+                const double* z = _z;
+                const double* dzdx = _dzdx;
+                const double* dzdy = _dzdy;
+                const double* d2zdxdy = _d2zdxdy;
+                #pragma omp target enter data map(to:z[:size], dzdx[:size], dzdy[:size], d2zdxdy[:size])
+                #pragma omp target map(from:ptr)
+                {
+                    ptr = new Bicubic(_x0, _y0, _dx, _dy, z, dzdx, dzdy, d2zdxdy, _nx, _ny);
+                }
+                _devPtr = ptr;
             }
-            _devPtr = ptr;
-        }
-        return _devPtr;
+            return _devPtr;
+        #else
+            return this;
+        #endif
     }
 }

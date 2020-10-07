@@ -11,7 +11,7 @@ namespace batoid {
         Asphere(double R, double conic, const double* coefs, size_t size);
         ~Asphere();
 
-        virtual Surface* getDevPtr() const override;
+        virtual const Surface* getDevPtr() const override;
 
         virtual double sag(double, double) const override;
         virtual void normal(

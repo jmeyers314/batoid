@@ -11,7 +11,7 @@ namespace batoid {
         virtual double getReflect(double wavelength, double cosIncidenceAngle) const = 0;
         virtual double getTransmit(double wavelength, double cosIncidenceAngle) const = 0;
 
-        virtual Coating* getDevPtr() const = 0;
+        virtual const Coating* getDevPtr() const = 0;
 
     protected:
         mutable Coating* _devPtr;
@@ -26,7 +26,7 @@ namespace batoid {
         double getReflect(double wavelength, double cosIncidenceAngle) const override;
         double getTransmit(double wavelength, double cosIncidenceAngle) const override;
 
-        virtual Coating* getDevPtr() const override;
+        virtual const Coating* getDevPtr() const override;
 
     private:
         double _reflectivity;

@@ -12,7 +12,7 @@ namespace batoid {
 
         virtual double getN(double wavelength) const = 0;
 
-        virtual Medium* getDevPtr() const = 0;
+        virtual const Medium* getDevPtr() const = 0;
 
     protected:
         mutable Medium* _devPtr;
@@ -26,7 +26,7 @@ namespace batoid {
 
         double getN(double wavelength) const override;
 
-        Medium* getDevPtr() const override;
+        const Medium* getDevPtr() const override;
 
     private:
         const double _n;
@@ -40,7 +40,7 @@ namespace batoid {
 
         double getN(double wavelength) const override;
 
-        Medium* getDevPtr() const override;
+        const Medium* getDevPtr() const override;
 
     private:
         const double* _args;
@@ -56,7 +56,7 @@ namespace batoid {
 
         double getN(double wavelength) const override;
 
-        Medium* getDevPtr() const override;
+        const Medium* getDevPtr() const override;
 
     private:
         const double _B1, _B2, _B3, _C1, _C2, _C3;
@@ -70,7 +70,7 @@ namespace batoid {
 
         double getN(double wavelength) const override;
 
-        Medium* getDevPtr() const override;
+        const Medium* getDevPtr() const override;
 
     private:
             const double _A0, _A1, _A2, _A3, _A4, _A5;
@@ -84,7 +84,7 @@ namespace batoid {
 
         double getN(double wavelength) const override;
 
-        Medium* getDevPtr() const override;
+        const Medium* getDevPtr() const override;
 
     private:
         const double _pressure, _temperature, _h2o_pressure; // input vars

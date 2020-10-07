@@ -6,7 +6,9 @@
 
 namespace batoid {
 
-    #pragma omp declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp declare target
+    #endif
 
         Obscuration::Obscuration() :
             _devPtr(nullptr)
@@ -25,22 +27,30 @@ namespace batoid {
             return std::hypot(x-_x0, y-_y0) < _radius;
         }
 
-    #pragma omp end declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp end declare target
+    #endif
 
-    Obscuration* ObscCircle::getDevPtr() const {
-        if (_devPtr)
-            return _devPtr;
-        Obscuration* ptr;
-        #pragma omp target map(from:ptr)
-        {
-            ptr = new ObscCircle(_radius, _x0, _y0);
-        }
-        _devPtr = ptr;
-        return ptr;
+    const Obscuration* ObscCircle::getDevPtr() const {
+        #if defined _OPENMP && _OPENMP >= 201511
+            if (_devPtr)
+                return _devPtr;
+            Obscuration* ptr;
+            #pragma omp target map(from:ptr)
+            {
+                ptr = new ObscCircle(_radius, _x0, _y0);
+            }
+            _devPtr = ptr;
+            return ptr;
+        #else
+            return this;
+        #endif
     }
 
 
-    #pragma omp declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp declare target
+    #endif
 
         ObscAnnulus::ObscAnnulus(double inner, double outer, double x0, double y0) :
             _inner(inner), _outer(outer), _x0(x0), _y0(y0)
@@ -53,22 +63,30 @@ namespace batoid {
             return (_inner <= h) && (h < _outer);
         }
 
-    #pragma omp end declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp end declare target
+    #endif
 
-    Obscuration* ObscAnnulus::getDevPtr() const {
-        if (_devPtr)
-            return _devPtr;
-        Obscuration* ptr;
-        #pragma omp target map(from:ptr)
-        {
-            ptr = new ObscAnnulus(_inner, _outer, _x0, _y0);
-        }
-        _devPtr = ptr;
-        return ptr;
+    const Obscuration* ObscAnnulus::getDevPtr() const {
+        #if defined _OPENMP && _OPENMP >= 201511
+            if (_devPtr)
+                return _devPtr;
+            Obscuration* ptr;
+            #pragma omp target map(from:ptr)
+            {
+                ptr = new ObscAnnulus(_inner, _outer, _x0, _y0);
+            }
+            _devPtr = ptr;
+            return ptr;
+        #else
+            return this;
+        #endif
     }
 
 
-    #pragma omp declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp declare target
+    #endif
 
         ObscRectangle::ObscRectangle(double w, double h, double x0, double y0, double th) :
             Obscuration(), _width(w), _height(h), _x0(x0), _y0(y0), _theta(th),
@@ -83,22 +101,30 @@ namespace batoid {
             return (xp > -_width/2 && xp < _width/2 && yp > -_height/2 && yp < _height/2);
         }
 
-    #pragma omp end declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp end declare target
+    #endif
 
-    Obscuration* ObscRectangle::getDevPtr() const {
-        if (_devPtr)
-            return _devPtr;
-        ObscRectangle* ptr;
-        #pragma omp target map(from:ptr)
-        {
-            ptr = new ObscRectangle(_width, _height, _x0, _y0, _theta);
-        }
-        _devPtr = ptr;
-        return ptr;
+    const Obscuration* ObscRectangle::getDevPtr() const {
+        #if defined _OPENMP && _OPENMP >= 201511
+            if (_devPtr)
+                return _devPtr;
+            ObscRectangle* ptr;
+            #pragma omp target map(from:ptr)
+            {
+                ptr = new ObscRectangle(_width, _height, _x0, _y0, _theta);
+            }
+            _devPtr = ptr;
+            return ptr;
+        #else
+            return this;
+        #endif
     }
 
 
-    #pragma omp declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp declare target
+    #endif
 
         ObscRay::ObscRay(double w, double th, double x0, double y0) :
             Obscuration(), _width(w), _theta(th), _x0(x0), _y0(y0),
@@ -113,30 +139,50 @@ namespace batoid {
             return (xp > 0.0 && yp > -_width/2 && yp < _width/2);
         }
 
-    #pragma omp end declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp end declare target
+    #endif
 
-    Obscuration* ObscRay::getDevPtr() const {
-        if (_devPtr)
-            return _devPtr;
-        ObscRay* ptr;
-        #pragma omp target map(from:ptr)
-        {
-            ptr = new ObscRay(_width, _theta, _x0, _y0);
-        }
-        _devPtr = ptr;
-        return ptr;
+    const Obscuration* ObscRay::getDevPtr() const {
+        #if defined _OPENMP && _OPENMP >= 201511
+            if (_devPtr)
+                return _devPtr;
+            ObscRay* ptr;
+            #pragma omp target map(from:ptr)
+            {
+                ptr = new ObscRay(_width, _theta, _x0, _y0);
+            }
+            _devPtr = ptr;
+            return ptr;
+        #else
+            return this;
+        #endif
     }
 
 
-    #pragma omp declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp declare target
+    #endif
 
         ObscPolygon::ObscPolygon(const double* xp, const double* yp, const size_t size) :
-            Obscuration(), _xp(_copyArr(xp, size)), _yp(_copyArr(yp, size)), _size(size)
+            Obscuration(), _xp(xp), _yp(yp), _size(size)
         {}
 
         ObscPolygon::~ObscPolygon() {
-            delete[] _xp;
-            delete[] _yp;
+            #if defined _OPENMP && _OPENMP >= 201511
+                if (_devPtr) {
+                    Obscuration* ptr = _devPtr;
+                    #pragma omp target is_device_ptr(ptr)
+                    {
+                        delete ptr;
+                    }
+
+                    const double* xp = _xp;
+                    const double* yp = _yp;
+                    #pragma omp target exit data \
+                        map(release:xp[:_size], yp[:_size])
+                }
+            #endif
         }
 
         bool ObscPolygon::contains(double x, double y) const {
@@ -165,31 +211,36 @@ namespace batoid {
             return inside;
         }
 
-        double* ObscPolygon::_copyArr(const double* arr, const size_t size) {
-            double* out = new double[size];
-            for(int i=0; i<size; i++)
-                out[i] = arr[i];
-            return out;
-        }
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp end declare target
+    #endif
 
-    #pragma omp end declare target
-
-    Obscuration* ObscPolygon::getDevPtr() const {
-        if (!_devPtr) {
-            Obscuration* ptr;
-            #pragma omp target map(from:ptr) map(to:_xp[:_size], _yp[:_size])
-            {
-                ptr = new ObscPolygon(_xp, _yp, _size);
+    const Obscuration* ObscPolygon::getDevPtr() const {
+        #if defined _OPENMP && _OPENMP >= 201511
+            if (!_devPtr) {
+                Obscuration* ptr;
+                // Allocate arrays on device
+                const double* xp = _xp;
+                const double* yp = _yp;
+                #pragma omp target enter data map(to:xp[:_size], yp[:_size])
+                #pragma omp target map(from:ptr)
+                {
+                    ptr = new ObscPolygon(xp, yp, _size);
+                }
+                _devPtr = ptr;
             }
-            _devPtr = ptr;
-        }
-        return _devPtr;
+            return _devPtr;
+        #else
+            return this;
+        #endif
     }
 
 
-    #pragma omp declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp declare target
+    #endif
 
-        ObscNegation::ObscNegation(Obscuration* original) :
+        ObscNegation::ObscNegation(const Obscuration* original) :
             Obscuration(), _original(original)
         {}
 
@@ -199,35 +250,45 @@ namespace batoid {
             return !_original->contains(x, y);
         }
 
-    #pragma omp end declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp end declare target
+    #endif
 
-    Obscuration* ObscNegation::getDevPtr() const {
-        if (_devPtr)
-            return _devPtr;
-        ObscNegation* ptr;
-        Obscuration* originalDevPtr = _original->getDevPtr();
+    const Obscuration* ObscNegation::getDevPtr() const {
+        #if defined _OPENMP && _OPENMP >= 201511
+            if (_devPtr)
+                return _devPtr;
+            ObscNegation* ptr;
+            const Obscuration* originalDevPtr = _original->getDevPtr();
 
-        #pragma omp target map(from:ptr) is_device_ptr(originalDevPtr)
-        {
-            ptr = new ObscNegation(originalDevPtr);
-        }
-        _devPtr = ptr;
-        return ptr;
+            #pragma omp target map(from:ptr) is_device_ptr(originalDevPtr)
+            {
+                ptr = new ObscNegation(originalDevPtr);
+            }
+            _devPtr = ptr;
+            return ptr;
+        #else
+            return this;
+        #endif
     }
 
 
-    #pragma omp declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp declare target
+    #endif
 
-        ObscUnion::ObscUnion(Obscuration** obscs, size_t nobsc) :
-            Obscuration(), _nobsc(nobsc)
-        {
-            _obscs = new Obscuration*[_nobsc];
-            for (int i=0; i<_nobsc; i++) {
-                _obscs[i] = obscs[i];
-            }
+        ObscUnion::ObscUnion(const Obscuration** obscs, size_t nobsc) :
+            Obscuration(), _obscs(obscs), _nobsc(nobsc)
+        {}
+
+        ObscUnion::~ObscUnion() {
+            #if defined _OPENMP && _OPENMP >= 201511
+                if (_devPtr) {
+                    const Obscuration** obscs = _obscs;
+                    #pragma omp target exit data map(release:obscs[:_nobsc])
+                }
+            #endif
         }
-
-        ObscUnion::~ObscUnion() {}
 
         bool ObscUnion::contains(double x, double y) const {
             bool ret = false;
@@ -237,38 +298,48 @@ namespace batoid {
             return ret;
         }
 
-    #pragma omp end declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp end declare target
+    #endif
 
-    Obscuration* ObscUnion::getDevPtr() const {
-        if (_devPtr)
-            return _devPtr;
-        Obscuration** devPtrs = new Obscuration*[_nobsc];
-        for (int i=0; i<_nobsc; i++) {
-            devPtrs[i] = _obscs[i]->getDevPtr();
-        }
-        ObscUnion* ptr;
-        // create device shadow instance
-        #pragma omp target map(from:ptr) map(to:devPtrs[:_nobsc])
-        {
-            ptr = new ObscUnion(devPtrs, _nobsc);
-        }
-        _devPtr = ptr;
-        return ptr;
+    const Obscuration* ObscUnion::getDevPtr() const {
+        #if defined _OPENMP && _OPENMP >= 201511
+            if (_devPtr)
+                return _devPtr;
+            const Obscuration** obscs = new const Obscuration*[_nobsc];
+            for (int i=0; i<_nobsc; i++) {
+                obscs[i] = _obscs[i]->getDevPtr();
+            }
+            Obscuration* ptr;
+            #pragma omp target enter data map(to:obscs[:_nobsc])
+            #pragma omp target map(from:ptr)
+            {
+                ptr = new ObscUnion(obscs, _nobsc);
+            }
+            _devPtr = ptr;
+            return ptr;
+        #else
+            return this;
+        #endif
     }
 
 
-    #pragma omp declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp declare target
+    #endif
 
-        ObscIntersection::ObscIntersection(Obscuration** obscs, size_t nobsc) :
-            Obscuration(), _nobsc(nobsc)
-        {
-            _obscs = new Obscuration*[_nobsc];
-            for (int i=0; i<_nobsc; i++) {
-                _obscs[i] = obscs[i];
-            }
+        ObscIntersection::ObscIntersection(const Obscuration** obscs, size_t nobsc) :
+            Obscuration(), _obscs(obscs), _nobsc(nobsc)
+        {}
+
+        ObscIntersection::~ObscIntersection() {
+            #if defined _OPENMP && _OPENMP >= 201511
+                if (_devPtr) {
+                    const Obscuration** obscs = _obscs;
+                    #pragma omp target exit data map(release:obscs[:_nobsc])
+                }
+            #endif
         }
-
-        ObscIntersection::~ObscIntersection() {}
 
         bool ObscIntersection::contains(double x, double y) const {
             bool ret = true;
@@ -278,22 +349,28 @@ namespace batoid {
             return ret;
         }
 
-    #pragma omp end declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp end declare target
+    #endif
 
-    Obscuration* ObscIntersection::getDevPtr() const {
-        if (_devPtr)
-            return _devPtr;
-        Obscuration** devPtrs = new Obscuration*[_nobsc];
-        for (int i=0; i<_nobsc; i++) {
-            devPtrs[i] = _obscs[i]->getDevPtr();
-        }
-        ObscIntersection* ptr;
-        // create device shadow instance
-        #pragma omp target map(from:ptr) map(to:devPtrs[:_nobsc])
-        {
-            ptr = new ObscIntersection(devPtrs, _nobsc);
-        }
-        _devPtr = ptr;
-        return ptr;
+    const Obscuration* ObscIntersection::getDevPtr() const {
+        #if defined _OPENMP && _OPENMP >= 201511
+            if (_devPtr)
+                return _devPtr;
+            const Obscuration** obscs = new const Obscuration*[_nobsc];
+            for (int i=0; i<_nobsc; i++) {
+                obscs[i] = _obscs[i]->getDevPtr();
+            }
+            Obscuration* ptr;
+            #pragma omp target enter data map(to:obscs[:_nobsc])
+            #pragma omp target map(from:ptr)
+            {
+                ptr = new ObscIntersection(obscs, _nobsc);
+            }
+            _devPtr = ptr;
+            return ptr;
+        #else
+            return this;
+        #endif
     }
 }

@@ -3,7 +3,9 @@
 
 namespace batoid {
 
-    #pragma omp declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp declare target
+    #endif
 
     double* Asphere::_computeDzDrCoefs(const double* coefs, const size_t size) {
         double* result = new double[size];
@@ -22,16 +24,18 @@ namespace batoid {
 
     Asphere::~Asphere()
     {
-        if (_devPtr) {
-            Surface* ptr = _devPtr;
-            #pragma omp target is_device_ptr(ptr)
-            {
-                delete ptr;
+        #if defined _OPENMP && _OPENMP >= 201511
+            if (_devPtr) {
+                Surface* ptr = _devPtr;
+                #pragma omp target is_device_ptr(ptr)
+                {
+                    delete ptr;
+                }
+                const size_t size = _size;
+                const double* coefs = _coefs;
+                #pragma omp target exit data map(release:coefs[:size])
             }
-            const size_t size = _size;
-            const double* coefs = _coefs;
-            #pragma omp target exit data map(release:coefs[:size])
-        }
+        #endif
         delete[] _dzdrcoefs;
     }
 
@@ -85,21 +89,27 @@ namespace batoid {
         return Surface::timeToIntersect(x, y, z, vx, vy, vz, dt);
     }
 
-    #pragma omp end declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp end declare target
+    #endif
 
-    Surface* Asphere::getDevPtr() const {
-        if (!_devPtr) {
-            Surface* ptr;
-            // Allocate coef array on device
-            const double* coefs = _coefs;
-            #pragma omp target enter data map(to:coefs[:_size])
-            #pragma omp target map(from:ptr)
-            {
-                ptr = new Asphere(_R, _conic, coefs, _size);
+    const Surface* Asphere::getDevPtr() const {
+        #if defined _OPENMP && _OPENMP >= 201511
+            if (!_devPtr) {
+                Surface* ptr;
+                // Allocate coef array on device
+                const double* coefs = _coefs;
+                #pragma omp target enter data map(to:coefs[:_size])
+                #pragma omp target map(from:ptr)
+                {
+                    ptr = new Asphere(_R, _conic, coefs, _size);
+                }
+                _devPtr = ptr;
             }
-            _devPtr = ptr;
-        }
         return _devPtr;
+        #else
+            return this;
+        #endif
     }
 
 }

@@ -3,7 +3,9 @@
 
 namespace batoid {
 
-    #pragma omp declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp declare target
+    #endif
 
     Coating::Coating() :
         _devPtr(nullptr)
@@ -31,19 +33,25 @@ namespace batoid {
         return _transmissivity;
     }
 
-    #pragma omp end declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp end declare target
+    #endif
 
 
-    Coating* SimpleCoating::getDevPtr() const {
-        if (!_devPtr) {
-            Coating* ptr;
-            #pragma omp target map(from:ptr)
-            {
-                ptr = new SimpleCoating(_reflectivity, _transmissivity);
+    const Coating* SimpleCoating::getDevPtr() const {
+        #if defined _OPENMP && _OPENMP >= 201511
+            if (!_devPtr) {
+                Coating* ptr;
+                #pragma omp target map(from:ptr)
+                {
+                    ptr = new SimpleCoating(_reflectivity, _transmissivity);
+                }
+                _devPtr = ptr;
             }
-            _devPtr = ptr;
-        }
-        return _devPtr;
+            return _devPtr;
+        #else
+            return this;
+        #endif
     }
 
 

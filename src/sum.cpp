@@ -3,17 +3,21 @@
 
 namespace batoid {
 
-    #pragma omp declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp declare target
+    #endif
 
-    Sum::Sum(Surface** surfaces, size_t nsurf) :
+    Sum::Sum(const Surface** surfaces, size_t nsurf) :
         Surface(), _surfaces(surfaces), _nsurf(nsurf)
     {}
 
     Sum::~Sum() {
-        if (_devPtr) {
-            Surface** surfaces = _surfaces;
-            #pragma omp target exit data map(release:surfaces[:_nsurf])
-        }
+        #if defined _OPENMP && _OPENMP >= 201511
+            if (_devPtr) {
+                const Surface** surfaces = _surfaces;
+                #pragma omp target exit data map(release:surfaces[:_nsurf])
+            }
+        #endif
     }
 
     double Sum::sag(double x, double y) const {
@@ -51,24 +55,30 @@ namespace batoid {
         return Surface::timeToIntersect(x, y, z, vx, vy, vz, dt);
     }
 
-    #pragma omp end declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp end declare target
+    #endif
 
 
-    Surface* Sum::getDevPtr() const {
-        if (_devPtr)
-            return _devPtr;
-        Surface** surfaces = new Surface*[_nsurf];
-        for (int i=0; i<_nsurf; i++) {
-            surfaces[i] = _surfaces[i]->getDevPtr();
-        }
-        Surface* ptr;
-        #pragma omp target enter data map(to:surfaces[:_nsurf])
-        #pragma omp target map(from:ptr)
-        {
-            ptr = new Sum(surfaces, _nsurf);
-        }
-        _devPtr = ptr;
-        return ptr;
+    const Surface* Sum::getDevPtr() const {
+        #if defined _OPENMP && _OPENMP >= 201511
+            if (_devPtr)
+                return _devPtr;
+            const Surface** surfaces = new const Surface*[_nsurf];
+            for (int i=0; i<_nsurf; i++) {
+                surfaces[i] = _surfaces[i]->getDevPtr();
+            }
+            Surface* ptr;
+            #pragma omp target enter data map(to:surfaces[:_nsurf])
+            #pragma omp target map(from:ptr)
+            {
+                ptr = new Sum(surfaces, _nsurf);
+            }
+            _devPtr = ptr;
+            return ptr;
+        #else
+            return this;
+        #endif
     }
 
 }

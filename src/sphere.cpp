@@ -2,7 +2,9 @@
 
 namespace batoid {
 
-    #pragma omp declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp declare target
+    #endif
 
     Sphere::Sphere(double R) :
         _R(R), _Rsq(R*R), _Rinv(1./R), _Rinvsq(1./R/R)
@@ -69,19 +71,24 @@ namespace batoid {
         return rat/sqrt(1-rat*rat);
     }
 
-    #pragma omp end declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp end declare target
+    #endif
 
-
-    Surface* Sphere::getDevPtr() const {
-        if (!_devPtr) {
-            Surface* ptr;
-            #pragma omp target map(from:ptr)
-            {
-                ptr = new Sphere(_R);
+    const Surface* Sphere::getDevPtr() const {
+        #if defined _OPENMP && _OPENMP >= 201511
+            if (!_devPtr) {
+                Surface* ptr;
+                #pragma omp target map(from:ptr)
+                {
+                    ptr = new Sphere(_R);
+                }
+                _devPtr = ptr;
             }
-            _devPtr = ptr;
-        }
-        return _devPtr;
+            return _devPtr;
+        #else
+            return this;
+        #endif
     }
 
 }

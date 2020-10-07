@@ -77,16 +77,20 @@ namespace batoid {
     #pragma omp end declare target
 
 
-    Surface* Quadric::getDevPtr() const {
-        if (!_devPtr) {
-            Surface* ptr;
-            #pragma omp target map(from:ptr)
-            {
-                ptr = new Quadric(_R, _conic);
+    const Surface* Quadric::getDevPtr() const {
+        #if defined _OPENMP && _OPENMP >= 201511
+            if (!_devPtr) {
+                Surface* ptr;
+                #pragma omp target map(from:ptr)
+                {
+                    ptr = new Quadric(_R, _conic);
+                }
+                _devPtr = ptr;
             }
-            _devPtr = ptr;
-        }
-        return _devPtr;
+            return _devPtr;
+        #else
+            return this;
+        #endif
     }
 
 

@@ -53,7 +53,7 @@ namespace batoid {
         py::class_<ObscUnion, std::shared_ptr<ObscUnion>, Obscuration>(m, "CPPObscUnion")
             .def(py::init(
                 [](const std::vector<std::shared_ptr<Obscuration>>& obscs) {
-                    Obscuration** _obscs = new Obscuration*[obscs.size()];
+                    const Obscuration** _obscs = new const Obscuration*[obscs.size()];
                     for (int i=0; i<obscs.size(); i++) {
                         _obscs[i] = obscs[i].get();
                     }
@@ -64,7 +64,7 @@ namespace batoid {
         py::class_<ObscIntersection, std::shared_ptr<ObscIntersection>, Obscuration>(m, "CPPObscIntersection")
             .def(py::init(
                 [](const std::vector<std::shared_ptr<Obscuration>>& obscs) {
-                    Obscuration** _obscs = new Obscuration*[obscs.size()];
+                    const Obscuration** _obscs = new const Obscuration*[obscs.size()];
                     for (int i=0; i<obscs.size(); i++) {
                         _obscs[i] = obscs[i].get();
                     }

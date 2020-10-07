@@ -11,7 +11,7 @@ namespace batoid {
 
         virtual bool contains(double x, double y) const = 0;
 
-        virtual Obscuration* getDevPtr() const = 0;
+        virtual const Obscuration* getDevPtr() const = 0;
 
     protected:
         mutable Obscuration* _devPtr;
@@ -25,7 +25,7 @@ namespace batoid {
 
         bool contains(double x, double y) const override;
 
-        Obscuration* getDevPtr() const override;
+        const Obscuration* getDevPtr() const override;
 
     private:
         const double _radius, _x0, _y0;
@@ -39,7 +39,7 @@ namespace batoid {
 
         bool contains(double x, double y) const override;
 
-        Obscuration* getDevPtr() const override;
+        const Obscuration* getDevPtr() const override;
 
     private:
         const double _inner, _outer, _x0, _y0;
@@ -53,7 +53,7 @@ namespace batoid {
 
         bool contains(double x, double y) const override;
 
-        Obscuration* getDevPtr() const override;
+        const Obscuration* getDevPtr() const override;
 
     private:
         const double _width, _height, _x0, _y0, _theta;
@@ -68,7 +68,7 @@ namespace batoid {
 
         bool contains(double x, double y) const override;
 
-        Obscuration* getDevPtr() const override;
+        const Obscuration* getDevPtr() const override;
 
     private:
         const double _width, _theta, _x0, _y0;
@@ -83,7 +83,7 @@ namespace batoid {
 
         bool contains(double x, double y) const override;
 
-        Obscuration* getDevPtr() const override;
+        const Obscuration* getDevPtr() const override;
 
     private:
         const double* _xp;
@@ -96,12 +96,12 @@ namespace batoid {
 
     class ObscNegation : public Obscuration {
     public:
-        ObscNegation(Obscuration* original);
+        ObscNegation(const Obscuration* original);
         ~ObscNegation();
 
         bool contains(double x, double y) const override;
 
-        Obscuration* getDevPtr() const override;
+        const Obscuration* getDevPtr() const override;
 
     private:
         const Obscuration* _original;
@@ -110,30 +110,30 @@ namespace batoid {
 
     class ObscUnion : public Obscuration {
     public:
-        ObscUnion(Obscuration** obscs, size_t nobsc);
+        ObscUnion(const Obscuration** obscs, size_t nobsc);
         ~ObscUnion();
 
         bool contains(double x, double y) const override;
 
-        Obscuration* getDevPtr() const override;
+        const Obscuration* getDevPtr() const override;
 
     private:
-        Obscuration** _obscs;
+        const Obscuration** _obscs;
         size_t _nobsc;
     };
 
 
     class ObscIntersection : public Obscuration {
     public:
-        ObscIntersection(Obscuration** obscs, size_t nobsc);
+        ObscIntersection(const Obscuration** obscs, size_t nobsc);
         ~ObscIntersection();
 
         bool contains(double x, double y) const override;
 
-        Obscuration* getDevPtr() const override;
+        const Obscuration* getDevPtr() const override;
 
     private:
-        Obscuration** _obscs;
+        const Obscuration** _obscs;
         size_t _nobsc;
     };
 }

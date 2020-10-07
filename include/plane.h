@@ -10,7 +10,7 @@ namespace batoid {
         Plane();
         ~Plane();
 
-        virtual Surface* getDevPtr() const override;
+        virtual const Surface* getDevPtr() const override;
 
         virtual double sag(double x, double y) const override;
         virtual void normal(

@@ -3,7 +3,9 @@
 namespace batoid {
 
 
-    #pragma omp declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp declare target
+    #endif
 
     PolynomialSurface::PolynomialSurface(
         const double* coefs, const double* coefs_gradx, const double* coefs_grady,
@@ -15,21 +17,23 @@ namespace batoid {
     {}
 
     PolynomialSurface::~PolynomialSurface() {
-        if (_devPtr) {
-            Surface* ptr = _devPtr;
-            #pragma omp target is_device_ptr(ptr)
-            {
-                delete ptr;
-            }
+        #if defined _OPENMP && _OPENMP >= 201511
+            if (_devPtr) {
+                Surface* ptr = _devPtr;
+                #pragma omp target is_device_ptr(ptr)
+                {
+                    delete ptr;
+                }
 
-            const size_t size = _nx * _ny;
-            const size_t sizem1 = (_nx-1) * (_ny-1);
-            const double* coefs = _coefs;
-            const double* coefs_gradx = _coefs_gradx;
-            const double* coefs_grady = _coefs_grady;
-            #pragma omp target exit data \
-                map(release:coefs[:size], coefs_gradx[:sizem1], coefs_grady[:sizem1])
-        }
+                const size_t size = _nx * _ny;
+                const size_t sizem1 = (_nx-1) * (_ny-1);
+                const double* coefs = _coefs;
+                const double* coefs_gradx = _coefs_gradx;
+                const double* coefs_grady = _coefs_grady;
+                #pragma omp target exit data \
+                    map(release:coefs[:size], coefs_gradx[:sizem1], coefs_grady[:sizem1])
+            }
+        #endif
     }
 
     double PolynomialSurface::sag(double x, double y) const {
@@ -62,26 +66,32 @@ namespace batoid {
         return result;
     }
 
-    #pragma omp end declare target
+    #if defined _OPENMP && _OPENMP >= 201511
+        #pragma omp end declare target
+    #endif
 
-    Surface* PolynomialSurface::getDevPtr() const {
-        if (!_devPtr) {
-            Surface* ptr;
-            // Allocate arrays on device
-            const size_t size = _nx * _ny;
-            const size_t sizem1 = (_nx-1) * (_ny-1);
-            const double* coefs = _coefs;
-            const double* coefs_gradx = _coefs_gradx;
-            const double* coefs_grady = _coefs_grady;
-            #pragma omp target enter data \
-                map(to:coefs[:size], coefs_gradx[:sizem1], coefs_grady[:sizem1])
-            #pragma omp target map(from:ptr)
-            {
-                ptr = new PolynomialSurface(coefs, coefs_gradx, coefs_grady, _nx, _ny);
+    const Surface* PolynomialSurface::getDevPtr() const {
+        #if defined _OPENMP && _OPENMP >= 201511
+            if (!_devPtr) {
+                Surface* ptr;
+                // Allocate arrays on device
+                const size_t size = _nx * _ny;
+                const size_t sizem1 = (_nx-1) * (_ny-1);
+                const double* coefs = _coefs;
+                const double* coefs_gradx = _coefs_gradx;
+                const double* coefs_grady = _coefs_grady;
+                #pragma omp target enter data \
+                    map(to:coefs[:size], coefs_gradx[:sizem1], coefs_grady[:sizem1])
+                #pragma omp target map(from:ptr)
+                {
+                    ptr = new PolynomialSurface(coefs, coefs_gradx, coefs_grady, _nx, _ny);
+                }
+                _devPtr = ptr;
             }
-            _devPtr = ptr;
-        }
-        return _devPtr;
+            return _devPtr;
+        #else
+            return this;
+        #endif
     }
 
 }

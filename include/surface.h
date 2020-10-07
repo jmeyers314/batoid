@@ -8,7 +8,7 @@ namespace batoid {
     public:
         virtual ~Surface();
 
-        virtual Surface* getDevPtr() const = 0;
+        virtual const Surface* getDevPtr() const = 0;
 
         virtual double sag(double x, double y) const = 0;
         virtual void normal(

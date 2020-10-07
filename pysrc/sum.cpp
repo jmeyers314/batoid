@@ -10,7 +10,7 @@ namespace batoid {
         py::class_<Sum, std::shared_ptr<Sum>, Surface>(m, "CPPSum")
             .def(py::init(
                 [](const std::vector<std::shared_ptr<Surface>>& surfaces) {
-                    Surface** _surfaces = new Surface*[surfaces.size()];
+                    const Surface** _surfaces = new const Surface*[surfaces.size()];
                     for (int i=0; i<surfaces.size(); i++) {
                         _surfaces[i] = surfaces[i].get();
                     }
