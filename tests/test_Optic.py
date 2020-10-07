@@ -207,7 +207,7 @@ def test_rotation():
     np.testing.assert_allclose(
         batoid.zernikeGQ(telescope, theta_x, theta_y, wavelength),
         batoid.zernikeGQ(rotTel, theta_x, theta_y, wavelength),
-        atol=1e-8
+        atol=1e-7
     )
 
     for item in telescope.itemDict:
@@ -219,12 +219,12 @@ def test_rotation():
         np.testing.assert_allclose(
             batoid.zernikeGQ(telescope, theta_x, theta_y, wavelength),
             batoid.zernikeGQ(rotTel, theta_x, theta_y, wavelength),
-            atol=1e-8
+            atol=1e-7
         )
         np.testing.assert_allclose(
             batoid.zernikeGQ(telescope, theta_x, theta_y, wavelength),
             batoid.zernikeGQ(rotTel2, theta_x, theta_y, wavelength),
-            atol=1e-8
+            atol=1e-7
         )
     # Test with non-fully-qualified name
     rotTel = telescope.withLocallyRotatedOptic('G1', rot)
@@ -233,12 +233,12 @@ def test_rotation():
     np.testing.assert_allclose(
         batoid.zernikeGQ(telescope, theta_x, theta_y, wavelength),
         batoid.zernikeGQ(rotTel, theta_x, theta_y, wavelength),
-        atol=1e-8
+        atol=1e-7
     )
     np.testing.assert_allclose(
         batoid.zernikeGQ(telescope, theta_x, theta_y, wavelength),
         batoid.zernikeGQ(rotTel2, theta_x, theta_y, wavelength),
-        atol=1e-8
+        atol=1e-7
     )
 
 
