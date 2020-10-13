@@ -25,6 +25,7 @@ jobs:
       language: shell
       env:
         - TRAVIS_PYTHON_VERSION=3.6
+        - PATH=/Users/travis/Library/Python/3.6/bin:$PATH
       name: OSX (Python 3.6)
 
     - os: osx
@@ -32,6 +33,7 @@ jobs:
       language: shell
       env:
         - TRAVIS_PYTHON_VERSION=3.7
+        - PATH=/Users/travis/Library/Python/3.7/bin:$PATH
       name: OSX (Python 3.7)
 
 before_install:
@@ -43,11 +45,12 @@ before_install:
   - if [[ $TRAVIS_OS_NAME == "osx" ]]; then brew install ccache; export PATH="/usr/local/opt/ccache/libexec:$PATH"; fi
 
 cache:
-  ccache: true
   pip: true
   directories:
     - $HOME/Library/Caches/Homebrew
-    - /usr/local/Cellar/
+    - /usr/local/Cellar
+    - /usr/local/Homebrew
+    - $HOME/.ccache
 
 install:
   # Update pip executable. (Needs sudo on some systems.)
