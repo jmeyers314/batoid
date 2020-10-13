@@ -62,8 +62,8 @@ class Lattice:
     def __eq__(self, rhs):
         if not isinstance(rhs, Lattice): return False
         return (
-            np.all(self.array == rhs.array) &
-            np.all(self.primitiveVectors == rhs.primitiveVectors)
+            np.array_equal(self.array, rhs.array) and
+            np.array_equal(self.primitiveVectors, rhs.primitiveVectors)
         )
 
     def __hash__(self):
