@@ -55,12 +55,22 @@ notebooks = [
     "Newtonian Telescope.ipynb",
     # "Rays.ipynb",
     "Thin Lens.ipynb",
-    pytest.param("FFT vs Huygens.ipynb", marks=pytest.mark.slow),
-    pytest.param("HSC ghosts.ipynb", marks=pytest.mark.slow),
-    pytest.param("LSST donuts.ipynb", marks=pytest.mark.slow),
-    pytest.param("LSST ghosts.ipynb", marks=pytest.mark.slow),
-    pytest.param("PH != Pupil.ipynb", marks=pytest.mark.slow)
 ]
+slow_notebooks = [
+    "FFT vs Huygens.ipynb",
+    "HSC ghosts.ipynb",
+    "LSST donuts.ipynb",
+    "LSST ghosts.ipynb",
+    "PH != Pupil.ipynb"
+]
+
+if __name__ == '__main__':
+    notebooks += slow_notebooks
+else:
+    notebooks += [
+        pytest.param(notebook, marks=pytest.mark.slow)
+        for notebook in slow_notebooks
+    ]
 
 
 @pytest.mark.timeout(600)
