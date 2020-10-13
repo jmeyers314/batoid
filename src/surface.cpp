@@ -21,8 +21,9 @@ namespace batoid {
         double rPz = z+vz*dt;
 
         double sz = sag(rPx, rPy);
-        // Always do exactly 10 iterations.  GPUifies better this way.
-        for (int iter=0; iter<10; iter++) {
+        // Always do exactly 5 iterations.  GPUifies better this way.
+        // Unit tests pass (as of 20/10/13) with just 3 iterations.
+        for (int iter=0; iter<5; iter++) {
             // repeatedly intersect plane tangent to surface at (rPx, rPy, sz) with ray
             double nx, ny, nz;
             normal(rPx, rPy, nx, ny, nz);
