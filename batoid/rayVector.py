@@ -20,33 +20,32 @@ def _reshape_arrays(arrays, shape, dtype=float):
     return arrays
 
 class RayVector:
+    """Create RayVector from 1d parameter arrays.  Always makes a copy
+    of input arrays.
+
+    Parameters
+    ----------
+    x, y, z : ndarray of float, shape (n,)
+        Positions of rays in meters.
+    vx, vy, vz : ndarray of float, shape (n,)
+        Velocities of rays in units of the speed of light in vacuum.
+    t : ndarray of float, shape (n,)
+        Reference times (divided by the speed of light in vacuum) in units
+        of meters.
+    wavelength : ndarray of float, shape (n,)
+        Vacuum wavelengths in meters.
+    flux : ndarray of float, shape (n,)
+        Fluxes in arbitrary units.
+    vignetted : ndarray of bool, shape (n,)
+        True where rays have been vignetted.
+    coordSys : CoordSys
+        Coordinate system in which this ray is expressed.  Default: the
+        global coordinate system.
+    """
     def __init__(
         self, x, y, z, vx, vy, vz, t=0, wavelength=500e-9, flux=1,
         vignetted=False, failed=False, coordSys=globalCoordSys
     ):
-        """Create RayVector from 1d parameter arrays.  Always makes a copy
-        of input arrays.
-
-        Parameters
-        ----------
-        x, y, z : ndarray of float, shape (n,)
-            Positions of rays in meters.
-        vx, vy, vz : ndarray of float, shape (n,)
-            Velocities of rays in units of the speed of light in vacuum.
-        t : ndarray of float, shape (n,)
-            Reference times (divided by the speed of light in vacuum) in units
-            of meters.
-        wavelength : ndarray of float, shape (n,)
-            Vacuum wavelengths in meters.
-        flux : ndarray of float, shape (n,)
-            Fluxes in arbitrary units.
-        vignetted : ndarray of bool, shape (n,)
-            True where rays have been vignetted.
-        coordSys : CoordSys
-            Coordinate system in which this ray is expressed.  Default: the
-            global coordinate system.
-        """
-
         shape = np.broadcast(
             x, y, z, vx, vy, vz, t, wavelength, flux, vignetted, failed
         ).shape
@@ -751,7 +750,7 @@ class RayVector:
         wavelength=None,
         source=None, dirCos=None,
         theta_x=None, theta_y=None, projection='postel',
-        flux=1, coordSys=globalCoordSys
+        flux=1
     ):
         """Create rays that intersects the "stop" surface at given points.
 
@@ -824,9 +823,6 @@ class RayVector:
             Projection used to convert field angle to direction cosines.
         flux : float, optional
             Flux of rays.  Default is 1.0.
-        coordSys : CoordSys
-            Coordinate system in which rays are expressed.  Default: the global
-            coordinate system.
         """
         from .optic import Interface
         from .surface import Plane
