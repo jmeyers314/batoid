@@ -6,7 +6,7 @@ from . import _batoid
 from .constants import globalCoordSys, vacuum
 from .coordSys import CoordSys
 from .coordTransform import CoordTransform
-from .trace import applyForwardTransform
+from .trace import applyForwardTransform, applyForwardTransformArrays
 from .utils import lazy_property, fieldToDirCos
 from .surface import Plane
 
@@ -18,6 +18,7 @@ def _reshape_arrays(arrays, shape, dtype=float):
             arrays[i] = np.array(np.broadcast_to(array, shape))
         arrays[i] = np.ascontiguousarray(arrays[i], dtype=dtype)
     return arrays
+
 
 class RayVector:
     """Create RayVector from 1d parameter arrays.  Always makes a copy
@@ -361,7 +362,7 @@ class RayVector:
         y = np.dot(ly, stack)
         z = stopSurface.surface.sag(x, y)
         transform = CoordTransform(stopSurface.coordSys, globalCoordSys)
-        x, y, z = transform.applyForwardArray(x, y, z)
+        applyForwardTransformArrays(transform, x, y, z)
 
         w = np.empty_like(x)
         w.fill(wavelength)
@@ -370,6 +371,7 @@ class RayVector:
         return cls._finish(backDist, source, dirCos, n, x, y, z, w, flux)
 
     @classmethod
+    # @profile
     def asPolar(
         cls,
         optic=None, backDist=None, medium=None, stopSurface=None,
@@ -506,30 +508,34 @@ class RayVector:
             raise ValueError("Missing wavelength keyword")
 
         if nrandom is None:
-            ths = []
-            rs = []
-            for r in np.linspace(outer, inner, nrad):
-                if r == 0:
-                    break
-                nphi = int((naz*r/outer)//6)*6
+            nphis = []
+            rrs = np.linspace(outer, inner, nrad)
+            for rr in rrs:
+                nphi = int((naz*rr/outer)//6)*6
                 if nphi == 0:
                     nphi = 6
-                ths.append(np.linspace(0, 2*np.pi, nphi, endpoint=False))
-                rs.append(np.ones(nphi)*r)
-            # Point in center is a special case
+                nphis.append(nphi)
             if inner == 0.0:
-                ths[-1] = np.array([0.0])
-                rs[-1] = np.array([0.0])
-            r = np.concatenate(rs)
-            th = np.concatenate(ths)
+                nphis[-1] = 1
+            th = np.empty(np.sum(nphis))
+            r = np.empty(np.sum(nphis))
+            idx = 0
+            for rr, nphi in zip(rrs, nphis):
+                r[idx:idx+nphi] = rr
+                th[idx:idx+nphi] = np.linspace(0, 2*np.pi, nphi, endpoint=False)
+                idx += nphi
+            if inner == 0.0:
+                r[-1] = 0.0
+                th[-1] = 0.0
         else:
             r = np.sqrt(np.random.uniform(inner**2, outer**2, size=nrandom))
             th = np.random.uniform(0, 2*np.pi, size=nrandom)
         x = r*np.cos(th)
         y = r*np.sin(th)
+        del r, th
         z = stopSurface.surface.sag(x, y)
         transform = CoordTransform(stopSurface.coordSys, globalCoordSys)
-        x, y, z = transform.applyForwardArray(x, y, z)
+        applyForwardTransformArrays(transform, x, y, z)
         w = np.empty_like(x)
         w.fill(wavelength)
         n = medium.getN(wavelength)
@@ -693,7 +699,7 @@ class RayVector:
         y = rings*np.sin(spokes)
         z = stopSurface.surface.sag(x, y)
         transform = CoordTransform(stopSurface.coordSys, globalCoordSys)
-        x, y, z = transform.applyForwardArray(x, y, z)
+        applyForwardTransformArrays(transform, x, y, z)
         w = np.empty_like(x)
         w.fill(wavelength)
         n = medium.getN(wavelength)
@@ -848,9 +854,11 @@ class RayVector:
         if wavelength is None:
             raise ValueError("Missing wavelength keyword")
 
+        x = np.atleast_1d(x)
+        y = np.atleast_1d(y)
         z = stopSurface.surface.sag(x, y)
         transform = CoordTransform(stopSurface.coordSys, globalCoordSys)
-        x, y, z = transform.applyForwardArray(x, y, z)
+        applyForwardTransformArrays(transform, x, y, z)
 
         w = np.empty_like(x)
         w.fill(wavelength)
@@ -1014,23 +1022,16 @@ class RayVector:
     def copy(self):
         # copy on host side for now...
         self._syncToHost()
-        x = self._r[:, 0].copy()
-        y = self._r[:, 1].copy()
-        z = self._r[:, 2].copy()
-        vx = self._v[:, 0].copy()
-        vy = self._v[:, 1].copy()
-        vz = self._v[:, 2].copy()
-        t = self._t.copy()
-        wavelength = self._wavelength.copy()
-        flux = self._flux.copy()
-        vignetted = self._vignetted.copy()
-        failed = self._failed.copy()
-
-        return RayVector(
-            x, y, z,
-            vx, vy, vz,
-            t, wavelength, flux, vignetted, failed, self.coordSys.copy()
-        )
+        ret = RayVector.__new__(RayVector)
+        ret._r = np.copy(self._r)
+        ret._v = np.copy(self._v)
+        ret._t = np.copy(self._t)
+        ret._wavelength = np.copy(self._wavelength)
+        ret._flux = np.copy(self._flux)
+        ret._vignetted = np.copy(self._vignetted)
+        ret._failed = np.copy(self._failed)
+        ret.coordSys = self.coordSys.copy()
+        return ret
 
     def toCoordSys(self, coordSys):
         """Transform this RayVector into a new coordinate system.

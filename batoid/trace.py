@@ -15,8 +15,24 @@ def applyReverseTransform(ct, rv):
     return rv
 
 
+def applyForwardTransformArrays(ct, x, y, z):
+    _batoid.applyForwardTransformArrays(
+        ct.dr, ct.drot.ravel(),
+        x.ctypes.data, y.ctypes.data, z.ctypes.data,
+        len(x)
+    )
+
+
+def applyReverseTransformArrays(ct, x, y, z):
+    _batoid.applyReverseTransformArrays(
+        ct.dr, ct.drot.ravel(),
+        x.ctypes.data, y.ctypes.data, z.ctypes.data,
+        len(x)
+    )
+
+
 def obscure(obsc, rv):
-    _batoid.obscure(obsc._obsc, rv._rv);
+    _batoid.obscure(obsc._obsc, rv._rv)
     return rv
 
 

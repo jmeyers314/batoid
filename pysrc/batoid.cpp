@@ -47,5 +47,41 @@ namespace batoid {
         m.def("refract", &refract);
         m.def("obscure", &obscure);
         m.def("rSplit", &rSplit);
+        m.def(
+            "applyForwardTransformArrays",
+            [](
+                const vec3 dr,
+                const mat3 drot,
+                size_t x,
+                size_t y,
+                size_t z,
+                size_t n
+            ){
+                applyForwardTransformArrays(
+                    dr, drot,
+                    reinterpret_cast<double*>(x),
+                    reinterpret_cast<double*>(y),
+                    reinterpret_cast<double*>(z),
+                    n
+                );
+            });
+        m.def(
+            "applyReverseTransformArrays",
+            [](
+                const vec3 dr,
+                const mat3 drot,
+                size_t x,
+                size_t y,
+                size_t z,
+                size_t n
+            ){
+                applyReverseTransformArrays(
+                    dr, drot,
+                    reinterpret_cast<double*>(x),
+                    reinterpret_cast<double*>(y),
+                    reinterpret_cast<double*>(z),
+                    n
+                );
+            });
     }
 }

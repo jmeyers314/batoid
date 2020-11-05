@@ -3,6 +3,36 @@
 namespace batoid {
 
 
+    void applyForwardTransformArrays(
+        const vec3 dr, const mat3 drot,
+        double* x, double* y, double* z,
+        size_t n
+    ) {
+        for(size_t i=0; i<n; i++) {
+            double dx = x[i]-dr[0];
+            double dy = y[i]-dr[1];
+            double dz = z[i]-dr[2];
+            x[i] = dx*drot[0] + dy*drot[3] + dz*drot[6];
+            y[i] = dx*drot[1] + dy*drot[4] + dz*drot[7];
+            z[i] = dx*drot[2] + dy*drot[5] + dz*drot[8];
+        }
+    }
+
+    void applyReverseTransformArrays(
+        const vec3 dr, const mat3 drot,
+        double* x, double* y, double* z,
+        size_t n
+    ) {
+        for(size_t i=0; i<n; i++) {
+            double xx = x[i]*drot[0] + y[i]*drot[1] + z[i]*drot[2] + dr[0];
+            double yy = x[i]*drot[3] + y[i]*drot[4] + z[i]*drot[5] + dr[1];
+            double zz = x[i]*drot[6] + y[i]*drot[7] + z[i]*drot[8] + dr[2];
+            x[i] = xx;
+            y[i] = yy;
+            z[i] = zz;
+        }
+    }
+
     void applyForwardTransform(const vec3 dr, const mat3 drot, RayVector& rv) {
         rv.r.syncToDevice();
         rv.v.syncToDevice();
