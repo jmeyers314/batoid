@@ -523,38 +523,43 @@ class RayVector:
 
         if nrandom is None:
             nphis = []
-            rrs = np.linspace(outer, inner, nrad)
-            for rr in rrs:
-                nphi = int((naz*rr/outer)//6)*6
+            rhos = np.linspace(outer, inner, nrad)
+            for rho in rhos:
+                nphi = int((naz*rho/outer)//6)*6
                 if nphi == 0:
                     nphi = 6
                 nphis.append(nphi)
             if inner == 0.0:
                 nphis[-1] = 1
             th = np.empty(np.sum(nphis))
-            r = np.empty(np.sum(nphis))
+            rr = np.empty(np.sum(nphis))
             idx = 0
-            for rr, nphi in zip(rrs, nphis):
-                r[idx:idx+nphi] = rr
+            for rho, nphi in zip(rhos, nphis):
+                rr[idx:idx+nphi] = rho
                 th[idx:idx+nphi] = np.linspace(0, 2*np.pi, nphi, endpoint=False)
                 idx += nphi
             if inner == 0.0:
-                r[-1] = 0.0
+                rr[-1] = 0.0
                 th[-1] = 0.0
         else:
-            r = np.sqrt(np.random.uniform(inner**2, outer**2, size=nrandom))
+            rr = np.sqrt(np.random.uniform(inner**2, outer**2, size=nrandom))
             th = np.random.uniform(0, 2*np.pi, size=nrandom)
-        x = r*np.cos(th)
-        y = r*np.sin(th)
-        del r, th
-        z = stopSurface.surface.sag(x, y)
+        r = np.empty((len(rr), 3), order='F')
+        x = r[:, 0]
+        y = r[:, 1]
+        z = r[:, 2]
+        x[:] = rr*np.cos(th)
+        y[:] = rr*np.sin(th)
+        del rr, th
+        z[:] = stopSurface.surface.sag(x, y)
         transform = CoordTransform(stopSurface.coordSys, globalCoordSys)
         applyForwardTransformArrays(transform, x, y, z)
         w = np.empty_like(x)
         w.fill(wavelength)
         n = medium.getN(wavelength)
 
-        return cls._finish(backDist, source, dirCos, n, x, y, z, w, flux)
+        # return cls._finish(backDist, source, dirCos, n, x, y, z, w, flux)
+        return cls._finish(backDist, source, dirCos, n, r, w, flux)
 
     @classmethod
     def asSpokes(
@@ -721,22 +726,23 @@ class RayVector:
         return cls._finish(backDist, source, dirCos, n, x, y, z, w, flux)
 
     @classmethod
-    def _finish(cls, backDist, source, dirCos, n, x, y, z, w, flux):
+    def _finish(cls, backDist, source, dirCos, n, r, w, flux):
         """Map rays backwards to their source position."""
         if source is None:
-            v = np.array(dirCos, dtype=float)
-            v /= n*np.sqrt(np.dot(v, v))
-            vx = np.empty_like(x)
-            vx.fill(v[0])
-            vy = np.empty_like(x)
-            vy.fill(v[1])
-            vz = np.empty_like(x)
-            vz.fill(v[2])
+            vv = np.array(dirCos, dtype=float)
+            vv /= n*np.sqrt(np.dot(vv, vv))
+            v = np.empty_like(r, order='F')
+            v[:] = -vv
             # Now need to raytrace backwards to the plane dist units away.
-            t = 0
-            rays = RayVector(x, y, z, -vx, -vy, -vz, t, w, flux=flux)
+            t = np.zeros(len(r))
+            vignetted = np.zeros(len(r), dtype=bool)
+            failed = np.zeros(len(r), dtype=bool)
+            flux = np.full_like(len(r), flux)
+            rays = RayVector._directInit(
+                r, v, t, w, flux, vignetted, failed, globalCoordSys
+            )
 
-            zhat = -n*v
+            zhat = -n*vv
             xhat = np.cross(np.array([1.0, 0.0, 0.0]), zhat)
             xhat /= np.sqrt(np.dot(xhat, xhat))
             yhat = np.cross(xhat, zhat)
@@ -747,9 +753,10 @@ class RayVector:
             plane = Plane()
             plane.intersect(rays)
             transform.applyReverse(rays)
-            t = 0
-            return RayVector(
-                rays.x, rays.y, rays.z, vx, vy, vz, t, w, flux=flux
+            t[:] = 0
+            v[:] *= -1
+            return RayVector._directInit(
+                rays.r, v, t, w, flux, vignetted, failed, globalCoordSys
             )
         else:
             vx = x - source[0]
