@@ -733,6 +733,131 @@ def test_factory_optic():
     rays_allclose(grid1, grid2)
 
 
+@timer
+def test_getitem():
+    telescope = batoid.Optic.fromYaml("LSST_r.yaml")
+    rv = batoid.RayVector.asPolar(
+        optic=telescope, wavelength=625e-9,
+        theta_x=np.deg2rad(1.0), theta_y=np.deg2rad(0.2),
+        nrad=10, naz=60
+    )
+    telescope.trace(rv)
+
+    # Single item indexing
+    for i in range(len(rv)):
+        rv1 = rv[i]
+        np.testing.assert_equal(rv1.r[0], rv.r[i])
+        np.testing.assert_equal(rv1.x[0], rv.x[i])
+        np.testing.assert_equal(rv1.y[0], rv.y[i])
+        np.testing.assert_equal(rv1.z[0], rv.z[i])
+        np.testing.assert_equal(rv1.v[0], rv.v[i])
+        np.testing.assert_equal(rv1.vx[0], rv.vx[i])
+        np.testing.assert_equal(rv1.vy[0], rv.vy[i])
+        np.testing.assert_equal(rv1.vz[0], rv.vz[i])
+        np.testing.assert_equal(rv1.t[0], rv.t[i])
+        np.testing.assert_equal(rv1.wavelength[0], rv.wavelength[i])
+        np.testing.assert_equal(rv1.flux[0], rv.flux[i])
+        np.testing.assert_equal(rv1.vignetted[0], rv.vignetted[i])
+        np.testing.assert_equal(rv1.failed[0], rv.failed[i])
+        assert rv1.r.flags.f_contiguous
+        assert rv1.v.flags.f_contiguous
+
+    # slice indexing
+    for i in range(len(rv)//10):
+        slc = slice(i*10, (i+1)*10, 2)
+        rv2 = rv[slc]
+        np.testing.assert_equal(rv2.r, rv.r[slc])
+        np.testing.assert_equal(rv2.x, rv.x[slc])
+        np.testing.assert_equal(rv2.y, rv.y[slc])
+        np.testing.assert_equal(rv2.z, rv.z[slc])
+        np.testing.assert_equal(rv2.v, rv.v[slc])
+        np.testing.assert_equal(rv2.vx, rv.vx[slc])
+        np.testing.assert_equal(rv2.vy, rv.vy[slc])
+        np.testing.assert_equal(rv2.vz, rv.vz[slc])
+        np.testing.assert_equal(rv2.t, rv.t[slc])
+        np.testing.assert_equal(rv2.wavelength, rv.wavelength[slc])
+        np.testing.assert_equal(rv2.flux, rv.flux[slc])
+        np.testing.assert_equal(rv2.vignetted, rv.vignetted[slc])
+        np.testing.assert_equal(rv2.failed, rv.failed[slc])
+        assert rv2.r.flags.f_contiguous
+        assert rv2.v.flags.f_contiguous
+
+    # integer array indexing
+    idx = [0, -1, 1, -2, 2, -3, 50]
+    rv3 = rv[idx]
+    np.testing.assert_equal(rv3.r, rv.r[idx])
+    np.testing.assert_equal(rv3.x, rv.x[idx])
+    np.testing.assert_equal(rv3.y, rv.y[idx])
+    np.testing.assert_equal(rv3.z, rv.z[idx])
+    np.testing.assert_equal(rv3.v, rv.v[idx])
+    np.testing.assert_equal(rv3.vx, rv.vx[idx])
+    np.testing.assert_equal(rv3.vy, rv.vy[idx])
+    np.testing.assert_equal(rv3.vz, rv.vz[idx])
+    np.testing.assert_equal(rv3.t, rv.t[idx])
+    np.testing.assert_equal(rv3.wavelength, rv.wavelength[idx])
+    np.testing.assert_equal(rv3.flux, rv.flux[idx])
+    np.testing.assert_equal(rv3.vignetted, rv.vignetted[idx])
+    np.testing.assert_equal(rv3.failed, rv.failed[idx])
+    assert rv3.r.flags.f_contiguous
+    assert rv3.v.flags.f_contiguous
+
+    # boolean array indexing
+    idx = np.zeros(len(rv), dtype=bool)
+    idx[[0, -1, 5]] = True
+    rv4 = rv[idx]
+    np.testing.assert_equal(rv4.r, rv.r[idx])
+    np.testing.assert_equal(rv4.x, rv.x[idx])
+    np.testing.assert_equal(rv4.y, rv.y[idx])
+    np.testing.assert_equal(rv4.z, rv.z[idx])
+    np.testing.assert_equal(rv4.v, rv.v[idx])
+    np.testing.assert_equal(rv4.vx, rv.vx[idx])
+    np.testing.assert_equal(rv4.vy, rv.vy[idx])
+    np.testing.assert_equal(rv4.vz, rv.vz[idx])
+    np.testing.assert_equal(rv4.t, rv.t[idx])
+    np.testing.assert_equal(rv4.wavelength, rv.wavelength[idx])
+    np.testing.assert_equal(rv4.flux, rv.flux[idx])
+    np.testing.assert_equal(rv4.vignetted, rv.vignetted[idx])
+    np.testing.assert_equal(rv4.failed, rv.failed[idx])
+    assert rv4.r.flags.f_contiguous
+    assert rv4.v.flags.f_contiguous
+
+    # test iteration
+    for i, rv5 in enumerate(rv):
+        np.testing.assert_equal(rv5.r[0], rv.r[i])
+        np.testing.assert_equal(rv5.x[0], rv.x[i])
+        np.testing.assert_equal(rv5.y[0], rv.y[i])
+        np.testing.assert_equal(rv5.z[0], rv.z[i])
+        np.testing.assert_equal(rv5.v[0], rv.v[i])
+        np.testing.assert_equal(rv5.vx[0], rv.vx[i])
+        np.testing.assert_equal(rv5.vy[0], rv.vy[i])
+        np.testing.assert_equal(rv5.vz[0], rv.vz[i])
+        np.testing.assert_equal(rv5.t[0], rv.t[i])
+        np.testing.assert_equal(rv5.wavelength[0], rv.wavelength[i])
+        np.testing.assert_equal(rv5.flux[0], rv.flux[i])
+        np.testing.assert_equal(rv5.vignetted[0], rv.vignetted[i])
+        np.testing.assert_equal(rv5.failed[0], rv.failed[i])
+        assert rv5.r.flags.f_contiguous
+        assert rv5.v.flags.f_contiguous
+
+    for i, rv6 in enumerate(reversed(rv)):
+        np.testing.assert_equal(rv6.r[0], rv.r[-i-1])
+        np.testing.assert_equal(rv6.r[0], rv.r[-i-1])
+        np.testing.assert_equal(rv6.x[0], rv.x[-i-1])
+        np.testing.assert_equal(rv6.y[0], rv.y[-i-1])
+        np.testing.assert_equal(rv6.z[0], rv.z[-i-1])
+        np.testing.assert_equal(rv6.v[0], rv.v[-i-1])
+        np.testing.assert_equal(rv6.vx[0], rv.vx[-i-1])
+        np.testing.assert_equal(rv6.vy[0], rv.vy[-i-1])
+        np.testing.assert_equal(rv6.vz[0], rv.vz[-i-1])
+        np.testing.assert_equal(rv6.t[0], rv.t[-i-1])
+        np.testing.assert_equal(rv6.wavelength[0], rv.wavelength[-i-1])
+        np.testing.assert_equal(rv6.flux[0], rv.flux[-i-1])
+        np.testing.assert_equal(rv6.vignetted[0], rv.vignetted[-i-1])
+        np.testing.assert_equal(rv6.failed[0], rv.failed[-i-1])
+        assert rv6.r.flags.f_contiguous
+        assert rv6.v.flags.f_contiguous
+
+
 if __name__ == '__main__':
     init_gpu()
     test_properties()
@@ -745,4 +870,5 @@ if __name__ == '__main__':
     test_asPolar()
     test_asSpokes()
     test_factory_optic()
+    test_getitem()
 

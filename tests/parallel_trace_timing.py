@@ -122,7 +122,6 @@ def parallel_trace_timing(args):
 
     if args.plot or args.show:
         import matplotlib.pyplot as plt
-        # rays_out.trimVignetted()
         w = ~rays_out.vignetted
         x = rays_out.x[w]
         y = rays_out.y[w]

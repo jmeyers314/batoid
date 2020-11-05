@@ -70,6 +70,21 @@ class RayVector:
 
         self.coordSys = coordSys
 
+    @staticmethod
+    def _directInit(
+        r, v, t, wavelength, flux, vignetted, failed, coordSys
+    ):
+        ret = RayVector.__new__(RayVector)
+        ret._r = r
+        ret._v = v
+        ret._t = t
+        ret._wavelength = wavelength
+        ret._flux = flux
+        ret._vignetted = vignetted
+        ret._failed = failed
+        ret.coordSys = coordSys
+        return ret
+
     def positionAtTime(self, t):
         """Calculate the positions of the rays at a given time.
 
@@ -371,7 +386,6 @@ class RayVector:
         return cls._finish(backDist, source, dirCos, n, x, y, z, w, flux)
 
     @classmethod
-    # @profile
     def asPolar(
         cls,
         optic=None, backDist=None, medium=None, stopSurface=None,
@@ -1023,8 +1037,8 @@ class RayVector:
         # copy on host side for now...
         self._syncToHost()
         ret = RayVector.__new__(RayVector)
-        ret._r = np.copy(self._r)
-        ret._v = np.copy(self._v)
+        ret._r = np.copy(self._r, order='F')
+        ret._v = np.copy(self._v, order='F')
         ret._t = np.copy(self._t)
         ret._wavelength = np.copy(self._wavelength)
         ret._flux = np.copy(self._flux)
@@ -1078,12 +1092,22 @@ class RayVector:
          self._wavelength, self._flux, self._vignetted,
          self._failed, self.coordSys) = args
 
-    def __getitem__(self, key):
-        return RayVector(
-            self.x[key], self.y[key], self.z[key],
-            self.vx[key], self.vy[key], self.vz[key],
-            self.t[key], self.wavelength[key], self.flux[key],
-            self.vignetted[key], self.failed[key],
+    def __getitem__(self, idx):
+        if isinstance(idx, int):
+            if idx >= self._rv.t.size:
+                msg = "index {} is out of bounds for axis 0 with size {}"
+                msg = msg.format(idx, self._rv.t.size)
+                raise IndexError(msg)
+            idx = slice(idx, idx+1)
+
+        return RayVector._directInit(
+            np.copy(self._r[idx], order='F'),
+            np.copy(self._v[idx], order='F'),
+            np.copy(self._t[idx]),
+            np.copy(self._wavelength[idx]),
+            np.copy(self._flux[idx]),
+            np.copy(self._vignetted[idx]),
+            np.copy(self._failed[idx]),
             self.coordSys
         )
 
