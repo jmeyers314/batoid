@@ -64,7 +64,8 @@ namespace batoid {
                     reinterpret_cast<double*>(z),
                     n
                 );
-            });
+            }
+        );
         m.def(
             "applyReverseTransformArrays",
             [](
@@ -80,6 +81,22 @@ namespace batoid {
                     reinterpret_cast<double*>(x),
                     reinterpret_cast<double*>(y),
                     reinterpret_cast<double*>(z),
+                    n
+                );
+            }
+        );
+        m.def(
+            "finishParallel",
+            [](
+                const vec3 dr,
+                const mat3 drot,
+                const vec3 vv,
+                size_t r,
+                size_t n
+            ){
+                finishParallel(
+                    dr, drot, vv,
+                    reinterpret_cast<double*>(r),
                     n
                 );
             });

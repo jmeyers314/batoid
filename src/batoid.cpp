@@ -33,6 +33,41 @@ namespace batoid {
         }
     }
 
+    void finishParallel(
+        const vec3 dr, const mat3 drot, const vec3 vv,
+        double* r, size_t n
+    ) {
+        double* x = r;
+        double* y = r + n;
+        double* z = r + 2*n;
+
+        double vxlocal = -vv[0]*drot[0] - vv[1]*drot[3] - vv[2]*drot[6];
+        double vylocal = -vv[0]*drot[1] - vv[1]*drot[4] - vv[2]*drot[7];
+        double vzlocal = -vv[0]*drot[2] - vv[1]*drot[5] - vv[2]*drot[8];
+
+        for(size_t i=0; i<n; i++) {
+            // rotate forward
+            double dx = x[i]-dr[0];
+            double dy = y[i]-dr[1];
+            double dz = z[i]-dr[2];
+            x[i] = dx*drot[0] + dy*drot[3] + dz*drot[6];
+            y[i] = dx*drot[1] + dy*drot[4] + dz*drot[7];
+            z[i] = dx*drot[2] + dy*drot[5] + dz*drot[8];
+            // intersect
+            double dt = -z[i]/vzlocal;
+            x[i] += dt*vxlocal;
+            y[i] += dt*vylocal;
+            z[i] += dt*vzlocal;
+            // rotate reverse
+            double xx = x[i]*drot[0] + y[i]*drot[1] + z[i]*drot[2] + dr[0];
+            double yy = x[i]*drot[3] + y[i]*drot[4] + z[i]*drot[5] + dr[1];
+            double zz = x[i]*drot[6] + y[i]*drot[7] + z[i]*drot[8] + dr[2];
+            x[i] = xx;
+            y[i] = yy;
+            z[i] = zz;
+        }
+    }
+
     void applyForwardTransform(const vec3 dr, const mat3 drot, RayVector& rv) {
         rv.r.syncToDevice();
         rv.v.syncToDevice();

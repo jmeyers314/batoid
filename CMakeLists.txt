@@ -80,6 +80,7 @@ if (DEFINED ENV{BATOID_GPU})
   # add_cxx_flag_if_avail doesn't seem to work for fopenmp-targets, so add forcibly
   # add_cxx_flag_if_avail(batoid-compile-flags "-fopenmp-targets=nvptx64-nvidia-cuda" CXX_FOPENMP_TARGETS)
   target_compile_options(batoid-compile-flags INTERFACE
+    # $<$<COMPILE_LANGUAGE:CXX>:-fopenmp-targets=nvptx64-nvidia-cuda -Xopenmp-target=nvptx64-nvidia-cuda -march=sm_70 -Wno-unknown-cuda-version -Wno-pass-failed>
     $<$<COMPILE_LANGUAGE:CXX>:-fopenmp-targets=nvptx64-nvidia-cuda>
   )
 
@@ -87,6 +88,7 @@ if (DEFINED ENV{BATOID_GPU})
 
   add_definitions(-DBATOID_GPU)
   pybind11_add_module(_batoid SYSTEM ${ALL_FILES})
+  # target_link_libraries(_batoid PUBLIC batoid-compile-flags "-fopenmp -fopenmp-targets=nvptx64-nvidia-cuda -Xopenmp-target=nvptx64-nvidia-cuda -march=sm_70 -Wno-unknown-cuda-version -Wno-pass-failed")
   target_link_libraries(_batoid PUBLIC batoid-compile-flags "-fopenmp -fopenmp-targets=nvptx64-nvidia-cuda")
 
   set_target_properties(_batoid

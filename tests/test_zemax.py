@@ -227,8 +227,6 @@ def test_LSST_wf(plot=False):
         wavelength = 500e-9
         nx = 32
 
-        # import ipdb; ipdb.set_trace()
-
         bwf = batoid.wavefront(
             telescope, thx, thy, wavelength, nx=nx,
             reference='chief', projection='zemax'

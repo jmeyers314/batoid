@@ -356,8 +356,8 @@ class RayVector:
             ly = (0.0, ly)
 
         if nrandom is not None:
-            x = np.random.uniform(-0.5, 0.5, size=nrandom)
-            y = np.random.uniform(-0.5, 0.5, size=nrandom)
+            xx = np.random.uniform(-0.5, 0.5, size=nrandom)
+            yy = np.random.uniform(-0.5, 0.5, size=nrandom)
         else:
             if nx <= 2:
                 x_d = 1.
@@ -367,23 +367,27 @@ class RayVector:
                 y_d = 1.
             else:
                 y_d = (ny-(2 if (ny%2) == 0 else 1))/ny
-            x = np.fft.fftshift(np.fft.fftfreq(nx, x_d))
-            y = np.fft.fftshift(np.fft.fftfreq(ny, y_d))
-            x, y = np.meshgrid(x, y)
-            x = x.ravel()
-            y = y.ravel()
-        stack = np.stack([x, y])
-        x = np.dot(lx, stack)
-        y = np.dot(ly, stack)
-        z = stopSurface.surface.sag(x, y)
+            xx = np.fft.fftshift(np.fft.fftfreq(nx, x_d))
+            yy = np.fft.fftshift(np.fft.fftfreq(ny, y_d))
+            xx, yy = np.meshgrid(xx, yy)
+            xx = xx.ravel()
+            yy = yy.ravel()
+        r = np.empty((len(xx), 3), order='F')
+        x = r[:, 0]
+        y = r[:, 1]
+        z = r[:, 2]
+        stack = np.stack([xx, yy])
+        x[:] = np.dot(lx, stack)
+        y[:] = np.dot(ly, stack)
+        del xx, yy, stack
+        z[:] = stopSurface.surface.sag(x, y)
         transform = CoordTransform(stopSurface.coordSys, globalCoordSys)
         applyForwardTransformArrays(transform, x, y, z)
-
         w = np.empty_like(x)
         w.fill(wavelength)
         n = medium.getN(wavelength)
 
-        return cls._finish(backDist, source, dirCos, n, x, y, z, w, flux)
+        return cls._finish(backDist, source, dirCos, n, r, w, flux)
 
     @classmethod
     def asPolar(
@@ -558,7 +562,6 @@ class RayVector:
         w.fill(wavelength)
         n = medium.getN(wavelength)
 
-        # return cls._finish(backDist, source, dirCos, n, x, y, z, w, flux)
         return cls._finish(backDist, source, dirCos, n, r, w, flux)
 
     @classmethod
@@ -714,61 +717,55 @@ class RayVector:
         spokes = spokes.ravel()
         flux = flux.ravel()
 
-        x = rings*np.cos(spokes)
-        y = rings*np.sin(spokes)
-        z = stopSurface.surface.sag(x, y)
+        r = np.empty((len(rings), 3), order='F')
+        x = r[:, 0]
+        y = r[:, 1]
+        z = r[:, 2]
+        x[:] = rings*np.cos(spokes)
+        y[:] = rings*np.sin(spokes)
+        del rings, spokes
+        z[:] = stopSurface.surface.sag(x, y)
         transform = CoordTransform(stopSurface.coordSys, globalCoordSys)
         applyForwardTransformArrays(transform, x, y, z)
         w = np.empty_like(x)
         w.fill(wavelength)
         n = medium.getN(wavelength)
-
-        return cls._finish(backDist, source, dirCos, n, x, y, z, w, flux)
+        return cls._finish(backDist, source, dirCos, n, r, w, flux)
 
     @classmethod
     def _finish(cls, backDist, source, dirCos, n, r, w, flux):
         """Map rays backwards to their source position."""
+        if isinstance(flux, Real):
+            flux = np.full(len(r), float(flux))
         if source is None:
+            from ._batoid import finishParallel
             vv = np.array(dirCos, dtype=float)
             vv /= n*np.sqrt(np.dot(vv, vv))
-            v = np.empty_like(r, order='F')
-            v[:] = -vv
-            # Now need to raytrace backwards to the plane dist units away.
-            t = np.zeros(len(r))
-            vignetted = np.zeros(len(r), dtype=bool)
-            failed = np.zeros(len(r), dtype=bool)
-            flux = np.full_like(len(r), flux)
-            rays = RayVector._directInit(
-                r, v, t, w, flux, vignetted, failed, globalCoordSys
-            )
-
             zhat = -n*vv
             xhat = np.cross(np.array([1.0, 0.0, 0.0]), zhat)
             xhat /= np.sqrt(np.dot(xhat, xhat))
             yhat = np.cross(xhat, zhat)
             origin = zhat*backDist
-            cs = CoordSys(origin, np.stack([xhat, yhat, zhat]).T)
-            transform = CoordTransform(globalCoordSys, cs)
-            transform.applyForward(rays)
-            plane = Plane()
-            plane.intersect(rays)
-            transform.applyReverse(rays)
-            t[:] = 0
-            v[:] *= -1
+            rot = np.stack([xhat, yhat, zhat]).T
+            finishParallel(origin, rot.ravel(), vv, r.ctypes.data, len(r))
+            v = np.full_like(r, vv)
+            t = np.zeros(len(r), dtype=float)
+            vignetted = np.zeros(len(r), dtype=bool)
+            failed = np.zeros(len(r), dtype=bool)
             return RayVector._directInit(
-                rays.r, v, t, w, flux, vignetted, failed, globalCoordSys
+                r, v, t, w, flux, vignetted, failed, globalCoordSys
             )
         else:
-            vx = x - source[0]
-            vy = y - source[1]
-            vz = z - source[2]
-            v = np.stack([vx, vy, vz])
+            v = np.copy(r)
+            v -= source
             v /= n*np.einsum('ab,ab->b', v, v)
-            x.fill(source[0])
-            y.fill(source[1])
-            z.fill(source[2])
-            t = 0
-            return RayVector(x, y, z, v[0], v[1], v[2], t, w, flux=flux)
+            r[:] = source
+            t = np.zeros(len(r), dtype=float)
+            vignetted = np.zeros(len(r), dtype=bool)
+            failed = np.zeros(len(r), dtype=bool)
+            return RayVector._directInit(
+                r, v, t, w, flux, vignetted, failed, globalCoordSys
+            )
 
     @classmethod
     def fromStop(
@@ -875,9 +872,16 @@ class RayVector:
         if wavelength is None:
             raise ValueError("Missing wavelength keyword")
 
-        x = np.atleast_1d(x)
-        y = np.atleast_1d(y)
-        z = stopSurface.surface.sag(x, y)
+        xx = np.atleast_1d(x)
+        yy = np.atleast_1d(y)
+
+        r = np.empty((len(xx), 3), order='F')
+        x = r[:, 0]
+        y = r[:, 1]
+        z = r[:, 2]
+        x[:] = xx
+        y[:] = yy
+        z[:] = stopSurface.surface.sag(x, y)
         transform = CoordTransform(stopSurface.coordSys, globalCoordSys)
         applyForwardTransformArrays(transform, x, y, z)
 
@@ -885,7 +889,7 @@ class RayVector:
         w.fill(wavelength)
         n = medium.getN(wavelength)
 
-        return cls._finish(backDist, source, dirCos, n, x, y, z, w, flux)
+        return cls._finish(backDist, source, dirCos, n, r, w, flux)
 
     @property
     def r(self):
@@ -1023,6 +1027,9 @@ class RayVector:
         )
 
     def _syncToHost(self):
+        if "_rv" not in self.__dict__:
+            # Was never copied to device, so still synchronized.
+            return
         self._rv.r.syncToHost()
         self._rv.v.syncToHost()
         self._rv.t.syncToHost()
@@ -1072,7 +1079,7 @@ class RayVector:
         return self
 
     def __len__(self):
-        return self._rv.t.size
+        return self._t.size
 
     def __eq__(self, rhs):
         return self._rv == rhs._rv
@@ -1107,6 +1114,7 @@ class RayVector:
                 raise IndexError(msg)
             idx = slice(idx, idx+1)
 
+        self._syncToHost()
         return RayVector._directInit(
             np.copy(self._r[idx], order='F'),
             np.copy(self._v[idx], order='F'),

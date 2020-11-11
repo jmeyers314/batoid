@@ -38,6 +38,8 @@ def parallel_trace_timing(args):
 
     nrays = len(rays)
     print("Tracing {:_d} rays.".format(nrays))
+    print(f"Minimum CPU RAM: {2*nrays*74/1024**3:.2f} GB")
+    print(f"Minimum GPU RAM: {nrays*74/1024**3:.2f} GB")
     print()
     print()
     if args.nrepeat > 1:
