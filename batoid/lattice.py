@@ -49,8 +49,10 @@ class Lattice:
     def __init__(self, array, primitiveVectors):
         primitiveVectors = np.atleast_2d(primitiveVectors)
 
-        assert array.ndim == len(primitiveVectors), "Not enough primitiveVectors for array"
-        assert array.ndim == len(primitiveVectors[0]), "primitiveVectors are too small for array"
+        if array.ndim != len(primitiveVectors):
+            raise ValueError("Not enough primitiveVectors for array")
+        if array.ndim != len(primitiveVectors[0]):
+            raise ValueError("primitiveVectors are too small for array")
 
         self.array = array
         self.primitiveVectors = primitiveVectors

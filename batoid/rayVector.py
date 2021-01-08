@@ -44,7 +44,7 @@ class RayVector:
         global coordinate system.
     """
     def __init__(
-        self, x, y, z, vx, vy, vz, t=0, wavelength=500e-9, flux=1,
+        self, x, y, z, vx, vy, vz, t=0.0, wavelength=0.0, flux=1.0,
         vignetted=False, failed=False, coordSys=globalCoordSys
     ):
         shape = np.broadcast(
@@ -116,6 +116,7 @@ class RayVector:
             Reference to self, no copy is made.
         """
         self._rv.propagateInPlace(t)
+        return self
 
     def phase(self, r, t):
         """Calculate plane wave phases at given position and time.
@@ -187,7 +188,7 @@ class RayVector:
         """Create RayVector on a parallelogram shaped region.
 
         This function will often be used to create a grid of rays on a square
-        grid, but is flexible enough to also create gris on an arbitrary
+        grid, but is flexible enough to also create grids on an arbitrary
         parallelogram, or even randomly distributed across an arbitrary
         parallelogram-shaped region.
 
@@ -202,7 +203,7 @@ class RayVector:
         difficult to locate automatically, the default stop surface in batoid
         is the global x-y plane.
 
-        If a telescope has an stopSurface attribute in its yaml file, then this
+        If a telescope has a stopSurface attribute in its yaml file, then this
         is usually a good choice to use in this function.  Using a curved
         surface for the stop surface is allowed, but is usually a bad idea as
         this may lead to a non-uniformly illuminated pupil and is inconsistent
@@ -217,7 +218,7 @@ class RayVector:
             those extracted from ``optic``.
         backDist : float, optional
             Map rays backwards from the stop surface to the plane that is
-            perpendicular to the ray and ``backDist`` meters from the point
+            perpendicular to the rays and ``backDist`` meters from the point
             (0, 0, z(0,0)) on the stop surface.  This should generally be set
             large enough that any obscurations or phantom surfaces occuring
             before the stop surface are now "in front" of the ray.  If this
@@ -425,7 +426,7 @@ class RayVector:
         difficult to locate automatically, the default stop surface in batoid
         is the global x-y plane.
 
-        If a telescope has an stopSurface attribute in its yaml file, then this
+        If a telescope has a stopSurface attribute in its yaml file, then this
         is usually a good choice to use in this function.  Using a curved
         surface for the stop surface is allowed, but is usually a bad idea as
         this may lead to a non-uniformly illuminated pupil and is inconsistent
@@ -596,7 +597,7 @@ class RayVector:
         difficult to locate automatically, the default stop surface in batoid
         is the global x-y plane.
 
-        If a telescope has an stopSurface attribute in its yaml file, then this
+        If a telescope has a stopSurface attribute in its yaml file, then this
         is usually a good choice to use in this function.  Using a curved
         surface for the stop surface is allowed, but is usually a bad idea as
         this may lead to a non-uniformly illuminated pupil and is inconsistent
@@ -789,7 +790,7 @@ class RayVector:
         difficult to locate automatically, the default stop surface in batoid
         is the global x-y plane.
 
-        If a telescope has an stopSurface attribute in its yaml file, then this
+        If a telescope has a stopSurface attribute in its yaml file, then this
         is usually a good choice to use in this function.  Using a curved
         surface for the stop surface is allowed, but is usually a bad idea as
         this may lead to a non-uniformly illuminated pupil and is inconsistent

@@ -17,7 +17,7 @@ def RotZ(th):
 
 
 class CoordSys:
-    """A coordinate system against which to measure Surfaces or Rays.
+    """A coordinate system against which to measure surfaces or rays.
 
     Coordinate systems consist of an origin and a rotation.  The `origin`
     attribute specifies where in 3D space the current coordinate system's
@@ -171,4 +171,5 @@ class CoordSys:
         return CoordSys(self.origin, self.rot)
 
     def __repr__(self):
-        return f"CoordSys({self.origin!r}, {self.rot!r})"
+        rotstr = np.array2string(self.rot, separator=', ').replace('\n', '')
+        return f"CoordSys({self.origin!r}, array({rotstr}))"

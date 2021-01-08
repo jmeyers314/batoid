@@ -57,52 +57,50 @@ class Surface(ABC):
         return intersect(self, rv, coordSys, coating)
 
     def reflect(self, rv, coordSys=None, coating=None):
-        """Calculate intersection of ray(s) with this surface, and immediately
-        reflect the ray(s) at the point(s) of intersection.
+        """Calculate intersection of rays with this surface, and immediately
+        reflect the rays at the points of intersection.
 
         Parameters
         ----------
         rv : RayVector
-            Ray(s) to reflect.
+            Rays to reflect.
         coordSys : CoordSys, optional
             If present, then use for the coordinate system of the surface.  If
-            `None` (default), then assume that ray(s) and surface are already
+            `None` (default), then assume that rays and surface are already
             expressed in the same coordinate system.
         coating : Coating, optional
             Apply this coating upon surface intersection.
 
         Returns
         -------
-        outRays : Ray or RayVector
-            New object corresponding to original ray(s) propagated and
-            reflected.
+        outRays : RayVector
+            New object corresponding to original rays propagated and reflected.
         """
         return reflect(self, rv, coordSys, coating)
 
     def refract(self, rv, inMedium, outMedium, coordSys=None, coating=None):
-        """Calculate intersection of ray(s) with this surface, and immediately
-        refract the ray(s) through the surface at the point(s) of intersection.
+        """Calculate intersection of rays with this surface, and immediately
+        refract the rays through the surface at the points of intersection.
 
         Parameters
         ----------
         rv : RayVector
-            Ray(s) to refract.
+            Rays to refract.
         inMedium : Medium
             Refractive medium on the incoming side of the surface.
         outMedium : Medium
             Refractive medium on the outgoing side of the surface.
         coordSys : CoordSys, optional
             If present, then use for the coordinate system of the surface.  If
-            `None` (default), then assume that ray(s) and surface are already
+            `None` (default), then assume that rays and surface are already
             expressed in the same coordinate system.
         coating : Coating, optional
             Apply this coating upon surface intersection.
 
         Returns
         -------
-        outRays : Ray or RayVector
-            New object corresponding to original ray(s) propagated and
-            refracted.
+        outRays : RayVector
+            New object corresponding to original rays propagated and refracted.
         """
         return refract(self, rv, inMedium, outMedium, coordSys, coating)
 
@@ -123,7 +121,7 @@ class Surface(ABC):
             Coating object to control transmission coefficient.
         coordSys : CoordSys, optional
             If present, then use for the coordinate system of the surface.  If
-            `None` (default), then assume that ray(s) and surface are already
+            `None` (default), then assume that rays and surface are already
             expressed in the same coordinate system.
 
         Returns

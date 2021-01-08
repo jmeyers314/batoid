@@ -3,14 +3,13 @@ from . import _batoid
 from .trace import obscure
 
 class Obscuration:
-    """An `Obscuration` instance is used to mark `Ray` s (potentially in
-    a `RayVector`) as vignetted (i.e., obscured) if their x/y coordinates lie
-    in a particular region.
+    """An `Obscuration` instance is used to mark as vignetted (i.e., obscured)
+    if their x/y coordinates lie in a particular region.
 
     `Obscuration` s are useful for modeling pupils, clear apertures of optical
     elements, struts, or other physical obstructions in an optical system.
-    Note that only the x and y local coordinates of a `Ray` are considered; the
-    z coordinate is ignored.
+    Note that only the x and y local coordinates of rays are considered; the z
+    coordinate is ignored.
     """
     def contains(self, x, y):
         """Return True if the point (x,y) is obscured.
@@ -27,20 +26,20 @@ class Obscuration:
         """
         return self._obsc.contains(x, y)
 
-    def obscure(self, r):
-        """Mark a `Ray` or `RayVector` for potential vignetting.
+    def obscure(self, rv):
+        """Mark rays for potential vignetting.
 
         Parameters
         ----------
-        r : `Ray` or `RayVector`
+        rv : `RayVector`
             Rays to analyze.
 
         Returns
         -------
-        out : `Ray` or `RayVector`
+        out : `RayVector`
             Returned object will have appropriate elements marked as vignetted.
         """
-        obscure(self, r)
+        obscure(self, rv)
 
     def __ne__(self, rhs):
         return not (self == rhs)

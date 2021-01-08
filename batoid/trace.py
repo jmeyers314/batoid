@@ -44,7 +44,7 @@ def intersect(surface, rv, coordSys=None, coating=None):
     surface: Surface
         Surface to intersect.
     rv : RayVector
-        Ray(s) to intersect.
+        Rays to intersect.
     coordSys : CoordSys, optional
         Transform rays into this coordinate system before computing
         intersection.

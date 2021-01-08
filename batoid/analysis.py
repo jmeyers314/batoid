@@ -356,7 +356,6 @@ def wavefront(
     if sphereRadius is None:
         sphereRadius = optic.sphereRadius
 
-    # tf = optic.traceFull(rays.copy())
     optic.trace(rays)
     if reference == 'mean':
         w = np.where(1-rays.vignetted)[0]
