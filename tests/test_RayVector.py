@@ -63,7 +63,7 @@ def test_positionAtTime():
     np.testing.assert_equal(rv.vy, vy)
     np.testing.assert_equal(rv.vz, vz)
     np.testing.assert_equal(rv.t, 0.0)
-    np.testing.assert_equal(rv.wavelength, 500e-9)
+    np.testing.assert_equal(rv.wavelength, 0.0)
 
     for t1 in [0.0, 1.0, -1.1, 2.5]:
         np.testing.assert_equal(
@@ -81,7 +81,7 @@ def test_positionAtTime():
     np.testing.assert_equal(rv.vy, vy)
     np.testing.assert_equal(rv.vz, vz)
     np.testing.assert_equal(rv.t, t)
-    np.testing.assert_equal(rv.wavelength, 500e-9)
+    np.testing.assert_equal(rv.wavelength, 0.0)
 
     for t1 in [0.0, 1.4, -1.3, 2.1]:
         np.testing.assert_equal(
