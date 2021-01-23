@@ -1109,11 +1109,18 @@ class RayVector:
 
     def __getitem__(self, idx):
         if isinstance(idx, int):
-            if idx >= self._rv.t.size:
-                msg = "index {} is out of bounds for axis 0 with size {}"
-                msg = msg.format(idx, self._rv.t.size)
-                raise IndexError(msg)
-            idx = slice(idx, idx+1)
+            if idx >= 0:
+                if idx >= self._rv.t.size:
+                    msg = "index {} is out of bounds for axis 0 with size {}"
+                    msg = msg.format(idx, self._rv.t.size)
+                    raise IndexError(msg)
+                idx = slice(idx, idx+1)
+            else:
+                if idx < -self._rv.t.size:
+                    msg = "index {} is out of bounds for axis 0 with size {}"
+                    msg = msg.format(idx, self._rv.t.size)
+                    raise IndexError(msg)
+                idx = slice(self._rv.t.size+idx, self._rv.t.size-idx+1)
 
         self._syncToHost()
         return RayVector._directInit(

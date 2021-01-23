@@ -744,7 +744,7 @@ def test_getitem():
     telescope.trace(rv)
 
     # Single item indexing
-    for i in range(len(rv)):
+    for i in range(-len(rv), len(rv)):
         rv1 = rv[i]
         np.testing.assert_equal(rv1.r[0], rv.r[i])
         np.testing.assert_equal(rv1.x[0], rv.x[i])
@@ -763,7 +763,7 @@ def test_getitem():
         assert rv1.v.flags.f_contiguous
 
     # slice indexing
-    for i in range(len(rv)//10):
+    for i in range(-len(rv)//10, len(rv)//10):
         slc = slice(i*10, (i+1)*10, 2)
         rv2 = rv[slc]
         np.testing.assert_equal(rv2.r, rv.r[slc])
@@ -856,6 +856,11 @@ def test_getitem():
         np.testing.assert_equal(rv6.failed[0], rv.failed[-i-1])
         assert rv6.r.flags.f_contiguous
         assert rv6.v.flags.f_contiguous
+
+    with np.testing.assert_raises(IndexError):
+        rv[len(rv)]
+    with np.testing.assert_raises(IndexError):
+        rv[-len(rv)-1]
 
 
 if __name__ == '__main__':
