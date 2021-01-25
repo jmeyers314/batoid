@@ -892,6 +892,105 @@ class RayVector:
 
         return cls._finish(backDist, source, dirCos, n, r, w, flux)
 
+    @classmethod
+    def fromFieldAngles(
+        cls, theta_x, theta_y, projection='postel',
+        optic=None, backDist=None, medium=None, stopSurface=None,
+        wavelength=None,
+        x=0, y=0,
+        flux=1
+    ):
+        """Create RayVector with one stop surface point but many field angles.
+
+        This method is similar to ``fromStop`` but broadcasts over ``theta_x``
+        and ``theta_y`` instead of over ``x`` and ``y``.  There is less
+        currently less effort paid to synchronizing the ``t`` values of the
+        created rays, as they don't correspond to points on a physical incoming
+        wavefront in this case.  The primary intended use case is to map chief
+        rays (``x``=``y``=0) from incoming field angle to focal plane position.
+
+        Parameters
+        ----------
+        theta_x, theta_y : ndarray
+            Field angles in radians.
+        projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}, optional
+            Projection used to convert field angle to direction cosines.
+        optic : `batoid.Optic`, optional
+            If present, then try to extract values for ``backDist``,
+            ``medium``, and ``stopSurface`` from the Optic.  Note that values
+            explicitly passed here as keyword arguments override those
+            extracted from ``optic``.
+        backDist : float, optional
+            Map rays backwards from the stop surface this far.  This should
+            generally be set large enough that any obscurations or phantom
+            surfaces occuring before the stop surface are now "in front" of the
+            rays.  If this keyword is set to ``None`` and the ``optic`` keyword
+            is set, then infer a value from ``optic.backDist``.  If both this
+            keyword and ``optic`` are ``None``, then use a default of 40 meters,
+            which should be sufficiently large for foreseeable telescopes.
+        medium : `batoid.Medium`, optional
+            Initial medium of rays.  If this keyword is set to ``None`` and
+            the ``optic`` keyword is set, then infer a value from
+            ``optic.inMedium``.  If both this keyword and ``optic`` are
+            ``None``, then use a default of vacuum.
+        stopSurface : batoid.Interface, optional
+            Surface defining the system stop.  If this keyword is set to
+            ``None`` and the ``optic`` keyword is set, then infer a value from
+            ``optic.stopSurface``.  If both this keyword and ``optic`` are
+            ``None``, then use a default ``Interface(Plane())``, which is the
+            global x-y plane.
+        wavelength : float
+            Vacuum wavelength of rays in meters.
+        x, y : float
+            X/Y coordinates on the stop surface where the rays would intersect
+            if not refracted or reflected first.
+        flux : float, optional
+            Flux of rays.  Default is 1.0.
+        """
+        from .optic import Interface
+        from .surface import Plane
+
+        if optic is not None:
+            if backDist is None:
+                backDist = optic.backDist
+            if medium is None:
+                medium = optic.inMedium
+            if stopSurface is None:
+                stopSurface = optic.stopSurface
+
+        if backDist is None:
+            backDist = 40.0
+        if stopSurface is None:
+            stopSurface = Interface(Plane())
+        if medium is None:
+            medium = vacuum
+
+        if wavelength is None:
+            raise ValueError("Missing wavelength keyword")
+
+        vx, vy, vz = fieldToDirCos(theta_x, theta_y, projection=projection)
+        n = medium.getN(wavelength)
+        vx /= n
+        vy /= n
+        vz /= n
+
+        z = stopSurface.surface.sag(x, y)
+        x = np.full_like(vx, x)
+        y = np.full_like(vx, y)
+        z = np.full_like(vx, z)
+        t = np.zeros_like(vx)
+
+        rv = RayVector(
+            x, y, z,
+            vx, vy, vz,
+            t, wavelength, flux,
+            coordSys=stopSurface.coordSys
+        )
+        rv.propagate(-backDist*n)
+
+        return rv
+
+
     @property
     def r(self):
         """ndarray of float, shape (n, 3): Positions of rays in meters."""

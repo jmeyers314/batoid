@@ -863,6 +863,158 @@ def test_getitem():
         rv[-len(rv)-1]
 
 
+def test_fromStop():
+    telescope = batoid.Optic.fromYaml("LSST_r.yaml")
+    rv = batoid.RayVector.asPolar(
+        optic=telescope, wavelength=625e-9,
+        theta_x=np.deg2rad(1.0), theta_y=np.deg2rad(0.2),
+        nrad=4, naz=10
+    )
+    rv_traced = telescope.trace(rv.copy())
+    rv_stop = telescope.stopSurface.interact(rv.copy())
+
+    for rv1, rv_traced1, rv_stop1 in zip(rv, rv_traced, rv_stop):
+        rv_test1 = batoid.RayVector.fromStop(
+            rv_stop1.x[0], rv_stop1.y[0],
+            optic=telescope, wavelength=625e-9,
+            theta_x=np.deg2rad(1.0), theta_y=np.deg2rad(0.2)
+        )
+        rv_test2 = batoid.RayVector.fromStop(
+            rv_stop1.x[0], rv_stop1.y[0],
+            optic=telescope, backDist=telescope.backDist, wavelength=625e-9,
+            theta_x=np.deg2rad(1.0), theta_y=np.deg2rad(0.2)
+        )
+        rv_test3 = batoid.RayVector.fromStop(
+            rv_stop1.x[0], rv_stop1.y[0],
+            optic=telescope, medium=telescope.inMedium, wavelength=625e-9,
+            theta_x=np.deg2rad(1.0), theta_y=np.deg2rad(0.2)
+        )
+        rv_test4 = batoid.RayVector.fromStop(
+            rv_stop1.x[0], rv_stop1.y[0],
+            optic=telescope, stopSurface=telescope.stopSurface,
+            wavelength=625e-9,
+            theta_x=np.deg2rad(1.0), theta_y=np.deg2rad(0.2)
+        )
+        rv_test5 = batoid.RayVector.fromStop(
+            rv_stop1.x[0], rv_stop1.y[0],
+            optic=telescope, stopSurface=telescope.stopSurface,
+            wavelength=625e-9,
+            dirCos=batoid.utils.fieldToDirCos(np.deg2rad(1.0), np.deg2rad(0.2))
+        )
+
+        for rv_test in [rv_test1, rv_test2, rv_test3, rv_test4, rv_test5]:
+            telescope.trace(rv_test)
+            np.testing.assert_allclose(
+                rv_test.x, rv_traced1.x, rtol=0, atol=1e-14
+            )
+            np.testing.assert_allclose(
+                rv_test.y, rv_traced1.y, rtol=0, atol=1e-14
+            )
+            np.testing.assert_allclose(
+                rv_test.z, rv_traced1.z, rtol=0, atol=1e-14
+            )
+            np.testing.assert_allclose(
+                rv_test.vx, rv_traced1.vx, rtol=0, atol=1e-14
+            )
+            np.testing.assert_allclose(
+                rv_test.vy, rv_traced1.vy, rtol=0, atol=1e-14
+            )
+            np.testing.assert_allclose(
+                rv_test.vz, rv_traced1.vz, rtol=0, atol=1e-14
+            )
+
+    # A few more coverage checks
+    with np.testing.assert_raises(ValueError):
+        rv = batoid.RayVector.fromStop(
+            0, 0, theta_x=0.0, theta_y=0.0
+        )
+    rv = batoid.RayVector.fromStop(
+        0, 0, theta_x=0.0, theta_y=0.0, wavelength=625e-9
+    )
+    rv2 = batoid.RayVector.fromStop(
+        0, 0, theta_x=0.0, theta_y=0.0, wavelength=625e-9,
+        backDist=40.0,
+        stopSurface=batoid.Interface(batoid.Plane()),
+        medium=batoid.vacuum
+    )
+    np.testing.assert_equal(rv, rv2)
+
+
+def test_fromFieldAngles():
+    telescope = batoid.Optic.fromYaml("LSST_r.yaml")
+    thx = np.linspace(-0.5, 0.5, 10)
+    thy = np.linspace(-0.5, 0.5, 10)
+    rv = batoid.RayVector.fromFieldAngles(
+        np.deg2rad(thx), np.deg2rad(thy),
+        optic=telescope, wavelength=625e-9,
+    )
+    rv_traced = telescope.trace(rv.copy())
+    rv_stop = telescope.stopSurface.interact(rv.copy())
+
+    for rv1, rv_traced1, rv_stop1 in zip(rv, rv_traced, rv_stop):
+        dc = rv_stop1.v[0]/np.sqrt(np.sum(np.square(rv_stop1.v)))
+        thx, thy = batoid.utils.dirCosToField(*dc)
+        rv_test1 = batoid.RayVector.fromStop(
+            0.0, 0.0,
+            optic=telescope, wavelength=625e-9,
+            theta_x=thx, theta_y=thy
+        )
+        rv_test2 = batoid.RayVector.fromStop(
+            0.0, 0.0,
+            optic=telescope, backDist=telescope.backDist, wavelength=625e-9,
+            theta_x=thx, theta_y=thy
+        )
+        rv_test3 = batoid.RayVector.fromStop(
+            0.0, 0.0,
+            optic=telescope, medium=telescope.inMedium, wavelength=625e-9,
+            theta_x=thx, theta_y=thy
+        )
+        rv_test4 = batoid.RayVector.fromStop(
+            0.0, 0.0,
+            optic=telescope, stopSurface=telescope.stopSurface,
+            wavelength=625e-9,
+            theta_x=thx, theta_y=thy
+        )
+
+        rv_tests = [rv_test1, rv_test2, rv_test3, rv_test4]
+        for rv_test in rv_tests:
+            telescope.trace(rv_test)
+            np.testing.assert_allclose(
+                rv_test.x, rv_traced1.x, rtol=0, atol=1e-14
+            )
+            np.testing.assert_allclose(
+                rv_test.y, rv_traced1.y, rtol=0, atol=1e-14
+            )
+            np.testing.assert_allclose(
+                rv_test.z, rv_traced1.z, rtol=0, atol=1e-14
+            )
+            np.testing.assert_allclose(
+                rv_test.vx, rv_traced1.vx, rtol=0, atol=1e-14
+            )
+            np.testing.assert_allclose(
+                rv_test.vy, rv_traced1.vy, rtol=0, atol=1e-14
+            )
+            np.testing.assert_allclose(
+                rv_test.vz, rv_traced1.vz, rtol=0, atol=1e-14
+            )
+
+    # A few more coverage checks
+    with np.testing.assert_raises(ValueError):  # no wavelength
+        rv = batoid.RayVector.fromFieldAngles(
+            0, 0
+        )
+    rv = batoid.RayVector.fromFieldAngles(
+        0, 0, wavelength=625e-9
+    )
+    rv2 = batoid.RayVector.fromFieldAngles(
+        0, 0, wavelength=625e-9,
+        backDist=40.0,
+        stopSurface=batoid.Interface(batoid.Plane()),
+        medium=batoid.vacuum
+    )
+    np.testing.assert_equal(rv, rv2)
+
+
 if __name__ == '__main__':
     init_gpu()
     test_properties()
@@ -876,4 +1028,5 @@ if __name__ == '__main__':
     test_asSpokes()
     test_factory_optic()
     test_getitem()
-
+    test_fromStop()
+    test_fromFieldAngles()
