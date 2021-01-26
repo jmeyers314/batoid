@@ -3,7 +3,7 @@
 
 namespace batoid {
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp declare target
     #endif
 
@@ -33,13 +33,13 @@ namespace batoid {
         return _transmissivity;
     }
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
 
 
     const Coating* SimpleCoating::getDevPtr() const {
-        #if defined _OPENMP && _OPENMP >= 201511
+        #if defined(BATOID_GPU)
             if (!_devPtr) {
                 Coating* ptr;
                 #pragma omp target map(from:ptr)

@@ -78,7 +78,7 @@ namespace batoid {
 
 
     const Surface* Quadric::getDevPtr() const {
-        #if defined _OPENMP && _OPENMP >= 201511
+        #if defined(BATOID_GPU)
             if (!_devPtr) {
                 Surface* ptr;
                 #pragma omp target map(from:ptr)

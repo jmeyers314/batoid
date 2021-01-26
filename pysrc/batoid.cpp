@@ -1,7 +1,7 @@
 #include "batoid.h"
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#if defined _OPENMP && _OPENMP >= 201511
+#if defined(BATOID_GPU)
     #include "omp.h"
 #endif
 
@@ -103,7 +103,7 @@ namespace batoid {
                     n
                 );
             });
-        #if defined _OPENMP && _OPENMP >= 201511
+        #if defined(BATOID_GPU)
             m.def(
                 "get_omp_environment",
                 []() {

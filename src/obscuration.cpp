@@ -6,7 +6,7 @@
 
 namespace batoid {
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp declare target
     #endif
 
@@ -27,12 +27,12 @@ namespace batoid {
             return std::hypot(x-_x0, y-_y0) < _radius;
         }
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
 
     const Obscuration* ObscCircle::getDevPtr() const {
-        #if defined _OPENMP && _OPENMP >= 201511
+        #if defined(BATOID_GPU)
             if (_devPtr)
                 return _devPtr;
             Obscuration* ptr;
@@ -48,7 +48,7 @@ namespace batoid {
     }
 
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp declare target
     #endif
 
@@ -63,12 +63,12 @@ namespace batoid {
             return (_inner <= h) && (h < _outer);
         }
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
 
     const Obscuration* ObscAnnulus::getDevPtr() const {
-        #if defined _OPENMP && _OPENMP >= 201511
+        #if defined(BATOID_GPU)
             if (_devPtr)
                 return _devPtr;
             Obscuration* ptr;
@@ -84,7 +84,7 @@ namespace batoid {
     }
 
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp declare target
     #endif
 
@@ -101,12 +101,12 @@ namespace batoid {
             return (xp > -_width/2 && xp < _width/2 && yp > -_height/2 && yp < _height/2);
         }
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
 
     const Obscuration* ObscRectangle::getDevPtr() const {
-        #if defined _OPENMP && _OPENMP >= 201511
+        #if defined(BATOID_GPU)
             if (_devPtr)
                 return _devPtr;
             ObscRectangle* ptr;
@@ -122,7 +122,7 @@ namespace batoid {
     }
 
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp declare target
     #endif
 
@@ -139,12 +139,12 @@ namespace batoid {
             return (xp > 0.0 && yp > -_width/2 && yp < _width/2);
         }
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
 
     const Obscuration* ObscRay::getDevPtr() const {
-        #if defined _OPENMP && _OPENMP >= 201511
+        #if defined(BATOID_GPU)
             if (_devPtr)
                 return _devPtr;
             ObscRay* ptr;
@@ -160,7 +160,7 @@ namespace batoid {
     }
 
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp declare target
     #endif
 
@@ -169,7 +169,7 @@ namespace batoid {
         {}
 
         ObscPolygon::~ObscPolygon() {
-            #if defined _OPENMP && _OPENMP >= 201511
+            #if defined(BATOID_GPU)
                 if (_devPtr) {
                     Obscuration* ptr = _devPtr;
                     #pragma omp target is_device_ptr(ptr)
@@ -211,12 +211,12 @@ namespace batoid {
             return inside;
         }
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
 
     const Obscuration* ObscPolygon::getDevPtr() const {
-        #if defined _OPENMP && _OPENMP >= 201511
+        #if defined(BATOID_GPU)
             if (!_devPtr) {
                 Obscuration* ptr;
                 // Allocate arrays on device
@@ -236,7 +236,7 @@ namespace batoid {
     }
 
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp declare target
     #endif
 
@@ -250,12 +250,12 @@ namespace batoid {
             return !_original->contains(x, y);
         }
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
 
     const Obscuration* ObscNegation::getDevPtr() const {
-        #if defined _OPENMP && _OPENMP >= 201511
+        #if defined(BATOID_GPU)
             if (_devPtr)
                 return _devPtr;
             ObscNegation* ptr;
@@ -273,7 +273,7 @@ namespace batoid {
     }
 
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp declare target
     #endif
 
@@ -282,7 +282,7 @@ namespace batoid {
         {}
 
         ObscUnion::~ObscUnion() {
-            #if defined _OPENMP && _OPENMP >= 201511
+            #if defined(BATOID_GPU)
                 if (_devPtr) {
                     const Obscuration** obscs = _obscs;
                     #pragma omp target exit data map(release:obscs[:_nobsc])
@@ -298,12 +298,12 @@ namespace batoid {
             return ret;
         }
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
 
     const Obscuration* ObscUnion::getDevPtr() const {
-        #if defined _OPENMP && _OPENMP >= 201511
+        #if defined(BATOID_GPU)
             if (_devPtr)
                 return _devPtr;
             const Obscuration** obscs = new const Obscuration*[_nobsc];
@@ -324,7 +324,7 @@ namespace batoid {
     }
 
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp declare target
     #endif
 
@@ -333,7 +333,7 @@ namespace batoid {
         {}
 
         ObscIntersection::~ObscIntersection() {
-            #if defined _OPENMP && _OPENMP >= 201511
+            #if defined(BATOID_GPU)
                 if (_devPtr) {
                     const Obscuration** obscs = _obscs;
                     #pragma omp target exit data map(release:obscs[:_nobsc])
@@ -349,12 +349,12 @@ namespace batoid {
             return ret;
         }
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
 
     const Obscuration* ObscIntersection::getDevPtr() const {
-        #if defined _OPENMP && _OPENMP >= 201511
+        #if defined(BATOID_GPU)
             if (_devPtr)
                 return _devPtr;
             const Obscuration** obscs = new const Obscuration*[_nobsc];

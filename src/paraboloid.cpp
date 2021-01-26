@@ -2,7 +2,7 @@
 
 namespace batoid {
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp declare target
     #endif
 
@@ -70,12 +70,12 @@ namespace batoid {
         return true;
     }
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
 
     const Surface* Paraboloid::getDevPtr() const {
-        #if defined _OPENMP && _OPENMP >= 201511
+        #if defined(BATOID_GPU)
             if (!_devPtr) {
                 Surface* ptr;
                 #pragma omp target map(from:ptr)

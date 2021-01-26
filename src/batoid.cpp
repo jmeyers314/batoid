@@ -81,13 +81,11 @@ namespace batoid {
         const double* drptr = dr.data();
         const double* drotptr = drot.data();
 
-        #if defined _OPENMP
-            #if _OPENMP >= 201511  // For OpenMP v4.5
-                #pragma omp target teams distribute parallel for \
-                    map(to:drptr[:3], drotptr[:9])
-            #else
-                #pragma omp parallel for
-            #endif
+        #if defined(BATOID_GPU)
+            #pragma omp target teams distribute parallel for \
+                map(to:drptr[:3], drotptr[:9])
+        #else
+            #pragma omp parallel for
         #endif
         for(int i=0; i<size; i++) {
             double dx = xptr[i]-drptr[0];
@@ -119,13 +117,11 @@ namespace batoid {
         const double* drptr = dr.data();
         const double* drotptr = drot.data();
 
-        #if defined _OPENMP
-            #if _OPENMP >= 201511  // For OpenMP v4.5
-                #pragma omp target teams distribute parallel for \
-                    map(to:drptr[:3], drotptr[:9])
-            #else
-                #pragma omp parallel for
-            #endif
+        #if defined(BATOID_GPU)
+            #pragma omp target teams distribute parallel for \
+                map(to:drptr[:3], drotptr[:9])
+        #else
+            #pragma omp parallel for
         #endif
         for(int i=0; i<size; i++) {
             double x = xptr[i]*drotptr[0] + yptr[i]*drotptr[1] + zptr[i]*drotptr[2] + drptr[0];
@@ -155,12 +151,10 @@ namespace batoid {
 
         const Obscuration* obscDevPtr = obsc.getDevPtr();
 
-        #if defined _OPENMP
-            #if _OPENMP >= 201511  // For OpenMP v4.5
-                #pragma omp target teams distribute parallel for is_device_ptr(obscDevPtr)
-            #else
-                #pragma omp parallel for
-            #endif
+        #if defined(BATOID_GPU)
+            #pragma omp target teams distribute parallel for is_device_ptr(obscDevPtr)
+        #else
+            #pragma omp parallel for
         #endif
         for(int i=0; i<size; i++) {
             vigptr[i] |= obscDevPtr->contains(xptr[i], yptr[i]);
@@ -203,14 +197,12 @@ namespace batoid {
         if (coating)
             coatingDevPtr = coating->getDevPtr();
 
-        #if defined _OPENMP
-            #if _OPENMP >= 201511  // For OpenMP v4.5
-                #pragma omp target teams distribute parallel for \
-                    is_device_ptr(surfaceDevPtr, coatingDevPtr) \
-                    map(to:drptr[:3], drotptr[:9])
-            #else
-                #pragma omp parallel for
-            #endif
+        #if defined(BATOID_GPU)
+            #pragma omp target teams distribute parallel for \
+                is_device_ptr(surfaceDevPtr, coatingDevPtr) \
+                map(to:drptr[:3], drotptr[:9])
+        #else
+            #pragma omp parallel for
         #endif
         for(int i=0; i<size; i++) {
             // Coordinate transformation
@@ -297,14 +289,12 @@ namespace batoid {
         if (coating)
             coatingDevPtr = coating->getDevPtr();
 
-        #if defined _OPENMP
-            #if _OPENMP >= 201511  // For OpenMP v4.5
-                #pragma omp target teams distribute parallel for \
-                    is_device_ptr(surfaceDevPtr, coatingDevPtr) \
-                    map(to:drptr[:3], drotptr[:9])
-            #else
-                #pragma omp parallel for
-            #endif
+        #if defined(BATOID_GPU)
+            #pragma omp target teams distribute parallel for \
+                is_device_ptr(surfaceDevPtr, coatingDevPtr) \
+                map(to:drptr[:3], drotptr[:9])
+        #else
+            #pragma omp parallel for
         #endif
         for(int i=0; i<size; i++) {
             // Coordinate transformation
@@ -403,14 +393,12 @@ namespace batoid {
         if (coating)
             coatingDevPtr = coating->getDevPtr();
 
-        #if defined _OPENMP
-            #if _OPENMP >= 201511  // For OpenMP v4.5
-                #pragma omp target teams distribute parallel for \
-                    is_device_ptr(surfaceDevPtr, mDevPtr, coatingDevPtr) \
-                    map(to:drptr[:3], drotptr[:9])
-            #else
-                #pragma omp parallel for
-            #endif
+        #if defined(BATOID_GPU)
+            #pragma omp target teams distribute parallel for \
+                is_device_ptr(surfaceDevPtr, mDevPtr, coatingDevPtr) \
+                map(to:drptr[:3], drotptr[:9])
+        #else
+            #pragma omp parallel for
         #endif
         for(int i=0; i<size; i++) {
             // Coordinate transformation
@@ -536,14 +524,12 @@ namespace batoid {
         const Medium* mDevPtr = m2.getDevPtr();
         const Coating* cDevPtr = coating.getDevPtr();
 
-        #if defined _OPENMP
-            #if _OPENMP >= 201511  // For OpenMP v4.5
-                #pragma omp target teams distribute parallel for \
-                    is_device_ptr(surfaceDevPtr, mDevPtr, cDevPtr) \
-                    map(to:drptr[:3], drotptr[:9])
-            #else
-                #pragma omp parallel for
-            #endif
+        #if defined(BATOID_GPU)
+            #pragma omp target teams distribute parallel for \
+                is_device_ptr(surfaceDevPtr, mDevPtr, cDevPtr) \
+                map(to:drptr[:3], drotptr[:9])
+        #else
+            #pragma omp parallel for
         #endif
         for(int i=0; i<size; i++) {
             // Coordinate transformation

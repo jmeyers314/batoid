@@ -2,7 +2,7 @@
 
 namespace batoid {
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp declare target
     #endif
 
@@ -71,12 +71,12 @@ namespace batoid {
         return rat/sqrt(1-rat*rat);
     }
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
 
     const Surface* Sphere::getDevPtr() const {
-        #if defined _OPENMP && _OPENMP >= 201511
+        #if defined(BATOID_GPU)
             if (!_devPtr) {
                 Surface* ptr;
                 #pragma omp target map(from:ptr)

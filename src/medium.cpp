@@ -5,7 +5,7 @@
 
 namespace batoid {
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp declare target
     #endif
 
@@ -26,13 +26,13 @@ namespace batoid {
             return _n;
         }
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
 
 
     const Medium* ConstMedium::getDevPtr() const {
-        #if defined _OPENMP && _OPENMP >= 201511
+        #if defined(BATOID_GPU)
             if (_devPtr)
                 return _devPtr;
             Medium* ptr;
@@ -48,7 +48,7 @@ namespace batoid {
     }
 
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp declare target
     #endif
 
@@ -59,7 +59,7 @@ namespace batoid {
         {}
 
         TableMedium::~TableMedium() {
-            #if defined _OPENMP && _OPENMP >= 201511
+            #if defined(BATOID_GPU)
                 if (_devPtr) {
                     Medium* ptr = _devPtr;
                     #pragma omp target is_device_ptr(ptr)
@@ -92,12 +92,12 @@ namespace batoid {
             return out;
         }
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
 
     const Medium* TableMedium::getDevPtr() const {
-        #if defined _OPENMP && _OPENMP >= 201511
+        #if defined(BATOID_GPU)
             if (!_devPtr) {
                 Medium* ptr;
                 // Allocate arrays on device
@@ -117,7 +117,7 @@ namespace batoid {
         #endif
     }
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp declare target
     #endif
 
@@ -136,13 +136,13 @@ namespace batoid {
             return std::sqrt(1.0 + _B1*x/(x-_C1) + _B2*x/(x-_C2) + _B3*x/(x-_C3));
         }
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
 
 
     const Medium* SellmeierMedium::getDevPtr() const {
-        #if defined _OPENMP && _OPENMP >= 201511
+        #if defined(BATOID_GPU)
             if (_devPtr)
                 return _devPtr;
             Medium* ptr;
@@ -158,7 +158,7 @@ namespace batoid {
     }
 
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp declare target
     #endif
 
@@ -178,12 +178,12 @@ namespace batoid {
             return std::sqrt(_A0 + _A1*x + y*(_A2 + y*(_A3 + y*(_A4 + y*_A5))));
         }
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
 
     const Medium* SumitaMedium::getDevPtr() const {
-        #if defined _OPENMP && _OPENMP >= 201511
+        #if defined(BATOID_GPU)
             if (_devPtr)
                 return _devPtr;
             Medium* ptr;
@@ -211,7 +211,7 @@ namespace batoid {
     // @param pressure       Air pressure in kiloPascals.
     // @param temperature    Temperature in Kelvins.
     // @param H2O_pressure   Water vapor pressure in kiloPascals.
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp declare target
     #endif
 
@@ -232,12 +232,12 @@ namespace batoid {
             return 1+n_minus_one;
         }
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
 
     const Medium* Air::getDevPtr() const {
-        #if defined _OPENMP && _OPENMP >= 201511
+        #if defined(BATOID_GPU)
             if (_devPtr)
                 return _devPtr;
             Medium* ptr;

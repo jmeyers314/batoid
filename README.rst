@@ -1,5 +1,5 @@
-.. image:: https://travis-ci.org/jmeyers314/batoid.svg?branch=master
-        :target: https://travis-ci.org/jmeyers314/batoid
+.. image:: https://github.com/jmeyers314/batoid/workflows/batoid%20CI/badge.svg
+        :target: https://github.com/jmeyers314/batoid/workflows/batoid%20CI/badge.svg
 .. image:: https://codecov.io/gh/jmeyers314/batoid/branch/master/graph/badge.svg
         :target: https://codecov.io/gh/jmeyers314/batoid
 

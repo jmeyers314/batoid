@@ -141,7 +141,11 @@ namespace batoid {
         bool* failptr = failed.data;
         double real=0;
         double imag=0;
-        #pragma omp target teams distribute parallel for reduction(+:real,imag)
+        #if defined(BATOID_GPU)
+            #pragma omp target teams distribute parallel for reduction(+:real,imag)
+        #else
+            #pragma omp parallel for reduction(+:real, imag)
+        #endif
         for(int i=0; i<size; i++) {
             double* yptr = xptr+size;
             double* zptr = xptr+2*size;

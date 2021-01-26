@@ -4,7 +4,7 @@
 namespace batoid {
 
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp declare target
     #endif
 
@@ -23,7 +23,7 @@ namespace batoid {
     {}
 
     Bicubic::~Bicubic() {
-        #if defined _OPENMP && _OPENMP >= 201511
+        #if defined(BATOID_GPU)
             if (_devPtr) {
                 Surface* ptr = _devPtr;
                 #pragma omp target is_device_ptr(ptr)
@@ -169,12 +169,12 @@ namespace batoid {
         nz = norm;
     }
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
 
     const Surface* Bicubic::getDevPtr() const {
-        #if defined _OPENMP && _OPENMP >= 201511
+        #if defined(BATOID_GPU)
             if (!_devPtr) {
                 Surface* ptr;
                 // Allocate arrays on device

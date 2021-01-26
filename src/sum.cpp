@@ -3,7 +3,7 @@
 
 namespace batoid {
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp declare target
     #endif
 
@@ -12,7 +12,7 @@ namespace batoid {
     {}
 
     Sum::~Sum() {
-        #if defined _OPENMP && _OPENMP >= 201511
+        #if defined(BATOID_GPU)
             if (_devPtr) {
                 const Surface** surfaces = _surfaces;
                 #pragma omp target exit data map(release:surfaces[:_nsurf])
@@ -55,13 +55,13 @@ namespace batoid {
         return Surface::timeToIntersect(x, y, z, vx, vy, vz, dt);
     }
 
-    #if defined _OPENMP && _OPENMP >= 201511
+    #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
 
 
     const Surface* Sum::getDevPtr() const {
-        #if defined _OPENMP && _OPENMP >= 201511
+        #if defined(BATOID_GPU)
             if (_devPtr)
                 return _devPtr;
             const Surface** surfaces = new const Surface*[_nsurf];
