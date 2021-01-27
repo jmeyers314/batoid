@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Optics &mdash; batoid 0.1.0rc2 documentation</title>
+  <title>Optics &mdash; batoid 0.2.0rc1 documentation</title>
   
-
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
 
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Coordinate Systems" href="coords.html" />
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                0.1
+                0.2
               </div>
             
           
@@ -78,6 +81,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -93,7 +97,6 @@
 <li class="toctree-l1"><a class="reference internal" href="coords.html">Coordinate Systems</a></li>
 <li class="toctree-l1"><a class="reference internal" href="obscurations.html">Obscurations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="media.html">Media</a></li>
-<li class="toctree-l1"><a class="reference internal" href="table.html">Lookup tables</a></li>
 <li class="toctree-l1"><a class="reference internal" href="coatings.html">Coatings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lattice.html">Lattices</a></li>
@@ -102,6 +105,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -136,18 +140,20 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>Optics</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="_sources/optic.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -163,9 +169,9 @@
             
   <div class="section" id="optics">
 <h1>Optics<a class="headerlink" href="#optics" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="batoid.Optic">
-<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">Optic</code><span class="sig-paren">(</span><em class="sig-param">name=None, coordSys=CoordSys([0,0,0],[[1,0,0],[0,1,0],[0,0,1]]), inMedium=ConstMedium(1), outMedium=ConstMedium(1), skip=False, **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Optic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Optic" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">Optic</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">coordSys</span><span class="o">=</span><span class="default_value">CoordSys(array([0., 0., 0.]), array([[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]]))</span></em>, <em class="sig-param"><span class="n">inMedium</span><span class="o">=</span><span class="default_value">ConstMedium(1.0)</span></em>, <em class="sig-param"><span class="n">outMedium</span><span class="o">=</span><span class="default_value">ConstMedium(1.0)</span></em>, <em class="sig-param"><span class="n">skip</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Optic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Optic" title="Permalink to this definition">¶</a></dt>
 <dd><p>The base class for all varieties of batoid optics and optical systems.</p>
 <p>An <a class="reference internal" href="#batoid.Optic" title="batoid.Optic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Optic</span></code></a> can include anything from a single reflective or refractive
 surface to an entire telescope including multiple mirrors and/or lenses.</p>
@@ -185,9 +191,9 @@ False.</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="batoid.Optic.fromYaml">
-<em class="property">classmethod </em><code class="sig-name descname">fromYaml</code><span class="sig-paren">(</span><em class="sig-param">filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Optic.fromYaml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Optic.fromYaml" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">fromYaml</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Optic.fromYaml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Optic.fromYaml" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load an <a class="reference internal" href="#batoid.Optic" title="batoid.Optic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Optic</span></code></a> (commonly a complete telescope) from the given yaml
 file.  This is the most common way to create an <a class="reference internal" href="#batoid.Optic" title="batoid.Optic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Optic</span></code></a>.  If the file
 is not initially found, then look in the <code class="docutils literal notranslate"><span class="pre">batoid.datadir</span></code> directory
@@ -206,9 +212,9 @@ yaml file.</p>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="batoid.Interface">
-<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">Interface</code><span class="sig-paren">(</span><em class="sig-param">surface</em>, <em class="sig-param">obscuration=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Interface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Interface" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">Interface</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">surface</span></em>, <em class="sig-param"><span class="n">obscuration</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Interface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Interface" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.optic.Optic</span></code></p>
 <p>An <a class="reference internal" href="#batoid.Optic" title="batoid.Optic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Optic</span></code></a> representing a single surface.  Almost always one of the
 concrete subclasses (<a class="reference internal" href="#batoid.Mirror" title="batoid.Mirror"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Mirror</span></code></a>, <a class="reference internal" href="#batoid.RefractiveInterface" title="batoid.RefractiveInterface"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RefractiveInterface</span></code></a>, <a class="reference internal" href="#batoid.Baffle" title="batoid.Baffle"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Baffle</span></code></a>, <a class="reference internal" href="#batoid.Detector" title="batoid.Detector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Detector</span></code></a>)
@@ -225,9 +231,9 @@ which means don’t apply any ray obscuration.</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="batoid.Interface.draw3d">
-<code class="sig-name descname">draw3d</code><span class="sig-paren">(</span><em class="sig-param">ax</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Interface.draw3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Interface.draw3d" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">draw3d</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ax</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Interface.draw3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Interface.draw3d" title="Permalink to this definition">¶</a></dt>
 <dd><p>Draw this interface on a mplot3d axis.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -236,9 +242,9 @@ which means don’t apply any ray obscuration.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="batoid.Interface.getXZSlice">
-<code class="sig-name descname">getXZSlice</code><span class="sig-paren">(</span><em class="sig-param">nslice=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Interface.getXZSlice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Interface.getXZSlice" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getXZSlice</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nslice</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Interface.getXZSlice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Interface.getXZSlice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate global coordinates for an (x,z) slice through this
 interface.</p>
 <p>The calculation is split into two half slices: xlocal &lt;= 0 and xlocal
@@ -260,9 +266,9 @@ half slice and xz2=[x2, z2] is the xlocal &gt;= 0 half slice.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="batoid.Interface.draw2d">
-<code class="sig-name descname">draw2d</code><span class="sig-paren">(</span><em class="sig-param">ax</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Interface.draw2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Interface.draw2d" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">draw2d</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ax</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Interface.draw2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Interface.draw2d" title="Permalink to this definition">¶</a></dt>
 <dd><p>Draw this interface on a 2d matplotlib axis.
 May not work if elements are non-circular or not axis-aligned.</p>
 <dl class="field-list simple">
@@ -272,32 +278,42 @@ May not work if elements are non-circular or not axis-aligned.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="batoid.Interface.trace">
-<code class="sig-name descname">trace</code><span class="sig-paren">(</span><em class="sig-param">r</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Interface.trace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Interface.trace" title="Permalink to this definition">¶</a></dt>
-<dd><p>Trace ray(s) through this optical element.</p>
+<code class="sig-name descname">trace</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rv</span></em>, <em class="sig-param"><span class="n">reverse</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Interface.trace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Interface.trace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trace ray through this optical element.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>r</strong> (<a class="reference internal" href="rays.html#batoid.Ray" title="batoid.Ray"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Ray</span></code></a> or <a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.RayVector</span></code></a>) – Input ray(s) to trace</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rv</strong> (<a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.RayVector</span></code></a>) – Input rays to trace, transforming in place.</p></li>
+<li><p><strong>reverse</strong> (<em>bool</em>) – Trace through optical element in reverse?  Default: False</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><a class="reference internal" href="rays.html#batoid.Ray" title="batoid.Ray"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Ray</span></code></a> or <a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.RayVector</span></code></a> – Output ray(s)</p>
+<dd class="field-even"><p><a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.RayVector</span></code></a> – Reference to transformed input rays.</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>Returned rays will be expressed in the local coordinate system of the
-Optic.  See <a class="reference internal" href="rays.html#batoid.Ray.toCoordSys" title="batoid.Ray.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Ray.toCoordSys</span></code></a> or <a class="reference internal" href="rays.html#batoid.RayVector.toCoordSys" title="batoid.RayVector.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">RayVector.toCoordSys</span></code></a> to express rays
-in a different coordinate system.</p>
+<p>This operation is performed in place; the return value is a reference to
+the transformed input <a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RayVector</span></code></a>.</p>
+<p>The transformed rays will be expressed in the local coordinate system of
+the Optic.  See <a class="reference internal" href="rays.html#batoid.RayVector.toCoordSys" title="batoid.RayVector.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">RayVector.toCoordSys</span></code></a> to express rays in a different
+coordinate system.</p>
+<p>Also, you may need to reverse the directions of rays if using this
+method with <code class="docutils literal notranslate"><span class="pre">reverse=True</span></code>.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="batoid.Interface.traceFull">
-<code class="sig-name descname">traceFull</code><span class="sig-paren">(</span><em class="sig-param">r</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Interface.traceFull"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Interface.traceFull" title="Permalink to this definition">¶</a></dt>
-<dd><p>Trace ray(s) through this optical element, returning a full history
-of all surface intersections.</p>
+<code class="sig-name descname">traceFull</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rv</span></em>, <em class="sig-param"><span class="n">reverse</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Interface.traceFull"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Interface.traceFull" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trace rays through this optical element, returning a full history of
+all surface intersections.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>r</strong> (<a class="reference internal" href="rays.html#batoid.Ray" title="batoid.Ray"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Ray</span></code></a> or <a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.RayVector</span></code></a>) – Input ray(s) to trace</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rv</strong> (<a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.RayVector</span></code></a>) – Input rays to trace</p></li>
+<li><p><strong>reverse</strong> (<em>bool</em>) – Trace through optical element in reverse?  Default: False</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><p><em>OrderedDict of dict</em> – There will be one key-value pair for every Interface traced
@@ -306,9 +322,9 @@ values will be dicts with key-value pairs:</p>
 <dl class="simple">
 <dt><code class="docutils literal notranslate"><span class="pre">'name'</span></code></dt><dd><p>name of Interface (str)</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">'in'</span></code></dt><dd><p>the incoming ray(s) to that Interface (Ray or RayVector)</p>
+<dt><code class="docutils literal notranslate"><span class="pre">'in'</span></code></dt><dd><p>the incoming rays to that Interface (RayVector)</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">'out'</span></code></dt><dd><p>the outgoing ray(s) from that Interface (Ray or RayVector)</p>
+<dt><code class="docutils literal notranslate"><span class="pre">'out'</span></code></dt><dd><p>the outgoing rays from that Interface (RayVector)</p>
 </dd>
 </dl>
 </p>
@@ -317,116 +333,47 @@ values will be dicts with key-value pairs:</p>
 <p class="rubric">Notes</p>
 <p>Pay careful attention to the coordinate systems of the returned rays.
 These will generally differ from the original input coordinate system.
-To transform to another coordinate system, see <a class="reference internal" href="rays.html#batoid.Ray.toCoordSys" title="batoid.Ray.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Ray.toCoordSys</span></code></a> or
-<a class="reference internal" href="rays.html#batoid.RayVector.toCoordSys" title="batoid.RayVector.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">RayVector.toCoordSys</span></code></a>.</p>
+To transform to another coordinate system, see <a class="reference internal" href="rays.html#batoid.RayVector.toCoordSys" title="batoid.RayVector.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">RayVector.toCoordSys</span></code></a>.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="batoid.Interface.traceInPlace">
-<code class="sig-name descname">traceInPlace</code><span class="sig-paren">(</span><em class="sig-param">r</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Interface.traceInPlace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Interface.traceInPlace" title="Permalink to this definition">¶</a></dt>
-<dd><p>Trace ray(s) through this optical element in place (result replaces
-input Ray or RayVector)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>r</strong> (<em>batoid.Ray or batoid.RayVector</em>) – Input ray(s) to trace</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>Ray or RayVector</em></p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>The return Ray or RayVector is present for convenience, but is actually
-an alias for the input Ray or RayVector that has had its values
-replaced.</p>
-<p>Returned rays will be expressed in the local coordinate system of the
-Optic.  See <a class="reference internal" href="rays.html#batoid.Ray.toCoordSys" title="batoid.Ray.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Ray.toCoordSys</span></code></a> or <a class="reference internal" href="rays.html#batoid.RayVector.toCoordSys" title="batoid.RayVector.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">RayVector.toCoordSys</span></code></a> to express rays
-in a different coordinate system.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="batoid.Interface.traceReverse">
-<code class="sig-name descname">traceReverse</code><span class="sig-paren">(</span><em class="sig-param">r</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Interface.traceReverse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Interface.traceReverse" title="Permalink to this definition">¶</a></dt>
-<dd><p>Trace ray(s) through this optical element in reverse.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>r</strong> (<em>batoid.Ray or batoid.RayVector</em>) – Input ray(s) to trace</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>Ray or RayVector</em></p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>You may need to reverse the directions of rays before using this
-method!</p>
-<p>Returned rays will be expressed in the local coordinate system of the
-Optic.  See <a class="reference internal" href="rays.html#batoid.Ray.toCoordSys" title="batoid.Ray.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Ray.toCoordSys</span></code></a> or <a class="reference internal" href="rays.html#batoid.RayVector.toCoordSys" title="batoid.RayVector.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">RayVector.toCoordSys</span></code></a> to express rays
-in a different coordinate system.</p>
-</dd></dl>
-
-<dl class="method">
+<dl class="py method">
 <dt id="batoid.Interface.traceSplit">
-<code class="sig-name descname">traceSplit</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">minFlux=0.001</em>, <em class="sig-param">_verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Interface.traceSplit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Interface.traceSplit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Trace ray(s) through this optical element, splitting the return
-values into rays that continue propagating in the “forward” direction,
-and those that were reflected into the “reverse” direction.  Fluxes of
+<code class="sig-name descname">traceSplit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rv</span></em>, <em class="sig-param"><span class="n">minFlux</span><span class="o">=</span><span class="default_value">0.001</span></em>, <em class="sig-param"><span class="n">reverse</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">_verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Interface.traceSplit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Interface.traceSplit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trace rays through this optical element, splitting the return values
+into rays that continue propagating in the “forward” direction, and
+those that were reflected into the “reverse” direction.  Fluxes of
 output rays are proportional to reflection/transmission coefficients of
 the interface (which may depend on wavelength and incidence angle).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>r</strong> (<em>batoid.Ray or batoid.RayVector</em>) – Input ray(s) to trace</p></li>
-<li><p><strong>minFlux</strong> (<em>float</em>) – Minimum flux value of ray(s) to continue propagating.
+<li><p><strong>rv</strong> (<em>batoid.RayVector</em>) – Input rays to trace</p></li>
+<li><p><strong>minFlux</strong> (<em>float</em>) – Minimum flux value of rays to continue propagating.
 Default: 1e-3.</p></li>
+<li><p><strong>reverse</strong> (<em>bool</em>) – Trace through optic in reverse?  Default: False.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p><strong>forwardRays</strong> (<em>batoid.Ray or batoid.RayVector</em>) – Ray(s) propagating in the forward direction.</p></li>
-<li><p><strong>reverseRays</strong> (<em>batoid.Ray or batoid.RayVector</em>) – Ray(s) propagating in the reverse direction.</p></li>
+<li><p><strong>forwardRays</strong> (<em>list of batoid.RayVector.</em>) – Each item in list comes from one distinct path through the optic
+exiting in the forward direction.  The exact path traversed is
+accessible from the <code class="docutils literal notranslate"><span class="pre">.path</span></code> attribute of the item.</p></li>
+<li><p><strong>reverseRays</strong> (<em>list of batoid.RayVector.</em>) – Each item in list comes from one distinct path through the optic
+exiting in the reverse direction.  The exact path traversed is
+accessible from the <code class="docutils literal notranslate"><span class="pre">.path</span></code> attribute of the item.</p></li>
 </ul>
 </p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
 <p>Returned rays will be expressed in the local coordinate system of the
-Optic.  See <a class="reference internal" href="rays.html#batoid.Ray.toCoordSys" title="batoid.Ray.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Ray.toCoordSys</span></code></a> or <a class="reference internal" href="rays.html#batoid.RayVector.toCoordSys" title="batoid.RayVector.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">RayVector.toCoordSys</span></code></a> to express rays
-in a different coordinate system.</p>
+Optic.  See <a class="reference internal" href="rays.html#batoid.RayVector.toCoordSys" title="batoid.RayVector.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">RayVector.toCoordSys</span></code></a> to express rays in a different
+coordinate system.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="batoid.Interface.traceSplitReverse">
-<code class="sig-name descname">traceSplitReverse</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">minFlux=0.001</em>, <em class="sig-param">_verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Interface.traceSplitReverse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Interface.traceSplitReverse" title="Permalink to this definition">¶</a></dt>
-<dd><p>Trace ray(s) through this optical element, splitting the return
-values into rays that propagate in the “forward” direction, and those
-that propagate in the “reverse” direction.  Incoming rays are assumed
-to be propagating in the reverse direction. Fluxes of output rays are
-proportional to reflection/transmission coefficients of the  interface
-(which may depend on wavelength and incidence angle).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>r</strong> (<em>batoid.Ray or batoid.RayVector</em>) – Input ray(s) to trace</p></li>
-<li><p><strong>minFlux</strong> (<em>float</em>) – Minimum flux value of ray(s) to continue propagating.
-Default: 1e-3.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><strong>forwardRays</strong> (<em>batoid.Ray or batoid.RayVector</em>) – Ray(s) propagating in the forward direction.</p></li>
-<li><p><strong>reverseRays</strong> (<em>batoid.Ray or batoid.RayVector</em>) – Ray(s) propagating in the reverse direction.</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>Returned rays will be expressed in the local coordinate system of the
-Optic.  See <a class="reference internal" href="rays.html#batoid.Ray.toCoordSys" title="batoid.Ray.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Ray.toCoordSys</span></code></a> or <a class="reference internal" href="rays.html#batoid.RayVector.toCoordSys" title="batoid.RayVector.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">RayVector.toCoordSys</span></code></a> to express rays
-in a different coordinate system.</p>
-</dd></dl>
-
-<dl class="method">
+<dl class="py method">
 <dt id="batoid.Interface.withGlobalShift">
-<code class="sig-name descname">withGlobalShift</code><span class="sig-paren">(</span><em class="sig-param">shift</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Interface.withGlobalShift"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Interface.withGlobalShift" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">withGlobalShift</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">shift</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Interface.withGlobalShift"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Interface.withGlobalShift" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a new <a class="reference internal" href="#batoid.Interface" title="batoid.Interface"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Interface</span></code></a> with its coordinate system shifted.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -434,14 +381,29 @@ in a different coordinate system.</p>
 apply to self.coordSys</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><a class="reference internal" href="#batoid.Interface" title="batoid.Interface"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Interface</span></code></a> – Shifted interface.</p>
+<dd class="field-even"><p><a class="reference internal" href="#batoid.Interface" title="batoid.Interface"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Interface</span></code></a> – Shifted interface.</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
+<dt id="batoid.Interface.withLocalShift">
+<code class="sig-name descname">withLocalShift</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">shift</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Interface.withLocalShift"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Interface.withLocalShift" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a new <a class="reference internal" href="#batoid.Interface" title="batoid.Interface"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Interface</span></code></a> with its coordinate system shifted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>shift</strong> (<em>array (3,)</em>) – The coordinate shift, relative to the local coordinate system, to
+apply to self.coordSys</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference internal" href="#batoid.Interface" title="batoid.Interface"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Interface</span></code></a> – Shifted interface.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="batoid.Interface.withLocalRotation">
-<code class="sig-name descname">withLocalRotation</code><span class="sig-paren">(</span><em class="sig-param">rot</em>, <em class="sig-param">rotOrigin=None</em>, <em class="sig-param">coordSys=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Interface.withLocalRotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Interface.withLocalRotation" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">withLocalRotation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rot</span></em>, <em class="sig-param"><span class="n">rotOrigin</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">coordSys</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Interface.withLocalRotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Interface.withLocalRotation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a new <a class="reference internal" href="#batoid.Interface" title="batoid.Interface"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Interface</span></code></a> with its coordinate system rotated.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -453,55 +415,55 @@ self.coordSys.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><a class="reference internal" href="#batoid.Interface" title="batoid.Interface"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Interface</span></code></a> – Rotated interface.</p>
+<dd class="field-even"><p><a class="reference internal" href="#batoid.Interface" title="batoid.Interface"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Interface</span></code></a> – Rotated interface.</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="batoid.Interface.withSurface">
-<code class="sig-name descname">withSurface</code><span class="sig-paren">(</span><em class="sig-param">surface</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Interface.withSurface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Interface.withSurface" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">withSurface</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">surface</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Interface.withSurface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Interface.withSurface" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a new <a class="reference internal" href="#batoid.Interface" title="batoid.Interface"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Interface</span></code></a> with its surface attribute replaced.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>surface</strong> (<a class="reference internal" href="surfaces.html#batoid.Surface" title="batoid.Surface"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Surface</span></code></a>) – New replacement surface.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><a class="reference internal" href="#batoid.Interface" title="batoid.Interface"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Interface</span></code></a> – Interface with new surface.</p>
+<dd class="field-even"><p><a class="reference internal" href="#batoid.Interface" title="batoid.Interface"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Interface</span></code></a> – Interface with new surface.</p>
 </dd>
 </dl>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="batoid.Mirror">
-<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">Mirror</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Mirror"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Mirror" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">Mirror</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Mirror"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Mirror" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.optic.Interface</span></code></p>
 <p>Specialization for reflective interfaces.</p>
 <p>Rays will interact with this surface by reflecting off of it.</p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="batoid.RefractiveInterface">
-<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">RefractiveInterface</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#RefractiveInterface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.RefractiveInterface" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">RefractiveInterface</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#RefractiveInterface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.RefractiveInterface" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.optic.Interface</span></code></p>
 <p>Specialization for refractive interfaces.</p>
 <p>Rays will interact with this surface by refracting through it.</p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="batoid.Baffle">
-<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">Baffle</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Baffle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Baffle" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">Baffle</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Baffle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Baffle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.optic.Interface</span></code></p>
 <p>Specialization for baffle interfaces.</p>
 <p>Rays will interact with this optic by passing straight through.  However,
 the vignetting calculation will still be applied at this <a class="reference internal" href="#batoid.Interface" title="batoid.Interface"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Interface</span></code></a>.</p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="batoid.Detector">
-<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">Detector</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Detector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Detector" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">Detector</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Detector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Detector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.optic.Interface</span></code></p>
 <p>Specialization for detector interfaces.</p>
 <p>Rays will interact with this surface by passing through it.  Usually,
@@ -509,9 +471,9 @@ however, this is the last <a class="reference internal" href="#batoid.Optic" tit
 stop with this <a class="reference internal" href="#batoid.Interface" title="batoid.Interface"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Interface</span></code></a>.</p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="batoid.CompoundOptic">
-<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">CompoundOptic</code><span class="sig-paren">(</span><em class="sig-param">items</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">CompoundOptic</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">items</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.optic.Optic</span></code></p>
 <p>An <a class="reference internal" href="#batoid.Optic" title="batoid.Optic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Optic</span></code></a> containing two or more <a class="reference internal" href="#batoid.Optic" title="batoid.Optic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Optic</span></code></a> s as subitems.</p>
 <p>Ray traces will be carried out sequentially for the subitems.</p>
@@ -523,9 +485,9 @@ stop with this <a class="reference internal" href="#batoid.Interface" title="bat
 </ul>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="batoid.CompoundOptic.__getitem__">
-<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic.__getitem__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic.__getitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dictionary access to the entire hierarchy of subitems of this
 <a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CompoundOptic</span></code></a>.</p>
 <p>Either access through the fully-qualified name
@@ -535,33 +497,50 @@ partially-qualified name access is only available for unique
 partially-qualified names.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="batoid.CompoundOptic.trace">
-<code class="sig-name descname">trace</code><span class="sig-paren">(</span><em class="sig-param">r</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic.trace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic.trace" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">trace</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rv</span></em>, <em class="sig-param"><span class="n">reverse</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic.trace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic.trace" title="Permalink to this definition">¶</a></dt>
 <dd><p>Recursively trace through all subitems of this <a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CompoundOptic</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>r</strong> (<a class="reference internal" href="rays.html#batoid.Ray" title="batoid.Ray"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Ray</span></code></a> or <a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.RayVector</span></code></a>) – Input ray(s) to trace</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rv</strong> (<a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.RayVector</span></code></a>) – Input rays to trace, transforming in place.</p></li>
+<li><p><strong>reverse</strong> (<em>bool</em>) – Trace through optical element in reverse?  Default: False</p></li>
+<li><p><strong>path</strong> (<em>list of names of Interfaces.</em>) – Trace through the optical system in this order, as opposed to the
+natural order.  Useful for investigating particular ghost images.
+Note that items included in path will not be skipped, even if their
+skip attribute is true.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><a class="reference internal" href="rays.html#batoid.Ray" title="batoid.Ray"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Ray</span></code></a> or <a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.RayVector</span></code></a> – Output ray(s)</p>
+<dd class="field-even"><p><a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.RayVector</span></code></a> – Reference to transformed input rays.</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
+<p>This operation is performed in place; the return value is a reference to
+the transformed input <a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RayVector</span></code></a>.</p>
 <p>Returned rays will be expressed in the local coordinate system of the
-last element of the CompoundOptic.  See <a class="reference internal" href="rays.html#batoid.Ray.toCoordSys" title="batoid.Ray.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Ray.toCoordSys</span></code></a> or
-<a class="reference internal" href="rays.html#batoid.RayVector.toCoordSys" title="batoid.RayVector.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">RayVector.toCoordSys</span></code></a> to express rays in a different coordinate
-system.</p>
+last element of the CompoundOptic.  See <a class="reference internal" href="rays.html#batoid.RayVector.toCoordSys" title="batoid.RayVector.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">RayVector.toCoordSys</span></code></a> to
+express rays in a different coordinate system.</p>
+<p>Also, you may need to reverse the directions of rays if using this
+method with <code class="docutils literal notranslate"><span class="pre">reverse=True</span></code>.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="batoid.CompoundOptic.traceFull">
-<code class="sig-name descname">traceFull</code><span class="sig-paren">(</span><em class="sig-param">r</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic.traceFull"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic.traceFull" title="Permalink to this definition">¶</a></dt>
-<dd><p>Recursively trace ray(s) through this <a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CompoundOptic</span></code></a>, returning a
-full history of all surface intersections.</p>
+<code class="sig-name descname">traceFull</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rv</span></em>, <em class="sig-param"><span class="n">reverse</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic.traceFull"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic.traceFull" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursively trace rays through this <a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CompoundOptic</span></code></a>, returning a full
+history of all surface intersections.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>r</strong> (<a class="reference internal" href="rays.html#batoid.Ray" title="batoid.Ray"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Ray</span></code></a> or <a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.RayVector</span></code></a>) – Input ray(s) to trace</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rv</strong> (<a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.RayVector</span></code></a>) – Input rays to trace</p></li>
+<li><p><strong>reverse</strong> (<em>bool</em>) – Trace through optical element in reverse?  Default: False</p></li>
+<li><p><strong>path</strong> (<em>list of names of Interfaces.</em>) – Trace through the optical system in this order, as opposed to the
+natural order.  Useful for investigating particular ghost images.
+Note that items included in path will not be skipped, even if their
+skip attribute is true.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><p><em>OrderedDict of dict</em> – There will be one key-value pair for every Interface traced
@@ -569,9 +548,9 @@ through.  The values will be dicts with key-value pairs:</p>
 <dl class="simple">
 <dt><code class="docutils literal notranslate"><span class="pre">'name'</span></code></dt><dd><p>name of Interface (str)</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">'in'</span></code></dt><dd><p>the incoming ray(s) to that Interface (Ray or RayVector)</p>
+<dt><code class="docutils literal notranslate"><span class="pre">'in'</span></code></dt><dd><p>the incoming rays to that Interface (RayVector)</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">'out'</span></code></dt><dd><p>the outgoing ray(s) from that Interface (Ray or RayVector)</p>
+<dt><code class="docutils literal notranslate"><span class="pre">'out'</span></code></dt><dd><p>the outgoing rays from that Interface (RayVector)</p>
 </dd>
 </dl>
 </p>
@@ -580,58 +559,13 @@ through.  The values will be dicts with key-value pairs:</p>
 <p class="rubric">Notes</p>
 <p>Pay careful attention to the coordinate systems of the returned rays.
 These will generally differ from the original input coordinate system.
-To transform to another coordinate system, see <a class="reference internal" href="rays.html#batoid.Ray.toCoordSys" title="batoid.Ray.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Ray.toCoordSys</span></code></a> or
-<a class="reference internal" href="rays.html#batoid.RayVector.toCoordSys" title="batoid.RayVector.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">RayVector.toCoordSys</span></code></a>.</p>
+To transform to another coordinate system, see <a class="reference internal" href="rays.html#batoid.RayVector.toCoordSys" title="batoid.RayVector.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">RayVector.toCoordSys</span></code></a>.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="batoid.CompoundOptic.traceInPlace">
-<code class="sig-name descname">traceInPlace</code><span class="sig-paren">(</span><em class="sig-param">r</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic.traceInPlace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic.traceInPlace" title="Permalink to this definition">¶</a></dt>
-<dd><p>Recursively trace ray(s) through this <a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CompoundOptic</span></code></a> in place
-(result replaces input <a class="reference internal" href="rays.html#batoid.Ray" title="batoid.Ray"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Ray</span></code></a> or <a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RayVector</span></code></a>)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>r</strong> (<a class="reference internal" href="rays.html#batoid.Ray" title="batoid.Ray"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Ray</span></code></a> or <a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.RayVector</span></code></a>) – Input ray(s) to trace</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><a class="reference internal" href="rays.html#batoid.Ray" title="batoid.Ray"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Ray</span></code></a> or <a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RayVector</span></code></a></p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>The return <a class="reference internal" href="rays.html#batoid.Ray" title="batoid.Ray"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Ray</span></code></a> or <a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RayVector</span></code></a> is present for convenience, but is
-actually an alias for the input <a class="reference internal" href="rays.html#batoid.Ray" title="batoid.Ray"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Ray</span></code></a> or <a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RayVector</span></code></a> that has had its
-values replaced.</p>
-<p>Returned rays will be expressed in the local coordinate system of the
-last element of the CompoundOptic.  See <a class="reference internal" href="rays.html#batoid.Ray.toCoordSys" title="batoid.Ray.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Ray.toCoordSys</span></code></a> or
-<a class="reference internal" href="rays.html#batoid.RayVector.toCoordSys" title="batoid.RayVector.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">RayVector.toCoordSys</span></code></a> to express rays in a different coordinate
-system.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="batoid.CompoundOptic.traceReverse">
-<code class="sig-name descname">traceReverse</code><span class="sig-paren">(</span><em class="sig-param">r</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic.traceReverse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic.traceReverse" title="Permalink to this definition">¶</a></dt>
-<dd><p>Recursively trace ray(s) through this <a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CompoundOptic</span></code></a> in reverse.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>r</strong> (<a class="reference internal" href="rays.html#batoid.Ray" title="batoid.Ray"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Ray</span></code></a> or <a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.RayVector</span></code></a>) – Input ray(s) to trace</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><a class="reference internal" href="rays.html#batoid.Ray" title="batoid.Ray"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Ray</span></code></a> or <a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RayVector</span></code></a></p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>You may need to reverse the directions of rays before using this
-method!</p>
-<p>Returned rays will be expressed in the local coordinate system of the
-first element of the CompoundOptic.  See <a class="reference internal" href="rays.html#batoid.Ray.toCoordSys" title="batoid.Ray.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Ray.toCoordSys</span></code></a> or
-<a class="reference internal" href="rays.html#batoid.RayVector.toCoordSys" title="batoid.RayVector.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">RayVector.toCoordSys</span></code></a> to express rays in a different coordinate
-system.</p>
-</dd></dl>
-
-<dl class="method">
+<dl class="py method">
 <dt id="batoid.CompoundOptic.traceSplit">
-<code class="sig-name descname">traceSplit</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">minFlux=0.001</em>, <em class="sig-param">_verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic.traceSplit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic.traceSplit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Recursively trace ray(s) through this <a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CompoundOptic</span></code></a>, splitting at
+<code class="sig-name descname">traceSplit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rv</span></em>, <em class="sig-param"><span class="n">minFlux</span><span class="o">=</span><span class="default_value">0.001</span></em>, <em class="sig-param"><span class="n">reverse</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">_verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic.traceSplit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic.traceSplit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursively trace rays through this <a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CompoundOptic</span></code></a>, splitting at
 each surface.</p>
 <p>The return values are rays that continuing in the “forward” direction,
 and those reflected into the “reverse” direction.  Fluxes of output
@@ -645,15 +579,20 @@ deleted by falling below the minFlux or reach the entrace/exit of the
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>r</strong> (<a class="reference internal" href="rays.html#batoid.Ray" title="batoid.Ray"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Ray</span></code></a> or <a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.RayVector</span></code></a>) – Input ray(s) to trace</p></li>
-<li><p><strong>minFlux</strong> (<em>float</em>) – Minimum flux value of ray(s) to continue propagating.
+<li><p><strong>rv</strong> (<a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.RayVector</span></code></a>) – Input rays to trace</p></li>
+<li><p><strong>minFlux</strong> (<em>float</em>) – Minimum flux value of rays to continue propagating.
 Default: 1e-3.</p></li>
+<li><p><strong>reverse</strong> (<em>bool</em>) – Trace through optic in reverse?  Default: False.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p><strong>forwardRays</strong> (<a class="reference internal" href="rays.html#batoid.Ray" title="batoid.Ray"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Ray</span></code></a> or <a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.RayVector</span></code></a>) – Ray(s) propagating in the forward direction.</p></li>
-<li><p><strong>reverseRays</strong> (<a class="reference internal" href="rays.html#batoid.Ray" title="batoid.Ray"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Ray</span></code></a> or <a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.RayVector</span></code></a>) – Ray(s) propagating in the reverse direction.</p></li>
+<li><p><strong>forwardRays</strong> (<em>list of batoid.RayVector.</em>) – Each item in list comes from one distinct path through the optic
+exiting in the forward direction.  The exact path traversed is
+accessible from the <code class="docutils literal notranslate"><span class="pre">.path</span></code> attribute of the item.</p></li>
+<li><p><strong>reverseRays</strong> (<em>list of batoid.RayVector.</em>) – Each item in list comes from one distinct path through the optic
+exiting in the reverse direction.  The exact path traversed is
+accessible from the <code class="docutils literal notranslate"><span class="pre">.path</span></code> attribute of the item.</p></li>
 </ul>
 </p>
 </dd>
@@ -661,51 +600,12 @@ Default: 1e-3.</p></li>
 <p class="rubric">Notes</p>
 <p>Returned forward (reverse) rays will be expressed in the local
 coordinate system of the last (first) element of the CompoundOptic.
-See <a class="reference internal" href="rays.html#batoid.Ray.toCoordSys" title="batoid.Ray.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Ray.toCoordSys</span></code></a> or <a class="reference internal" href="rays.html#batoid.RayVector.toCoordSys" title="batoid.RayVector.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">RayVector.toCoordSys</span></code></a> to express rays in a
-different coordinate system.</p>
+See <a href="#id1"><span class="problematic" id="id2">`</span></a>RayVector.toCoordSys to express rays in a different coordinate system.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="batoid.CompoundOptic.traceSplitReverse">
-<code class="sig-name descname">traceSplitReverse</code><span class="sig-paren">(</span><em class="sig-param">r</em>, <em class="sig-param">minFlux=0.001</em>, <em class="sig-param">_verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic.traceSplitReverse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic.traceSplitReverse" title="Permalink to this definition">¶</a></dt>
-<dd><p>Recursively trace ray(s) through this <a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CompoundOptic</span></code></a> in reverse,
-splitting at each surface.</p>
-<p>The return values are both rays continuing in the “forward” direction,
-and those reflected into the “reverse” direction.  Initially incoming
-rays are assumed to be propagating in the reverse direction.  Fluxes of
-output rays are proportional to reflection/transmission coefficients of
-the interface (which may depend on wavelength and incidence angle).
-Note that traceSplitReverse is applied recursively, so a single call on
-a <a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CompoundOptic</span></code></a> may result in many combinations of
-reflections/refractions being applied internally before rays are either
-deleted by falling below the minFlux or reach the entrace/exit of the
-<a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CompoundOptic</span></code></a>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>r</strong> (<a class="reference internal" href="rays.html#batoid.Ray" title="batoid.Ray"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Ray</span></code></a> or <a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.RayVector</span></code></a>) – Input ray(s) to trace</p></li>
-<li><p><strong>minFlux</strong> (<em>float</em>) – Minimum flux value of ray(s) to continue propagating.
-Default: 1e-3.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><strong>forwardRays</strong> (<a class="reference internal" href="rays.html#batoid.Ray" title="batoid.Ray"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Ray</span></code></a> or <a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.RayVector</span></code></a>) – Ray(s) propagating in the forward direction.</p></li>
-<li><p><strong>reverseRays</strong> (<a class="reference internal" href="rays.html#batoid.Ray" title="batoid.Ray"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Ray</span></code></a> or <a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.RayVector</span></code></a>) – Ray(s) propagating in the reverse direction.</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>Returned forward (reverse) rays will be expressed in the local
-coordinate system of the first (last) element of the CompoundOptic.
-See <a class="reference internal" href="rays.html#batoid.Ray.toCoordSys" title="batoid.Ray.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Ray.toCoordSys</span></code></a> or <a class="reference internal" href="rays.html#batoid.RayVector.toCoordSys" title="batoid.RayVector.toCoordSys"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">RayVector.toCoordSys</span></code></a> to express rays in a
-different coordinate system.</p>
-</dd></dl>
-
-<dl class="method">
+<dl class="py method">
 <dt id="batoid.CompoundOptic.draw3d">
-<code class="sig-name descname">draw3d</code><span class="sig-paren">(</span><em class="sig-param">ax</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic.draw3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic.draw3d" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">draw3d</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ax</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic.draw3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic.draw3d" title="Permalink to this definition">¶</a></dt>
 <dd><p>Recursively draw this <a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CompoundOptic</span></code></a> on a mplot3d axis by drawing
 all subitems.</p>
 <dl class="field-list simple">
@@ -715,9 +615,9 @@ all subitems.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="batoid.CompoundOptic.draw2d">
-<code class="sig-name descname">draw2d</code><span class="sig-paren">(</span><em class="sig-param">ax</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic.draw2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic.draw2d" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">draw2d</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ax</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic.draw2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic.draw2d" title="Permalink to this definition">¶</a></dt>
 <dd><p>Draw a 2D slice of this <a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CompoundOptic</span></code></a> in the (x,z) plane.</p>
 <p>Calls draw2d recursively on each of our items, with the actual
 drawing taking place in Interface and (optionally) Lens instances.</p>
@@ -728,16 +628,16 @@ that are subclasses of a specified type or types.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ax</strong> (<em>matplotlib.axes.Axes</em>) – Axis on which to draw this optic.</p></li>
-<li><p><strong>only</strong> (<em>list</em>) – A list of types to draw, e.g., <a class="reference internal" href="#batoid.Mirror" title="batoid.Mirror"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Mirror</span></code></a>, or <a class="reference internal" href="#batoid.Lens" title="batoid.Lens"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Lens</span></code></a>.
+<li><p><strong>only</strong> (<em>list</em>) – A list of types to draw, e.g., <a class="reference internal" href="#batoid.Mirror" title="batoid.Mirror"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Mirror</span></code></a>, or <a class="reference internal" href="#batoid.Lens" title="batoid.Lens"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Lens</span></code></a>.
 Default: None means to draw all types.</p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="batoid.CompoundOptic.withGlobalShift">
-<code class="sig-name descname">withGlobalShift</code><span class="sig-paren">(</span><em class="sig-param">shift</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic.withGlobalShift"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic.withGlobalShift" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">withGlobalShift</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">shift</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic.withGlobalShift"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic.withGlobalShift" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a new <a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CompoundOptic</span></code></a> with its coordinate system shifted (and
 the coordinate systems of all subitems)</p>
 <dl class="field-list simple">
@@ -751,9 +651,24 @@ apply to self.coordSys</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
+<dt id="batoid.CompoundOptic.withLocalShift">
+<code class="sig-name descname">withLocalShift</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">shift</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic.withLocalShift"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic.withLocalShift" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a new <a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CompoundOptic</span></code></a> with its coordinate system shifted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>shift</strong> (<em>array (3,)</em>) – The coordinate shift, relative to the local coordinate system, to
+apply to self.coordSys</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CompoundOptic</span></code></a> – Shifted interface.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="batoid.CompoundOptic.withGloballyShiftedOptic">
-<code class="sig-name descname">withGloballyShiftedOptic</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">shift</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic.withGloballyShiftedOptic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic.withGloballyShiftedOptic" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">withGloballyShiftedOptic</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">shift</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic.withGloballyShiftedOptic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic.withGloballyShiftedOptic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a new <a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CompoundOptic</span></code></a> with the coordinate system of one of
 its subitems shifted.</p>
 <dl class="field-list simple">
@@ -765,14 +680,33 @@ apply to the subitem’s coordSys.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.CompoundOptic</span></code></a> – Optic with shifted subitem.</p>
+<dd class="field-even"><p><a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CompoundOptic</span></code></a> – Optic with shifted subitem.</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
+<dt id="batoid.CompoundOptic.withLocallyShiftedOptic">
+<code class="sig-name descname">withLocallyShiftedOptic</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">shift</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic.withLocallyShiftedOptic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic.withLocallyShiftedOptic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a new <a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CompoundOptic</span></code></a> with the coordinate system of one of
+its subitems shifted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – The subitem to shift.</p></li>
+<li><p><strong>shift</strong> (<em>array (3,)</em>) – The coordinate shift, relative to the local coordinate system of
+that subitem, to apply to the subitem’s coordSys.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CompoundOptic</span></code></a> – Optic with shifted subitem.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="batoid.CompoundOptic.withLocalRotation">
-<code class="sig-name descname">withLocalRotation</code><span class="sig-paren">(</span><em class="sig-param">rot</em>, <em class="sig-param">rotOrigin=None</em>, <em class="sig-param">coordSys=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic.withLocalRotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic.withLocalRotation" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">withLocalRotation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rot</span></em>, <em class="sig-param"><span class="n">rotOrigin</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">coordSys</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic.withLocalRotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic.withLocalRotation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a new <a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CompoundOptic</span></code></a> with its coordinate system rotated.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -784,14 +718,14 @@ self.coordSys.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.CompoundOptic</span></code></a> – Rotated optic.</p>
+<dd class="field-even"><p><a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CompoundOptic</span></code></a> – Rotated optic.</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="batoid.CompoundOptic.withLocallyRotatedOptic">
-<code class="sig-name descname">withLocallyRotatedOptic</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">rot</em>, <em class="sig-param">rotOrigin=None</em>, <em class="sig-param">coordSys=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic.withLocallyRotatedOptic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic.withLocallyRotatedOptic" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">withLocallyRotatedOptic</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">rot</span></em>, <em class="sig-param"><span class="n">rotOrigin</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">coordSys</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic.withLocallyRotatedOptic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic.withLocallyRotatedOptic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a new <a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CompoundOptic</span></code></a> with the coordinate system of one of
 its subitems rotated.</p>
 <dl class="field-list simple">
@@ -806,14 +740,14 @@ coordinate system of the subitem being rotated.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.CompoundOptic</span></code></a> – Optic with rotated subitem.</p>
+<dd class="field-even"><p><a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CompoundOptic</span></code></a> – Optic with rotated subitem.</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="batoid.CompoundOptic.withSurface">
-<code class="sig-name descname">withSurface</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">surface</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic.withSurface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic.withSurface" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">withSurface</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">surface</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#CompoundOptic.withSurface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CompoundOptic.withSurface" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a new <a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CompoundOptic</span></code></a> with one of its subitem’s surfaces
 attribute replaced.</p>
 <dl class="field-list simple">
@@ -824,131 +758,37 @@ attribute replaced.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.CompoundOptic</span></code></a> – Optic with new surface.</p>
+<dd class="field-even"><p><a class="reference internal" href="#batoid.CompoundOptic" title="batoid.CompoundOptic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CompoundOptic</span></code></a> – Optic with new surface.</p>
 </dd>
 </dl>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="batoid.Lens">
-<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">Lens</code><span class="sig-paren">(</span><em class="sig-param">items</em>, <em class="sig-param">medium</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Lens"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Lens" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">Lens</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">items</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Lens"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Lens" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.optic.CompoundOptic</span></code></p>
 <p>An lens with two <a class="reference internal" href="#batoid.Interface" title="batoid.Interface"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Interface</span></code></a> s as front and back surfaces.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>items</strong> (list of <a class="reference internal" href="#batoid.Optic" title="batoid.Optic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Optic</span></code></a>, len (2,)) – Subitems making up this compound optic.</p></li>
-<li><p><strong>medium</strong> (<a class="reference internal" href="media.html#batoid.Medium" title="batoid.Medium"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Medium</span></code></a>) – The refractive index medium internal to the lens.</p></li>
-<li><p><strong>**kwargs</strong> – Other parameters to forward to Optic.__init__</p></li>
+<li><p><strong>**kwargs</strong> – Other parameters to forward to CompoundOptic.__init__</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="batoid.Lens.draw2d">
-<code class="sig-name descname">draw2d</code><span class="sig-paren">(</span><em class="sig-param">ax</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Lens.draw2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Lens.draw2d" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">draw2d</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ax</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Lens.draw2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Lens.draw2d" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specialized draw2d for <a class="reference internal" href="#batoid.Lens" title="batoid.Lens"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Lens</span></code></a> instances.</p>
-<p>If the optional keyword ‘only’ equals <a class="reference internal" href="#batoid.Lens" title="batoid.Lens"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Lens</span></code></a>, then fill the area
+<p>If the optional keyword ‘only’ equals <a class="reference internal" href="#batoid.Lens" title="batoid.Lens"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Lens</span></code></a>, then fill the area
 between the lens refractive interfaces using the remaining specified
 kwargs (fc, ec, alpha, …)</p>
 <p>Otherwise, call draw2d on each of our refractive interfaces.</p>
 <p>The optional labelpos and fontdict kwargs are used to draw a label at
 the specified x position (in global coords), using the specified font
 properties.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="batoid.Lens.withGlobalShift">
-<code class="sig-name descname">withGlobalShift</code><span class="sig-paren">(</span><em class="sig-param">shift</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Lens.withGlobalShift"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Lens.withGlobalShift" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a new <a class="reference internal" href="#batoid.Lens" title="batoid.Lens"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Lens</span></code></a> with its coordinate system shifted (and the
-coordinate systems of all subitems)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>shift</strong> (<em>array (3,)</em>) – The coordinate shift, relative to the global coordinate system, to
-apply to self.coordSys</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><a class="reference internal" href="#batoid.Lens" title="batoid.Lens"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Lens</span></code></a> – Shifted optic.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="batoid.Lens.withGloballyShiftedOptic">
-<code class="sig-name descname">withGloballyShiftedOptic</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">shift</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Lens.withGloballyShiftedOptic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Lens.withGloballyShiftedOptic" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a new <a class="reference internal" href="#batoid.Lens" title="batoid.Lens"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Lens</span></code></a> with the coordinate system of one of its
-subitems shifted.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<em>str</em>) – The subitem to shift.</p></li>
-<li><p><strong>shift</strong> (<em>array (3,)</em>) – The coordinate shift, relative to the global coordinate system, to
-apply to the subitem’s coordSys.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><a class="reference internal" href="#batoid.Lens" title="batoid.Lens"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Lens</span></code></a> – Lens with shifted surface.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="batoid.Lens.withLocalRotation">
-<code class="sig-name descname">withLocalRotation</code><span class="sig-paren">(</span><em class="sig-param">rot</em>, <em class="sig-param">rotOrigin=None</em>, <em class="sig-param">coordSys=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Lens.withLocalRotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Lens.withLocalRotation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a new <a class="reference internal" href="#batoid.Lens" title="batoid.Lens"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Lens</span></code></a> with its coordinate system rotated.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>rot</strong> (<em>array (3,3)</em>) – Rotation matrix wrt to the local coordinate system to apply.</p></li>
-<li><p><strong>rotOrigin</strong> (<em>array (3,)</em>) – Origin of rotation.  Default: None means use [0,0,0]</p></li>
-<li><p><strong>coordSys</strong> (<a class="reference internal" href="coords.html#batoid.CoordSys" title="batoid.CoordSys"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.CoordSys</span></code></a>) – Coordinate system of rotOrigin above.  Default: None means use
-self.coordSys.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><a class="reference internal" href="#batoid.Lens" title="batoid.Lens"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Lens</span></code></a> – Rotated lens.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="batoid.Lens.withLocallyRotatedOptic">
-<code class="sig-name descname">withLocallyRotatedOptic</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">rot</em>, <em class="sig-param">rotOrigin=None</em>, <em class="sig-param">coordSys=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Lens.withLocallyRotatedOptic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Lens.withLocallyRotatedOptic" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a new <a class="reference internal" href="#batoid.Lens" title="batoid.Lens"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Lens</span></code></a> with the coordinate system of one of its
-surfaces rotated.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<em>str</em>) – The subitem to rotate.</p></li>
-<li><p><strong>rot</strong> (<em>array (3,3)</em>) – Rotation matrix wrt to the subitem’s local coordinate system to
-apply.</p></li>
-<li><p><strong>rotOrigin</strong> (<em>array (3,)</em>) – Origin of rotation.  Default: None means use [0,0,0]</p></li>
-<li><p><strong>coordSys</strong> (<a class="reference internal" href="coords.html#batoid.CoordSys" title="batoid.CoordSys"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.CoordSys</span></code></a>) – Coordinate system of rotOrigin above.  Default: None means use the
-coordinate system of the subitem being rotated.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><a class="reference internal" href="#batoid.Lens" title="batoid.Lens"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Lens</span></code></a> – Lens with rotated surface.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="batoid.Lens.withSurface">
-<code class="sig-name descname">withSurface</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">surface</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/optic.html#Lens.withSurface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Lens.withSurface" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a new <a class="reference internal" href="#batoid.Lens" title="batoid.Lens"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Lens</span></code></a> with one of its surfaces replaced.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<em>str</em>) – Which surface to replace.</p></li>
-<li><p><strong>surface</strong> (<a class="reference internal" href="surfaces.html#batoid.Surface" title="batoid.Surface"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Surface</span></code></a>) – New replacement surface.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><a class="reference internal" href="#batoid.Lens" title="batoid.Lens"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Lens</span></code></a> – Lens with new surface.</p>
-</dd>
-</dl>
 </dd></dl>
 
 </dd></dl>
@@ -960,29 +800,29 @@ coordinate system of the subitem being rotated.</p></li>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="coords.html" class="btn btn-neutral float-right" title="Coordinate Systems" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="surfaces.html" class="btn btn-neutral float-left" title="Surfaces" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="coords.html" class="btn btn-neutral float-right" title="Coordinate Systems" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="surfaces.html" class="btn btn-neutral float-left" title="Surfaces" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Josh Meyers
+        &#169; Copyright 2020, Josh Meyers.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -990,7 +830,6 @@ coordinate system of the subitem being rotated.</p></li>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

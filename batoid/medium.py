@@ -63,8 +63,10 @@ class TableMedium(Medium):
 
     Parameters
     ----------
-    table : `batoid.Table`
-        Lookup table for refractive index.
+    wavelengths : array of float
+        Wavelengths in meters.
+    ns : array of float
+        Refractive indices.
     """
     def __init__(self, wavelengths, ns):
         self.wavelengths = np.array(wavelengths)

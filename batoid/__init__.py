@@ -20,11 +20,11 @@ from .medium import (
 )
 
 from .obscuration import (
-    ObscCircle, ObscAnnulus, ObscRectangle, ObscRay, ObscPolygon, ObscNegation,
-    ObscUnion, ObscIntersection
+    Obscuration, ObscCircle, ObscAnnulus, ObscRectangle, ObscRay, ObscPolygon,
+    ObscNegation, ObscUnion, ObscIntersection
 )
 
-from .coating import SimpleCoating
+from .coating import Coating, SimpleCoating
 
 from .optic import Optic, CompoundOptic, Lens
 from .optic import Interface, RefractiveInterface, Mirror, Detector, Baffle

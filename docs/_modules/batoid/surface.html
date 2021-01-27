@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>batoid.surface &mdash; batoid 0.1.0rc2 documentation</title>
+  <title>batoid.surface &mdash; batoid 0.2.0rc1 documentation</title>
   
-
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
 
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
@@ -59,7 +62,7 @@
             
             
               <div class="version">
-                0.1
+                0.2
               </div>
             
           
@@ -76,6 +79,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -91,7 +95,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../coords.html">Coordinate Systems</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../obscurations.html">Obscurations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../media.html">Media</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../table.html">Lookup tables</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../coatings.html">Coatings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../analysis.html">Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../lattice.html">Lattices</a></li>
@@ -100,6 +103,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -134,11 +138,13 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../index.html">Module code</a> &raquo;</li>
         
@@ -158,12 +164,13 @@
            <div itemprop="articleBody">
             
   <h1>Source code for batoid.surface</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">_batoid</span>
-<span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">_rayify</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_batoid</span>
+<span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="n">globalCoordSys</span>
+<span class="kn">from</span> <span class="nn">.trace</span> <span class="kn">import</span> <span class="n">intersect</span><span class="p">,</span> <span class="n">rSplit</span><span class="p">,</span> <span class="n">reflect</span><span class="p">,</span> <span class="n">refract</span>
 
 
 <div class="viewcode-block" id="Surface"><a class="viewcode-back" href="../../surfaces.html#batoid.Surface">[docs]</a><span class="k">class</span> <span class="nc">Surface</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
@@ -197,130 +204,80 @@
 <span class="sd">        normal : array_like, shape (n, 3)</span>
 <span class="sd">            Surface normals.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></div>
+        <span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asfortranarray</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">yy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asfortranarray</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">xx</span><span class="o">.</span><span class="n">shape</span><span class="o">+</span><span class="p">(</span><span class="mi">3</span><span class="p">,),</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">xx</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
 
-<div class="viewcode-block" id="Surface.intersect"><a class="viewcode-back" href="../../surfaces.html#batoid.Surface.intersect">[docs]</a>    <span class="k">def</span> <span class="nf">intersect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Calculate intersection of a ray or rays with this surface.  If the</span>
-<span class="sd">        intersection is in the past, then set the ray.fail flag.  If the ray</span>
-<span class="sd">        intersects at an obscured point, then set the ray.vignetted flag.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span>
+            <span class="n">xx</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">yy</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span>
+        <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">out</span></div>
+
+    <span class="k">def</span> <span class="nf">intersect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rv</span><span class="p">,</span> <span class="n">coordSys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">coating</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">intersect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rv</span><span class="p">,</span> <span class="n">coordSys</span><span class="p">,</span> <span class="n">coating</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Surface.reflect"><a class="viewcode-back" href="../../surfaces.html#batoid.Surface.reflect">[docs]</a>    <span class="k">def</span> <span class="nf">reflect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rv</span><span class="p">,</span> <span class="n">coordSys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">coating</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate intersection of rays with this surface, and immediately</span>
+<span class="sd">        reflect the rays at the points of intersection.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        r : Ray or RayVector</span>
-<span class="sd">            Input ray(s) to intersect</span>
+<span class="sd">        rv : RayVector</span>
+<span class="sd">            Rays to reflect.</span>
+<span class="sd">        coordSys : CoordSys, optional</span>
+<span class="sd">            If present, then use for the coordinate system of the surface.  If</span>
+<span class="sd">            ``None`` (default), then assume that rays and surface are already</span>
+<span class="sd">            expressed in the same coordinate system.</span>
+<span class="sd">        coating : Coating, optional</span>
+<span class="sd">            Apply this coating upon surface intersection.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        outRays : Ray or RayVector</span>
-<span class="sd">            New object corresponding to original ray(s) propagated to the</span>
-<span class="sd">            intersection point.</span>
+<span class="sd">        outRays : RayVector</span>
+<span class="sd">            New object corresponding to original rays propagated and reflected.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_rayify</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_surface</span><span class="o">.</span><span class="n">intersect</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">_r</span><span class="p">),</span> <span class="n">r</span><span class="o">.</span><span class="n">coordSys</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">reflect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rv</span><span class="p">,</span> <span class="n">coordSys</span><span class="p">,</span> <span class="n">coating</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Surface.intersectInPlace"><a class="viewcode-back" href="../../surfaces.html#batoid.Surface.intersectInPlace">[docs]</a>    <span class="k">def</span> <span class="nf">intersectInPlace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Calculate intersection of ray or rays with this surface.  Same as</span>
-<span class="sd">        `intersect`, but operates on the input argument in place.</span>
+<div class="viewcode-block" id="Surface.refract"><a class="viewcode-back" href="../../surfaces.html#batoid.Surface.refract">[docs]</a>    <span class="k">def</span> <span class="nf">refract</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rv</span><span class="p">,</span> <span class="n">inMedium</span><span class="p">,</span> <span class="n">outMedium</span><span class="p">,</span> <span class="n">coordSys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">coating</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate intersection of rays with this surface, and immediately</span>
+<span class="sd">        refract the rays through the surface at the points of intersection.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        r : Ray or RayVector</span>
-<span class="sd">            Ray(s) to manipulate in place.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span><span class="o">.</span><span class="n">intersectInPlace</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">_r</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="Surface.reflect"><a class="viewcode-back" href="../../surfaces.html#batoid.Surface.reflect">[docs]</a>    <span class="k">def</span> <span class="nf">reflect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">coating</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Calculate intersection of ray(s) with this surface, and immediately</span>
-<span class="sd">        reflect the ray(s) at the point(s) of intersection.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        r : Ray or RayVector</span>
-<span class="sd">            Ray(s) to reflect.</span>
-<span class="sd">        coating : Coating, optional</span>
-<span class="sd">            Coating object to control reflection coefficient.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        outRays : Ray or RayVector</span>
-<span class="sd">            New object corresponding to original ray(s) propagated and</span>
-<span class="sd">            reflected.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">_coating</span> <span class="o">=</span> <span class="n">coating</span><span class="o">.</span><span class="n">_coating</span> <span class="k">if</span> <span class="n">coating</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
-        <span class="k">return</span> <span class="n">_rayify</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_surface</span><span class="o">.</span><span class="n">reflect</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">_r</span><span class="p">,</span> <span class="n">_coating</span><span class="p">),</span> <span class="n">r</span><span class="o">.</span><span class="n">coordSys</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="Surface.reflectInPlace"><a class="viewcode-back" href="../../surfaces.html#batoid.Surface.reflectInPlace">[docs]</a>    <span class="k">def</span> <span class="nf">reflectInPlace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">coating</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Calculate intersection of ray(s) with this surface, and immediately</span>
-<span class="sd">        reflect the ray(s) at the point(s) of intersection.  Same as `reflect`,</span>
-<span class="sd">        but manipulates the input ray(s) in place.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        r : Ray or RayVector</span>
-<span class="sd">            Ray(s) to reflect in place.</span>
-<span class="sd">        coating : Coating, optional</span>
-<span class="sd">            Coating object to control reflection coefficient.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">_coating</span> <span class="o">=</span> <span class="n">coating</span><span class="o">.</span><span class="n">_coating</span> <span class="k">if</span> <span class="n">coating</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span><span class="o">.</span><span class="n">reflectInPlace</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">_r</span><span class="p">,</span> <span class="n">_coating</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="Surface.refract"><a class="viewcode-back" href="../../surfaces.html#batoid.Surface.refract">[docs]</a>    <span class="k">def</span> <span class="nf">refract</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">inMedium</span><span class="p">,</span> <span class="n">outMedium</span><span class="p">,</span> <span class="n">coating</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Calculate intersection of ray(s) with this surface, and immediately</span>
-<span class="sd">        refract the ray(s) through the surface at the point(s) of intersection.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        r : Ray or RayVector</span>
-<span class="sd">            Ray(s) to refract.</span>
+<span class="sd">        rv : RayVector</span>
+<span class="sd">            Rays to refract.</span>
 <span class="sd">        inMedium : Medium</span>
 <span class="sd">            Refractive medium on the incoming side of the surface.</span>
 <span class="sd">        outMedium : Medium</span>
 <span class="sd">            Refractive medium on the outgoing side of the surface.</span>
+<span class="sd">        coordSys : CoordSys, optional</span>
+<span class="sd">            If present, then use for the coordinate system of the surface.  If</span>
+<span class="sd">            ``None`` (default), then assume that rays and surface are already</span>
+<span class="sd">            expressed in the same coordinate system.</span>
 <span class="sd">        coating : Coating, optional</span>
-<span class="sd">            Coating object to control transmission coefficient.</span>
+<span class="sd">            Apply this coating upon surface intersection.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        outRays : Ray or RayVector</span>
-<span class="sd">            New object corresponding to original ray(s) propagated and</span>
-<span class="sd">            refracted.</span>
+<span class="sd">        outRays : RayVector</span>
+<span class="sd">            New object corresponding to original rays propagated and refracted.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">_coating</span> <span class="o">=</span> <span class="n">coating</span><span class="o">.</span><span class="n">_coating</span> <span class="k">if</span> <span class="n">coating</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
-        <span class="k">return</span> <span class="n">_rayify</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span><span class="o">.</span><span class="n">refract</span><span class="p">(</span>
-                <span class="n">r</span><span class="o">.</span><span class="n">_r</span><span class="p">,</span> <span class="n">inMedium</span><span class="o">.</span><span class="n">_medium</span><span class="p">,</span> <span class="n">outMedium</span><span class="o">.</span><span class="n">_medium</span><span class="p">,</span> <span class="n">_coating</span>
-            <span class="p">),</span>
-            <span class="n">r</span><span class="o">.</span><span class="n">coordSys</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">refract</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rv</span><span class="p">,</span> <span class="n">inMedium</span><span class="p">,</span> <span class="n">outMedium</span><span class="p">,</span> <span class="n">coordSys</span><span class="p">,</span> <span class="n">coating</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Surface.refractInPlace"><a class="viewcode-back" href="../../surfaces.html#batoid.Surface.refractInPlace">[docs]</a>    <span class="k">def</span> <span class="nf">refractInPlace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">inMedium</span><span class="p">,</span> <span class="n">outMedium</span><span class="p">,</span> <span class="n">coating</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Calculate intersection of ray(s) with this surface, and immediately</span>
-<span class="sd">        refract the ray(s) through the surface at the point(s) of intersection.</span>
-<span class="sd">        Same as `refract`, but manipulates the input ray(s) in place.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        r : Ray or RayVector</span>
-<span class="sd">            Ray(s) to refract in place.</span>
-<span class="sd">        inMedium : Medium</span>
-<span class="sd">            Refractive medium on the incoming side of the surface.</span>
-<span class="sd">        outMedium : Medium</span>
-<span class="sd">            Refractive medium on the outgoing side of the surface.</span>
-<span class="sd">        coating : Coating, optional</span>
-<span class="sd">            Coating object to control transmission coefficient.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">_coating</span> <span class="o">=</span> <span class="n">coating</span><span class="o">.</span><span class="n">_coating</span> <span class="k">if</span> <span class="n">coating</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span><span class="o">.</span><span class="n">refractInPlace</span><span class="p">(</span>
-            <span class="n">r</span><span class="o">.</span><span class="n">_r</span><span class="p">,</span> <span class="n">inMedium</span><span class="o">.</span><span class="n">_medium</span><span class="p">,</span> <span class="n">outMedium</span><span class="o">.</span><span class="n">_medium</span><span class="p">,</span> <span class="n">_coating</span>
-        <span class="p">)</span></div>
-
-<div class="viewcode-block" id="Surface.rSplit"><a class="viewcode-back" href="../../surfaces.html#batoid.Surface.rSplit">[docs]</a>    <span class="k">def</span> <span class="nf">rSplit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">inMedium</span><span class="p">,</span> <span class="n">outMedium</span><span class="p">,</span> <span class="n">coating</span><span class="p">):</span>
+<div class="viewcode-block" id="Surface.rSplit"><a class="viewcode-back" href="../../surfaces.html#batoid.Surface.rSplit">[docs]</a>    <span class="k">def</span> <span class="nf">rSplit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rv</span><span class="p">,</span> <span class="n">inMedium</span><span class="p">,</span> <span class="n">outMedium</span><span class="p">,</span> <span class="n">coating</span><span class="p">,</span> <span class="n">coordSys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Calculate intersection of rays with this surface, and immediately</span>
 <span class="sd">        split the rays into reflected and refracted rays, with appropriate</span>
 <span class="sd">        fluxes.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        r : RayVector</span>
+<span class="sd">        rv : RayVector</span>
 <span class="sd">            Rays to refract.</span>
 <span class="sd">        inMedium : Medium</span>
 <span class="sd">            Refractive medium on the incoming side of the surface.</span>
@@ -328,6 +285,10 @@
 <span class="sd">            Refractive medium on the outgoing side of the surface.</span>
 <span class="sd">        coating : Coating</span>
 <span class="sd">            Coating object to control transmission coefficient.</span>
+<span class="sd">        coordSys : CoordSys, optional</span>
+<span class="sd">            If present, then use for the coordinate system of the surface.  If</span>
+<span class="sd">            ``None`` (default), then assume that rays and surface are already</span>
+<span class="sd">            expressed in the same coordinate system.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -335,36 +296,9 @@
 <span class="sd">            New objects corresponding to original rays propagated and</span>
 <span class="sd">            reflected/refracted.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">_coating</span> <span class="o">=</span> <span class="n">coating</span><span class="o">.</span><span class="n">_coating</span> <span class="k">if</span> <span class="n">coating</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
-        <span class="n">reflectedRays</span><span class="p">,</span> <span class="n">refractedRays</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span><span class="o">.</span><span class="n">rSplit</span><span class="p">(</span>
-            <span class="n">r</span><span class="o">.</span><span class="n">_r</span><span class="p">,</span> <span class="n">inMedium</span><span class="o">.</span><span class="n">_medium</span><span class="p">,</span> <span class="n">outMedium</span><span class="o">.</span><span class="n">_medium</span><span class="p">,</span> <span class="n">_coating</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="n">_rayify</span><span class="p">(</span><span class="n">reflectedRays</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">coordSys</span><span class="p">),</span>
-            <span class="n">_rayify</span><span class="p">(</span><span class="n">refractedRays</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">coordSys</span><span class="p">)</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">rSplit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rv</span><span class="p">,</span> <span class="n">inMedium</span><span class="p">,</span> <span class="n">outMedium</span><span class="p">,</span> <span class="n">coating</span><span class="p">,</span> <span class="n">coordSys</span><span class="p">)</span></div>
 
-    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-
-    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-
-    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-
-    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-
-    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-
-    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
         <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span> <span class="o">==</span> <span class="n">rhs</span><span class="p">)</span></div>
 
 
@@ -375,30 +309,22 @@
 
 <span class="sd">        z(x, y) = 0</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">allowReverse</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPPlane</span><span class="p">(</span><span class="n">allowReverse</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPPlane</span><span class="p">()</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">allowReverse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span><span class="o">.</span><span class="n">allowReverse</span>
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="s2">&quot;batoid.Plane&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="s2">&quot;batoid.Plane&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowReverse</span><span class="p">))</span>
-
-    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">allowReverse</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPPlane</span><span class="p">(</span><span class="n">allowReverse</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tup</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowReverse</span>
+        <span class="k">return</span> <span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">Plane</span><span class="p">):</span> <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowReverse</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">allowReverse</span>
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">Plane</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowReverse</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s2">&quot;Plane(allowReverse=True)&quot;</span>
-        <span class="k">else</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="k">return</span> <span class="s2">&quot;Plane()&quot;</span></div>
 
 
@@ -411,7 +337,7 @@
 
 <span class="sd">        z(x, y) = z(r) = \\frac{r^2}{2 R}</span>
 
-<span class="sd">    where :math:`r = \\sqrt{x^2 + y^2}` and `R` is the radius of curvature at</span>
+<span class="sd">    where :math:`r = \\sqrt{x^2 + y^2}` and ``R`` is the radius of curvature at</span>
 <span class="sd">    the paraboloid vertex.</span>
 
 <span class="sd">    Parameters</span>
@@ -419,29 +345,25 @@
 <span class="sd">    R : float</span>
 <span class="sd">        Radius of curvature at paraboloid vertex.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">R</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">R</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">R</span> <span class="o">=</span> <span class="n">R</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPParaboloid</span><span class="p">(</span><span class="n">R</span><span class="p">)</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">R</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Radius of curvature at paraboloid vertex.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span><span class="o">.</span><span class="n">R</span>
-
-    <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="s2">&quot;batoid.Paraboloid&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">R</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPParaboloid</span><span class="p">(</span><span class="n">R</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">R</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span>
 
-    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">Paraboloid</span><span class="p">):</span> <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">R</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;Paraboloid(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Paraboloid(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="si">}</span><span class="s2">)&quot;</span></div>
 
 
 <div class="viewcode-block" id="Sphere"><a class="viewcode-back" href="../../surfaces.html#batoid.Sphere">[docs]</a><span class="k">class</span> <span class="nc">Sphere</span><span class="p">(</span><span class="n">Surface</span><span class="p">):</span>
@@ -451,38 +373,33 @@
 
 <span class="sd">        z(x, y) = z(r) = R \\left(1 - \\sqrt{1-\\frac{r^2}{R^2}}\\right)</span>
 
-<span class="sd">    where :math:`r = \\sqrt{x^2 + y^2}` and `R` is the radius the sphere.  Note</span>
-<span class="sd">    that the center of the sphere is a distance `R` above the vertex.</span>
+<span class="sd">    where :math:`r = \\sqrt{x^2 + y^2}` and ``R`` is the radius the sphere.</span>
+<span class="sd">    Note that the center of the sphere is a distance ``R`` above the vertex.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    R : float</span>
 <span class="sd">        Sphere radius.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">R</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">R</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">R</span> <span class="o">=</span> <span class="n">R</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPSphere</span><span class="p">(</span><span class="n">R</span><span class="p">)</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">R</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Sphere radius.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span><span class="o">.</span><span class="n">R</span>
-
-    <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="s2">&quot;batoid.Sphere&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">R</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPSphere</span><span class="p">(</span><span class="n">R</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">R</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span>
 
-    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">Sphere</span><span class="p">):</span> <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">R</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;Sphere(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Sphere(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="si">}</span><span class="s2">)&quot;</span></div>
 
 
 <div class="viewcode-block" id="Quadric"><a class="viewcode-back" href="../../surfaces.html#batoid.Quadric">[docs]</a><span class="k">class</span> <span class="nc">Quadric</span><span class="p">(</span><span class="n">Surface</span><span class="p">):</span>
@@ -493,7 +410,7 @@
 
 <span class="sd">        z(x, y) = z(r) = \\frac{r^2}{R \\left(1 + \\sqrt{1 - \\frac{r^2}{R^2} (1 + \\kappa)}\\right)}</span>
 
-<span class="sd">    where :math:`r = \\sqrt{x^2 + y^2}`, `R` is the radius of curvature at the</span>
+<span class="sd">    where :math:`r = \\sqrt{x^2 + y^2}`, ``R`` is the radius of curvature at the</span>
 <span class="sd">    surface vertex, and :math:`\\kappa` is the conic constant.  Different</span>
 <span class="sd">    ranges of :math:`\\kappa` indicate different categories of surfaces:</span>
 
@@ -510,37 +427,27 @@
 <span class="sd">    conic : float</span>
 <span class="sd">        Conic constant :math:`\\kappa`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">conic</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">conic</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">R</span> <span class="o">=</span> <span class="n">R</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conic</span> <span class="o">=</span> <span class="n">conic</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPQuadric</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">conic</span><span class="p">)</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">R</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Radius of curvature at quadric vertex.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span><span class="o">.</span><span class="n">R</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">conic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Conic constant.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span><span class="o">.</span><span class="n">conic</span>
-
-    <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="s2">&quot;batoid.Quadric&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">conic</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPQuadric</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">conic</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">Quadric</span><span class="p">):</span> <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">R</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">R</span> <span class="ow">and</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">conic</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">conic</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;Quadric(</span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">conic</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Quadric(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">conic</span><span class="si">}</span><span class="s2">)&quot;</span></div>
 
 
 <div class="viewcode-block" id="Asphere"><a class="viewcode-back" href="../../surfaces.html#batoid.Asphere">[docs]</a><span class="k">class</span> <span class="nc">Asphere</span><span class="p">(</span><span class="n">Surface</span><span class="p">):</span>
@@ -553,7 +460,7 @@
 
 <span class="sd">        z(x, y) = z(r) = \\frac{r^2}{R \\left(1 + \\sqrt{1 - \\frac{r^2}{R^2} (1 + \\kappa)}\\right)} + \\sum_i \\alpha_i r^{2 i}</span>
 
-<span class="sd">    where :math:`r = \\sqrt{x^2 + y^2}`, `R` is the radius of curvature at the</span>
+<span class="sd">    where :math:`r = \\sqrt{x^2 + y^2}`, ``R`` is the radius of curvature at the</span>
 <span class="sd">    surface vertex, :math:`\\kappa` is the conic constant, and</span>
 <span class="sd">    :math:`\\left\\{\\alpha_i\\right\\}` are the even polynomial coefficients.</span>
 <span class="sd">    Different ranges of :math:`\\kappa` produce different categories of</span>
@@ -574,44 +481,31 @@
 <span class="sd">    coefs : list of float</span>
 <span class="sd">        Even polynomial coefficients :math:`\\left\\{\\alpha_i\\right\\}`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">conic</span><span class="p">,</span> <span class="n">coefs</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPAsphere</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">conic</span><span class="p">,</span> <span class="n">coefs</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">conic</span><span class="p">,</span> <span class="n">coefs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">R</span> <span class="o">=</span> <span class="n">R</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conic</span> <span class="o">=</span> <span class="n">conic</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coefs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">coefs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPAsphere</span><span class="p">(</span>
+            <span class="n">R</span><span class="p">,</span> <span class="n">conic</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefs</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">coefs</span><span class="p">)</span>
+        <span class="p">)</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">R</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Radius of curvature at asphere vertex.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span><span class="o">.</span><span class="n">R</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">conic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Conic constant.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span><span class="o">.</span><span class="n">conic</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">coefs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Even polynomial coefficients.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span><span class="o">.</span><span class="n">coefs</span>
-
-    <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="s2">&quot;batoid.Asphere&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">conic</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coefs</span><span class="p">)))</span>
 
     <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPAsphere</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">conic</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefs</span>
 
-    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">Asphere</span><span class="p">):</span> <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">R</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">R</span> <span class="ow">and</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">conic</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">conic</span> <span class="ow">and</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">coefs</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">coefs</span><span class="p">)</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coefs</span><span class="p">,</span> <span class="n">rhs</span><span class="o">.</span><span class="n">coefs</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;Asphere(</span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">conic</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefs</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Asphere(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">conic</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">coefs</span><span class="si">!r}</span><span class="s2">)&quot;</span></div>
 
 
 <div class="viewcode-block" id="Zernike"><a class="viewcode-back" href="../../surfaces.html#batoid.Zernike">[docs]</a><span class="k">class</span> <span class="nc">Zernike</span><span class="p">(</span><span class="n">Surface</span><span class="p">):</span>
@@ -642,35 +536,26 @@
 <span class="sd">    R_inner : float</span>
 <span class="sd">        Inner radius of annulus.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coef</span><span class="p">,</span> <span class="n">R_outer</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">R_inner</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coef</span><span class="p">,</span> <span class="n">R_outer</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">R_inner</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
         <span class="kn">import</span> <span class="nn">galsim</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_coef</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">coef</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_R_outer</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">R_outer</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_R_inner</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">R_inner</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coef</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coef</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;C&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">R_outer</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">R_outer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">R_inner</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">R_inner</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">zernike</span><span class="o">.</span><span class="n">Zernike</span><span class="p">(</span><span class="n">coef</span><span class="p">,</span> <span class="n">R_outer</span><span class="p">,</span> <span class="n">R_inner</span><span class="p">)</span>
-        <span class="n">pcoef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span><span class="o">.</span><span class="n">_coef_array_xy</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPPolynomialSurface</span><span class="p">(</span><span class="n">pcoef</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_xycoef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span><span class="o">.</span><span class="n">_coef_array_xy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_xycoef_gradx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span><span class="o">.</span><span class="n">gradX</span><span class="o">.</span><span class="n">_coef_array_xy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_xycoef_grady</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span><span class="o">.</span><span class="n">gradY</span><span class="o">.</span><span class="n">_coef_array_xy</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">coef</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Annular Zernike polynomial coefficients.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coef</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPPolynomialSurface</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_xycoef</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_xycoef_gradx</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_xycoef_grady</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_xycoef</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_xycoef</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">)</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">R_outer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Outer radius of annulus.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_R_outer</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">R_inner</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Outer radius of annulus.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_R_inner</span>
-
-    <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span>
             <span class="s2">&quot;batoid.Zernike&quot;</span><span class="p">,</span>
             <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coef</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">R_outer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">R_inner</span>
@@ -682,16 +567,14 @@
     <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coef</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">R_outer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">R_inner</span>
 
-    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">Zernike</span><span class="p">):</span> <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coef</span><span class="p">,</span> <span class="n">rhs</span><span class="o">.</span><span class="n">coef</span><span class="p">)</span> <span class="ow">and</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">R_outer</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">R_outer</span> <span class="ow">and</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">R_inner</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">R_inner</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;Zernike(</span><span class="si">{!r}</span><span class="s2">, </span><span class="si">{!r}</span><span class="s2">, </span><span class="si">{!r}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">coef</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">R_outer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">R_inner</span>
-        <span class="p">)</span></div>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Zernike(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">coef</span><span class="si">!r}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">R_outer</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">R_inner</span><span class="si">}</span><span class="s2">)&quot;</span></div>
 
 
 <div class="viewcode-block" id="Bicubic"><a class="viewcode-back" href="../../surfaces.html#batoid.Bicubic">[docs]</a><span class="k">class</span> <span class="nc">Bicubic</span><span class="p">(</span><span class="n">Surface</span><span class="p">):</span>
@@ -710,14 +593,16 @@
 <span class="sd">    d2zdxdys : array_like, optional</span>
 <span class="sd">        2d array indicating mixed derivatives d^2 z / (dx dy) at grid points.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">zs</span><span class="p">,</span>
-                 <span class="n">dzdxs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dzdys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">d2zdxdys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">_slopFrac</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">ys</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_zs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">zs</span><span class="p">)</span>
-        <span class="n">dx</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_xs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_xs</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">dy</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ys</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ys</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ys</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">zs</span><span class="p">,</span> <span class="n">dzdxs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dzdys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">d2zdxdys</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;C&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;C&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">zs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;C&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x0</span> <span class="o">=</span> <span class="n">xs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y0</span> <span class="o">=</span> <span class="n">ys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dx</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_xs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_xs</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">dy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dy</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ys</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ys</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ys</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">dzdxs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dzdys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zs</span><span class="p">)</span>
@@ -735,15 +620,18 @@
             <span class="n">d2zdxdys</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">dzdys</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">dzdys</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="n">dx</span>
             <span class="n">d2zdxdys</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">dzdys</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">dzdys</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">2</span><span class="p">])</span><span class="o">/</span><span class="n">dx</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_dzdxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">dzdxs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_dzdys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">dzdys</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_d2zdxdys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">d2zdxdys</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_slopFrac</span> <span class="o">=</span> <span class="n">_slopFrac</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dzdxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dzdxs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;C&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dzdys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dzdys</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;C&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_d2zdxdys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">d2zdxdys</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;C&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPBicubic</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_xs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zs</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_dzdxs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dzdys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d2zdxdys</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_slopFrac</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_x0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dy</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_zs</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dzdxs</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dzdys</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_d2zdxdys</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_xs</span><span class="p">),</span>
+            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ys</span><span class="p">)</span>
         <span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -770,7 +658,7 @@
     <span class="k">def</span> <span class="nf">d2zdxdys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d2zdxdys</span>
 
-    <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span>
             <span class="s2">&quot;Bicubic&quot;</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">),</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ys</span><span class="p">),</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">zs</span><span class="o">.</span><span class="n">ravel</span><span class="p">()),</span>
             <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dzdxs</span><span class="o">.</span><span class="n">ravel</span><span class="p">()),</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dzdys</span><span class="o">.</span><span class="n">ravel</span><span class="p">()),</span>
@@ -779,31 +667,44 @@
 
     <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
         <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_xs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zs</span><span class="p">,</span>
-         <span class="bp">self</span><span class="o">.</span><span class="n">_dzdxs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dzdys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d2zdxdys</span><span class="p">,</span>
-         <span class="bp">self</span><span class="o">.</span><span class="n">_slopFrac</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">_dzdxs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dzdys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d2zdxdys</span>
         <span class="p">)</span> <span class="o">=</span> <span class="n">args</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPBicubic</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">zs</span><span class="p">,</span>
-                                        <span class="bp">self</span><span class="o">.</span><span class="n">dzdxs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dzdys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">d2zdxdys</span><span class="p">,</span>
-                                        <span class="bp">self</span><span class="o">.</span><span class="n">_slopFrac</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dx</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_xs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_xs</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dy</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ys</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ys</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ys</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPBicubic</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_x0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dy</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_zs</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dzdxs</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dzdys</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_d2zdxdys</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_xs</span><span class="p">),</span>
+            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ys</span><span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">zs</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">dzdxs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dzdys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">d2zdxdys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slopFrac</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dzdxs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dzdys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">d2zdxdys</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">Bicubic</span><span class="p">):</span> <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">,</span> <span class="n">rhs</span><span class="o">.</span><span class="n">xs</span><span class="p">)</span>
-                <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ys</span><span class="p">,</span> <span class="n">rhs</span><span class="o">.</span><span class="n">ys</span><span class="p">)</span>
-                <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">zs</span><span class="p">,</span> <span class="n">rhs</span><span class="o">.</span><span class="n">zs</span><span class="p">)</span>
-                <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dzdxs</span><span class="p">,</span> <span class="n">rhs</span><span class="o">.</span><span class="n">dzdxs</span><span class="p">)</span>
-                <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dzdys</span><span class="p">,</span> <span class="n">rhs</span><span class="o">.</span><span class="n">dzdys</span><span class="p">)</span>
-                <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d2zdxdys</span><span class="p">,</span> <span class="n">rhs</span><span class="o">.</span><span class="n">d2zdxdys</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">,</span> <span class="n">rhs</span><span class="o">.</span><span class="n">xs</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ys</span><span class="p">,</span> <span class="n">rhs</span><span class="o">.</span><span class="n">ys</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">zs</span><span class="p">,</span> <span class="n">rhs</span><span class="o">.</span><span class="n">zs</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dzdxs</span><span class="p">,</span> <span class="n">rhs</span><span class="o">.</span><span class="n">dzdxs</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dzdys</span><span class="p">,</span> <span class="n">rhs</span><span class="o">.</span><span class="n">dzdys</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d2zdxdys</span><span class="p">,</span> <span class="n">rhs</span><span class="o">.</span><span class="n">d2zdxdys</span><span class="p">)</span>
+        <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;Bicubic(</span><span class="si">{!r}</span><span class="s2">, </span><span class="si">{!r}</span><span class="s2">, </span><span class="si">{!r}</span><span class="s2">, </span><span class="si">{!r}</span><span class="s2">, </span><span class="si">{!r}</span><span class="s2">, </span><span class="si">{!r}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">zs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dzdxs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dzdys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">d2zdxdys</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Bicubic(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">xs</span><span class="si">!r}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ys</span><span class="si">!r}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">zs</span><span class="si">!r}</span><span class="s2">, &quot;</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dzdxs</span><span class="si">!r}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dzdys</span><span class="si">!r}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">d2zdxdys</span><span class="si">!r}</span><span class="s2">)&quot;</span>
+        <span class="k">return</span> <span class="n">out</span></div>
 
 
 <div class="viewcode-block" id="Sum"><a class="viewcode-back" href="../../surfaces.html#batoid.Sum">[docs]</a><span class="k">class</span> <span class="nc">Sum</span><span class="p">(</span><span class="n">Surface</span><span class="p">):</span>
@@ -816,56 +717,61 @@
 
 <span class="sd">    where :math:`S_i` is the ith input `Surface`.</span>
 
+<span class="sd">    Note that Sum-Ray intersection calculations will use the intersection of the</span>
+<span class="sd">    ray with the first surface in the list as an initial guess for the</span>
+<span class="sd">    intersection with the full Sum surface.  Thus it is usually a good idea to</span>
+<span class="sd">    place any surface with an analytic intersection (Quadric or simpler) first</span>
+<span class="sd">    in the list, and any small perturbations around that surface after.</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    surfaces : list of Surface</span>
 <span class="sd">        `Surface` s to add together.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surfaces</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_surfaces</span> <span class="o">=</span> <span class="n">surfaces</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surfaces</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">surfaces</span> <span class="o">=</span> <span class="n">surfaces</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPSum</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">_surface</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">surfaces</span><span class="p">])</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">surfaces</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;List of constituent `Surface` s.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_surfaces</span>
-
-    <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="s2">&quot;batoid.Sum&quot;</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surfaces</span><span class="p">)))</span>
 
-    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_surfaces</span> <span class="o">=</span> <span class="n">args</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPSum</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">_surface</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">args</span><span class="p">])</span>
+    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surfaces</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">surfaces</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">surfaces</span>
 
-    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">Sum</span><span class="p">):</span> <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">surfaces</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">surfaces</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;Sum(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surfaces</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Sum(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">surfaces</span><span class="si">}</span><span class="s2">)&quot;</span></div>
 </pre></div>
 
            </div>
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Josh Meyers
+        &#169; Copyright 2020, Josh Meyers.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -873,7 +779,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

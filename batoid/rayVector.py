@@ -902,7 +902,7 @@ class RayVector:
     ):
         """Create RayVector with one stop surface point but many field angles.
 
-        This method is similar to ``fromStop`` but broadcasts over ``theta_x``
+        This method is similar to `fromStop` but broadcasts over ``theta_x``
         and ``theta_y`` instead of over ``x`` and ``y``.  There is less
         currently less effort paid to synchronizing the ``t`` values of the
         created rays, as they don't correspond to points on a physical incoming

@@ -66,7 +66,7 @@ class Surface(ABC):
             Rays to reflect.
         coordSys : CoordSys, optional
             If present, then use for the coordinate system of the surface.  If
-            `None` (default), then assume that rays and surface are already
+            ``None`` (default), then assume that rays and surface are already
             expressed in the same coordinate system.
         coating : Coating, optional
             Apply this coating upon surface intersection.
@@ -92,7 +92,7 @@ class Surface(ABC):
             Refractive medium on the outgoing side of the surface.
         coordSys : CoordSys, optional
             If present, then use for the coordinate system of the surface.  If
-            `None` (default), then assume that rays and surface are already
+            ``None`` (default), then assume that rays and surface are already
             expressed in the same coordinate system.
         coating : Coating, optional
             Apply this coating upon surface intersection.
@@ -121,7 +121,7 @@ class Surface(ABC):
             Coating object to control transmission coefficient.
         coordSys : CoordSys, optional
             If present, then use for the coordinate system of the surface.  If
-            `None` (default), then assume that rays and surface are already
+            ``None`` (default), then assume that rays and surface are already
             expressed in the same coordinate system.
 
         Returns
@@ -171,7 +171,7 @@ class Paraboloid(Surface):
 
         z(x, y) = z(r) = \\frac{r^2}{2 R}
 
-    where :math:`r = \\sqrt{x^2 + y^2}` and `R` is the radius of curvature at
+    where :math:`r = \\sqrt{x^2 + y^2}` and ``R`` is the radius of curvature at
     the paraboloid vertex.
 
     Parameters
@@ -207,8 +207,8 @@ class Sphere(Surface):
 
         z(x, y) = z(r) = R \\left(1 - \\sqrt{1-\\frac{r^2}{R^2}}\\right)
 
-    where :math:`r = \\sqrt{x^2 + y^2}` and `R` is the radius the sphere.  Note
-    that the center of the sphere is a distance `R` above the vertex.
+    where :math:`r = \\sqrt{x^2 + y^2}` and ``R`` is the radius the sphere.
+    Note that the center of the sphere is a distance ``R`` above the vertex.
 
     Parameters
     ----------
@@ -244,7 +244,7 @@ class Quadric(Surface):
 
         z(x, y) = z(r) = \\frac{r^2}{R \\left(1 + \\sqrt{1 - \\frac{r^2}{R^2} (1 + \\kappa)}\\right)}
 
-    where :math:`r = \\sqrt{x^2 + y^2}`, `R` is the radius of curvature at the
+    where :math:`r = \\sqrt{x^2 + y^2}`, ``R`` is the radius of curvature at the
     surface vertex, and :math:`\\kappa` is the conic constant.  Different
     ranges of :math:`\\kappa` indicate different categories of surfaces:
 
@@ -294,7 +294,7 @@ class Asphere(Surface):
 
         z(x, y) = z(r) = \\frac{r^2}{R \\left(1 + \\sqrt{1 - \\frac{r^2}{R^2} (1 + \\kappa)}\\right)} + \\sum_i \\alpha_i r^{2 i}
 
-    where :math:`r = \\sqrt{x^2 + y^2}`, `R` is the radius of curvature at the
+    where :math:`r = \\sqrt{x^2 + y^2}`, ``R`` is the radius of curvature at the
     surface vertex, :math:`\\kappa` is the conic constant, and
     :math:`\\left\\{\\alpha_i\\right\\}` are the even polynomial coefficients.
     Different ranges of :math:`\\kappa` produce different categories of

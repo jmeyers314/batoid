@@ -19,11 +19,11 @@ def RotZ(th):
 class CoordSys:
     """A coordinate system against which to measure surfaces or rays.
 
-    Coordinate systems consist of an origin and a rotation.  The `origin`
+    Coordinate systems consist of an origin and a rotation.  The ``origin``
     attribute specifies where in 3D space the current coordinate system's
-    origin lands in the global coordinate system.  The rotation `rot` specifies
-    the 3D rotation matrix to apply to the global coordinate axes to yield the
-    axes of the this coordinate system.
+    origin lands in the global coordinate system.  The rotation ``rot``
+    specifies the 3D rotation matrix to apply to the global coordinate axes to
+    yield the axes of the this coordinate system.
 
     Parameters
     ----------

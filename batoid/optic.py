@@ -303,7 +303,7 @@ class Interface(Optic):
         coordinate system.
 
         Also, you may need to reverse the directions of rays if using this
-        method with `reverse=True`.
+        method with ``reverse=True``.
         """
         # refract, reflect, pass-through - depending on subclass
         self.interact(rv, reverse=reverse)
@@ -375,11 +375,11 @@ class Interface(Optic):
         forwardRays : list of batoid.RayVector.
             Each item in list comes from one distinct path through the optic
             exiting in the forward direction.  The exact path traversed is
-            accessible from the `.path` attribute of the item.
+            accessible from the ``.path`` attribute of the item.
         reverseRays : list of batoid.RayVector.
             Each item in list comes from one distinct path through the optic
             exiting in the reverse direction.  The exact path traversed is
-            accessible from the `.path` attribute of the item.
+            accessible from the ``.path`` attribute of the item.
 
         Notes
         -----
@@ -756,7 +756,7 @@ class CompoundOptic(Optic):
         express rays in a different coordinate system.
 
         Also, you may need to reverse the directions of rays if using this
-        method with `reverse=True`.
+        method with ``reverse=True``.
         """
         if path is None:
             items = self.items if not reverse else reversed(self.items)
@@ -926,17 +926,17 @@ class CompoundOptic(Optic):
         forwardRays : list of batoid.RayVector.
             Each item in list comes from one distinct path through the optic
             exiting in the forward direction.  The exact path traversed is
-            accessible from the `.path` attribute of the item.
+            accessible from the ``.path`` attribute of the item.
         reverseRays : list of batoid.RayVector.
             Each item in list comes from one distinct path through the optic
             exiting in the reverse direction.  The exact path traversed is
-            accessible from the `.path` attribute of the item.
+            accessible from the ``.path`` attribute of the item.
 
         Notes
         -----
         Returned forward (reverse) rays will be expressed in the local
         coordinate system of the last (first) element of the CompoundOptic.
-        See `Ray.toCoordSys` to express rays in a different coordinate system.
+        See `RayVector.toCoordSys to express rays in a different coordinate system.
         """
         if _verbose:
             s = "reverse" if reverse else "forward"
