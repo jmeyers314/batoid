@@ -4,6 +4,21 @@ from matplotlib.gridspec import GridSpec
 
 def zernikePyramid(xs, ys, zs, figsize=(13, 8), vmin=-1, vmax=1, vdim=True,
                    s=5, title=None, filename=None, fig=None, **kwargs):
+    """Make a multi-zernike plot in a pyramid shape.
+
+    Subplots show individual Zernikes over a range of x and y (presumably a
+    field of view).
+
+    Parameters
+    ----------
+    xs, ys: array of float
+        Field angles (or other spatial coordinate over which to plot Zernikes)
+    zs: array of float, shape (jmax, xymax)
+        Zernike values.  First index labels the particular Zernike coefficient,
+        second index labels spatial coordinate.  First index implicitly starts
+        at j=4 defocus.
+    """
+
     import galsim
     jmax = zs.shape[0]+3
     nmax, _ = galsim.zernike.noll_to_zern(jmax)
@@ -48,8 +63,10 @@ def zernikePyramid(xs, ys, zs, figsize=(13, 8), vmin=-1, vmax=1, vdim=True,
         else:
             _vmin = vmin
             _vmax = vmax
-        scat = ax.scatter(xs, ys, c=zs[j-4], s=s, linewidths=0.5, cmap='Spectral_r',
-                          rasterized=True, vmin=_vmin, vmax=_vmax)
+        scat = ax.scatter(
+            xs, ys, c=zs[j-4], s=s, linewidths=0.5, cmap='Spectral_r',
+            rasterized=True, vmin=_vmin, vmax=_vmax
+        )
         cbar[j] = fig.colorbar(scat, ax=ax)
         ax.set_xticks([])
         ax.set_yticks([])
