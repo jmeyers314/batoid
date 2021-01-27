@@ -1,24 +1,27 @@
 #ifndef batoid_paraboloid_h
 #define batoid_paraboloid_h
 
-#include <sstream>
-#include <limits>
 #include "surface.h"
-#include "ray.h"
-#include <Eigen/Dense>
-
-using Eigen::Vector3d;
 
 namespace batoid {
 
     class Paraboloid : public Surface {
     public:
         Paraboloid(double R);
-        virtual double sag(double, double) const override;
-        virtual Vector3d normal(double, double) const override;
-        virtual bool timeToIntersect(const Ray& r, double& t) const override;
+        ~Paraboloid();
 
-        double getR() const {return _R;}
+        virtual const Surface* getDevPtr() const override;
+
+        virtual double sag(double, double) const override;
+        virtual void normal(
+            double x, double y,
+            double& nx, double& ny, double& nz
+        ) const override;
+        virtual bool timeToIntersect(
+            double x, double y, double z,
+            double vx, double vy, double vz,
+            double& dt
+        ) const override;
 
     private:
         const double _R;  // Radius of curvature

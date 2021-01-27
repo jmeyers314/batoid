@@ -22,7 +22,7 @@
 import batoid
 
 project = 'batoid'
-copyright = '2019, Josh Meyers'
+copyright = '2017-2021, Josh Meyers'
 author = 'Josh Meyers'
 
 # The short X.Y version

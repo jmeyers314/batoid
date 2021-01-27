@@ -169,18 +169,17 @@ opticalSystem:
         type: ObscAnnulus
         inner: 1.971
         outer: 2.3
-    # -
-    #   type: Baffle
-    #   name: CHIMNEY_D
-    #   surface:
-    #     type: Plane
-    #     allowReverse: True
-    #   coordSys:
-    #     z: 0.0
-    #     # z: 0.1
-    #   obscuration:
-    #     type: ObscCircle
-    #     radius: 0.6477
+    -
+      type: Baffle
+      name: CHIMNEY_D
+      surface:
+        type: Plane
+      coordSys:
+        # z: 0.0
+        z: 0.1
+      obscuration:
+        type: ObscCircle
+        radius: 0.6477
     -
       type: Mirror
       name: PM
@@ -192,18 +191,17 @@ opticalSystem:
         type: ClearAnnulus
         outer: 2.005
         inner: 0.6684
-    # -
-    #   type: Baffle
-    #   name: CHIMNEY_D_2
-    #   surface:
-    #     type: Plane
-    #     allowReverse: True
-    #   coordSys:
-    #     z: 0.0
-    #     # z: 0.1
-    #   obscuration:
-    #     type: ObscCircle
-    #     radius: 0.6477
+    -
+      type: Baffle
+      name: CHIMNEY_D_2
+      surface:
+        type: Plane
+      coordSys:
+        # z: 0.0
+        z: 0.1
+      obscuration:
+        type: ObscCircle
+        radius: 0.6477
     -
       type: Baffle
       name: MASK_2

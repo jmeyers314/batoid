@@ -49,8 +49,10 @@ class Lattice:
     def __init__(self, array, primitiveVectors):
         primitiveVectors = np.atleast_2d(primitiveVectors)
 
-        assert array.ndim == len(primitiveVectors), "Not enough primitiveVectors for array"
-        assert array.ndim == len(primitiveVectors[0]), "primitiveVectors are too small for array"
+        if array.ndim != len(primitiveVectors):
+            raise ValueError("Not enough primitiveVectors for array")
+        if array.ndim != len(primitiveVectors[0]):
+            raise ValueError("primitiveVectors are too small for array")
 
         self.array = array
         self.primitiveVectors = primitiveVectors
@@ -58,3 +60,20 @@ class Lattice:
     @lazy_property
     def coords(self):
         return primitiveToLattice(self.primitiveVectors, self.array.shape)
+
+    def __eq__(self, rhs):
+        if not isinstance(rhs, Lattice): return False
+        return (
+            np.array_equal(self.array, rhs.array) and
+            np.array_equal(self.primitiveVectors, rhs.primitiveVectors)
+        )
+
+    def __hash__(self):
+        return hash((
+            "Lattice",
+            tuple(self.array.ravel()),
+            tuple(self.primitiveVectors.ravel())
+        ))
+
+    def __repr__(self):
+        return f"Lattice({self.array!r}, {self.primitiveVectors!r})"

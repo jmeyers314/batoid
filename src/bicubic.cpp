@@ -1,40 +1,48 @@
 #include "bicubic.h"
-#include "solve.h"
-#include "table.h"
-#include <cmath>
 
-using Eigen::Vector2d;
-using Eigen::Vector4d;
-using Eigen::Matrix4d;
 
 namespace batoid {
-    // Look up an index.  Use STL binary search.
-    int EqArgVec::upperIndex(const double a) const
-    {
-        if (a<vec.front()-slop || a>vec.back()+slop)
-            throw TableOutOfRange(a,vec.front(),vec.back());
-        // check for slop
-        if (a < vec.front()) return 1;
-        if (a > vec.back()) return vec.size()-1;
 
-        int i = int( std::ceil( (a-vec.front()) / da) );
-        if (i >= int(vec.size())) --i; // in case of rounding error
-        if (i == 0) ++i;
-        // check if we need to move ahead or back one step due to rounding errors
-        while (a > vec[i]) ++i;
-        while (a < vec[i-1]) --i;
-        return i;
-    }
+
+    #if defined(BATOID_GPU)
+        #pragma omp declare target
+    #endif
 
     Bicubic::Bicubic(
-        const std::vector<double> xs, const std::vector<double> ys, const DRef<MatrixXd> zs,
-        const DRef<MatrixXd> dzdxs, const DRef<MatrixXd> dzdys, const DRef<MatrixXd> d2zdxdys,
-        const double slopFrac
-    ) :     _xargs(xs, slopFrac), _yargs(ys, slopFrac), _zs(zs),
-            _dzdxs(dzdxs), _dzdys(dzdys), _d2zdxdys(d2zdxdys)
+        double x0, double y0, double dx, double dy,
+        const double* z, const double* dzdx, const double* dzdy, const double* d2zdxdy,
+        size_t nx, size_t ny
+    ) :
+        Surface(),
+        _x0(x0), _y0(y0), _dx(dx), _dy(dy),
+        _z(z),
+        _dzdx(dzdx),
+        _dzdy(dzdy),
+        _d2zdxdy(d2zdxdy),
+        _nx(nx), _ny(ny)
     {}
 
-    double Bicubic::oneDSpline(double x, double val0, double val1, double der0, double der1) const {
+    Bicubic::~Bicubic() {
+        #if defined(BATOID_GPU)
+            if (_devPtr) {
+                Surface* ptr = _devPtr;
+                #pragma omp target is_device_ptr(ptr)
+                {
+                    delete ptr;
+                }
+
+                const size_t size = _nx * _ny;
+                const double* z = _z;
+                const double* dzdx = _dzdx;
+                const double* dzdy = _dzdy;
+                const double* d2zdxdy = _d2zdxdy;
+                #pragma omp target exit data \
+                    map(release:z[:size], dzdx[:size], dzdy[:size], d2zdxdy[:size])
+            }
+        #endif
+    }
+
+    double oneDSpline(double x, double val0, double val1, double der0, double der1) {
         double a = 2*(val0-val1) + der0 + der1;
         double b = 3*(val1-val0) - 2*der0 - der1;
         double c = der0;
@@ -43,7 +51,7 @@ namespace batoid {
         return d + x*(c + x*(b + x*a));
     }
 
-    double Bicubic::oneDGrad(double x, double val0, double val1, double der0, double der1) const {
+    double oneDGrad(double x, double val0, double val1, double der0, double der1) {
         double a = 2*(val0-val1) + der0 + der1;
         double b = 3*(val1-val0) - 2*der0 - der1;
         double c = der0;
@@ -51,99 +59,140 @@ namespace batoid {
     }
 
     double Bicubic::sag(double x, double y) const {
-        // Determine cell to use and offset
-        int ix, iy;
-        try {
-            ix = _xargs.upperIndex(x);
-            iy = _yargs.upperIndex(y);
-        } catch (const TableOutOfRange&) {
+        int ix = int(std::floor((x-_x0)/_dx));
+        int iy = int(std::floor((y-_y0)/_dy));
+        if ((ix >= _nx) or (ix < 0) or (iy >= _ny) or (iy < 0)) {
             return NAN;
         }
-        double dx = _xargs.getDa();
-        double dy = _yargs.getDa();
-        double xfrac = (x-_xargs[ix-1])/dx;
-        double yfrac = (y-_yargs[iy-1])/dy;
+        double xgrid = _x0 + ix*_dx;
+        double ygrid = _y0 + iy*_dy;
+        double xfrac = (x - xgrid)/_dx;
+        double yfrac = (y - ygrid)/_dy;
 
-        // Interpolate
-        double val0 = oneDSpline(xfrac, _zs(iy-1, ix-1), _zs(iy-1, ix),
-                                 _dzdxs(iy-1, ix-1)*dx, _dzdxs(iy-1, ix)*dx);
-        double val1 = oneDSpline(xfrac, _zs(iy, ix-1), _zs(iy, ix),
-                                 _dzdxs(iy, ix-1)*dx, _dzdxs(iy, ix)*dx);
-        double der0 = oneDSpline(xfrac, _dzdys(iy-1, ix-1), _dzdys(iy-1, ix),
-                                 _d2zdxdys(iy-1, ix-1)*dx, _d2zdxdys(iy-1, ix)*dx);
-        double der1 = oneDSpline(xfrac, _dzdys(iy, ix-1), _dzdys(iy, ix),
-                                 _d2zdxdys(iy, ix-1)*dx, _d2zdxdys(iy, ix)*dx);
-        return oneDSpline(yfrac, val0, val1, der0*dy, der1*dy);
+        double val0 = oneDSpline(
+            xfrac,
+               _z[_nx*iy + ix],        _z[_nx*iy + ix+1],
+            _dzdx[_nx*iy + ix]*_dx, _dzdx[_nx*iy + ix+1]*_dx
+        );
+        double val1 = oneDSpline(
+            xfrac,
+               _z[_nx*(iy+1) + ix],        _z[_nx*(iy+1) + ix+1],
+            _dzdx[_nx*(iy+1) + ix]*_dx, _dzdx[_nx*(iy+1) + ix+1]*_dx
+        );
+        double der0 = oneDSpline(
+            xfrac,
+               _dzdy[_nx*iy + ix],        _dzdy[_nx*iy + ix+1],
+            _d2zdxdy[_nx*iy + ix]*_dx, _d2zdxdy[_nx*iy + ix+1]*_dx
+        );
+        double der1 = oneDSpline(
+            xfrac,
+               _dzdy[_nx*(iy+1) + ix],        _dzdy[_nx*(iy+1) + ix+1],
+            _d2zdxdy[_nx*(iy+1) + ix]*_dx, _d2zdxdy[_nx*(iy+1) + ix+1]*_dx
+        );
+        return oneDSpline(yfrac, val0, val1, der0*_dy, der1*_dy);
     }
 
-    Vector3d Bicubic::normal(double x, double y) const {
-        // Determine cell to use and offset
-        int ix, iy;
-        try {
-            ix = _xargs.upperIndex(x);
-            iy = _yargs.upperIndex(y);
-        } catch (const TableOutOfRange&) {
-            return Vector3d(NAN, NAN, NAN);
+    void Bicubic::normal(
+        double x, double y,
+        double& nx, double& ny, double& nz
+    ) const {
+        int ix = int(std::floor((x-_x0)/_dx));
+        int iy = int(std::floor((y-_y0)/_dy));
+        if ((ix >= _nx) or (ix < 0) or (iy >= _ny) or (iy < 0)) {
+            nx = NAN;
+            ny = NAN;
+            nz = NAN;
+            return;
         }
-        double dx = _xargs.getDa();
-        double dy = _yargs.getDa();
-        double xfrac = (x-_xargs[ix-1])/dx;
-        double yfrac = (y-_yargs[iy-1])/dy;
+        double xgrid = _x0 + ix*_dx;
+        double ygrid = _y0 + iy*_dy;
+        double xfrac = (x - xgrid)/_dx;
+        double yfrac = (y - ygrid)/_dy;
 
         // x-gradient
-        double val0 = oneDGrad(xfrac, _zs(iy-1, ix-1), _zs(iy-1, ix),
-                               _dzdxs(iy-1, ix-1)*dx, _dzdxs(iy-1, ix)*dx);
-        double val1 = oneDGrad(xfrac, _zs(iy, ix-1), _zs(iy, ix),
-                               _dzdxs(iy, ix-1)*dx, _dzdxs(iy, ix)*dx);
-        double der0 = oneDGrad(xfrac, _dzdys(iy-1, ix-1), _dzdys(iy-1, ix),
-                               _d2zdxdys(iy-1, ix-1)*dx, _d2zdxdys(iy-1, ix)*dx);
-        double der1 = oneDGrad(xfrac, _dzdys(iy, ix-1), _dzdys(iy, ix),
-                               _d2zdxdys(iy, ix-1)*dx, _d2zdxdys(iy, ix)*dx);
-        double gradx = oneDSpline(yfrac, val0, val1, der0*dy, der1*dy)/dx;
+        double val0 = oneDGrad(
+            xfrac,
+               _z[_nx*iy + ix],        _z[_nx*iy + ix+1],
+            _dzdx[_nx*iy + ix]*_dx, _dzdx[_nx*iy + ix+1]*_dx
+        );
+        double val1 = oneDGrad(
+            xfrac,
+               _z[_nx*(iy+1) + ix],        _z[_nx*(iy+1) + ix+1],
+            _dzdx[_nx*(iy+1) + ix]*_dx, _dzdx[_nx*(iy+1) + ix+1]*_dx
+        );
+        double der0 = oneDGrad(
+            xfrac,
+               _dzdy[_nx*iy + ix],        _dzdy[_nx*iy + ix+1],
+            _d2zdxdy[_nx*iy + ix]*_dx, _d2zdxdy[_nx*iy + ix+1]*_dx
+        );
+        double der1 = oneDGrad(
+            xfrac,
+               _dzdy[_nx*(iy+1) + ix],        _dzdy[_nx*(iy+1) + ix+1],
+            _d2zdxdy[_nx*(iy+1) + ix]*_dx, _d2zdxdy[_nx*(iy+1) + ix+1]*_dx
+        );
+        double gradx = oneDSpline(yfrac, val0, val1, der0*_dy, der1*_dy)/_dx;
 
         // y-gradient
-        val0 = oneDGrad(yfrac, _zs(iy-1, ix-1), _zs(iy, ix-1),
-                               _dzdys(iy-1, ix-1)*dy, _dzdys(iy, ix-1)*dy);
-        val1 = oneDGrad(yfrac, _zs(iy-1, ix), _zs(iy, ix),
-                               _dzdys(iy-1, ix)*dy, _dzdys(iy, ix)*dy);
-        der0 = oneDGrad(yfrac, _dzdxs(iy-1, ix-1), _dzdxs(iy, ix-1),
-                               _d2zdxdys(iy-1, ix-1)*dy, _d2zdxdys(iy, ix-1)*dy);
-        der1 = oneDGrad(yfrac, _dzdxs(iy-1, ix), _dzdxs(iy, ix),
-                               _d2zdxdys(iy-1, ix)*dy, _d2zdxdys(iy, ix)*dy);
-        double grady = oneDSpline(xfrac, val0, val1, der0*dx, der1*dx)/dy;
-        return Vector3d(-gradx, -grady, 1).normalized();
+        val0 = oneDGrad(
+            yfrac,
+               _z[_nx*iy + ix],        _z[_nx*(iy+1) + ix],
+            _dzdy[_nx*iy + ix]*_dy, _dzdy[_nx*(iy+1) + ix]*_dy
+        );
+        val1 = oneDGrad(
+            yfrac,
+               _z[_nx*iy + ix+1],        _z[_nx*(iy+1) + ix+1],
+            _dzdy[_nx*iy + ix+1]*_dy, _dzdy[_nx*(iy+1) + ix+1]*_dy
+        );
+        der0 = oneDGrad(
+            yfrac,
+               _dzdx[_nx*iy + ix],        _dzdx[_nx*(iy+1) + ix],
+            _d2zdxdy[_nx*iy + ix]*_dy, _d2zdxdy[_nx*(iy+1) + ix]*_dy
+        );
+        der1 = oneDGrad(
+            yfrac,
+               _dzdx[_nx*iy + ix+1],        _dzdx[_nx*(iy+1) + ix+1],
+            _d2zdxdy[_nx*iy + ix+1]*_dy, _d2zdxdy[_nx*(iy+1) + ix+1]*_dy
+        );
+        double grady = oneDSpline(xfrac, val0, val1, der0*_dx, der1*_dx)/_dy;
+
+        // Following fails
+        // double norm = 1/std::sqrt(gradx*gradx + grady+grady + 1.0);
+
+        // This works
+        double norm = gradx*gradx;
+        norm += grady*grady;
+        norm += 1;
+        norm = 1/std::sqrt(norm);
+
+        nx = -gradx*norm;
+        ny = -grady*norm;
+        nz = norm;
     }
 
-    class BicubicResidual {
-    public:
-        BicubicResidual(const Bicubic& b, const Ray& r) : _b(b), _r(r) {}
-        double operator()(double t) const {
-            Vector3d p = _r.positionAtTime(t);
-            return _b.sag(p(0), p(1)) - p(2);
-        }
-    private:
-        const Bicubic& _b;
-        const Ray& _r;
-    };
+    #if defined(BATOID_GPU)
+        #pragma omp end declare target
+    #endif
 
-    bool Bicubic::timeToIntersect(const Ray& r, double& t) const {
-        // Guess that 0.0 is a good inital estimate
-        t = 0.0;
-        BicubicResidual resid(*this, r);
-        Solve<BicubicResidual> solve(resid, t, t+1e-2);
-        solve.setMethod(Method::Brent);
-        solve.setXTolerance(1e-12);
-
-        try {
-            solve.bracket();
-            t = solve.root();
-        } catch (const SolveError&) {
-            return false;
-        } catch (const TableOutOfRange&) {
-            return false;
-        }
-        if (t < r.t) return false;
-        return true;
+    const Surface* Bicubic::getDevPtr() const {
+        #if defined(BATOID_GPU)
+            if (!_devPtr) {
+                Surface* ptr;
+                // Allocate arrays on device
+                const size_t size = _nx*_ny;
+                const double* z = _z;
+                const double* dzdx = _dzdx;
+                const double* dzdy = _dzdy;
+                const double* d2zdxdy = _d2zdxdy;
+                #pragma omp target enter data map(to:z[:size], dzdx[:size], dzdy[:size], d2zdxdy[:size])
+                #pragma omp target map(from:ptr)
+                {
+                    ptr = new Bicubic(_x0, _y0, _dx, _dy, z, dzdx, dzdy, d2zdxdy, _nx, _ny);
+                }
+                _devPtr = ptr;
+            }
+            return _devPtr;
+        #else
+            return this;
+        #endif
     }
-
 }

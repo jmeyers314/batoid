@@ -109,8 +109,18 @@ def parse_optic(config,
         medium = parse_medium(config.pop('medium'))
         itemsConfig = config.pop('items')
         items = [
-            parse_optic(itemsConfig[0], coordSys=coordSys, inMedium=inMedium, outMedium=medium),
-            parse_optic(itemsConfig[1], coordSys=coordSys, inMedium=medium, outMedium=outMedium)
+            parse_optic(
+                itemsConfig[0],
+                coordSys=coordSys,
+                inMedium=inMedium,
+                outMedium=medium
+            ),
+            parse_optic(
+                itemsConfig[1],
+                coordSys=coordSys,
+                inMedium=medium,
+                outMedium=outMedium
+            )
         ]
         return batoid.optic.Lens(
             items, name=name, coordSys=coordSys,
@@ -118,7 +128,12 @@ def parse_optic(config,
     elif typ == 'CompoundOptic':
         itemsConfig = config.pop('items')
         items = [
-            parse_optic(iC, coordSys=coordSys, inMedium=inMedium, outMedium=outMedium)
+            parse_optic(
+                iC,
+                coordSys=coordSys,
+                inMedium=inMedium,
+                outMedium=outMedium
+            )
             for iC in itemsConfig
         ]
         # Look for a few more possible attributes
@@ -153,10 +168,7 @@ def parse_medium(config):
     # before parsing
     config = dict(**config)
     typ = config.pop('type')
-    if typ == 'TableMedium':
-        table = parse_table(config['table'])
-        return batoid.TableMedium(table=table)
-    # Sellmeier, ConstMedium, SumitaMedium, Air end up here...
+    # TableMedium, Sellmeier, ConstMedium, SumitaMedium, Air end up here...
     evalstr = "batoid.{}(**config)".format(typ)
     return eval(evalstr)
 

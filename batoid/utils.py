@@ -1,6 +1,5 @@
+import warnings
 import numpy as np
-from numbers import Real
-from . import _batoid
 
 
 def normalized(*args):
@@ -93,21 +92,24 @@ def postelToDirCos(u, v):
     orientation is such that vx (vy) is positive when u (v) is positive.
     """
     rho = np.sqrt(u*u + v*v)
-    wZero = rho == 0.0
+    wZero = (rho == 0.0)
     try:
         if wZero:
             return 0.0, 0.0, -1.0
     except ValueError:
         pass
     srho = np.sin(rho)
-    alpha = u/rho*srho
-    beta = v/rho*srho
-    gamma = np.cos(rho)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        alpha = u/rho*srho
+        beta = v/rho*srho
+    gamma = -np.cos(rho)
     if np.any(wZero):
         alpha[wZero] = 0.0
         beta[wZero] = 0.0
-        gamma[wZero] = 1.0
-    return alpha, beta, -gamma
+        gamma[wZero] = -1.0
+
+    return alpha, beta, gamma
 
 
 def dirCosToPostel(alpha, beta, gamma):
@@ -130,10 +132,21 @@ def dirCosToPostel(alpha, beta, gamma):
     (alpha, beta, gamma) = (0, 0, -1) (a ray coming directly from above).  The
     orientation is such that vx (vy) is positive when u (v) is positive.
     """
+    wZero = (gamma == -1)
+    try:
+        if wZero:
+            return 0.0, 0.0
+    except ValueError:
+        pass
     rho = np.arccos(-gamma)
     srho = np.sin(rho)
-    u = alpha*rho/srho
-    v = beta*rho/srho
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        u = alpha*rho/srho
+        v = beta*rho/srho
+    if np.any(wZero):
+        u[wZero] = 0.0
+        v[wZero] = 0.0
     return u, v
 
 
@@ -213,7 +226,7 @@ def stereographicToDirCos(u, v):
     orientation is such that vx (vy) is positive when u (v) is positive.
     """
     rho = np.sqrt(u*u + v*v)
-    wZero = rho == 0.0
+    wZero = (rho == 0.0)
     try:
         if wZero:
             return 0.0, 0.0, -1.0
@@ -221,14 +234,16 @@ def stereographicToDirCos(u, v):
         pass
     theta = 2*np.arctan(rho/2)
     stheta = np.sin(theta)
-    gamma = np.cos(theta)
-    alpha = u/rho*stheta
-    beta = v/rho*stheta
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        alpha = u/rho*stheta
+        beta = v/rho*stheta
+    gamma = -np.cos(theta)
     if np.any(wZero):
         alpha[wZero] = 0.0
         beta[wZero] = 0.0
-        gamma[wZero] = 1.0
-    return alpha, beta, -gamma
+        gamma[wZero] = -1.0
+    return alpha, beta, gamma
 
 
 def dirCosToStereographic(alpha, beta, gamma):
@@ -250,11 +265,22 @@ def dirCosToStereographic(alpha, beta, gamma):
     (alpha, beta, gamma) = (0, 0, -1) (a ray coming directly from above).  The
     orientation is such that vx (vy) is positive when u (v) is positive.
     """
+    wZero = (gamma == -1)
+    try:
+        if wZero:
+            return 0.0, 0.0
+    except ValueError:
+        pass
     theta = np.arccos(-gamma)
     rho = 2*np.tan(theta/2)
     stheta = np.sin(theta)
-    u = alpha*rho/stheta
-    v = beta*rho/stheta
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        u = alpha*rho/stheta
+        v = beta*rho/stheta
+    if np.any(wZero):
+        u[wZero] = 0.0
+        v[wZero] = 0.0
     return u, v
 
 
@@ -339,12 +365,14 @@ def lambertToDirCos(u, v):
     rho = np.sqrt(rhosqr)
     gamma = (2-rhosqr)/2
     r = np.sqrt(1-gamma*gamma)
-    alpha = u * r/rho
-    beta = v * r/rho
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        alpha = u * r/rho
+        beta = v * r/rho
     if np.any(wZero):
         alpha[wZero] = 0.0
         beta[wZero] = 0.0
-        gamma[wZero] = 0.0
+        gamma[wZero] = 1.0
     return alpha, beta, -gamma
 
 
@@ -368,10 +396,21 @@ def dirCosToLambert(alpha, beta, gamma):
     (alpha, beta, gamma) = (0, 0, -1) (a ray coming directly from above).  The
     orientation is such that vx (vy) is positive when u (v) is positive.
     """
+    wZero = (gamma == -1)
+    try:
+        if wZero:
+            return 0.0, 0.0
+    except ValueError:
+        pass
     rho = np.sqrt(2+2*gamma)
     norm = np.sqrt(1-gamma*gamma)
-    u = alpha*rho/norm
-    v = beta*rho/norm
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        u = alpha*rho/norm
+        v = beta*rho/norm
+    if np.any(wZero):
+        u[wZero] = 0.0
+        v[wZero] = 0.0
     return u, v
 
 

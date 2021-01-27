@@ -1,5 +1,5 @@
-.. image:: https://travis-ci.org/jmeyers314/batoid.svg?branch=master
-        :target: https://travis-ci.org/jmeyers314/batoid
+.. image:: https://github.com/jmeyers314/batoid/workflows/batoid%20CI/badge.svg
+        :target: https://github.com/jmeyers314/batoid/workflows/batoid%20CI/badge.svg
 .. image:: https://codecov.io/gh/jmeyers314/batoid/branch/master/graph/badge.svg
         :target: https://codecov.io/gh/jmeyers314/batoid
 
@@ -17,7 +17,7 @@ https://jmeyers314.github.io/batoid/overview.html
 Requirements
 ============
 
-Batoid is known to work on MacOS and linux, using Python version 3.4+, and
+Batoid is known to work on MacOS and linux, using Python version 3.6+, and
 either the clang or gcc compiler with support for c++11.
 
 Installation
@@ -38,8 +38,8 @@ Github
 
 If Pypi doesn't work, then you can try cloning the source from github and
 running setup.py.  One minor hiccup in this case is that the batoid repo
-includes submodules for ``pybind11`` and ``eigen``, so when cloning for the
-first time, a command similar to one of the following should be used ::
+includes ``pybind11`` as a submodule, so when cloning for the first time, a
+command similar to one of the following should be used ::
 
     git clone --recurse-submodules git@github.com:jmeyers314/batoid.git
 

@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>batoid.coordsys &mdash; batoid 0.1.0rc2 documentation</title>
+  <title>batoid.coordSys &mdash; batoid 0.2.0rc1 documentation</title>
   
-
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
 
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
@@ -59,7 +62,7 @@
             
             
               <div class="version">
-                0.1
+                0.2
               </div>
             
           
@@ -76,6 +79,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -91,7 +95,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../coords.html">Coordinate Systems</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../obscurations.html">Obscurations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../media.html">Media</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../table.html">Lookup tables</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../coatings.html">Coatings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../analysis.html">Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../lattice.html">Lattices</a></li>
@@ -100,6 +103,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -134,15 +138,17 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../index.html">Module code</a> &raquo;</li>
         
-      <li>batoid.coordsys</li>
+      <li>batoid.coordSys</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -157,17 +163,19 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for batoid.coordsys</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">_batoid</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+  <h1>Source code for batoid.coordSys</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
 
 <span class="k">def</span> <span class="nf">RotX</span><span class="p">(</span><span class="n">th</span><span class="p">):</span>
     <span class="n">sth</span><span class="p">,</span> <span class="n">cth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">th</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">th</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="n">cth</span><span class="p">,</span><span class="o">-</span><span class="n">sth</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="n">sth</span><span class="p">,</span><span class="n">cth</span><span class="p">]])</span>
 
+
 <span class="k">def</span> <span class="nf">RotY</span><span class="p">(</span><span class="n">th</span><span class="p">):</span>
     <span class="n">sth</span><span class="p">,</span> <span class="n">cth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">th</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">th</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">cth</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">sth</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="o">-</span><span class="n">sth</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">cth</span><span class="p">]])</span>
+
 
 <span class="k">def</span> <span class="nf">RotZ</span><span class="p">(</span><span class="n">th</span><span class="p">):</span>
     <span class="n">sth</span><span class="p">,</span> <span class="n">cth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">th</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">th</span><span class="p">)</span>
@@ -175,14 +183,13 @@
 
 
 <div class="viewcode-block" id="CoordSys"><a class="viewcode-back" href="../../coords.html#batoid.CoordSys">[docs]</a><span class="k">class</span> <span class="nc">CoordSys</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;A coordinate system against which to measure Surfaces or Rays.</span>
+    <span class="sd">&quot;&quot;&quot;A coordinate system against which to measure surfaces or rays.</span>
 
-<span class="sd">    Coordinate systems consist of an origin and a rotation.  The `origin`</span>
+<span class="sd">    Coordinate systems consist of an origin and a rotation.  The ``origin``</span>
 <span class="sd">    attribute specifies where in 3D space the current coordinate system&#39;s</span>
-<span class="sd">    origin lands in the global coordinate system.  The rotation `rot` specifies</span>
-<span class="sd">    the 3D rotation matrix to apply to the global coordinate axes to yield the</span>
-<span class="sd">    axes of the this coordinate system.</span>
-
+<span class="sd">    origin lands in the global coordinate system.  The rotation ``rot``</span>
+<span class="sd">    specifies the 3D rotation matrix to apply to the global coordinate axes to</span>
+<span class="sd">    yield the axes of the this coordinate system.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -191,61 +198,34 @@
 <span class="sd">    rot : ndarray of float, shape (3, 3)</span>
 <span class="sd">        Rotation matrix taking global axes into current system axes.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rot</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rot</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">origin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">rot</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_coordSys</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPCoordSys</span><span class="p">()</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_coordSys</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPCoordSys</span><span class="p">(</span><span class="n">rot</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">rot</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_coordSys</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPCoordSys</span><span class="p">(</span><span class="n">origin</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_coordSys</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPCoordSys</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">rot</span><span class="p">)</span>
-
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_fromCoordSys</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">_coordSys</span><span class="p">):</span>
-        <span class="n">ret</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
-        <span class="n">ret</span><span class="o">.</span><span class="n">_coordSys</span> <span class="o">=</span> <span class="n">_coordSys</span>
-        <span class="k">return</span> <span class="n">ret</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">origin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;ndarray of float, shape (3,): Origin of coordinate system in global</span>
-<span class="sd">        coordinates.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coordSys</span><span class="o">.</span><span class="n">origin</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">rot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;ndarray of float, shape (3, 3): Rotation matrix taking global axes</span>
-<span class="sd">        into current system axes.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coordSys</span><span class="o">.</span><span class="n">rot</span>
+            <span class="n">origin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rot</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">origin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">origin</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rot</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">xhat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;ndarray of float, shape (3,): Orientation of local x vector in</span>
 <span class="sd">        global coordinates.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coordSys</span><span class="o">.</span><span class="n">xhat</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rot</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">yhat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;ndarray of float, shape (3,): Orientation of local y vector in</span>
 <span class="sd">        global coordinates.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coordSys</span><span class="o">.</span><span class="n">yhat</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rot</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">zhat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;ndarray of float, shape (3,): Orientation of local z vector in</span>
 <span class="sd">        global coordinates.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coordSys</span><span class="o">.</span><span class="n">zhat</span>
-
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coordSys</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rot</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
 
 <div class="viewcode-block" id="CoordSys.shiftGlobal"><a class="viewcode-back" href="../../coords.html#batoid.CoordSys.shiftGlobal">[docs]</a>    <span class="k">def</span> <span class="nf">shiftGlobal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dr</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return new CoordSys with origin shifted along global axes.</span>
@@ -259,7 +239,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        CoordSys</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">CoordSys</span><span class="o">.</span><span class="n">_fromCoordSys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coordSys</span><span class="o">.</span><span class="n">shiftGlobal</span><span class="p">(</span><span class="n">dr</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="n">CoordSys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">origin</span><span class="o">+</span><span class="n">dr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rot</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CoordSys.shiftLocal"><a class="viewcode-back" href="../../coords.html#batoid.CoordSys.shiftLocal">[docs]</a>    <span class="k">def</span> <span class="nf">shiftLocal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dr</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return new CoordSys with origin shifted along local axes.</span>
@@ -273,7 +253,8 @@
 <span class="sd">        -------</span>
 <span class="sd">        CoordSys</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">CoordSys</span><span class="o">.</span><span class="n">_fromCoordSys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coordSys</span><span class="o">.</span><span class="n">shiftLocal</span><span class="p">(</span><span class="n">dr</span><span class="p">))</span></div>
+        <span class="c1"># Rotate the shift into global coordinates, then do the shift globally</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">shiftGlobal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rot</span><span class="nd">@dr</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CoordSys.rotateGlobal"><a class="viewcode-back" href="../../coords.html#batoid.CoordSys.rotateGlobal">[docs]</a>    <span class="k">def</span> <span class="nf">rotateGlobal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rot</span><span class="p">,</span> <span class="n">rotCenter</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">coordSys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return new CoordSys rotated with respect to global axes.</span>
@@ -292,9 +273,13 @@
 <span class="sd">        CoordSys</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">coordSys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">coordSys</span> <span class="o">=</span> <span class="bp">self</span>
-        <span class="k">return</span> <span class="n">CoordSys</span><span class="o">.</span><span class="n">_fromCoordSys</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_coordSys</span><span class="o">.</span><span class="n">rotateGlobal</span><span class="p">(</span><span class="n">rot</span><span class="p">,</span> <span class="n">rotCenter</span><span class="p">,</span> <span class="n">coordSys</span><span class="o">.</span><span class="n">_coordSys</span><span class="p">)</span>
+            <span class="n">coordSys</span> <span class="o">=</span> <span class="n">CoordSys</span><span class="p">()</span>
+        <span class="c1"># Find rot center in global coordinates</span>
+        <span class="n">globalRotCenter</span> <span class="o">=</span> <span class="n">coordSys</span><span class="o">.</span><span class="n">rot</span><span class="nd">@rotCenter</span> <span class="o">+</span> <span class="n">coordSys</span><span class="o">.</span><span class="n">origin</span>
+        <span class="c1"># Then rotate about this center</span>
+        <span class="k">return</span> <span class="n">CoordSys</span><span class="p">(</span>
+            <span class="n">rot</span><span class="o">@</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">origin</span><span class="o">-</span><span class="n">globalRotCenter</span><span class="p">)</span><span class="o">+</span><span class="n">globalRotCenter</span><span class="p">,</span>
+            <span class="n">rot</span><span class="nd">@self</span><span class="o">.</span><span class="n">rot</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="CoordSys.rotateLocal"><a class="viewcode-back" href="../../coords.html#batoid.CoordSys.rotateLocal">[docs]</a>    <span class="k">def</span> <span class="nf">rotateLocal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rot</span><span class="p">,</span> <span class="n">rotCenter</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">coordSys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -315,163 +300,70 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">coordSys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">coordSys</span> <span class="o">=</span> <span class="bp">self</span>
-        <span class="k">return</span> <span class="n">CoordSys</span><span class="o">.</span><span class="n">_fromCoordSys</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_coordSys</span><span class="o">.</span><span class="n">rotateLocal</span><span class="p">(</span><span class="n">rot</span><span class="p">,</span> <span class="n">rotCenter</span><span class="p">,</span> <span class="n">coordSys</span><span class="o">.</span><span class="n">_coordSys</span><span class="p">)</span>
+        <span class="c1"># Find rot center in global coordinates</span>
+        <span class="n">globalRotCenter</span> <span class="o">=</span> <span class="n">coordSys</span><span class="o">.</span><span class="n">rot</span><span class="nd">@rotCenter</span> <span class="o">+</span> <span class="n">coordSys</span><span class="o">.</span><span class="n">origin</span>
+        <span class="c1"># first rotate rot into global coords: (self.rot rot self.rot.T),</span>
+        <span class="c1"># then apply that: (self.rot rot self.rot.T) self.rot = self.rot rot</span>
+        <span class="n">rTmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rot</span><span class="nd">@rot</span>
+        <span class="k">return</span> <span class="n">CoordSys</span><span class="p">(</span>
+            <span class="n">rTmp</span><span class="nd">@self</span><span class="o">.</span><span class="n">rot</span><span class="o">.</span><span class="n">T</span><span class="o">@</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">origin</span><span class="o">-</span><span class="n">globalRotCenter</span><span class="p">)</span><span class="o">+</span><span class="n">globalRotCenter</span><span class="p">,</span>
+            <span class="n">rTmp</span>
         <span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rot</span>
+
+    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">origin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rot</span> <span class="o">=</span> <span class="n">d</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">CoordSys</span><span class="p">):</span> <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coordSys</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">_coordSys</span>
-
-    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
-        <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span> <span class="o">==</span> <span class="n">rhs</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coordSys</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="CoordTransform"><a class="viewcode-back" href="../../coords.html#batoid.CoordTransform">[docs]</a><span class="k">class</span> <span class="nc">CoordTransform</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Transformation between two coordinate systems.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    fromSys : CoordSys</span>
-<span class="sd">        Origin coordinate systems.</span>
-<span class="sd">    toSys : CoordSys</span>
-<span class="sd">        Destination coordinate systems.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fromSys</span><span class="p">,</span> <span class="n">toSys</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fromSys</span> <span class="o">=</span> <span class="n">fromSys</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">toSys</span> <span class="o">=</span> <span class="n">toSys</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_coordTransform</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPCoordTransform</span><span class="p">(</span>
-            <span class="n">fromSys</span><span class="o">.</span><span class="n">_coordSys</span><span class="p">,</span>
-            <span class="n">toSys</span><span class="o">.</span><span class="n">_coordSys</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">origin</span><span class="p">,</span> <span class="n">rhs</span><span class="o">.</span><span class="n">origin</span><span class="p">)</span> <span class="ow">and</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rot</span><span class="p">,</span> <span class="n">rhs</span><span class="o">.</span><span class="n">rot</span><span class="p">)</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="CoordTransform.applyForward"><a class="viewcode-back" href="../../coords.html#batoid.CoordTransform.applyForward">[docs]</a>    <span class="k">def</span> <span class="nf">applyForward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">arg3</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Apply forward-direction transformation.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        arg : Ray or RayVector or array</span>
-<span class="sd">            Object to transform.  Return type is the same as the input type.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        transformed : Ray or RayVector or array</span>
-<span class="sd">            Result of transformation.  Type is the same as the input type.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">.ray</span> <span class="k">import</span> <span class="n">Ray</span>
-        <span class="kn">from</span> <span class="nn">.rayVector</span> <span class="k">import</span> <span class="n">RayVector</span>
-        <span class="k">if</span> <span class="n">arg2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coordTransform</span><span class="o">.</span><span class="n">applyForward</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">,</span> <span class="n">arg3</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">Ray</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">Ray</span><span class="o">.</span><span class="n">_fromCPPRay</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_coordTransform</span><span class="o">.</span><span class="n">applyForward</span><span class="p">(</span><span class="n">arg1</span><span class="o">.</span><span class="n">_r</span><span class="p">),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">toSys</span>
-            <span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">RayVector</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">RayVector</span><span class="o">.</span><span class="n">_fromCPPRayVector</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_coordTransform</span><span class="o">.</span><span class="n">applyForward</span><span class="p">(</span><span class="n">arg1</span><span class="o">.</span><span class="n">_r</span><span class="p">),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">toSys</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coordTransform</span><span class="o">.</span><span class="n">applyForward</span><span class="p">(</span><span class="n">arg1</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="CoordTransform.applyReverse"><a class="viewcode-back" href="../../coords.html#batoid.CoordTransform.applyReverse">[docs]</a>    <span class="k">def</span> <span class="nf">applyReverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">arg3</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Apply reverse-direction transformation.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        arg : Ray or RayVector or array</span>
-<span class="sd">            Object to transform.  Return type is the same as the input type.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        transformed : Ray or RayVector or array</span>
-<span class="sd">            Result of transformation.  Type is the same as the input type.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">.ray</span> <span class="k">import</span> <span class="n">Ray</span>
-        <span class="kn">from</span> <span class="nn">.rayVector</span> <span class="k">import</span> <span class="n">RayVector</span>
-        <span class="k">if</span> <span class="n">arg2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coordTransform</span><span class="o">.</span><span class="n">applyReverse</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">,</span> <span class="n">arg3</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">Ray</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">Ray</span><span class="o">.</span><span class="n">_fromCPPRay</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_coordTransform</span><span class="o">.</span><span class="n">applyReverse</span><span class="p">(</span><span class="n">arg1</span><span class="o">.</span><span class="n">_r</span><span class="p">),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">fromSys</span>
-            <span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">RayVector</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">RayVector</span><span class="o">.</span><span class="n">_fromCPPRayVector</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_coordTransform</span><span class="o">.</span><span class="n">applyReverse</span><span class="p">(</span><span class="n">arg1</span><span class="o">.</span><span class="n">_r</span><span class="p">),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">fromSys</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coordTransform</span><span class="o">.</span><span class="n">applyReverse</span><span class="p">(</span><span class="n">arg1</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="CoordTransform.applyForwardInPlace"><a class="viewcode-back" href="../../coords.html#batoid.CoordTransform.applyForwardInPlace">[docs]</a>    <span class="k">def</span> <span class="nf">applyForwardInPlace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Apply forward-direction transformation in place.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        arg : Ray or RayVector</span>
-<span class="sd">            Object to transform.  Return type is the same as the input type.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        transformed : Ray or RayVector</span>
-<span class="sd">            Result of transformation.  Type is the same as the input type.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_coordTransform</span><span class="o">.</span><span class="n">applyForwardInPlace</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">_r</span><span class="p">)</span>
-        <span class="n">r</span><span class="o">.</span><span class="n">coordSys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">toSys</span></div>
-
-<div class="viewcode-block" id="CoordTransform.applyReverseInPlace"><a class="viewcode-back" href="../../coords.html#batoid.CoordTransform.applyReverseInPlace">[docs]</a>    <span class="k">def</span> <span class="nf">applyReverseInPlace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Apply reverse-direction transformation in place.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        arg : Ray or RayVector</span>
-<span class="sd">            Object to transform.  Return type is the same as the input type.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        transformed : Ray or RayVector</span>
-<span class="sd">            Result of transformation.  Type is the same as the input type.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_coordTransform</span><span class="o">.</span><span class="n">applyReverseInPlace</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">_r</span><span class="p">)</span>
-        <span class="n">r</span><span class="o">.</span><span class="n">coordSys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fromSys</span></div>
-
-    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">CoordTransform</span><span class="p">):</span> <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coordTransform</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">_coordTransform</span>
-
-    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
         <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span> <span class="o">==</span> <span class="n">rhs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coordTransform</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span>
+            <span class="s2">&quot;batoid.CoordSys&quot;</span><span class="p">,</span>
+            <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">origin</span><span class="o">.</span><span class="n">tolist</span><span class="p">()),</span>
+            <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rot</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+        <span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coordTransform</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">CoordSys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">origin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rot</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rotstr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array2string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rot</span><span class="p">,</span> <span class="n">separator</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;CoordSys(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">origin</span><span class="si">!r}</span><span class="s2">, array(</span><span class="si">{</span><span class="n">rotstr</span><span class="si">}</span><span class="s2">))&quot;</span></div>
 </pre></div>
 
            </div>
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Josh Meyers
+        &#169; Copyright 2020, Josh Meyers.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -479,7 +371,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

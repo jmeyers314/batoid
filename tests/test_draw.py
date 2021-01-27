@@ -1,7 +1,5 @@
 import batoid
-import time
 import numpy as np
-import pytest
 from test_helpers import timer
 
 # Use matplotlib with a non-interactive backend.
@@ -15,10 +13,10 @@ from mpl_toolkits.mplot3d import Axes3D
 def initialize(ngrid=25, theta_x=1.):
     telescope = batoid.Optic.fromYaml("DESI.yaml")
     dirCos = batoid.utils.gnomonicToDirCos(np.deg2rad(theta_x), 0.)
-    rays = batoid.rayGrid(
-        telescope.backDist, telescope.pupilSize,
-        dirCos[0], dirCos[1], dirCos[2],
-        ngrid, 500e-9, 1.0, telescope.inMedium
+    rays = batoid.RayVector.asGrid(
+        optic=telescope,
+        theta_x=np.deg2rad(theta_x), theta_y=0.0,
+        wavelength=500e-9, nx=ngrid
     )
     return telescope, telescope.traceFull(rays)
 

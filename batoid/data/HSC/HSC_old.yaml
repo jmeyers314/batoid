@@ -159,10 +159,8 @@ opticalSystem:
           # that a Lens must have exactly two surfaces.
           medium: &silica
             type: TableMedium
-            table:
-              args: &waves [0.4e-6, 0.6e-6, 0.75e-6, 0.9e-6, 1.1e-6]
-              vals: [1.47009272, 1.45801158, 1.45421013, 1.45172729, 1.44917721]
-              interp: linear
+            wavelengths: &waves [0.4e-6, 0.6e-6, 0.75e-6, 0.9e-6, 1.1e-6]
+            ns: [1.47009272, 1.45801158, 1.45421013, 1.45172729, 1.44917721]
           items:
             -
               type: RefractiveInterface
@@ -192,10 +190,8 @@ opticalSystem:
           name: G2
           medium: &bsl7y
             type: TableMedium
-            table:
-              args: *waves
-              vals: [1.53123287, 1.51671428, 1.51225242, 1.50939738, 1.50653251]
-              interp: linear
+            wavelengths: *waves
+            ns: [1.53123287, 1.51671428, 1.51225242, 1.50939738, 1.50653251]
           # Note that this coordSys is wrt the parent.  I.e., not wrt the global coords, and also
           # not wrt the G1_exit coords given above, since those are at the same level in the
           # hierarchy.
@@ -262,10 +258,8 @@ opticalSystem:
               z: 0.043
             medium: &pbl1y
               type: TableMedium
-              table:
-                args: *waves
-                vals: [1.57046066, 1.54784671, 1.54157395, 1.53789058, 1.53457169]
-                interp: linear
+              wavelengths: *waves
+              ns: [1.57046066, 1.54784671, 1.54157395, 1.53789058, 1.53457169]
             items:
               -
                 type: RefractiveInterface

@@ -3,6 +3,8 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 from . import _batoid
+from .constants import globalCoordSys
+from .trace import intersect, rSplit, reflect, refract
 
 
 class Surface(ABC):
@@ -36,103 +38,80 @@ class Surface(ABC):
         normal : array_like, shape (n, 3)
             Surface normals.
         """
-        return self._surface.normal(x, y)
+        xx = np.asfortranarray(x, dtype=float)
+        yy = np.asfortranarray(y, dtype=float)
+        out = np.empty(xx.shape+(3,), order='F', dtype=float)
+        size = len(xx.ravel())
 
-    def intersect(self, r, coordSys=None):
-        """Calculate intersection of a ray or rays with this surface.  If the
-        intersection is in the past, then set the ray.fail flag.  If the ray
-        intersects at an obscured point, then set the ray.vignetted flag.
+        self._surface.normal(
+            xx.ctypes.data, yy.ctypes.data, size, out.ctypes.data
+        )
+        try:
+            len(x)
+        except TypeError:
+            return out[0]
+        else:
+            return out
+
+    def intersect(self, rv, coordSys=None, coating=None):
+        return intersect(self, rv, coordSys, coating)
+
+    def reflect(self, rv, coordSys=None, coating=None):
+        """Calculate intersection of rays with this surface, and immediately
+        reflect the rays at the points of intersection.
 
         Parameters
         ----------
-        r : Ray or RayVector
-            Input ray(s) to intersect
+        rv : RayVector
+            Rays to reflect.
         coordSys : CoordSys, optional
             If present, then use for the coordinate system of the surface.  If
-            `None` (default), then assume that ray(s) and surface are already
+            ``None`` (default), then assume that rays and surface are already
             expressed in the same coordinate system.
-
-        Returns
-        -------
-        outRays : Ray or RayVector
-            New object corresponding to original ray(s) propagated to the
-            intersection point.
-        """
-        if coordSys is not None:
-            coordSys = coordSys._coordSys
-        self._surface.intersectInPlace(r._rv, coordSys)
-        return r
-
-    def reflect(self, r, coating=None, coordSys=None):
-        """Calculate intersection of ray(s) with this surface, and immediately
-        reflect the ray(s) at the point(s) of intersection.
-
-        Parameters
-        ----------
-        r : Ray or RayVector
-            Ray(s) to reflect.
         coating : Coating, optional
-            Coating object to control reflection coefficient.
-        coordSys : CoordSys, optional
-            If present, then use for the coordinate system of the surface.  If
-            `None` (default), then assume that ray(s) and surface are already
-            expressed in the same coordinate system.
+            Apply this coating upon surface intersection.
 
         Returns
         -------
-        outRays : Ray or RayVector
-            New object corresponding to original ray(s) propagated and
-            reflected.
+        outRays : RayVector
+            New object corresponding to original rays propagated and reflected.
         """
-        if coating is not None:
-            coating = coating._coating
-        if coordSys is not None:
-            coordSys = coordSys._coordSys
-        self._surface.reflectInPlace(r._rv, coating, coordSys)
-        return r
+        return reflect(self, rv, coordSys, coating)
 
-    def refract(self, r, inMedium, outMedium, coating=None, coordSys=None):
-        """Calculate intersection of ray(s) with this surface, and immediately
-        refract the ray(s) through the surface at the point(s) of intersection.
+    def refract(self, rv, inMedium, outMedium, coordSys=None, coating=None):
+        """Calculate intersection of rays with this surface, and immediately
+        refract the rays through the surface at the points of intersection.
 
         Parameters
         ----------
-        r : Ray or RayVector
-            Ray(s) to refract.
+        rv : RayVector
+            Rays to refract.
         inMedium : Medium
             Refractive medium on the incoming side of the surface.
         outMedium : Medium
             Refractive medium on the outgoing side of the surface.
-        coating : Coating, optional
-            Coating object to control transmission coefficient.
         coordSys : CoordSys, optional
             If present, then use for the coordinate system of the surface.  If
-            `None` (default), then assume that ray(s) and surface are already
+            ``None`` (default), then assume that rays and surface are already
             expressed in the same coordinate system.
+        coating : Coating, optional
+            Apply this coating upon surface intersection.
 
         Returns
         -------
-        outRays : Ray or RayVector
-            New object corresponding to original ray(s) propagated and
-            refracted.
+        outRays : RayVector
+            New object corresponding to original rays propagated and refracted.
         """
-        if coating is not None:
-            coating = coating._coating
-        if coordSys is not None:
-            coordSys = coordSys._coordSys
-        self._surface.refractInPlace(
-            r._rv, inMedium._medium, outMedium._medium, coating, coordSys
-        )
-        return r
+        return refract(self, rv, inMedium, outMedium, coordSys, coating)
 
-    def rSplit(self, r, inMedium, outMedium, coating, coordSys=None):
+    def rSplit(self, rv, inMedium, outMedium, coating, coordSys=None):
         """Calculate intersection of rays with this surface, and immediately
         split the rays into reflected and refracted rays, with appropriate
         fluxes.
 
         Parameters
         ----------
-        r : RayVector
+        rv : RayVector
             Rays to refract.
         inMedium : Medium
             Refractive medium on the incoming side of the surface.
@@ -142,7 +121,7 @@ class Surface(ABC):
             Coating object to control transmission coefficient.
         coordSys : CoordSys, optional
             If present, then use for the coordinate system of the surface.  If
-            `None` (default), then assume that ray(s) and surface are already
+            ``None`` (default), then assume that rays and surface are already
             expressed in the same coordinate system.
 
         Returns
@@ -151,44 +130,7 @@ class Surface(ABC):
             New objects corresponding to original rays propagated and
             reflected/refracted.
         """
-        from .ray import Ray
-        from .rayVector import RayVector
-        if coordSys is not None:
-            coordSys = coordSys._coordSys
-        reflectedRays, refractedRays = self._surface.rSplit(
-            r._rv, inMedium._medium, outMedium._medium, coating._coating,
-            coordSys
-        )
-        if isinstance(r, Ray):
-            return (
-                Ray._fromCPPRayVector(reflectedRays),
-                Ray._fromCPPRayVector(refractedRays)
-            )
-        else:
-            return (
-                RayVector._fromCPPRayVector(reflectedRays),
-                RayVector._fromCPPRayVector(refractedRays)
-            )
-
-    @abstractmethod
-    def __hash__(self):
-        raise NotImplementedError
-
-    @abstractmethod
-    def __setstate__(self, state):
-        raise NotImplementedError
-
-    @abstractmethod
-    def __getstate__(self):
-        raise NotImplementedError
-
-    @abstractmethod
-    def __repr__(self):
-        raise NotImplementedError
-
-    @abstractmethod
-    def __eq__(self, rhs):
-        raise NotImplementedError
+        return rSplit(self, rv, inMedium, outMedium, coating, coordSys)
 
     def __ne__(self, rhs):
         return not (self == rhs)
@@ -201,30 +143,22 @@ class Plane(Surface):
 
         z(x, y) = 0
     """
-    def __init__(self, allowReverse=False):
-        self._surface = _batoid.CPPPlane(allowReverse)
-
-    @property
-    def allowReverse(self):
-        return self._surface.allowReverse
+    def __init__(self):
+        self._surface = _batoid.CPPPlane()
 
     def __hash__(self):
-        return hash(("batoid.Plane", self.allowReverse))
+        return hash("batoid.Plane")
 
-    def __setstate__(self, allowReverse):
-        self._surface = _batoid.CPPPlane(allowReverse)
+    def __setstate__(self, tup):
+        self.__init__()
 
     def __getstate__(self):
-        return self.allowReverse
+        return ()
 
     def __eq__(self, rhs):
-        if not isinstance(rhs, Plane): return False
-        return self.allowReverse == rhs.allowReverse
+        return isinstance(rhs, Plane)
 
     def __repr__(self):
-        if self.allowReverse:
-            return "Plane(allowReverse=True)"
-        else:
             return "Plane()"
 
 
@@ -237,7 +171,7 @@ class Paraboloid(Surface):
 
         z(x, y) = z(r) = \\frac{r^2}{2 R}
 
-    where :math:`r = \\sqrt{x^2 + y^2}` and `R` is the radius of curvature at
+    where :math:`r = \\sqrt{x^2 + y^2}` and ``R`` is the radius of curvature at
     the paraboloid vertex.
 
     Parameters
@@ -246,18 +180,14 @@ class Paraboloid(Surface):
         Radius of curvature at paraboloid vertex.
     """
     def __init__(self, R):
+        self.R = R
         self._surface = _batoid.CPPParaboloid(R)
-
-    @property
-    def R(self):
-        """Radius of curvature at paraboloid vertex."""
-        return self._surface.R
 
     def __hash__(self):
         return hash(("batoid.Paraboloid", self.R))
 
     def __setstate__(self, R):
-        self._surface = _batoid.CPPParaboloid(R)
+        self.__init__(R)
 
     def __getstate__(self):
         return self.R
@@ -267,7 +197,7 @@ class Paraboloid(Surface):
         return self.R == rhs.R
 
     def __repr__(self):
-        return "Paraboloid({})".format(self.R)
+        return f"Paraboloid({self.R})"
 
 
 class Sphere(Surface):
@@ -277,8 +207,8 @@ class Sphere(Surface):
 
         z(x, y) = z(r) = R \\left(1 - \\sqrt{1-\\frac{r^2}{R^2}}\\right)
 
-    where :math:`r = \\sqrt{x^2 + y^2}` and `R` is the radius the sphere.  Note
-    that the center of the sphere is a distance `R` above the vertex.
+    where :math:`r = \\sqrt{x^2 + y^2}` and ``R`` is the radius the sphere.
+    Note that the center of the sphere is a distance ``R`` above the vertex.
 
     Parameters
     ----------
@@ -286,19 +216,14 @@ class Sphere(Surface):
         Sphere radius.
     """
     def __init__(self, R):
+        self.R = R
         self._surface = _batoid.CPPSphere(R)
-
-    @property
-    def R(self):
-        """Sphere radius.
-        """
-        return self._surface.R
 
     def __hash__(self):
         return hash(("batoid.Sphere", self.R))
 
     def __setstate__(self, R):
-        self._surface = _batoid.CPPSphere(R)
+        self.__init__(R)
 
     def __getstate__(self):
         return self.R
@@ -308,7 +233,7 @@ class Sphere(Surface):
         return self.R == rhs.R
 
     def __repr__(self):
-        return "Sphere({})".format(self.R)
+        return f"Sphere({self.R})"
 
 
 class Quadric(Surface):
@@ -319,7 +244,7 @@ class Quadric(Surface):
 
         z(x, y) = z(r) = \\frac{r^2}{R \\left(1 + \\sqrt{1 - \\frac{r^2}{R^2} (1 + \\kappa)}\\right)}
 
-    where :math:`r = \\sqrt{x^2 + y^2}`, `R` is the radius of curvature at the
+    where :math:`r = \\sqrt{x^2 + y^2}`, ``R`` is the radius of curvature at the
     surface vertex, and :math:`\\kappa` is the conic constant.  Different
     ranges of :math:`\\kappa` indicate different categories of surfaces:
 
@@ -337,25 +262,15 @@ class Quadric(Surface):
         Conic constant :math:`\\kappa`
     """
     def __init__(self, R, conic):
+        self.R = R
+        self.conic = conic
         self._surface = _batoid.CPPQuadric(R, conic)
-
-    @property
-    def R(self):
-        """Radius of curvature at quadric vertex.
-        """
-        return self._surface.R
-
-    @property
-    def conic(self):
-        """Conic constant.
-        """
-        return self._surface.conic
 
     def __hash__(self):
         return hash(("batoid.Quadric", self.R, self.conic))
 
     def __setstate__(self, args):
-        self._surface = _batoid.CPPQuadric(*args)
+        self.__init__(*args)
 
     def __getstate__(self):
         return (self.R, self.conic)
@@ -366,7 +281,7 @@ class Quadric(Surface):
                 self.conic == rhs.conic)
 
     def __repr__(self):
-        return "Quadric({}, {})".format(self.R, self.conic)
+        return f"Quadric({self.R}, {self.conic})"
 
 
 class Asphere(Surface):
@@ -379,7 +294,7 @@ class Asphere(Surface):
 
         z(x, y) = z(r) = \\frac{r^2}{R \\left(1 + \\sqrt{1 - \\frac{r^2}{R^2} (1 + \\kappa)}\\right)} + \\sum_i \\alpha_i r^{2 i}
 
-    where :math:`r = \\sqrt{x^2 + y^2}`, `R` is the radius of curvature at the
+    where :math:`r = \\sqrt{x^2 + y^2}`, ``R`` is the radius of curvature at the
     surface vertex, :math:`\\kappa` is the conic constant, and
     :math:`\\left\\{\\alpha_i\\right\\}` are the even polynomial coefficients.
     Different ranges of :math:`\\kappa` produce different categories of
@@ -401,31 +316,18 @@ class Asphere(Surface):
         Even polynomial coefficients :math:`\\left\\{\\alpha_i\\right\\}`
     """
     def __init__(self, R, conic, coefs):
-        self._surface = _batoid.CPPAsphere(R, conic, coefs)
-
-    @property
-    def R(self):
-        """Radius of curvature at asphere vertex.
-        """
-        return self._surface.R
-
-    @property
-    def conic(self):
-        """Conic constant.
-        """
-        return self._surface.conic
-
-    @property
-    def coefs(self):
-        """Even polynomial coefficients.
-        """
-        return self._surface.coefs
+        self.R = R
+        self.conic = conic
+        self.coefs = np.ascontiguousarray(coefs)
+        self._surface = _batoid.CPPAsphere(
+            R, conic, self.coefs.ctypes.data, len(coefs)
+        )
 
     def __hash__(self):
         return hash(("batoid.Asphere", self.R, self.conic, tuple(self.coefs)))
 
     def __setstate__(self, args):
-        self._surface = _batoid.CPPAsphere(*args)
+        self.__init__(*args)
 
     def __getstate__(self):
         return self.R, self.conic, self.coefs
@@ -434,10 +336,10 @@ class Asphere(Surface):
         if not isinstance(rhs, Asphere): return False
         return (self.R == rhs.R and
                 self.conic == rhs.conic and
-                self.coefs == rhs.coefs)
+                np.array_equal(self.coefs, rhs.coefs))
 
     def __repr__(self):
-        return "Asphere({}, {}, {})".format(self.R, self.conic, self.coefs)
+        return f"Asphere({self.R}, {self.conic}, {self.coefs!r})"
 
 
 class Zernike(Surface):
@@ -471,30 +373,21 @@ class Zernike(Surface):
     def __init__(self, coef, R_outer=1.0, R_inner=0.0):
         import galsim
 
-        self._coef = np.asarray(coef)
-        self._R_outer = float(R_outer)
-        self._R_inner = float(R_inner)
+        self.coef = np.array(coef, dtype=float, order="C")
+        self.R_outer = float(R_outer)
+        self.R_inner = float(R_inner)
         self.Z = galsim.zernike.Zernike(coef, R_outer, R_inner)
-        pcoef = self.Z._coef_array_xy
-        self._surface = _batoid.CPPPolynomialSurface(pcoef)
+        self._xycoef = self.Z._coef_array_xy
+        self._xycoef_gradx = self.Z.gradX._coef_array_xy
+        self._xycoef_grady = self.Z.gradY._coef_array_xy
 
-    @property
-    def coef(self):
-        """Annular Zernike polynomial coefficients.
-        """
-        return self._coef
-
-    @property
-    def R_outer(self):
-        """Outer radius of annulus.
-        """
-        return self._R_outer
-
-    @property
-    def R_inner(self):
-        """Outer radius of annulus.
-        """
-        return self._R_inner
+        self._surface = _batoid.CPPPolynomialSurface(
+            self._xycoef.ctypes.data,
+            self._xycoef_gradx.ctypes.data,
+            self._xycoef_grady.ctypes.data,
+            self._xycoef.shape[0],
+            self._xycoef.shape[1]
+        )
 
     def __hash__(self):
         return hash((
@@ -515,9 +408,7 @@ class Zernike(Surface):
                 self.R_inner == rhs.R_inner)
 
     def __repr__(self):
-        return "Zernike({!r}, {!r}, {!r})".format(
-            self.coef, self.R_outer, self.R_inner
-        )
+        return f"Zernike({self.coef!r}, {self.R_outer}, {self.R_inner})"
 
 
 class Bicubic(Surface):
@@ -536,14 +427,16 @@ class Bicubic(Surface):
     d2zdxdys : array_like, optional
         2d array indicating mixed derivatives d^2 z / (dx dy) at grid points.
     """
-    def __init__(self, xs, ys, zs,
-                 dzdxs=None, dzdys=None, d2zdxdys=None,
-                 _slopFrac=1e-4):
-        self._xs = np.ascontiguousarray(xs)
-        self._ys = np.ascontiguousarray(ys)
-        self._zs = np.ascontiguousarray(zs)
-        dx = (self._xs[-1] - self._xs[0])/(len(self._xs)-1)
-        dy = (self._ys[-1] - self._ys[0])/(len(self._ys)-1)
+    def __init__(
+        self, xs, ys, zs, dzdxs=None, dzdys=None, d2zdxdys=None
+    ):
+        self._xs = np.array(xs, dtype=float, order="C")
+        self._ys = np.array(ys, dtype=float, order="C")
+        self._zs = np.array(zs, dtype=float, order="C")
+        self._x0 = xs[0]
+        self._y0 = ys[0]
+        dx = self._dx = (self._xs[-1] - self._xs[0])/(len(self._xs)-1)
+        dy = self._dy = (self._ys[-1] - self._ys[0])/(len(self._ys)-1)
 
         if dzdxs is None:
             dzdys = np.empty_like(self._zs)
@@ -561,15 +454,18 @@ class Bicubic(Surface):
             d2zdxdys[:, 0] = (dzdys[:, 1] - dzdys[:, 0])/dx
             d2zdxdys[:, -1] = (dzdys[:, -1] - dzdys[:, -2])/dx
 
-        self._dzdxs = np.ascontiguousarray(dzdxs)
-        self._dzdys = np.ascontiguousarray(dzdys)
-        self._d2zdxdys = np.ascontiguousarray(d2zdxdys)
-        self._slopFrac = _slopFrac
+        self._dzdxs = np.array(dzdxs, dtype=float, order="C")
+        self._dzdys = np.array(dzdys, dtype=float, order="C")
+        self._d2zdxdys = np.array(d2zdxdys, dtype=float, order="C")
 
         self._surface = _batoid.CPPBicubic(
-            self._xs, self._ys, self._zs,
-            self._dzdxs, self._dzdys, self._d2zdxdys,
-            self._slopFrac
+            self._x0, self._y0, self._dx, self._dy,
+            self._zs.ctypes.data,
+            self._dzdxs.ctypes.data,
+            self._dzdys.ctypes.data,
+            self._d2zdxdys.ctypes.data,
+            len(self._xs),
+            len(self._ys)
         )
 
     @property
@@ -605,31 +501,44 @@ class Bicubic(Surface):
 
     def __setstate__(self, args):
         (self._xs, self._ys, self._zs,
-         self._dzdxs, self._dzdys, self._d2zdxdys,
-         self._slopFrac
+         self._dzdxs, self._dzdys, self._d2zdxdys
         ) = args
-        self._surface = _batoid.CPPBicubic(self.xs, self.ys, self.zs,
-                                        self.dzdxs, self.dzdys, self.d2zdxdys,
-                                        self._slopFrac)
+        self._x0 = self._xs[0]
+        self._y0 = self._ys[0]
+        self._dx = (self._xs[-1] - self._xs[0])/(len(self._xs)-1)
+        self._dy = (self._ys[-1] - self._ys[0])/(len(self._ys)-1)
+
+        self._surface = _batoid.CPPBicubic(
+            self._x0, self._y0, self._dx, self._dy,
+            self._zs.ctypes.data,
+            self._dzdxs.ctypes.data,
+            self._dzdys.ctypes.data,
+            self._d2zdxdys.ctypes.data,
+            len(self._xs),
+            len(self._ys)
+        )
 
     def __getstate__(self):
         return (
             self.xs, self.ys, self.zs,
-            self.dzdxs, self.dzdys, self.d2zdxdys, self._slopFrac
+            self.dzdxs, self.dzdys, self.d2zdxdys
         )
 
     def __eq__(self, rhs):
         if not isinstance(rhs, Bicubic): return False
-        return (np.array_equal(self.xs, rhs.xs)
-                and np.array_equal(self.ys, rhs.ys)
-                and np.array_equal(self.zs, rhs.zs)
-                and np.array_equal(self.dzdxs, rhs.dzdxs)
-                and np.array_equal(self.dzdys, rhs.dzdys)
-                and np.array_equal(self.d2zdxdys, rhs.d2zdxdys))
+        return (
+            np.array_equal(self.xs, rhs.xs)
+            and np.array_equal(self.ys, rhs.ys)
+            and np.array_equal(self.zs, rhs.zs)
+            and np.array_equal(self.dzdxs, rhs.dzdxs)
+            and np.array_equal(self.dzdys, rhs.dzdys)
+            and np.array_equal(self.d2zdxdys, rhs.d2zdxdys)
+        )
 
     def __repr__(self):
-        return "Bicubic({!r}, {!r}, {!r}, {!r}, {!r}, {!r})".format(
-            self.xs, self.ys, self.zs, self.dzdxs, self.dzdys, self.d2zdxdys)
+        out = f"Bicubic({self.xs!r}, {self.ys!r}, {self.zs!r}, "
+        out += f"{self.dzdxs!r}, {self.dzdys!r}, {self.d2zdxdys!r})"
+        return out
 
 
 class Sum(Surface):
@@ -654,20 +563,14 @@ class Sum(Surface):
         `Surface` s to add together.
     """
     def __init__(self, surfaces):
-        self._surfaces = surfaces
+        self.surfaces = surfaces
         self._surface = _batoid.CPPSum([s._surface for s in surfaces])
-
-    @property
-    def surfaces(self):
-        """List of constituent `Surface` s."""
-        return self._surfaces
 
     def __hash__(self):
         return hash(("batoid.Sum", tuple(self.surfaces)))
 
-    def __setstate__(self, args):
-        self._surfaces = args
-        self._surface = _batoid.CPPSum([s._surface for s in args])
+    def __setstate__(self, surfaces):
+        self.__init__(surfaces)
 
     def __getstate__(self):
         return self.surfaces
@@ -677,4 +580,4 @@ class Sum(Surface):
         return self.surfaces == rhs.surfaces
 
     def __repr__(self):
-        return "Sum({})".format(self.surfaces)
+        return f"Sum({self.surfaces})"

@@ -94,3 +94,5 @@ ENV/
 # Temporary outputs
 *.png
 *.pdf
+.vscode
+pytest_session.txt

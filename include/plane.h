@@ -1,27 +1,27 @@
 #ifndef batoid_plane_h
 #define batoid_plane_h
 
-#include <sstream>
-#include <limits>
 #include "surface.h"
-#include "ray.h"
-#include <Eigen/Dense>
-
-using Eigen::Vector3d;
 
 namespace batoid {
 
     class Plane : public Surface {
     public:
-        Plane(bool allowReverse=false) : _allowReverse(allowReverse) {}
-        virtual double sag(double, double) const override { return 0.0; }
-        virtual Vector3d normal(double, double) const override { return Vector3d(0.0, 0.0, 1.0); }
-        virtual bool timeToIntersect(const Ray& r, double& t) const override;
+        Plane();
+        ~Plane();
 
-        bool getAllowReverse() const {return _allowReverse;}
+        virtual const Surface* getDevPtr() const override;
 
-    private:
-        bool _allowReverse;
+        virtual double sag(double x, double y) const override;
+        virtual void normal(
+            double x, double y,
+            double& nx, double& ny, double& nz
+        ) const override;
+        virtual bool timeToIntersect(
+            double x, double y, double z,
+            double vx, double vy, double vz,
+            double& dt
+        ) const override;
     };
 }
 #endif

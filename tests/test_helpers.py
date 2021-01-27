@@ -1,29 +1,28 @@
 import numpy as np
-
-
-def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
-    return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
-
-
-def ray_isclose(ray1, ray2, atol=1e-14):
-    return (
-        np.allclose(ray1.r, ray2.r, rtol=0, atol=atol)
-        and np.allclose(ray1.v, ray2.v, rtol=0, atol=atol)
-        and np.allclose(ray1.t, ray2.t, rtol=0, atol=atol)
-        and np.allclose(ray1.wavelength, ray2.wavelength, rtol=0, atol=atol)
-        and ray1.vignetted == ray2.vignetted
-        and ray1.failed == ray2.failed
-    )
+import batoid
 
 
 def rays_allclose(rv1, rv2, atol=1e-14):
-    return (
-        np.allclose(rv1.r, rv2.r, rtol=0, atol=atol)
-        and np.allclose(rv1.v, rv2.v, rtol=0, atol=atol)
-        and np.allclose(rv1.t, rv2.t, rtol=0, atol=atol)
-        and np.allclose(rv1.wavelength, rv2.wavelength, rtol=0, atol=atol)
-        and np.all(rv1.vignetted == rv2.vignetted)
-        and np.all(rv1.failed == rv2.failed)
+    np.testing.assert_allclose(
+        rv1.r, rv2.r, rtol=0, atol=atol
+    )
+    np.testing.assert_allclose(
+        rv1.v, rv2.v, rtol=0, atol=atol
+    )
+    np.testing.assert_allclose(
+        rv1.t, rv2.t, rtol=0, atol=atol
+    )
+    np.testing.assert_allclose(
+        rv1.wavelength, rv2.wavelength, rtol=0, atol=atol
+    )
+    np.testing.assert_allclose(
+        rv1.flux, rv2.flux, rtol=0, atol=atol
+    )
+    np.testing.assert_array_equal(
+        rv1.vignetted, rv2.vignetted
+    )
+    np.testing.assert_array_equal(
+        rv1.failed, rv2.failed
     )
 
 
@@ -72,21 +71,26 @@ def do_pickle(obj, reprable=True):
     assert obj == obj4
 
     if reprable:
-        from numpy import array, uint16, uint32, int16, int32, float32, float64, complex64, complex128, ndarray
-        from batoid import Ray, RayVector
-        from batoid import Plane, Paraboloid, Sphere, Quadric, Asphere
-        from batoid import Bicubic, Zernike, Sum
-        from batoid import Table
-        from batoid import ConstMedium, TableMedium, SellmeierMedium, Air
-        from batoid import ObscCircle, ObscAnnulus, ObscRectangle, ObscRay
-        from batoid import ObscPolygon
-        from batoid import ObscNegation, ObscUnion, ObscIntersection
-        from batoid import CoordSys, CoordTransform
-        from batoid import CompoundOptic, Lens
-        from batoid import RefractiveInterface, Mirror, Detector, Baffle
-        from batoid import SimpleCoating
-        # While eval(repr(obj)) == obj is the python repr gold standard, it can be pretty ugly for
-        # exact reproduction of doubles.  Here, we strive for a lesser goal:
+        from numpy import (
+            array, uint16, uint32, int16, int32, float32, float64, complex64,
+            complex128, ndarray
+        )
+        from batoid import (
+            RayVector,
+            Plane, Paraboloid, Sphere, Quadric, Asphere,
+            Bicubic, Sum, Zernike,
+            ConstMedium, TableMedium, SellmeierMedium, SumitaMedium, Air,
+            ObscCircle, ObscAnnulus, ObscRectangle, ObscRay, ObscPolygon,
+            ObscNegation, ObscUnion, ObscIntersection,
+            CoordSys, CoordTransform,
+            SimpleCoating,
+            Optic, CompoundOptic, Baffle, Mirror, Lens, RefractiveInterface,
+            Detector,
+            Lattice
+        )
+        # While eval(repr(obj)) == obj is the python repr gold standard, it can
+        # be pretty ugly for exact reproduction of doubles.  Here, we strive for
+        # a lesser goal:
         #      repr(eval(repr(obj))) == repr(obj).
         # I.e., it's okay to lose precision, as long as it only happens once.
         try:
@@ -97,40 +101,35 @@ def do_pickle(obj, reprable=True):
 
 
 def all_obj_diff(objs):
-    """ Helper function that verifies that each element in `objs` is unique and, if hashable,
-    produces a unique hash."""
+    """ Helper function that verifies that each element in `objs` is unique and,
+    if hashable, produces a unique hash.
+    """
 
     from collections.abc import Hashable
     # Check that all objects are unique.
-    # Would like to use `assert len(objs) == len(set(objs))` here, but this requires that the
-    # elements of objs are hashable (and that they have unique hashes!, which is what we're trying
-    # to test!.  So instead, we just loop over all combinations.
+    # Would like to use `assert len(objs) == len(set(objs))` here, but this
+    # requires that the elements of objs are hashable (and that they have unique
+    # hashes!, which is what we're trying to test!.  So instead, we just loop
+    # over all combinations.
     for i, obji in enumerate(objs):
-        # Could probably start the next loop at `i+1`, but we start at 0 for completeness
-        # (and to verify a != b implies b != a)
+        # Could probably start the next loop at `i+1`, but we start at 0 for
+        # completeness (and to verify a != b implies b != a)
         for j, objj in enumerate(objs):
             if i == j:
                 continue
-            assert obji != objj, ("Found equivalent objects {0} == {1} at indices {2} and {3}"
-                                  .format(obji, objj, i, j))
+            assert obji != objj, (
+                "Found equivalent objects {0} == {1} at indices {2} and {3}"
+                .format(obji, objj, i, j)
+            )
 
     # Now check that all hashes are unique (if the items are hashable).
     if not isinstance(objs[0], Hashable):
         return
     hashes = [hash(obj) for obj in objs]
-    try:
-        assert len(hashes) == len(set(hashes))
-    except AssertionError as e:
-        try:
-            # Only valid in 2.7, but only needed if we have an error to provide more information.
-            from collections.abc import Counter
-        except ImportError:
-            raise e
-        for k, v in Counter(hashes).items():
-            if v <= 1:
-                continue
-            print("Found multiple equivalent object hashes:")
-            for i, obj in enumerate(objs):
-                if hash(obj) == k:
-                    print(i, repr(obj))
-        raise e
+    assert len(hashes) == len(set(hashes))
+
+
+def init_gpu():
+    arr = np.zeros(100)
+    _arr = batoid._batoid.CPPDualViewDouble(arr.ctypes.data, len(arr))
+    _arr.syncToDevice()

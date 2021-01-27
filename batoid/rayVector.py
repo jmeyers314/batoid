@@ -1,78 +1,176 @@
 from numbers import Real, Integral
-from collections.abc import Sequence
 
 import numpy as np
 
 from . import _batoid
-from .constants import vacuum, globalCoordSys
-from .coordsys import CoordSys
-from .coordtransform import CoordTransform
-from .ray import Ray
-from .utils import fieldToDirCos
+from .constants import globalCoordSys, vacuum
+from .coordSys import CoordSys
+from .coordTransform import CoordTransform
+from .trace import applyForwardTransform, applyForwardTransformArrays
+from .utils import lazy_property, fieldToDirCos
+from .surface import Plane
+
+
+def _reshape_arrays(arrays, shape, dtype=float):
+    for i in range(len(arrays)):
+        array = arrays[i]
+        if not hasattr(array, 'shape') or array.shape != shape:
+            arrays[i] = np.array(np.broadcast_to(array, shape))
+        arrays[i] = np.ascontiguousarray(arrays[i], dtype=dtype)
+    return arrays
 
 
 class RayVector:
-    """A sequence of `Ray` s.
+    """Create RayVector from 1d parameter arrays.  Always makes a copy
+    of input arrays.
 
     Parameters
     ----------
-    rays : list of Ray
-        The Rays to assemble into a RayVector.  Note that all Rays must have
-        the same coordSys.
+    x, y, z : ndarray of float, shape (n,)
+        Positions of rays in meters.
+    vx, vy, vz : ndarray of float, shape (n,)
+        Velocities of rays in units of the speed of light in vacuum.
+    t : ndarray of float, shape (n,)
+        Reference times (divided by the speed of light in vacuum) in units
+        of meters.
+    wavelength : ndarray of float, shape (n,)
+        Vacuum wavelengths in meters.
+    flux : ndarray of float, shape (n,)
+        Fluxes in arbitrary units.
+    vignetted : ndarray of bool, shape (n,)
+        True where rays have been vignetted.
+    coordSys : CoordSys
+        Coordinate system in which this ray is expressed.  Default: the
+        global coordinate system.
     """
-    def __init__(self, rays):
-        if len(rays) < 1:
-            raise ValueError("No Rays from which to create RayVector")
-        elif isinstance(rays, Sequence):
-            wavelength = rays[0].wavelength
-            for r in rays:
-                if r.wavelength != wavelength:
-                    wavelength = float("nan")
-                    break
-            self._rv = _batoid.CPPRayVector(
-                [ray._rv[0] for ray in rays], rays[0].coordSys._coordSys, wavelength
-            )
-        else:
-            raise ValueError("Wrong arguments to RayVector")
+    def __init__(
+        self, x, y, z, vx, vy, vz, t=0.0, wavelength=0.0, flux=1.0,
+        vignetted=False, failed=False, coordSys=globalCoordSys
+    ):
+        shape = np.broadcast(
+            x, y, z, vx, vy, vz, t, wavelength, flux, vignetted, failed
+        ).shape
+        x, y, z, vx, vy, vz, t, wavelength, flux = _reshape_arrays(
+            [x, y, z, vx, vy, vz, t, wavelength, flux],
+            shape
+        )
+        vignetted, failed = _reshape_arrays(
+            [vignetted, failed],
+            shape,
+            bool
+        )
 
-    @classmethod
-    def fromArrays(cls, x, y, z, vx, vy, vz, t, w, flux=1, vignetted=False,
-                   coordSys=globalCoordSys):
-        """Create RayVector from 1d parameter arrays.
+        self._r = np.ascontiguousarray([x, y, z], dtype=float).T
+        self._v = np.ascontiguousarray([vx, vy, vz], dtype=float).T
+        self._t = t
+        self._wavelength = wavelength
+        self._flux = flux
+        self._vignetted = vignetted
+        self._failed = failed
+
+        self.coordSys = coordSys
+
+    @staticmethod
+    def _directInit(
+        r, v, t, wavelength, flux, vignetted, failed, coordSys
+    ):
+        ret = RayVector.__new__(RayVector)
+        ret._r = r
+        ret._v = v
+        ret._t = t
+        ret._wavelength = wavelength
+        ret._flux = flux
+        ret._vignetted = vignetted
+        ret._failed = failed
+        ret.coordSys = coordSys
+        return ret
+
+    def positionAtTime(self, t):
+        """Calculate the positions of the rays at a given time.
 
         Parameters
         ----------
-        x, y, z : ndarray of float, shape (n,)
-            Positions of rays in meters.
-        vx, vy, vz : ndarray of float, shape (n,)
-            Velocities of rays in units of the speed of light in vacuum.
-        t : ndarray of float, shape (n,)
-            Reference times (divided by the speed of light in vacuum) in units
-            of meters.
-        wavelength : ndarray of float, shape (n,)
-            Vacuum wavelengths in meters.
-        flux : ndarray of float, shape (n,)
-            Fluxes in arbitrary units.
-        vignetted : ndarray of bool, shape (n,)
-            True where rays have been vignetted.
-        coordSys : CoordSys
-            Coordinate system in which this ray is expressed.  Default: the
-            global coordinate system.
+        t : float
+            Time (over vacuum speed of light; in meters).
+
+        Returns
+        -------
+        ndarray of float, shape (n, 3)
+            Positions in meters.
         """
-        n = len(x)
-        if isinstance(flux, Real):
-            tmp = flux
-            flux = np.empty_like(x)
-            flux.fill(tmp)
-        if isinstance(vignetted, bool):
-            tmp = vignetted
-            vignetted = np.empty_like(x, dtype=bool)
-            vignetted.fill(tmp)
-        ret = cls.__new__(cls)
-        ret._rv = _batoid.CPPRayVector(
-            x, y, z, vx, vy, vz, t, w, flux, vignetted, coordSys._coordSys
-        )
-        return ret
+        out = np.empty_like(self._r)
+        self._rv.positionAtTime(t, out.ctypes.data)
+        return out
+
+    def propagate(self, t):
+        """Propagate this RayVector to given time.
+
+        Parameters
+        ----------
+        t : float
+            Time (over vacuum speed of light; in meters).
+
+        Returns
+        -------
+        RayVector
+            Reference to self, no copy is made.
+        """
+        self._rv.propagateInPlace(t)
+        return self
+
+    def phase(self, r, t):
+        """Calculate plane wave phases at given position and time.
+
+        Parameters
+        ----------
+        r : ndarray of float, shape (3,)
+            Position in meters at which to compute phase
+        t : float
+            Time (over vacuum speed of light; in meters).
+
+        Returns
+        -------
+        ndarray of float, shape(n,)
+        """
+        out = np.empty_like(self._t)
+        self._rv.phase(r[0], r[1], r[2], t, out.ctypes.data)
+        return out
+
+    def amplitude(self, r, t):
+        """Calculate (scalar) complex electric-field amplitudes at given
+        position and time.
+
+        Parameters
+        ----------
+        r : ndarray of float, shape (3,)
+            Position in meters.
+        t : float
+            Time (over vacuum speed of light; in meters).
+
+        Returns
+        -------
+        ndarray of complex, shape (n,)
+        """
+        out = np.empty_like(self._t, dtype=np.complex128)
+        self._rv.amplitude(r[0], r[1], r[2], t, out.ctypes.data)
+        return out
+
+    def sumAmplitude(self, r, t, ignoreVignetted=True):
+        """Calculate the sum of (scalar) complex electric-field amplitudes of
+        all rays at given position and time.
+
+        Parameters
+        ----------
+        r : ndarray of float, shape (3,)
+            Position in meters.
+        t : float
+            Time (over vacuum speed of light; in meters).
+
+        Returns
+        -------
+        complex
+        """
+        return self._rv.sumAmplitude(r[0], r[1], r[2], t, ignoreVignetted)
 
     @classmethod
     def asGrid(
@@ -90,7 +188,7 @@ class RayVector:
         """Create RayVector on a parallelogram shaped region.
 
         This function will often be used to create a grid of rays on a square
-        grid, but is flexible enough to also create gris on an arbitrary
+        grid, but is flexible enough to also create grids on an arbitrary
         parallelogram, or even randomly distributed across an arbitrary
         parallelogram-shaped region.
 
@@ -105,7 +203,7 @@ class RayVector:
         difficult to locate automatically, the default stop surface in batoid
         is the global x-y plane.
 
-        If a telescope has an stopSurface attribute in its yaml file, then this
+        If a telescope has a stopSurface attribute in its yaml file, then this
         is usually a good choice to use in this function.  Using a curved
         surface for the stop surface is allowed, but is usually a bad idea as
         this may lead to a non-uniformly illuminated pupil and is inconsistent
@@ -120,7 +218,7 @@ class RayVector:
             those extracted from ``optic``.
         backDist : float, optional
             Map rays backwards from the stop surface to the plane that is
-            perpendicular to the ray and ``backDist`` meters from the point
+            perpendicular to the rays and ``backDist`` meters from the point
             (0, 0, z(0,0)) on the stop surface.  This should generally be set
             large enough that any obscurations or phantom surfaces occuring
             before the stop surface are now "in front" of the ray.  If this
@@ -259,8 +357,8 @@ class RayVector:
             ly = (0.0, ly)
 
         if nrandom is not None:
-            x = np.random.uniform(-0.5, 0.5, size=nrandom)
-            y = np.random.uniform(-0.5, 0.5, size=nrandom)
+            xx = np.random.uniform(-0.5, 0.5, size=nrandom)
+            yy = np.random.uniform(-0.5, 0.5, size=nrandom)
         else:
             if nx <= 2:
                 x_d = 1.
@@ -270,24 +368,27 @@ class RayVector:
                 y_d = 1.
             else:
                 y_d = (ny-(2 if (ny%2) == 0 else 1))/ny
-            x = np.fft.fftshift(np.fft.fftfreq(nx, x_d))
-            y = np.fft.fftshift(np.fft.fftfreq(ny, y_d))
-            x, y = np.meshgrid(x, y)
-            x = x.ravel()
-            y = y.ravel()
-        stack = np.stack([x, y])
-        x = np.dot(lx, stack)
-        y = np.dot(ly, stack)
-        z = stopSurface.surface.sag(x, y)
+            xx = np.fft.fftshift(np.fft.fftfreq(nx, x_d))
+            yy = np.fft.fftshift(np.fft.fftfreq(ny, y_d))
+            xx, yy = np.meshgrid(xx, yy)
+            xx = xx.ravel()
+            yy = yy.ravel()
+        r = np.empty((len(xx), 3), order='F')
+        x = r[:, 0]
+        y = r[:, 1]
+        z = r[:, 2]
+        stack = np.stack([xx, yy])
+        x[:] = np.dot(lx, stack)
+        y[:] = np.dot(ly, stack)
+        del xx, yy, stack
+        z[:] = stopSurface.surface.sag(x, y)
         transform = CoordTransform(stopSurface.coordSys, globalCoordSys)
-        x, y, z = transform.applyForward(x, y, z)
-
-        t = np.zeros_like(x)
+        applyForwardTransformArrays(transform, x, y, z)
         w = np.empty_like(x)
         w.fill(wavelength)
         n = medium.getN(wavelength)
 
-        return cls._finish(backDist, source, dirCos, n, x, y, z, t, w, flux)
+        return cls._finish(backDist, source, dirCos, n, r, w, flux)
 
     @classmethod
     def asPolar(
@@ -325,7 +426,7 @@ class RayVector:
         difficult to locate automatically, the default stop surface in batoid
         is the global x-y plane.
 
-        If a telescope has an stopSurface attribute in its yaml file, then this
+        If a telescope has a stopSurface attribute in its yaml file, then this
         is usually a good choice to use in this function.  Using a curved
         surface for the stop surface is allowed, but is usually a bad idea as
         this may lead to a non-uniformly illuminated pupil and is inconsistent
@@ -401,7 +502,6 @@ class RayVector:
             region instead of sampling on a hexapolar grid.
         """
         from .optic import Interface
-        from .surface import Plane
 
         if optic is not None:
             if backDist is None:
@@ -427,36 +527,43 @@ class RayVector:
             raise ValueError("Missing wavelength keyword")
 
         if nrandom is None:
-            ths = []
-            rs = []
-            for r in np.linspace(outer, inner, nrad):
-                if r == 0:
-                    break
-                nphi = int((naz*r/outer)//6)*6
+            nphis = []
+            rhos = np.linspace(outer, inner, nrad)
+            for rho in rhos:
+                nphi = int((naz*rho/outer)//6)*6
                 if nphi == 0:
                     nphi = 6
-                ths.append(np.linspace(0, 2*np.pi, nphi, endpoint=False))
-                rs.append(np.ones(nphi)*r)
-            # Point in center is a special case
+                nphis.append(nphi)
             if inner == 0.0:
-                ths[-1] = np.array([0.0])
-                rs[-1] = np.array([0.0])
-            r = np.concatenate(rs)
-            th = np.concatenate(ths)
+                nphis[-1] = 1
+            th = np.empty(np.sum(nphis))
+            rr = np.empty(np.sum(nphis))
+            idx = 0
+            for rho, nphi in zip(rhos, nphis):
+                rr[idx:idx+nphi] = rho
+                th[idx:idx+nphi] = np.linspace(0, 2*np.pi, nphi, endpoint=False)
+                idx += nphi
+            if inner == 0.0:
+                rr[-1] = 0.0
+                th[-1] = 0.0
         else:
-            r = np.sqrt(np.random.uniform(inner**2, outer**2, size=nrandom))
+            rr = np.sqrt(np.random.uniform(inner**2, outer**2, size=nrandom))
             th = np.random.uniform(0, 2*np.pi, size=nrandom)
-        x = r*np.cos(th)
-        y = r*np.sin(th)
-        z = stopSurface.surface.sag(x, y)
+        r = np.empty((len(rr), 3), order='F')
+        x = r[:, 0]
+        y = r[:, 1]
+        z = r[:, 2]
+        x[:] = rr*np.cos(th)
+        y[:] = rr*np.sin(th)
+        del rr, th
+        z[:] = stopSurface.surface.sag(x, y)
         transform = CoordTransform(stopSurface.coordSys, globalCoordSys)
-        x, y, z = transform.applyForward(x, y, z)
-        t = np.zeros_like(x)
+        applyForwardTransformArrays(transform, x, y, z)
         w = np.empty_like(x)
         w.fill(wavelength)
         n = medium.getN(wavelength)
 
-        return cls._finish(backDist, source, dirCos, n, x, y, z, t, w, flux)
+        return cls._finish(backDist, source, dirCos, n, r, w, flux)
 
     @classmethod
     def asSpokes(
@@ -490,7 +597,7 @@ class RayVector:
         difficult to locate automatically, the default stop surface in batoid
         is the global x-y plane.
 
-        If a telescope has an stopSurface attribute in its yaml file, then this
+        If a telescope has a stopSurface attribute in its yaml file, then this
         is usually a good choice to use in this function.  Using a curved
         surface for the stop surface is allowed, but is usually a bad idea as
         this may lead to a non-uniformly illuminated pupil and is inconsistent
@@ -611,127 +718,451 @@ class RayVector:
         spokes = spokes.ravel()
         flux = flux.ravel()
 
-        x = rings*np.cos(spokes)
-        y = rings*np.sin(spokes)
-        z = stopSurface.surface.sag(x, y)
+        r = np.empty((len(rings), 3), order='F')
+        x = r[:, 0]
+        y = r[:, 1]
+        z = r[:, 2]
+        x[:] = rings*np.cos(spokes)
+        y[:] = rings*np.sin(spokes)
+        del rings, spokes
+        z[:] = stopSurface.surface.sag(x, y)
         transform = CoordTransform(stopSurface.coordSys, globalCoordSys)
-        x, y, z = transform.applyForward(x, y, z)
-        t = np.zeros_like(x)
+        applyForwardTransformArrays(transform, x, y, z)
         w = np.empty_like(x)
         w.fill(wavelength)
         n = medium.getN(wavelength)
-
-        return cls._finish(backDist, source, dirCos, n, x, y, z, t, w, flux)
+        return cls._finish(backDist, source, dirCos, n, r, w, flux)
 
     @classmethod
-    def _finish(cls, backDist, source, dirCos, n, x, y, z, t, w, flux):
+    def _finish(cls, backDist, source, dirCos, n, r, w, flux):
         """Map rays backwards to their source position."""
-        from .surface import Plane
+        if isinstance(flux, Real):
+            flux = np.full(len(r), float(flux))
         if source is None:
-            v = np.array(dirCos, dtype=float)
-            v /= n*np.sqrt(np.dot(v, v))
-            vx = np.empty_like(x)
-            vx.fill(v[0])
-            vy = np.empty_like(x)
-            vy.fill(v[1])
-            vz = np.empty_like(x)
-            vz.fill(v[2])
-            # Now need to raytrace backwards to the plane dist units away.
-            rays = RayVector.fromArrays(x, y, z, -vx, -vy, -vz, t, w, flux=flux)
-
-            zhat = -n*v
+            from ._batoid import finishParallel
+            vv = np.array(dirCos, dtype=float)
+            vv /= n*np.sqrt(np.dot(vv, vv))
+            zhat = -n*vv
             xhat = np.cross(np.array([1.0, 0.0, 0.0]), zhat)
             xhat /= np.sqrt(np.dot(xhat, xhat))
             yhat = np.cross(xhat, zhat)
             origin = zhat*backDist
-            cs = CoordSys(origin, np.stack([xhat, yhat, zhat]).T)
-            transform = CoordTransform(globalCoordSys, cs)
-            transform.applyForward(rays)
-            plane = Plane()
-            plane.intersect(rays)
-            transform.applyReverse(rays)
-            return RayVector.fromArrays(
-                rays.x, rays.y, rays.z, vx, vy, vz, t, w, flux=flux
+            rot = np.stack([xhat, yhat, zhat]).T
+            finishParallel(origin, rot.ravel(), vv, r.ctypes.data, len(r))
+            v = np.full_like(r, vv)
+            t = np.zeros(len(r), dtype=float)
+            vignetted = np.zeros(len(r), dtype=bool)
+            failed = np.zeros(len(r), dtype=bool)
+            return RayVector._directInit(
+                r, v, t, w, flux, vignetted, failed, globalCoordSys
             )
         else:
-            vx = x - source[0]
-            vy = y - source[1]
-            vz = z - source[2]
-            v = np.stack([vx, vy, vz])
+            v = np.copy(r)
+            v -= source
             v /= n*np.einsum('ab,ab->b', v, v)
-            x.fill(source[0])
-            y.fill(source[1])
-            z.fill(source[2])
-            return RayVector.fromArrays(
-                x, y, z, v[0], v[1], v[2], t, w, flux=flux
+            r[:] = source
+            t = np.zeros(len(r), dtype=float)
+            vignetted = np.zeros(len(r), dtype=bool)
+            failed = np.zeros(len(r), dtype=bool)
+            return RayVector._directInit(
+                r, v, t, w, flux, vignetted, failed, globalCoordSys
             )
 
     @classmethod
-    def _fromCPPRayVector(cls, _rv):
-        """Turn a c++ RayVector into a python RayVector."""
-        ret = cls.__new__(cls)
-        ret._rv = _rv
-        return ret
+    def fromStop(
+        cls, x, y,
+        optic=None, backDist=None, medium=None, stopSurface=None,
+        wavelength=None,
+        source=None, dirCos=None,
+        theta_x=None, theta_y=None, projection='postel',
+        flux=1
+    ):
+        """Create rays that intersects the "stop" surface at given points.
+
+        The algorithm used here starts by placing the rays on the "stop"
+        surface, and then backing them up such that they are in front of any
+        surfaces of the optic they're intended to trace.
+
+        The stop surface of most large telescopes is the plane perpendicular to
+        the optic axis and flush with the rim of the primary mirror.  This
+        plane is usually also the entrance pupil since there are no earlier
+        refractive or reflective surfaces.  However, since this plane is a bit
+        difficult to locate automatically, the default stop surface in batoid
+        is the global x-y plane.
+
+        If a telescope has a stopSurface attribute in its yaml file, then this
+        is usually a good choice to use in this function.  Using a curved
+        surface for the stop surface is allowed, but is usually a bad idea as
+        this may lead to a non-uniformly illuminated pupil and is inconsistent
+        with, say, an incoming uniform spherical wave or uniform plane wave.
+
+        Parameters
+        ----------
+        x, y : ndarray
+            X/Y coordinates on the stop surface where the rays would intersect
+            if not refracted or reflected first.
+        optic : `batoid.Optic`, optional
+            If present, then try to extract values for ``backDist``,
+            ``medium``, and ``stopSurface`` from the Optic.  Note that values
+            explicitly passed here as keyword arguments override those
+            extracted from ``optic``.
+        backDist : float, optional
+            Map rays backwards from the stop surface to the plane that is
+            perpendicular to the rays and ``backDist`` meters from the point
+            (0, 0, z(0,0)) on the stop surface.  This should generally be set
+            large enough that any obscurations or phantom surfaces occuring
+            before the stop surface are now "in front" of the ray.  If this
+            keyword is set to ``None`` and the ``optic`` keyword is set, then
+            infer a value from ``optic.backDist``.  If both this keyword and
+            ``optic`` are ``None``, then use a default of 40 meters, which
+            should be sufficiently large for foreseeable telescopes.
+        medium : `batoid.Medium`, optional
+            Initial medium of rays.  If this keyword is set to ``None`` and
+            the ``optic`` keyword is set, then infer a value from
+            ``optic.inMedium``.  If both this keyword and ``optic`` are
+            ``None``, then use a default of vacuum.
+        stopSurface : batoid.Interface, optional
+            Surface defining the system stop.  If this keyword is set to
+            ``None`` and the ``optic`` keyword is set, then infer a value from
+            ``optic.stopSurface``.  If both this keyword and ``optic`` are
+            ``None``, then use a default ``Interface(Plane())``, which is the
+            global x-y plane.
+        wavelength : float
+            Vacuum wavelength of rays in meters.
+        source : None or ndarray of float, shape (3,), optional
+            Where the rays originate.  If None, then the rays originate an
+            infinite distance away, in which case the ``dirCos`` kwarg must also
+            be specified to set the direction of ray propagation.  If an
+            ndarray, then the rays originates from this point in global
+            coordinates and the ``dirCos`` kwarg is ignored.
+        dirCos : ndarray of float, shape (3,), optional
+            If source is None, then indicates the direction of ray propagation.
+            If source is not None, then this is ignored.
+        theta_x, theta_y : float, optional
+            Field angle in radians.  If source is None, then this indicates the
+            initial direction of propagation of the rays.  If source is not
+            None, then this is ignored.  Uses `utils.fieldToDirCos` to convert
+            to direction cosines.  Also see ``dirCos`` as an alternative to
+            this keyword.
+        projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}, optional
+            Projection used to convert field angle to direction cosines.
+        flux : float, optional
+            Flux of rays.  Default is 1.0.
+        """
+        from .optic import Interface
+        from .surface import Plane
+
+        if optic is not None:
+            if backDist is None:
+                backDist = optic.backDist
+            if medium is None:
+                medium = optic.inMedium
+            if stopSurface is None:
+                stopSurface = optic.stopSurface
+
+        if backDist is None:
+            backDist = 40.0
+        if stopSurface is None:
+            stopSurface = Interface(Plane())
+        if medium is None:
+            medium = vacuum
+
+        if dirCos is None and source is None:
+            dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
+
+        if wavelength is None:
+            raise ValueError("Missing wavelength keyword")
+
+        xx = np.atleast_1d(x)
+        yy = np.atleast_1d(y)
+
+        r = np.empty((len(xx), 3), order='F')
+        x = r[:, 0]
+        y = r[:, 1]
+        z = r[:, 2]
+        x[:] = xx
+        y[:] = yy
+        z[:] = stopSurface.surface.sag(x, y)
+        transform = CoordTransform(stopSurface.coordSys, globalCoordSys)
+        applyForwardTransformArrays(transform, x, y, z)
+
+        w = np.empty_like(x)
+        w.fill(wavelength)
+        n = medium.getN(wavelength)
+
+        return cls._finish(backDist, source, dirCos, n, r, w, flux)
+
+    @classmethod
+    def fromFieldAngles(
+        cls, theta_x, theta_y, projection='postel',
+        optic=None, backDist=None, medium=None, stopSurface=None,
+        wavelength=None,
+        x=0, y=0,
+        flux=1
+    ):
+        """Create RayVector with one stop surface point but many field angles.
+
+        This method is similar to `fromStop` but broadcasts over ``theta_x``
+        and ``theta_y`` instead of over ``x`` and ``y``.  There is less
+        currently less effort paid to synchronizing the ``t`` values of the
+        created rays, as they don't correspond to points on a physical incoming
+        wavefront in this case.  The primary intended use case is to map chief
+        rays (``x``=``y``=0) from incoming field angle to focal plane position.
+
+        Parameters
+        ----------
+        theta_x, theta_y : ndarray
+            Field angles in radians.
+        projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}, optional
+            Projection used to convert field angle to direction cosines.
+        optic : `batoid.Optic`, optional
+            If present, then try to extract values for ``backDist``,
+            ``medium``, and ``stopSurface`` from the Optic.  Note that values
+            explicitly passed here as keyword arguments override those
+            extracted from ``optic``.
+        backDist : float, optional
+            Map rays backwards from the stop surface this far.  This should
+            generally be set large enough that any obscurations or phantom
+            surfaces occuring before the stop surface are now "in front" of the
+            rays.  If this keyword is set to ``None`` and the ``optic`` keyword
+            is set, then infer a value from ``optic.backDist``.  If both this
+            keyword and ``optic`` are ``None``, then use a default of 40 meters,
+            which should be sufficiently large for foreseeable telescopes.
+        medium : `batoid.Medium`, optional
+            Initial medium of rays.  If this keyword is set to ``None`` and
+            the ``optic`` keyword is set, then infer a value from
+            ``optic.inMedium``.  If both this keyword and ``optic`` are
+            ``None``, then use a default of vacuum.
+        stopSurface : batoid.Interface, optional
+            Surface defining the system stop.  If this keyword is set to
+            ``None`` and the ``optic`` keyword is set, then infer a value from
+            ``optic.stopSurface``.  If both this keyword and ``optic`` are
+            ``None``, then use a default ``Interface(Plane())``, which is the
+            global x-y plane.
+        wavelength : float
+            Vacuum wavelength of rays in meters.
+        x, y : float
+            X/Y coordinates on the stop surface where the rays would intersect
+            if not refracted or reflected first.
+        flux : float, optional
+            Flux of rays.  Default is 1.0.
+        """
+        from .optic import Interface
+        from .surface import Plane
+
+        if optic is not None:
+            if backDist is None:
+                backDist = optic.backDist
+            if medium is None:
+                medium = optic.inMedium
+            if stopSurface is None:
+                stopSurface = optic.stopSurface
+
+        if backDist is None:
+            backDist = 40.0
+        if stopSurface is None:
+            stopSurface = Interface(Plane())
+        if medium is None:
+            medium = vacuum
+
+        if wavelength is None:
+            raise ValueError("Missing wavelength keyword")
+
+        vx, vy, vz = fieldToDirCos(theta_x, theta_y, projection=projection)
+        n = medium.getN(wavelength)
+        vx /= n
+        vy /= n
+        vz /= n
+
+        z = stopSurface.surface.sag(x, y)
+        x = np.full_like(vx, x)
+        y = np.full_like(vx, y)
+        z = np.full_like(vx, z)
+        t = np.zeros_like(vx)
+
+        rv = RayVector(
+            x, y, z,
+            vx, vy, vz,
+            t, wavelength, flux,
+            coordSys=stopSurface.coordSys
+        )
+        rv.propagate(-backDist*n)
+
+        return rv
+
+
+    @property
+    def r(self):
+        """ndarray of float, shape (n, 3): Positions of rays in meters."""
+        self._rv.r.syncToHost()
+        return self._r
+
+    @property
+    def x(self):
+        """The x components of ray positions in meters."""
+        self._rv.r.syncToHost()
+        return self._r[:, 0]
+
+    @property
+    def y(self):
+        """The y components of ray positions in meters."""
+        self._rv.r.syncToHost()
+        return self._r[:, 1]
+
+    @property
+    def z(self):
+        """The z components of ray positions in meters."""
+        self._rv.r.syncToHost()
+        return self._r[:, 2]
+
+    @property
+    def v(self):
+        """ndarray of float, shape (n, 3): Velocities of rays in units of the
+        speed of light in vacuum.  Note that these may have magnitudes < 1 if
+        the rays are inside a refractive medium.
+        """
+        self._rv.v.syncToHost()
+        return self._v
+
+    @property
+    def vx(self):
+        """The x components of ray velocities units of the vacuum speed of
+        light.
+        """
+        self._rv.v.syncToHost()
+        return self._v[:, 0]
+
+    @property
+    def vy(self):
+        """The y components of ray velocities units of the vacuum speed of
+        light.
+        """
+        self._rv.v.syncToHost()
+        return self._v[:, 1]
+
+    @property
+    def vz(self):
+        """The z components of ray velocities units of the vacuum speed of
+        light.
+        """
+        self._rv.v.syncToHost()
+        return self._v[:, 2]
+
+    @property
+    def t(self):
+        """Reference times (divided by the speed of light in vacuum) in units
+        of meters, also known as the optical path lengths.
+        """
+        self._rv.t.syncToHost()
+        return self._t
+
+    @property
+    def wavelength(self):
+        """Vacuum wavelengths in meters."""
+        # wavelength is constant, so no need to synchronize
+        return self._wavelength
+
+    @property
+    def flux(self):
+        """Fluxes in arbitrary units."""
+        self._rv.flux.syncToHost()
+        return self._flux
+
+    @property
+    def vignetted(self):
+        """True for rays that have been vignetted."""
+        self._rv.vignetted.syncToHost()
+        return self._vignetted
+
+    @property
+    def failed(self):
+        """True for rays that have failed.  This may occur, for example, if
+        batoid failed to find the intersection of a ray wiht a surface.
+        """
+        self._rv.failed.syncToHost()
+        return self._failed
+
+    @property
+    def k(self):
+        r"""ndarray of float, shape (n, 3): Wavevectors of plane waves in units
+        of radians per meter.  The magnitude of each wavevector is equal to
+        :math:`2 \pi n / \lambda`, where :math:`n` is the refractive index and
+        :math:`\lambda` is the wavelength.
+        """
+        out = 2*np.pi*np.array(self.v)
+        out /= self.wavelength[:, None]
+        out /= np.sum(self.v*self.v, axis=-1)[:, None]
+        return out
+
+    @property
+    def kx(self):
+        """The x component of each ray wavevector in radians per meter."""
+        return self.k[:,0]
+
+    @property
+    def ky(self):
+        """The y component of each ray wavevector in radians per meter."""
+        return self.k[:,1]
+
+    @property
+    def kz(self):
+        """The z component of each ray wavevector in radians per meter."""
+        return self.k[:,2]
+
+    @property
+    def omega(self):
+        r"""The temporal angular frequency of each plane wave divided by the
+        vacuum speed of light in units of radians per meter.  Equals
+        :math:`2 \pi / \lambda`.
+        """
+        return 2*np.pi/self.wavelength
+
+    @lazy_property
+    def _rv(self):
+        return _batoid.CPPRayVector(
+            self._r.ctypes.data, self._v.ctypes.data, self._t.ctypes.data,
+            self._wavelength.ctypes.data, self._flux.ctypes.data,
+            self._vignetted.ctypes.data, self._failed.ctypes.data,
+            len(self._wavelength)
+        )
+
+    def _syncToHost(self):
+        if "_rv" not in self.__dict__:
+            # Was never copied to device, so still synchronized.
+            return
+        self._rv.r.syncToHost()
+        self._rv.v.syncToHost()
+        self._rv.t.syncToHost()
+        self._rv.wavelength.syncToHost()
+        self._rv.flux.syncToHost()
+        self._rv.vignetted.syncToHost()
+        self._rv.failed.syncToHost()
+
+    def _syncToDevice(self):
+        self._rv.r.syncToDevice()
+        self._rv.v.syncToDevice()
+        self._rv.t.syncToDevice()
+        self._rv.wavelength.syncToDevice()
+        self._rv.flux.syncToDevice()
+        self._rv.vignetted.syncToDevice()
+        self._rv.failed.syncToDevice()
 
     def copy(self):
-        """Return a copy of this RayVector."""
-        return RayVector._fromCPPRayVector(_batoid.CPPRayVector(self._rv))
-
-    def __repr__(self):
-        return repr(self._rv)
-
-    def amplitude(self, r, t):
-        """Calculate (scalar) complex electric-field amplitudes at given
-        position and time.
-
-        Parameters
-        ----------
-        r : ndarray of float, shape (3,)
-            Position in meters.
-        t : float
-            Time (over vacuum speed of light; in meters).
-
-        Returns
-        -------
-        ndarray of complex, shape (n,)
-        """
-        return self._rv.amplitude(r, t)
-
-    def sumAmplitude(self, r, t):
-        """Calculate the sum of (scalar) complex electric-field amplitudes of
-        all rays at given position and time.
-
-        Parameters
-        ----------
-        r : ndarray of float, shape (3,)
-            Position in meters.
-        t : float
-            Time (over vacuum speed of light; in meters).
-
-        Returns
-        -------
-        complex
-        """
-        return self._rv.sumAmplitude(r, t)
-
-    def phase(self, r, t):
-        """Calculate plane wave phases at given position and time.
-
-        Parameters
-        ----------
-        r : ndarray of float, shape (3,)
-            Position in meters at which to compute phase
-        t : float
-            Time (over vacuum speed of light; in meters).
-
-        Returns
-        -------
-        ndarray of float, shape(n,)
-        """
-        return self._rv.phase(r, t)
+        # copy on host side for now...
+        self._syncToHost()
+        ret = RayVector.__new__(RayVector)
+        ret._r = np.copy(self._r, order='F')
+        ret._v = np.copy(self._v, order='F')
+        ret._t = np.copy(self._t)
+        ret._wavelength = np.copy(self._wavelength)
+        ret._flux = np.copy(self._flux)
+        ret._vignetted = np.copy(self._vignetted)
+        ret._failed = np.copy(self._failed)
+        ret.coordSys = self.coordSys.copy()
+        return ret
 
     def toCoordSys(self, coordSys):
-        """Transform rays into new coordinate system.
+        """Transform this RayVector into a new coordinate system.
 
         Parameters
         ----------
@@ -741,373 +1172,79 @@ class RayVector:
         Returns
         -------
         RayVector
+            Reference to self, no copy is made.
         """
         transform = CoordTransform(self.coordSys, coordSys)
-        return transform.applyForward(self)
-
-    def positionAtTime(self, t):
-        """Calculate the positions of the rays at a given time.
-
-        Parameters
-        ----------
-        t : float
-            Time (over vacuum speed of light; in meters).
-
-        Returns
-        -------
-        ndarray of float, shape (n, 3)
-            Positions in meters.
-        """
-        return self._rv.positionAtTime(t)
-
-    def propagate(self, t):
-        """Propagate RayVector to given time.
-
-        Parameters
-        ----------
-        t : float
-            Time (over vacuum speed of light; in meters).
-
-        Returns
-        -------
-        RayVector
-        """
-        self._rv.propagateInPlace(t)
+        applyForwardTransform(transform, self)
         return self
-
-    def trimVignetted(self, minflux=0.0):
-        """Return new RayVector with vignetted rays or rays with flux below
-        given threshold removed.
-
-        Parameters
-        ----------
-        minflux : float
-            Minimum flux value to not remove.
-
-        Returns
-        -------
-        RayVector
-        """
-        self._rv.trimVignettedInPlace(minflux)
-        return self
-
-    @property
-    def coordSys(self):
-        """Coordinate system in which this RayVector is defined."""
-        return CoordSys._fromCoordSys(self._rv.coordSys)
-
-    @property
-    def monochromatic(self):
-        """True if all rays have same wavelength."""
-        return self._rv.monochromatic
-
-    @property
-    def x(self):
-        """The x components of ray positions in meters."""
-        return self._rv.x
-
-    @property
-    def y(self):
-        """The y components of ray positions in meters."""
-        return self._rv.y
-
-    @property
-    def z(self):
-        """The z components of ray positions in meters."""
-        return self._rv.z
-
-    @property
-    def vx(self):
-        """The x components of ray velocities units of the vacuum speed of
-        light.
-        """
-        return self._rv.vx
-
-    @property
-    def vy(self):
-        """The y components of ray velocities units of the vacuum speed of
-        light.
-        """
-        return self._rv.vy
-
-    @property
-    def vz(self):
-        """The z components of ray velocities units of the vacuum speed of
-        light.
-        """
-        return self._rv.vz
-
-    @property
-    def t(self):
-        """Reference times (divided by the speed of light in vacuum) in units
-        of meters, also known as the optical path lengths.
-        """
-        return self._rv.t
-
-    @property
-    def wavelength(self):
-        """Vacuum wavelengths in meters."""
-        return self._rv.wavelength
-
-    @property
-    def flux(self):
-        """Fluxes in arbitrary units."""
-        return self._rv.flux
-
-    @property
-    def vignetted(self):
-        """True for rays that have been vignetted."""
-        return self._rv.vignetted
-
-    @property
-    def failed(self):
-        """True for rays that have failed.  This may occur, for example, if
-        batoid failed to find the intersection of a ray wiht a surface.
-        """
-        return self._rv.failed
-
-    @property
-    def r(self):
-        """ndarray of float, shape (n, 3): Positions of rays in meters."""
-        return self._rv.r
-
-    @property
-    def v(self):
-        """ndarray of float, shape (n, 3): Velocities of rays in units of the
-        speed of light in vacuum.  Note that these may have magnitudes < 1 if
-        the rays are inside a refractive medium.
-        """
-        return self._rv.v
-
-    @property
-    def k(self):
-        r"""ndarray of float, shape (n, 3): Wavevectors of plane waves in units
-        of radians per meter.  The magnitude of each wavevector is equal to
-        :math:`2 \pi n / \lambda`, where :math:`n` is the refractive index and
-        :math:`\lambda` is the wavelength.
-        """
-        return self._rv.k
-
-    @property
-    def kx(self):
-        """The x component of each ray wavevector in radians per meter."""
-        return self._rv.kx
-
-    @property
-    def ky(self):
-        """The y component of each ray wavevector in radians per meter."""
-        return self._rv.ky
-
-    @property
-    def kz(self):
-        """The z component of each ray wavevector in radians per meter."""
-        return self._rv.kz
-
-    @property
-    def omega(self):
-        r"""The temporal angular frequency of each plane wave divided by the
-        vacuum speed of light in units of radians per meter.  Equals
-        :math:`2 \pi / \lambda`.
-        """
-        return self._rv.omega
-
-    def __getitem__(self, idx):
-        return Ray._fromCPPRay(self._rv[idx], self.coordSys._coordSys)
-
-    def __iter__(self):
-        self._iter = iter(self._rv)
-        return self
-
-    def __next__(self):
-        # Note returns a new copy, not a reference to the original Ray.
-        return Ray._fromCPPRay(next(self._iter), self.coordSys._coordSys)
 
     def __len__(self):
-        return len(self._rv)
+        return self._t.size
 
     def __eq__(self, rhs):
-        if not isinstance(rhs, RayVector): return False
-        return (self._rv == rhs._rv)
+        return self._rv == rhs._rv
 
     def __ne__(self, rhs):
-        return not (self == rhs)
+        return self._rv != rhs._rv
+
+    def __repr__(self):
+        out = f"RayVector({self.x!r}, {self.y!r}, {self.z!r}"
+        out += f", {self.vx!r}, {self.vy!r}, {self.vz!r}"
+        out += f", {self.t!r}, {self.wavelength!r}, {self.flux!r}"
+        out += f", {self.vignetted!r}, {self.failed!r}, {self.coordSys!r})"
+        return out
+
+    def __getstate__(self):
+        return (
+            self.r, self.v, self.t,
+            self.wavelength, self.flux,
+            self.vignetted, self.failed, self.coordSys
+        )
+
+    def __setstate__(self, args):
+        (self._r, self._v, self._t,
+         self._wavelength, self._flux, self._vignetted,
+         self._failed, self.coordSys) = args
+
+    def __getitem__(self, idx):
+        if isinstance(idx, int):
+            if idx >= 0:
+                if idx >= self._rv.t.size:
+                    msg = "index {} is out of bounds for axis 0 with size {}"
+                    msg = msg.format(idx, self._rv.t.size)
+                    raise IndexError(msg)
+                idx = slice(idx, idx+1)
+            else:
+                if idx < -self._rv.t.size:
+                    msg = "index {} is out of bounds for axis 0 with size {}"
+                    msg = msg.format(idx, self._rv.t.size)
+                    raise IndexError(msg)
+                idx = slice(self._rv.t.size+idx, self._rv.t.size-idx+1)
+
+        self._syncToHost()
+        return RayVector._directInit(
+            np.copy(self._r[idx], order='F'),
+            np.copy(self._v[idx], order='F'),
+            np.copy(self._t[idx]),
+            np.copy(self._wavelength[idx]),
+            np.copy(self._flux[idx]),
+            np.copy(self._vignetted[idx]),
+            np.copy(self._failed[idx]),
+            self.coordSys
+        )
 
 def concatenateRayVectors(rvs):
-    """Concatenates two or more RayVectors together.
-
-    Parameters
-    ----------
-    rvs : list of RayVector
-        RayVectors to concatenate.
-
-    Returns
-    -------
-    concatenatedRayVector : RayVector
-    """
-    if len(rvs) == 0:
-        return RayVector._fromCPPRayVector(_batoid.CPPRayVector())
-    coordSys = rvs[0].coordSys
-    for rv in rvs[1:]:
-        if rv.coordSys != coordSys:
-            raise ValueError(
-                "Cannot concatenate RayVectors "
-                "with different coordinate systems"
-            )
-    _rv = _batoid.concatenateRayVectors([rv._rv for rv in rvs])
-    return RayVector._fromCPPRayVector(_rv)
-
-
-def rayGrid(zdist, length, xcos, ycos, zcos, nside, wavelength, flux, medium,
-            coordSys=globalCoordSys, lattice=False):
-    """Construct a parallel square grid of rays in a given direction.
-
-    Parameters
-    ----------
-    zdist : float
-        Distance of central Ray from origin.
-    length : float
-        Length of one side of square grid in meters.
-    xcos, ycos, zcos : float
-        Direction cosines of rays.
-    nside : int
-        Number of rays on a side.
-    wavelength : float
-        Vacuum wavelength of rays in meters.
-    flux : float
-        Flux of rays in arbitrary units.
-    medium : batoid.Medium
-        Medium containing rays.
-    coordSys : batoid.CoordSys
-        Coordinate system in which rays are defined.
-    lattice : bool
-        Whether to center grid as a batoid.Lattice or not.
-
-    Returns
-    -------
-    grid : RayVector
-        The grid of rays.
-    """
-    return RayVector._fromCPPRayVector(
-        _batoid.rayGrid(
-            zdist, length, xcos, ycos, zcos, nside,
-            wavelength, flux, medium._medium, coordSys._coordSys, lattice
-        )
-    )
-
-def circularGrid(zdist, outer, inner, xcos, ycos, zcos, nradii, naz,
-                 wavelength, flux, medium, coordSys=globalCoordSys):
-    """Construct a hexapolar grid of rays in a given direction.
-
-    Parameters
-    ----------
-    zdist : float
-        Distance of central Ray from origin.
-    outer : float
-        Outer radius of grid in meters.
-    inner : float
-        Inner radius of grid in meters.
-    xcos, ycos, zcos : float
-        Direction cosines of rays.
-    nradii : int
-        Number of radii (rings) in hexapolar grid.
-    naz : int
-        Number of azimuthal positions along outermost ring.
-    wavelength : float
-        Vacuum wavelength of rays in meters.
-    flux : float
-        Flux of rays in arbitrary units.
-    medium : batoid.Medium
-        Medium containing rays.
-    coordSys : batoid.CoordSys
-        Coordinate system in which rays are defined.
-
-    Returns
-    -------
-    hexgrid : RayVector
-        The hexapolar grid of rays.
-    """
-    return RayVector._fromCPPRayVector(
-        _batoid.circularGrid(
-            zdist, outer, inner, xcos, ycos, zcos, nradii, naz, wavelength,
-            flux, medium._medium, coordSys._coordSys
-        )
-    )
-
-def uniformCircularGrid(zdist, outer, inner, xcos, ycos, zcos, nrays,
-                        wavelength, flux, medium, coordSys=globalCoordSys,
-                        seed=0):
-    """Uniformly sample ray positions from an annulus, assign all the same
-    direction.
-
-    Parameters
-    ----------
-    zdist : float
-        Distance of central Ray from origin.
-    outer : float
-        Outer radius of grid in meters.
-    inner : float
-        Inner radius of grid in meters.
-    xcos, ycos, zcos : float
-        Direction cosines of rays.
-    nrays : int
-        Number of rays to create.
-    wavelength : float
-        Vacuum wavelength of rays in meters.
-    flux : float
-        Flux of rays in arbitrary units.
-    medium : batoid.Medium
-        Medium containing rays.
-    coordSys : batoid.CoordSys
-        Coordinate system in which rays are defined.
-
-    Returns
-    -------
-    hexgrid : RayVector
-        The hexapolar grid of rays.
-    """
-    return RayVector._fromCPPRayVector(
-        _batoid.uniformCircularGrid(
-            zdist, outer, inner, xcos, ycos, zcos, nrays, wavelength, flux,
-            medium._medium, coordSys._coordSys, seed
-        )
-    )
-
-def pointSourceCircularGrid(source, outer, inner, nradii, naz, wavelength,
-                            flux, medium, coordSys=globalCoordSys):
-    """Construct grid of rays all emanating from the same source location but
-    with a hexapolar grid in direction cosines.
-
-    Parameters
-    ----------
-    source : (3,) array of float
-        Source position of rays.
-    outer : float
-        Outer radius of rays at intersection with plane perpendicular to
-        source-origin line.
-    inner : float
-        Inner radius of rays at intersection with plane perpendicular to
-        source-origin line.
-    nradii : int
-        Number of radii (rings) in hexapolar grid.
-    naz : int
-        Number of azimuthal positions along outermost ring.
-    wavelength : float
-        Vacuum wavelength of rays in meters.
-    flux : float
-        Flux of rays in arbitrary units.
-    medium : batoid.Medium
-        Medium containing rays.
-    coordSys : batoid.CoordSys
-        Coordinate system in which rays are defined.
-
-    Returns
-    -------
-    hexgrid : RayVector
-        The hexapolar grid of rays.
-    """
-    return RayVector._fromCPPRayVector(
-        _batoid.pointSourceCircularGrid(
-            source, outer, inner, nradii, naz, wavelength, flux, medium._medium,
-            coordSys._coordSys
-        )
+    return RayVector(
+        np.hstack([rv.x for rv in rvs]),
+        np.hstack([rv.y for rv in rvs]),
+        np.hstack([rv.z for rv in rvs]),
+        np.hstack([rv.vx for rv in rvs]),
+        np.hstack([rv.vy for rv in rvs]),
+        np.hstack([rv.vz for rv in rvs]),
+        np.hstack([rv.t for rv in rvs]),
+        np.hstack([rv.wavelength for rv in rvs]),
+        np.hstack([rv.flux for rv in rvs]),
+        np.hstack([rv.vignetted for rv in rvs]),
+        np.hstack([rv.failed for rv in rvs]),
+        rvs[0].coordSys
     )

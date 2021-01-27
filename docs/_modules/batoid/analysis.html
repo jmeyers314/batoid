@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>batoid.analysis &mdash; batoid 0.1.0rc2 documentation</title>
+  <title>batoid.analysis &mdash; batoid 0.2.0rc1 documentation</title>
   
-
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
 
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
@@ -59,7 +62,7 @@
             
             
               <div class="version">
-                0.1
+                0.2
               </div>
             
           
@@ -76,6 +79,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -91,7 +95,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../coords.html">Coordinate Systems</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../obscurations.html">Obscurations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../media.html">Media</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../table.html">Lookup tables</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../coatings.html">Coatings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../analysis.html">Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../lattice.html">Lattices</a></li>
@@ -100,6 +103,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -134,11 +138,13 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../index.html">Module code</a> &raquo;</li>
         
@@ -161,13 +167,195 @@
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">batoid</span>
 
-<span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">bilinear_fit</span><span class="p">,</span> <span class="n">fieldToDirCos</span>
-<span class="kn">from</span> <span class="nn">.psf</span> <span class="k">import</span> <span class="n">dkdu</span><span class="p">,</span> <span class="n">reciprocalLatticeVectors</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">bilinear_fit</span><span class="p">,</span> <span class="n">fieldToDirCos</span>
 
 
-<div class="viewcode-block" id="huygensPSF"><a class="viewcode-back" href="../../analysis.html#batoid.analysis.huygensPSF">[docs]</a><span class="k">def</span> <span class="nf">huygensPSF</span><span class="p">(</span><span class="n">optic</span><span class="p">,</span> <span class="n">theta_x</span><span class="p">,</span> <span class="n">theta_y</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span>
-               <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;postel&#39;</span><span class="p">,</span> <span class="n">nx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-               <span class="n">nxOut</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_reciprocalLatticeVectors</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+    <span class="n">norm</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="p">(</span><span class="n">a1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">a2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">a1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">a2</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="n">N</span>
+    <span class="n">b1</span> <span class="o">=</span> <span class="n">norm</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">a2</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">a2</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+    <span class="n">b2</span> <span class="o">=</span> <span class="n">norm</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">a1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">a1</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+    <span class="k">return</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span>
+
+
+<div class="viewcode-block" id="dkdu"><a class="viewcode-back" href="../../analysis.html#batoid.analysis.dkdu">[docs]</a><span class="k">def</span> <span class="nf">dkdu</span><span class="p">(</span>
+    <span class="n">optic</span><span class="p">,</span> <span class="n">theta_x</span><span class="p">,</span> <span class="n">theta_y</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span> <span class="n">nrad</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">naz</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;postel&#39;</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate derivative of outgoing ray k-vector with respect to incoming</span>
+<span class="sd">    ray pupil coordinate.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    optic : batoid.Optic</span>
+<span class="sd">        Optical system</span>
+<span class="sd">    theta_x, theta_y : float</span>
+<span class="sd">        Field angle in radians</span>
+<span class="sd">    wavelength : float</span>
+<span class="sd">        Wavelength in meters</span>
+<span class="sd">    nx : int, optional</span>
+<span class="sd">        Size of ray grid to use.</span>
+<span class="sd">    projection : {&#39;postel&#39;, &#39;zemax&#39;, &#39;gnomonic&#39;, &#39;stereographic&#39;, &#39;lambert&#39;, &#39;orthographic&#39;}</span>
+<span class="sd">        Projection used to convert field angle to direction cosines.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dkdu : (2, 2), ndarray</span>
+<span class="sd">        Jacobian transformation matrix for converting between (kx, ky) of rays</span>
+<span class="sd">        impacting the focal plane and initial pupil plane coordinate.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">outer</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">pupilSize</span><span class="o">/</span><span class="mi">2</span>
+    <span class="n">inner</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="n">ths</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">rs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">outer</span><span class="p">,</span> <span class="n">inner</span><span class="p">,</span> <span class="n">nrad</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">nphi</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">naz</span><span class="o">*</span><span class="n">r</span><span class="o">/</span><span class="n">outer</span><span class="p">)</span><span class="o">//</span><span class="mi">6</span><span class="p">)</span><span class="o">*</span><span class="mi">6</span>
+        <span class="k">if</span> <span class="n">nphi</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">nphi</span> <span class="o">=</span> <span class="mi">6</span>
+        <span class="n">ths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">nphi</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+        <span class="n">rs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nphi</span><span class="p">)</span><span class="o">*</span><span class="n">r</span><span class="p">)</span>
+    <span class="c1"># Point in center is a special case</span>
+    <span class="k">if</span> <span class="n">inner</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="n">ths</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">])</span>
+        <span class="n">rs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">])</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">rs</span><span class="p">)</span>
+    <span class="n">th</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">ths</span><span class="p">)</span>
+    <span class="n">ux</span> <span class="o">=</span> <span class="n">r</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">th</span><span class="p">)</span>
+    <span class="n">uy</span> <span class="o">=</span> <span class="n">r</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">th</span><span class="p">)</span>
+
+    <span class="n">rays</span> <span class="o">=</span> <span class="n">batoid</span><span class="o">.</span><span class="n">RayVector</span><span class="o">.</span><span class="n">fromStop</span><span class="p">(</span>
+        <span class="n">ux</span><span class="p">,</span> <span class="n">uy</span><span class="p">,</span> <span class="n">optic</span><span class="o">=</span><span class="n">optic</span><span class="p">,</span>
+        <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
+        <span class="n">theta_x</span><span class="o">=</span><span class="n">theta_x</span><span class="p">,</span> <span class="n">theta_y</span><span class="o">=</span><span class="n">theta_y</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="n">projection</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">optic</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">rays</span><span class="p">)</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="o">~</span><span class="n">rays</span><span class="o">.</span><span class="n">vignetted</span>
+    <span class="n">soln</span> <span class="o">=</span> <span class="n">bilinear_fit</span><span class="p">(</span><span class="n">ux</span><span class="p">[</span><span class="n">w</span><span class="p">],</span> <span class="n">uy</span><span class="p">[</span><span class="n">w</span><span class="p">],</span> <span class="n">rays</span><span class="o">.</span><span class="n">kx</span><span class="p">[</span><span class="n">w</span><span class="p">],</span> <span class="n">rays</span><span class="o">.</span><span class="n">ky</span><span class="p">[</span><span class="n">w</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">soln</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span></div>
+
+
+<div class="viewcode-block" id="drdth"><a class="viewcode-back" href="../../analysis.html#batoid.analysis.drdth">[docs]</a><span class="k">def</span> <span class="nf">drdth</span><span class="p">(</span>
+    <span class="n">optic</span><span class="p">,</span> <span class="n">theta_x</span><span class="p">,</span> <span class="n">theta_y</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span> <span class="n">nrad</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">naz</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;postel&#39;</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate derivative of focal plane coord with respect to field angle.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    optic : batoid.Optic</span>
+<span class="sd">        Optical system</span>
+<span class="sd">    theta_x, theta_y : float</span>
+<span class="sd">        Field angle in radians</span>
+<span class="sd">    wavelength : float</span>
+<span class="sd">        Wavelength in meters</span>
+<span class="sd">    nrad : int, optional</span>
+<span class="sd">        Number of ray radii to use.  (see RayVector.asPolar())</span>
+<span class="sd">    naz : int, optional</span>
+<span class="sd">        Approximate number of azimuthal angles in outermost ring.  (see</span>
+<span class="sd">        RayVector.asPolar())</span>
+<span class="sd">    projection : {&#39;postel&#39;, &#39;zemax&#39;, &#39;gnomonic&#39;, &#39;stereographic&#39;, &#39;lambert&#39;, &#39;orthographic&#39;}</span>
+<span class="sd">        Projection used to convert field angle to direction cosines.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    drdth : (2, 2), ndarray</span>
+<span class="sd">        Jacobian transformation matrix for converting between (theta_x, theta_y)</span>
+<span class="sd">        and (x, y) on the focal plane.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">        This is the Jacobian of pixels -&gt; tangent plane, (and importantly, not</span>
+<span class="sd">        pixels -&gt; ra/dec).  It should be *close* to the inverse plate scale</span>
+<span class="sd">        though, especially near the center of the tangent plane projection.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># We just use a finite difference approach here.</span>
+    <span class="n">dth</span> <span class="o">=</span> <span class="mf">1e-5</span>
+
+    <span class="c1"># Make direction cosine vectors</span>
+    <span class="n">nominalCos</span> <span class="o">=</span> <span class="n">fieldToDirCos</span><span class="p">(</span><span class="n">theta_x</span><span class="p">,</span> <span class="n">theta_y</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="n">projection</span><span class="p">)</span>
+    <span class="n">dthxCos</span> <span class="o">=</span> <span class="n">fieldToDirCos</span><span class="p">(</span><span class="n">theta_x</span> <span class="o">+</span> <span class="n">dth</span><span class="p">,</span> <span class="n">theta_y</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="n">projection</span><span class="p">)</span>
+    <span class="n">dthyCos</span> <span class="o">=</span> <span class="n">fieldToDirCos</span><span class="p">(</span><span class="n">theta_x</span><span class="p">,</span> <span class="n">theta_y</span> <span class="o">+</span> <span class="n">dth</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="n">projection</span><span class="p">)</span>
+
+    <span class="n">rays</span> <span class="o">=</span> <span class="n">batoid</span><span class="o">.</span><span class="n">RayVector</span><span class="o">.</span><span class="n">asPolar</span><span class="p">(</span>
+        <span class="n">optic</span><span class="o">=</span><span class="n">optic</span><span class="p">,</span> <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
+        <span class="n">dirCos</span><span class="o">=</span><span class="n">nominalCos</span><span class="p">,</span>
+        <span class="n">nrad</span><span class="o">=</span><span class="n">nrad</span><span class="p">,</span> <span class="n">naz</span><span class="o">=</span><span class="n">naz</span>
+    <span class="p">)</span>
+    <span class="n">rays_x</span> <span class="o">=</span> <span class="n">batoid</span><span class="o">.</span><span class="n">RayVector</span><span class="o">.</span><span class="n">asPolar</span><span class="p">(</span>
+        <span class="n">optic</span><span class="o">=</span><span class="n">optic</span><span class="p">,</span> <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
+        <span class="n">dirCos</span><span class="o">=</span><span class="n">dthxCos</span><span class="p">,</span>
+        <span class="n">nrad</span><span class="o">=</span><span class="n">nrad</span><span class="p">,</span> <span class="n">naz</span><span class="o">=</span><span class="n">naz</span>
+    <span class="p">)</span>
+    <span class="n">rays_y</span> <span class="o">=</span> <span class="n">batoid</span><span class="o">.</span><span class="n">RayVector</span><span class="o">.</span><span class="n">asPolar</span><span class="p">(</span>
+        <span class="n">optic</span><span class="o">=</span><span class="n">optic</span><span class="p">,</span> <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
+        <span class="n">dirCos</span><span class="o">=</span><span class="n">dthyCos</span><span class="p">,</span>
+        <span class="n">nrad</span><span class="o">=</span><span class="n">nrad</span><span class="p">,</span> <span class="n">naz</span><span class="o">=</span><span class="n">naz</span>
+    <span class="p">)</span>
+
+    <span class="n">optic</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">rays</span><span class="p">)</span>
+    <span class="n">optic</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">rays_x</span><span class="p">)</span>
+    <span class="n">optic</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">rays_y</span><span class="p">)</span>
+
+    <span class="n">mx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">rays</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="o">~</span><span class="n">rays</span><span class="o">.</span><span class="n">vignetted</span><span class="p">])</span>
+    <span class="n">my</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">rays</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="o">~</span><span class="n">rays</span><span class="o">.</span><span class="n">vignetted</span><span class="p">])</span>
+
+    <span class="c1"># meters / radian</span>
+    <span class="n">drx_dthx</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">rays_x</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="o">~</span><span class="n">rays_x</span><span class="o">.</span><span class="n">vignetted</span><span class="p">])</span> <span class="o">-</span> <span class="n">mx</span><span class="p">)</span><span class="o">/</span><span class="n">dth</span>
+    <span class="n">drx_dthy</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">rays_y</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="o">~</span><span class="n">rays_y</span><span class="o">.</span><span class="n">vignetted</span><span class="p">])</span> <span class="o">-</span> <span class="n">mx</span><span class="p">)</span><span class="o">/</span><span class="n">dth</span>
+    <span class="n">dry_dthx</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">rays_x</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="o">~</span><span class="n">rays_x</span><span class="o">.</span><span class="n">vignetted</span><span class="p">])</span> <span class="o">-</span> <span class="n">my</span><span class="p">)</span><span class="o">/</span><span class="n">dth</span>
+    <span class="n">dry_dthy</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">rays_y</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="o">~</span><span class="n">rays_y</span><span class="o">.</span><span class="n">vignetted</span><span class="p">])</span> <span class="o">-</span> <span class="n">my</span><span class="p">)</span><span class="o">/</span><span class="n">dth</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">drx_dthx</span><span class="p">,</span> <span class="n">drx_dthy</span><span class="p">],</span> <span class="p">[</span><span class="n">dry_dthx</span><span class="p">,</span> <span class="n">dry_dthy</span><span class="p">]])</span></div>
+
+
+<div class="viewcode-block" id="dthdr"><a class="viewcode-back" href="../../analysis.html#batoid.analysis.dthdr">[docs]</a><span class="k">def</span> <span class="nf">dthdr</span><span class="p">(</span>
+    <span class="n">optic</span><span class="p">,</span> <span class="n">theta_x</span><span class="p">,</span> <span class="n">theta_y</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span> <span class="n">nrad</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">naz</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;postel&#39;</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate derivative of field angle with respect to focal plane</span>
+<span class="sd">    coordinate.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    optic : batoid.Optic</span>
+<span class="sd">        Optical system</span>
+<span class="sd">    theta_x, theta_y : float</span>
+<span class="sd">        Field angle in radians</span>
+<span class="sd">    wavelength : float</span>
+<span class="sd">        Wavelength in meters</span>
+<span class="sd">    nrad : int, optional</span>
+<span class="sd">        Number of ray radii to use.  (see RayVector.asPolar())</span>
+<span class="sd">    naz : int, optional</span>
+<span class="sd">        Approximate number of azimuthal angles in outermost ring.  (see</span>
+<span class="sd">        RayVector.asPolar())</span>
+<span class="sd">    projection : {&#39;postel&#39;, &#39;zemax&#39;, &#39;gnomonic&#39;, &#39;stereographic&#39;, &#39;lambert&#39;, &#39;orthographic&#39;}</span>
+<span class="sd">        Projection used to convert field angle to direction cosines.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dthdr : (2, 2), ndarray</span>
+<span class="sd">        Jacobian transformation matrix for converting between (x, y) on the</span>
+<span class="sd">        focal plane and field angle (theta_x, theta_y).</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">        This is the Jacobian of tangent plane -&gt; pixels, (and importantly, not</span>
+<span class="sd">        ra/dec -&gt; pixels). It should be *close* to the plate scale though,</span>
+<span class="sd">        especially near the center of the tangent plane projection.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span>
+        <span class="n">drdth</span><span class="p">(</span>
+            <span class="n">optic</span><span class="p">,</span> <span class="n">theta_x</span><span class="p">,</span> <span class="n">theta_y</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span>
+            <span class="n">nrad</span><span class="o">=</span><span class="n">nrad</span><span class="p">,</span> <span class="n">naz</span><span class="o">=</span><span class="n">naz</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="n">projection</span>
+        <span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="huygensPSF"><a class="viewcode-back" href="../../analysis.html#batoid.analysis.huygensPSF">[docs]</a><span class="k">def</span> <span class="nf">huygensPSF</span><span class="p">(</span>
+    <span class="n">optic</span><span class="p">,</span> <span class="n">theta_x</span><span class="p">,</span> <span class="n">theta_y</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span>
+    <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;postel&#39;</span><span class="p">,</span> <span class="n">nx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">nxOut</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span>
+<span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute a PSF via the Huygens construction.</span>
 
 <span class="sd">    Parameters</span>
@@ -219,7 +407,7 @@
 <span class="sd">    If ``dx`` and ``dy`` are 2-vectors, then those will be the primitive</span>
 <span class="sd">    vectors of the output lattice.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">numbers</span> <span class="k">import</span> <span class="n">Real</span>
+    <span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Real</span>
 
     <span class="k">if</span> <span class="n">dx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">nx</span><span class="o">%</span><span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -238,7 +426,7 @@
         <span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">primitiveU</span><span class="p">)</span>
         <span class="n">pad_factor</span> <span class="o">=</span> <span class="mi">2</span>
         <span class="n">primitiveX</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
-            <span class="n">reciprocalLatticeVectors</span><span class="p">(</span>
+            <span class="n">_reciprocalLatticeVectors</span><span class="p">(</span>
                 <span class="n">primitiveK</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">primitiveK</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">pad_factor</span><span class="o">*</span><span class="n">nx</span>
             <span class="p">)</span>
         <span class="p">)</span>
@@ -270,30 +458,31 @@
         <span class="n">primitiveX</span>
     <span class="p">)</span>
 
-    <span class="n">optic</span><span class="o">.</span><span class="n">traceInPlace</span><span class="p">(</span><span class="n">rays</span><span class="p">)</span>
+    <span class="n">optic</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">rays</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">reference</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
         <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">rays</span><span class="o">.</span><span class="n">vignetted</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">point</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">rays</span><span class="o">.</span><span class="n">r</span><span class="p">[</span><span class="n">w</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">reference</span> <span class="o">==</span> <span class="s1">&#39;chief&#39;</span><span class="p">:</span>
         <span class="n">cridx</span> <span class="o">=</span> <span class="p">(</span><span class="n">nx</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">nx</span><span class="o">+</span><span class="n">nx</span><span class="o">//</span><span class="mi">2</span> <span class="k">if</span> <span class="p">(</span><span class="n">nx</span><span class="o">%</span><span class="mi">2</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span> <span class="k">else</span> <span class="p">(</span><span class="n">nx</span><span class="o">*</span><span class="n">nx</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span>
-        <span class="n">point</span> <span class="o">=</span> <span class="n">rays</span><span class="p">[</span><span class="n">cridx</span><span class="p">]</span><span class="o">.</span><span class="n">r</span>
-    <span class="n">rays</span><span class="o">.</span><span class="n">trimVignettedInPlace</span><span class="p">()</span>
+        <span class="n">point</span> <span class="o">=</span> <span class="n">rays</span><span class="o">.</span><span class="n">r</span><span class="p">[</span><span class="n">cridx</span><span class="p">]</span>
     <span class="c1"># Need transpose to conform to numpy [y,x] ordering convention</span>
     <span class="n">xs</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span> <span class="o">+</span> <span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">ys</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">T</span> <span class="o">+</span> <span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">zs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
 
     <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">aux</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="k">for</span> <span class="n">aux</span> <span class="ow">in</span> <span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">zs</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">time</span> <span class="o">=</span> <span class="n">rays</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">t</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">rays</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">ndindex</span><span class="p">(</span><span class="n">amplitudes</span><span class="o">.</span><span class="n">shape</span><span class="p">):</span>
         <span class="n">amplitudes</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">rays</span><span class="o">.</span><span class="n">sumAmplitude</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">time</span><span class="p">)</span>
     <span class="n">out</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">amplitudes</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
     <span class="k">return</span> <span class="n">out</span></div>
 
 
-<div class="viewcode-block" id="wavefront"><a class="viewcode-back" href="../../analysis.html#batoid.analysis.wavefront">[docs]</a><span class="k">def</span> <span class="nf">wavefront</span><span class="p">(</span><span class="n">optic</span><span class="p">,</span> <span class="n">theta_x</span><span class="p">,</span> <span class="n">theta_y</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span>
-              <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;postel&#39;</span><span class="p">,</span> <span class="n">nx</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
-              <span class="n">sphereRadius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="wavefront"><a class="viewcode-back" href="../../analysis.html#batoid.analysis.wavefront">[docs]</a><span class="k">def</span> <span class="nf">wavefront</span><span class="p">(</span>
+    <span class="n">optic</span><span class="p">,</span> <span class="n">theta_x</span><span class="p">,</span> <span class="n">theta_y</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span>
+    <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;postel&#39;</span><span class="p">,</span> <span class="n">nx</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+    <span class="n">sphereRadius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span>
+<span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute wavefront.</span>
 
 <span class="sd">    Parameters</span>
@@ -330,33 +519,31 @@
         <span class="n">optic</span><span class="o">=</span><span class="n">optic</span><span class="p">,</span> <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
         <span class="n">nx</span><span class="o">=</span><span class="n">nx</span><span class="p">,</span> <span class="n">dirCos</span><span class="o">=</span><span class="n">dirCos</span>
     <span class="p">)</span>
-
     <span class="k">if</span> <span class="n">sphereRadius</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">sphereRadius</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">sphereRadius</span>
 
-    <span class="n">optic</span><span class="o">.</span><span class="n">traceInPlace</span><span class="p">(</span><span class="n">rays</span><span class="p">)</span>
+    <span class="n">optic</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">rays</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">reference</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
         <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">rays</span><span class="o">.</span><span class="n">vignetted</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">point</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">rays</span><span class="o">.</span><span class="n">r</span><span class="p">[</span><span class="n">w</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">reference</span> <span class="o">==</span> <span class="s1">&#39;chief&#39;</span><span class="p">:</span>
         <span class="n">cridx</span> <span class="o">=</span> <span class="p">(</span><span class="n">nx</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">nx</span><span class="o">+</span><span class="n">nx</span><span class="o">//</span><span class="mi">2</span> <span class="k">if</span> <span class="p">(</span><span class="n">nx</span><span class="o">%</span><span class="mi">2</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span> <span class="k">else</span> <span class="p">(</span><span class="n">nx</span><span class="o">*</span><span class="n">nx</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span>
-        <span class="n">point</span> <span class="o">=</span> <span class="n">rays</span><span class="p">[</span><span class="n">cridx</span><span class="p">]</span><span class="o">.</span><span class="n">r</span>
-
+        <span class="n">point</span> <span class="o">=</span> <span class="n">rays</span><span class="o">.</span><span class="n">r</span><span class="p">[</span><span class="n">cridx</span><span class="p">]</span>
     <span class="c1"># Place vertex of reference sphere one radius length away from the</span>
     <span class="c1"># intersection point.  So transform our rays into that coordinate system.</span>
     <span class="n">targetCoordSys</span> <span class="o">=</span> <span class="n">rays</span><span class="o">.</span><span class="n">coordSys</span><span class="o">.</span><span class="n">shiftLocal</span><span class="p">(</span>
         <span class="n">point</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">sphereRadius</span><span class="p">])</span>
     <span class="p">)</span>
-    <span class="n">rays</span><span class="o">.</span><span class="n">toCoordSysInPlace</span><span class="p">(</span><span class="n">targetCoordSys</span><span class="p">)</span>
+    <span class="n">rays</span><span class="o">.</span><span class="n">toCoordSys</span><span class="p">(</span><span class="n">targetCoordSys</span><span class="p">)</span>
 
     <span class="n">sphere</span> <span class="o">=</span> <span class="n">batoid</span><span class="o">.</span><span class="n">Sphere</span><span class="p">(</span><span class="o">-</span><span class="n">sphereRadius</span><span class="p">)</span>
-    <span class="n">sphere</span><span class="o">.</span><span class="n">intersectInPlace</span><span class="p">(</span><span class="n">rays</span><span class="p">)</span>
+    <span class="n">sphere</span><span class="o">.</span><span class="n">intersect</span><span class="p">(</span><span class="n">rays</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">reference</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
         <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">rays</span><span class="o">.</span><span class="n">vignetted</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">t0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">rays</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="n">w</span><span class="p">])</span>
     <span class="k">elif</span> <span class="n">reference</span> <span class="o">==</span> <span class="s1">&#39;chief&#39;</span><span class="p">:</span>
-        <span class="n">t0</span> <span class="o">=</span> <span class="n">rays</span><span class="p">[</span><span class="n">cridx</span><span class="p">]</span><span class="o">.</span><span class="n">t</span>
+        <span class="n">t0</span> <span class="o">=</span> <span class="n">rays</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="n">cridx</span><span class="p">]</span>
     <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_array</span><span class="p">(</span>
         <span class="p">(</span><span class="n">t0</span><span class="o">-</span><span class="n">rays</span><span class="o">.</span><span class="n">t</span><span class="p">)</span><span class="o">/</span><span class="n">wavelength</span><span class="p">,</span>
         <span class="n">mask</span><span class="o">=</span><span class="n">rays</span><span class="o">.</span><span class="n">vignetted</span>
@@ -374,9 +561,39 @@
     <span class="k">return</span> <span class="n">batoid</span><span class="o">.</span><span class="n">Lattice</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">primitiveVectors</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="fftPSF"><a class="viewcode-back" href="../../analysis.html#batoid.analysis.fftPSF">[docs]</a><span class="k">def</span> <span class="nf">fftPSF</span><span class="p">(</span><span class="n">optic</span><span class="p">,</span> <span class="n">theta_x</span><span class="p">,</span> <span class="n">theta_y</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span>
-           <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;postel&#39;</span><span class="p">,</span> <span class="n">nx</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">pad_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-           <span class="n">sphereRadius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">_addedWF</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">spot</span><span class="p">(</span>
+    <span class="n">optic</span><span class="p">,</span> <span class="n">theta_x</span><span class="p">,</span> <span class="n">theta_y</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span>
+    <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;postel&#39;</span><span class="p">,</span> <span class="n">nx</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">sphereRadius</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">):</span>
+    <span class="n">dirCos</span> <span class="o">=</span> <span class="n">fieldToDirCos</span><span class="p">(</span><span class="n">theta_x</span><span class="p">,</span> <span class="n">theta_y</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="n">projection</span><span class="p">)</span>
+    <span class="n">rays</span> <span class="o">=</span> <span class="n">batoid</span><span class="o">.</span><span class="n">RayVector</span><span class="o">.</span><span class="n">asGrid</span><span class="p">(</span>
+        <span class="n">optic</span><span class="o">=</span><span class="n">optic</span><span class="p">,</span> <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
+        <span class="n">nx</span><span class="o">=</span><span class="n">nx</span><span class="p">,</span> <span class="n">dirCos</span><span class="o">=</span><span class="n">dirCos</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">sphereRadius</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">sphereRadius</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">sphereRadius</span>
+    <span class="n">optic</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">rays</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">reference</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">rays</span><span class="o">.</span><span class="n">vignetted</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">point</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">rays</span><span class="o">.</span><span class="n">r</span><span class="p">[</span><span class="n">w</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">reference</span> <span class="o">==</span> <span class="s1">&#39;chief&#39;</span><span class="p">:</span>
+        <span class="n">cridx</span> <span class="o">=</span> <span class="p">(</span><span class="n">nx</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">nx</span><span class="o">+</span><span class="n">nx</span><span class="o">//</span><span class="mi">2</span> <span class="k">if</span> <span class="p">(</span><span class="n">nx</span><span class="o">%</span><span class="mi">2</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span> <span class="k">else</span> <span class="p">(</span><span class="n">nx</span><span class="o">*</span><span class="n">nx</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span>
+        <span class="n">point</span> <span class="o">=</span> <span class="n">rays</span><span class="p">[</span><span class="n">cridx</span><span class="p">]</span><span class="o">.</span><span class="n">r</span>
+    <span class="c1"># Place vertex of reference sphere one radius length away from the</span>
+    <span class="c1"># intersection point.  So transform our rays into that coordinate system.</span>
+    <span class="n">targetCoordSys</span> <span class="o">=</span> <span class="n">rays</span><span class="o">.</span><span class="n">coordSys</span><span class="o">.</span><span class="n">shiftLocal</span><span class="p">(</span>
+        <span class="n">point</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">sphereRadius</span><span class="p">])</span>
+    <span class="p">)</span>
+    <span class="n">rays</span><span class="o">.</span><span class="n">toCoordSys</span><span class="p">(</span><span class="n">targetCoordSys</span><span class="p">)</span>
+
+    <span class="n">w</span> <span class="o">=</span> <span class="o">~</span><span class="n">rays</span><span class="o">.</span><span class="n">vignetted</span>
+    <span class="k">return</span> <span class="n">rays</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">w</span><span class="p">],</span> <span class="n">rays</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="n">w</span><span class="p">]</span>
+
+<div class="viewcode-block" id="fftPSF"><a class="viewcode-back" href="../../analysis.html#batoid.analysis.fftPSF">[docs]</a><span class="k">def</span> <span class="nf">fftPSF</span><span class="p">(</span>
+    <span class="n">optic</span><span class="p">,</span> <span class="n">theta_x</span><span class="p">,</span> <span class="n">theta_y</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span>
+    <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;postel&#39;</span><span class="p">,</span> <span class="n">nx</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">pad_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">sphereRadius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span>
+<span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute PSF using FFT.</span>
 
 <span class="sd">    Parameters</span>
@@ -423,22 +640,23 @@
     <span class="n">expwf</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">][</span><span class="o">~</span><span class="n">wfarr</span><span class="o">.</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> \
         <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">2</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">wfarr</span><span class="p">[</span><span class="o">~</span><span class="n">wfarr</span><span class="o">.</span><span class="n">mask</span><span class="p">])</span>
     <span class="n">psf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft2</span><span class="p">(</span><span class="n">expwf</span><span class="p">)))</span><span class="o">**</span><span class="mi">2</span>
-
     <span class="n">primitiveU</span> <span class="o">=</span> <span class="n">wf</span><span class="o">.</span><span class="n">primitiveVectors</span>
     <span class="n">primitiveK</span> <span class="o">=</span> <span class="n">dkdu</span><span class="p">(</span>
         <span class="n">optic</span><span class="p">,</span> <span class="n">theta_x</span><span class="p">,</span> <span class="n">theta_y</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span>
         <span class="n">projection</span><span class="o">=</span><span class="n">projection</span>
     <span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">primitiveU</span><span class="p">)</span>
     <span class="n">primitiveX</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
-        <span class="n">reciprocalLatticeVectors</span><span class="p">(</span><span class="n">primitiveK</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">primitiveK</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">pad_size</span><span class="p">)</span>
+        <span class="n">_reciprocalLatticeVectors</span><span class="p">(</span><span class="n">primitiveK</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">primitiveK</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">pad_size</span><span class="p">)</span>
     <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">batoid</span><span class="o">.</span><span class="n">Lattice</span><span class="p">(</span><span class="n">psf</span><span class="p">,</span> <span class="n">primitiveX</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="zernike"><a class="viewcode-back" href="../../analysis.html#batoid.analysis.zernike">[docs]</a><span class="k">def</span> <span class="nf">zernike</span><span class="p">(</span><span class="n">optic</span><span class="p">,</span> <span class="n">theta_x</span><span class="p">,</span> <span class="n">theta_y</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span>
-            <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;postel&#39;</span><span class="p">,</span> <span class="n">nx</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
-            <span class="n">sphereRadius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">jmax</span><span class="o">=</span><span class="mi">22</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+<div class="viewcode-block" id="zernike"><a class="viewcode-back" href="../../analysis.html#batoid.analysis.zernike">[docs]</a><span class="k">def</span> <span class="nf">zernike</span><span class="p">(</span>
+    <span class="n">optic</span><span class="p">,</span> <span class="n">theta_x</span><span class="p">,</span> <span class="n">theta_y</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span>
+    <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;postel&#39;</span><span class="p">,</span> <span class="n">nx</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+    <span class="n">sphereRadius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">jmax</span><span class="o">=</span><span class="mi">22</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">0.0</span>
+<span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute Zernike polynomial decomposition of the wavefront.</span>
 
 <span class="sd">    This calculation propagates a square grid of rays to the exit pupil</span>
@@ -504,7 +722,7 @@
     <span class="p">)</span>
     <span class="c1"># Propagate to entrance pupil to get positions</span>
     <span class="n">epRays</span> <span class="o">=</span> <span class="n">rays</span><span class="o">.</span><span class="n">toCoordSys</span><span class="p">(</span><span class="n">optic</span><span class="o">.</span><span class="n">stopSurface</span><span class="o">.</span><span class="n">coordSys</span><span class="p">)</span>
-    <span class="n">optic</span><span class="o">.</span><span class="n">stopSurface</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">intersectInPlace</span><span class="p">(</span><span class="n">epRays</span><span class="p">)</span>
+    <span class="n">optic</span><span class="o">.</span><span class="n">stopSurface</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">intersect</span><span class="p">(</span><span class="n">epRays</span><span class="p">)</span>
     <span class="n">orig_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">epRays</span><span class="o">.</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">nx</span><span class="p">,</span> <span class="n">nx</span><span class="p">)</span>
     <span class="n">orig_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">epRays</span><span class="o">.</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">nx</span><span class="p">,</span> <span class="n">nx</span><span class="p">)</span>
 
@@ -524,10 +742,12 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coefs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="zernikeGQ"><a class="viewcode-back" href="../../analysis.html#batoid.analysis.zernikeGQ">[docs]</a><span class="k">def</span> <span class="nf">zernikeGQ</span><span class="p">(</span><span class="n">optic</span><span class="p">,</span> <span class="n">theta_x</span><span class="p">,</span> <span class="n">theta_y</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span>
-              <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;postel&#39;</span><span class="p">,</span> <span class="n">rings</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">spokes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-              <span class="n">sphereRadius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span>
-              <span class="n">jmax</span><span class="o">=</span><span class="mi">22</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+<div class="viewcode-block" id="zernikeGQ"><a class="viewcode-back" href="../../analysis.html#batoid.analysis.zernikeGQ">[docs]</a><span class="k">def</span> <span class="nf">zernikeGQ</span><span class="p">(</span>
+    <span class="n">optic</span><span class="p">,</span> <span class="n">theta_x</span><span class="p">,</span> <span class="n">theta_y</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span>
+    <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;postel&#39;</span><span class="p">,</span> <span class="n">rings</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">spokes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">sphereRadius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span>
+    <span class="n">jmax</span><span class="o">=</span><span class="mi">22</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">0.0</span>
+<span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute Zernike polynomial decomposition of the wavefront.</span>
 
 <span class="sd">    This calculation uses Gaussian Quadrature points and weights to compute the</span>
@@ -605,9 +825,9 @@
         <span class="n">spacing</span><span class="o">=</span><span class="s1">&#39;GQ&#39;</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="c1"># Trace to stopSurface to get points at which to evalue Zernikes</span>
-    <span class="n">epRays</span> <span class="o">=</span> <span class="n">rays</span><span class="o">.</span><span class="n">toCoordSys</span><span class="p">(</span><span class="n">optic</span><span class="o">.</span><span class="n">stopSurface</span><span class="o">.</span><span class="n">coordSys</span><span class="p">)</span>
-    <span class="n">optic</span><span class="o">.</span><span class="n">stopSurface</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">intersectInPlace</span><span class="p">(</span><span class="n">epRays</span><span class="p">)</span>
+    <span class="c1"># Trace to stopSurface to get points at which to evaluate Zernikes</span>
+    <span class="n">epRays</span> <span class="o">=</span> <span class="n">rays</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">toCoordSys</span><span class="p">(</span><span class="n">optic</span><span class="o">.</span><span class="n">stopSurface</span><span class="o">.</span><span class="n">coordSys</span><span class="p">)</span>
+    <span class="n">optic</span><span class="o">.</span><span class="n">stopSurface</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">intersect</span><span class="p">(</span><span class="n">epRays</span><span class="p">)</span>
 
     <span class="n">basis</span> <span class="o">=</span> <span class="n">galsim</span><span class="o">.</span><span class="n">zernike</span><span class="o">.</span><span class="n">zernikeBasis</span><span class="p">(</span>
         <span class="n">jmax</span><span class="p">,</span> <span class="n">epRays</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">epRays</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
@@ -618,7 +838,7 @@
     <span class="k">if</span> <span class="n">sphereRadius</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">sphereRadius</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">sphereRadius</span>
 
-    <span class="n">optic</span><span class="o">.</span><span class="n">traceInPlace</span><span class="p">(</span><span class="n">rays</span><span class="p">)</span>
+    <span class="n">optic</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">rays</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">rays</span><span class="o">.</span><span class="n">failed</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -628,32 +848,32 @@
         <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">rays</span><span class="o">.</span><span class="n">vignetted</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">point</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">rays</span><span class="o">.</span><span class="n">r</span><span class="p">[</span><span class="n">w</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">reference</span> <span class="o">==</span> <span class="s1">&#39;chief&#39;</span><span class="p">:</span>
-        <span class="n">chiefRay</span> <span class="o">=</span> <span class="n">batoid</span><span class="o">.</span><span class="n">Ray</span><span class="o">.</span><span class="n">fromStop</span><span class="p">(</span>
+        <span class="n">chiefRay</span> <span class="o">=</span> <span class="n">batoid</span><span class="o">.</span><span class="n">RayVector</span><span class="o">.</span><span class="n">fromStop</span><span class="p">(</span>
             <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span>
             <span class="n">backDist</span><span class="o">=</span><span class="n">optic</span><span class="o">.</span><span class="n">backDist</span><span class="p">,</span> <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
             <span class="n">dirCos</span><span class="o">=</span><span class="n">dirCos</span><span class="p">,</span>
             <span class="n">medium</span><span class="o">=</span><span class="n">optic</span><span class="o">.</span><span class="n">inMedium</span><span class="p">,</span>
             <span class="n">stopSurface</span><span class="o">=</span><span class="n">optic</span><span class="o">.</span><span class="n">stopSurface</span>
         <span class="p">)</span>
-        <span class="n">optic</span><span class="o">.</span><span class="n">traceInPlace</span><span class="p">(</span><span class="n">chiefRay</span><span class="p">)</span>
-        <span class="n">point</span> <span class="o">=</span> <span class="n">chiefRay</span><span class="o">.</span><span class="n">r</span>
+        <span class="n">optic</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">chiefRay</span><span class="p">)</span>
+        <span class="n">point</span> <span class="o">=</span> <span class="n">chiefRay</span><span class="o">.</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="c1"># Place vertex of reference sphere one radius length away from the</span>
     <span class="c1"># intersection point.  So transform our rays into that coordinate system.</span>
     <span class="n">targetCoordSys</span> <span class="o">=</span> <span class="n">rays</span><span class="o">.</span><span class="n">coordSys</span><span class="o">.</span><span class="n">shiftLocal</span><span class="p">(</span>
         <span class="n">point</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">sphereRadius</span><span class="p">])</span>
     <span class="p">)</span>
-    <span class="n">rays</span><span class="o">.</span><span class="n">toCoordSysInPlace</span><span class="p">(</span><span class="n">targetCoordSys</span><span class="p">)</span>
+    <span class="n">rays</span><span class="o">.</span><span class="n">toCoordSys</span><span class="p">(</span><span class="n">targetCoordSys</span><span class="p">)</span>
 
     <span class="n">sphere</span> <span class="o">=</span> <span class="n">batoid</span><span class="o">.</span><span class="n">Sphere</span><span class="p">(</span><span class="o">-</span><span class="n">sphereRadius</span><span class="p">)</span>
-    <span class="n">sphere</span><span class="o">.</span><span class="n">intersectInPlace</span><span class="p">(</span><span class="n">rays</span><span class="p">)</span>
+    <span class="n">sphere</span><span class="o">.</span><span class="n">intersect</span><span class="p">(</span><span class="n">rays</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">reference</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
         <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">rays</span><span class="o">.</span><span class="n">vignetted</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">t0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">rays</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="n">w</span><span class="p">])</span>
     <span class="k">elif</span> <span class="n">reference</span> <span class="o">==</span> <span class="s1">&#39;chief&#39;</span><span class="p">:</span>
-        <span class="n">chiefRay</span><span class="o">.</span><span class="n">toCoordSysInPlace</span><span class="p">(</span><span class="n">targetCoordSys</span><span class="p">)</span>
-        <span class="n">sphere</span><span class="o">.</span><span class="n">intersectInPlace</span><span class="p">(</span><span class="n">chiefRay</span><span class="p">)</span>
+        <span class="n">chiefRay</span><span class="o">.</span><span class="n">toCoordSys</span><span class="p">(</span><span class="n">targetCoordSys</span><span class="p">)</span>
+        <span class="n">sphere</span><span class="o">.</span><span class="n">intersect</span><span class="p">(</span><span class="n">chiefRay</span><span class="p">)</span>
         <span class="n">t0</span> <span class="o">=</span> <span class="n">chiefRay</span><span class="o">.</span><span class="n">t</span>
 
     <span class="c1"># Zernike coefficients are flux-weighted dot products of relative phases</span>
@@ -662,8 +882,10 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="p">(</span><span class="n">t0</span><span class="o">-</span><span class="n">rays</span><span class="o">.</span><span class="n">t</span><span class="p">)</span><span class="o">/</span><span class="n">wavelength</span><span class="o">*</span><span class="n">rays</span><span class="o">.</span><span class="n">flux</span><span class="p">)</span><span class="o">/</span><span class="n">area</span></div>
 
 
-<div class="viewcode-block" id="doubleZernike"><a class="viewcode-back" href="../../analysis.html#batoid.analysis.doubleZernike">[docs]</a><span class="k">def</span> <span class="nf">doubleZernike</span><span class="p">(</span><span class="n">optic</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span> <span class="n">rings</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">spokes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kmax</span><span class="o">=</span><span class="mi">22</span><span class="p">,</span>
-                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="doubleZernike"><a class="viewcode-back" href="../../analysis.html#batoid.analysis.doubleZernike">[docs]</a><span class="k">def</span> <span class="nf">doubleZernike</span><span class="p">(</span>
+    <span class="n">optic</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span> <span class="n">rings</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">spokes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kmax</span><span class="o">=</span><span class="mi">22</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute double Zernike polynomial decomposition of the wavefront.</span>
 
 <span class="sd">    The double Zernike decomposition describes both the focal and pupil</span>
@@ -733,20 +955,25 @@
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Josh Meyers
+        &#169; Copyright 2020, Josh Meyers.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -754,7 +981,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

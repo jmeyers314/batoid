@@ -1,9 +1,24 @@
 #include "coating.h"
-#include <sstream>
+#include <new>
 
 namespace batoid {
+
+    #if defined(BATOID_GPU)
+        #pragma omp declare target
+    #endif
+
+    Coating::Coating() :
+        _devPtr(nullptr)
+    {}
+
+    Coating::~Coating() {}
+
+
     SimpleCoating::SimpleCoating(double reflectivity, double transmissivity) :
-        _reflectivity(reflectivity), _transmissivity(transmissivity) {}
+        _reflectivity(reflectivity), _transmissivity(transmissivity)
+    {}
+
+    SimpleCoating::~SimpleCoating() {}
 
     void SimpleCoating::getCoefs(double wavelength, double cosIncidenceAngle, double& reflect, double& transmit) const {
         reflect = _reflectivity;
@@ -18,21 +33,26 @@ namespace batoid {
         return _transmissivity;
     }
 
-    bool SimpleCoating::operator==(const Coating& rhs) const {
-        if (const SimpleCoating* other = dynamic_cast<const SimpleCoating*>(&rhs)) {
-            return _reflectivity == other->_reflectivity &&
-                   _transmissivity == other->_transmissivity;
-        } else return false;
+    #if defined(BATOID_GPU)
+        #pragma omp end declare target
+    #endif
+
+
+    const Coating* SimpleCoating::getDevPtr() const {
+        #if defined(BATOID_GPU)
+            if (!_devPtr) {
+                Coating* ptr;
+                #pragma omp target map(from:ptr)
+                {
+                    ptr = new SimpleCoating(_reflectivity, _transmissivity);
+                }
+                _devPtr = ptr;
+            }
+            return _devPtr;
+        #else
+            return this;
+        #endif
     }
 
-    std::string SimpleCoating::repr() const {
-        std::ostringstream oss;
-        oss << "SimpleCoating("
-            << _reflectivity
-            << ", "
-            << _transmissivity
-            << ")";
-        return oss.str();
-    }
 
 }

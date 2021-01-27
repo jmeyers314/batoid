@@ -1,0 +1,26 @@
+cd ~jemeyers/sandbox/GPU/batoid/
+
+
+# Load modules
+
+module use /project/projectdirs/m1759/csdaley/Modules/cgpu/modulefiles
+module purge && module load esslurm PrgEnv-llvm/11.0.0-git_20200310-init-patch2 python3 cmake
+export CXX=clang++
+
+
+# Load a GPU.  Use one of the below
+
+salloc -C gpu -N 1 -t 30 -c 10 --gres=gpu:1 -A m1759
+
+salloc -C gpu -N 1 -t 240 --gres=gpu:1 -A m1759 --exclusive
+
+
+# Compile
+python setup.py develop --user  # CPU only
+BATOID_GPU=1 python setup.py develop --user  # GPU
+
+# Run on GPU
+srun --pty python tests/parallel_trace_timing.py --lsst --gpu --nside 1024 --nrepeat 3
+
+# Compare on CPU
+python tests/parallel_trace_timing.py --lsst --gpu --nside 1024 --nrepeat 3 --nthread 12

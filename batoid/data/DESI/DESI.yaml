@@ -180,11 +180,9 @@ opticalSystem:
             name: C1
             medium:
               type: TableMedium
-              table:
-                # Melt data from DESI-2880-v2
-                args: &waves [365.015e-9, 435.835e-9, 486.133e-9, 587.562e-9, 656.273e-9, 852.110e-9, 1013.98e-9]
-                vals: [1.474580, 1.466730, 1.463162, 1.458499, 1.456402, 1.452500, 1.450278]
-                interp: linear
+              # Melt data from DESI-2880-v2
+              wavelengths: &waves [365.015e-9, 435.835e-9, 486.133e-9, 587.562e-9, 656.273e-9, 852.110e-9, 1013.98e-9]
+              ns: [1.474580, 1.466730, 1.463162, 1.458499, 1.456402, 1.452500, 1.450278]
             items:
               -
                 type: RefractiveInterface
@@ -244,11 +242,8 @@ opticalSystem:
             name: C2
             medium:
               type: TableMedium
-              table:
-                # Melt data from DESI-2880-v2
-                args: *waves
-                vals: [1.474641, 1.466791, 1.463223, 1.458561, 1.45646, 1.452563, 1.450342]
-                interp: linear
+              wavelengths: *waves
+              ns: [1.474641, 1.466791, 1.463223, 1.458561, 1.45646, 1.452563, 1.450342]
             coordSys:
               # C2 front face to C1 front face
               z: +0.611807
@@ -310,11 +305,9 @@ opticalSystem:
               # https://refractiveindex.info/?shelf=glass&book=BK7&page=SCHOTT
               medium:
                 type: TableMedium
-                table:
-                  # Melt data from DESI-2880-v2
-                  args: *waves
-                  vals: [1.536945, 1.527374, 1.523070, 1.517498, 1.515022, 1.510508, 1.508023]
-                  interp: linear
+                # Melt data from DESI-2880-v2
+                wavelengths: *waves
+                ns: [1.536945, 1.527374, 1.523070, 1.517498, 1.515022, 1.510508, 1.508023]
               coordSys:
                 # ADC1 front face to C1 front face
                 z: +0.847401
@@ -366,11 +359,9 @@ opticalSystem:
               # https://refractiveindex.info/?shelf=glass&book=BK7&page=SCHOTT
               medium:
                 type: TableMedium
-                table:
-                  # Melt data from DESI-2880-v2
-                  args: *waves
-                  vals: [1.536225, 1.526635, 1.522325, 1.516746, 1.514267, 1.509743, 1.507246]
-                  interp: linear
+                # Melt data from DESI-2880-v2
+                wavelengths: *waves
+                ns: [1.536225, 1.526635, 1.522325, 1.516746, 1.514267, 1.509743, 1.507246]
               coordSys:
                 # ADC2 front face to C1 front face
                 z: +0.932401
@@ -425,10 +416,8 @@ opticalSystem:
             name: C3
             medium: &silica  # Use generic fused silica until melt data is available.
               type: TableMedium
-              table:
-                args: *waves
-                vals: [1.474555, 1.466701, 1.463132, 1.458467, 1.45637, 1.452469, 1.450245]
-                interp: linear
+              wavelengths: *waves
+              ns: [1.474555, 1.466701, 1.463132, 1.458467, 1.45637, 1.452469, 1.450245]
             coordSys:
               # C3 front face to C1 front face
               z: +1.191808

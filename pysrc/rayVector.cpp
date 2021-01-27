@@ -1,265 +1,84 @@
 #include "rayVector.h"
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include <pybind11/stl_bind.h>
 #include <pybind11/operators.h>
 #include <pybind11/complex.h>
-#include <pybind11/numpy.h>
-#include <pybind11/eigen.h>
 
 namespace py = pybind11;
-using namespace pybind11::literals;
 
 namespace batoid {
     void pyExportRayVector(py::module& m) {
-        py::class_<RayVector>(m, "CPPRayVector")
-            .def(py::init<>())
-            .def(py::init<RayVector>())
-            .def(py::init<std::vector<Ray>, CoordSys>())
-            .def(py::init<std::vector<Ray>, CoordSys, double>())
-            .def(py::init<std::vector<double>, std::vector<double>, std::vector<double>,
-                          std::vector<double>, std::vector<double>, std::vector<double>,
-                          std::vector<double>, std::vector<double>, std::vector<double>,
-                          std::vector<bool>, CoordSys>())
-            .def("__repr__", &RayVector::repr)
-            .def("amplitude", &RayVector::amplitude)
-            .def("sumAmplitude", &RayVector::sumAmplitude)
-            .def("phase", &RayVector::phase)
-            .def("positionAtTime",
-                [](const RayVector& rv, double t){
-                    std::vector<Vector3d> result(rv.positionAtTime(t));
-                    return py::array_t<double>(
-                        {result.size(), 3ul},
-                        {3*sizeof(double), sizeof(double)},
-                        &result[0].data()[0]
-                    );
+        auto dvd = py::class_<DualView<double>>(m, "CPPDualViewDouble")
+            .def(py::init(
+                [](
+                    size_t arr_ptr,
+                    size_t size
+                ){
+                    return new DualView<double>(reinterpret_cast<double*>(arr_ptr), size);
                 }
-            )
-            .def("propagatedToTime", &RayVector::propagatedToTime)
-            .def("propagateInPlace", &RayVector::propagateInPlace)
-            .def("trimVignetted", &RayVector::trimVignetted, "", "minFlux"_a=0.0)
-            .def("trimVignettedInPlace", &RayVector::trimVignettedInPlace, "", "minFlux"_a=0.0)
-            // Note, monochromatic == True guarantees monochromaticity, but monochromatic == False,
-            // doesn't guarantee polychromaticity.
-            .def_property_readonly("monochromatic", [](const RayVector& rv){ return !std::isnan(rv.getWavelength()); })
-            .def(py::pickle(
-                [](const RayVector& rv) {  // __getstate__
-                    return py::make_tuple(rv.getRays(), rv.getCoordSys(), rv.getWavelength());
-                },
-                [](py::tuple t) {  // __setstate__
-                    return RayVector(
-                        t[0].cast<std::vector<Ray>>(),
-                        t[1].cast<CoordSys>(),
-                        t[2].cast<double>()
+            ))
+            .def("syncToHost", &DualView<double>::syncToHost)
+            .def("syncToDevice", &DualView<double>::syncToDevice)
+            .def_readonly("size", &DualView<double>::size)
+            .def_readonly("ownsHostData", &DualView<double>::ownsHostData);
+
+        auto dvb = py::class_<DualView<bool>>(m, "CPPDualViewBool")
+            .def("syncToHost", &DualView<bool>::syncToHost)
+            .def("syncToDevice", &DualView<bool>::syncToDevice)
+            .def_readonly("size", &DualView<bool>::size)
+            .def_readonly("ownsHostData", &DualView<bool>::ownsHostData);
+
+        auto rv = py::class_<RayVector>(m, "CPPRayVector")
+            .def(py::init(
+                [](
+                    size_t r_ptr,
+                    size_t v_ptr,
+                    size_t t_ptr,
+                    size_t w_ptr,
+                    size_t f_ptr,
+                    size_t vig_ptr,
+                    size_t fail_ptr,
+                    size_t size
+                ){
+                    return new RayVector(
+                        reinterpret_cast<double*>(r_ptr),
+                        reinterpret_cast<double*>(v_ptr),
+                        reinterpret_cast<double*>(t_ptr),
+                        reinterpret_cast<double*>(w_ptr),
+                        reinterpret_cast<double*>(f_ptr),
+                        reinterpret_cast<bool*>(vig_ptr),
+                        reinterpret_cast<bool*>(fail_ptr),
+                        size
                     );
                 }
             ))
-            .def("__hash__", [](const RayVector& rv) {
-                return py::hash(py::make_tuple(
-                    "CPPRayVector",
-                    py::tuple(py::cast(rv.getRays())),
-                    rv.getCoordSys(),
-                    rv.getWavelength()
-                ));
-            })
-            .def_property_readonly("coordSys", &RayVector::getCoordSys)
-            .def_property_readonly("x",
-                [](RayVector& rv) -> py::array_t<double> {
-                    return {{rv.size()},
-                        {sizeof(Ray)},
-                        &(rv.front()).r[0],
-                        py::cast(rv)};
+            .def("positionAtTime",
+                [](const RayVector& rv, double t, size_t out_ptr){
+                    rv.positionAtTime(t, reinterpret_cast<double*>(out_ptr));
                 }
             )
-            .def_property_readonly("y",
-                [](RayVector& rv) -> py::array_t<double> {
-                    return {{rv.size()},
-                        {sizeof(Ray)},
-                        &(rv.front()).r[1],
-                        py::cast(rv)};
+            .def("propagateInPlace", &RayVector::propagateInPlace)
+            .def("phase",
+                [](const RayVector& rv, double x, double y, double z, double t, size_t out_ptr){
+                    rv.phase(x, y, z, t, reinterpret_cast<double*>(out_ptr));
                 }
             )
-            .def_property_readonly("z",
-                [](RayVector& rv) -> py::array_t<double> {
-                    return {{rv.size()},
-                        {sizeof(Ray)},
-                        &(rv.front()).r[2],
-                        py::cast(rv)};
+            .def("amplitude",
+                [](const RayVector& rv, double x, double y, double z, double t, size_t out_ptr){
+                    rv.amplitude(x, y, z, t, reinterpret_cast<std::complex<double>*>(out_ptr));
                 }
             )
-            .def_property_readonly("vx",
-                [](RayVector& rv) -> py::array_t<double> {
-                    return {{rv.size()},
-                        {sizeof(Ray)},
-                        &(rv.front()).v[0],
-                        py::cast(rv)};
-                }
-            )
-            .def_property_readonly("vy",
-                [](RayVector& rv) -> py::array_t<double> {
-                    return {{rv.size()},
-                        {sizeof(Ray)},
-                        &(rv.front()).v[1],
-                        py::cast(rv)};
-                }
-            )
-            .def_property_readonly("vz",
-                [](RayVector& rv) -> py::array_t<double> {
-                    return {{rv.size()},
-                        {sizeof(Ray)},
-                        &(rv.front()).v[2],
-                        py::cast(rv)};
-                }
-            )
-            .def_property_readonly("t",
-                [](RayVector& rv) -> py::array_t<double> {
-                    return {{rv.size()},
-                        {sizeof(Ray)},
-                        &(rv.front()).t,
-                        py::cast(rv)};
-                }
-            )
-            .def_property_readonly("wavelength",
-                [](RayVector& rv) -> py::array_t<double> {
-                    return {{rv.size()},
-                        {sizeof(Ray)},
-                        &(rv.front()).wavelength,
-                        py::cast(rv)};
-                }
-            )
-            .def_property_readonly("flux",
-                [](RayVector& rv) -> py::array_t<double> {
-                    return {{rv.size()},
-                        {sizeof(Ray)},
-                        &(rv.front()).flux,
-                        py::cast(rv)};
-                }
-            )
-            .def_property_readonly("vignetted",
-                [](RayVector& rv) -> py::array_t<bool> {
-                    return {{rv.size()},
-                        {sizeof(Ray)},
-                        &(rv.front()).vignetted,
-                        py::cast(rv)};
-                }
-            )
-            .def_property_readonly("failed",
-                [](RayVector& rv) -> py::array_t<bool> {
-                    return {{rv.size()},
-                        {sizeof(Ray)},
-                        &(rv.front()).failed,
-                        py::cast(rv)};
-                }
-            )
-            .def_property_readonly("v",
-                [](RayVector& rv) -> py::array_t<double> {
-                    return {{rv.size(), 3ul},
-                        {sizeof(Ray), sizeof(double)},
-                        &(rv.front()).v[0],
-                        py::cast(rv)};
-                }
-            )
-            .def_property_readonly("r",
-                [](RayVector& rv) -> py::array_t<double> {
-                    return {{rv.size(), 3ul},
-                        {sizeof(Ray), sizeof(double)},
-                        &(rv.front()).r[0],
-                        py::cast(rv)};
-                }
-            )
-            .def_property_readonly("k",
-                [](const RayVector& rv) {
-                    std::vector<Vector3d> result;
-                    result.reserve(rv.size());
-                    for (int i=0; i < rv.size(); i++) {
-                        result.push_back(rv[i].k());
-                    }
-                    return py::array_t<double>(
-                        {rv.size(), 3ul},
-                        {3*sizeof(double), sizeof(double)},
-                        &result[0].data()[0]
-                    );
-                }
-            )
-            .def_property_readonly("kx",
-                [](const RayVector& rv) {
-                    std::vector<double> result;
-                    result.reserve(rv.size());
-                    for (int i=0; i < rv.size(); i++) {
-                        result.push_back(rv[i].k()[0]);
-                    }
-                    return py::array_t<double>(
-                        {rv.size()},
-                        {sizeof(double)},
-                        result.data()
-                    );
-                }
-            )
-            .def_property_readonly("ky",
-                [](const RayVector& rv) {
-                    std::vector<double> result;
-                    result.reserve(rv.size());
-                    for (int i=0; i < rv.size(); i++) {
-                        result.push_back(rv[i].k()[1]);
-                    }
-                    return py::array_t<double>(
-                        {rv.size()},
-                        {sizeof(double)},
-                        result.data()
-                    );
-                }
-            )
-            .def_property_readonly("kz",
-                [](const RayVector& rv) {
-                    std::vector<double> result;
-                    result.reserve(rv.size());
-                    for (int i=0; i < rv.size(); i++) {
-                        result.push_back(rv[i].k()[2]);
-                    }
-                    return py::array_t<double>(
-                        {rv.size()},
-                        {sizeof(double)},
-                        result.data()
-                    );
-                }
-            )
-            .def_property_readonly("omega",
-                [](const RayVector& rv) {
-                    std::vector<double> result;
-                    result.reserve(rv.size());
-                    for (int i=0; i < rv.size(); i++) {
-                        result.push_back(rv[i].omega());
-                    }
-                    return py::array_t<double>(
-                        {rv.size()},
-                        {sizeof(double)},
-                        &result[0]
-                    );
-                }
-            )
+            .def("sumAmplitude", &RayVector::sumAmplitude)
+            .def(py::self == py::self)
+            .def(py::self != py::self)
 
-            .def("__getitem__",
-                [](RayVector &rv, typename std::vector<Ray>::size_type i) -> Ray& {
-                    if (i >= rv.size())
-                        throw py::index_error();
-                    return rv[i];
-                },
-                py::return_value_policy::reference_internal
-            )
-            .def("__iter__",
-                [](RayVector &rv) {
-                    return py::make_iterator<
-                        py::return_value_policy::reference_internal,
-                        typename std::vector<Ray>::iterator,
-                        typename std::vector<Ray>::iterator,
-                        Ray&>(rv.begin(), rv.end());
-                },
-                py::keep_alive<0, 1>()
-            )
-            .def("append", [](RayVector& rv, const Ray& r) { rv.push_back(r); })
-            .def("__len__", &RayVector::size)
-            .def("__eq__", [](const RayVector& lhs, const RayVector& rhs) { return lhs == rhs; }, py::is_operator())
-            .def("__ne__", [](const RayVector& lhs, const RayVector& rhs) { return lhs != rhs; }, py::is_operator());
-        m.def("concatenateRayVectors", &concatenateRayVectors);
+            // Expose dualviews so can access their syncToHost methods
+            .def_readonly("r", &RayVector::r)
+            .def_readonly("v", &RayVector::v)
+            .def_readonly("t", &RayVector::t)
+            .def_readonly("wavelength", &RayVector::wavelength)
+            .def_readonly("flux", &RayVector::flux)
+            .def_readonly("vignetted", &RayVector::vignetted)
+            .def_readonly("failed", &RayVector::failed);
     }
 }

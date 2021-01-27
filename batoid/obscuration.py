@@ -1,15 +1,15 @@
+import numpy as np
 from . import _batoid
-
+from .trace import obscure
 
 class Obscuration:
-    """An `Obscuration` instance is used to mark `Ray` s (potentially in
-    a `RayVector`) as vignetted (i.e., obscured) if their x/y coordinates lie
-    in a particular region.
+    """An `Obscuration` instance is used to mark as vignetted (i.e., obscured)
+    if their x/y coordinates lie in a particular region.
 
     `Obscuration` s are useful for modeling pupils, clear apertures of optical
     elements, struts, or other physical obstructions in an optical system.
-    Note that only the x and y local coordinates of a `Ray` are considered; the
-    z coordinate is ignored.
+    Note that only the x and y local coordinates of rays are considered; the z
+    coordinate is ignored.
     """
     def contains(self, x, y):
         """Return True if the point (x,y) is obscured.
@@ -26,33 +26,23 @@ class Obscuration:
         """
         return self._obsc.contains(x, y)
 
-    def obscure(self, r):
-        """Mark a `Ray` or `RayVector` for potential vignetting.
+    def obscure(self, rv):
+        """Mark rays for potential vignetting.
 
         Parameters
         ----------
-        r : `Ray` or `RayVector`
+        rv : `RayVector`
             Rays to analyze.
 
         Returns
         -------
-        out : `Ray` or `RayVector`
+        out : `RayVector`
             Returned object will have appropriate elements marked as vignetted.
         """
-        self._obsc.obscureInPlace(r._rv)
-
-    def __eq__(self, rhs):
-        return (type(self) == type(rhs)
-                and self._obsc == rhs._obsc)
+        obscure(self, rv)
 
     def __ne__(self, rhs):
         return not (self == rhs)
-
-    def __hash__(self):
-        return hash((type(self), self._obsc))
-
-    def __repr__(self):
-        return repr(self._obsc)
 
 
 class ObscCircle(Obscuration):
@@ -66,22 +56,36 @@ class ObscCircle(Obscuration):
         Coordinates of circle center in meters.  [default: 0.0]
     """
     def __init__(self, radius, x=0.0, y=0.0):
+        self.radius = radius
+        self.x = x
+        self.y = y
         self._obsc = _batoid.CPPObscCircle(radius, x, y)
 
-    @property
-    def radius(self):
-        """Radius of circle in meters."""
-        return self._obsc.radius
+    def __eq__(self, rhs):
+        if type(rhs) == type(self):
+            return (
+                self.radius == rhs.radius
+                and self.x == rhs.x
+                and self.y == rhs.y
+            )
+        return False
 
-    @property
-    def x(self):
-        """X coordinate of circle center in meters."""
-        return self._obsc.x
+    def __getstate__(self):
+        return self.radius, self.x, self.y
 
-    @property
-    def y(self):
-        """Y coordinate of circle center in meters."""
-        return self._obsc.y
+    def __setstate__(self, args):
+        self.radius, self.x, self.y = args
+        self._obsc = _batoid.CPPObscCircle(*args)
+
+    def __hash__(self):
+        return hash(("batoid.ObscCircle", self.radius, self.x, self.y))
+
+    def __repr__(self):
+        out = f"ObscCircle({self.radius}"
+        if self.x != 0 or self.y != 0:
+            out += f", {self.x}, {self.y}"
+        out += ")"
+        return out
 
 
 class ObscAnnulus(Obscuration):
@@ -97,27 +101,40 @@ class ObscAnnulus(Obscuration):
         Coordinates of annulus center in meters.  [default: 0.0]
     """
     def __init__(self, inner, outer, x=0.0, y=0.0):
+        self.inner = inner
+        self.outer = outer
+        self.x = x
+        self.y = y
         self._obsc = _batoid.CPPObscAnnulus(inner, outer, x, y)
 
-    @property
-    def inner(self):
-        """Inner radius of annulus in meters."""
-        return self._obsc.inner
+    def __eq__(self, rhs):
+        if type(rhs) == type(self):
+            return (
+                self.inner == rhs.inner
+                and self.outer == rhs.outer
+                and self.x == rhs.x
+                and self.y == rhs.y
+            )
+        return False
 
-    @property
-    def outer(self):
-        """Outer radius of annulus in meters."""
-        return self._obsc.outer
+    def __getstate__(self):
+        return self.inner, self.outer, self.x, self.y
 
-    @property
-    def x(self):
-        """X coordinate of annulus center in meters."""
-        return self._obsc.x
+    def __setstate__(self, args):
+        self.inner, self.outer, self.x, self.y = args
+        self._obsc = _batoid.CPPObscAnnulus(*args)
 
-    @property
-    def y(self):
-        """Y coordinate of annulus center in meters."""
-        return self._obsc.y
+    def __hash__(self):
+        return hash((
+            "batoid.ObscAnnulus", self.inner, self.outer, self.x, self.y
+        ))
+
+    def __repr__(self):
+        out = f"ObscAnnulus({self.inner}, {self.outer}"
+        if self.x != 0 or self.y != 0:
+            out += f", {self.x}, {self.y}"
+        out += ")"
+        return out
 
 
 class ObscRectangle(Obscuration):
@@ -135,32 +152,45 @@ class ObscRectangle(Obscuration):
         Counter-clockwise rotation of rectangle in radians.  [default: 0.0]
     """
     def __init__(self, width, height, x=0.0, y=0.0, theta=0.0):
+        self.width = width
+        self.height = height
+        self.x = x
+        self.y = y
+        self.theta = theta
         self._obsc = _batoid.CPPObscRectangle(width, height, x, y, theta)
 
-    @property
-    def width(self):
-        """Width (X-center) of rectangle in meters."""
-        return self._obsc.width
+    def __eq__(self, rhs):
+        if type(rhs) == type(self):
+            return (
+                self.width == rhs.width
+                and self.height == rhs.height
+                and self.x == rhs.x
+                and self.y == rhs.y
+                and self.theta == rhs.theta
+            )
+        return False
 
-    @property
-    def height(self):
-        """Height (Y-center) of rectangle in meters."""
-        return self._obsc.height
+    def __getstate__(self):
+        return self.width, self.height, self.x, self.y, self.theta
 
-    @property
-    def x(self):
-        """X coordinate of rectangle center in meters."""
-        return self._obsc.x
+    def __setstate__(self, args):
+        self.width, self.height, self.x, self.y, self.theta = args
+        self._obsc = _batoid.CPPObscRectangle(*args)
 
-    @property
-    def y(self):
-        """Y coordinate of rectangle center in meters."""
-        return self._obsc.y
+    def __hash__(self):
+        return hash((
+            "batoid.ObscRectangle",
+            self.width, self.height, self.x, self.y, self.theta
+        ))
 
-    @property
-    def theta(self):
-        """Counter-clockwise rotation of rectangle in radians."""
-        return self._obsc.theta
+    def __repr__(self):
+        out = f"ObscRectangle({self.width}, {self.height}"
+        if self.x != 0.0 or self.y != 0.0:
+            out += f", {self.x}, {self.y}"
+        if self.theta != 0.0:
+            out += f", theta={self.theta}"
+        out += ")"
+        return out
 
 
 class ObscRay(Obscuration):
@@ -171,34 +201,48 @@ class ObscRay(Obscuration):
     Parameters
     ----------
     width : float
-        Width of ray in meters.
+        Width of ray obscuration in meters.
     theta : float
         Rotation angle of ray in radians.
     x, y : float, optional
         Coordinates of ray origin in meters.  [default: 0.0]
     """
     def __init__(self, width, theta, x=0.0, y=0.0):
+        self.width = width
+        self.theta = theta
+        self.x = x
+        self.y = y
         self._obsc = _batoid.CPPObscRay(width, theta, x, y)
 
-    @property
-    def width(self):
-        """Width of ray in meters."""
-        return self._obsc.width
+    def __eq__(self, rhs):
+        if type(rhs) == type(self):
+            return (
+                self.width == rhs.width
+                and self.theta == rhs.theta
+                and self.x == rhs.x
+                and self.y == rhs.y
+            )
+        return False
 
-    @property
-    def theta(self):
-        """Rotation angle of ray in radians."""
-        return self._obsc.theta
+    def __getstate__(self):
+        return self.width, self.theta, self.x, self.y
 
-    @property
-    def x(self):
-        """X coordinate of ray origin in meters."""
-        return self._obsc.x
+    def __setstate__(self, args):
+        self.width, self.theta, self.x, self.y = args
+        self._obsc = _batoid.CPPObscRay(*args)
 
-    @property
-    def y(self):
-        """Y coordinate of ray origin in meters."""
-        return self._obsc.y
+    def __hash__(self):
+        return hash((
+            "batoid.ObscRay",
+            self.width, self.theta, self.x, self.y
+        ))
+
+    def __repr__(self):
+        out = f"ObscRay({self.width}, {self.theta}"
+        if self.x != 0.0 or self.y != 0.0:
+            out += f", {self.x}, {self.y}"
+        out += ")"
+        return out
 
 
 class ObscPolygon(Obscuration):
@@ -213,17 +257,37 @@ class ObscPolygon(Obscuration):
     """
 
     def __init__(self, xs, ys):
-        self._xs = xs
-        self._ys = ys
-        self._obsc = _batoid.CPPObscPolygon(xs, ys)
+        self.xs = np.ascontiguousarray(xs, dtype=float)
+        self.ys = np.ascontiguousarray(ys, dtype=float)
+        self._obsc = _batoid.CPPObscPolygon(
+            self.xs.ctypes.data,
+            self.ys.ctypes.data,
+            len(self.xs)
+        )
 
-    @property
-    def xs(self):
-        return self._obsc._xs
+    def __eq__(self, rhs):
+        if type(rhs) == type(self):
+            return (
+                np.all(self.xs == rhs.xs)
+                and np.all(self.ys == rhs.ys)
+            )
+        return False
 
-    @property
-    def ys(self):
-        return self._obsc._ys
+    def __getstate__(self):
+        return self.xs, self.ys
+
+    def __setstate__(self, args):
+        self.__init__(*args)
+
+    def __hash__(self):
+        return hash((
+            "batoid.ObscPolygon",
+            tuple(self.xs),
+            tuple(self.ys)
+        ))
+
+    def __repr__(self):
+        return f"ObscPolygon({self.xs!r}, {self.ys!r})"
 
 
 class ObscNegation(Obscuration):
@@ -238,13 +302,28 @@ class ObscNegation(Obscuration):
         The obscuration to negate.
     """
     def __init__(self, original):
-        self._original = original
+        self.original = original
         self._obsc = _batoid.CPPObscNegation(original._obsc)
 
-    @property
-    def original(self):
-        """The negated original `Obscuration`."""
-        return self._original
+    def __eq__(self, rhs):
+        if type(rhs) == type(self):
+            return self.original == rhs.original
+        return False
+
+    def __getstate__(self):
+        return self.original
+
+    def __setstate__(self, original):
+        self.__init__(original)
+
+    def __hash__(self):
+        return hash((
+            "batoid.ObscNegation",
+            self.original
+        ))
+
+    def __repr__(self):
+        return f"ObscNegation({self.original!r})"
 
 
 class ObscUnion(Obscuration):
@@ -286,13 +365,32 @@ class ObscUnion(Obscuration):
         elif len(items) == 1:
             if isinstance(items, (list, tuple)):
                 items = items[0]
-        self._items = items
+        self.items = sorted(items, key=repr)
         self._obsc = _batoid.CPPObscUnion([item._obsc for item in items])
 
-    @property
-    def items(self):
-        """List of `Obscuration` : unionized `Obscuration` s."""
-        return self._items
+    def __eq__(self, rhs):
+        if type(rhs) == type(self):
+            return self.items == rhs.items
+        return False
+
+    def __getstate__(self):
+        return self.items
+
+    def __setstate__(self, items):
+        self.__init__(items)
+
+    def __hash__(self):
+        return hash((
+            "batoid.ObscUnion",
+            tuple(self.items)
+        ))
+
+    def __repr__(self):
+        out = f"ObscUnion({self.items[0]!r}"
+        for item in self.items[1:]:
+            out += f", {item!r}"
+        out += ")"
+        return out
 
 
 class ObscIntersection(Obscuration):
@@ -340,10 +438,29 @@ class ObscIntersection(Obscuration):
         elif len(items) == 1:
             if isinstance(items, (list, tuple)):
                 items = items[0]
-        self._items = items
+        self.items = sorted(items, key=repr)
         self._obsc = _batoid.CPPObscIntersection([item._obsc for item in items])
 
-    @property
-    def items(self):
-        """List of `Obscuration` : intersected `Obscuration` s."""
-        return self._items
+    def __eq__(self, rhs):
+        if type(rhs) == type(self):
+            return self.items == rhs.items
+        return False
+
+    def __getstate__(self):
+        return self.items
+
+    def __setstate__(self, items):
+        self.__init__(items)
+
+    def __hash__(self):
+        return hash((
+            "batoid.ObscIntersection",
+            tuple(self.items)
+        ))
+
+    def __repr__(self):
+        out = f"ObscIntersection({self.items[0]!r}"
+        for item in self.items[1:]:
+            out += f", {item!r}"
+        out += ")"
+        return out

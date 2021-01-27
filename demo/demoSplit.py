@@ -27,13 +27,10 @@ angles = [0.3]
 for angle in angles:
     dirCos = batoid.utils.gnomonicToDirCos(0.0, np.deg2rad(angle))
 
-    rays = batoid.circularGrid(
-        telescope.backDist,
-        telescope.pupilSize/2,
-        telescope.pupilSize*telescope.pupilObscuration/2,
-        dirCos[0], dirCos[1], dirCos[2],
-        # 30, 90, 500e-9, 1.0, telescope.inMedium
-        300, 900, 500e-9, 1.0, telescope.inMedium
+    rays = batoid.RayVector.asPolar(
+        optic=telescope, wavelength=500e-9,
+        theta_x=0.0, theta_y=np.deg2rad(angle),
+        nrad=300, naz=900
     )
 
     rForward, rReverse = telescope.traceSplit(rays, minFlux=1e-4, _verbose=True)
@@ -64,3 +61,4 @@ for angle in angles:
     ax.set_position([0,0,1,1])
     ax.set_facecolor('black')
     plt.show()
+    # fig.savefig("ghost.png")

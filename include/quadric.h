@@ -1,31 +1,33 @@
 #ifndef batoid_quadric_h
 #define batoid_quadric_h
 
-#include <sstream>
-#include <limits>
 #include "surface.h"
-#include "ray.h"
-#include <Eigen/Dense>
-
-using Eigen::Vector3d;
 
 namespace batoid {
 
     class Quadric : public Surface {
     public:
         Quadric(double R, double conic);
-        virtual double sag(double, double) const override;
-        virtual Vector3d normal(double, double) const override;
-        virtual bool timeToIntersect(const Ray& r, double& t) const override;
+        ~Quadric();
 
-        double getR() const {return _R;}
-        double getConic() const {return _conic;}
+        virtual const Surface* getDevPtr() const override;
+
+        virtual double sag(double, double) const override;
+        virtual void normal(
+            double x, double y,
+            double& nx, double& ny, double& nz
+        ) const override;
+        virtual bool timeToIntersect(
+            double x, double y, double z,
+            double vx, double vy, double vz,
+            double& dt
+        ) const override;
 
     protected:
         const double _R;  // Radius of curvature
         const double _conic;  // Conic constant
 
-        double dzdr(double r) const;
+        double _dzdr(double r) const;
 
     private:
         const double _Rsq;  // R*R

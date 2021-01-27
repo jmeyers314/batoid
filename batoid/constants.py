@@ -1,4 +1,4 @@
-from .coordsys import CoordSys
+from .coordSys import CoordSys
 from .medium import ConstMedium
 
 globalCoordSys = CoordSys()

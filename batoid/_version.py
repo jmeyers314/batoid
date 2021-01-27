@@ -1,6 +1,6 @@
 #https://stackoverflow.com/a/7071358/7530778
 
-__version__ = "0.1.0"
+__version__ = "0.2.0rc1"
 tmp = __version__
 if "rc" in tmp:
     tmp = tmp[:tmp.find("rc")]

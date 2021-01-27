@@ -12,7 +12,6 @@ batoid: c++ backed python optical raytracer
    coords
    obscurations
    media
-   table
    coatings
    analysis
    lattice

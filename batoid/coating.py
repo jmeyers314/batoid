@@ -1,3 +1,4 @@
+from batoid.trace import reflect
 from . import _batoid
 
 
@@ -62,6 +63,9 @@ class Coating:
         """
         return self._coating.getTransmit(wavelength, cosIncidenceAngle)
 
+    def __ne__(self, rhs):
+        return not (self == rhs)
+
 
 class SimpleCoating(Coating):
     """Coating with reflectivity and transmissivity that are both constant with
@@ -75,31 +79,27 @@ class SimpleCoating(Coating):
         Transmission coefficient
     """
     def __init__(self, reflectivity, transmissivity):
+        self.reflectivity = reflectivity
+        self.transmissivity = transmissivity
         self._coating = _batoid.CPPSimpleCoating(
             reflectivity, transmissivity
         )
 
-    @property
-    def reflectivity(self):
-        """Reflection coefficient"""
-        return self._coating.reflectivity
-
-    @property
-    def transmissivity(self):
-        """Transmission coefficient"""
-        return self._coating.transmissivity
-
     def __eq__(self, rhs):
-        return (isinstance(rhs, SimpleCoating) and
-                self._coating == rhs._coating)
+        return (
+            isinstance(rhs, SimpleCoating)
+            and self.reflectivity == rhs.reflectivity
+            and self.transmissivity == rhs.transmissivity
+        )
 
-    def __ne__(self, rhs):
-        return not (self == rhs)
+    def __getstate__(self):
+        return self.reflectivity, self.transmissivity
+
+    def __setstate__(self, args):
+        self.__init__(*args)
 
     def __hash__(self):
-        return hash(("SimpleCoating", self._coating))
+        return hash(("SimpleCoating", self.reflectivity, self.transmissivity))
 
     def __repr__(self):
-        return "SimpleCoating({}, {})".format(
-            self.reflectivity, self.transmissivity
-        )
+        return f"SimpleCoating({self.reflectivity}, {self.transmissivity})"

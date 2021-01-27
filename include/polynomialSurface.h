@@ -1,45 +1,34 @@
 #ifndef batoid_PolynomialSurface_h
 #define batoid_PolynomialSurface_h
 
-#include <vector>
-#include <mutex>
 #include "surface.h"
-#include "ray.h"
-
-using Eigen::MatrixXd;
-using Eigen::VectorXd;
-using Eigen::Vector3d;
 
 namespace batoid {
 
     class PolynomialSurface : public Surface {
     public:
-        PolynomialSurface(MatrixXd coefs);
+        PolynomialSurface(
+            const double* coefs, const double* coefs_gradx, const double* coefs_grady,
+            size_t nx, size_t ny
+        );
+        ~PolynomialSurface();
+
+        virtual const Surface* getDevPtr() const override;
 
         virtual double sag(double, double) const override;
-        virtual Vector3d normal(double, double) const override;
-        virtual bool timeToIntersect(const Ray& r, double & t) const override;
-
-        MatrixXd getCoefs() const {return _coefs; }
-
-        PolynomialSurface getGradX() const;
-        PolynomialSurface getGradY() const;
+        virtual void normal(
+            double x, double y,
+            double& nx, double& ny, double& nz
+        ) const override;
 
     private:
-        const MatrixXd _coefs;
-        mutable MatrixXd _coefs_gradx;
-        mutable MatrixXd _coefs_grady;
-        mutable bool _grad_ready{false};
-        mutable std::mutex _mtx;
-
-        void computeGradCoefs() const;
+        const double* _coefs;
+        const double* _coefs_gradx;
+        const double* _coefs_grady;
+        const size_t _nx, _ny;
     };
 
-    namespace poly {
-        double horner2d(double x, double y, const MatrixXd&);
-        MatrixXd gradx(const MatrixXd& coefs);
-        MatrixXd grady(const MatrixXd& coefs);
-    }
+    double horner2d(double x, double y, const double* coefs, size_t nx, size_t ny);
 }
 
 #endif // batoid_PolynomialSurface_h
