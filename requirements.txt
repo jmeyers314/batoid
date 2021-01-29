@@ -1,6 +1,6 @@
 pyyaml
-numpy>=1.18
+numpy
 scipy
-pybind11
 galsim
+matplotlib
 

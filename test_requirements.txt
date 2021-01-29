@@ -1,10 +1,6 @@
-pytest>=4.4
+pytest
 pytest-timeout
 pytest-cov
-pytest-xdist>=1.19
+pytest-xdist
 jupyter
-jupyter_contrib_nbextensions
-notebook
-matplotlib
 ipyvolume
-LSSTDESC.Coord
