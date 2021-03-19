@@ -3,12 +3,12 @@ name: batoid CI
 on:
   push:
     branches:
-      - master
+      - main
       - releases/*
 
   pull_request:
     branches:
-      - master
+      - main
       - releases/*
   workflow_dispatch:
 
