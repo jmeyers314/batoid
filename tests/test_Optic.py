@@ -14,9 +14,6 @@ def test_optic():
         medium = batoid.ConstMedium(1.0)
     )
 
-    nrays = len(rays)
-    print("Tracing {} rays.".format(nrays))
-
     # Do one with full pathname
     import os
     filename = os.path.join(batoid.datadir, "HSC", "HSC.yaml")
@@ -56,8 +53,6 @@ def test_traceFull():
         theta_x=0.005, theta_y=0.005,
         wavelength=650e-9
     )
-
-    print("Tracing {} rays.".format(len(rays)))
 
     tf = telescope.traceFull(rays)
     rays = telescope.trace(rays)
@@ -160,12 +155,14 @@ def test_rotXYZ_parsing():
     import os
     import yaml
     fn = os.path.join(batoid.datadir, "DESI", "DESI.yaml")
-    config = yaml.safe_load(open(fn))
+    with open(fn) as f:
+        config = yaml.safe_load(f)
     # Verify that we can parse the DESI model, which has some rotated lens
     # surfaces.
     telescope = batoid.parse.parse_optic(config['opticalSystem'])
     # Verify that only a single rotation is allowed.
-    config = yaml.safe_load(open(fn))
+    with open(fn) as f:
+        config = yaml.safe_load(f)
     coordSys = config['opticalSystem']['items'][0]['coordSys']
     coordSys['rotX'] = 1.
     coordSys['rotY'] = 1.

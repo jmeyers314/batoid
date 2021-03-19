@@ -937,7 +937,7 @@ def test_fromStop():
         stopSurface=batoid.Interface(batoid.Plane()),
         medium=batoid.vacuum
     )
-    np.testing.assert_equal(rv, rv2)
+    assert rv == rv2
 
 
 def test_fromFieldAngles():
@@ -1012,7 +1012,7 @@ def test_fromFieldAngles():
         stopSurface=batoid.Interface(batoid.Plane()),
         medium=batoid.vacuum
     )
-    np.testing.assert_equal(rv, rv2)
+    assert rv == rv2
 
 
 if __name__ == '__main__':

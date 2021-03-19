@@ -19,6 +19,7 @@ def zernikePyramid(xs, ys, zs, figsize=(13, 8), vmin=-1, vmax=1, vdim=True,
         at j=4 defocus.
     """
 
+    import warnings
     import galsim
     jmax = zs.shape[0]+3
     nmax, _ = galsim.zernike.noll_to_zern(jmax)
@@ -74,7 +75,11 @@ def zernikePyramid(xs, ys, zs, figsize=(13, 8), vmin=-1, vmax=1, vdim=True,
     if title:
         fig.suptitle(title, x=0.1)
 
-    fig.tight_layout()
+    # Mistakenly raises MatplotlibDeprecationWarning.
+    # See https://github.com/matplotlib/matplotlib/issues/19486
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        fig.tight_layout()
     amt = 0.5*(axes[4].get_position().x0 - axes[5].get_position().x0)
     shiftAxes(shiftLeft, -amt)
     shiftAxes(shiftRight, amt)

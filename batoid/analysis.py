@@ -25,8 +25,11 @@ def dkdu(
         Field angle in radians
     wavelength : float
         Wavelength in meters
-    nx : int, optional
-        Size of ray grid to use.
+    nrad : int, optional
+        Number of ray radii to use.  (see RayVector.asPolar())
+    naz : int, optional
+        Approximate number of azimuthal angles in outermost ring.  (see
+        RayVector.asPolar())
     projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}
         Projection used to convert field angle to direction cosines.
 
@@ -131,14 +134,15 @@ def drdth(
     optic.trace(rays_x)
     optic.trace(rays_y)
 
-    mx = np.mean(rays.x[~rays.vignetted])
-    my = np.mean(rays.y[~rays.vignetted])
+    w = ~rays.vignetted
+    mx = np.mean(rays.x[w])
+    my = np.mean(rays.y[w])
 
     # meters / radian
-    drx_dthx = (np.mean(rays_x.x[~rays_x.vignetted]) - mx)/dth
-    drx_dthy = (np.mean(rays_y.x[~rays_y.vignetted]) - mx)/dth
-    dry_dthx = (np.mean(rays_x.y[~rays_x.vignetted]) - my)/dth
-    dry_dthy = (np.mean(rays_y.y[~rays_y.vignetted]) - my)/dth
+    drx_dthx = (np.mean(rays_x.x[w]) - mx)/dth
+    drx_dthy = (np.mean(rays_y.x[w]) - mx)/dth
+    dry_dthx = (np.mean(rays_x.y[w]) - my)/dth
+    dry_dthy = (np.mean(rays_y.y[w]) - my)/dth
 
     return np.array([[drx_dthx, drx_dthy], [dry_dthx, dry_dthy]])
 
@@ -397,15 +401,13 @@ def wavefront(
 
 def spot(
     optic, theta_x, theta_y, wavelength,
-    projection='postel', nx=32, reference='mean', sphereRadius=None
+    projection='postel', nx=32, reference='mean'
 ):
     dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
     rays = batoid.RayVector.asGrid(
         optic=optic, wavelength=wavelength,
         nx=nx, dirCos=dirCos
     )
-    if sphereRadius is None:
-        sphereRadius = optic.sphereRadius
     optic.trace(rays)
     if reference == 'mean':
         w = np.where(1-rays.vignetted)[0]
@@ -413,11 +415,9 @@ def spot(
     elif reference == 'chief':
         cridx = (nx//2)*nx+nx//2 if (nx%2)==0 else (nx*nx-1)//2
         point = rays[cridx].r
-    # Place vertex of reference sphere one radius length away from the
-    # intersection point.  So transform our rays into that coordinate system.
-    targetCoordSys = rays.coordSys.shiftLocal(
-        point+np.array([0,0,sphereRadius])
-    )
+    else:
+        point = [0,0,0]
+    targetCoordSys = rays.coordSys.shiftLocal(point)
     rays.toCoordSys(targetCoordSys)
 
     w = ~rays.vignetted
