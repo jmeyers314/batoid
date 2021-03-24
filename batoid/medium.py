@@ -171,7 +171,8 @@ class SellmeierMedium(Medium):
 
 
 class SumitaMedium(Medium):
-    r"""A `Medium` with Sumita dispersion formula.
+    r"""A `Medium` with Sumita dispersion formula, also known as the Schott
+    dispersion formula.
 
     The Sumita formula is
 

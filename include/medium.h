@@ -73,7 +73,7 @@ namespace batoid {
         const Medium* getDevPtr() const override;
 
     private:
-            const double _A0, _A1, _A2, _A3, _A4, _A5;
+        const double _A0, _A1, _A2, _A3, _A4, _A5;
     };
 
 
