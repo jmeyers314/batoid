@@ -91,7 +91,7 @@ jobs:
 
       - name: Install GalSim
         run: |
-          pip install -U galsim>=2.2.4
+          pip install -U galsim
 
       - name: Install remaining dependencies
         run: |
