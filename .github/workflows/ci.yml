@@ -90,13 +90,14 @@ jobs:
           pip install -U pybind11
           pip install -U pandas
           pip install -U "starlink-pyast>3.9.0,<=3.12"
+          pip install -U matplotlib
 
       - name: Install GalSim
         # Without --no-deps, GalSim tries and fails to install eigency.
         # I don't think it's actually required though, since eigen is either
         # apt-get'd or brew'd above.
         run: |
-          pip install -U --no-deps galsim
+          pip install --no-deps "galsim>=2.2.4"
 
       - name: Install remaining dependencies
         run: |
