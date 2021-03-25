@@ -91,6 +91,7 @@ jobs:
           pip install -U pandas
           pip install -U "starlink-pyast>3.9.0,<=3.12"
           pip install -U matplotlib
+          pip install -U scipy
 
       - name: Install GalSim
         # Without --no-deps, GalSim tries and fails to install eigency.
