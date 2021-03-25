@@ -106,7 +106,7 @@ namespace batoid {
                 }
                 _devPtr = ptr;
             }
-        return _devPtr;
+            return _devPtr;
         #else
             return this;
         #endif

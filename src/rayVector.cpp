@@ -24,7 +24,11 @@ namespace batoid {
         double* rptr = r.data;
         double* vptr = v.data;
         double* tptr = t.data;
-        #pragma omp target teams distribute parallel for map(from:out[:3*size])
+        #if defined(BATOID_GPU)
+            #pragma omp target teams distribute parallel for map(from:out[:3*size])
+        #else
+            #pragma omp parallel for
+        #endif
         for(int i=0; i<size; i++) {
             int j = i + size;
             int k = i + 2*size;
@@ -41,7 +45,11 @@ namespace batoid {
         double* rptr = r.data;
         double* vptr = v.data;
         double* tptr = t.data;
-        #pragma omp target teams distribute parallel for
+        #if defined(BATOID_GPU)
+            #pragma omp target teams distribute parallel for
+        #else
+            #pragma omp parallel for
+        #endif
         for(int i=0; i<size; i++) {
             int j = i + size;
             int k = i + 2*size;
@@ -67,7 +75,11 @@ namespace batoid {
         double* vzptr = v.data+2*size;
         double* tptr = t.data;
         double* wptr = wavelength.data;
-        #pragma omp target teams distribute parallel for map(from:out[:size])
+        #if defined(BATOID_GPU)
+            #pragma omp target teams distribute parallel for map(from:out[:size])
+        #else
+            #pragma omp parallel for
+        #endif
         for(int i=0; i<size; i++) {
             // phi = k.(r-r0) - (t-t0)omega
             // k = 2 pi v / lambda |v|^2
@@ -98,7 +110,11 @@ namespace batoid {
         double* tptr = t.data;
         double* wptr = wavelength.data;
         double* outptr = reinterpret_cast<double*>(out);
-        #pragma omp target teams distribute parallel for map(from:outptr[:2*size])
+        #if defined(BATOID_GPU)
+            #pragma omp target teams distribute parallel for map(from:outptr[:2*size])
+        #else
+            #pragma omp parallel for
+        #endif
         for(int i=0; i<size; i++) {
             double* yptr = xptr+size;
             double* zptr = xptr+2*size;

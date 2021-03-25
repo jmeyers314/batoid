@@ -2,7 +2,9 @@
 
 namespace batoid {
 
-    #pragma omp declare target
+    #if defined(BATOID_GPU)
+        #pragma omp declare target
+    #endif
 
     Surface::Surface() :
         _devPtr(nullptr)
@@ -37,6 +39,8 @@ namespace batoid {
         return (std::abs(sz-rPz) < 1e-12);
     }
 
-    #pragma omp end declare target
+    #if defined(BATOID_GPU)
+        #pragma omp end declare target
+    #endif
 
 }

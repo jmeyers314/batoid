@@ -149,15 +149,15 @@ namespace batoid {
         double* zptr = yptr + size;
         bool* vigptr = rv.vignetted.data;
 
-        const Obscuration* obscDevPtr = obsc.getDevPtr();
+        const Obscuration* obscPtr = obsc.getDevPtr();
 
         #if defined(BATOID_GPU)
-            #pragma omp target teams distribute parallel for is_device_ptr(obscDevPtr)
+            #pragma omp target teams distribute parallel for is_device_ptr(obscPtr)
         #else
             #pragma omp parallel for
         #endif
         for(int i=0; i<size; i++) {
-            vigptr[i] |= obscDevPtr->contains(xptr[i], yptr[i]);
+            vigptr[i] |= obscPtr->contains(xptr[i], yptr[i]);
         }
     }
 
@@ -190,16 +190,16 @@ namespace batoid {
         bool* vigptr = rv.vignetted.data;
         bool* failptr = rv.failed.data;
 
-        const Surface* surfaceDevPtr = surface.getDevPtr();
+        const Surface* surfacePtr = surface.getDevPtr();
         const double* drptr = dr.data();
         const double* drotptr = drot.data();
-        const Coating* coatingDevPtr = nullptr;
+        const Coating* coatingPtr = nullptr;
         if (coating)
-            coatingDevPtr = coating->getDevPtr();
+            coatingPtr = coating->getDevPtr();
 
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for \
-                is_device_ptr(surfaceDevPtr, coatingDevPtr) \
+                is_device_ptr(surfacePtr, coatingPtr) \
                 map(to:drptr[:3], drotptr[:9])
         #else
             #pragma omp parallel for
@@ -219,7 +219,7 @@ namespace batoid {
             // intersection
             if (!failptr[i]) {
                 double dt;
-                bool success = surfaceDevPtr->timeToIntersect(x, y, z, vx, vy, vz, dt);
+                bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt);
                 if (success) {
                     x += vx * dt;
                     y += vy * dt;
@@ -232,9 +232,9 @@ namespace batoid {
                     vyptr[i] = vy;
                     vzptr[i] = vz;
                     tptr[i] = t;
-                    if (coatingDevPtr) {
+                    if (coatingPtr) {
                         double nx, ny, nz;
-                        surfaceDevPtr->normal(x, y, nx, ny, nz);
+                        surfacePtr->normal(x, y, nx, ny, nz);
                         double n1 = vx*vx;
                         n1 += vy*vy;
                         n1 += vz*vz;
@@ -243,7 +243,7 @@ namespace batoid {
                         alpha += vy*ny;
                         alpha += vz*nz;
                         alpha *= n1;
-                        fluxptr[i] *= coatingDevPtr->getTransmit(wptr[i], alpha);
+                        fluxptr[i] *= coatingPtr->getTransmit(wptr[i], alpha);
                     }
                 } else {
                     failptr[i] = true;
@@ -282,16 +282,16 @@ namespace batoid {
         bool* vigptr = rv.vignetted.data;
         bool* failptr = rv.failed.data;
 
-        const Surface* surfaceDevPtr = surface.getDevPtr();
+        const Surface* surfacePtr = surface.getDevPtr();
         const double* drptr = dr.data();
         const double* drotptr = drot.data();
-        const Coating* coatingDevPtr = nullptr;
+        const Coating* coatingPtr = nullptr;
         if (coating)
-            coatingDevPtr = coating->getDevPtr();
+            coatingPtr = coating->getDevPtr();
 
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for \
-                is_device_ptr(surfaceDevPtr, coatingDevPtr) \
+                is_device_ptr(surfacePtr, coatingPtr) \
                 map(to:drptr[:3], drotptr[:9])
         #else
             #pragma omp parallel for
@@ -311,7 +311,7 @@ namespace batoid {
             if (!failptr[i]) {
                 // intersection
                 double dt;
-                bool success = surfaceDevPtr->timeToIntersect(x, y, z, vx, vy, vz, dt);
+                bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt);
                 if (success) {
                     // propagation
                     x += vx * dt;
@@ -320,7 +320,7 @@ namespace batoid {
                     t += dt;
                     // reflection
                     double nx, ny, nz;
-                    surfaceDevPtr->normal(x, y, nx, ny, nz);
+                    surfacePtr->normal(x, y, nx, ny, nz);
                     // alpha = v dot normVec
                     double alpha = vx*nx;
                     alpha += vy*ny;
@@ -337,15 +337,15 @@ namespace batoid {
                     vyptr[i] = vy;
                     vzptr[i] = vz;
                     tptr[i] = t;
-                    if (coatingDevPtr) {
+                    if (coatingPtr) {
                         double nx, ny, nz;
-                        surfaceDevPtr->normal(x, y, nx, ny, nz);
+                        surfacePtr->normal(x, y, nx, ny, nz);
                         double n1 = vx*vx;
                         n1 += vy*vy;
                         n1 += vz*vz;
                         n1 = 1/sqrt(n1);
                         alpha *= n1;
-                        fluxptr[i] *= coatingDevPtr->getReflect(wptr[i], alpha);
+                        fluxptr[i] *= coatingPtr->getReflect(wptr[i], alpha);
                     }
                 } else {
                     failptr[i] = true;
@@ -385,17 +385,17 @@ namespace batoid {
         bool* vigptr = rv.vignetted.data;
         bool* failptr = rv.failed.data;
 
-        const Surface* surfaceDevPtr = surface.getDevPtr();
+        const Surface* surfacePtr = surface.getDevPtr();
         const double* drptr = dr.data();
         const double* drotptr = drot.data();
-        const Medium* mDevPtr = m2.getDevPtr();
-        const Coating* coatingDevPtr = nullptr;
+        const Medium* mPtr = m2.getDevPtr();
+        const Coating* coatingPtr = nullptr;
         if (coating)
-            coatingDevPtr = coating->getDevPtr();
+            coatingPtr = coating->getDevPtr();
 
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for \
-                is_device_ptr(surfaceDevPtr, mDevPtr, coatingDevPtr) \
+                is_device_ptr(surfacePtr, mPtr, coatingPtr) \
                 map(to:drptr[:3], drotptr[:9])
         #else
             #pragma omp parallel for
@@ -415,7 +415,7 @@ namespace batoid {
             if (!failptr[i]) {
                 // intersection
                 double dt;
-                bool success = surfaceDevPtr->timeToIntersect(x, y, z, vx, vy, vz, dt);
+                bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt);
                 if (success) {
                     // propagation
                     x += vx * dt;
@@ -432,7 +432,7 @@ namespace batoid {
                     double nvy = vy*n1;
                     double nvz = vz*n1;
                     double nx, ny, nz;
-                    surfaceDevPtr->normal(x, y, nx, ny, nz);
+                    surfacePtr->normal(x, y, nx, ny, nz);
                     // alpha = v dot normVec
                     double alpha = nvx*nx;
                     alpha += nvy*ny;
@@ -443,7 +443,7 @@ namespace batoid {
                         nz *= -1;
                         alpha *= -1;
                     }
-                    double n2 = mDevPtr->getN(wptr[i]);
+                    double n2 = mPtr->getN(wptr[i]);
                     double eta = n1/n2;
                     double sinsqr = eta*eta*(1-alpha*alpha);
                     double nfactor = eta*alpha + sqrt(1-sinsqr);
@@ -458,8 +458,8 @@ namespace batoid {
                     yptr[i] = y;
                     zptr[i] = z;
                     tptr[i] = t;
-                    if (coatingDevPtr) {
-                        fluxptr[i] *= coatingDevPtr->getTransmit(wptr[i], alpha);
+                    if (coatingPtr) {
+                        fluxptr[i] *= coatingPtr->getTransmit(wptr[i], alpha);
                     }
                 } else {
                     failptr[i] = true;
@@ -518,15 +518,15 @@ namespace batoid {
         bool* vigptr2 = rvSplit.vignetted.data;
         bool* failptr2 = rvSplit.failed.data;
 
-        const Surface* surfaceDevPtr = surface.getDevPtr();
+        const Surface* surfacePtr = surface.getDevPtr();
         const double* drptr = dr.data();
         const double* drotptr = drot.data();
-        const Medium* mDevPtr = m2.getDevPtr();
-        const Coating* cDevPtr = coating.getDevPtr();
+        const Medium* mPtr = m2.getDevPtr();
+        const Coating* cPtr = coating.getDevPtr();
 
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for \
-                is_device_ptr(surfaceDevPtr, mDevPtr, cDevPtr) \
+                is_device_ptr(surfacePtr, mPtr, cPtr) \
                 map(to:drptr[:3], drotptr[:9])
         #else
             #pragma omp parallel for
@@ -546,7 +546,7 @@ namespace batoid {
             if (!failptr[i]) {
                 // intersection
                 double dt;
-                bool success = surfaceDevPtr->timeToIntersect(x, y, z, vx, vy, vz, dt);
+                bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt);
                 if (success) {
                     // propagation
                     x += vx * dt;
@@ -564,7 +564,7 @@ namespace batoid {
                     double nvy = vy*n1;
                     double nvz = vz*n1;
                     double nx, ny, nz;
-                    surfaceDevPtr->normal(x, y, nx, ny, nz);
+                    surfacePtr->normal(x, y, nx, ny, nz);
                     double alpha = nvx*nx;
                     alpha += nvy*ny;
                     alpha += nvz*nz;
@@ -577,7 +577,7 @@ namespace batoid {
 
                     // Flux coefficients
                     double reflect, transmit;
-                    cDevPtr->getCoefs(wptr[i], alpha, reflect, transmit);
+                    cPtr->getCoefs(wptr[i], alpha, reflect, transmit);
 
                     // Reflection
                     xptr2[i] = x;
@@ -593,7 +593,7 @@ namespace batoid {
                     failptr2[i] = failptr[i];
 
                     // refraction
-                    double n2 = mDevPtr->getN(wptr[i]);
+                    double n2 = mPtr->getN(wptr[i]);
                     double eta = n1/n2;
                     double sinsqr = eta*eta*(1-alpha*alpha);
                     double nfactor = eta*alpha + sqrt(1-sinsqr);

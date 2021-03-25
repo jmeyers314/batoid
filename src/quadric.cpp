@@ -2,7 +2,9 @@
 
 namespace batoid {
 
-    #pragma omp declare target
+    #if defined(BATOID_GPU)
+        #pragma omp declare target
+    #endif
 
     Quadric::Quadric(double R, double conic) :
         _R(R), _conic(conic),
@@ -74,7 +76,9 @@ namespace batoid {
         return 0.0;
     }
 
-    #pragma omp end declare target
+    #if defined(BATOID_GPU)
+        #pragma omp end declare target
+    #endif
 
 
     const Surface* Quadric::getDevPtr() const {
