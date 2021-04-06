@@ -396,7 +396,7 @@ def test_LSST_huygensPSF(plot=False):
 
 
 @timer
-def test_LSST_trace():
+def test_LSST_trace(verbose=False):
     # The g_500 file uses vacuum instead of air, which is important to match
     # Zemax for this test.
     telescope = batoid.Optic.fromYaml("LSST_g_500.yaml")
@@ -411,11 +411,6 @@ def test_LSST_trace():
         with open(filename, encoding='utf-16-le') as f:
             arr = np.genfromtxt(f, skip_header=22, max_rows=18, usecols=list(range(1, 12)))
 
-        dirCos = batoid.utils.fieldToDirCos(
-            np.deg2rad(Hx*1.75),
-            np.deg2rad(Hy*1.75),
-            projection='zemax'
-        )
         ray = batoid.RayVector.fromStop(
             Px*4.18, Py*4.18,
             optic=telescope,
@@ -433,14 +428,15 @@ def test_LSST_trace():
             # direction cosines.  The important bits to match are x and y, which
             # do match, including the signs.
 
-            # print(surface['name'])
-            # print('x', r.x, arr[iz][0]/1e3, r.x-arr[iz][0]/1e3)
-            # print('y', r.y, arr[iz][1]/1e3, r.y-arr[iz][1]/1e3)
-            # print('z', r.z, arr[iz][2]/1e3, r.z-arr[iz][2]/1e3)
-            # print('vx', r.vx*n, arr[iz][3], np.abs(r.vx*n) - np.abs(arr[iz][3]))
-            # print('vy', r.vy*n, arr[iz][4], np.abs(r.vy*n) - np.abs(arr[iz][4]))
-            # print('vz', r.vz*n, arr[iz][5], np.abs(r.vz*n) - np.abs(arr[iz][5]))
-            # print()
+            if verbose:
+                print(surface['name'])
+                print('x', r.x[0], arr[iz][0]/1e3, r.x-arr[iz][0]/1e3)
+                print('y', r.y[0], arr[iz][1]/1e3, r.y-arr[iz][1]/1e3)
+                print('z', r.z[0], arr[iz][2]/1e3, r.z+arr[iz][2]/1e3)
+                print('vx', r.vx[0]*n, arr[iz][3], np.abs(r.vx*n) - np.abs(arr[iz][3]))
+                print('vy', r.vy[0]*n, arr[iz][4], np.abs(r.vy*n) - np.abs(arr[iz][4]))
+                print('vz', r.vz[0]*n, arr[iz][5], np.abs(r.vz*n) - np.abs(arr[iz][5]))
+                print()
             np.testing.assert_allclose(r.x, arr[iz][0]/1e3, rtol=0, atol=1e-10)
             np.testing.assert_allclose(r.y, arr[iz][1]/1e3, rtol=0, atol=1e-10)
             np.testing.assert_allclose(
@@ -450,6 +446,62 @@ def test_LSST_trace():
             np.testing.assert_allclose(np.abs(r.vx*n), np.abs(arr[iz][3]), rtol=0, atol=1e-10)
             np.testing.assert_allclose(np.abs(r.vy*n), np.abs(arr[iz][4]), rtol=0, atol=1e-10)
             np.testing.assert_allclose(np.abs(r.vz*n), np.abs(arr[iz][5]), rtol=0, atol=1e-10)
+
+
+@timer
+def test_DECam_trace(verbose=False):
+    telescope = batoid.Optic.fromYaml("DECam.yaml")
+    for fn in ["DECam_raytrace_0.txt", "DECam_raytrace_1.txt", "DECam_raytrace_2.txt"]:
+        filename = os.path.join(directory, "testdata", fn)
+
+        # Get normalized coordinates
+        with open(filename, encoding='utf-16-le') as f:
+            Hx, Hy, Px, Py = np.genfromtxt(f, skip_header=13, max_rows=4, usecols=(6,))
+
+        with open(filename, encoding='utf-16-le') as f:
+            arr = np.genfromtxt(f, skip_header=22, max_rows=40, usecols=list(range(1, 12)))
+
+        ray = batoid.RayVector.fromStop(
+            Px*2.005, Py*2.005,
+            optic=telescope,
+            stopSurface=telescope['PM'],
+            wavelength=700e-9,
+            theta_x=np.deg2rad(Hx*1.1), theta_y=np.deg2rad(Hy*1.1),
+            projection='zemax'
+        )
+        tf = telescope.traceFull(ray)
+
+        zSurfaces = [
+            2, 3, 5, 7, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 28,
+            29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40
+        ]
+
+        for surface, iiz in zip(tf.values(), zSurfaces):
+            iz = iiz-1
+            r = surface['out'].toCoordSys(batoid.globalCoordSys)
+            n = 1./np.sqrt(np.sum(r.v**2))
+
+            # Note Zemax has different sign convention for z-coordinates and
+            # direction cosines.  The important bits to match are x and y, which
+            # do match, including the signs.
+            if verbose:
+                print(surface['name'])
+                print('x', r.x[0], arr[iz][0]/1e3, r.x-arr[iz][0]/1e3)
+                print('y', r.y[0], arr[iz][1]/1e3, r.y-arr[iz][1]/1e3)
+                print('z', r.z[0], -arr[iz][2]/1e3, r.z+arr[iz][2]/1e3)
+                print('vx', r.vx[0]*n, arr[iz][3], np.abs(r.vx*n) - np.abs(arr[iz][3]))
+                print('vy', r.vy[0]*n, arr[iz][4], np.abs(r.vy*n) - np.abs(arr[iz][4]))
+                print('vz', r.vz[0]*n, arr[iz][5], np.abs(r.vz*n) - np.abs(arr[iz][5]))
+                print()
+            np.testing.assert_allclose(r.x, arr[iz][0]/1e3, rtol=0, atol=1e-9)
+            np.testing.assert_allclose(r.y, arr[iz][1]/1e3, rtol=0, atol=1e-9)
+            np.testing.assert_allclose(
+                np.abs(r.z), np.abs(arr[iz][2]/1e3),
+                rtol=0, atol=1e-9
+            )
+            np.testing.assert_allclose(np.abs(r.vx*n), np.abs(arr[iz][3]), rtol=0, atol=1e-9)
+            np.testing.assert_allclose(np.abs(r.vy*n), np.abs(arr[iz][4]), rtol=0, atol=1e-9)
+            np.testing.assert_allclose(np.abs(r.vz*n), np.abs(arr[iz][5]), rtol=0, atol=1e-9)
 
 
 if __name__ == '__main__':
@@ -468,4 +520,5 @@ if __name__ == '__main__':
     test_LSST_wf(args.plotWF)
     test_LSST_fftPSF(args.plotFFT)
     test_LSST_huygensPSF(args.plotHuygens)
-    test_LSST_trace()
+    test_LSST_trace(verbose=False)
+    test_DECam_trace(verbose=False)
