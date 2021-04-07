@@ -504,6 +504,19 @@ def test_DECam_trace(verbose=False):
             np.testing.assert_allclose(np.abs(r.vz*n), np.abs(arr[iz][5]), rtol=0, atol=1e-9)
 
 
+def test_DECam_exit_pupil_pos():
+    telescope = batoid.Optic.fromYaml("DECam.yaml")
+    # From the Optics Prescription report, the exit pupil is
+    # -4275.016 mm behind the focal plane.  This is with the stop surface set to
+    # the primary mirror though, so make sure to adjust that.
+    telescope.stopSurface = telescope['PM']
+    np.testing.assert_allclose(
+        batoid.exitPupilPos(telescope, wavelength=700e-9),
+        (0, 0, telescope['D'].coordSys.origin[2]+4275.016/1e3),
+        rtol=0, atol=1e-3
+    )
+
+
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
@@ -522,3 +535,4 @@ if __name__ == '__main__':
     test_LSST_huygensPSF(args.plotHuygens)
     test_LSST_trace(verbose=False)
     test_DECam_trace(verbose=False)
+    test_DECam_exit_pupil_pos()

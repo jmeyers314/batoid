@@ -783,3 +783,74 @@ def doubleZernike(
     )
     dzs = np.dot(basis, coefs*w[:,None])/np.pi
     return dzs
+
+
+def _closestApproach(P, u, Q, v):
+    """Compute position along line P + u t of closest approach to line Q + v t
+
+    Parameters
+    ----------
+    P, Q : ndarray
+        Points on lines
+    u, v : ndarray
+        Direction cosines of lines
+
+    Returns
+    -------
+    Pc : ndarray
+        Closest approach point.
+    """
+    # Follows http://geomalgorithms.com/a07-_distance.html
+    a = np.dot(u, u)
+    b = np.dot(u, v)
+    c = np.dot(v, v)
+    w0 = P - Q
+    d = np.dot(u, w0)
+    e = np.dot(v, w0)
+    den = a*c - b*b
+    if den == 0:
+        raise ValueError("Lines are parallel")
+    sc = (b*e - c*d)/den
+    return P + sc*u
+
+
+def exitPupilPos(optic, wavelength, smallAngle=np.deg2rad(1./3600)):
+    """Compute position of the exit pupil.
+
+    Traces a collection of small angle chief rays into object space, and then
+    finds the mean of their closest approaches to the optic axis.  Possibly only
+    accurate for axially symmetric optical systems.
+
+    Parameters
+    ----------
+    optic : batoid.Optic
+        Optical system
+    wavelength : float
+        Wavelength in meters
+    smallAngle : float, optional
+        Angle in radians from which to search for the exit pupil position.
+
+    Returns
+    -------
+    Location of exit pupil in global coordinates.
+    """
+    thx = np.array([0, 0, smallAngle, -smallAngle])
+    thy = np.array([smallAngle, -smallAngle, 0, 0])
+    rays = batoid.RayVector.fromFieldAngles(
+        thx, thy,
+        optic=optic,
+        wavelength=wavelength
+    )
+    optic.trace(rays)
+    rays.toCoordSys(batoid.globalCoordSys)
+    # Assume last intersection places rays into "object" space.
+    # Now find closest approach to optic axis.
+    ps = []
+    for ray in rays:
+        ps.append(_closestApproach(
+            rays.r[0],
+            rays.v[0],
+            np.array([0., 0., 0.]),
+            np.array([0., 0., 1.0])
+        ))
+    return np.mean(ps, axis=0)
