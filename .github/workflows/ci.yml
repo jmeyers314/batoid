@@ -117,6 +117,7 @@ jobs:
         run: |
           pwd -P
           ls -la
+          env
           coverage combine || true  # (Not necessary I think, but just in case.)
           coverage report
           ls -la
