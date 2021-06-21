@@ -696,6 +696,66 @@ def zernikeGQ(
     return np.dot(basis, (t0-rays.t)/wavelength*rays.flux)/area
 
 
+def _dZernikeBasis(jmax, x, y, R_outer=1.0, R_inner=0.0):
+    import galsim
+    xout = np.zeros(tuple((jmax+1,)+x.shape), dtype=float)
+    yout = np.zeros_like(xout)
+    for j in range(2, 1+jmax):
+        xout[j,:] = galsim.zernike.Zernike(
+            [0]*j+[1], R_outer=R_outer, R_inner=R_inner
+        ).gradX(x, y)
+        yout[j,:] = galsim.zernike.Zernike(
+            [0]*j+[1], R_outer=R_outer, R_inner=R_inner
+        ).gradY(x, y)
+    return np.array([xout, yout])
+
+
+def zernikeTransverseAberration(
+    optic, theta_x, theta_y, wavelength,
+    projection='postel', nrad=10, naz=60,
+    reference='mean', jmax=22, eps=0.0
+):
+    import galsim
+
+    dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
+    rays = batoid.RayVector.asPolar(
+        optic=optic,
+        wavelength=wavelength,
+        dirCos=dirCos,
+        nrad=nrad, naz=naz
+    )
+    # Propagate to entrance pupil to get positions
+    epRays = rays.copy().toCoordSys(optic.stopSurface.coordSys)
+    optic.stopSurface.surface.intersect(epRays)
+    u = np.array(epRays.x)
+    v = np.array(epRays.y)
+
+    rays = optic.trace(rays)
+    w = ~rays.vignetted
+    if reference == 'mean':
+        point = np.mean(rays.r[w], axis=0)
+    elif reference == 'chief':
+        chief = batoid.RayVector.fromStop(
+            0, 0, optic, wavelength=wavelength,
+            theta_x=theta_x, theta_y=theta_y
+        )
+        optic.trace(chief)
+        point = chief.r[0]
+    x = rays.x - point[0]
+    y = rays.y - point[1]
+
+    factor = -wavelength * drdth(
+        optic, theta_x, theta_y, wavelength, projection=projection
+    )
+    factor = -7.8e-6*np.eye(2)  # for testing
+
+    dzb = _dZernikeBasis(jmax, u[w], v[w], optic.pupilSize/2, eps*optic.pupilSize/2)
+    a = np.hstack((dzb.T@factor).T).T
+    b = np.hstack([x[w], y[w]])
+    r, _, _, _ = np.linalg.lstsq(a, b, rcond=None)
+    return r
+
+
 def doubleZernike(
     optic, field, wavelength, rings=6, spokes=None, kmax=22,
     **kwargs
