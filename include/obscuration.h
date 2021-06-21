@@ -83,6 +83,10 @@ namespace batoid {
 
         bool contains(double x, double y) const override;
 
+        void containsGrid(
+            const double* xgrid, const double* ygrid, bool* out, const size_t nx, const size_t ny
+        ) const;
+
         const Obscuration* getDevPtr() const override;
 
     private:

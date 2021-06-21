@@ -43,7 +43,25 @@ namespace batoid {
                         size
                     );
                 }
-            ));
+            ))
+            .def(
+                "containsGrid",
+                [](
+                    const ObscPolygon& op,
+                    size_t x_ptr,
+                    size_t y_ptr,
+                    size_t out_ptr,
+                    size_t nx,
+                    size_t ny
+                ){
+                    op.containsGrid(
+                        reinterpret_cast<const double*>(x_ptr),
+                        reinterpret_cast<const double*>(y_ptr),
+                        reinterpret_cast<bool*>(out_ptr),
+                        nx, ny
+                    );
+                }
+            );
 
 
         py::class_<ObscNegation, std::shared_ptr<ObscNegation>, Obscuration>(m, "CPPObscNegation")

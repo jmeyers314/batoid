@@ -1,4 +1,3 @@
-from batoid.obscuration import ObscPolygon
 import batoid
 import numpy as np
 from test_helpers import timer, do_pickle, all_obj_diff
@@ -169,8 +168,7 @@ def test_ObscRay():
 @timer
 def test_ObscPolygon():
     rng = np.random.default_rng(57721)
-    # size = 10_000
-    size = 10
+    size = 10_000
 
     # Test equivalency with ObscRectangle
     for i in range(100):
@@ -221,6 +219,15 @@ def test_ObscPolygon():
     np.testing.assert_array_equal(
         o1.contains(x, y),
         o2.contains(x, y)
+    )
+
+    # Check containsGrid
+    x = np.linspace(-10.0, 10.0, 25)
+    y = np.linspace(-10.0, 10.0, 25)
+    xx, yy = np.meshgrid(x, y)
+    np.testing.assert_array_equal(
+        o2.contains(xx, yy),
+        o2.containsGrid(x, y)
     )
 
 

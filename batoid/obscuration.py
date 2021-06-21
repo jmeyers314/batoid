@@ -289,6 +289,15 @@ class ObscPolygon(Obscuration):
     def __repr__(self):
         return f"ObscPolygon({self.xs!r}, {self.ys!r})"
 
+    def containsGrid(self, xgrid, ygrid):
+        nx = len(xgrid)
+        ny = len(ygrid)
+        out = np.empty((ny, nx), dtype=bool)
+        self._obsc.containsGrid(
+            xgrid.ctypes.data, ygrid.ctypes.data, out.ctypes.data, nx, ny
+        )
+        return out
+
 
 class ObscNegation(Obscuration):
     """A negated obscuration.

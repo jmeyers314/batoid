@@ -2,6 +2,7 @@
 #include <new>
 #include <cmath>
 #include <algorithm>
+#include <vector>
 
 
 namespace batoid {
@@ -186,12 +187,12 @@ namespace batoid {
         }
 
         bool ObscPolygon::contains(double x, double y) const {
-            double x1 = _xp[0];
+            double x1 = _xp[0];  // first point of segment
             double y1 = _yp[0];
             double xinters = 0.0;
             bool inside = false;
-            for (int i=1; i<=_size; i++) {
-                double x2 = _xp[i % _size];
+            for (int i=1; i<=_size; i++) {  // Loop over polygon edges
+                double x2 = _xp[i % _size];  // second point of segment
                 double y2 = _yp[i % _size];
                 if (y > std::min(y1,y2)) {
                     if (y <= std::max(y1,y2)) {
@@ -214,6 +215,64 @@ namespace batoid {
     #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
+
+
+    // CPU only for now.
+    void ObscPolygon::containsGrid(
+        const double* xgrid, const double* ygrid, bool* out, const size_t nx, const size_t ny
+    ) const {
+        // xgrid is [nx], ygrid is [ny]
+        // out is [ny, nx]
+
+        // Compute polygon y min/max
+        double ymin = _yp[0];
+        double ymax = _yp[0];
+        for (int k=1; k<_size; k++) {
+            if (_yp[k] < ymin)
+                ymin = _yp[k];
+            if (_yp[k] > ymax)
+                ymax = _yp[k];
+        }
+
+        // Proceed row by row
+        std::vector<double> xinters;
+        xinters.reserve(16);  // 2 is probably most common, but it's cheap to allocate 16
+        for (int j=0; j<ny; j++) {
+            double y = ygrid[j];
+            if ((y < ymin) or (y > ymax)) {
+                for (int i=0; i<nx; i++) {
+                    out[j*nx+i] = false;
+                }
+                continue;
+            }
+            xinters.clear();
+            // Loop through edges to find all relevant x intercepts
+            double x1 = _xp[0];  // first point of segment
+            double y1 = _yp[0];
+            for (int k=0; k<_size; k++) {
+                double x2 = _xp[k % _size];  // second point of segment
+                double y2 = _yp[k % _size];
+                if ((y > std::min(y1, y2)) && (y <= std::max(y1, y2)))
+                    xinters.push_back((y-y1)*(x2-x1)/(y2-y1)+x1);
+                x1 = x2;
+                y1 = y2;
+            }
+            std::sort(xinters.begin(), xinters.end());
+            // All points to the left of first intercept are outside the polygon
+            // Alternate after that.
+            bool contained = false;
+            auto xptr = xinters.begin();
+            for (int i=0; i<nx; i++) {
+                if (xptr != xinters.end()) {
+                    if (xgrid[i] > *xptr) {
+                        contained = !contained;
+                        xptr++;
+                    }
+                }
+                out[j*ny+i] = contained;
+            }
+        }
+    }
 
     const Obscuration* ObscPolygon::getDevPtr() const {
         #if defined(BATOID_GPU)
