@@ -245,8 +245,9 @@ def test_sphere():
         conic = 0.0
         quad = batoid.Quadric(R, conic)
         sphere = batoid.Sphere(R)
-        x = rng.uniform(-0.7*R, 0.7*R, size=size)
-        y = rng.uniform(-0.7*R, 0.7*R, size=size)
+        lim = 0.7*abs(R)
+        x = rng.uniform(-lim, lim, size=size)
+        y = rng.uniform(-lim, lim, size=size)
         np.testing.assert_allclose(
             quad.sag(x,y), sphere.sag(x, y),
             rtol=0, atol=1e-11
@@ -266,8 +267,9 @@ def test_paraboloid():
         conic = -1.0
         quad = batoid.Quadric(R, conic)
         para = batoid.Paraboloid(R)
-        x = rng.uniform(-0.7*R, 0.7*R, size=size)
-        y = rng.uniform(-0.7*R, 0.7*R, size=size)
+        lim = 0.7*abs(R)
+        x = rng.uniform(-lim, lim, size=size)
+        y = rng.uniform(-lim, lim, size=size)
         np.testing.assert_allclose(
             quad.sag(x,y), para.sag(x, y),
             rtol=0, atol=1e-11
