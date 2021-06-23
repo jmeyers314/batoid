@@ -715,8 +715,6 @@ def zernikeTransverseAberration(
     projection='postel', nrad=10, naz=60,
     reference='mean', jmax=22, eps=0.0
 ):
-    import galsim
-
     dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
     rays = batoid.RayVector.asPolar(
         optic=optic,
@@ -744,16 +742,19 @@ def zernikeTransverseAberration(
     x = rays.x - point[0]
     y = rays.y - point[1]
 
-    factor = -wavelength * drdth(
+    # We may wish to revisit defining/using the focal length this way in the
+    # future.
+    focalLength = np.sqrt(np.linalg.det(drdth(
         optic, theta_x, theta_y, wavelength, projection=projection
-    )
-    factor = -7.8e-6*np.eye(2)  # for testing
+    )))
 
-    dzb = _dZernikeBasis(jmax, u[w], v[w], optic.pupilSize/2, eps*optic.pupilSize/2)
-    a = np.hstack((dzb.T@factor).T).T
+    dzb = _dZernikeBasis(
+        jmax, u[w], v[w], optic.pupilSize/2, eps*optic.pupilSize/2
+    )
+    a = np.hstack(dzb).T
     b = np.hstack([x[w], y[w]])
     r, _, _, _ = np.linalg.lstsq(a, b, rcond=None)
-    return r
+    return -r/focalLength/wavelength
 
 
 def doubleZernike(
