@@ -162,6 +162,36 @@ class Plane(Surface):
             return "Plane()"
 
 
+class Tilted(Surface):
+    """Tilted planar surface.  The surface sag follows the equation:
+
+    .. math::
+
+        z(x, y) = x \\tan(\\theta_x) + y \\tan(\\theta_y)
+    """
+    def __init__(self, tanx, tany):
+        self.tanx = tanx
+        self.tany = tany
+        self._surface = _batoid.CPPTilted(tanx, tany)
+
+    def __hash__(self):
+        return hash(("batoid.Tilted", self.tanx, self.tany))
+
+    def __setstate__(self, tup):
+        tanx, tany = tup
+        self.__init__(tanx, tany)
+
+    def __getstate__(self):
+        return (self.tanx, self.tany)
+
+    def __eq__(self, rhs):
+        if not isinstance(rhs, Tilted): return False
+        return self.tanx == rhs.tanx and self.tany == rhs.tany
+
+    def __repr__(self):
+            return f"Tilted({self.tanx}, {self.tany})"
+
+
 class Paraboloid(Surface):
     """Surface of revolution with parabolic cross-section, and where the axis
     of revolution is along the axis of the parabola.  The surface sag follows

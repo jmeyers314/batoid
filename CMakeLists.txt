@@ -40,6 +40,7 @@ set(SRC_FILES
   src/sphere.cpp
   src/sum.cpp
   src/surface.cpp
+  src/tilted.cpp
 )
 
 set(PYSRC_FILES
@@ -57,6 +58,7 @@ set(PYSRC_FILES
   pysrc/sphere.cpp
   pysrc/sum.cpp
   pysrc/surface.cpp
+  pysrc/tilted.cpp
 )
 
 include(CheckCXXCompilerFlag)
