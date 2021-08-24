@@ -10,6 +10,8 @@ namespace py = pybind11;
 namespace batoid {
     void pyExportRayVector(py::module&);
 
+    void pyExportTable(py::module&);
+
     void pyExportSurface(py::module&);
     void pyExportQuadric(py::module&);
     void pyExportAsphere(py::module&);
@@ -27,6 +29,8 @@ namespace batoid {
 
     PYBIND11_MODULE(_batoid, m) {
         pyExportRayVector(m);
+
+        pyExportTable(m);
 
         pyExportSurface(m);
         pyExportQuadric(m);

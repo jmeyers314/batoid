@@ -488,7 +488,7 @@ class Bicubic(Surface):
         self._dzdys = np.array(dzdys, dtype=float, order="C")
         self._d2zdxdys = np.array(d2zdxdys, dtype=float, order="C")
 
-        self._surface = _batoid.CPPBicubic(
+        self._table = _batoid.CPPTable(
             self._x0, self._y0, self._dx, self._dy,
             self._zs.ctypes.data,
             self._dzdxs.ctypes.data,
@@ -497,6 +497,7 @@ class Bicubic(Surface):
             len(self._xs),
             len(self._ys)
         )
+        self._surface = _batoid.CPPBicubic(self._table)
 
     @property
     def xs(self):
@@ -538,7 +539,7 @@ class Bicubic(Surface):
         self._dx = (self._xs[-1] - self._xs[0])/(len(self._xs)-1)
         self._dy = (self._ys[-1] - self._ys[0])/(len(self._ys)-1)
 
-        self._surface = _batoid.CPPBicubic(
+        self._table = _batoid.CPPTable(
             self._x0, self._y0, self._dx, self._dy,
             self._zs.ctypes.data,
             self._dzdxs.ctypes.data,
@@ -547,6 +548,7 @@ class Bicubic(Surface):
             len(self._xs),
             len(self._ys)
         )
+        self._surface = _batoid.CPPBicubic(self._table)
 
     def __getstate__(self):
         return (
