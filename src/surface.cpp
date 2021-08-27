@@ -39,6 +39,21 @@ namespace batoid {
         return (std::abs(sz-rPz) < 1e-12);
     }
 
+    void Surface::grad(
+        double x, double y,
+        double& dzdx, double& dzdy
+    ) const {
+        double nx, ny, nz;
+        normal(x, y, nx, ny, nz);
+        if (std::isnan(nx)) {
+            dzdx = NAN;
+            dzdy = NAN;
+            return;
+        }
+        dzdx = -nx/nz;
+        dzdy = -ny/nz;
+    }
+
     #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif

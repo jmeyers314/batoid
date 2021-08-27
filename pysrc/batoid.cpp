@@ -54,6 +54,7 @@ namespace batoid {
         m.def("intersect", &intersect);
         m.def("reflect", &reflect);
         m.def("refract", &refract);
+        m.def("refractScreen", &refractScreen);
         m.def("obscure", &obscure);
         m.def("rSplit", &rSplit);
         m.def(

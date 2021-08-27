@@ -33,6 +33,10 @@ namespace batoid {
         const Coating& coating,
         RayVector& rv, RayVector& rvSplit
     );
+    void refractScreen(
+        const Surface& surface, const vec3 dr, const mat3 drot,
+        const Surface& screen, RayVector& rv
+    );
 
     void applyForwardTransformArrays(
         const vec3 dr, const mat3 drot,

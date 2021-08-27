@@ -85,7 +85,7 @@ def do_pickle(obj, reprable=True):
             CoordSys, CoordTransform,
             SimpleCoating,
             Optic, CompoundOptic, Baffle, Mirror, Lens, RefractiveInterface,
-            Detector,
+            OPDScreen, Detector,
             Lattice
         )
         # While eval(repr(obj)) == obj is the python repr gold standard, it can

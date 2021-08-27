@@ -469,6 +469,7 @@ namespace batoid {
         }
     }
 
+
     void rSplit(
         const Surface& surface,
         const vec3 dr, const mat3 drot,
@@ -613,6 +614,193 @@ namespace batoid {
                     failptr[i] = true;
                     vigptr2[i] = true;
                     failptr2[i] = true;
+                }
+            }
+        }
+    }
+
+
+    void refractScreen(
+        const Surface& surface,
+        const vec3 dr, const mat3 drot,
+        const Surface& screen,
+        RayVector& rv
+    ) {
+        rv.r.syncToDevice();
+        rv.v.syncToDevice();
+        rv.t.syncToDevice();
+        rv.vignetted.syncToDevice();
+        rv.failed.syncToDevice();
+        rv.wavelength.syncToDevice();
+        size_t size = rv.size;
+        double* xptr = rv.r.data;
+        double* yptr = xptr + size;
+        double* zptr = yptr + size;
+        double* vxptr = rv.v.data;
+        double* vyptr = vxptr + size;
+        double* vzptr = vyptr + size;
+        double* tptr = rv.t.data;
+        double* wptr = rv.wavelength.data;
+        double* fluxptr = rv.flux.data;
+        bool* vigptr = rv.vignetted.data;
+        bool* failptr = rv.failed.data;
+
+        const Surface* surfacePtr = surface.getDevPtr();
+        const Surface* screenPtr = screen.getDevPtr();
+        const double* drptr = dr.data();
+        const double* drotptr = drot.data();
+
+        #if defined(BATOID_GPU)
+            #pragma omp target teams distribute parallel for \
+                is_device_ptr(surfacePtr, screenPtr) \
+                map(to:drptr[:3], drotptr[:9])
+        #else
+            #pragma omp parallel for
+        #endif
+        for(int i=0; i<size; i++) {
+            // Coordinate transformation
+            double dx = xptr[i]-drptr[0];
+            double dy = yptr[i]-drptr[1];
+            double dz = zptr[i]-drptr[2];
+            double x = dx*drotptr[0] + dy*drotptr[3] + dz*drotptr[6];
+            double y = dx*drotptr[1] + dy*drotptr[4] + dz*drotptr[7];
+            double z = dx*drotptr[2] + dy*drotptr[5] + dz*drotptr[8];
+            double vx = vxptr[i]*drotptr[0] + vyptr[i]*drotptr[3] + vzptr[i]*drotptr[6];
+            double vy = vxptr[i]*drotptr[1] + vyptr[i]*drotptr[4] + vzptr[i]*drotptr[7];
+            double vz = vxptr[i]*drotptr[2] + vyptr[i]*drotptr[5] + vzptr[i]*drotptr[8];
+            double t = tptr[i];
+            if (!failptr[i]) {
+                // intersection
+                double dt;
+                bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt);
+                if (success) {
+                    // propagation
+                    x += vx * dt;
+                    y += vy * dt;
+                    z += vz * dt;
+                    t += dt;
+                    // screen refraction
+
+                    // double oldvx = vx;
+                    // double oldvy = vy;
+                    // double oldvz = vz;
+
+                    // // Plane surface version
+                    // // For the moment, assume that surface is a batoid.Plane.
+                    // double dPdx, dPdy;
+                    // screenPtr->grad(x, y, dPdx, dPdy);
+                    // double norm = std::sqrt(vx*vx + vy*vy + vz*vz);
+                    // double cosx = vx/norm + dPdx;
+                    // double cosy = vy/norm + dPdy;
+                    // double cosz = std::sqrt(1 - cosx*cosx - cosy*cosy);
+                    // printf("\n\n\n");
+                    // printf("vx = %.18f\n", vx);
+                    // printf("vy = %.18f\n", vy);
+                    // printf("vz = %.18f\n", vz);
+                    // printf("norm = %.18f\n", norm);
+                    // printf("dPdx = %.18f\n", dPdx);
+                    // printf("dPdy = %.18f\n", dPdy);
+                    // printf("cosx = %.18f\n", cosx);
+                    // printf("cosy = %.18f\n", cosy);
+                    // printf("cosz = %.18f\n", cosz);
+                    // t += screenPtr->sag(x, y);
+                    // if (vz < 0) {
+                    //     vx = -cosx*norm;
+                    //     vy = -cosy*norm;
+                    //     vz = -cosz*norm;
+                    // } else {
+                    //     vx = cosx*norm;
+                    //     vy = cosy*norm;
+                    //     vz = cosz*norm;
+                    // }
+                    // printf("vx = %.18f\n", vx);
+                    // printf("vy = %.18f\n", vy);
+                    // printf("vz = %.18f\n", vz);
+                    // printf("\n");
+
+                    // vx = oldvx;
+                    // vy = oldvy;
+                    // vz = oldvz;
+                    // Arbitrary surface version
+                    // Make an orthogonal unit-vector basis:
+                    //   e3 is the surface normal
+                    double e3x, e3y, e3z;
+                    surfacePtr->normal(x, y, e3x, e3y, e3z);
+                    // printf("e3x = %.18f\n", e3x);
+                    // printf("e3y = %.18f\n", e3y);
+                    // printf("e3z = %.18f\n", e3z);
+
+                    //   e1 parallel to y x n
+                    double e1norm = std::sqrt(e3z*e3z + e3x*e3x);
+                    double e1x = e3z/e1norm;
+                    double e1y = 0;
+                    double e1z = -e3x/e1norm;
+                    // printf("e1x = %.18f\n", e1x);
+                    // printf("e1y = %.18f\n", e1y);
+                    // printf("e1z = %.18f\n", e1z);
+                    //   e2 = e3 x e1
+                    double e2x = e3x*e1y - e3y*e1x;
+                    double e2y = e3z*e1x - e3x*e1z;
+                    double e2z = e3x*e1y - e3y*e1x;
+                    // printf("e2x = %.18f\n", e2x);
+                    // printf("e2y = %.18f\n", e2y);
+                    // printf("e2z = %.18f\n", e2z);
+
+                    // Projections of v onto e1, e2.
+                    double norm = std::sqrt(vx*vx + vy*vy + vz*vz);
+                    double norm_inv = 1/norm;
+                    double cos1 = vx*norm_inv*e1x + vy*norm_inv*e1y + vz*norm_inv*e1z;
+                    double cos2 = vx*norm_inv*e2x + vy*norm_inv*e2y + vz*norm_inv*e2z;
+                    double cos3 = vx*norm_inv*e3x + vy*norm_inv*e3y + vz*norm_inv*e3z;
+                    // printf("cos1 = %.18f\n", cos1);
+                    // printf("cos2 = %.18f\n", cos2);
+                    // printf("cos3 = %.18f\n", cos3);
+
+                    // Add screen gradient along e1, e2 to direction cosines
+                    double dPdx, dPdy;
+                    screenPtr->grad(x, y, dPdx, dPdy);
+                    double dPd1 = dPdx*e1x + dPdy*e1y;
+                    double dPd2 = dPdx*e2x + dPdy*e2y;
+                    // printf("dPd1 = %.18f\n", dPd1);
+                    // printf("dPd2 = %.18f\n", dPd2);
+                    cos1 += dPd1;
+                    cos2 += dPd2;
+
+                    // Normalize
+                    if (cos3 < 0) {
+                        cos1 *= -norm;
+                        cos2 *= -norm;
+                        cos3 = -norm*std::sqrt(1 - cos1*cos1 - cos2*cos2);
+                    } else {
+                        cos1 *= norm;
+                        cos2 *= norm;
+                        cos3 = norm*std::sqrt(1 - cos1*cos1 - cos2*cos2);
+                    }
+                    // printf("cos1 = %.18f\n", cos1);
+                    // printf("cos2 = %.18f\n", cos2);
+                    // printf("cos3 = %.18f\n", cos3);
+
+                    // Rotate back to xyz.
+                    vx = cos1*e1x + cos2*e2x + cos3*e3x;
+                    vy = cos1*e1y + cos2*e2y + cos3*e3y;
+                    vz = cos1*e1z + cos2*e2z + cos3*e3z;
+                    // printf("vx = %.18f\n", vx);
+                    // printf("vy = %.18f\n", vy);
+                    // printf("vz = %.18f\n", vz);
+                    // printf("\n");
+                    t += screenPtr->sag(x, y);
+
+                    // output
+                    vxptr[i] = vx;
+                    vyptr[i] = vy;
+                    vzptr[i] = vz;
+                    xptr[i] = x;
+                    yptr[i] = y;
+                    zptr[i] = z;
+                    tptr[i] = t;
+                } else {
+                    failptr[i] = true;
+                    vigptr[i] = true;
                 }
             }
         }

@@ -4,7 +4,7 @@ import numpy as np
 
 from . import _batoid
 from .constants import globalCoordSys
-from .trace import intersect, rSplit, reflect, refract
+from .trace import intersect, rSplit, reflect, refract, refractScreen
 
 
 class Surface(ABC):
@@ -131,6 +131,28 @@ class Surface(ABC):
             reflected/refracted.
         """
         return rSplit(self, rv, inMedium, outMedium, coating, coordSys)
+
+    def refractScreen(self, rv, screen, coordSys=None):
+        """Calculate intersection of rays with this surface, and immediately
+        refract the rays through the phase screen at the points of intersection.
+
+        Parameters
+        ----------
+        rv : RayVector
+            Rays to refract.
+        screen : Surface
+            OPD to add to rays (in meters) as they cross this interface.
+        coordSys : CoordSys, optional
+            If present, then use for the coordinate system of the surface.  If
+            ``None`` (default), then assume that rays and surface are already
+            expressed in the same coordinate system.
+
+        Returns
+        -------
+        outRays : RayVector
+            New object corresponding to original rays propagated and refracted.
+        """
+        return refractScreen(self, rv, screen, coordSys)
 
     def __ne__(self, rhs):
         return not (self == rhs)

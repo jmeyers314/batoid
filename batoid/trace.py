@@ -118,3 +118,18 @@ def rSplit(surface, rv, inMedium, outMedium, coating, coordSys=None):
     rv.coordSys = coordSys
     rvSplit.coordSys = coordSys
     return rv, rvSplit
+
+
+def refractScreen(surface, rv, screen, coordSys=None):
+    if coordSys is None:
+        coordSys = rv.coordSys
+    ct = CoordTransform(rv.coordSys, coordSys)
+
+    _batoid.refractScreen(
+        surface._surface,
+        ct.dr, ct.drot.ravel(),
+        screen._surface,
+        rv._rv
+    )
+    rv.coordSys = coordSys
+    return rv

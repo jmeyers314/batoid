@@ -647,6 +647,70 @@ class Baffle(Interface):
     def rSplit(self, rv, reverse=False):
         return self.surface.intersect(rv, self.coordSys), None
 
+
+class OPDScreen(Interface):
+    """An `Optic` defined by a surface and an Optical Path Difference function.
+
+    Notes
+    -----
+    We use a `batoid.Surface` object for both the intersection surface and the
+    OPD.  For the OPD, the `surface.sag` method should return the desired
+    optical path difference (in meters) to add to traversing rays.
+
+    Rays traversing an OPD screen are deflected according to:
+
+    cosx2 = cosx1 + d(OPD)/dx
+    cosy2 = cosy1 + d(OPD)/dy
+
+    Where cosx1, cosx2 are direction cosines relative to the surface normal.
+
+    Parameters
+    ----------
+    surface : `batoid.Surface`
+        The intersection surface for the phase screen.
+    screen : `batoid.Surface`
+        The OPD to add upon traversal, in meters.
+    **kwargs : dict
+        Other keyword arguments to `Interface`.
+    """
+    def __init__(self, surface, screen, **kwargs):
+        Interface.__init__(self, surface, **kwargs)
+        self.screen = screen
+        assert self.inMedium == self.outMedium
+        # Not coatings available.
+
+    def __repr__(self):
+        out = "OPDScreen({!r}, {!r}".format(self.surface, self.screen)
+        if self.obscuration is not None:
+            out += ", obscuration={!r}".format(self.obscuration)
+        out += Optic._repr_helper(self)
+        out +=")"
+        return out
+
+    def __hash__(self):
+        return hash((
+            Interface.__hash__(self),
+            self.screen
+        ))
+
+    def __eq__(self, rhs):
+        if Interface.__eq__(self, rhs):
+            return self.screen == rhs.screen
+        return False
+
+    def interact(self, rv, reverse=False):
+        # Should reverse be different somehow?
+        return self.surface.refractScreen(
+            rv,
+            self.screen,
+            coordSys=self.coordSys
+        )
+
+    def rSplit(self, rv, reverse=False):
+        # Can only go forward for now.
+        return self.surface.interact(rv), None
+
+
 class CompoundOptic(Optic):
     """An `Optic` containing two or more `Optic` s as subitems.
 

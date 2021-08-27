@@ -20,6 +20,10 @@ namespace batoid {
             double vx, double vy, double vz,
             double& dt
         ) const;
+        virtual void grad(
+            double x, double y,
+            double& dzdx, double& dzdy
+        ) const;
 
     protected:
         Surface();
