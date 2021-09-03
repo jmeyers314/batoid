@@ -18,7 +18,7 @@ Requirements
 ============
 
 Batoid is known to work on MacOS and linux, using Python version 3.6+, and
-either the clang or gcc compiler with support for c++11.
+either the clang or gcc compiler with support for c++14.
 
 Installation
 ============
