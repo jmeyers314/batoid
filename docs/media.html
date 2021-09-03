@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Media &mdash; batoid 0.2.0rc1 documentation</title>
+  <title>Media &mdash; batoid 0.3.0 documentation</title>
   
 
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,10 +31,11 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -64,7 +67,7 @@
             
             
               <div class="version">
-                0.2
+                0.3
               </div>
             
           
@@ -170,14 +173,14 @@
   <div class="section" id="media">
 <h1>Media<a class="headerlink" href="#media" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="batoid.Medium">
-<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">Medium</code><a class="reference internal" href="_modules/batoid/medium.html#Medium"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Medium" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.Medium">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">batoid.</span></span><span class="sig-name descname"><span class="pre">Medium</span></span><a class="reference internal" href="_modules/batoid/medium.html#Medium"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.Medium" title="Permalink to this definition">¶</a></dt>
 <dd><p>The <a class="reference internal" href="#batoid.Medium" title="batoid.Medium"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Medium</span></code></a> class is used to model a refractive medium.</p>
 <p>Media have essentially one function: to return their refractive index given
 a wavelength.</p>
 <dl class="py method">
-<dt id="batoid.Medium.getN">
-<code class="sig-name descname">getN</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">wavelength</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/medium.html#Medium.getN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Medium.getN" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.Medium.getN">
+<span class="sig-name descname"><span class="pre">getN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wavelength</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/medium.html#Medium.getN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.Medium.getN" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return refractive index.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -192,9 +195,9 @@ a wavelength.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="batoid.ConstMedium">
-<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">ConstMedium</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/medium.html#ConstMedium"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.ConstMedium" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.medium.Medium</span></code></p>
+<dt class="sig sig-object py" id="batoid.ConstMedium">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">batoid.</span></span><span class="sig-name descname"><span class="pre">ConstMedium</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/medium.html#ConstMedium"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.ConstMedium" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#batoid.Medium" title="batoid.medium.Medium"><code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.medium.Medium</span></code></a></p>
 <p>A <a class="reference internal" href="#batoid.Medium" title="batoid.Medium"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Medium</span></code></a> with wavelength-independent refractive index.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -204,9 +207,9 @@ a wavelength.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="batoid.TableMedium">
-<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">TableMedium</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">wavelengths</span></em>, <em class="sig-param"><span class="n">ns</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/medium.html#TableMedium"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.TableMedium" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.medium.Medium</span></code></p>
+<dt class="sig sig-object py" id="batoid.TableMedium">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">batoid.</span></span><span class="sig-name descname"><span class="pre">TableMedium</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wavelengths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ns</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/medium.html#TableMedium"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.TableMedium" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#batoid.Medium" title="batoid.medium.Medium"><code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.medium.Medium</span></code></a></p>
 <p>A <a class="reference internal" href="#batoid.Medium" title="batoid.Medium"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Medium</span></code></a> with refractive index defined via a lookup table.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -217,8 +220,8 @@ a wavelength.</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="batoid.TableMedium.fromTxt">
-<em class="property">classmethod </em><code class="sig-name descname">fromTxt</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/medium.html#TableMedium.fromTxt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.TableMedium.fromTxt" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.TableMedium.fromTxt">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">fromTxt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/medium.html#TableMedium.fromTxt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.TableMedium.fromTxt" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load a text file with refractive index information in it.
 The file should have two columns, the first with wavelength in microns,
 and the second with the corresponding refractive indices.</p>
@@ -227,9 +230,9 @@ and the second with the corresponding refractive indices.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="batoid.SellmeierMedium">
-<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">SellmeierMedium</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/medium.html#SellmeierMedium"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.SellmeierMedium" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.medium.Medium</span></code></p>
+<dt class="sig sig-object py" id="batoid.SellmeierMedium">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">batoid.</span></span><span class="sig-name descname"><span class="pre">SellmeierMedium</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/medium.html#SellmeierMedium"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.SellmeierMedium" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#batoid.Medium" title="batoid.medium.Medium"><code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.medium.Medium</span></code></a></p>
 <p>A <a class="reference internal" href="#batoid.Medium" title="batoid.Medium"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Medium</span></code></a> with Sellmeier dispersion formula.</p>
 <p>The Sellmeier formula is</p>
 <div class="math notranslate nohighlight">
@@ -243,10 +246,11 @@ and the second with the corresponding refractive indices.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="batoid.SumitaMedium">
-<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">SumitaMedium</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/medium.html#SumitaMedium"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.SumitaMedium" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.medium.Medium</span></code></p>
-<p>A <a class="reference internal" href="#batoid.Medium" title="batoid.Medium"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Medium</span></code></a> with Sumita dispersion formula.</p>
+<dt class="sig sig-object py" id="batoid.SumitaMedium">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">batoid.</span></span><span class="sig-name descname"><span class="pre">SumitaMedium</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/medium.html#SumitaMedium"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.SumitaMedium" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#batoid.Medium" title="batoid.medium.Medium"><code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.medium.Medium</span></code></a></p>
+<p>A <a class="reference internal" href="#batoid.Medium" title="batoid.Medium"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Medium</span></code></a> with Sumita dispersion formula, also known as the Schott
+dispersion formula.</p>
 <p>The Sumita formula is</p>
 <div class="math notranslate nohighlight">
 \[n = \sqrt{A_0 + A_1 \lambda^2 + \sum_{i=2}^5 A_i \lambda^{-2 (i-1)}}\]</div>
@@ -259,9 +263,9 @@ and the second with the corresponding refractive indices.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="batoid.Air">
-<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">Air</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pressure</span><span class="o">=</span><span class="default_value">69.328</span></em>, <em class="sig-param"><span class="n">temperature</span><span class="o">=</span><span class="default_value">293.15</span></em>, <em class="sig-param"><span class="n">h2o_pressure</span><span class="o">=</span><span class="default_value">1.067</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/medium.html#Air"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Air" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.medium.Medium</span></code></p>
+<dt class="sig sig-object py" id="batoid.Air">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">batoid.</span></span><span class="sig-name descname"><span class="pre">Air</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pressure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">69.328</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">293.15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h2o_pressure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.067</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/medium.html#Air"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.Air" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#batoid.Medium" title="batoid.medium.Medium"><code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.medium.Medium</span></code></a></p>
 <p>A <a class="reference internal" href="#batoid.Medium" title="batoid.Medium"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Medium</span></code></a> for air.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -296,7 +300,7 @@ reasonable for most observatories.</p>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2020, Josh Meyers.
+        &#169; Copyright 2017-2021, Josh Meyers.
 
     </p>
   </div>

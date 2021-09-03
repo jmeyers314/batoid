@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Analysis &mdash; batoid 0.2.0rc1 documentation</title>
+  <title>Analysis &mdash; batoid 0.3.0 documentation</title>
   
 
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,10 +31,11 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -64,7 +67,7 @@
             
             
               <div class="version">
-                0.2
+                0.3
               </div>
             
           
@@ -172,8 +175,8 @@
 <p>The batoid analysis module contains functions for evaluating wavefronts, PSFs,
 and Zernike polynomial decompositions.</p>
 <span class="target" id="module-batoid.analysis"></span><dl class="py function">
-<dt id="batoid.analysis.dkdu">
-<code class="sig-prename descclassname">batoid.analysis.</code><code class="sig-name descname">dkdu</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">optic</span></em>, <em class="sig-param"><span class="n">theta_x</span></em>, <em class="sig-param"><span class="n">theta_y</span></em>, <em class="sig-param"><span class="n">wavelength</span></em>, <em class="sig-param"><span class="n">nrad</span><span class="o">=</span><span class="default_value">16</span></em>, <em class="sig-param"><span class="n">naz</span><span class="o">=</span><span class="default_value">16</span></em>, <em class="sig-param"><span class="n">projection</span><span class="o">=</span><span class="default_value">'postel'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/analysis.html#dkdu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.analysis.dkdu" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.analysis.dkdu">
+<span class="sig-prename descclassname"><span class="pre">batoid.analysis.</span></span><span class="sig-name descname"><span class="pre">dkdu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nrad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">naz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'postel'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/analysis.html#dkdu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.analysis.dkdu" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate derivative of outgoing ray k-vector with respect to incoming
 ray pupil coordinate.</p>
 <dl class="field-list simple">
@@ -182,7 +185,9 @@ ray pupil coordinate.</p>
 <li><p><strong>optic</strong> (<em>batoid.Optic</em>) – Optical system</p></li>
 <li><p><strong>theta_x, theta_y</strong> (<em>float</em>) – Field angle in radians</p></li>
 <li><p><strong>wavelength</strong> (<em>float</em>) – Wavelength in meters</p></li>
-<li><p><strong>nx</strong> (<em>int, optional</em>) – Size of ray grid to use.</p></li>
+<li><p><strong>nrad</strong> (<em>int, optional</em>) – Number of ray radii to use.  (see RayVector.asPolar())</p></li>
+<li><p><strong>naz</strong> (<em>int, optional</em>) – Approximate number of azimuthal angles in outermost ring.  (see
+RayVector.asPolar())</p></li>
 <li><p><strong>projection</strong> (<em>{‘postel’, ‘zemax’, ‘gnomonic’, ‘stereographic’, ‘lambert’, ‘orthographic’}</em>) – Projection used to convert field angle to direction cosines.</p></li>
 </ul>
 </dd>
@@ -194,8 +199,8 @@ impacting the focal plane and initial pupil plane coordinate.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="batoid.analysis.drdth">
-<code class="sig-prename descclassname">batoid.analysis.</code><code class="sig-name descname">drdth</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">optic</span></em>, <em class="sig-param"><span class="n">theta_x</span></em>, <em class="sig-param"><span class="n">theta_y</span></em>, <em class="sig-param"><span class="n">wavelength</span></em>, <em class="sig-param"><span class="n">nrad</span><span class="o">=</span><span class="default_value">50</span></em>, <em class="sig-param"><span class="n">naz</span><span class="o">=</span><span class="default_value">300</span></em>, <em class="sig-param"><span class="n">projection</span><span class="o">=</span><span class="default_value">'postel'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/analysis.html#drdth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.analysis.drdth" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.analysis.drdth">
+<span class="sig-prename descclassname"><span class="pre">batoid.analysis.</span></span><span class="sig-name descname"><span class="pre">drdth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nrad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">naz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'postel'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/analysis.html#drdth"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.analysis.drdth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate derivative of focal plane coord with respect to field angle.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -221,8 +226,8 @@ though, especially near the center of the tangent plane projection.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="batoid.analysis.dthdr">
-<code class="sig-prename descclassname">batoid.analysis.</code><code class="sig-name descname">dthdr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">optic</span></em>, <em class="sig-param"><span class="n">theta_x</span></em>, <em class="sig-param"><span class="n">theta_y</span></em>, <em class="sig-param"><span class="n">wavelength</span></em>, <em class="sig-param"><span class="n">nrad</span><span class="o">=</span><span class="default_value">50</span></em>, <em class="sig-param"><span class="n">naz</span><span class="o">=</span><span class="default_value">300</span></em>, <em class="sig-param"><span class="n">projection</span><span class="o">=</span><span class="default_value">'postel'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/analysis.html#dthdr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.analysis.dthdr" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.analysis.dthdr">
+<span class="sig-prename descclassname"><span class="pre">batoid.analysis.</span></span><span class="sig-name descname"><span class="pre">dthdr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nrad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">naz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'postel'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/analysis.html#dthdr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.analysis.dthdr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate derivative of field angle with respect to focal plane
 coordinate.</p>
 <dl class="field-list simple">
@@ -249,8 +254,8 @@ especially near the center of the tangent plane projection.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="batoid.analysis.huygensPSF">
-<code class="sig-prename descclassname">batoid.analysis.</code><code class="sig-name descname">huygensPSF</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">optic</span></em>, <em class="sig-param"><span class="n">theta_x</span></em>, <em class="sig-param"><span class="n">theta_y</span></em>, <em class="sig-param"><span class="n">wavelength</span></em>, <em class="sig-param"><span class="n">projection</span><span class="o">=</span><span class="default_value">'postel'</span></em>, <em class="sig-param"><span class="n">nx</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dx</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dy</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nxOut</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reference</span><span class="o">=</span><span class="default_value">'mean'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/analysis.html#huygensPSF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.analysis.huygensPSF" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.analysis.huygensPSF">
+<span class="sig-prename descclassname"><span class="pre">batoid.analysis.</span></span><span class="sig-name descname"><span class="pre">huygensPSF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'postel'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nxOut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/analysis.html#huygensPSF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.analysis.huygensPSF" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute a PSF via the Huygens construction.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -291,8 +296,8 @@ vectors of the output lattice.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="batoid.analysis.wavefront">
-<code class="sig-prename descclassname">batoid.analysis.</code><code class="sig-name descname">wavefront</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">optic</span></em>, <em class="sig-param"><span class="n">theta_x</span></em>, <em class="sig-param"><span class="n">theta_y</span></em>, <em class="sig-param"><span class="n">wavelength</span></em>, <em class="sig-param"><span class="n">projection</span><span class="o">=</span><span class="default_value">'postel'</span></em>, <em class="sig-param"><span class="n">nx</span><span class="o">=</span><span class="default_value">32</span></em>, <em class="sig-param"><span class="n">sphereRadius</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reference</span><span class="o">=</span><span class="default_value">'mean'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/analysis.html#wavefront"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.analysis.wavefront" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.analysis.wavefront">
+<span class="sig-prename descclassname"><span class="pre">batoid.analysis.</span></span><span class="sig-name descname"><span class="pre">wavefront</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'postel'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sphereRadius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/analysis.html#wavefront"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.analysis.wavefront" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute wavefront.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -320,8 +325,8 @@ the primitive lattice vectors of the entrance pupil grid in meters.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="batoid.analysis.fftPSF">
-<code class="sig-prename descclassname">batoid.analysis.</code><code class="sig-name descname">fftPSF</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">optic</span></em>, <em class="sig-param"><span class="n">theta_x</span></em>, <em class="sig-param"><span class="n">theta_y</span></em>, <em class="sig-param"><span class="n">wavelength</span></em>, <em class="sig-param"><span class="n">projection</span><span class="o">=</span><span class="default_value">'postel'</span></em>, <em class="sig-param"><span class="n">nx</span><span class="o">=</span><span class="default_value">32</span></em>, <em class="sig-param"><span class="n">pad_factor</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">sphereRadius</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reference</span><span class="o">=</span><span class="default_value">'mean'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/analysis.html#fftPSF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.analysis.fftPSF" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.analysis.fftPSF">
+<span class="sig-prename descclassname"><span class="pre">batoid.analysis.</span></span><span class="sig-name descname"><span class="pre">fftPSF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'postel'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sphereRadius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/analysis.html#fftPSF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.analysis.fftPSF" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute PSF using FFT.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -350,8 +355,8 @@ the primitive lattice vectors of the focal plane grid.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="batoid.analysis.zernike">
-<code class="sig-prename descclassname">batoid.analysis.</code><code class="sig-name descname">zernike</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">optic</span></em>, <em class="sig-param"><span class="n">theta_x</span></em>, <em class="sig-param"><span class="n">theta_y</span></em>, <em class="sig-param"><span class="n">wavelength</span></em>, <em class="sig-param"><span class="n">projection</span><span class="o">=</span><span class="default_value">'postel'</span></em>, <em class="sig-param"><span class="n">nx</span><span class="o">=</span><span class="default_value">32</span></em>, <em class="sig-param"><span class="n">sphereRadius</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reference</span><span class="o">=</span><span class="default_value">'mean'</span></em>, <em class="sig-param"><span class="n">jmax</span><span class="o">=</span><span class="default_value">22</span></em>, <em class="sig-param"><span class="n">eps</span><span class="o">=</span><span class="default_value">0.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/analysis.html#zernike"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.analysis.zernike" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.analysis.zernike">
+<span class="sig-prename descclassname"><span class="pre">batoid.analysis.</span></span><span class="sig-name descname"><span class="pre">zernike</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'postel'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sphereRadius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">22</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/analysis.html#zernike"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.analysis.zernike" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute Zernike polynomial decomposition of the wavefront.</p>
 <p>This calculation propagates a square grid of rays to the exit pupil
 reference sphere where the wavefront is computed.  The optical path
@@ -397,8 +402,8 @@ jmax.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="batoid.analysis.zernikeGQ">
-<code class="sig-prename descclassname">batoid.analysis.</code><code class="sig-name descname">zernikeGQ</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">optic</span></em>, <em class="sig-param"><span class="n">theta_x</span></em>, <em class="sig-param"><span class="n">theta_y</span></em>, <em class="sig-param"><span class="n">wavelength</span></em>, <em class="sig-param"><span class="n">projection</span><span class="o">=</span><span class="default_value">'postel'</span></em>, <em class="sig-param"><span class="n">rings</span><span class="o">=</span><span class="default_value">6</span></em>, <em class="sig-param"><span class="n">spokes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sphereRadius</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reference</span><span class="o">=</span><span class="default_value">'mean'</span></em>, <em class="sig-param"><span class="n">jmax</span><span class="o">=</span><span class="default_value">22</span></em>, <em class="sig-param"><span class="n">eps</span><span class="o">=</span><span class="default_value">0.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/analysis.html#zernikeGQ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.analysis.zernikeGQ" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.analysis.zernikeGQ">
+<span class="sig-prename descclassname"><span class="pre">batoid.analysis.</span></span><span class="sig-name descname"><span class="pre">zernikeGQ</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'postel'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spokes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sphereRadius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">22</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/analysis.html#zernikeGQ"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.analysis.zernikeGQ" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute Zernike polynomial decomposition of the wavefront.</p>
 <p>This calculation uses Gaussian Quadrature points and weights to compute the
 Zernike decomposition of the wavefront.  The wavefront values at the GQ
@@ -449,8 +454,8 @@ even in vignetted regions.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="batoid.analysis.doubleZernike">
-<code class="sig-prename descclassname">batoid.analysis.</code><code class="sig-name descname">doubleZernike</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">optic</span></em>, <em class="sig-param"><span class="n">field</span></em>, <em class="sig-param"><span class="n">wavelength</span></em>, <em class="sig-param"><span class="n">rings</span><span class="o">=</span><span class="default_value">6</span></em>, <em class="sig-param"><span class="n">spokes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">kmax</span><span class="o">=</span><span class="default_value">22</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/analysis.html#doubleZernike"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.analysis.doubleZernike" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.analysis.doubleZernike">
+<span class="sig-prename descclassname"><span class="pre">batoid.analysis.</span></span><span class="sig-name descname"><span class="pre">doubleZernike</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spokes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">22</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/analysis.html#doubleZernike"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.analysis.doubleZernike" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute double Zernike polynomial decomposition of the wavefront.</p>
 <p>The double Zernike decomposition describes both the focal and pupil
 variation of the wavefront.  More specifically:</p>
@@ -476,6 +481,27 @@ the field angle coordinate.</p>
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="batoid.analysis.exitPupilPos">
+<span class="sig-prename descclassname"><span class="pre">batoid.analysis.</span></span><span class="sig-name descname"><span class="pre">exitPupilPos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smallAngle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4.84813681109536e-06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/analysis.html#exitPupilPos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.analysis.exitPupilPos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute position of the exit pupil.</p>
+<p>Traces a collection of small angle chief rays into object space, and then
+finds the mean of their closest approaches to the optic axis.  Possibly only
+accurate for axially symmetric optical systems.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>optic</strong> (<em>batoid.Optic</em>) – Optical system</p></li>
+<li><p><strong>wavelength</strong> (<em>float</em>) – Wavelength in meters</p></li>
+<li><p><strong>smallAngle</strong> (<em>float, optional</em>) – Angle in radians from which to search for the exit pupil position.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>Location of exit pupil in global coordinates.</em></p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 
 
@@ -492,7 +518,7 @@ the field angle coordinate.</p>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2020, Josh Meyers.
+        &#169; Copyright 2017-2021, Josh Meyers.
 
     </p>
   </div>

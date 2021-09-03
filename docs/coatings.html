@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Coatings &mdash; batoid 0.2.0rc1 documentation</title>
+  <title>Coatings &mdash; batoid 0.3.0 documentation</title>
   
 
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,10 +31,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -64,7 +66,7 @@
             
             
               <div class="version">
-                0.2
+                0.3
               </div>
             
           
@@ -170,8 +172,8 @@
   <div class="section" id="coatings">
 <h1>Coatings<a class="headerlink" href="#coatings" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="batoid.Coating">
-<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">Coating</code><a class="reference internal" href="_modules/batoid/coating.html#Coating"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Coating" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.Coating">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">batoid.</span></span><span class="sig-name descname"><span class="pre">Coating</span></span><a class="reference internal" href="_modules/batoid/coating.html#Coating"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.Coating" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class to control ray reflection/transmission at an <a class="reference internal" href="optic.html#batoid.Interface" title="batoid.Interface"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Interface</span></code></a>.</p>
 <p>Coatings can be used to split a ray into reflected/refracted components
 using <a class="reference internal" href="surfaces.html#batoid.Surface.rSplit" title="batoid.Surface.rSplit"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Surface.rSplit</span></code></a>, or control the transmission or reflection
@@ -181,8 +183,8 @@ thereof).</p>
 wavelength and the cosine of the incidence angle, which is the angle
 between the incoming ray and the surface normal.</p>
 <dl class="py method">
-<dt id="batoid.Coating.getCoefs">
-<code class="sig-name descname">getCoefs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">wavelength</span></em>, <em class="sig-param"><span class="n">cosIncidenceAngle</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coating.html#Coating.getCoefs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Coating.getCoefs" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.Coating.getCoefs">
+<span class="sig-name descname"><span class="pre">getCoefs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wavelength</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cosIncidenceAngle</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coating.html#Coating.getCoefs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.Coating.getCoefs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return reflection and transmission coefficients.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -202,8 +204,8 @@ between the incoming ray and the surface normal.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="batoid.Coating.getReflect">
-<code class="sig-name descname">getReflect</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">wavelength</span></em>, <em class="sig-param"><span class="n">cosIncidenceAngle</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coating.html#Coating.getReflect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Coating.getReflect" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.Coating.getReflect">
+<span class="sig-name descname"><span class="pre">getReflect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wavelength</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cosIncidenceAngle</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coating.html#Coating.getReflect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.Coating.getReflect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return reflection coefficient.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -219,8 +221,8 @@ between the incoming ray and the surface normal.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="batoid.Coating.getTransmit">
-<code class="sig-name descname">getTransmit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">wavelength</span></em>, <em class="sig-param"><span class="n">cosIncidenceAngle</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coating.html#Coating.getTransmit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.Coating.getTransmit" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.Coating.getTransmit">
+<span class="sig-name descname"><span class="pre">getTransmit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wavelength</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cosIncidenceAngle</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coating.html#Coating.getTransmit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.Coating.getTransmit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return transmission coefficient.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -238,9 +240,9 @@ between the incoming ray and the surface normal.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="batoid.SimpleCoating">
-<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">SimpleCoating</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">reflectivity</span></em>, <em class="sig-param"><span class="n">transmissivity</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coating.html#SimpleCoating"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.SimpleCoating" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.coating.Coating</span></code></p>
+<dt class="sig sig-object py" id="batoid.SimpleCoating">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">batoid.</span></span><span class="sig-name descname"><span class="pre">SimpleCoating</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reflectivity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transmissivity</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coating.html#SimpleCoating"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.SimpleCoating" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#batoid.Coating" title="batoid.coating.Coating"><code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.coating.Coating</span></code></a></p>
 <p>Coating with reflectivity and transmissivity that are both constant with
 wavelength and incidence angle.</p>
 <dl class="field-list simple">
@@ -269,7 +271,7 @@ wavelength and incidence angle.</p>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2020, Josh Meyers.
+        &#169; Copyright 2017-2021, Josh Meyers.
 
     </p>
   </div>

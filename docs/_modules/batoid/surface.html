@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>batoid.surface &mdash; batoid 0.2.0rc1 documentation</title>
+  <title>batoid.surface &mdash; batoid 0.3.0 documentation</title>
   
 
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,10 +31,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -62,7 +64,7 @@
             
             
               <div class="version">
-                0.2
+                0.3
               </div>
             
           
@@ -170,7 +172,7 @@
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_batoid</span>
 <span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="n">globalCoordSys</span>
-<span class="kn">from</span> <span class="nn">.trace</span> <span class="kn">import</span> <span class="n">intersect</span><span class="p">,</span> <span class="n">rSplit</span><span class="p">,</span> <span class="n">reflect</span><span class="p">,</span> <span class="n">refract</span>
+<span class="kn">from</span> <span class="nn">.trace</span> <span class="kn">import</span> <span class="n">intersect</span><span class="p">,</span> <span class="n">rSplit</span><span class="p">,</span> <span class="n">reflect</span><span class="p">,</span> <span class="n">refract</span><span class="p">,</span> <span class="n">refractScreen</span>
 
 
 <div class="viewcode-block" id="Surface"><a class="viewcode-back" href="../../surfaces.html#batoid.Surface">[docs]</a><span class="k">class</span> <span class="nc">Surface</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
@@ -298,6 +300,28 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">rSplit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rv</span><span class="p">,</span> <span class="n">inMedium</span><span class="p">,</span> <span class="n">outMedium</span><span class="p">,</span> <span class="n">coating</span><span class="p">,</span> <span class="n">coordSys</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="Surface.refractScreen"><a class="viewcode-back" href="../../surfaces.html#batoid.Surface.refractScreen">[docs]</a>    <span class="k">def</span> <span class="nf">refractScreen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rv</span><span class="p">,</span> <span class="n">screen</span><span class="p">,</span> <span class="n">coordSys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate intersection of rays with this surface, and immediately</span>
+<span class="sd">        refract the rays through the phase screen at the points of intersection.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rv : RayVector</span>
+<span class="sd">            Rays to refract.</span>
+<span class="sd">        screen : Surface</span>
+<span class="sd">            OPD to add to rays (in meters) as they cross this interface.</span>
+<span class="sd">        coordSys : CoordSys, optional</span>
+<span class="sd">            If present, then use for the coordinate system of the surface.  If</span>
+<span class="sd">            ``None`` (default), then assume that rays and surface are already</span>
+<span class="sd">            expressed in the same coordinate system.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        outRays : RayVector</span>
+<span class="sd">            New object corresponding to original rays propagated and refracted.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">refractScreen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rv</span><span class="p">,</span> <span class="n">screen</span><span class="p">,</span> <span class="n">coordSys</span><span class="p">)</span></div>
+
     <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
         <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span> <span class="o">==</span> <span class="n">rhs</span><span class="p">)</span></div>
 
@@ -326,6 +350,36 @@
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="k">return</span> <span class="s2">&quot;Plane()&quot;</span></div>
+
+
+<span class="k">class</span> <span class="nc">Tilted</span><span class="p">(</span><span class="n">Surface</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tilted planar surface.  The surface sag follows the equation:</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        z(x, y) = x \\tan(\\theta_x) + y \\tan(\\theta_y)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tanx</span><span class="p">,</span> <span class="n">tany</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tanx</span> <span class="o">=</span> <span class="n">tanx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tany</span> <span class="o">=</span> <span class="n">tany</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPTilted</span><span class="p">(</span><span class="n">tanx</span><span class="p">,</span> <span class="n">tany</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="s2">&quot;batoid.Tilted&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tanx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tany</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tup</span><span class="p">):</span>
+        <span class="n">tanx</span><span class="p">,</span> <span class="n">tany</span> <span class="o">=</span> <span class="n">tup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">tanx</span><span class="p">,</span> <span class="n">tany</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tanx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tany</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">Tilted</span><span class="p">):</span> <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tanx</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">tanx</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">tany</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">tany</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Tilted(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tanx</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tany</span><span class="si">}</span><span class="s2">)&quot;</span>
 
 
 <div class="viewcode-block" id="Paraboloid"><a class="viewcode-back" href="../../surfaces.html#batoid.Paraboloid">[docs]</a><span class="k">class</span> <span class="nc">Paraboloid</span><span class="p">(</span><span class="n">Surface</span><span class="p">):</span>
@@ -624,7 +678,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_dzdys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dzdys</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;C&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_d2zdxdys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">d2zdxdys</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;C&quot;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPBicubic</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_table</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPTable</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_x0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dy</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_zs</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dzdxs</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
@@ -633,6 +687,7 @@
             <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_xs</span><span class="p">),</span>
             <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ys</span><span class="p">)</span>
         <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPBicubic</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">xs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -674,7 +729,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_dx</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_xs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_xs</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dy</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ys</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ys</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ys</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPBicubic</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_table</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPTable</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_x0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dy</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_zs</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dzdxs</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
@@ -683,6 +738,7 @@
             <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_xs</span><span class="p">),</span>
             <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ys</span><span class="p">)</span>
         <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_surface</span> <span class="o">=</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPBicubic</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
@@ -758,7 +814,7 @@
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2020, Josh Meyers.
+        &#169; Copyright 2017-2021, Josh Meyers.
 
     </p>
   </div>

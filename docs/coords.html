@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Coordinate Systems &mdash; batoid 0.2.0rc1 documentation</title>
+  <title>Coordinate Systems &mdash; batoid 0.3.0 documentation</title>
   
 
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,10 +31,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -64,7 +66,7 @@
             
             
               <div class="version">
-                0.2
+                0.3
               </div>
             
           
@@ -186,8 +188,8 @@ with respect to the global axes.</p></li>
 </ul>
 </div></blockquote>
 <dl class="py class">
-<dt id="batoid.CoordSys">
-<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">CoordSys</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">origin</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">rot</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordSys.html#CoordSys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CoordSys" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.CoordSys">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">batoid.</span></span><span class="sig-name descname"><span class="pre">CoordSys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">origin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordSys.html#CoordSys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.CoordSys" title="Permalink to this definition">¶</a></dt>
 <dd><p>A coordinate system against which to measure surfaces or rays.</p>
 <p>Coordinate systems consist of an origin and a rotation.  The <code class="docutils literal notranslate"><span class="pre">origin</span></code>
 attribute specifies where in 3D space the current coordinate system’s
@@ -202,9 +204,9 @@ yield the axes of the this coordinate system.</p>
 </ul>
 </dd>
 </dl>
-<dl class="py method">
-<dt id="batoid.CoordSys.xhat">
-<em class="property">property </em><code class="sig-name descname">xhat</code><a class="headerlink" href="#batoid.CoordSys.xhat" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="batoid.CoordSys.xhat">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">xhat</span></span><a class="headerlink" href="#batoid.CoordSys.xhat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Orientation of local x vector in
 global coordinates.</p>
 <dl class="field-list simple">
@@ -214,9 +216,9 @@ global coordinates.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="batoid.CoordSys.yhat">
-<em class="property">property </em><code class="sig-name descname">yhat</code><a class="headerlink" href="#batoid.CoordSys.yhat" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="batoid.CoordSys.yhat">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">yhat</span></span><a class="headerlink" href="#batoid.CoordSys.yhat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Orientation of local y vector in
 global coordinates.</p>
 <dl class="field-list simple">
@@ -226,9 +228,9 @@ global coordinates.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="batoid.CoordSys.zhat">
-<em class="property">property </em><code class="sig-name descname">zhat</code><a class="headerlink" href="#batoid.CoordSys.zhat" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="batoid.CoordSys.zhat">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">zhat</span></span><a class="headerlink" href="#batoid.CoordSys.zhat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Orientation of local z vector in
 global coordinates.</p>
 <dl class="field-list simple">
@@ -239,8 +241,8 @@ global coordinates.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="batoid.CoordSys.shiftGlobal">
-<code class="sig-name descname">shiftGlobal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dr</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordSys.html#CoordSys.shiftGlobal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CoordSys.shiftGlobal" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.CoordSys.shiftGlobal">
+<span class="sig-name descname"><span class="pre">shiftGlobal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordSys.html#CoordSys.shiftGlobal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.CoordSys.shiftGlobal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return new CoordSys with origin shifted along global axes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -253,8 +255,8 @@ global coordinates.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="batoid.CoordSys.shiftLocal">
-<code class="sig-name descname">shiftLocal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dr</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordSys.html#CoordSys.shiftLocal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CoordSys.shiftLocal" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.CoordSys.shiftLocal">
+<span class="sig-name descname"><span class="pre">shiftLocal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordSys.html#CoordSys.shiftLocal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.CoordSys.shiftLocal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return new CoordSys with origin shifted along local axes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -267,8 +269,8 @@ global coordinates.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="batoid.CoordSys.rotateGlobal">
-<code class="sig-name descname">rotateGlobal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rot</span></em>, <em class="sig-param"><span class="n">rotCenter</span><span class="o">=</span><span class="default_value">(0, 0, 0)</span></em>, <em class="sig-param"><span class="n">coordSys</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordSys.html#CoordSys.rotateGlobal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CoordSys.rotateGlobal" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.CoordSys.rotateGlobal">
+<span class="sig-name descname"><span class="pre">rotateGlobal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotCenter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coordSys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordSys.html#CoordSys.rotateGlobal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.CoordSys.rotateGlobal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return new CoordSys rotated with respect to global axes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -285,8 +287,8 @@ global coordinates.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="batoid.CoordSys.rotateLocal">
-<code class="sig-name descname">rotateLocal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rot</span></em>, <em class="sig-param"><span class="n">rotCenter</span><span class="o">=</span><span class="default_value">(0, 0, 0)</span></em>, <em class="sig-param"><span class="n">coordSys</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordSys.html#CoordSys.rotateLocal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CoordSys.rotateLocal" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.CoordSys.rotateLocal">
+<span class="sig-name descname"><span class="pre">rotateLocal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotCenter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coordSys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordSys.html#CoordSys.rotateLocal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.CoordSys.rotateLocal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return new CoordSys rotated with respect to local axes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -305,8 +307,8 @@ global coordinates.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="batoid.CoordTransform">
-<em class="property">class </em><code class="sig-prename descclassname">batoid.</code><code class="sig-name descname">CoordTransform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fromSys</span></em>, <em class="sig-param"><span class="n">toSys</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordTransform.html#CoordTransform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CoordTransform" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.CoordTransform">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">batoid.</span></span><span class="sig-name descname"><span class="pre">CoordTransform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fromSys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">toSys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordTransform.html#CoordTransform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.CoordTransform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transformation between two coordinate systems.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -317,8 +319,8 @@ global coordinates.</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="batoid.CoordTransform.applyForward">
-<code class="sig-name descname">applyForward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rv</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordTransform.html#CoordTransform.applyForward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CoordTransform.applyForward" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.CoordTransform.applyForward">
+<span class="sig-name descname"><span class="pre">applyForward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rv</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordTransform.html#CoordTransform.applyForward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.CoordTransform.applyForward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply forward-direction transformation to RayVector.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -331,8 +333,8 @@ global coordinates.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="batoid.CoordTransform.applyReverse">
-<code class="sig-name descname">applyReverse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rv</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordTransform.html#CoordTransform.applyReverse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CoordTransform.applyReverse" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.CoordTransform.applyReverse">
+<span class="sig-name descname"><span class="pre">applyReverse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rv</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordTransform.html#CoordTransform.applyReverse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.CoordTransform.applyReverse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply reverse-direction transformation to RayVector.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -345,8 +347,8 @@ global coordinates.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="batoid.CoordTransform.applyForwardArray">
-<code class="sig-name descname">applyForwardArray</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">z</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordTransform.html#CoordTransform.applyForwardArray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CoordTransform.applyForwardArray" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.CoordTransform.applyForwardArray">
+<span class="sig-name descname"><span class="pre">applyForwardArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordTransform.html#CoordTransform.applyForwardArray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.CoordTransform.applyForwardArray" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply forward-direction transformation to ndarrays.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -362,8 +364,8 @@ returns a newly created ndarray.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="batoid.CoordTransform.applyReverseArray">
-<code class="sig-name descname">applyReverseArray</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">z</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordTransform.html#CoordTransform.applyReverseArray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.CoordTransform.applyReverseArray" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.CoordTransform.applyReverseArray">
+<span class="sig-name descname"><span class="pre">applyReverseArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/coordTransform.html#CoordTransform.applyReverseArray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.CoordTransform.applyReverseArray" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply reverse-direction transformation to ndarrays.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -386,8 +388,8 @@ returns a newly created ndarray.</p>
 two-dimensional projection.  Batoid includes a number of such projections and
 deprojections:</p>
 <dl class="py function">
-<dt id="batoid.utils.fieldToDirCos">
-<code class="sig-prename descclassname">batoid.utils.</code><code class="sig-name descname">fieldToDirCos</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">v</span></em>, <em class="sig-param"><span class="n">projection</span><span class="o">=</span><span class="default_value">'postel'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#fieldToDirCos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.utils.fieldToDirCos" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.utils.fieldToDirCos">
+<span class="sig-prename descclassname"><span class="pre">batoid.utils.</span></span><span class="sig-name descname"><span class="pre">fieldToDirCos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'postel'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#fieldToDirCos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.utils.fieldToDirCos" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert field angle to direction cosines using specified projection.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -407,8 +409,8 @@ orientation is such that vx (vy) is positive when u (v) is positive.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="batoid.utils.dirCosToField">
-<code class="sig-prename descclassname">batoid.utils.</code><code class="sig-name descname">dirCosToField</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">alpha</span></em>, <em class="sig-param"><span class="n">beta</span></em>, <em class="sig-param"><span class="n">gamma</span></em>, <em class="sig-param"><span class="n">projection</span><span class="o">=</span><span class="default_value">'postel'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#dirCosToField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.utils.dirCosToField" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.utils.dirCosToField">
+<span class="sig-prename descclassname"><span class="pre">batoid.utils.</span></span><span class="sig-name descname"><span class="pre">dirCosToField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'postel'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#dirCosToField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.utils.dirCosToField" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert direction cosines to field angle using specified projection.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -428,8 +430,8 @@ orientation is such that vx (vy) is positive when u (v) is positive.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="batoid.utils.gnomonicToDirCos">
-<code class="sig-prename descclassname">batoid.utils.</code><code class="sig-name descname">gnomonicToDirCos</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">v</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#gnomonicToDirCos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.utils.gnomonicToDirCos" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.utils.gnomonicToDirCos">
+<span class="sig-prename descclassname"><span class="pre">batoid.utils.</span></span><span class="sig-name descname"><span class="pre">gnomonicToDirCos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#gnomonicToDirCos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.utils.gnomonicToDirCos" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert gnomonic tangent plane projection u,v to direction cosines.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -446,8 +448,8 @@ orientation is such that vx (vy) is positive when u (v) is positive.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="batoid.utils.dirCosToGnomonic">
-<code class="sig-prename descclassname">batoid.utils.</code><code class="sig-name descname">dirCosToGnomonic</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">alpha</span></em>, <em class="sig-param"><span class="n">beta</span></em>, <em class="sig-param"><span class="n">gamma</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#dirCosToGnomonic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.utils.dirCosToGnomonic" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.utils.dirCosToGnomonic">
+<span class="sig-prename descclassname"><span class="pre">batoid.utils.</span></span><span class="sig-name descname"><span class="pre">dirCosToGnomonic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#dirCosToGnomonic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.utils.dirCosToGnomonic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert direction cosines to gnomonic tangent plane projection.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -464,8 +466,8 @@ orientation is such that vx (vy) is positive when u (v) is positive.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="batoid.utils.postelToDirCos">
-<code class="sig-prename descclassname">batoid.utils.</code><code class="sig-name descname">postelToDirCos</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">v</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#postelToDirCos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.utils.postelToDirCos" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.utils.postelToDirCos">
+<span class="sig-prename descclassname"><span class="pre">batoid.utils.</span></span><span class="sig-name descname"><span class="pre">postelToDirCos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#postelToDirCos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.utils.postelToDirCos" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert Postel azimuthal equidistant tangent plane projection u,v to
 direction cosines.</p>
 <dl class="field-list simple">
@@ -483,8 +485,8 @@ orientation is such that vx (vy) is positive when u (v) is positive.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="batoid.utils.dirCosToPostel">
-<code class="sig-prename descclassname">batoid.utils.</code><code class="sig-name descname">dirCosToPostel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">alpha</span></em>, <em class="sig-param"><span class="n">beta</span></em>, <em class="sig-param"><span class="n">gamma</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#dirCosToPostel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.utils.dirCosToPostel" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.utils.dirCosToPostel">
+<span class="sig-prename descclassname"><span class="pre">batoid.utils.</span></span><span class="sig-name descname"><span class="pre">dirCosToPostel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#dirCosToPostel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.utils.dirCosToPostel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert direction cosines to Postel azimuthal equidistant tangent plane
 projection.</p>
 <dl class="field-list simple">
@@ -502,8 +504,8 @@ orientation is such that vx (vy) is positive when u (v) is positive.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="batoid.utils.zemaxToDirCos">
-<code class="sig-prename descclassname">batoid.utils.</code><code class="sig-name descname">zemaxToDirCos</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">v</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#zemaxToDirCos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.utils.zemaxToDirCos" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.utils.zemaxToDirCos">
+<span class="sig-prename descclassname"><span class="pre">batoid.utils.</span></span><span class="sig-name descname"><span class="pre">zemaxToDirCos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#zemaxToDirCos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.utils.zemaxToDirCos" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert Zemax field angles u,v to direction cosines.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -523,8 +525,8 @@ cosine for (u, v) = (0.6, 0.8).</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="batoid.utils.dirCosToZemax">
-<code class="sig-prename descclassname">batoid.utils.</code><code class="sig-name descname">dirCosToZemax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">alpha</span></em>, <em class="sig-param"><span class="n">beta</span></em>, <em class="sig-param"><span class="n">gamma</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#dirCosToZemax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.utils.dirCosToZemax" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.utils.dirCosToZemax">
+<span class="sig-prename descclassname"><span class="pre">batoid.utils.</span></span><span class="sig-name descname"><span class="pre">dirCosToZemax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#dirCosToZemax"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.utils.dirCosToZemax" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert direction cosines to Postel azimuthal equidistant tangent plane
 projection.</p>
 <dl class="field-list simple">
@@ -545,8 +547,8 @@ cosine for (u, v) = (0.6, 0.8).</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="batoid.utils.stereographicToDirCos">
-<code class="sig-prename descclassname">batoid.utils.</code><code class="sig-name descname">stereographicToDirCos</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">v</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#stereographicToDirCos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.utils.stereographicToDirCos" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.utils.stereographicToDirCos">
+<span class="sig-prename descclassname"><span class="pre">batoid.utils.</span></span><span class="sig-name descname"><span class="pre">stereographicToDirCos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#stereographicToDirCos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.utils.stereographicToDirCos" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert stereographic tangent plane projection u,v to direction cosines.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -563,8 +565,8 @@ orientation is such that vx (vy) is positive when u (v) is positive.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="batoid.utils.dirCosToStereographic">
-<code class="sig-prename descclassname">batoid.utils.</code><code class="sig-name descname">dirCosToStereographic</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">alpha</span></em>, <em class="sig-param"><span class="n">beta</span></em>, <em class="sig-param"><span class="n">gamma</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#dirCosToStereographic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.utils.dirCosToStereographic" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.utils.dirCosToStereographic">
+<span class="sig-prename descclassname"><span class="pre">batoid.utils.</span></span><span class="sig-name descname"><span class="pre">dirCosToStereographic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#dirCosToStereographic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.utils.dirCosToStereographic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert direction cosines to stereographic tangent plane projection.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -581,8 +583,8 @@ orientation is such that vx (vy) is positive when u (v) is positive.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="batoid.utils.orthographicToDirCos">
-<code class="sig-prename descclassname">batoid.utils.</code><code class="sig-name descname">orthographicToDirCos</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">v</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#orthographicToDirCos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.utils.orthographicToDirCos" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.utils.orthographicToDirCos">
+<span class="sig-prename descclassname"><span class="pre">batoid.utils.</span></span><span class="sig-name descname"><span class="pre">orthographicToDirCos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#orthographicToDirCos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.utils.orthographicToDirCos" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert orthographic tangent plane projection u,v to direction cosines.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -599,8 +601,8 @@ orientation is such that vx (vy) is positive when u (v) is positive.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="batoid.utils.dirCosToOrthographic">
-<code class="sig-prename descclassname">batoid.utils.</code><code class="sig-name descname">dirCosToOrthographic</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">alpha</span></em>, <em class="sig-param"><span class="n">beta</span></em>, <em class="sig-param"><span class="n">gamma</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#dirCosToOrthographic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.utils.dirCosToOrthographic" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.utils.dirCosToOrthographic">
+<span class="sig-prename descclassname"><span class="pre">batoid.utils.</span></span><span class="sig-name descname"><span class="pre">dirCosToOrthographic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#dirCosToOrthographic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.utils.dirCosToOrthographic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert direction cosines to orthographic tangent plane projection.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -617,8 +619,8 @@ orientation is such that vx (vy) is positive when u (v) is positive.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="batoid.utils.lambertToDirCos">
-<code class="sig-prename descclassname">batoid.utils.</code><code class="sig-name descname">lambertToDirCos</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">v</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#lambertToDirCos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.utils.lambertToDirCos" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.utils.lambertToDirCos">
+<span class="sig-prename descclassname"><span class="pre">batoid.utils.</span></span><span class="sig-name descname"><span class="pre">lambertToDirCos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#lambertToDirCos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.utils.lambertToDirCos" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert Lambert azimuthal equal-area tangent plane projection u,v to
 direction cosines.</p>
 <dl class="field-list simple">
@@ -636,8 +638,8 @@ orientation is such that vx (vy) is positive when u (v) is positive.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="batoid.utils.dirCosToLambert">
-<code class="sig-prename descclassname">batoid.utils.</code><code class="sig-name descname">dirCosToLambert</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">alpha</span></em>, <em class="sig-param"><span class="n">beta</span></em>, <em class="sig-param"><span class="n">gamma</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#dirCosToLambert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#batoid.utils.dirCosToLambert" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="batoid.utils.dirCosToLambert">
+<span class="sig-prename descclassname"><span class="pre">batoid.utils.</span></span><span class="sig-name descname"><span class="pre">dirCosToLambert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/utils.html#dirCosToLambert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.utils.dirCosToLambert" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert direction cosines to Lambert azimuthal equal-area tangent plane
 projection.</p>
 <dl class="field-list simple">
@@ -671,7 +673,7 @@ orientation is such that vx (vy) is positive when u (v) is positive.</p>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2020, Josh Meyers.
+        &#169; Copyright 2017-2021, Josh Meyers.
 
     </p>
   </div>

@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>batoid.optic &mdash; batoid 0.2.0rc1 documentation</title>
+  <title>batoid.optic &mdash; batoid 0.3.0 documentation</title>
   
 
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,10 +31,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -62,7 +64,7 @@
             
             
               <div class="version">
-                0.2
+                0.3
               </div>
             
           
@@ -812,6 +814,70 @@
 
     <span class="k">def</span> <span class="nf">rSplit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rv</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">intersect</span><span class="p">(</span><span class="n">rv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span><span class="p">),</span> <span class="kc">None</span></div>
+
+
+<span class="k">class</span> <span class="nc">OPDScreen</span><span class="p">(</span><span class="n">Interface</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An `Optic` defined by a surface and an Optical Path Difference function.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    We use a `batoid.Surface` object for both the intersection surface and the</span>
+<span class="sd">    OPD.  For the OPD, the `surface.sag` method should return the desired</span>
+<span class="sd">    optical path difference (in meters) to add to traversing rays.</span>
+
+<span class="sd">    Rays traversing an OPD screen are deflected according to:</span>
+
+<span class="sd">    cosx2 = cosx1 + d(OPD)/dx</span>
+<span class="sd">    cosy2 = cosy1 + d(OPD)/dy</span>
+
+<span class="sd">    Where cosx1, cosx2 are direction cosines relative to the surface normal.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    surface : `batoid.Surface`</span>
+<span class="sd">        The intersection surface for the phase screen.</span>
+<span class="sd">    screen : `batoid.Surface`</span>
+<span class="sd">        The OPD to add upon traversal, in meters.</span>
+<span class="sd">    **kwargs : dict</span>
+<span class="sd">        Other keyword arguments to `Interface`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surface</span><span class="p">,</span> <span class="n">screen</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">Interface</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surface</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">screen</span> <span class="o">=</span> <span class="n">screen</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">inMedium</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">outMedium</span>
+        <span class="c1"># Not coatings available.</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s2">&quot;OPDScreen(</span><span class="si">{!r}</span><span class="s2">, </span><span class="si">{!r}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surface</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">obscuration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="s2">&quot;, obscuration=</span><span class="si">{!r}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obscuration</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="n">Optic</span><span class="o">.</span><span class="n">_repr_helper</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">+=</span><span class="s2">&quot;)&quot;</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span>
+            <span class="n">Interface</span><span class="o">.</span><span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">screen</span>
+        <span class="p">))</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">Interface</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">screen</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">interact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rv</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="c1"># Should reverse be different somehow?</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">refractScreen</span><span class="p">(</span>
+            <span class="n">rv</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">screen</span><span class="p">,</span>
+            <span class="n">coordSys</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">rSplit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rv</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="c1"># Can only go forward for now.</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">interact</span><span class="p">(</span><span class="n">rv</span><span class="p">),</span> <span class="kc">None</span>
+
 
 <div class="viewcode-block" id="CompoundOptic"><a class="viewcode-back" href="../../optic.html#batoid.CompoundOptic">[docs]</a><span class="k">class</span> <span class="nc">CompoundOptic</span><span class="p">(</span><span class="n">Optic</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;An `Optic` containing two or more `Optic` s as subitems.</span>
@@ -1691,7 +1757,7 @@
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2020, Josh Meyers.
+        &#169; Copyright 2017-2021, Josh Meyers.
 
     </p>
   </div>
