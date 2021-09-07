@@ -5,32 +5,33 @@ opticalSystem:
     type: Air
   medium: *air
   backDist: 3.0
-  sphereRadius: 5.0
-  pupilSize: 1.27
+  sphereRadius: 1.0
+  pupilSize: 1.2
   pupilObscuration: 0.188976378
   stopSurface:
     type: Interface
     name: entrancePupil
     surface:
       type: Plane
+    z: 0.04768
   items:
-    # -
-    #   type: Baffle
-    #   name: Baffle_M1
-    #   surface:
-    #     type: Plane
-    #   coordSys:
-    #     z: 0.04768
-    #   obscuration:
-    #     type: ClearCircle
-    #     radius: 0.6
+    -
+      type: Baffle
+      name: Baffle_M1
+      surface:
+        type: Plane
+      coordSys:
+        z: 0.04768
+      obscuration:
+        type: ClearCircle
+        radius: 0.6
     -
       type: Mirror
       name: M1
       surface:
         type: Quadric
         R: 6.605995
-        conic: -1.008
+        conic: -1.007514
       obscuration:
         type: ClearAnnulus
         outer: 0.635
@@ -44,46 +45,47 @@ opticalSystem:
         z: 2.692074
       obscuration:
         type: ClearCircle
-        radius: 0.2115
+        radius: 0.125
     -
       type: Baffle
       name: Baffle_M2b
       surface:
         type: Plane
       coordSys:
-        z: 2.706774
+        z: 2.702544
       obscuration:
         type: ClearCircle
-        radius: 0.2115
+        radius: 0.121
     -
       type: Mirror
       name: M2
       surface:
         type: Quadric
         R: 1.41517
-        conic: -1.92
+        conic: -1.920444
       obscuration:
         type: ClearCircle
         radius: 0.133
       coordSys:
-        z: 2.7078539349999997
+        z: 2.703614
     -
       type: Mirror
       name: M3
       surface:
         type: Plane
       coordSys:
-        z: 0.21070399999999978
+        z: 0.206
         rotX: 0.7853981633974483  # 45 degree
       obscuration:
         type: ClearCircle
         radius: 0.1
+        # Should really be elliptical with 109 x 151.5
     -
       type: CompoundOptic
       name: LATISS
       coordSys:
-        z: 0.21070399999999978
-        y: -0.69
+        z: 0.206
+        y: -0.8627
         rotX: 1.5707963267948966
       items:
         -
@@ -211,8 +213,3 @@ opticalSystem:
           obscuration:
             type: ClearCircle
             radius: 0.025075
-
-
-
-
-
