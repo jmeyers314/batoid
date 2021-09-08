@@ -7,7 +7,7 @@ opticalSystem:
   backDist: 3.0
   sphereRadius: 1.0
   pupilSize: 1.2
-  pupilObscuration: 0.188976378
+  pupilObscuration: 0.33333333
   stopSurface:
     type: Interface
     name: entrancePupil
@@ -15,6 +15,16 @@ opticalSystem:
       type: Plane
     z: 0.04768
   items:
+    -
+      type: Baffle
+      name: Baffle_M2c
+      surface:
+        type: Plane
+      coordSys:
+        z: 2.7
+      obscuration:
+        type: Circle
+        radius: 0.2115
     -
       type: Baffle
       name: Baffle_M1
@@ -33,9 +43,8 @@ opticalSystem:
         R: 6.605995
         conic: -1.007514
       obscuration:
-        type: ClearAnnulus
-        outer: 0.635
-        inner: 0.12
+        type: ClearCircle
+        radius: 0.635
     -
       type: Baffle
       name: Baffle_M2a
@@ -212,4 +221,4 @@ opticalSystem:
             z: 0.569038
           obscuration:
             type: ClearCircle
-            radius: 0.025075
+            radius: 0.04  # large enough to go out (4, 4) arcmin off axis.
