@@ -10,17 +10,19 @@ def parse_obscuration(config):
     ]:
         evalstr = "batoid.{}(**config)".format(typ)
         return eval(evalstr)
-    if typ == 'ObscNegation':
+    elif typ == 'ObscNegation':
         original = parse_obscuration(config['original'])
         return batoid.ObscNegation(original)
-    if typ in ['ObscUnion', 'ObscIntersection']:
+    elif typ in ['ObscUnion', 'ObscIntersection']:
         items = [parse_obscuration(c) for c in config['items']]  # noqa
         evalstr = "batoid.{}(items)".format(typ)
         return eval(evalstr)
-    if typ.startswith('Clear'): # triggers negation
+    elif typ.startswith('Clear'): # triggers negation
         # put type back into config, but with Clear->Obsc
         config['type'] = typ.replace("Clear", "Obsc")
         return batoid.ObscNegation(parse_obscuration(config))
+    else:
+        raise ValueError(f"Unknown obscuration type {typ}")
 
 
 def parse_surface(config):

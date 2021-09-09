@@ -23,7 +23,7 @@ opticalSystem:
       coordSys:
         z: 2.7
       obscuration:
-        type: Circle
+        type: ObscCircle
         radius: 0.2115
     -
       type: Baffle

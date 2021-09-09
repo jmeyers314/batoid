@@ -37,6 +37,8 @@ notebooks = [
     "Analytic despace aberration.ipynb",
     "Apochromat.ipynb",
     "Aspheric Newtonian Telescope.ipynb",
+    "AuxTel perturbations.ipynb",
+    "AuxTel trace.ipynb",
     "DECam draw2d.ipynb",
     "DECam perturbations.ipynb",
     "DECam trace.ipynb",
