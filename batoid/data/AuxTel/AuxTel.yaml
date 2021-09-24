@@ -5,9 +5,9 @@ opticalSystem:
     type: Air
   medium: *air
   backDist: 3.0
-  sphereRadius: 1.0
+  sphereRadius: 4.48
   pupilSize: 1.2
-  pupilObscuration: 0.33333333
+  pupilObscuration: 0.423
   stopSurface:
     type: Interface
     name: entrancePupil
@@ -24,7 +24,7 @@ opticalSystem:
         z: 2.7
       obscuration:
         type: ObscCircle
-        radius: 0.2115
+        radius: 0.2538
     -
       type: Baffle
       name: Baffle_M1
@@ -94,7 +94,7 @@ opticalSystem:
       name: LATISS
       coordSys:
         z: 0.206
-        y: -0.8627
+        y: -0.8626653895354659
         rotX: 1.5707963267948966
       items:
         -

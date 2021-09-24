@@ -1,0 +1,89 @@
+opticalSystem:
+  type: CompoundOptic
+  name: Calypso
+  inMedium: &air
+    type: Air
+  medium: *air
+  backDist: 3.0
+  sphereRadius: 4.48
+  pupilSize: 1.2
+  pupilObscuration: 0.423
+  stopSurface:
+    type: Interface
+    name: entrancePupil
+    surface:
+      type: Plane
+    z: 0.04768
+  items:
+    -
+      type: Baffle
+      name: Baffle_M2c
+      surface:
+        type: Plane
+      coordSys:
+        z: 2.7
+      obscuration:
+        type: ObscCircle
+        radius: 0.2538
+    -
+      type: Baffle
+      name: Baffle_M1
+      surface:
+        type: Plane
+      coordSys:
+        z: 0.04768
+      obscuration:
+        type: ClearCircle
+        radius: 0.6
+    -
+      type: Mirror
+      name: M1
+      surface:
+        type: Quadric
+        R: 6.605995
+        conic: -1.007514
+      obscuration:
+        type: ClearCircle
+        radius: 0.635
+    -
+      type: Baffle
+      name: Baffle_M2a
+      surface:
+        type: Plane
+      coordSys:
+        z: 2.692074
+      obscuration:
+        type: ClearCircle
+        radius: 0.125
+    -
+      type: Baffle
+      name: Baffle_M2b
+      surface:
+        type: Plane
+      coordSys:
+        z: 2.702544
+      obscuration:
+        type: ClearCircle
+        radius: 0.121
+    -
+      type: Mirror
+      name: M2
+      surface:
+        type: Quadric
+        R: 1.41517
+        conic: -1.920444
+      obscuration:
+        type: ClearCircle
+        radius: 0.133
+      coordSys:
+        z: 2.703614
+    -
+      type: Detector
+      name: Detector
+      surface:
+        type: Plane
+      coordSys:
+        z: -1.21606742
+      obscuration:
+        type: ClearCircle
+        radius: 0.1
