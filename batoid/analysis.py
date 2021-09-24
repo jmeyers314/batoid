@@ -735,7 +735,7 @@ def zernikeTransverseAberration(
     elif reference == 'chief':
         chief = batoid.RayVector.fromStop(
             0, 0, optic, wavelength=wavelength,
-            theta_x=theta_x, theta_y=theta_y
+            dirCos=dirCos
         )
         optic.trace(chief)
         point = chief.r[0]
@@ -889,8 +889,8 @@ def exitPupilPos(optic, wavelength, smallAngle=np.deg2rad(1./3600)):
     ps = []
     for ray in rays:
         ps.append(_closestApproach(
-            rays.r[0],
-            rays.v[0],
+            ray.r[0],
+            ray.v[0],
             np.array([0., 0., 0.]),
             np.array([0., 0., 1.0])
         ))
