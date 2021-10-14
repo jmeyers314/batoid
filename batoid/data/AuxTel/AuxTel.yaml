@@ -87,7 +87,7 @@ opticalSystem:
         rotX: 0.7853981633974483  # 45 degree
       obscuration:
         type: ClearCircle
-        radius: 0.1
+        radius: 0.1515
         # Should really be elliptical with 109 x 151.5
     -
       type: CompoundOptic
@@ -118,7 +118,8 @@ opticalSystem:
                 tany: 0.02
               obscuration:
                 type: ClearCircle
-                radius: 0.04445
+                # radius: 0.04445
+                radius: 0.1
             -
               type: RefractiveInterface
               name: L1_exit
@@ -126,7 +127,8 @@ opticalSystem:
                 type: Plane
               obscuration:
                 type: ClearCircle
-                radius: 0.04445
+                # radius: 0.04445
+                radius: 0.1
               coordSys:
                 z: 0.00778
         -
@@ -145,7 +147,8 @@ opticalSystem:
                 tany: 0.1
               obscuration:
                 type: ClearCircle
-                radius: 0.0254
+                # radius: 0.0254
+                radius: 0.1
             -
               type: RefractiveInterface
               name: Filter_exit
@@ -155,7 +158,8 @@ opticalSystem:
                 tany: 0.1
               obscuration:
                 type: ClearCircle
-                radius: 0.0254
+                # radius: 0.0254
+                radius: 0.1
               coordSys:
                 z: 0.005
         -
@@ -174,7 +178,8 @@ opticalSystem:
                 tany: -0.02
               obscuration:
                 type: ClearCircle
-                radius: 0.0325
+                # radius: 0.0325
+                radius: 0.1
             -
               type: RefractiveInterface
               name: L2_exit
@@ -182,7 +187,8 @@ opticalSystem:
                 type: Plane
               obscuration:
                 type: ClearCircle
-                radius: 0.0325
+                # radius: 0.0325
+                radius: 0.1
               coordSys:
                 z: 0.010
         -
@@ -201,7 +207,8 @@ opticalSystem:
                 tany: 0.02
               obscuration:
                 type: ClearCircle
-                radius: 0.04445
+                # radius: 0.04445
+                radius: 0.1
             -
               type: RefractiveInterface
               name: L3_exit
@@ -209,7 +216,8 @@ opticalSystem:
                 type: Plane
               obscuration:
                 type: ClearCircle
-                radius: 0.04445
+                # radius: 0.04445
+                radius: 0.1
               coordSys:
                 z: 0.0078
         -
@@ -221,4 +229,5 @@ opticalSystem:
             z: 0.569038
           obscuration:
             type: ClearCircle
-            radius: 0.04  # large enough to go out (4, 4) arcmin off axis.
+            radius: 0.1  # plenty large?
+            # radius: 0.04  # large enough to go out (4, 4) arcmin off axis.
