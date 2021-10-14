@@ -681,113 +681,91 @@ namespace batoid {
                     t += dt;
                     // screen refraction
 
-                    // double oldvx = vx;
-                    // double oldvy = vy;
-                    // double oldvz = vz;
+                    double norm = std::sqrt(vx*vx + vy*vy + vz*vz);
+                    double norm_inv = 1/norm;
 
-                    // // Plane surface version
-                    // // For the moment, assume that surface is a batoid.Plane.
-                    // double dPdx, dPdy;
-                    // screenPtr->grad(x, y, dPdx, dPdy);
-                    // double norm = std::sqrt(vx*vx + vy*vy + vz*vz);
-                    // double cosx = vx/norm + dPdx;
-                    // double cosy = vy/norm + dPdy;
-                    // double cosz = std::sqrt(1 - cosx*cosx - cosy*cosy);
-                    // printf("\n\n\n");
                     // printf("vx = %.18f\n", vx);
                     // printf("vy = %.18f\n", vy);
                     // printf("vz = %.18f\n", vz);
-                    // printf("norm = %.18f\n", norm);
-                    // printf("dPdx = %.18f\n", dPdx);
-                    // printf("dPdy = %.18f\n", dPdy);
-                    // printf("cosx = %.18f\n", cosx);
-                    // printf("cosy = %.18f\n", cosy);
-                    // printf("cosz = %.18f\n", cosz);
-                    // t += screenPtr->sag(x, y);
-                    // if (vz < 0) {
-                    //     vx = -cosx*norm;
-                    //     vy = -cosy*norm;
-                    //     vz = -cosz*norm;
-                    // } else {
-                    //     vx = cosx*norm;
-                    //     vy = cosy*norm;
-                    //     vz = cosz*norm;
-                    // }
-                    // printf("vx = %.18f\n", vx);
-                    // printf("vy = %.18f\n", vy);
-                    // printf("vz = %.18f\n", vz);
-                    // printf("\n");
+                    // printf("|v| = %.18f\n", norm);
 
-                    // vx = oldvx;
-                    // vy = oldvy;
-                    // vz = oldvz;
-                    // Arbitrary surface version
                     // Make an orthogonal unit-vector basis:
                     //   e3 is the surface normal
                     double e3x, e3y, e3z;
                     surfacePtr->normal(x, y, e3x, e3y, e3z);
-                    // printf("e3x = %.18f\n", e3x);
-                    // printf("e3y = %.18f\n", e3y);
-                    // printf("e3z = %.18f\n", e3z);
 
                     //   e1 parallel to y x n
                     double e1norm = std::sqrt(e3z*e3z + e3x*e3x);
                     double e1x = e3z/e1norm;
                     double e1y = 0;
                     double e1z = -e3x/e1norm;
+
+                    //   e2 = e3 x e1
+                    double e2x = e3y*e1z - e3z*e1y;
+                    double e2y = e3z*e1x - e3x*e1z;
+                    double e2z = e3x*e1y - e3y*e1x;
+
                     // printf("e1x = %.18f\n", e1x);
                     // printf("e1y = %.18f\n", e1y);
                     // printf("e1z = %.18f\n", e1z);
-                    //   e2 = e3 x e1
-                    double e2x = e3x*e1y - e3y*e1x;
-                    double e2y = e3z*e1x - e3x*e1z;
-                    double e2z = e3x*e1y - e3y*e1x;
+
                     // printf("e2x = %.18f\n", e2x);
                     // printf("e2y = %.18f\n", e2y);
                     // printf("e2z = %.18f\n", e2z);
 
-                    // Projections of v onto e1, e2.
-                    double norm = std::sqrt(vx*vx + vy*vy + vz*vz);
-                    double norm_inv = 1/norm;
+                    // printf("e3x = %.18f\n", e3x);
+                    // printf("e3y = %.18f\n", e3y);
+                    // printf("e3z = %.18f\n", e3z);
+
+                    // printf("|e1| = %.18f\n", std::sqrt(e1x*e1x + e1y*e1y + e1z*e1z));
+                    // printf("|e2| = %.18f\n", std::sqrt(e2x*e2x + e2y*e2y + e2z*e2z));
+                    // printf("|e3| = %.18f\n", std::sqrt(e3x*e3x + e3y*e3y + e3z*e3z));
+
+                    // Projections of v onto e1, e2, e3.
                     double cos1 = vx*norm_inv*e1x + vy*norm_inv*e1y + vz*norm_inv*e1z;
                     double cos2 = vx*norm_inv*e2x + vy*norm_inv*e2y + vz*norm_inv*e2z;
                     double cos3 = vx*norm_inv*e3x + vy*norm_inv*e3y + vz*norm_inv*e3z;
+
                     // printf("cos1 = %.18f\n", cos1);
                     // printf("cos2 = %.18f\n", cos2);
                     // printf("cos3 = %.18f\n", cos3);
+                    // printf("len = %.18f\n", std::sqrt(cos1*cos1 + cos2*cos2 + cos3*cos3));
 
                     // Add screen gradient along e1, e2 to direction cosines
                     double dPdx, dPdy;
                     screenPtr->grad(x, y, dPdx, dPdy);
                     double dPd1 = dPdx*e1x + dPdy*e1y;
                     double dPd2 = dPdx*e2x + dPdy*e2y;
+
                     // printf("dPd1 = %.18f\n", dPd1);
                     // printf("dPd2 = %.18f\n", dPd2);
-                    cos1 += dPd1;
-                    cos2 += dPd2;
 
-                    // Normalize
                     if (cos3 < 0) {
-                        cos1 *= -norm;
-                        cos2 *= -norm;
-                        cos3 = -norm*std::sqrt(1 - cos1*cos1 - cos2*cos2);
+                        cos1 += dPd1;
+                        cos2 += dPd2;
+                        cos3 = -std::sqrt(1 - cos1*cos1 - cos2*cos2);
                     } else {
-                        cos1 *= norm;
-                        cos2 *= norm;
-                        cos3 = norm*std::sqrt(1 - cos1*cos1 - cos2*cos2);
+                        cos1 -= dPd1;
+                        cos2 -= dPd2;
+                        cos3 = std::sqrt(1 - cos1*cos1 - cos2*cos2);
                     }
+
                     // printf("cos1 = %.18f\n", cos1);
                     // printf("cos2 = %.18f\n", cos2);
                     // printf("cos3 = %.18f\n", cos3);
+                    // printf("len = %.18f\n", std::sqrt(cos1*cos1 + cos2*cos2 + cos3*cos3));
 
                     // Rotate back to xyz.
-                    vx = cos1*e1x + cos2*e2x + cos3*e3x;
-                    vy = cos1*e1y + cos2*e2y + cos3*e3y;
-                    vz = cos1*e1z + cos2*e2z + cos3*e3z;
+                    vx = cos1*norm*e1x + cos2*norm*e2x + cos3*norm*e3x;
+                    vy = cos1*norm*e1y + cos2*norm*e2y + cos3*norm*e3y;
+                    vz = cos1*norm*e1z + cos2*norm*e2z + cos3*norm*e3z;
+
                     // printf("vx = %.18f\n", vx);
                     // printf("vy = %.18f\n", vy);
                     // printf("vz = %.18f\n", vz);
+                    // printf("|v| = %.18f\n", std::sqrt(vx*vx + vy*vy + vz*vz));
                     // printf("\n");
+
                     t += screenPtr->sag(x, y);
 
                     // output
