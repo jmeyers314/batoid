@@ -679,8 +679,8 @@ namespace batoid {
                     y += vy * dt;
                     z += vz * dt;
                     t += dt;
-                    // screen refraction
 
+                    // screen refraction
                     double norm = std::sqrt(vx*vx + vy*vy + vz*vz);
                     double norm_inv = 1/norm;
 

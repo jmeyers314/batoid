@@ -95,6 +95,13 @@ def parse_optic(config,
             surface, name=name,
             coordSys=coordSys, obscuration=obscuration,
             inMedium=inMedium, outMedium=outMedium)
+    elif typ == 'OPDScreen':
+        surface = parse_surface(config.pop('surface'))
+        screen = parse_surface(config.pop('screen'))
+        return batoid.optic.OPDScreen(
+            surface, screen, name=name,
+            coordSys=coordSys, obscuration=obscuration,
+            inMedium=inMedium, outMedium=outMedium)
     elif typ == 'Baffle':
         surface = parse_surface(config.pop('surface'))
         return batoid.optic.Baffle(
@@ -155,7 +162,7 @@ def parse_optic(config,
             coordSys=coordSys
         )
     else:
-        raise ValueError("Unknown optic type")
+        raise ValueError(f"Unknown optic type: {typ}")
 
 
 def parse_medium(config):
