@@ -16,8 +16,8 @@ namespace batoid {
             double& nx, double& ny, double& nz
         ) const = 0;
         virtual bool timeToIntersect(
-            double x, double y, double z,
-            double vx, double vy, double vz,
+            const double x, const double y, const double z,
+            const double vx, const double vy, const double vz,
             double& dt
         ) const;
         virtual void grad(

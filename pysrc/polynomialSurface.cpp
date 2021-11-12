@@ -12,14 +12,14 @@ namespace batoid {
                     size_t coefs,
                     size_t coefs_gradx,
                     size_t coefs_grady,
-                    size_t nx,
-                    size_t ny
+                    size_t xsize,
+                    size_t ysize
                 ){
                     return new PolynomialSurface(
-                        reinterpret_cast<double*>(coefs),
-                        reinterpret_cast<double*>(coefs_gradx),
-                        reinterpret_cast<double*>(coefs_grady),
-                        nx, ny
+                        reinterpret_cast<const double*>(coefs),
+                        reinterpret_cast<const double*>(coefs_gradx),
+                        reinterpret_cast<const double*>(coefs_grady),
+                        xsize, ysize
                     );
                 }
             ));
@@ -29,7 +29,7 @@ namespace batoid {
             [](double x, double y, size_t coefs, size_t nx, size_t ny){
                 return horner2d(
                     x, y,
-                    reinterpret_cast<double*>(coefs),
+                    reinterpret_cast<const double*>(coefs),
                     nx, ny
                 );
             }

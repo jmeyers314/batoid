@@ -73,7 +73,7 @@ setup(
     package_dir={'batoid': 'batoid'},
     package_data={'batoid' : ['data/**/*']},
     ext_modules=[CMakeExtension('batoid._batoid')],
-    install_requires=['numpy', 'pyyaml'],
+    install_requires=['numpy'],
     python_requires='>=3.6',
     setup_requires=['pytest-runner'],
     tests_require=['pytest'],

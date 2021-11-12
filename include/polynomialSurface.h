@@ -9,7 +9,7 @@ namespace batoid {
     public:
         PolynomialSurface(
             const double* coefs, const double* coefs_gradx, const double* coefs_grady,
-            size_t nx, size_t ny
+            size_t xsize, size_t ysize
         );
         ~PolynomialSurface();
 
@@ -25,7 +25,7 @@ namespace batoid {
         const double* _coefs;
         const double* _coefs_gradx;
         const double* _coefs_grady;
-        const size_t _nx, _ny;
+        const size_t _xsize, _ysize;
     };
 
     double horner2d(double x, double y, const double* coefs, size_t nx, size_t ny);

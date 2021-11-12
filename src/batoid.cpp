@@ -671,7 +671,7 @@ namespace batoid {
             double t = tptr[i];
             if (!failptr[i]) {
                 // intersection
-                double dt;
+                double dt=0.0;
                 bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt);
                 if (success) {
                     // propagation

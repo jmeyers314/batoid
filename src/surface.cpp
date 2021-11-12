@@ -13,9 +13,9 @@ namespace batoid {
     Surface::~Surface() {}
 
     bool Surface::timeToIntersect(
-        double x, double y, double z,
-        double vx, double vy, double vz,
-        double& dt
+        const double x, const double y, const double z,
+        const double vx, const double vy, const double vz,
+        double& dt  // Used as initial guess on input!
     ) const {
         // The better the initial estimate of dt, the better this will perform
         double rPx = x+vx*dt;
