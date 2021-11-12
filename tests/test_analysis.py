@@ -19,11 +19,11 @@ def test_zernikeGQ():
     telescope['LSST.M1'].obscuration = batoid.ObscNegation(
         batoid.ObscCircle(4.18)
     )
-    zSquare = batoid.analysis.zernike(
+    zSquare = batoid.zernike(
         telescope, 0.0, 0.0, 625e-9,
         nx=nx, jmax=28, reference='chief'
     )
-    zGQ = batoid.analysis.zernikeGQ(
+    zGQ = batoid.zernikeGQ(
         telescope, 0.0, 0.0, 625e-9,
         rings=rings, jmax=28, reference='chief'
     )
@@ -36,11 +36,11 @@ def test_zernikeGQ():
     telescope['LSST.M1'].obscuration = batoid.ObscNegation(
         batoid.ObscAnnulus(0.61*4.18, 4.18)
     )
-    zSquare = batoid.analysis.zernike(
+    zSquare = batoid.zernike(
         telescope, 0.0, 0.0, 625e-9,
         nx=nx, jmax=28, reference='chief', eps=0.61
     )
-    zGQ = batoid.analysis.zernikeGQ(
+    zGQ = batoid.zernikeGQ(
         telescope, 0.0, 0.0, 625e-9,
         rings=rings, jmax=28, reference='chief', eps=0.61
     )
@@ -50,11 +50,11 @@ def test_zernikeGQ():
     )
 
     # Try off-axis
-    zSquare = batoid.analysis.zernike(
+    zSquare = batoid.zernike(
         telescope, np.deg2rad(0.2), np.deg2rad(0.1), 625e-9,
         nx=nx, jmax=28, reference='chief', eps=0.61
     )
-    zGQ = batoid.analysis.zernikeGQ(
+    zGQ = batoid.zernikeGQ(
         telescope, np.deg2rad(0.2), np.deg2rad(0.1), 625e-9,
         rings=rings, jmax=28, reference='chief', eps=0.61
     )
@@ -65,11 +65,11 @@ def test_zernikeGQ():
 
     # Try reference == mean
     # Try off-axis
-    zSquare = batoid.analysis.zernike(
+    zSquare = batoid.zernike(
         telescope, np.deg2rad(0.2), np.deg2rad(0.1), 625e-9,
         nx=nx, jmax=28, reference='mean', eps=0.61
     )
-    zGQ = batoid.analysis.zernikeGQ(
+    zGQ = batoid.zernikeGQ(
         telescope, np.deg2rad(0.2), np.deg2rad(0.1), 625e-9,
         rings=rings, jmax=28, reference='mean', eps=0.61
     )
@@ -84,50 +84,54 @@ def test_huygensPSF():
     telescope = batoid.Optic.fromYaml("LSST_r.yaml")
 
     # Test that we can infer dy from dx properly
-    psf1 = batoid.analysis.huygensPSF(
+    psf1 = batoid.huygensPSF(
         telescope,
         np.deg2rad(0.1), np.deg2rad(0.1),
         620e-9,
         nx=64,
         nxOut=32,
         dx=10e-6,
+        reference='mean'
     )
-    psf2 = batoid.analysis.huygensPSF(
+    psf2 = batoid.huygensPSF(
         telescope,
         np.deg2rad(0.1), np.deg2rad(0.1),
         620e-9,
         nx=64,
         nxOut=32,
         dx=10e-6,
-        dy=10e-6
+        dy=10e-6,
+        reference='mean'
     )
     assert np.array_equal(psf1.primitiveVectors, psf2.primitiveVectors)
     np.testing.assert_allclose(psf1.array, psf2.array, rtol=1e-14, atol=1e-15)
 
     # Test vector vs scalar dx,dy
-    psf1 = batoid.analysis.huygensPSF(
+    psf1 = batoid.huygensPSF(
         telescope,
         np.deg2rad(0.1), np.deg2rad(0.1),
         620e-9,
         nx=64,
         nxOut=32,
         dx=[10e-6, 0],
-        dy=[0, 11e-6]
+        dy=[0, 11e-6],
+        reference='mean'
     )
-    psf2 = batoid.analysis.huygensPSF(
+    psf2 = batoid.huygensPSF(
         telescope,
         np.deg2rad(0.1), np.deg2rad(0.1),
         620e-9,
         nx=64,
         nxOut=32,
         dx=10e-6,
-        dy=11e-6
+        dy=11e-6,
+        reference='mean'
     )
     assert np.array_equal(psf1.primitiveVectors, psf2.primitiveVectors)
     np.testing.assert_allclose(psf1.array, psf2.array, rtol=1e-14, atol=1e-15)
 
     # Should still work with reference = 'chief'
-    psf3 = batoid.analysis.huygensPSF(
+    psf3 = batoid.huygensPSF(
         telescope,
         np.deg2rad(0.1), np.deg2rad(0.1),
         620e-9,
@@ -137,7 +141,7 @@ def test_huygensPSF():
         dy=[0, 11e-6],
         reference='chief'
     )
-    psf4 = batoid.analysis.huygensPSF(
+    psf4 = batoid.huygensPSF(
         telescope,
         np.deg2rad(0.1), np.deg2rad(0.1),
         620e-9,
@@ -154,7 +158,7 @@ def test_huygensPSF():
     np.testing.assert_allclose(psf3.array, psf4.array, rtol=1e-14, atol=1e-15)
 
     # And just cover nx odd
-    batoid.analysis.huygensPSF(
+    batoid.huygensPSF(
         telescope,
         np.deg2rad(0.1), np.deg2rad(0.1),
         620e-9,
@@ -165,7 +169,7 @@ def test_huygensPSF():
 @timer
 def test_doubleZernike():
     telescope = batoid.Optic.fromYaml("LSST_r.yaml")
-    dz = batoid.analysis.doubleZernike(
+    dz = batoid.doubleZernike(
         telescope,
         np.deg2rad(1.75),
         625e-9,
@@ -189,7 +193,7 @@ def test_doubleZernike():
             R_outer=np.deg2rad(1.75)
         )
         for thx_, thy_ in zip(thx, thy):
-            zGQ = batoid.analysis.zernikeGQ(
+            zGQ = batoid.zernikeGQ(
                 telescope, thx_, thy_,
                 625e-9,
                 jmax=22
@@ -197,7 +201,7 @@ def test_doubleZernike():
             np.testing.assert_allclose(Z(thx_, thy_), zGQ[j], rtol=0, atol=1e-4)
 
     # Check that we get similar results with different number of rings/spokes
-    dz2 = batoid.analysis.doubleZernike(
+    dz2 = batoid.doubleZernike(
         telescope,
         np.deg2rad(1.75),
         625e-9,

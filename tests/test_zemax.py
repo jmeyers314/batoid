@@ -82,7 +82,8 @@ def test_HSC_huygensPSF():
         telescope,
         thx, thy, projection='zemax',
         wavelength=wavelength,
-        nx=nx, dx=dx, nxOut=256
+        nx=nx, dx=dx, nxOut=256,
+        reference='mean'
     )
     print("Done")
 

@@ -172,7 +172,7 @@ def dthdr(
 def huygensPSF(
     optic, theta_x, theta_y, wavelength,
     projection='postel', nx=None, dx=None, dy=None,
-    nxOut=None, reference='mean'
+    nxOut=None, reference='chief'
 ):
     r"""Compute a PSF via the Huygens construction.
 
@@ -196,7 +196,7 @@ def huygensPSF(
     reference : {'chief', 'mean'}
         If 'chief', then center the output lattice where the chief ray
         intersects the focal plane.  If 'mean', then center at the mean
-        non-vignetted ray intersection.
+        non-vignetted ray intersections.
 
     Returns
     -------
@@ -299,7 +299,7 @@ def huygensPSF(
 def wavefront(
     optic, theta_x, theta_y, wavelength,
     projection='postel', nx=32,
-    sphereRadius=None, reference='mean'
+    sphereRadius=None, reference='chief'
 ):
     """Compute wavefront.
 
@@ -324,7 +324,7 @@ def wavefront(
     reference : {'chief', 'mean'}
         If 'chief', then center the output lattice where the chief ray
         intersects the focal plane.  If 'mean', then center at the mean
-        non-vignetted ray intersection.
+        non-vignetted ray intersections.
 
     Returns
     -------
@@ -381,7 +381,7 @@ def wavefront(
 
 def spot(
     optic, theta_x, theta_y, wavelength,
-    projection='postel', nx=32, reference='mean'
+    projection='postel', nx=32, reference='chief'
 ):
     dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
     rays = batoid.RayVector.asGrid(
@@ -394,7 +394,7 @@ def spot(
         point = np.mean(rays.r[w], axis=0)
     elif reference == 'chief':
         cridx = (nx//2)*nx+nx//2 if (nx%2)==0 else (nx*nx-1)//2
-        point = rays[cridx].r
+        point = rays[cridx].r[0]
     else:
         point = [0,0,0]
     targetCoordSys = rays.coordSys.shiftLocal(point)
@@ -406,7 +406,7 @@ def spot(
 def fftPSF(
     optic, theta_x, theta_y, wavelength,
     projection='postel', nx=32, pad_factor=2,
-    sphereRadius=None, reference='mean'
+    sphereRadius=None, reference='chief'
 ):
     """Compute PSF using FFT.
 
@@ -469,7 +469,7 @@ def fftPSF(
 def zernike(
     optic, theta_x, theta_y, wavelength,
     projection='postel', nx=32,
-    sphereRadius=None, reference='mean', jmax=22, eps=0.0
+    sphereRadius=None, reference='chief', jmax=22, eps=0.0
 ):
     """Compute Zernike polynomial decomposition of the wavefront.
 
@@ -510,7 +510,7 @@ def zernike(
     Returns
     -------
     zernikes : array
-        Zernike polynomial coefficients.
+        Zernike polynomial coefficients in waves.
 
     Notes
     -----
@@ -559,7 +559,7 @@ def zernike(
 def zernikeGQ(
     optic, theta_x, theta_y, wavelength,
     projection='postel', rings=6, spokes=None,
-    sphereRadius=None, reference='mean',
+    sphereRadius=None, reference='chief',
     jmax=22, eps=0.0
 ):
     r"""Compute Zernike polynomial decomposition of the wavefront.
@@ -603,7 +603,7 @@ def zernikeGQ(
     Returns
     -------
     zernikes : array
-        Zernike polynomial coefficients.
+        Zernike polynomial coefficients in waves.
 
     Notes
     -----
@@ -879,7 +879,7 @@ def _closestApproach(P, u, Q, v):
     Returns
     -------
     Pc : ndarray
-        Closest approach point.
+        Closest approach point in meters.
     """
     # Follows http://geomalgorithms.com/a07-_distance.html
     a = np.dot(u, u)
@@ -913,7 +913,7 @@ def exitPupilPos(optic, wavelength, smallAngle=np.deg2rad(1./3600)):
 
     Returns
     -------
-    Location of exit pupil in global coordinates.
+    Location of exit pupil in global coordinates (in meters).
     """
     thx = np.array([0, 0, smallAngle, -smallAngle])
     thy = np.array([smallAngle, -smallAngle, 0, 0])
