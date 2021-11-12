@@ -710,11 +710,51 @@ def _dZernikeBasis(jmax, x, y, R_outer=1.0, R_inner=0.0):
     return np.array([xout, yout])
 
 
-def zernikeTransverseAberration(
+def zernikeTA(
     optic, theta_x, theta_y, wavelength,
     projection='postel', nrad=10, naz=60,
-    reference='mean', jmax=22, eps=0.0
+    reference='chief', jmax=22, eps=0.0
 ):
+    """Compute Zernikes in such a way that transverse ray aberrations are
+    proportional to the gradient of the wavefront.
+
+    Parameters
+    ----------
+    optic : batoid.Optic
+        Optical system
+    theta_x, theta_y : float
+        Field angle in radians
+    wavelength : float
+        Wavelength in meters
+    projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}
+        Projection used to convert field angle to direction cosines.
+    nrad : int, optional
+        Number of ray radii to use.  (see RayVector.asPolar())
+    naz : int, optional
+        Approximate number of azimuthal angles in outermost ring.  (see
+        RayVector.asPolar())
+    reference : {'chief', 'mean'}
+        If 'chief', then center the output lattice where the chief ray
+        intersects the focal plane.  If 'mean', then center at the mean
+        non-vignetted ray intersection.
+    jmax : int, optional
+        Number of coefficients to compute.  Default: 22.
+    eps : float, optional
+        Use annular Zernike polynomials with this fractional inner radius.
+        Default: 0.0.
+
+    Returns
+    -------
+    zernikes : array
+        Zernike polynomial coefficients in waves.
+
+    Notes
+    -----
+    Zernike coefficients are indexed following the Noll convention.
+    Additionally, since python lists start at 0, but the Noll convention starts
+    at 1, the 0-th index of the returned array is meaningless.  I.e.,
+    zernikes[1] is piston, zernikes[4] is defocus, and so on...
+    """
     dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
     rays = batoid.RayVector.asPolar(
         optic=optic,
@@ -793,7 +833,7 @@ def doubleZernike(
     Returns
     -------
     dzs : array
-        Double Zernike polynomial coefficients.
+        Double Zernike polynomial coefficients in waves.
     """
     if spokes is None:
         spokes = 2*rings+1

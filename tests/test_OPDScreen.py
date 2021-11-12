@@ -12,7 +12,7 @@ def test_prescreen():
     lsst = batoid.Optic.fromYaml("LSST_r.yaml")
     wavelength = 620e-9
 
-    z_ref = batoid.analysis.zernikeGQ(
+    z_ref = batoid.zernikeGQ(
         lsst, 0, 0, wavelength, rings=10, reference='chief', jmax=37, eps=0.61
     )
     rng = np.random.default_rng(577)
@@ -45,10 +45,10 @@ def test_prescreen():
         )
         do_pickle(tel)
 
-        zGQ = batoid.analysis.zernikeGQ(
+        zGQ = batoid.zernikeGQ(
             tel, 0, 0, wavelength, rings=10, reference='chief', jmax=37, eps=0.61
         )
-        zTA = batoid.analysis.zernikeTransverseAberration(
+        zTA = batoid.zernikeTA(
             tel, 0, 0, wavelength, nrad=10, naz=60, reference='chief', jmax=37, eps=0.61
         )
 
@@ -118,7 +118,7 @@ def test_zeroscreen():
         rays = batoid.RayVector.asPolar(
             optic=tel, wavelength=620e-9,
             theta_x=thx, theta_y=thy,
-            nrad=2, naz=6
+            nrad=5, naz=60
         )
 
         tf1 = tel.traceFull(rays)
@@ -166,41 +166,41 @@ def test_z4_focus():
     inMedium: {n0}
     backDist: 1.0
     stopSurface:
-      type: Interface
-      surface:
-        type: Plane
-      coordSys:
-        z: 0.0
+        type: Interface
+        surface:
+            type: Plane
+        coordSys:
+            z: 0.0
     pupilSize: 0.1
     items:
-      -
-        type: RefractiveInterface
-        surface:
-          type: Sphere
-          R: {-R}
-        coordSys:
-          z: {+d/2}
-        inMedium: {n0}
-        outMedium: {n1}
-        name: 'L1'
-      -
-        type: RefractiveInterface
-        surface:
-          type: Sphere
-          R: {R}
-        coordSys:
-          z: {-d/2}
-        inMedium: {n1}
-        outMedium: {n0}
-        name: 'L2'
-      -
-        type: Detector
-        surface:
-          type: Plane
-        coordSys:
-          z: {-f}
-        inMedium: {n0}
-        name: D
+        -
+            type: RefractiveInterface
+            surface:
+                type: Sphere
+                R: {-R}
+            coordSys:
+                z: {+d/2}
+            inMedium: {n0}
+            outMedium: {n1}
+            name: 'L1'
+        -
+            type: RefractiveInterface
+            surface:
+                type: Sphere
+                R: {R}
+            coordSys:
+                z: {-d/2}
+            inMedium: {n1}
+            outMedium: {n0}
+            name: 'L2'
+        -
+            type: Detector
+            surface:
+                type: Plane
+            coordSys:
+                z: {-f}
+            inMedium: {n0}
+            name: D
     """
     biconvex = batoid.parse.parse_optic(
         yaml.safe_load(biconvex_str)
