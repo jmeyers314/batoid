@@ -218,7 +218,7 @@ namespace batoid {
             double t = tptr[i];
             // intersection
             if (!failptr[i]) {
-                double dt;
+                double dt = 0.0;
                 bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt);
                 if (success) {
                     x += vx * dt;
@@ -310,7 +310,7 @@ namespace batoid {
             double t = tptr[i];
             if (!failptr[i]) {
                 // intersection
-                double dt;
+                double dt = 0.0;
                 bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt);
                 if (success) {
                     // propagation
@@ -414,7 +414,7 @@ namespace batoid {
             double t = tptr[i];
             if (!failptr[i]) {
                 // intersection
-                double dt;
+                double dt = 0.0;
                 bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt);
                 if (success) {
                     // propagation
@@ -546,7 +546,7 @@ namespace batoid {
             double t = tptr[i];
             if (!failptr[i]) {
                 // intersection
-                double dt;
+                double dt = 0.0;
                 bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt);
                 if (success) {
                     // propagation
@@ -671,7 +671,7 @@ namespace batoid {
             double t = tptr[i];
             if (!failptr[i]) {
                 // intersection
-                double dt=0.0;
+                double dt = 0.0;
                 bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt);
                 if (success) {
                     // propagation
