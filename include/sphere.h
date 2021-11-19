@@ -5,6 +5,10 @@
 
 namespace batoid {
 
+    #if defined(BATOID_GPU)
+        #pragma omp declare target
+    #endif
+
     class Sphere : public Surface {
     public:
         Sphere(double R);
@@ -31,6 +35,10 @@ namespace batoid {
 
         double _dzdr(double r) const;
     };
+
+    #if defined(BATOID_GPU)
+        #pragma omp end declare target
+    #endif
 
 }
 #endif

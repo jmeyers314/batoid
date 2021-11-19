@@ -80,7 +80,6 @@ namespace batoid {
         #pragma omp end declare target
     #endif
 
-
     const Surface* Quadric::getDevPtr() const {
         #if defined(BATOID_GPU)
             if (!_devPtr) {
@@ -96,6 +95,4 @@ namespace batoid {
             return this;
         #endif
     }
-
-
 }

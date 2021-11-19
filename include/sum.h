@@ -5,6 +5,10 @@
 
 namespace batoid {
 
+    #if defined(BATOID_GPU)
+        #pragma omp declare target
+    #endif
+
     class Sum : public Surface {
     public:
         Sum(const Surface** surfaces, size_t nsurf);
@@ -27,6 +31,10 @@ namespace batoid {
         const Surface** _surfaces;
         size_t _nsurf;
     };
+
+    #if defined(BATOID_GPU)
+        #pragma omp end declare target
+    #endif
 
 }
 

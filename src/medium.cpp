@@ -13,8 +13,24 @@ namespace batoid {
             _devPtr(nullptr)
         {}
 
-        Medium::~Medium() {}
+        Medium::~Medium() {
+            #if defined(BATOID_GPU)
+                if (_devPtr) {
+                    freeDevPtr();
+                }
+            #endif
+        }
 
+        void Medium::freeDevPtr() const {
+            if(_devPtr) {
+                Medium* ptr = _devPtr;
+                _devPtr = nullptr;
+                #pragma omp target is_device_ptr(ptr)
+                {
+                    delete ptr;
+                }
+            }
+        }
 
         ConstMedium::ConstMedium(double n) :
             Medium(), _n(n)
@@ -61,11 +77,6 @@ namespace batoid {
         TableMedium::~TableMedium() {
             #if defined(BATOID_GPU)
                 if (_devPtr) {
-                    Medium* ptr = _devPtr;
-                    #pragma omp target is_device_ptr(ptr)
-                    {
-                        delete ptr;
-                    }
                     const double* args = _args;
                     const double* vals = _vals;
                     #pragma omp target exit data \

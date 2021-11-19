@@ -6,6 +6,10 @@
 
 namespace batoid {
 
+    #if defined(BATOID_GPU)
+        #pragma omp declare target
+    #endif
+
     class Bicubic : public Surface {
     public:
         Bicubic(const Table* table);
@@ -22,6 +26,10 @@ namespace batoid {
     private:
         const Table* _table;
     };
+
+    #if defined(BATOID_GPU)
+        #pragma omp end declare target
+    #endif
 
 }
 #endif

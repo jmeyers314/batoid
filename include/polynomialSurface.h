@@ -5,6 +5,10 @@
 
 namespace batoid {
 
+    #if defined(BATOID_GPU)
+        #pragma omp declare target
+    #endif
+
     class PolynomialSurface : public Surface {
     public:
         PolynomialSurface(
@@ -29,6 +33,10 @@ namespace batoid {
     };
 
     double horner2d(double x, double y, const double* coefs, size_t nx, size_t ny);
+
+    #if defined(BATOID_GPU)
+        #pragma omp end declare target
+    #endif
 }
 
 #endif // batoid_PolynomialSurface_h

@@ -14,11 +14,6 @@ namespace batoid {
     Sum::~Sum() {
         #if defined(BATOID_GPU)
             if (_devPtr) {
-                Surface* ptr = _devPtr;
-                #pragma omp target is_device_ptr(ptr)
-                {
-                    delete ptr;
-                }
                 const Surface** surfaces = _surfaces;
                 #pragma omp target exit data map(release:surfaces[:_nsurf])
             }

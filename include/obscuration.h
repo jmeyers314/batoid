@@ -4,6 +4,11 @@
 #include <cstdlib>  // for size_t
 
 namespace batoid {
+
+    #if defined(BATOID_GPU)
+        #pragma omp declare target
+    #endif
+
     class Obscuration {
     public:
         Obscuration();
@@ -15,6 +20,9 @@ namespace batoid {
 
     protected:
         mutable Obscuration* _devPtr;
+
+    private:
+        void freeDevPtr() const;
     };
 
 
@@ -93,8 +101,6 @@ namespace batoid {
         const double* _xp;
         const double* _yp;
         const size_t _size;
-
-        static double* _copyArr(const double* coefs, const size_t size);
     };
 
 
@@ -140,6 +146,10 @@ namespace batoid {
         const Obscuration** _obscs;
         size_t _nobsc;
     };
+
+    #if defined(BATOID_GPU)
+        #pragma omp end declare target
+    #endif
 }
 
 #endif

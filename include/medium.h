@@ -5,6 +5,11 @@
 
 
 namespace batoid {
+
+    #if defined(BATOID_GPU)
+        #pragma omp declare target
+    #endif
+
     class Medium {
     public:
         Medium();
@@ -16,6 +21,9 @@ namespace batoid {
 
     protected:
         mutable Medium* _devPtr;
+
+    private:
+        void freeDevPtr() const;
     };
 
 
@@ -90,6 +98,11 @@ namespace batoid {
         const double _pressure, _temperature, _h2o_pressure; // input vars
         const double _P, _T, _W;  // same, but transformed to better units
     };
+
+    #if defined(BATOID_GPU)
+        #pragma omp end declare target
+    #endif
+
 }
 
 #endif

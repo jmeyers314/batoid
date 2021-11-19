@@ -5,6 +5,10 @@
 
 namespace batoid {
 
+    #if defined(BATOID_GPU)
+        #pragma omp declare target
+    #endif
+
     class Quadric : public Surface {
     public:
         Quadric(double R, double conic);
@@ -38,6 +42,10 @@ namespace batoid {
         const double _RRcp1cp1; // R*R/(1+conic)/(1+conic)
         const double _cp1RR; // (1+conic)/R/R
     };
+
+    #if defined(BATOID_GPU)
+        #pragma omp end declare target
+    #endif
 
 }
 #endif

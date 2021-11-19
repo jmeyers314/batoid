@@ -5,6 +5,10 @@
 
 namespace batoid {
 
+    #if defined(BATOID_GPU)
+        #pragma omp declare target
+    #endif
+
     class Tilted : public Surface {
     public:
         Tilted(double tanx, double tany);
@@ -26,6 +30,10 @@ namespace batoid {
     private:
         const double _tanx, _tany;
     };
+
+    #if defined(BATOID_GPU)
+        #pragma omp end declare target
+    #endif
 
 }
 #endif

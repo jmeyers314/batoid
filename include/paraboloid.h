@@ -5,6 +5,10 @@
 
 namespace batoid {
 
+    #if defined(BATOID_GPU)
+        #pragma omp declare target
+    #endif
+
     class Paraboloid : public Surface {
     public:
         Paraboloid(double R);
@@ -28,6 +32,10 @@ namespace batoid {
         const double _Rinv;  // 1/R
         const double _2Rinv;  // 1/(2*R)
     };
+
+    #if defined(BATOID_GPU)
+        #pragma omp end declare target
+    #endif
 
 }
 #endif

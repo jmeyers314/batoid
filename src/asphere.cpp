@@ -26,11 +26,6 @@ namespace batoid {
     {
         #if defined(BATOID_GPU)
             if (_devPtr) {
-                Surface* ptr = _devPtr;
-                #pragma omp target is_device_ptr(ptr)
-                {
-                    delete ptr;
-                }
                 const size_t size = _size;
                 const double* coefs = _coefs;
                 #pragma omp target exit data map(release:coefs[:size])

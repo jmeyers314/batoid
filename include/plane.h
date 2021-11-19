@@ -5,6 +5,10 @@
 
 namespace batoid {
 
+    #if defined(BATOID_GPU)
+        #pragma omp declare target
+    #endif
+
     class Plane : public Surface {
     public:
         Plane();
@@ -23,5 +27,9 @@ namespace batoid {
             double& dt
         ) const override;
     };
+
+    #if defined(BATOID_GPU)
+        #pragma omp end declare target
+    #endif
 }
 #endif

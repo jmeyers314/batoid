@@ -1,8 +1,8 @@
+#include <new>
 #include "bicubic.h"
 
 
 namespace batoid {
-
 
     #if defined(BATOID_GPU)
         #pragma omp declare target
@@ -14,21 +14,7 @@ namespace batoid {
         Surface(), _table(table)
     {}
 
-    Bicubic::~Bicubic() {
-        #if defined(BATOID_GPU)
-            if (_devPtr) {
-                Surface* ptr = _devPtr;
-                #pragma omp target is_device_ptr(ptr)
-                {
-                    delete ptr;
-                }
-
-                const Table* table = _table;
-                #pragma omp target exit data \
-                    map(release:table)
-            }
-        #endif
-    }
+    Bicubic::~Bicubic() {}  // don't own _table
 
     double Bicubic::sag(double x, double y) const {
         return _table->eval(x, y);
@@ -65,7 +51,7 @@ namespace batoid {
     const Surface* Bicubic::getDevPtr() const {
         #if defined(BATOID_GPU)
             if (!_devPtr) {
-                Bicubic* ptr;
+                Surface* ptr;
                 const Table* tableDevPtr = _table->getDevPtr();
 
                 #pragma omp target map(from:ptr) is_device_ptr(tableDevPtr)

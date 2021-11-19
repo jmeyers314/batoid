@@ -6,6 +6,10 @@
 
 namespace batoid {
 
+    #if defined(BATOID_GPU)
+        #pragma omp declare target
+    #endif
+
     class Asphere : public Quadric {
     public:
         Asphere(double R, double conic, const double* coefs, size_t size);
@@ -32,6 +36,10 @@ namespace batoid {
         double _dzdr(double r) const;
         static double* _computeDzDrCoefs(const double* coefs, const size_t size);
     };
+
+    #if defined(BATOID_GPU)
+        #pragma omp end declare target
+    #endif
 
 }
 #endif

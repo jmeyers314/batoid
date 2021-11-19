@@ -10,7 +10,13 @@ namespace batoid {
         _devPtr(nullptr)
     {}
 
-    Surface::~Surface() {}
+    Surface::~Surface() {
+        #if defined(BATOID_GPU)
+            if (_devPtr) {
+                freeDevPtr();
+            }
+        #endif
+    }
 
     bool Surface::timeToIntersect(
         const double x, const double y, const double z,
@@ -57,5 +63,16 @@ namespace batoid {
     #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
+
+    void Surface::freeDevPtr() const {
+        if(_devPtr) {
+            Surface* ptr = _devPtr;
+            _devPtr = nullptr;
+            #pragma omp target is_device_ptr(ptr)
+            {
+                delete ptr;
+            }
+        }
+    }
 
 }

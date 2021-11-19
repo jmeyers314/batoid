@@ -1,9 +1,6 @@
 #include "batoid.h"
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#if defined(BATOID_GPU)
-    #include "omp.h"
-#endif
 
 namespace py = pybind11;
 
@@ -110,18 +107,18 @@ namespace batoid {
                     n
                 );
             });
-        #if defined(BATOID_GPU)
-            m.def(
-                "get_omp_environment",
-                []() {
-                    py::dict out;
-                    out.attr("__setitem__")("initial_device", omp_get_initial_device());
-                    out.attr("__setitem__")("default_device", omp_get_default_device());
-                    out.attr("__setitem__")("num_devices", omp_get_num_devices());
-                    out.attr("__setitem__")("device_num", omp_get_device_num());
-                    return out;
-                }
-            );
-        #endif
+        // #if defined(BATOID_GPU)
+        //     m.def(
+        //         "get_omp_environment",
+        //         []() {
+        //             py::dict out;
+        //             out.attr("__setitem__")("initial_device", omp_get_initial_device());
+        //             out.attr("__setitem__")("default_device", omp_get_default_device());
+        //             out.attr("__setitem__")("num_devices", omp_get_num_devices());
+        //             out.attr("__setitem__")("device_num", omp_get_device_num());
+        //             return out;
+        //         }
+        //     );
+        // #endif
     }
 }

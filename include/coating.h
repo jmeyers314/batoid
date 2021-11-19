@@ -2,6 +2,11 @@
 #define batoid_coating_h
 
 namespace batoid {
+
+    #if defined(BATOID_GPU)
+        #pragma omp declare target
+    #endif
+
     class Coating {
     public:
         Coating();
@@ -15,6 +20,9 @@ namespace batoid {
 
     protected:
         mutable Coating* _devPtr;
+
+    private:
+        void freeDevPtr() const;
     };
 
     class SimpleCoating : public Coating {
@@ -32,6 +40,11 @@ namespace batoid {
         double _reflectivity;
         double _transmissivity;
     };
+
+    #if defined(BATOID_GPU)
+        #pragma omp end declare target
+    #endif
+
 }
 
 #endif

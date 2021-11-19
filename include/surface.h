@@ -4,6 +4,11 @@
 #include "rayVector.h"
 
 namespace batoid {
+
+    #if defined(BATOID_GPU)
+        #pragma omp declare target
+    #endif
+
     class Surface {
     public:
         virtual ~Surface();
@@ -28,6 +33,14 @@ namespace batoid {
     protected:
         Surface();
         mutable Surface* _devPtr;
+
+    private:
+        void freeDevPtr() const;
     };
+
+    #if defined(BATOID_GPU)
+        #pragma omp end declare target
+    #endif
+
 }
 #endif

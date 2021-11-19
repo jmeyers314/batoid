@@ -1,9 +1,9 @@
 #include "table.h"
+#include <new>
 #include <cmath>
 
 
 namespace batoid {
-
 
     #if defined(BATOID_GPU)
         #pragma omp declare target
@@ -26,12 +26,6 @@ namespace batoid {
     Table::~Table() {
         #if defined(BATOID_GPU)
             if (_devPtr) {
-                Table* ptr = _devPtr;
-                #pragma omp target is_device_ptr(ptr)
-                {
-                    delete ptr;
-                }
-
                 const size_t size = _nx * _ny;
                 const double* z = _z;
                 const double* dzdx = _dzdx;
@@ -39,6 +33,7 @@ namespace batoid {
                 const double* d2zdxdy = _d2zdxdy;
                 #pragma omp target exit data \
                     map(release:z[:size], dzdx[:size], dzdy[:size], d2zdxdy[:size])
+                freeDevPtr();
             }
         #endif
     }
@@ -159,6 +154,17 @@ namespace batoid {
     #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
+
+    void Table::freeDevPtr() const {
+        if(_devPtr) {
+            Table* ptr = _devPtr;
+            _devPtr = nullptr;
+            #pragma omp target is_device_ptr(ptr)
+            {
+                delete ptr;
+            }
+        }
+    }
 
     const Table* Table::getDevPtr() const {
         #if defined(BATOID_GPU)

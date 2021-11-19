@@ -19,12 +19,6 @@ namespace batoid {
     PolynomialSurface::~PolynomialSurface() {
         #if defined(BATOID_GPU)
             if (_devPtr) {
-                Surface* ptr = _devPtr;
-                #pragma omp target is_device_ptr(ptr)
-                {
-                    delete ptr;
-                }
-
                 const size_t size = _xsize * _ysize;
                 const size_t sizem1 = (_xsize-1) * (_ysize-1);
                 const double* coefs = _coefs;

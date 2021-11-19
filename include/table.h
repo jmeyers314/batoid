@@ -5,11 +5,15 @@
 
 namespace batoid {
 
+    #if defined(BATOID_GPU)
+        #pragma omp declare target
+    #endif
+
     class Table {
     public:
         Table(
             double x0, double y0, double dx, double dy,
-            const double* z, const double* dzdx, const double* dzdy, const double*d2zdxdy,
+            const double* z, const double* dzdx, const double* dzdy, const double* d2zdxdy,
             size_t nx, size_t ny
         );
         ~Table();
@@ -26,6 +30,8 @@ namespace batoid {
         mutable Table* _devPtr;
 
     private:
+        void freeDevPtr() const;
+
         const double _x0, _y0;
         const double _dx, _dy;
         const double* _z;
@@ -34,6 +40,10 @@ namespace batoid {
         const double* _d2zdxdy;
         const size_t _nx, _ny;
     };
+
+    #if defined(BATOID_GPU)
+        #pragma omp end declare target
+    #endif
 
 }
 #endif
