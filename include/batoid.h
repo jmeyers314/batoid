@@ -49,7 +49,7 @@ namespace batoid {
         size_t n
     );
 
-    void finishParallel(const vec3 dr, const mat3 drot, const vec3 vv, double* r, size_t n);
+    void finishParallel(const vec3 dr, const mat3 drot, const vec3 vv, double* x, double* y, double* z, size_t n);
 }
 
 #endif

@@ -98,12 +98,16 @@ namespace batoid {
                 const vec3 dr,
                 const mat3 drot,
                 const vec3 vv,
-                size_t r,
+                size_t x,
+                size_t y,
+                size_t z,
                 size_t n
             ){
                 finishParallel(
                     dr, drot, vv,
-                    reinterpret_cast<double*>(r),
+                    reinterpret_cast<double*>(x),
+                    reinterpret_cast<double*>(y),
+                    reinterpret_cast<double*>(z),
                     n
                 );
             });

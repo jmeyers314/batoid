@@ -76,7 +76,9 @@ def test_traceReverse():
     # Now, turn the result rays around and trace backwards
     forward_rays.propagate(40.0)
     reverse_rays = forward_rays.copy()
-    reverse_rays.v[:] *= -1
+    reverse_rays.vx[:] *= -1
+    reverse_rays.vy[:] *= -1
+    reverse_rays.vz[:] *= -1
     reverse_rays.t[:] *= -1
 
     final_rays = telescope.trace(reverse_rays.copy(), reverse=True)

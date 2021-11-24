@@ -2,13 +2,19 @@
 
 namespace batoid {
     RayVector::RayVector(
-        double* _r, double* _v, double* _t,
+        double* _x, double* _y, double* _z,
+        double* _vx, double* _vy, double* _vz,
+        double* _t,
         double* _wavelength, double* _flux,
         bool* _vignetted, bool* _failed,
         size_t _size
     ) :
-        r(_r, 3*_size),
-        v(_v, 3*_size),
+        x(_x, _size),
+        y(_y, _size),
+        z(_z, _size),
+        vx(_vx, _size),
+        vy(_vy, _size),
+        vz(_vz, _size),
         t(_t, _size),
         wavelength(_wavelength, _size),
         flux(_flux, _size),
@@ -17,33 +23,48 @@ namespace batoid {
         size(_size)
     { }
 
-    void RayVector::positionAtTime(double _t, double* out) const {
-        r.syncToDevice();
-        v.syncToDevice();
+    void RayVector::positionAtTime(double _t, double* xout, double* yout, double* zout) const {
+        x.syncToDevice();
+        y.syncToDevice();
+        z.syncToDevice();
+        vx.syncToDevice();
+        vy.syncToDevice();
+        vz.syncToDevice();
         t.syncToDevice();
-        double* rptr = r.data;
-        double* vptr = v.data;
+        double* xptr = x.data;
+        double* yptr = y.data;
+        double* zptr = z.data;
+        double* vxptr = vx.data;
+        double* vyptr = vy.data;
+        double* vzptr = vz.data;
         double* tptr = t.data;
         #if defined(BATOID_GPU)
-            #pragma omp target teams distribute parallel for map(from:out[:3*size])
+            #pragma omp target teams distribute parallel for \
+                map(from:xout[:size],yout[:size],zout[:size])
         #else
             #pragma omp parallel for
         #endif
         for(int i=0; i<size; i++) {
-            int j = i + size;
-            int k = i + 2*size;
-            out[i] = rptr[i] + vptr[i] * (_t-tptr[i]);
-            out[j] = rptr[j] + vptr[j] * (_t-tptr[i]);
-            out[k] = rptr[k] + vptr[k] * (_t-tptr[i]);
+            xout[i] = xptr[i] + vxptr[i] * (_t-tptr[i]);
+            yout[i] = yptr[i] + vyptr[i] * (_t-tptr[i]);
+            zout[i] = zptr[i] + vzptr[i] * (_t-tptr[i]);
         }
     }
 
     void RayVector::propagateInPlace(double _t) {
-        r.syncToDevice();
-        v.syncToDevice();
+        x.syncToDevice();
+        y.syncToDevice();
+        z.syncToDevice();
+        vx.syncToDevice();
+        vy.syncToDevice();
+        vz.syncToDevice();
         t.syncToDevice();
-        double* rptr = r.data;
-        double* vptr = v.data;
+        double* xptr = x.data;
+        double* yptr = y.data;
+        double* zptr = z.data;
+        double* vxptr = vx.data;
+        double* vyptr = vy.data;
+        double* vzptr = vz.data;
         double* tptr = t.data;
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for
@@ -51,28 +72,30 @@ namespace batoid {
             #pragma omp parallel for
         #endif
         for(int i=0; i<size; i++) {
-            int j = i + size;
-            int k = i + 2*size;
-            rptr[i] += vptr[i] * (_t-tptr[i]);
-            rptr[j] += vptr[j] * (_t-tptr[i]);
-            rptr[k] += vptr[k] * (_t-tptr[i]);
+            xptr[i] += vxptr[i] * (_t - tptr[i]);
+            yptr[i] += vyptr[i] * (_t - tptr[i]);
+            zptr[i] += vzptr[i] * (_t - tptr[i]);
             tptr[i] = _t;
         }
     }
 
     void RayVector::phase(double _x, double _y, double _z, double _t, double* out) const {
         const double PI = 3.14159265358979323846;
-        r.syncToDevice();
-        v.syncToDevice();
+        x.syncToDevice();
+        y.syncToDevice();
+        z.syncToDevice();
+        vx.syncToDevice();
+        vy.syncToDevice();
+        vz.syncToDevice();
         t.syncToDevice();
         wavelength.syncToDevice();
 
-        double* xptr = r.data;
-        double* yptr = r.data+size;
-        double* zptr = r.data+2*size;
-        double* vxptr = v.data;
-        double* vyptr = v.data+size;
-        double* vzptr = v.data+2*size;
+        double* xptr = x.data;
+        double* yptr = y.data;
+        double* zptr = z.data;
+        double* vxptr = vx.data;
+        double* vyptr = vy.data;
+        double* vzptr = vz.data;
         double* tptr = t.data;
         double* wptr = wavelength.data;
         #if defined(BATOID_GPU)
@@ -96,8 +119,12 @@ namespace batoid {
 
     void RayVector::amplitude(double _x, double _y, double _z, double _t, std::complex<double>* out) const {
         const double PI = 3.14159265358979323846;
-        r.syncToDevice();
-        v.syncToDevice();
+        x.syncToDevice();
+        y.syncToDevice();
+        z.syncToDevice();
+        vx.syncToDevice();
+        vy.syncToDevice();
+        vz.syncToDevice();
         t.syncToDevice();
         wavelength.syncToDevice();
 
@@ -105,8 +132,12 @@ namespace batoid {
         // k = 2 pi v / lambda |v|^2
         // omega = 2 pi / lambda
         // amplitude = exp(i phi)
-        double* xptr = r.data;
-        double* vxptr = v.data;
+        double* xptr = x.data;
+        double* yptr = y.data;
+        double* zptr = z.data;
+        double* vxptr = vx.data;
+        double* vyptr = vy.data;
+        double* vzptr = vz.data;
         double* tptr = t.data;
         double* wptr = wavelength.data;
         double* outptr = reinterpret_cast<double*>(out);
@@ -116,11 +147,6 @@ namespace batoid {
             #pragma omp parallel for
         #endif
         for(int i=0; i<size; i++) {
-            double* yptr = xptr+size;
-            double* zptr = xptr+2*size;
-            double* vyptr = vxptr+size;
-            double* vzptr = vxptr+2*size;
-
             double v2 = vxptr[i]*vxptr[i] + vyptr[i]*vyptr[i] + vzptr[i]*vzptr[i];
             double phase = (_x-xptr[i])*vxptr[i];
             phase += (_y-yptr[i])*vyptr[i];
@@ -136,8 +162,12 @@ namespace batoid {
 
     std::complex<double> RayVector::sumAmplitude(double _x, double _y, double _z, double _t, bool ignoreVignetted) const {
         const double PI = 3.14159265358979323846;
-        r.syncToDevice();
-        v.syncToDevice();
+        x.syncToDevice();
+        y.syncToDevice();
+        z.syncToDevice();
+        vx.syncToDevice();
+        vy.syncToDevice();
+        vz.syncToDevice();
         t.syncToDevice();
         wavelength.syncToDevice();
         flux.syncToDevice();
@@ -148,8 +178,12 @@ namespace batoid {
         // k = 2 pi v / lambda |v|^2
         // omega = 2 pi / lambda
         // amplitude = exp(i phi)
-        double* xptr = r.data;
-        double* vxptr = v.data;
+        double* xptr = x.data;
+        double* yptr = y.data;
+        double* zptr = z.data;
+        double* vxptr = vx.data;
+        double* vyptr = vy.data;
+        double* vzptr = vz.data;
         double* tptr = t.data;
         double* wptr = wavelength.data;
         double* fluxptr = flux.data;
@@ -163,11 +197,6 @@ namespace batoid {
             #pragma omp parallel for reduction(+:real, imag)
         #endif
         for(int i=0; i<size; i++) {
-            double* yptr = xptr+size;
-            double* zptr = xptr+2*size;
-            double* vyptr = vxptr+size;
-            double* vzptr = vxptr+2*size;
-
             double v2 = vxptr[i]*vxptr[i] + vyptr[i]*vyptr[i] + vzptr[i]*vzptr[i];
             double phase = (_x-xptr[i])*vxptr[i];
             phase += (_y-yptr[i])*vyptr[i];
@@ -186,8 +215,12 @@ namespace batoid {
 
     bool RayVector::operator==(const RayVector& rhs) const {
         return (
-            r == rhs.r
-            && v == rhs.v
+            x == rhs.x
+            && y == rhs.y
+            && z == rhs.z
+            && vx == rhs.vx
+            && vy == rhs.vy
+            && vz == rhs.vz
             && t == rhs.t
             && wavelength == rhs.wavelength
             && flux == rhs.flux

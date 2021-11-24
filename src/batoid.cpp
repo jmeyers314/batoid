@@ -35,12 +35,8 @@ namespace batoid {
 
     void finishParallel(
         const vec3 dr, const mat3 drot, const vec3 vv,
-        double* r, size_t n
+        double* x, double* y, double* z, size_t n
     ) {
-        double* x = r;
-        double* y = r + n;
-        double* z = r + 2*n;
-
         double vxlocal = -vv[0]*drot[0] - vv[1]*drot[3] - vv[2]*drot[6];
         double vylocal = -vv[0]*drot[1] - vv[1]*drot[4] - vv[2]*drot[7];
         double vzlocal = -vv[0]*drot[2] - vv[1]*drot[5] - vv[2]*drot[8];
@@ -69,15 +65,19 @@ namespace batoid {
     }
 
     void applyForwardTransform(const vec3 dr, const mat3 drot, RayVector& rv) {
-        rv.r.syncToDevice();
-        rv.v.syncToDevice();
+        rv.x.syncToDevice();
+        rv.y.syncToDevice();
+        rv.z.syncToDevice();
+        rv.vx.syncToDevice();
+        rv.vy.syncToDevice();
+        rv.vz.syncToDevice();
         size_t size = rv.size;
-        double* xptr = rv.r.data;
-        double* yptr = xptr + size;
-        double* zptr = yptr + size;
-        double* vxptr = rv.v.data;
-        double* vyptr = vxptr + size;
-        double* vzptr = vyptr + size;
+        double* xptr = rv.x.data;
+        double* yptr = rv.y.data;
+        double* zptr = rv.z.data;
+        double* vxptr = rv.vx.data;
+        double* vyptr = rv.vy.data;
+        double* vzptr = rv.vz.data;
         const double* drptr = dr.data();
         const double* drotptr = drot.data();
 
@@ -105,15 +105,19 @@ namespace batoid {
 
 
     void applyReverseTransform(const vec3 dr, const mat3 drot, RayVector& rv) {
-        rv.r.syncToDevice();
-        rv.v.syncToDevice();
+        rv.x.syncToDevice();
+        rv.y.syncToDevice();
+        rv.z.syncToDevice();
+        rv.vx.syncToDevice();
+        rv.vy.syncToDevice();
+        rv.vz.syncToDevice();
         size_t size = rv.size;
-        double* xptr = rv.r.data;
-        double* yptr = xptr + size;
-        double* zptr = yptr + size;
-        double* vxptr = rv.v.data;
-        double* vyptr = vxptr + size;
-        double* vzptr = vyptr + size;
+        double* xptr = rv.x.data;
+        double* yptr = rv.y.data;
+        double* zptr = rv.z.data;
+        double* vxptr = rv.vx.data;
+        double* vyptr = rv.vy.data;
+        double* vzptr = rv.vz.data;
         const double* drptr = dr.data();
         const double* drotptr = drot.data();
 
@@ -141,12 +145,14 @@ namespace batoid {
 
 
     void obscure(const Obscuration& obsc, RayVector& rv) {
-        rv.r.syncToDevice();
+        rv.x.syncToDevice();
+        rv.y.syncToDevice();
+        rv.z.syncToDevice();
         rv.vignetted.syncToDevice();
         size_t size = rv.size;
-        double* xptr = rv.r.data;
-        double* yptr = xptr + size;
-        double* zptr = yptr + size;
+        double* xptr = rv.x.data;
+        double* yptr = rv.y.data;
+        double* zptr = rv.z.data;
         bool* vigptr = rv.vignetted.data;
 
         const Obscuration* obscPtr = obsc.getDevPtr();
@@ -168,8 +174,12 @@ namespace batoid {
         RayVector& rv,
         const Coating* coating
     ) {
-        rv.r.syncToDevice();
-        rv.v.syncToDevice();
+        rv.x.syncToDevice();
+        rv.y.syncToDevice();
+        rv.z.syncToDevice();
+        rv.vx.syncToDevice();
+        rv.vy.syncToDevice();
+        rv.vz.syncToDevice();
         rv.t.syncToDevice();
         rv.vignetted.syncToDevice();
         rv.failed.syncToDevice();
@@ -178,12 +188,12 @@ namespace batoid {
             rv.flux.syncToDevice();
         }
         size_t size = rv.size;
-        double* xptr = rv.r.data;
-        double* yptr = xptr + size;
-        double* zptr = yptr + size;
-        double* vxptr = rv.v.data;
-        double* vyptr = vxptr + size;
-        double* vzptr = vyptr + size;
+        double* xptr = rv.x.data;
+        double* yptr = rv.y.data;
+        double* zptr = rv.z.data;
+        double* vxptr = rv.vx.data;
+        double* vyptr = rv.vy.data;
+        double* vzptr = rv.vz.data;
         double* tptr = rv.t.data;
         double* wptr = rv.wavelength.data;
         double* fluxptr = rv.flux.data;
@@ -260,8 +270,12 @@ namespace batoid {
         RayVector& rv,
         const Coating* coating
     ) {
-        rv.r.syncToDevice();
-        rv.v.syncToDevice();
+        rv.x.syncToDevice();
+        rv.y.syncToDevice();
+        rv.z.syncToDevice();
+        rv.vx.syncToDevice();
+        rv.vy.syncToDevice();
+        rv.vz.syncToDevice();
         rv.t.syncToDevice();
         rv.vignetted.syncToDevice();
         rv.failed.syncToDevice();
@@ -270,12 +284,12 @@ namespace batoid {
             rv.flux.syncToDevice();
         }
         size_t size = rv.size;
-        double* xptr = rv.r.data;
-        double* yptr = xptr + size;
-        double* zptr = yptr + size;
-        double* vxptr = rv.v.data;
-        double* vyptr = vxptr + size;
-        double* vzptr = vyptr + size;
+        double* xptr = rv.x.data;
+        double* yptr = rv.y.data;
+        double* zptr = rv.z.data;
+        double* vxptr = rv.vx.data;
+        double* vyptr = rv.vy.data;
+        double* vzptr = rv.vz.data;
         double* tptr = rv.t.data;
         double* wptr = rv.wavelength.data;
         double* fluxptr = rv.flux.data;
@@ -363,8 +377,12 @@ namespace batoid {
         RayVector& rv,
         const Coating* coating
     ) {
-        rv.r.syncToDevice();
-        rv.v.syncToDevice();
+        rv.x.syncToDevice();
+        rv.y.syncToDevice();
+        rv.z.syncToDevice();
+        rv.vx.syncToDevice();
+        rv.vy.syncToDevice();
+        rv.vz.syncToDevice();
         rv.t.syncToDevice();
         rv.vignetted.syncToDevice();
         rv.failed.syncToDevice();
@@ -373,12 +391,12 @@ namespace batoid {
             rv.flux.syncToDevice();
         }
         size_t size = rv.size;
-        double* xptr = rv.r.data;
-        double* yptr = xptr + size;
-        double* zptr = yptr + size;
-        double* vxptr = rv.v.data;
-        double* vyptr = vxptr + size;
-        double* vzptr = vyptr + size;
+        double* xptr = rv.x.data;
+        double* yptr = rv.y.data;
+        double* zptr = rv.z.data;
+        double* vxptr = rv.vx.data;
+        double* vyptr = rv.vy.data;
+        double* vzptr = rv.vz.data;
         double* tptr = rv.t.data;
         double* wptr = rv.wavelength.data;
         double* fluxptr = rv.flux.data;
@@ -477,15 +495,23 @@ namespace batoid {
         const Coating& coating,
         RayVector& rv, RayVector& rvSplit
     ) {
-        rv.r.syncToDevice();
-        rv.v.syncToDevice();
+        rv.x.syncToDevice();
+        rv.y.syncToDevice();
+        rv.z.syncToDevice();
+        rv.vx.syncToDevice();
+        rv.vy.syncToDevice();
+        rv.vz.syncToDevice();
         rv.t.syncToDevice();
         rv.wavelength.syncToDevice();
         rv.flux.syncToDevice();
         rv.vignetted.syncToDevice();
         rv.failed.syncToDevice();
-        rvSplit.r.syncState = SyncState::device;
-        rvSplit.v.syncState = SyncState::device;
+        rvSplit.x.syncState = SyncState::device;
+        rvSplit.y.syncState = SyncState::device;
+        rvSplit.z.syncState = SyncState::device;
+        rvSplit.vx.syncState = SyncState::device;
+        rvSplit.vy.syncState = SyncState::device;
+        rvSplit.vz.syncState = SyncState::device;
         rvSplit.t.syncState = SyncState::device;
         rvSplit.wavelength.syncState = SyncState::device;
         rvSplit.flux.syncState = SyncState::device;
@@ -494,12 +520,12 @@ namespace batoid {
 
         // Original RayVector will get replaced with refraction
         size_t size = rv.size;
-        double* xptr = rv.r.data;
-        double* yptr = xptr + size;
-        double* zptr = yptr + size;
-        double* vxptr = rv.v.data;
-        double* vyptr = vxptr + size;
-        double* vzptr = vyptr + size;
+        double* xptr = rv.x.data;
+        double* yptr = rv.y.data;
+        double* zptr = rv.z.data;
+        double* vxptr = rv.vx.data;
+        double* vyptr = rv.vy.data;
+        double* vzptr = rv.vz.data;
         double* tptr = rv.t.data;
         double* wptr = rv.wavelength.data;
         double* fluxptr = rv.flux.data;
@@ -507,12 +533,12 @@ namespace batoid {
         bool* failptr = rv.failed.data;
 
         // rvSplit will contain reflection
-        double* xptr2 = rvSplit.r.data;
-        double* yptr2 = xptr2 + size;
-        double* zptr2 = yptr2 + size;
-        double* vxptr2 = rvSplit.v.data;
-        double* vyptr2 = vxptr2 + size;
-        double* vzptr2 = vyptr2 + size;
+        double* xptr2 = rvSplit.x.data;
+        double* yptr2 = rvSplit.y.data;
+        double* zptr2 = rvSplit.z.data;
+        double* vxptr2 = rvSplit.vx.data;
+        double* vyptr2 = rvSplit.vy.data;
+        double* vzptr2 = rvSplit.vz.data;
         double* tptr2 = rvSplit.t.data;
         double* wptr2 = rvSplit.wavelength.data;
         double* fluxptr2 = rvSplit.flux.data;
@@ -626,19 +652,23 @@ namespace batoid {
         const Surface& screen,
         RayVector& rv
     ) {
-        rv.r.syncToDevice();
-        rv.v.syncToDevice();
+        rv.x.syncToDevice();
+        rv.y.syncToDevice();
+        rv.z.syncToDevice();
+        rv.vx.syncToDevice();
+        rv.vy.syncToDevice();
+        rv.vz.syncToDevice();
         rv.t.syncToDevice();
         rv.vignetted.syncToDevice();
         rv.failed.syncToDevice();
         rv.wavelength.syncToDevice();
         size_t size = rv.size;
-        double* xptr = rv.r.data;
-        double* yptr = xptr + size;
-        double* zptr = yptr + size;
-        double* vxptr = rv.v.data;
-        double* vyptr = vxptr + size;
-        double* vzptr = vyptr + size;
+        double* xptr = rv.x.data;
+        double* yptr = rv.y.data;
+        double* zptr = rv.z.data;
+        double* vxptr = rv.vx.data;
+        double* vyptr = rv.vy.data;
+        double* vzptr = rv.vz.data;
         double* tptr = rv.t.data;
         double* wptr = rv.wavelength.data;
         double* fluxptr = rv.flux.data;

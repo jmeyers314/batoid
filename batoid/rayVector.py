@@ -60,8 +60,12 @@ class RayVector:
             bool
         )
 
-        self._r = np.ascontiguousarray([x, y, z], dtype=float).T
-        self._v = np.ascontiguousarray([vx, vy, vz], dtype=float).T
+        self._x = x
+        self._y = y
+        self._z = z
+        self._vx = vx
+        self._vy = vy
+        self._vz = vz
         self._t = t
         self._wavelength = wavelength
         self._flux = flux
@@ -72,11 +76,15 @@ class RayVector:
 
     @staticmethod
     def _directInit(
-        r, v, t, wavelength, flux, vignetted, failed, coordSys
+        x, y, z, vx, vy, vz, t, wavelength, flux, vignetted, failed, coordSys
     ):
         ret = RayVector.__new__(RayVector)
-        ret._r = r
-        ret._v = v
+        ret._x = x
+        ret._y = y
+        ret._z = z
+        ret._vx = vx
+        ret._vy = vy
+        ret._vz = vz
         ret._t = t
         ret._wavelength = wavelength
         ret._flux = flux
@@ -98,9 +106,11 @@ class RayVector:
         ndarray of float, shape (n, 3)
             Positions in meters.
         """
-        out = np.empty_like(self._r)
-        self._rv.positionAtTime(t, out.ctypes.data)
-        return out
+        x = np.empty(len(self._x))
+        y = np.empty(len(self._x))
+        z = np.empty(len(self._x))
+        self._rv.positionAtTime(t, x.ctypes.data, y.ctypes.data, z.ctypes.data)
+        return np.array([x, y, z]).T
 
     def propagate(self, t):
         """Propagate this RayVector to given time.
@@ -373,22 +383,18 @@ class RayVector:
             xx, yy = np.meshgrid(xx, yy)
             xx = xx.ravel()
             yy = yy.ravel()
-        r = np.empty((len(xx), 3), order='F')
-        x = r[:, 0]
-        y = r[:, 1]
-        z = r[:, 2]
         stack = np.stack([xx, yy])
-        x[:] = np.dot(lx, stack)
-        y[:] = np.dot(ly, stack)
+        x = np.dot(lx, stack)
+        y = np.dot(ly, stack)
         del xx, yy, stack
-        z[:] = stopSurface.surface.sag(x, y)
+        z = stopSurface.surface.sag(x, y)
         transform = CoordTransform(stopSurface.coordSys, globalCoordSys)
         applyForwardTransformArrays(transform, x, y, z)
         w = np.empty_like(x)
         w.fill(wavelength)
         n = medium.getN(wavelength)
 
-        return cls._finish(backDist, source, dirCos, n, r, w, flux)
+        return cls._finish(backDist, source, dirCos, n, x, y, z, w, flux)
 
     @classmethod
     def asPolar(
@@ -549,21 +555,17 @@ class RayVector:
         else:
             rr = np.sqrt(np.random.uniform(inner**2, outer**2, size=nrandom))
             th = np.random.uniform(0, 2*np.pi, size=nrandom)
-        r = np.empty((len(rr), 3), order='F')
-        x = r[:, 0]
-        y = r[:, 1]
-        z = r[:, 2]
-        x[:] = rr*np.cos(th)
-        y[:] = rr*np.sin(th)
+        x = rr*np.cos(th)
+        y = rr*np.sin(th)
         del rr, th
-        z[:] = stopSurface.surface.sag(x, y)
+        z = stopSurface.surface.sag(x, y)
         transform = CoordTransform(stopSurface.coordSys, globalCoordSys)
         applyForwardTransformArrays(transform, x, y, z)
         w = np.empty_like(x)
         w.fill(wavelength)
         n = medium.getN(wavelength)
 
-        return cls._finish(backDist, source, dirCos, n, r, w, flux)
+        return cls._finish(backDist, source, dirCos, n, x, y, z, w, flux)
 
     @classmethod
     def asSpokes(
@@ -718,28 +720,23 @@ class RayVector:
         spokes = spokes.ravel()
         flux = flux.ravel()
 
-        r = np.empty((len(rings), 3), order='F')
-        x = r[:, 0]
-        y = r[:, 1]
-        z = r[:, 2]
-        x[:] = rings*np.cos(spokes)
-        y[:] = rings*np.sin(spokes)
+        x = rings*np.cos(spokes)
+        y = rings*np.sin(spokes)
         del rings, spokes
-        z[:] = stopSurface.surface.sag(x, y)
+        z = stopSurface.surface.sag(x, y)
         transform = CoordTransform(stopSurface.coordSys, globalCoordSys)
         applyForwardTransformArrays(transform, x, y, z)
         w = np.empty_like(x)
         w.fill(wavelength)
         n = medium.getN(wavelength)
-        return cls._finish(backDist, source, dirCos, n, r, w, flux)
+        return cls._finish(backDist, source, dirCos, n, x, y, z, w, flux)
 
     @classmethod
-    def _finish(cls, backDist, source, dirCos, n, r, w, flux):
+    def _finish(cls, backDist, source, dirCos, n, x, y, z, w, flux):
         """Map rays backwards to their source position."""
         if isinstance(flux, Real):
-            flux = np.full(len(r), float(flux))
+            flux = np.full(len(x), float(flux))
         if source is None:
-            from ._batoid import finishParallel
             vv = np.array(dirCos, dtype=float)
             vv /= n*np.sqrt(np.dot(vv, vv))
             zhat = -n*vv
@@ -748,25 +745,33 @@ class RayVector:
             yhat = np.cross(xhat, zhat)
             origin = zhat*backDist
             rot = np.stack([xhat, yhat, zhat]).T
-            finishParallel(origin, rot.ravel(), vv, r.ctypes.data, len(r))
-            v = np.full_like(r, vv)
-            t = np.zeros(len(r), dtype=float)
-            vignetted = np.zeros(len(r), dtype=bool)
-            failed = np.zeros(len(r), dtype=bool)
+            _batoid.finishParallel(
+                origin, rot.ravel(), vv,
+                x.ctypes.data, y.ctypes.data, z.ctypes.data,
+                len(x)
+            )
+            vx = np.full_like(x, vv[0])
+            vy = np.full_like(y, vv[1])
+            vz = np.full_like(z, vv[2])
+            t = np.zeros(len(x), dtype=float)
+            vignetted = np.zeros(len(x), dtype=bool)
+            failed = np.zeros(len(x), dtype=bool)
             return RayVector._directInit(
-                r, v, t, w, flux, vignetted, failed, globalCoordSys
+                x, y, z, vx, vy, vz, t, w,
+                flux, vignetted, failed, globalCoordSys
             )
         else:
-            v = np.copy(r)
-            v -= source
-            v /= n*np.einsum('ab,ab->b', v, v)
-            r[:] = source
-            t = np.zeros(len(r), dtype=float)
-            vignetted = np.zeros(len(r), dtype=bool)
-            failed = np.zeros(len(r), dtype=bool)
-            return RayVector._directInit(
-                r, v, t, w, flux, vignetted, failed, globalCoordSys
-            )
+            pass
+            # v = np.copy(r)
+            # v -= source
+            # v /= n*np.einsum('ab,ab->b', v, v)
+            # r[:] = source
+            # t = np.zeros(len(r), dtype=float)
+            # vignetted = np.zeros(len(r), dtype=bool)
+            # failed = np.zeros(len(r), dtype=bool)
+            # return RayVector._directInit(
+            #     r, v, t, w, flux, vignetted, failed, globalCoordSys
+            # )
 
     @classmethod
     def fromStop(
@@ -873,16 +878,9 @@ class RayVector:
         if wavelength is None:
             raise ValueError("Missing wavelength keyword")
 
-        xx = np.atleast_1d(x)
-        yy = np.atleast_1d(y)
-
-        r = np.empty((len(xx), 3), order='F')
-        x = r[:, 0]
-        y = r[:, 1]
-        z = r[:, 2]
-        x[:] = xx
-        y[:] = yy
-        z[:] = stopSurface.surface.sag(x, y)
+        x = np.atleast_1d(x).astype(float, copy=False)
+        y = np.atleast_1d(y).astype(float, copy=False)
+        z = stopSurface.surface.sag(x, y)
         transform = CoordTransform(stopSurface.coordSys, globalCoordSys)
         applyForwardTransformArrays(transform, x, y, z)
 
@@ -890,7 +888,7 @@ class RayVector:
         w.fill(wavelength)
         n = medium.getN(wavelength)
 
-        return cls._finish(backDist, source, dirCos, n, r, w, flux)
+        return cls._finish(backDist, source, dirCos, n, x, y, z, w, flux)
 
     @classmethod
     def fromFieldAngles(
@@ -990,30 +988,31 @@ class RayVector:
 
         return rv
 
-
     @property
     def r(self):
         """ndarray of float, shape (n, 3): Positions of rays in meters."""
-        self._rv.r.syncToHost()
-        return self._r
+        self._rv.x.syncToHost()
+        self._rv.y.syncToHost()
+        self._rv.z.syncToHost()
+        return np.array([self._x, self._y, self._z]).T
 
     @property
     def x(self):
         """The x components of ray positions in meters."""
-        self._rv.r.syncToHost()
-        return self._r[:, 0]
+        self._rv.x.syncToHost()
+        return self._x
 
     @property
     def y(self):
         """The y components of ray positions in meters."""
-        self._rv.r.syncToHost()
-        return self._r[:, 1]
+        self._rv.y.syncToHost()
+        return self._y
 
     @property
     def z(self):
         """The z components of ray positions in meters."""
-        self._rv.r.syncToHost()
-        return self._r[:, 2]
+        self._rv.z.syncToHost()
+        return self._z
 
     @property
     def v(self):
@@ -1021,32 +1020,34 @@ class RayVector:
         speed of light in vacuum.  Note that these may have magnitudes < 1 if
         the rays are inside a refractive medium.
         """
-        self._rv.v.syncToHost()
-        return self._v
+        self._rv.vx.syncToHost()
+        self._rv.vy.syncToHost()
+        self._rv.vz.syncToHost()
+        return np.array([self._vx, self._vy, self._vz]).T
 
     @property
     def vx(self):
         """The x components of ray velocities units of the vacuum speed of
         light.
         """
-        self._rv.v.syncToHost()
-        return self._v[:, 0]
+        self._rv.vx.syncToHost()
+        return self._vx
 
     @property
     def vy(self):
         """The y components of ray velocities units of the vacuum speed of
         light.
         """
-        self._rv.v.syncToHost()
-        return self._v[:, 1]
+        self._rv.vy.syncToHost()
+        return self._vy
 
     @property
     def vz(self):
         """The z components of ray velocities units of the vacuum speed of
         light.
         """
-        self._rv.v.syncToHost()
-        return self._v[:, 2]
+        self._rv.vz.syncToHost()
+        return self._vz
 
     @property
     def t(self):
@@ -1089,9 +1090,10 @@ class RayVector:
         :math:`2 \pi n / \lambda`, where :math:`n` is the refractive index and
         :math:`\lambda` is the wavelength.
         """
-        out = 2*np.pi*np.array(self.v)
+        v = self.v
+        out = 2*np.pi*v
         out /= self.wavelength[:, None]
-        out /= np.sum(self.v*self.v, axis=-1)[:, None]
+        out /= np.sum(v*v, axis=-1)[:, None]
         return out
 
     @property
@@ -1120,7 +1122,9 @@ class RayVector:
     @lazy_property
     def _rv(self):
         return _batoid.CPPRayVector(
-            self._r.ctypes.data, self._v.ctypes.data, self._t.ctypes.data,
+            self._x.ctypes.data, self._y.ctypes.data, self._z.ctypes.data,
+            self._vx.ctypes.data, self._vy.ctypes.data, self._vz.ctypes.data,
+            self._t.ctypes.data,
             self._wavelength.ctypes.data, self._flux.ctypes.data,
             self._vignetted.ctypes.data, self._failed.ctypes.data,
             len(self._wavelength)
@@ -1130,8 +1134,12 @@ class RayVector:
         if "_rv" not in self.__dict__:
             # Was never copied to device, so still synchronized.
             return
-        self._rv.r.syncToHost()
-        self._rv.v.syncToHost()
+        self._rv.x.syncToHost()
+        self._rv.y.syncToHost()
+        self._rv.z.syncToHost()
+        self._rv.vx.syncToHost()
+        self._rv.vy.syncToHost()
+        self._rv.vz.syncToHost()
         self._rv.t.syncToHost()
         self._rv.wavelength.syncToHost()
         self._rv.flux.syncToHost()
@@ -1139,8 +1147,12 @@ class RayVector:
         self._rv.failed.syncToHost()
 
     def _syncToDevice(self):
-        self._rv.r.syncToDevice()
-        self._rv.v.syncToDevice()
+        self._rv.x.syncToHost()
+        self._rv.y.syncToHost()
+        self._rv.z.syncToHost()
+        self._rv.vx.syncToHost()
+        self._rv.vy.syncToHost()
+        self._rv.vz.syncToHost()
         self._rv.t.syncToDevice()
         self._rv.wavelength.syncToDevice()
         self._rv.flux.syncToDevice()
@@ -1151,8 +1163,12 @@ class RayVector:
         # copy on host side for now...
         self._syncToHost()
         ret = RayVector.__new__(RayVector)
-        ret._r = np.copy(self._r, order='F')
-        ret._v = np.copy(self._v, order='F')
+        ret._x = np.copy(self._x)
+        ret._y = np.copy(self._y)
+        ret._z = np.copy(self._z)
+        ret._vx = np.copy(self._vx)
+        ret._vy = np.copy(self._vy)
+        ret._vz = np.copy(self._vz)
         ret._t = np.copy(self._t)
         ret._wavelength = np.copy(self._wavelength)
         ret._flux = np.copy(self._flux)
@@ -1196,13 +1212,16 @@ class RayVector:
 
     def __getstate__(self):
         return (
-            self.r, self.v, self.t,
+            self.x, self.y, self.z,
+            self.vx, self.vy, self.vz,
+            self.t,
             self.wavelength, self.flux,
             self.vignetted, self.failed, self.coordSys
         )
 
     def __setstate__(self, args):
-        (self._r, self._v, self._t,
+        (self._x, self._y, self._z,
+         self._vx, self._vy, self._vz, self._t,
          self._wavelength, self._flux, self._vignetted,
          self._failed, self.coordSys) = args
 
@@ -1223,8 +1242,12 @@ class RayVector:
 
         self._syncToHost()
         return RayVector._directInit(
-            np.copy(self._r[idx], order='F'),
-            np.copy(self._v[idx], order='F'),
+            np.copy(self._x[idx]),
+            np.copy(self._y[idx]),
+            np.copy(self._z[idx]),
+            np.copy(self._vx[idx]),
+            np.copy(self._vy[idx]),
+            np.copy(self._vz[idx]),
             np.copy(self._t[idx]),
             np.copy(self._wavelength[idx]),
             np.copy(self._flux[idx]),
