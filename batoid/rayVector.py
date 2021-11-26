@@ -401,7 +401,7 @@ class RayVector:
         cls,
         optic=None, backDist=None, medium=None, stopSurface=None,
         wavelength=None,
-        outer=None, inner=0.0,
+        outer=None, inner=None,
         source=None, dirCos=None,
         theta_x=None, theta_y=None, projection='postel',
         nrad=None, naz=None,
@@ -518,6 +518,14 @@ class RayVector:
                 stopSurface = optic.stopSurface
             if outer is None:
                 outer = optic.pupilSize/2
+            if inner is None:
+                if hasattr(optic, 'pupilObscuration'):
+                    inner = optic.pupilSize*optic.pupilObscuration/2
+                else:
+                    inner = 0.0
+        else:
+            if inner is None:
+                inner = 0.0
 
         if backDist is None:
             backDist = 40.0

@@ -61,7 +61,7 @@ def test_prescreen():
         # Distortion makes this comparison less precise
         np.testing.assert_allclose(
             zGQ[4:], zTA[4:],
-            rtol=0, atol=3e-3
+            rtol=0, atol=5e-3
         )
 
 
@@ -172,6 +172,7 @@ def test_z4_focus():
         coordSys:
             z: 0.0
     pupilSize: 0.1
+    pupilObscuration: 0.0
     items:
         -
             type: RefractiveInterface
@@ -217,6 +218,7 @@ def test_z4_focus():
       coordSys:
         z: 0.0
     pupilSize: 0.1
+    pupilObscuration: 0.0
     items:
       -
         type: OPDScreen

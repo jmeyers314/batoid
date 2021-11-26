@@ -729,6 +729,7 @@ def test_factory_optic():
         wavelength=500e-9, theta_x=0.1, theta_y=0.1,
         backDist=telescope.backDist, stopSurface=telescope.stopSurface,
         medium=telescope.inMedium, outer=telescope.pupilSize/2,
+        inner=telescope.pupilSize/2*telescope.pupilObscuration,
         naz=100, nrad=20
     )
     rays_allclose(grid1, grid2)

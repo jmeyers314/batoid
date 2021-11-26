@@ -12,7 +12,7 @@ def _reciprocalLatticeVectors(a1, a2, N):
 
 
 def dkdu(
-    optic, theta_x, theta_y, wavelength, nrad=16, naz=16, projection='postel'
+    optic, theta_x, theta_y, wavelength, nrad=6, naz=36, projection='postel'
 ):
     """Calculate derivative of outgoing ray k-vector with respect to incoming
     ray pupil coordinate.
@@ -54,7 +54,7 @@ def dkdu(
 
 
 def drdth(
-    optic, theta_x, theta_y, wavelength, nrad=50, naz=300, projection='postel'
+    optic, theta_x, theta_y, wavelength, nrad=6, naz=36, projection='postel'
 ):
     """Calculate derivative of focal plane coord with respect to field angle.
 
@@ -110,9 +110,15 @@ def drdth(
         nrad=nrad, naz=naz
     )
 
-    optic.trace(rays)
-    optic.trace(rays_x)
-    optic.trace(rays_y)
+    # Faster to concatenate and trace all at once
+    rays_c = batoid.concatenateRayVectors(
+        [rays, rays_x, rays_y]
+    )
+    optic.trace(rays_c)
+    n = len(rays)
+    rays = rays_c[:n]
+    rays_x = rays_c[n:2*n]
+    rays_y = rays_c[2*n:3*n]
 
     w = ~rays.vignetted
     mx = np.mean(rays.x[w])
@@ -128,7 +134,7 @@ def drdth(
 
 
 def dthdr(
-    optic, theta_x, theta_y, wavelength, nrad=50, naz=300, projection='postel'
+    optic, theta_x, theta_y, wavelength, nrad=6, naz=36, projection='postel'
 ):
     """Calculate derivative of field angle with respect to focal plane
     coordinate.
@@ -402,6 +408,7 @@ def spot(
 
     w = ~rays.vignetted
     return rays.x[w], rays.y[w]
+
 
 def fftPSF(
     optic, theta_x, theta_y, wavelength,
@@ -712,8 +719,9 @@ def _dZernikeBasis(jmax, x, y, R_outer=1.0, R_inner=0.0):
 
 def zernikeTA(
     optic, theta_x, theta_y, wavelength,
-    projection='postel', nrad=10, naz=60,
-    reference='chief', jmax=22, eps=0.0
+    projection='postel', nrad=6, naz=36,
+    reference='chief', jmax=22, eps=0.0,
+    focal_length=None
 ):
     """Compute Zernikes in such a way that transverse ray aberrations are
     proportional to the gradient of the wavefront.
@@ -742,6 +750,9 @@ def zernikeTA(
     eps : float, optional
         Use annular Zernike polynomials with this fractional inner radius.
         Default: 0.0.
+    focal_length : float, optional
+        Value to use for focal length.  If omitted, then compute focal length
+        from dr/dth.
 
     Returns
     -------
@@ -784,9 +795,10 @@ def zernikeTA(
 
     # We may wish to revisit defining/using the focal length this way in the
     # future.
-    focalLength = np.sqrt(np.linalg.det(drdth(
-        optic, theta_x, theta_y, wavelength, projection=projection
-    )))
+    if focal_length is None:
+        focal_length = np.sqrt(np.linalg.det(drdth(
+            optic, theta_x, theta_y, wavelength, projection=projection
+        )))
 
     dzb = _dZernikeBasis(
         jmax, u[w], v[w], optic.pupilSize/2, eps*optic.pupilSize/2
@@ -794,7 +806,7 @@ def zernikeTA(
     a = np.hstack(dzb).T
     b = np.hstack([x[w], y[w]])
     r, _, _, _ = np.linalg.lstsq(a, b, rcond=None)
-    return -r/focalLength/wavelength
+    return -r/focal_length/wavelength
 
 
 def doubleZernike(

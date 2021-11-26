@@ -6,7 +6,11 @@ from test_helpers import timer
 
 import nbformat
 
-notebook_dir = os.path.join(os.path.split(__file__)[0], '..', 'notebook')
+notebook_dir = os.path.abspath(os.path.join(
+    os.path.split(os.path.abspath(__file__))[0],
+    '..',
+    'notebook'
+))
 
 
 # https://blog.thedataincubator.com/2016/06/testing-jupyter-notebooks/
