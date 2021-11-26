@@ -19,17 +19,6 @@ namespace batoid {
         #endif
     }
 
-    void Coating::freeDevPtr() const {
-        if(_devPtr) {
-            Coating* ptr = _devPtr;
-            _devPtr = nullptr;
-            #pragma omp target is_device_ptr(ptr)
-            {
-                delete ptr;
-            }
-        }
-    }
-
     SimpleCoating::SimpleCoating(double reflectivity, double transmissivity) :
         _reflectivity(reflectivity), _transmissivity(transmissivity)
     {}
@@ -53,6 +42,17 @@ namespace batoid {
         #pragma omp end declare target
     #endif
 
+
+    void Coating::freeDevPtr() const {
+        if(_devPtr) {
+            Coating* ptr = _devPtr;
+            _devPtr = nullptr;
+            #pragma omp target is_device_ptr(ptr)
+            {
+                delete ptr;
+            }
+        }
+    }
 
     const Coating* SimpleCoating::getDevPtr() const {
         #if defined(BATOID_GPU)

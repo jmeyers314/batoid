@@ -23,17 +23,6 @@ namespace batoid {
             #endif
         }
 
-        void Obscuration::freeDevPtr() const {
-            if(_devPtr) {
-                Obscuration* ptr = _devPtr;
-                _devPtr = nullptr;
-                #pragma omp target is_device_ptr(ptr)
-                {
-                    delete ptr;
-                }
-            }
-        }
-
         ObscCircle::ObscCircle(double radius, double x0, double y0) :
             Obscuration(), _radius(radius), _x0(x0), _y0(y0)
         {}
@@ -47,6 +36,17 @@ namespace batoid {
     #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
+
+    void Obscuration::freeDevPtr() const {
+        if(_devPtr) {
+            Obscuration* ptr = _devPtr;
+            _devPtr = nullptr;
+            #pragma omp target is_device_ptr(ptr)
+            {
+                delete ptr;
+            }
+        }
+    }
 
     const Obscuration* ObscCircle::getDevPtr() const {
         #if defined(BATOID_GPU)
