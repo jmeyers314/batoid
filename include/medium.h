@@ -23,7 +23,9 @@ namespace batoid {
         mutable Medium* _devPtr;
 
     private:
+        #if defined(BATOID_GPU)
         void freeDevPtr() const;
+        #endif
     };
 
 

@@ -22,7 +22,9 @@ namespace batoid {
         mutable Obscuration* _devPtr;
 
     private:
+        #if defined(BATOID_GPU)
         void freeDevPtr() const;
+        #endif
     };
 
 

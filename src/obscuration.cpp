@@ -37,6 +37,7 @@ namespace batoid {
         #pragma omp end declare target
     #endif
 
+    #if defined(BATOID_GPU)
     void Obscuration::freeDevPtr() const {
         if(_devPtr) {
             Obscuration* ptr = _devPtr;
@@ -47,6 +48,7 @@ namespace batoid {
             }
         }
     }
+    #endif
 
     const Obscuration* ObscCircle::getDevPtr() const {
         #if defined(BATOID_GPU)

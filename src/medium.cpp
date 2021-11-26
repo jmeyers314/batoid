@@ -35,7 +35,7 @@ namespace batoid {
         #pragma omp end declare target
     #endif
 
-
+    #if defined(BATOID_GPU)
     void Medium::freeDevPtr() const {
         if(_devPtr) {
             Medium* ptr = _devPtr;
@@ -46,6 +46,7 @@ namespace batoid {
             }
         }
     }
+    #endif
 
     const Medium* ConstMedium::getDevPtr() const {
         #if defined(BATOID_GPU)

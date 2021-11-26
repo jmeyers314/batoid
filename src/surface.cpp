@@ -64,6 +64,7 @@ namespace batoid {
         #pragma omp end declare target
     #endif
 
+    #if defined(BATOID_GPU)
     void Surface::freeDevPtr() const {
         if(_devPtr) {
             Surface* ptr = _devPtr;
@@ -74,5 +75,6 @@ namespace batoid {
             }
         }
     }
+    #endif
 
 }

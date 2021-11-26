@@ -22,7 +22,9 @@ namespace batoid {
         mutable Coating* _devPtr;
 
     private:
+        #if defined(BATOID_GPU)
         void freeDevPtr() const;
+        #endif
     };
 
     class SimpleCoating : public Coating {

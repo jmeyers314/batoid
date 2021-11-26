@@ -35,7 +35,9 @@ namespace batoid {
         mutable Surface* _devPtr;
 
     private:
+        #if defined(BATOID_GPU)
         void freeDevPtr() const;
+        #endif
     };
 
     #if defined(BATOID_GPU)

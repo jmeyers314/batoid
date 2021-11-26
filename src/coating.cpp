@@ -43,6 +43,7 @@ namespace batoid {
     #endif
 
 
+    #if defined(BATOID_GPU)
     void Coating::freeDevPtr() const {
         if(_devPtr) {
             Coating* ptr = _devPtr;
@@ -53,6 +54,7 @@ namespace batoid {
             }
         }
     }
+    #endif
 
     const Coating* SimpleCoating::getDevPtr() const {
         #if defined(BATOID_GPU)

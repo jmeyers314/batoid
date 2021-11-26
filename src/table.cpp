@@ -155,6 +155,7 @@ namespace batoid {
         #pragma omp end declare target
     #endif
 
+    #if defined(BATOID_GPU)
     void Table::freeDevPtr() const {
         if(_devPtr) {
             Table* ptr = _devPtr;
@@ -165,6 +166,7 @@ namespace batoid {
             }
         }
     }
+    #endif
 
     const Table* Table::getDevPtr() const {
         #if defined(BATOID_GPU)

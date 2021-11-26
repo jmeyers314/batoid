@@ -30,7 +30,9 @@ namespace batoid {
         mutable Table* _devPtr;
 
     private:
+        #if defined(BATOID_GPU)
         void freeDevPtr() const;
+        #endif
 
         const double _x0, _y0;
         const double _dx, _dy;
