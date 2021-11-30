@@ -7,7 +7,7 @@ opticalSystem:
   backDist: 3.0
   sphereRadius: 4.48
   pupilSize: 1.2
-  pupilObscuration: 0.423
+  pupilObscuration: 0.3525
   stopSurface:
     type: Interface
     name: entrancePupil
@@ -24,7 +24,7 @@ opticalSystem:
         z: 2.7
       obscuration:
         type: ObscCircle
-        radius: 0.2538
+        radius: 0.2115
     -
       type: Baffle
       name: Baffle_M1
