@@ -907,7 +907,7 @@ def _closestApproach(P, u, Q, v):
     return P + sc*u
 
 
-def exitPupilPos(optic, wavelength, smallAngle=np.deg2rad(1./3600)):
+def exitPupilPos(optic, wavelength, smallAngle=np.deg2rad(1./3600), **kwargs):
     """Compute position of the exit pupil.
 
     Traces a collection of small angle chief rays into object space, and then
@@ -932,7 +932,8 @@ def exitPupilPos(optic, wavelength, smallAngle=np.deg2rad(1./3600)):
     rays = batoid.RayVector.fromFieldAngles(
         thx, thy,
         optic=optic,
-        wavelength=wavelength
+        wavelength=wavelength,
+        **kwargs
     )
     optic.trace(rays)
     rays.toCoordSys(batoid.globalCoordSys)

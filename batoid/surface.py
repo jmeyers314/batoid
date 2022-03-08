@@ -491,16 +491,18 @@ class Bicubic(Surface):
         dy = self._dy = (self._ys[-1] - self._ys[0])/(len(self._ys)-1)
 
         if dzdxs is None:
-            dzdys = np.empty_like(self._zs)
-            dzdys[1:-1, :] = (self._zs[2:, :] - self._zs[:-2, :])/(2*dy)
-            dzdys[0, :] = (self._zs[1, :] - self._zs[0, :])/dy
-            dzdys[-1, :] = (self._zs[-1, :] - self._zs[-2, :])/dy
-
             dzdxs = np.empty_like(self._zs)
             dzdxs[:, 1:-1] = (self._zs[:, 2:] - self._zs[:, :-2])/(2*dx)
             dzdxs[:, 0] = (self._zs[:, 1] - self._zs[:, 0])/dx
             dzdxs[:, -1] = (self._zs[:, -1] - self._zs[:, -2])/dx
 
+        if dzdys is None:
+            dzdys = np.empty_like(self._zs)
+            dzdys[1:-1, :] = (self._zs[2:, :] - self._zs[:-2, :])/(2*dy)
+            dzdys[0, :] = (self._zs[1, :] - self._zs[0, :])/dy
+            dzdys[-1, :] = (self._zs[-1, :] - self._zs[-2, :])/dy
+
+        if d2zdxdys is None:
             d2zdxdys = np.empty_like(self._zs)
             d2zdxdys[:, 1:-1] = (dzdys[:, 2:] - dzdys[:, :-2])/(2*dx)
             d2zdxdys[:, 0] = (dzdys[:, 1] - dzdys[:, 0])/dx
