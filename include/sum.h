@@ -5,6 +5,10 @@
 
 namespace batoid {
 
+    /////////
+    // Sum //
+    /////////
+
     #if defined(BATOID_GPU)
         #pragma omp declare target
     #endif
@@ -13,8 +17,6 @@ namespace batoid {
     public:
         Sum(const Surface** surfaces, size_t nsurf);
         ~Sum();
-
-        virtual const Surface* getDevPtr() const override;
 
         virtual double sag(double, double) const override;
         virtual void normal(
@@ -36,6 +38,24 @@ namespace batoid {
         #pragma omp end declare target
     #endif
 
+
+    ///////////////
+    // SumHandle //
+    ///////////////
+
+    class SumHandle : public SurfaceHandle {
+    public:
+        SumHandle(const SurfaceHandle** handles, const size_t nsurf);
+        virtual ~SumHandle();
+
+        static const Surface** _getSurfaces(
+            const SurfaceHandle** handles, const size_t nsurf, bool host
+        );
+    private:
+        const Surface** _hostSurfaces;
+        const Surface** _devSurfaces;
+        const size_t _nsurf;
+    };
 }
 
 #endif

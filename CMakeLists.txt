@@ -38,7 +38,7 @@ set(SRC_FILES
   src/quadric.cpp
   src/rayVector.cpp
   src/sphere.cpp
-  # src/sum.cpp
+  src/sum.cpp
   src/surface.cpp
   src/tilted.cpp
   # src/table.cpp
@@ -57,7 +57,7 @@ set(PYSRC_FILES
   pysrc/quadric.cpp
   pysrc/rayVector.cpp
   pysrc/sphere.cpp
-  # pysrc/sum.cpp
+  pysrc/sum.cpp
   pysrc/surface.cpp
   pysrc/tilted.cpp
   # pysrc/table.cpp

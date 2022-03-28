@@ -1,4 +1,5 @@
 #include "sum.h"
+#include <omp.h>
 
 
 namespace batoid {
@@ -8,16 +9,10 @@ namespace batoid {
     #endif
 
     Sum::Sum(const Surface** surfaces, size_t nsurf) :
-        Surface(), _surfaces(surfaces), _nsurf(nsurf)
+        _surfaces(surfaces), _nsurf(nsurf)
     {}
 
     Sum::~Sum() {
-        #if defined(BATOID_GPU)
-            if (_devPtr) {
-                const Surface** surfaces = _surfaces;
-                #pragma omp target exit data map(release:surfaces[:_nsurf])
-            }
-        #endif
     }
 
     double Sum::sag(double x, double y) const {
@@ -60,25 +55,55 @@ namespace batoid {
     #endif
 
 
-    const Surface* Sum::getDevPtr() const {
+    ///////////////
+    // SumHandle //
+    ///////////////
+
+    const Surface** SumHandle::_getSurfaces(
+        const SurfaceHandle** handles, const size_t nsurf, bool host
+    ) {
+        auto out = new const Surface*[nsurf];
+        for (size_t i=0; i<nsurf; i++) {
+            out[i] = host ? handles[i]->getHostPtr() : handles[i]->getPtr();
+        }
+        return out;
+    }
+
+    SumHandle::SumHandle(const SurfaceHandle** handles, const size_t nsurf) :
+        SurfaceHandle(),
+        _hostSurfaces(_getSurfaces(handles, nsurf, true)),
+        _devSurfaces(_getSurfaces(handles, nsurf, false)),
+        _nsurf(nsurf)
+    {
+        _hostPtr = new Sum(_hostSurfaces, _nsurf);
         #if defined(BATOID_GPU)
-            if (_devPtr)
-                return _devPtr;
-            const Surface** surfaces = new const Surface*[_nsurf];
-            for (int i=0; i<_nsurf; i++) {
-                surfaces[i] = _surfaces[i]->getDevPtr();
-            }
-            Surface* ptr;
-            #pragma omp target enter data map(to:surfaces[:_nsurf])
-            #pragma omp target map(from:ptr)
+            auto alloc = omp_target_alloc(sizeof(Sum), omp_get_default_device());
+            const Surface** devS = _devSurfaces;
+            size_t ns = _nsurf;
+            #pragma omp target enter data map(to:devS[:_nsurf])
+            #pragma omp target map(from:_devicePtr), is_device_ptr(alloc)
             {
-                ptr = new Sum(surfaces, _nsurf);
+                _devicePtr = new (alloc) Sum(devS, ns);
             }
-            _devPtr = ptr;
-            return ptr;
-        #else
-            return this;
         #endif
+    }
+
+    SumHandle::~SumHandle() {
+        #if defined(BATOID_GPU)
+            // We know following is noop, but compiler might not...
+
+            // auto devPtr = static_cast<Sum *>(_devicePtr);
+            // #pragma omp target is_device_ptr(devPtr)
+            // {
+            //     devPtr->~Sum();
+            // }
+
+            #pragma omp target exit data map(release:_devSurfaces[:_nsurf])
+            omp_target_free(_devicePtr, omp_get_default_device());
+        #endif
+        delete[] _hostSurfaces;
+        delete[] _devSurfaces;
+        delete _hostPtr;
     }
 
 }

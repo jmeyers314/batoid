@@ -7,14 +7,14 @@ using namespace pybind11::literals;
 
 namespace batoid {
     void pyExportSum(py::module& m) {
-        py::class_<Sum, std::shared_ptr<Sum>, Surface>(m, "CPPSum")
+        py::class_<SumHandle, std::shared_ptr<SumHandle>, SurfaceHandle>(m, "CPPSum")
             .def(py::init(
-                [](const std::vector<std::shared_ptr<Surface>>& surfaces) {
-                    const Surface** _surfaces = new const Surface*[surfaces.size()];
-                    for (int i=0; i<surfaces.size(); i++) {
-                        _surfaces[i] = surfaces[i].get();
+                [](const std::vector<std::shared_ptr<SurfaceHandle>>& handles) {
+                    const SurfaceHandle** _handles = new const SurfaceHandle*[handles.size()];
+                    for (int i=0; i<handles.size(); i++) {
+                        _handles[i] = handles[i].get();
                     }
-                    return new Sum(_surfaces, surfaces.size());
+                    return new SumHandle(_handles, handles.size());
                 }
             ));
     }
