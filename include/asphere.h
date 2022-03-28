@@ -6,16 +6,21 @@
 
 namespace batoid {
 
+    /////////////
+    // Asphere //
+    /////////////
+
     #if defined(BATOID_GPU)
         #pragma omp declare target
     #endif
 
+    double* _computeAsphereDzDrCoefs(const double* coefs, const size_t size);
+
     class Asphere : public Quadric {
     public:
         Asphere(double R, double conic, const double* coefs, size_t size);
+        Asphere(double R, double conic, const double* coefs, const double* dzdrcoefs, size_t size);
         ~Asphere();
-
-        virtual const Surface* getDevPtr() const override;
 
         virtual double sag(double, double) const override;
         virtual void normal(
@@ -32,14 +37,29 @@ namespace batoid {
         const double* _coefs;
         const double* _dzdrcoefs;
         const size_t _size;
+        const bool _owns_dzdrcoefs;
 
         double _dzdr(double r) const;
-        static double* _computeDzDrCoefs(const double* coefs, const size_t size);
     };
 
     #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
+
+
+    ///////////////////
+    // AsphereHandle //
+    ///////////////////
+
+    class AsphereHandle : public SurfaceHandle {
+    public:
+        AsphereHandle(double R, double conic, const double* coefs, size_t size);
+        virtual ~AsphereHandle();
+    private:
+        const double* _coefs;
+        const double* _dzdrcoefs;
+        const size_t _size;
+    };
 
 }
 #endif

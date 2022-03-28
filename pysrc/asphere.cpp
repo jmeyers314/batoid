@@ -7,7 +7,7 @@ using namespace pybind11::literals;
 
 namespace batoid {
     void pyExportAsphere(py::module& m) {
-        py::class_<Asphere, std::shared_ptr<Asphere>, Quadric, Surface>(m, "CPPAsphere")
+        py::class_<AsphereHandle, std::shared_ptr<AsphereHandle>, SurfaceHandle>(m, "CPPAsphere")
             .def(py::init(
                 [](
                     double R,
@@ -15,7 +15,7 @@ namespace batoid {
                     size_t coefptr,
                     size_t size
                 ){
-                    return new Asphere(
+                    return new AsphereHandle(
                         R, conic,
                         reinterpret_cast<double*>(coefptr),
                         size

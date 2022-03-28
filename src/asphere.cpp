@@ -1,5 +1,6 @@
 #include "asphere.h"
 #include "quadric.h"
+#include <omp.h>
 
 namespace batoid {
 
@@ -7,7 +8,7 @@ namespace batoid {
         #pragma omp declare target
     #endif
 
-    double* Asphere::_computeDzDrCoefs(const double* coefs, const size_t size) {
+    double* _computeAsphereDzDrCoefs(const double* coefs, const size_t size) {
         double* result = new double[size];
         for(int i=4, j=0; j<size; j++, i += 2) {
             result[j] = coefs[j]*i;
@@ -15,23 +16,33 @@ namespace batoid {
         return result;
     }
 
+
+    /////////////
+    // Asphere //
+    /////////////
+
     Asphere::Asphere(double R, double conic, const double* coefs, size_t size) :
         Quadric(R, conic),
         _coefs(coefs),
-        _dzdrcoefs(_computeDzDrCoefs(coefs, size)),
-        _size(size)
+        _dzdrcoefs(_computeAsphereDzDrCoefs(coefs, size)),
+        _size(size),
+        _owns_dzdrcoefs(true)
+    {}
+
+    Asphere::Asphere(
+        double R, double conic, const double* coefs, const double* dzdrcoefs, size_t size
+    ) :
+        Quadric(R, conic),
+        _coefs(coefs),
+        _dzdrcoefs(dzdrcoefs),
+        _size(size),
+        _owns_dzdrcoefs(false)
     {}
 
     Asphere::~Asphere()
     {
-        #if defined(BATOID_GPU)
-            if (_devPtr) {
-                const size_t size = _size;
-                const double* coefs = _coefs;
-                #pragma omp target exit data map(release:coefs[:size])
-            }
-        #endif
-        delete[] _dzdrcoefs;
+        if (_owns_dzdrcoefs)
+            delete[] _dzdrcoefs;
     }
 
     double Asphere::sag(double x, double y) const {
@@ -88,23 +99,44 @@ namespace batoid {
         #pragma omp end declare target
     #endif
 
-    const Surface* Asphere::getDevPtr() const {
+
+    ///////////////////
+    // AsphereHandle //
+    ///////////////////
+
+    AsphereHandle::AsphereHandle(double R, double conic, const double* coefs, size_t size) :
+        SurfaceHandle(),
+        _coefs(coefs),
+        _dzdrcoefs(_computeAsphereDzDrCoefs(coefs, size)),
+        _size(size)
+    {
+        _hostPtr = new Asphere(R, conic, _coefs, _dzdrcoefs, _size);
         #if defined(BATOID_GPU)
-            if (!_devPtr) {
-                Surface* ptr;
-                // Allocate coef array on device
-                const double* coefs = _coefs;
-                #pragma omp target enter data map(to:coefs[:_size])
-                #pragma omp target map(from:ptr)
-                {
-                    ptr = new Asphere(_R, _conic, coefs, _size);
-                }
-                _devPtr = ptr;
+            auto alloc = omp_target_alloc(sizeof(Asphere), omp_get_default_device());
+            const double* cfs = _coefs;
+            const double* dzdrcfs = _dzdrcoefs;
+            #pragma omp target enter data map(to:cfs[:_size], dzdrcfs[:_size])
+            #pragma omp target map(from:_devicePtr), is_device_ptr(alloc)
+            {
+                _devicePtr = new (alloc) Asphere(R, conic, cfs, dzdrcfs, _size);
             }
-            return _devPtr;
-        #else
-            return this;
         #endif
     }
 
+    AsphereHandle::~AsphereHandle() {
+        #if defined(BATOID_GPU)
+            // We know following is noop, but compiler might not...
+
+            // auto devPtr = static_cast<Asphere *>(_devicePtr);
+            // #pragma omp target is_device_ptr(devPtr)
+            // {
+            //     devPtr->~Asphere();
+            // }
+
+            #pragma omp target exit data map(release:_coefs[:_size], _dzdrcoefs[:_size])
+            omp_target_free(_devicePtr, omp_get_default_device());
+        #endif
+        delete[] _dzdrcoefs;
+        delete _hostPtr;
+    }
 }
