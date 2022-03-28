@@ -31,6 +31,23 @@ namespace batoid {
                     s->normal(xptr[i], yptr[i], outptr[i], outptr[i+size], outptr[i+2*size]);
                 }
             }
-        );
+        )
+        #if defined(BATOID_GPU)  // For intermediate testing during GPU development
+            .def("_sagGPU",
+                [](const SurfaceHandle& h, size_t xarr, size_t yarr, size_t size, size_t outarr)
+                {
+                    double* xptr = reinterpret_cast<double*>(xarr);
+                    double* yptr = reinterpret_cast<double*>(yarr);
+                    double* outptr = reinterpret_cast<double*>(outarr);
+                    auto s = h.getPtr();
+                    #pragma omp target teams distribute parallel for is_device_ptr(s), \
+                            map(to:xptr[:size],yptr[:size]), map(from:outptr[:size])
+                    for(size_t i=0; i<size; i++) {
+                        outptr[i] = s->sag(xptr[i], yptr[i]);
+                    }
+                }
+            )
+        #endif
+        ;
     }
 }

@@ -35,6 +35,21 @@ class Surface(ABC):
         else:
             return out
 
+    def _sagGPU(self, x, y):  # For intermediate testing during GPU development
+        xx = np.asfortranarray(x, dtype=float)
+        yy = np.asfortranarray(y, dtype=float)
+        out = np.empty(xx.shape, order='F', dtype=float)
+        size = len(xx.ravel())
+        self._surface._sagGPU(
+            xx.ctypes.data, yy.ctypes.data, size, out.ctypes.data
+        )
+        try:
+            len(x)
+        except TypeError:
+            return out[0]
+        else:
+            return out
+
     def normal(self, x, y):
         """The normal vector to the surface at (x, y, z(x, y)).
 
