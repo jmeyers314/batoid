@@ -4,7 +4,6 @@ import numpy as np
 
 from . import _batoid
 from .constants import globalCoordSys, vacuum
-from .coordSys import CoordSys
 from .coordTransform import CoordTransform
 from .trace import applyForwardTransform, applyForwardTransformArrays
 from .utils import lazy_property, fieldToDirCos
@@ -315,7 +314,7 @@ class RayVector:
         if stopSurface is None:
             stopSurface = Interface(Plane())
         if medium is None:
-            medium = vacuum
+            medium = batoid.constants.vacuum
 
         if dirCos is None and source is None:
             dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)

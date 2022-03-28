@@ -11,17 +11,9 @@ namespace batoid {
         #pragma omp declare target
     #endif
 
-        Obscuration::Obscuration() :
-            _devPtr(nullptr)
-        {}
+        Obscuration::Obscuration() {}
 
-        Obscuration::~Obscuration() {
-            #if defined(BATOID_GPU)
-                if (_devPtr) {
-                    freeDevPtr();
-                }
-            #endif
-        }
+        Obscuration::~Obscuration() {}
 
         ObscCircle::ObscCircle(double radius, double x0, double y0) :
             Obscuration(), _radius(radius), _x0(x0), _y0(y0)

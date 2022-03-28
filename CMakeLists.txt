@@ -25,42 +25,42 @@ include_directories(include)
 add_subdirectory(pybind11)
 
 set(SRC_FILES
-  src/asphere.cpp
+  # src/asphere.cpp
   src/batoid.cpp
-  src/bicubic.cpp
-  src/coating.cpp
+  # src/bicubic.cpp
+  # src/coating.cpp
   src/dualView.cpp
-  src/medium.cpp
-  src/obscuration.cpp
+  # src/medium.cpp
+  # src/obscuration.cpp
   src/paraboloid.cpp
   src/plane.cpp
-  src/polynomialSurface.cpp
+  # src/polynomialSurface.cpp
   src/quadric.cpp
   src/rayVector.cpp
   src/sphere.cpp
-  src/sum.cpp
+  # src/sum.cpp
   src/surface.cpp
   src/tilted.cpp
-  src/table.cpp
+  # src/table.cpp
 )
 
 set(PYSRC_FILES
-  pysrc/asphere.cpp
+  # pysrc/asphere.cpp
   pysrc/batoid.cpp
-  pysrc/bicubic.cpp
-  pysrc/coating.cpp
-  pysrc/medium.cpp
-  pysrc/obscuration.cpp
+  # pysrc/bicubic.cpp
+  # pysrc/coating.cpp
+  # pysrc/medium.cpp
+  # pysrc/obscuration.cpp
   pysrc/paraboloid.cpp
   pysrc/plane.cpp
-  pysrc/polynomialSurface.cpp
+  # pysrc/polynomialSurface.cpp
   pysrc/quadric.cpp
   pysrc/rayVector.cpp
   pysrc/sphere.cpp
-  pysrc/sum.cpp
+  # pysrc/sum.cpp
   pysrc/surface.cpp
   pysrc/tilted.cpp
-  pysrc/table.cpp
+  # pysrc/table.cpp
 )
 
 include(CheckCXXCompilerFlag)

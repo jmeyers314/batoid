@@ -7,7 +7,7 @@ using namespace pybind11::literals;
 
 namespace batoid {
     void pyExportQuadric(py::module& m) {
-        py::class_<Quadric, std::shared_ptr<Quadric>, Surface>(m, "CPPQuadric")
+        py::class_<QuadricHandle, std::shared_ptr<QuadricHandle>, SurfaceHandle>(m, "CPPQuadric")
             .def(py::init<double,double>(), "init", "R"_a, "conic"_a);
     }
 }

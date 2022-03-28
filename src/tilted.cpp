@@ -1,6 +1,11 @@
 #include "tilted.h"
+#include <omp.h>
 
 namespace batoid {
+
+    ////////////
+    // Tilted //
+    ////////////
 
     #if defined(BATOID_GPU)
         #pragma omp declare target
@@ -40,20 +45,35 @@ namespace batoid {
         #pragma omp end declare target
     #endif
 
-    const Surface* Tilted::getDevPtr() const {
+
+    //////////////////
+    // TiltedHandle //
+    //////////////////
+
+    TiltedHandle::TiltedHandle(double tanx, double tany) : SurfaceHandle() {
+        _hostPtr = new Tilted(tanx, tany);
         #if defined(BATOID_GPU)
-            if (!_devPtr) {
-                Surface* ptr;
-                #pragma omp target map(from:ptr)
-                {
-                    ptr = new Tilted(_tanx, _tany);
-                }
-                _devPtr = ptr;
+            auto alloc = omp_target_alloc(sizeof(Tilted), omp_get_default_device());
+            #pragma omp target map(from:_devicePtr), is_device_ptr(alloc)
+            {
+                _devicePtr = new (alloc) Tilted(tanx, tany);
             }
-            return _devPtr;
-        #else
-            return this;
         #endif
     }
 
+    TiltedHandle::~TiltedHandle() {
+        #if defined(BATOID_GPU)
+            // We know following is a noop, but compiler might not.
+            // This is what it'd look like though if we wanted to destruct on the device.
+
+            // auto devPtr = static_cast<Tilted *>(_devicePtr);
+            // #pragma omp target is_device_ptr(devPtr)
+            // {
+            //     devPtr->~Tilted();
+            // }
+
+            omp_target_free(_devicePtr, omp_get_default_device());
+        #endif
+        delete _hostPtr;
+    }
 }

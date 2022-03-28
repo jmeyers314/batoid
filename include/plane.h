@@ -5,6 +5,10 @@
 
 namespace batoid {
 
+    ///////////
+    // Plane //
+    ///////////
+
     #if defined(BATOID_GPU)
         #pragma omp declare target
     #endif
@@ -13,8 +17,6 @@ namespace batoid {
     public:
         Plane();
         ~Plane();
-
-        virtual const Surface* getDevPtr() const override;
 
         virtual double sag(double x, double y) const override;
         virtual void normal(
@@ -31,5 +33,17 @@ namespace batoid {
     #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
+
+
+    /////////////////
+    // PlaneHandle //
+    /////////////////
+
+    class PlaneHandle : public SurfaceHandle {
+    public:
+        PlaneHandle();
+        virtual ~PlaneHandle();
+    };
+
 }
 #endif

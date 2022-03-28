@@ -5,6 +5,10 @@
 
 namespace batoid {
 
+    /////////////
+    // Quadric //
+    /////////////
+
     #if defined(BATOID_GPU)
         #pragma omp declare target
     #endif
@@ -13,8 +17,6 @@ namespace batoid {
     public:
         Quadric(double R, double conic);
         ~Quadric();
-
-        virtual const Surface* getDevPtr() const override;
 
         virtual double sag(double, double) const override;
         virtual void normal(
@@ -46,6 +48,16 @@ namespace batoid {
     #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
+
+    ///////////////////
+    // QuadricHandle //
+    ///////////////////
+
+    class QuadricHandle : public SurfaceHandle {
+    public:
+        QuadricHandle(double R, double conic);
+        virtual ~QuadricHandle();
+    };
 
 }
 #endif

@@ -1,6 +1,11 @@
 #include "paraboloid.h"
+#include <omp.h>
 
 namespace batoid {
+
+    ////////////////
+    // Paraboloid //
+    ////////////////
 
     #if defined(BATOID_GPU)
         #pragma omp declare target
@@ -74,20 +79,35 @@ namespace batoid {
         #pragma omp end declare target
     #endif
 
-    const Surface* Paraboloid::getDevPtr() const {
+
+    //////////////////////
+    // ParaboloidHandle //
+    //////////////////////
+
+    ParaboloidHandle::ParaboloidHandle(double R) : SurfaceHandle() {
+        _hostPtr = new Paraboloid(R);
         #if defined(BATOID_GPU)
-            if (!_devPtr) {
-                Surface* ptr;
-                #pragma omp target map(from:ptr)
-                {
-                    ptr = new Paraboloid(_R);
-                }
-                _devPtr = ptr;
+            auto alloc = omp_target_alloc(sizeof(Paraboloid), omp_get_default_device());
+            #pragma omp target map(from:_devicePtr), is_device_ptr(alloc)
+            {
+                _devicePtr = new (alloc) Paraboloid(R);
             }
-            return _devPtr;
-        #else
-            return this;
         #endif
     }
 
+    ParaboloidHandle::~ParaboloidHandle() {
+        #if defined(BATOID_GPU)
+            // We know following is a noop, but compiler might not.
+            // This is what it'd look like though if we wanted to destruct on the device.
+
+            // auto devPtr = static_cast<Paraboloid *>(_devicePtr);
+            // #pragma omp target is_device_ptr(devPtr)
+            // {
+            //     devPtr->~Paraboloid();
+            // }
+
+            omp_target_free(_devicePtr, omp_get_default_device());
+        #endif
+        delete _hostPtr;
+    }
 }

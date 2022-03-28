@@ -2,21 +2,17 @@
 
 namespace batoid {
 
+    /////////////
+    // Surface //
+    /////////////
+
     #if defined(BATOID_GPU)
         #pragma omp declare target
     #endif
 
-    Surface::Surface() :
-        _devPtr(nullptr)
-    {}
+    Surface::Surface() {}
 
-    Surface::~Surface() {
-        #if defined(BATOID_GPU)
-            if (_devPtr) {
-                freeDevPtr();
-            }
-        #endif
-    }
+    Surface::~Surface() {}
 
     bool Surface::timeToIntersect(
         const double x, const double y, const double z,
@@ -31,6 +27,7 @@ namespace batoid {
         double sz = sag(rPx, rPy);
         // Always do exactly 5 iterations.  GPUifies better this way.
         // Unit tests pass (as of 20/10/13) with just 3 iterations.
+        // Algorithm is 2D Newton-Raphson iterations
         for (int iter=0; iter<5; iter++) {
             // repeatedly intersect plane tangent to surface at (rPx, rPy, sz) with ray
             double nx, ny, nz;
@@ -64,17 +61,30 @@ namespace batoid {
         #pragma omp end declare target
     #endif
 
-    #if defined(BATOID_GPU)
-    void Surface::freeDevPtr() const {
-        if(_devPtr) {
-            Surface* ptr = _devPtr;
-            _devPtr = nullptr;
-            #pragma omp target is_device_ptr(ptr)
-            {
-                delete ptr;
-            }
-        }
+
+    ///////////////////
+    // SurfaceHandle //
+    ///////////////////
+
+    SurfaceHandle::SurfaceHandle() :
+        _hostPtr(nullptr),
+        _devicePtr(nullptr)
+    {}
+
+    SurfaceHandle::~SurfaceHandle() {}
+
+    const Surface* SurfaceHandle::getPtr() const {
+        #if defined(BATOID_GPU)
+            return _devicePtr;
+        #else
+            return _hostPtr;
+        #endif
     }
-    #endif
+
+    const Surface* SurfaceHandle::getHostPtr() const {
+        return _hostPtr;
+    }
+
+
 
 }

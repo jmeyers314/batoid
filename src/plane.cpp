@@ -1,6 +1,11 @@
 #include "plane.h"
+#include <omp.h>
 
 namespace batoid {
+
+    ///////////
+    // Plane //
+    ///////////
 
     #if defined(BATOID_GPU)
         #pragma omp declare target
@@ -34,20 +39,34 @@ namespace batoid {
     #endif
 
 
-    const Surface* Plane::getDevPtr() const {
+    /////////////////
+    // PlaneHandle //
+    /////////////////
+
+    PlaneHandle::PlaneHandle() : SurfaceHandle() {
+        _hostPtr = new Plane();
         #if defined(BATOID_GPU)
-            if (!_devPtr) {
-                Surface* ptr;
-                #pragma omp target map(from:ptr)
-                {
-                    ptr = new Plane();
-                }
-                _devPtr = ptr;
+            auto alloc = omp_target_alloc(sizeof(Plane), omp_get_default_device());
+            #pragma omp target map(from:_devicePtr), is_device_ptr(alloc)
+            {
+                _devicePtr = new (alloc) Plane();
             }
-            return _devPtr;
-        #else
-            return this;
         #endif
     }
 
+    PlaneHandle::~PlaneHandle() {
+        #if defined(BATOID_GPU)
+            // We know following is a noop, but compiler might not.
+            // This is what it'd look like though if we wanted to destruct on the device.
+
+            // auto devPtr = static_cast<Plane *>(_devicePtr);
+            // #pragma omp target is_device_ptr(devPtr)
+            // {
+            //     devPtr->~Plane();
+            // }
+
+            omp_target_free(_devicePtr, omp_get_default_device());
+        #endif
+        delete _hostPtr;
+    }
 }

@@ -5,6 +5,10 @@
 
 namespace batoid {
 
+    ////////////
+    // Tilted //
+    ////////////
+
     #if defined(BATOID_GPU)
         #pragma omp declare target
     #endif
@@ -13,8 +17,6 @@ namespace batoid {
     public:
         Tilted(double tanx, double tany);
         ~Tilted();
-
-        virtual const Surface* getDevPtr() const override;
 
         virtual double sag(double, double) const override;
         virtual void normal(
@@ -34,6 +36,16 @@ namespace batoid {
     #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
+
+    //////////////////////
+    // TiltedHandle //
+    //////////////////////
+
+    class TiltedHandle : public SurfaceHandle {
+    public:
+        TiltedHandle(double tanx, double tany);
+        virtual ~TiltedHandle();
+    };
 
 }
 #endif

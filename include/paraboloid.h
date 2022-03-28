@@ -5,6 +5,10 @@
 
 namespace batoid {
 
+    ////////////////
+    // Paraboloid //
+    ////////////////
+
     #if defined(BATOID_GPU)
         #pragma omp declare target
     #endif
@@ -13,8 +17,6 @@ namespace batoid {
     public:
         Paraboloid(double R);
         ~Paraboloid();
-
-        virtual const Surface* getDevPtr() const override;
 
         virtual double sag(double, double) const override;
         virtual void normal(
@@ -36,6 +38,16 @@ namespace batoid {
     #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
+
+    //////////////////////
+    // ParaboloidHandle //
+    //////////////////////
+
+    class ParaboloidHandle : public SurfaceHandle {
+    public:
+        ParaboloidHandle(double R);
+        virtual ~ParaboloidHandle();
+    };
 
 }
 #endif

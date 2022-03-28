@@ -5,6 +5,10 @@
 
 namespace batoid {
 
+    ////////////
+    // Sphere //
+    ////////////
+
     #if defined(BATOID_GPU)
         #pragma omp declare target
     #endif
@@ -13,8 +17,6 @@ namespace batoid {
     public:
         Sphere(double R);
         ~Sphere();
-
-        virtual const Surface* getDevPtr() const override;
 
         virtual double sag(double, double) const override;
         virtual void normal(
@@ -39,6 +41,16 @@ namespace batoid {
     #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
+
+    //////////////////
+    // SphereHandle //
+    //////////////////
+
+    class SphereHandle : public SurfaceHandle {
+    public:
+        SphereHandle(double R);
+        virtual ~SphereHandle();
+    };
 
 }
 #endif
