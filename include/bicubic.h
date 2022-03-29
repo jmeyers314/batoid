@@ -6,6 +6,10 @@
 
 namespace batoid {
 
+    /////////////
+    // Bicubic //
+    /////////////
+
     #if defined(BATOID_GPU)
         #pragma omp declare target
     #endif
@@ -14,8 +18,6 @@ namespace batoid {
     public:
         Bicubic(const Table* table);
         ~Bicubic();
-
-        virtual const Surface* getDevPtr() const override;
 
         virtual double sag(double, double) const override;
         virtual void normal(
@@ -30,6 +32,17 @@ namespace batoid {
     #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
+
+
+    ///////////////////
+    // BicubicHandle //
+    ///////////////////
+
+    class BicubicHandle : public SurfaceHandle {
+    public:
+        BicubicHandle(const TableHandle* handle);
+        virtual ~BicubicHandle();
+    };
 
 }
 #endif

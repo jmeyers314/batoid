@@ -6,7 +6,7 @@ using namespace pybind11::literals;
 
 namespace batoid {
     void pyExportBicubic(py::module& m) {
-        py::class_<Bicubic, std::shared_ptr<Bicubic>, Surface>(m, "CPPBicubic")
-            .def(py::init<const Table*>(), "init", "table"_a);
+        py::class_<BicubicHandle, std::shared_ptr<BicubicHandle>, SurfaceHandle>(m, "CPPBicubic")
+            .def(py::init<const TableHandle*>(), "init", "table"_a);
     }
 }

@@ -1,8 +1,13 @@
 #include <new>
 #include "bicubic.h"
+#include <omp.h>
 
 
 namespace batoid {
+
+    /////////////
+    // Bicubic //
+    /////////////
 
     #if defined(BATOID_GPU)
         #pragma omp declare target
@@ -33,7 +38,6 @@ namespace batoid {
             return;
         }
 
-        // This works
         nz = 1/std::sqrt(1 + dxdz*dxdz + dydz*dydz);
         nx = -dxdz*nz;
         ny = -dydz*nz;
@@ -43,21 +47,36 @@ namespace batoid {
         #pragma omp end declare target
     #endif
 
-    const Surface* Bicubic::getDevPtr() const {
-        #if defined(BATOID_GPU)
-            if (!_devPtr) {
-                Surface* ptr;
-                const Table* tableDevPtr = _table->getDevPtr();
 
-                #pragma omp target map(from:ptr) is_device_ptr(tableDevPtr)
-                {
-                    ptr = new Bicubic(tableDevPtr);
-                }
-                _devPtr = ptr;
+    ///////////////////
+    // BicubicHandle //
+    ///////////////////
+
+    BicubicHandle::BicubicHandle(const TableHandle* handle) :
+        SurfaceHandle()
+    {
+        _hostPtr = new Bicubic(handle->getHostPtr());
+        #if defined(BATOID_GPU)
+            auto alloc = omp_target_alloc(sizeof(Bicubic), omp_get_default_device());
+            const Table* table = handle->getPtr();
+            #pragma omp target map(from:_devicePtr), is_device_ptr(alloc, table)
+            {
+                _devicePtr = new (alloc) Bicubic(table);
             }
-            return _devPtr;
-        #else
-            return this;
         #endif
+    }
+
+    BicubicHandle::~BicubicHandle() {
+        #if defined(BATOID_GPU)
+            // We know following is noop, but compiler might not...
+
+            // auto devPtr = static_cast<Bicubic *>(_devicePtr);
+            // #pragma omp target is_device_ptr(devPtr)
+            // {
+            //     devPtr->~Bicubic();
+            // }
+            omp_target_free(_devicePtr, omp_get_default_device());
+        #endif
+        delete _hostPtr;
     }
 }
