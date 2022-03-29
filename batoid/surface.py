@@ -26,8 +26,7 @@ class Surface(ABC):
         xx = np.asfortranarray(x, dtype=float)
         yy = np.asfortranarray(y, dtype=float)
         out = np.empty(xx.shape, order='F', dtype=float)
-        size = len(xx.ravel())
-        self._surface.sag(xx.ctypes.data, yy.ctypes.data, size, out.ctypes.data)
+        self._surface.sag(xx.ctypes.data, yy.ctypes.data, xx.size, out.ctypes.data)
         try:
             len(x)
         except TypeError:
@@ -39,9 +38,8 @@ class Surface(ABC):
         xx = np.asfortranarray(x, dtype=float)
         yy = np.asfortranarray(y, dtype=float)
         out = np.empty(xx.shape, order='F', dtype=float)
-        size = len(xx.ravel())
         self._surface._sagGPU(
-            xx.ctypes.data, yy.ctypes.data, size, out.ctypes.data
+            xx.ctypes.data, yy.ctypes.data, xx.size, out.ctypes.data
         )
         try:
             len(x)
@@ -66,10 +64,9 @@ class Surface(ABC):
         xx = np.asfortranarray(x, dtype=float)
         yy = np.asfortranarray(y, dtype=float)
         out = np.empty(xx.shape+(3,), order='F', dtype=float)
-        size = len(xx.ravel())
 
         self._surface.normal(
-            xx.ctypes.data, yy.ctypes.data, size, out.ctypes.data
+            xx.ctypes.data, yy.ctypes.data, xx.size, out.ctypes.data
         )
         try:
             len(x)
