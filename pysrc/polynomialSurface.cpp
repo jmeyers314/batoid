@@ -6,7 +6,11 @@ using namespace pybind11::literals;
 
 namespace batoid {
     void pyExportPolynomialSurface(py::module& m) {
-        py::class_<PolynomialSurface, std::shared_ptr<PolynomialSurface>, Surface>(m, "CPPPolynomialSurface")
+        py::class_<
+            PolynomialSurfaceHandle,
+            std::shared_ptr<PolynomialSurfaceHandle>,
+            SurfaceHandle
+        >(m, "CPPPolynomialSurface")
             .def(py::init(
                 [](
                     size_t coefs,
@@ -15,7 +19,7 @@ namespace batoid {
                     size_t xsize,
                     size_t ysize
                 ){
-                    return new PolynomialSurface(
+                    return new PolynomialSurfaceHandle(
                         reinterpret_cast<const double*>(coefs),
                         reinterpret_cast<const double*>(coefs_gradx),
                         reinterpret_cast<const double*>(coefs_grady),

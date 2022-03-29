@@ -34,7 +34,7 @@ set(SRC_FILES
   # src/obscuration.cpp
   src/paraboloid.cpp
   src/plane.cpp
-  # src/polynomialSurface.cpp
+  src/polynomialSurface.cpp
   src/quadric.cpp
   src/rayVector.cpp
   src/sphere.cpp
@@ -53,7 +53,7 @@ set(PYSRC_FILES
   # pysrc/obscuration.cpp
   pysrc/paraboloid.cpp
   pysrc/plane.cpp
-  # pysrc/polynomialSurface.cpp
+  pysrc/polynomialSurface.cpp
   pysrc/quadric.cpp
   pysrc/rayVector.cpp
   pysrc/sphere.cpp

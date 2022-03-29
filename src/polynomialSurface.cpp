@@ -1,7 +1,12 @@
 #include "polynomialSurface.h"
+#include <omp.h>
 
 namespace batoid {
 
+
+    ///////////////////////
+    // PolynomialSurface //
+    ///////////////////////
 
     #if defined(BATOID_GPU)
         #pragma omp declare target
@@ -11,24 +16,11 @@ namespace batoid {
         const double* coefs, const double* coefs_gradx, const double* coefs_grady,
         size_t xsize, size_t ysize
     ) :
-        Surface(),
         _coefs(coefs), _coefs_gradx(coefs_gradx), _coefs_grady(coefs_grady),
         _xsize(xsize), _ysize(ysize)
     {}
 
-    PolynomialSurface::~PolynomialSurface() {
-        #if defined(BATOID_GPU)
-            if (_devPtr) {
-                const size_t size = _xsize * _ysize;
-                const size_t sizem1 = (_xsize-1) * (_ysize-1);
-                const double* coefs = _coefs;
-                const double* coefs_gradx = _coefs_gradx;
-                const double* coefs_grady = _coefs_grady;
-                #pragma omp target exit data \
-                    map(release:coefs[:size], coefs_gradx[:sizem1], coefs_grady[:sizem1])
-            }
-        #endif
-    }
+    PolynomialSurface::~PolynomialSurface() {}
 
     double PolynomialSurface::sag(double x, double y) const {
         return horner2d(x, y, _coefs, _xsize, _ysize);
@@ -67,28 +59,56 @@ namespace batoid {
         #pragma omp end declare target
     #endif
 
-    const Surface* PolynomialSurface::getDevPtr() const {
+
+    /////////////////////////////
+    // PolynomialSurfaceHandle //
+    /////////////////////////////
+
+    PolynomialSurfaceHandle::PolynomialSurfaceHandle(
+        const double* coefs, const double* coefs_gradx, const double* coefs_grady,
+        size_t xsize, size_t ysize
+    ) :
+        SurfaceHandle(),
+        _coefs(coefs),
+        _coefs_gradx(coefs_gradx),
+        _coefs_grady(coefs_grady),
+        _xsize(xsize),
+        _ysize(ysize)
+    {
+        _hostPtr = new PolynomialSurface(
+            _coefs, _coefs_gradx, _coefs_grady, _xsize, _ysize
+        );
         #if defined(BATOID_GPU)
-            if (!_devPtr) {
-                Surface* ptr;
-                // Allocate arrays on device
-                const size_t size = _xsize * _ysize;
-                const size_t sizem1 = (_xsize-1) * (_ysize-1);
-                const double* coefs = _coefs;
-                const double* coefs_gradx = _coefs_gradx;
-                const double* coefs_grady = _coefs_grady;
-                #pragma omp target enter data \
-                    map(to:coefs[:size], coefs_gradx[:sizem1], coefs_grady[:sizem1])
-                #pragma omp target map(from:ptr)
-                {
-                    ptr = new PolynomialSurface(coefs, coefs_gradx, coefs_grady, _xsize, _ysize);
-                }
-                _devPtr = ptr;
+            auto alloc = omp_target_alloc(sizeof(PolynomialSurface), omp_get_default_device());
+            const size_t size = _xsize * _ysize;
+            const size_t sizem1 = (_xsize-1) * (_ysize-1);
+            const double* cfs = _coefs;
+            const double* cfsx = _coefs_gradx;
+            const double* cfsy = _coefs_grady;
+            #pragma omp target enter data map(to:cfs[:size], cfsx[:sizem1], cfsy[:sizem1])
+            #pragma omp target map(from:_devicePtr), is_device_ptr(alloc)
+            {
+                _devicePtr = new (alloc) PolynomialSurface(cfs, cfsx, cfsy, _xsize, _ysize);
             }
-            return _devPtr;
-        #else
-            return this;
         #endif
     }
 
+    PolynomialSurfaceHandle::~PolynomialSurfaceHandle() {
+        #if defined(BATOID_GPU)
+            // We know following is noop, but compiler might not...
+
+            // auto devPtr = static_cast<PolynomialSurface *>(_devicePtr);
+            // #pragma omp target is_device_ptr(devPtr)
+            // {
+            //     devPtr->~PolynomialSurface();
+            // }
+
+            const size_t size = _xsize * _ysize;
+            const size_t sizem1 = (_xsize-1) * (_ysize-1);
+            #pragma omp target exit data \
+                map(release:_coefs[:size], _coefs_gradx[:sizem1], _coefs_grady[:sizem1])
+            omp_target_free(_devicePtr, omp_get_default_device());
+        #endif
+        delete _hostPtr;
+    }
 }

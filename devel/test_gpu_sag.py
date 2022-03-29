@@ -11,7 +11,8 @@ for surf in [
     batoid.Sphere(-0.3),
     batoid.Quadric(-0.2, 0.01),
     batoid.Asphere(-0.2, 0.01, [1e-3, 1e-5, -2e-7]),
-    batoid.Sum([batoid.Paraboloid(1.0), batoid.Sphere(0.01)])
+    batoid.Sum([batoid.Paraboloid(1.0), batoid.Sphere(0.01)]),
+    batoid.Zernike([0]*10+[1e-6], R_outer=2.0, R_inner=0.5),
 ]:
     print(surf)
     out_cpu = surf.sag(x, y)
