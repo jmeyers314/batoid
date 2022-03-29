@@ -6,7 +6,7 @@ using namespace pybind11::literals;
 
 namespace batoid {
     void pyExportTable(py::module& m) {
-        py::class_<Table, std::shared_ptr<Table>>(m, "CPPTable")
+        py::class_<TableHandle, std::shared_ptr<TableHandle>>(m, "CPPTable")
             .def(py::init(
                 [](
                     double x0,
@@ -20,7 +20,7 @@ namespace batoid {
                     size_t nx,
                     size_t ny
                 ){
-                    return new Table(
+                    return new TableHandle(
                         x0, y0, dx, dy,
                         reinterpret_cast<double*>(z_ptr),
                         reinterpret_cast<double*>(dzdx_ptr),

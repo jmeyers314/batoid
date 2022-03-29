@@ -1,6 +1,8 @@
 #include "table.h"
 #include <new>
 #include <cmath>
+#include <cstdio>
+#include <omp.h>
 
 
 namespace batoid {
@@ -14,7 +16,6 @@ namespace batoid {
         const double* z, const double* dzdx, const double* dzdy, const double* d2zdxdy,
         size_t nx, size_t ny
     ) :
-        _devPtr(nullptr),
         _x0(x0), _y0(y0), _dx(dx), _dy(dy),
         _z(z),
         _dzdx(dzdx),
@@ -23,20 +24,7 @@ namespace batoid {
         _nx(nx), _ny(ny)
     {}
 
-    Table::~Table() {
-        #if defined(BATOID_GPU)
-            if (_devPtr) {
-                const size_t size = _nx * _ny;
-                const double* z = _z;
-                const double* dzdx = _dzdx;
-                const double* dzdy = _dzdy;
-                const double* d2zdxdy = _d2zdxdy;
-                #pragma omp target exit data \
-                    map(release:z[:size], dzdx[:size], dzdy[:size], d2zdxdy[:size])
-                freeDevPtr();
-            }
-        #endif
-    }
+    Table::~Table() {}
 
     double oneDSpline(double x, double val0, double val1, double der0, double der1) {
         double a = 2*(val0-val1) + der0 + der1;
@@ -57,7 +45,7 @@ namespace batoid {
     double Table::eval(double x, double y) const {
         int ix = int(std::floor((x-_x0)/_dx));
         int iy = int(std::floor((y-_y0)/_dy));
-        if ((ix >= _nx) or (ix < 0) or (iy >= _ny) or (iy < 0)) {
+        if ((ix >= (_nx-1)) or (ix < 0) or (iy >= (_ny-1)) or (iy < 0)) {
             return NAN;
         }
         double xgrid = _x0 + ix*_dx;
@@ -155,39 +143,67 @@ namespace batoid {
         #pragma omp end declare target
     #endif
 
-    #if defined(BATOID_GPU)
-    void Table::freeDevPtr() const {
-        if(_devPtr) {
-            Table* ptr = _devPtr;
-            _devPtr = nullptr;
-            #pragma omp target is_device_ptr(ptr)
-            {
-                delete ptr;
-            }
-        }
-    }
-    #endif
 
-    const Table* Table::getDevPtr() const {
+    /////////////////
+    // TableHandle //
+    /////////////////
+
+    TableHandle::TableHandle(
+        double x0, double y0, double dx, double dy,
+        const double* z, const double* dzdx, const double* dzdy, const double* d2zdxdy,
+        size_t nx, size_t ny
+    ) :
+        _z(z),
+        _dzdx(dzdx),
+        _dzdy(dzdy),
+        _d2zdxdy(d2zdxdy),
+        _size(nx*ny),
+        _hostPtr(new Table(x0, y0, dx, dy, _z, _dzdx, _dzdy, _d2zdxdy, nx, ny)),
+        _devicePtr(nullptr)
+    {
         #if defined(BATOID_GPU)
-            if (!_devPtr) {
-                Table* ptr;
-                // Allocate arrays on device
-                const size_t size = _nx*_ny;
-                const double* z = _z;
-                const double* dzdx = _dzdx;
-                const double* dzdy = _dzdy;
-                const double* d2zdxdy = _d2zdxdy;
-                #pragma omp target enter data map(to:z[:size], dzdx[:size], dzdy[:size], d2zdxdy[:size])
-                #pragma omp target map(from:ptr)
-                {
-                    ptr = new Table(_x0, _y0, _dx, _dy, z, dzdx, dzdy, d2zdxdy, _nx, _ny);
-                }
-                _devPtr = ptr;
+            auto alloc = omp_target_alloc(sizeof(Table), omp_get_default_device());
+            const double* mz = _z;
+            const double* mdzdx = _dzdx;
+            const double* mdzdy = _dzdy;
+            const double* md2zdxdy = _d2zdxdy;
+            size_t msize = _size;
+            #pragma omp target enter data \
+                map(to:mz[:msize], mdzdx[:msize], mdzdy[:msize], md2zdxdy[:msize])
+            #pragma omp target map(from:_devicePtr), is_device_ptr(alloc)
+            {
+                _devicePtr = new (alloc) Table(
+                    x0, y0, dx, dy, mz, mdzdx, mdzdy, md2zdxdy, nx, ny
+                );
             }
-            return _devPtr;
-        #else
-            return this;
         #endif
+    }
+
+    TableHandle::~TableHandle() {
+        #if defined(BATOID_GPU)
+            // We know following is noop, but compiler might not...
+
+            // auto devPtr = static_cast<Table *>(_devicePtr);
+            // #pragma omp target is_device_ptr(devPtr)
+            // {
+            //     devPtr->~Table();
+            // }
+            #pragma omp target exit data \
+                map(release:_z[:_size],  _dzdx[:_size], _dzdy[:_size], _d2zdxdy[:_size])
+            omp_target_free(_devicePtr, omp_get_default_device());
+        #endif
+        delete _hostPtr;
+    }
+
+    const Table* TableHandle::getPtr() const {
+        #if defined(BATOID_GPU)
+            return _devicePtr;
+        #else
+            return _hostPtr;
+        #endif
+    }
+
+    const Table* TableHandle::getHostPtr() const {
+        return _hostPtr;
     }
 }
