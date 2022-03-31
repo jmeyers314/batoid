@@ -5,7 +5,9 @@ namespace batoid {
     DualView<T>::DualView(T* _data, size_t _size) :
         data(_data), size(_size), syncState(SyncState::host), ownsHostData(false) {
             #if defined(BATOID_GPU)
-                #pragma omp target enter data map(alloc:data[:size])
+                auto dt = data;
+                auto sz = size;
+                #pragma omp target enter data map(alloc:dt[:sz])
             #endif
         }
 
@@ -13,7 +15,9 @@ namespace batoid {
     DualView<T>::DualView(size_t _size, SyncState _syncState) :
         data(new T[_size]), size(_size), syncState(_syncState), ownsHostData(true) {
             #if defined(BATOID_GPU)
-                #pragma omp target enter data map(alloc:data[:size])
+                auto dt = data;
+                auto sz = size;
+                #pragma omp target enter data map(alloc:dt[:sz])
             #endif
         }
 
