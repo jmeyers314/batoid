@@ -28,10 +28,10 @@ set(SRC_FILES
   src/asphere.cpp
   src/batoid.cpp
   src/bicubic.cpp
-  # src/coating.cpp
+  src/coating.cpp
   src/dualView.cpp
-  # src/medium.cpp
-  # src/obscuration.cpp
+  src/medium.cpp
+  src/obscuration.cpp
   src/paraboloid.cpp
   src/plane.cpp
   src/polynomialSurface.cpp
@@ -48,9 +48,9 @@ set(PYSRC_FILES
   pysrc/asphere.cpp
   pysrc/batoid.cpp
   pysrc/bicubic.cpp
-  # pysrc/coating.cpp
-  # pysrc/medium.cpp
-  # pysrc/obscuration.cpp
+  pysrc/coating.cpp
+  pysrc/medium.cpp
+  pysrc/obscuration.cpp
   pysrc/paraboloid.cpp
   pysrc/plane.cpp
   pysrc/polynomialSurface.cpp

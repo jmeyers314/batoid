@@ -21,9 +21,9 @@ namespace batoid {
     void pyExportPlane(py::module&);
     void pyExportPolynomialSurface(py::module&);
 
-    // void pyExportCoating(py::module&);
-    // void pyExportMedium(py::module&);
-    // void pyExportObscuration(py::module&);
+    void pyExportCoating(py::module&);
+    void pyExportMedium(py::module&);
+    void pyExportObscuration(py::module&);
 
     PYBIND11_MODULE(_batoid, m) {
         pyExportRayVector(m);
@@ -41,77 +41,77 @@ namespace batoid {
         pyExportPlane(m);
         pyExportPolynomialSurface(m);
 
-        // pyExportCoating(m);
-        // pyExportMedium(m);
-        // pyExportObscuration(m);
+        pyExportCoating(m);
+        pyExportMedium(m);
+        pyExportObscuration(m);
 
         using namespace pybind11::literals;
 
         m.def("applyForwardTransform", &applyForwardTransform);
         m.def("applyReverseTransform", &applyReverseTransform);
-        // m.def("intersect", &intersect);
-        // m.def("reflect", &reflect);
-        // m.def("refract", &refract);
-        // m.def("refractScreen", &refractScreen);
-        // m.def("obscure", &obscure);
-        // m.def("rSplit", &rSplit);
-        // m.def(
-        //     "applyForwardTransformArrays",
-        //     [](
-        //         const vec3 dr,
-        //         const mat3 drot,
-        //         size_t x,
-        //         size_t y,
-        //         size_t z,
-        //         size_t n
-        //     ){
-        //         applyForwardTransformArrays(
-        //             dr, drot,
-        //             reinterpret_cast<double*>(x),
-        //             reinterpret_cast<double*>(y),
-        //             reinterpret_cast<double*>(z),
-        //             n
-        //         );
-        //     }
-        // );
-        // m.def(
-        //     "applyReverseTransformArrays",
-        //     [](
-        //         const vec3 dr,
-        //         const mat3 drot,
-        //         size_t x,
-        //         size_t y,
-        //         size_t z,
-        //         size_t n
-        //     ){
-        //         applyReverseTransformArrays(
-        //             dr, drot,
-        //             reinterpret_cast<double*>(x),
-        //             reinterpret_cast<double*>(y),
-        //             reinterpret_cast<double*>(z),
-        //             n
-        //         );
-        //     }
-        // );
-        // m.def(
-        //     "finishParallel",
-        //     [](
-        //         const vec3 dr,
-        //         const mat3 drot,
-        //         const vec3 vv,
-        //         size_t x,
-        //         size_t y,
-        //         size_t z,
-        //         size_t n
-        //     ){
-        //         finishParallel(
-        //             dr, drot, vv,
-        //             reinterpret_cast<double*>(x),
-        //             reinterpret_cast<double*>(y),
-        //             reinterpret_cast<double*>(z),
-        //             n
-        //         );
-        //     });
+        m.def("intersect", &intersect);
+        m.def("reflect", &reflect);
+        m.def("refract", &refract);
+        m.def("refractScreen", &refractScreen);
+        m.def("obscure", &obscure);
+        m.def("rSplit", &rSplit);
+        m.def(
+            "applyForwardTransformArrays",
+            [](
+                const vec3 dr,
+                const mat3 drot,
+                size_t x,
+                size_t y,
+                size_t z,
+                size_t n
+            ){
+                applyForwardTransformArrays(
+                    dr, drot,
+                    reinterpret_cast<double*>(x),
+                    reinterpret_cast<double*>(y),
+                    reinterpret_cast<double*>(z),
+                    n
+                );
+            }
+        );
+        m.def(
+            "applyReverseTransformArrays",
+            [](
+                const vec3 dr,
+                const mat3 drot,
+                size_t x,
+                size_t y,
+                size_t z,
+                size_t n
+            ){
+                applyReverseTransformArrays(
+                    dr, drot,
+                    reinterpret_cast<double*>(x),
+                    reinterpret_cast<double*>(y),
+                    reinterpret_cast<double*>(z),
+                    n
+                );
+            }
+        );
+        m.def(
+            "finishParallel",
+            [](
+                const vec3 dr,
+                const mat3 drot,
+                const vec3 vv,
+                size_t x,
+                size_t y,
+                size_t z,
+                size_t n
+            ){
+                finishParallel(
+                    dr, drot, vv,
+                    reinterpret_cast<double*>(x),
+                    reinterpret_cast<double*>(y),
+                    reinterpret_cast<double*>(z),
+                    n
+                );
+            });
         #if defined(BATOID_GPU)
             m.def(
                 "get_omp_environment",
