@@ -384,9 +384,9 @@ def test_asphere_approximation():
 @timer
 def test_ne():
     xs1 = np.linspace(0, 1, 10)
-    xs2 = np.linspace(0, 1, 11)
+    xs2 = np.linspace(0, 1.1, 10)
     ys1 = np.linspace(0.1, 1, 10)
-    ys2 = np.linspace(0.1, 0.9, 11)
+    ys2 = np.linspace(0.1, 0.9, 10)
 
     def f1(x, y):
         return x+y

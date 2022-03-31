@@ -512,6 +512,8 @@ class Bicubic(Surface):
         dx = self._dx = (self._xs[-1] - self._xs[0])/(len(self._xs)-1)
         dy = self._dy = (self._ys[-1] - self._ys[0])/(len(self._ys)-1)
 
+        assert self._zs.shape == (len(self._xs), len(self._ys))
+
         if dzdxs is None:
             dzdxs = np.empty_like(self._zs)
             dzdxs[:, 1:-1] = (self._zs[:, 2:] - self._zs[:, :-2])/(2*dx)
@@ -533,6 +535,10 @@ class Bicubic(Surface):
         self._dzdxs = np.array(dzdxs, dtype=float, order="C")
         self._dzdys = np.array(dzdys, dtype=float, order="C")
         self._d2zdxdys = np.array(d2zdxdys, dtype=float, order="C")
+
+        assert self._dzdxs.shape == (len(self._xs), len(self._ys))
+        assert self._dzdys.shape == (len(self._xs), len(self._ys))
+        assert self._d2zdxdys.shape == (len(self._xs), len(self._ys))
 
         self._table = _batoid.CPPTable(
             self._x0, self._y0, self._dx, self._dy,
