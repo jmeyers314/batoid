@@ -2,6 +2,7 @@ import numpy as np
 from . import _batoid
 from .trace import obscure
 
+
 class Obscuration:
     """An `Obscuration` instance is used to mark as vignetted (i.e., obscured)
     if their x/y coordinates lie in a particular region.
@@ -24,7 +25,18 @@ class Obscuration:
         obscured : bool
             True if point is obscured.  False otherwise.
         """
-        return self._obsc.contains(x, y)
+        xx = np.asfortranarray(x, dtype=float)
+        yy = np.asfortranarray(y, dtype=float)
+        out = np.empty(xx.shape, order='F', dtype=bool)
+        self._obsc.contains(
+            xx.ctypes.data, yy.ctypes.data, xx.size, out.ctypes.data
+        )
+        try:
+            len(x)
+        except TypeError:
+            return out[0]
+        else:
+            return out
 
     def obscure(self, rv):
         """Mark rays for potential vignetting.

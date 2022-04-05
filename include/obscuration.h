@@ -9,24 +9,23 @@ namespace batoid {
         #pragma omp declare target
     #endif
 
+
+    /////////////////
+    // Obscuration //
+    /////////////////
+
     class Obscuration {
     public:
         Obscuration();
         virtual ~Obscuration();
 
         virtual bool contains(double x, double y) const = 0;
-
-        virtual const Obscuration* getDevPtr() const = 0;
-
-    protected:
-        mutable Obscuration* _devPtr;
-
-    private:
-        #if defined(BATOID_GPU)
-        void freeDevPtr() const;
-        #endif
     };
 
+
+    ////////////////
+    // ObscCircle //
+    ////////////////
 
     class ObscCircle : public Obscuration {
     public:
@@ -35,12 +34,14 @@ namespace batoid {
 
         bool contains(double x, double y) const override;
 
-        const Obscuration* getDevPtr() const override;
-
     private:
         const double _radius, _x0, _y0;
     };
 
+
+    /////////////////
+    // ObscAnnulus //
+    /////////////////
 
     class ObscAnnulus : public Obscuration {
     public:
@@ -49,12 +50,14 @@ namespace batoid {
 
         bool contains(double x, double y) const override;
 
-        const Obscuration* getDevPtr() const override;
-
     private:
         const double _inner, _outer, _x0, _y0;
     };
 
+
+    ///////////////////
+    // ObscRectangle //
+    ///////////////////
 
     class ObscRectangle : public Obscuration {
     public:
@@ -63,13 +66,15 @@ namespace batoid {
 
         bool contains(double x, double y) const override;
 
-        const Obscuration* getDevPtr() const override;
-
     private:
         const double _width, _height, _x0, _y0, _theta;
         const double _sth, _cth;
     };
 
+
+    /////////////
+    // ObscRay //
+    /////////////
 
     class ObscRay : public Obscuration {
     public:
@@ -78,13 +83,15 @@ namespace batoid {
 
         bool contains(double x, double y) const override;
 
-        const Obscuration* getDevPtr() const override;
-
     private:
         const double _width, _theta, _x0, _y0;
         const double _sth, _cth;
     };
 
+
+    /////////////////
+    // ObscPolygon //
+    /////////////////
 
     class ObscPolygon : public Obscuration {
     public:
@@ -93,11 +100,9 @@ namespace batoid {
 
         bool contains(double x, double y) const override;
 
-        void containsGrid(
-            const double* xgrid, const double* ygrid, bool* out, const size_t nx, const size_t ny
-        ) const;
-
-        const Obscuration* getDevPtr() const override;
+        // void containsGrid(
+        //     const double* xgrid, const double* ygrid, bool* out, const size_t nx, const size_t ny
+        // ) const;
 
     private:
         const double* _xp;
@@ -106,6 +111,10 @@ namespace batoid {
     };
 
 
+    //////////////////
+    // ObscNegation //
+    //////////////////
+
     class ObscNegation : public Obscuration {
     public:
         ObscNegation(const Obscuration* original);
@@ -113,12 +122,14 @@ namespace batoid {
 
         bool contains(double x, double y) const override;
 
-        const Obscuration* getDevPtr() const override;
-
     private:
         const Obscuration* _original;
     };
 
+
+    ///////////////
+    // ObscUnion //
+    ///////////////
 
     class ObscUnion : public Obscuration {
     public:
@@ -127,13 +138,15 @@ namespace batoid {
 
         bool contains(double x, double y) const override;
 
-        const Obscuration* getDevPtr() const override;
-
     private:
         const Obscuration** _obscs;
         size_t _nobsc;
     };
 
+
+    //////////////////////
+    // ObscIntersection //
+    //////////////////////
 
     class ObscIntersection : public Obscuration {
     public:
@@ -142,16 +155,148 @@ namespace batoid {
 
         bool contains(double x, double y) const override;
 
-        const Obscuration* getDevPtr() const override;
-
     private:
         const Obscuration** _obscs;
         size_t _nobsc;
     };
 
-    #if defined(BATOID_GPU)
-        #pragma omp end declare target
-    #endif
+
+#if defined(BATOID_GPU)
+    #pragma omp end declare target
+#endif
+
+
+    ///////////////////////
+    // ObscurationHandle //
+    ///////////////////////
+
+    class ObscurationHandle {
+    public:
+        ObscurationHandle();
+
+        virtual ~ObscurationHandle();
+
+        const Obscuration* getPtr() const;
+
+        const Obscuration* getHostPtr() const;
+
+    protected:
+        Obscuration* _hostPtr;
+        Obscuration* _devicePtr;
+    };
+
+
+    //////////////////////
+    // ObscCircleHandle //
+    //////////////////////
+
+    class ObscCircleHandle : public ObscurationHandle {
+    public:
+        ObscCircleHandle(double radius, double x0=0.0, double y0=0.0);
+        virtual ~ObscCircleHandle();
+    };
+
+
+    ///////////////////////
+    // ObscAnnulusHandle //
+    ///////////////////////
+
+    class ObscAnnulusHandle : public ObscurationHandle {
+    public:
+        ObscAnnulusHandle(double inner, double outer, double x0=0.0, double y0=0.0);
+        virtual ~ObscAnnulusHandle();
+    };
+
+
+    /////////////////////////
+    // ObscRectangleHandle //
+    /////////////////////////
+
+    class ObscRectangleHandle : public ObscurationHandle {
+    public:
+        ObscRectangleHandle(double width, double height, double x0=0.0, double y0=0.0, double theta=0.0);
+        virtual ~ObscRectangleHandle();
+    };
+
+
+    ///////////////////
+    // ObscRayHandle //
+    ///////////////////
+
+    class ObscRayHandle : public ObscurationHandle {
+    public:
+        ObscRayHandle(double width, double theta, double x0=0.0, double y0=0.0);
+        ~ObscRayHandle();
+    };
+
+
+    ///////////////////////
+    // ObscPolygonHandle //
+    ///////////////////////
+
+    class ObscPolygonHandle : public ObscurationHandle {
+    public:
+        ObscPolygonHandle(const double* xp, const double* yp, const size_t size);
+        ~ObscPolygonHandle();
+    private:
+        const double* _xp;
+        const double* _yp;
+        const size_t _size;
+    };
+
+
+    ////////////////////////
+    // ObscNegationHandle //
+    ////////////////////////
+
+    class ObscNegationHandle : public ObscurationHandle {
+    public:
+        ObscNegationHandle(const ObscurationHandle* original);
+        ~ObscNegationHandle();
+    private:
+        const Obscuration* _original;
+    };
+
+
+    /////////////////////
+    // ObscUnionHandle //
+    /////////////////////
+
+    class ObscUnionHandle : public ObscurationHandle {
+    public:
+        ObscUnionHandle(const ObscurationHandle** handles, size_t nobsc);
+        ~ObscUnionHandle();
+
+        static const Obscuration** _getObscs(
+            const ObscurationHandle** handles, const size_t nobsc, bool host
+        );
+
+    private:
+        const Obscuration** _hostObscs;
+        const Obscuration** _devObscs;
+        size_t _nobsc;
+    };
+
+
+    ////////////////////////////
+    // ObscIntersectionHandle //
+    ////////////////////////////
+
+    class ObscIntersectionHandle : public ObscurationHandle {
+    public:
+        ObscIntersectionHandle(const ObscurationHandle** handles, size_t nobsc);
+        ~ObscIntersectionHandle();
+
+        static const Obscuration** _getObscs(
+            const ObscurationHandle** handles, const size_t nobsc, bool host
+        );
+
+    private:
+        const Obscuration** _hostObscs;
+        const Obscuration** _devObscs;
+        size_t _nobsc;
+    };
+
 }
 
 #endif

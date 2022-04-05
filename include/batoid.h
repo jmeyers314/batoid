@@ -14,7 +14,7 @@ namespace batoid {
 
     void applyForwardTransform(const vec3 dr, const mat3 drot, RayVector& rv);
     void applyReverseTransform(const vec3 dr, const mat3 drot, RayVector& rv);
-    void obscure(const Obscuration& obsc, RayVector& rv);
+    void obscure(const ObscurationHandle& obsc, RayVector& rv);
     void intersect(
         const SurfaceHandle& surface, const vec3 dr, const mat3 drot, RayVector& rv,
         const Coating* coating

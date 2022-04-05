@@ -221,14 +221,14 @@ def test_ObscPolygon():
         o2.contains(x, y)
     )
 
-    # Check containsGrid
-    x = np.linspace(-10.0, 10.0, 25)
-    y = np.linspace(-10.0, 10.0, 25)
-    xx, yy = np.meshgrid(x, y)
-    np.testing.assert_array_equal(
-        o2.contains(xx, yy),
-        o2.containsGrid(x, y)
-    )
+    # # Check containsGrid
+    # x = np.linspace(-10.0, 10.0, 25)
+    # y = np.linspace(-10.0, 10.0, 25)
+    # xx, yy = np.meshgrid(x, y)
+    # np.testing.assert_array_equal(
+    #     o2.contains(xx, yy),
+    #     o2.containsGrid(x, y)
+    # )
 
 
 @timer

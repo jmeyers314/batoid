@@ -144,7 +144,7 @@ namespace batoid {
     }
 
 
-    void obscure(const Obscuration& obsc, RayVector& rv) {
+    void obscure(const ObscurationHandle& obsc, RayVector& rv) {
         rv.x.syncToDevice();
         rv.y.syncToDevice();
         rv.z.syncToDevice();
@@ -155,10 +155,12 @@ namespace batoid {
         double* zptr = rv.z.data;
         bool* vigptr = rv.vignetted.data;
 
-        const Obscuration* obscPtr = obsc.getDevPtr();
+        const Obscuration* obscPtr = obsc.getPtr();
 
         #if defined(BATOID_GPU)
-            #pragma omp target teams distribute parallel for is_device_ptr(obscPtr)
+        #pragma omp target teams distribute parallel for \
+            is_device_ptr(obscPtr) \
+            map(to:xptr[:size], yptr[:size]) map(from:vigptr[:size])
         #else
             #pragma omp parallel for
         #endif
