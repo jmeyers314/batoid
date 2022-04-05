@@ -375,7 +375,7 @@ namespace batoid {
     void refract(
         const SurfaceHandle& surface,
         const vec3 dr, const mat3 drot,
-        const Medium& m1, const Medium& m2,
+        const MediumHandle& m1, const MediumHandle& m2,
         RayVector& rv,
         const Coating* coating
     ) {
@@ -408,7 +408,7 @@ namespace batoid {
         const Surface* surfacePtr = surface.getPtr();
         const double* drptr = dr.data();
         const double* drotptr = drot.data();
-        const Medium* mPtr = m2.getDevPtr();
+        const Medium* mPtr = m2.getPtr();
         const Coating* coatingPtr = nullptr;
         if (coating)
             coatingPtr = coating->getDevPtr();
@@ -493,7 +493,7 @@ namespace batoid {
     void rSplit(
         const SurfaceHandle& surface,
         const vec3 dr, const mat3 drot,
-        const Medium& m1, const Medium& m2,
+        const MediumHandle& m1, const MediumHandle& m2,
         const Coating& coating,
         RayVector& rv, RayVector& rvSplit
     ) {
@@ -550,7 +550,7 @@ namespace batoid {
         const Surface* surfacePtr = surface.getPtr();
         const double* drptr = dr.data();
         const double* drotptr = drot.data();
-        const Medium* mPtr = m2.getDevPtr();
+        const Medium* mPtr = m2.getPtr();
         const Coating* cPtr = coating.getDevPtr();
 
         #if defined(BATOID_GPU)

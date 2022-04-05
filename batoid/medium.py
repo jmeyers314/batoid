@@ -21,7 +21,15 @@ class Medium:
         n : float
             Refractive index.
         """
-        return self._medium.getN(wavelength)
+        ww = np.asfortranarray(wavelength, dtype=float)
+        out = np.empty(ww.shape, order='F', dtype=float)
+        self._medium.getN(ww.ctypes.data, ww.size, out.ctypes.data)
+        try:
+            len(wavelength)
+        except TypeError:
+            return out[0]
+        else:
+            return out
 
     def __ne__(self, rhs):
         return not (self == rhs)

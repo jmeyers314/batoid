@@ -25,11 +25,11 @@ namespace batoid {
     );
     void refract(
         const SurfaceHandle& surface, const vec3 dr, const mat3 drot,
-        const Medium& m1, const Medium& m2, RayVector& rv, const Coating* coating
+        const MediumHandle& m1, const MediumHandle& m2, RayVector& rv, const Coating* coating
     );
     void rSplit(
         const SurfaceHandle& surface, const vec3 dr, const mat3 drot,
-        const Medium& m1, const Medium& m2,
+        const MediumHandle& m1, const MediumHandle& m2,
         const Coating& coating,
         RayVector& rv, RayVector& rvSplit
     );
