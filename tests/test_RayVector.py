@@ -75,9 +75,10 @@ def test_positionAtTime():
     np.testing.assert_equal(rv.wavelength, 0.0)
 
     for t1 in [0.0, 1.0, -1.1, 2.5]:
-        np.testing.assert_equal(
+        np.testing.assert_allclose(
             rv.positionAtTime(t1),
-            rv.r + t1 * rv.v
+            rv.r + t1 * rv.v,
+            rtol=0, atol=1e-15
         )
 
     # Now add some random t's
@@ -93,9 +94,10 @@ def test_positionAtTime():
     np.testing.assert_equal(rv.wavelength, 0.0)
 
     for t1 in [0.0, 1.4, -1.3, 2.1]:
-        np.testing.assert_equal(
+        np.testing.assert_allclose(
             rv.positionAtTime(t1),
-            rv.r + rv.v*(t1-rv.t)[:,None]
+            rv.r + rv.v*(t1-rv.t)[:,None],
+            rtol=0, atol=1e-15
         )
 
 
@@ -490,7 +492,7 @@ def test_asGrid():
         # Check that projected points are inside region
         pupil = batoid.Plane()
         pupil.intersect(rays)
-        np.testing.assert_allclose(rays.z, 0.0)
+        np.testing.assert_allclose(rays.z, 0.0, rtol=0, atol=1e-15)
         np.testing.assert_array_less(rays.x, 0.5)
         np.testing.assert_array_less(rays.y, 0.5)
         np.testing.assert_array_less(-0.5, rays.x)
@@ -877,6 +879,7 @@ def test_getitem():
         rv[-len(rv)-1]
 
 
+@timer
 def test_fromStop():
     telescope = batoid.Optic.fromYaml("LSST_r.yaml")
     rv = batoid.RayVector.asPolar(
@@ -954,6 +957,7 @@ def test_fromStop():
     assert rv == rv2
 
 
+@timer
 def test_fromFieldAngles():
     telescope = batoid.Optic.fromYaml("LSST_r.yaml")
     thx = np.linspace(-0.5, 0.5, 10)
