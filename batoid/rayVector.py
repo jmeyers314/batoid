@@ -314,7 +314,7 @@ class RayVector:
         if stopSurface is None:
             stopSurface = Interface(Plane())
         if medium is None:
-            medium = batoid.constants.vacuum
+            medium = vacuum
 
         if dirCos is None and source is None:
             dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
@@ -1154,12 +1154,12 @@ class RayVector:
         self._rv.failed.syncToHost()
 
     def _syncToDevice(self):
-        self._rv.x.syncToHost()
-        self._rv.y.syncToHost()
-        self._rv.z.syncToHost()
-        self._rv.vx.syncToHost()
-        self._rv.vy.syncToHost()
-        self._rv.vz.syncToHost()
+        self._rv.x.syncToDevice()
+        self._rv.y.syncToDevice()
+        self._rv.z.syncToDevice()
+        self._rv.vx.syncToDevice()
+        self._rv.vy.syncToDevice()
+        self._rv.vz.syncToDevice()
         self._rv.t.syncToDevice()
         self._rv.wavelength.syncToDevice()
         self._rv.flux.syncToDevice()
