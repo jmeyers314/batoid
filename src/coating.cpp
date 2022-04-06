@@ -1,5 +1,6 @@
 #include "coating.h"
 #include <new>
+#include <omp.h>
 
 namespace batoid {
 
@@ -7,17 +8,19 @@ namespace batoid {
         #pragma omp declare target
     #endif
 
-    Coating::Coating() :
-        _devPtr(nullptr)
-    {}
 
-    Coating::~Coating() {
-        #if defined(BATOID_GPU)
-            if (_devPtr) {
-                freeDevPtr();
-            }
-        #endif
-    }
+    /////////////
+    // Coating //
+    /////////////
+
+    Coating::Coating() {}
+
+    Coating::~Coating() {}
+
+
+    ///////////////////
+    // SimpleCoating //
+    ///////////////////
 
     SimpleCoating::SimpleCoating(double reflectivity, double transmissivity) :
         _reflectivity(reflectivity), _transmissivity(transmissivity)
@@ -38,39 +41,67 @@ namespace batoid {
         return _transmissivity;
     }
 
+
     #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
 
 
-    #if defined(BATOID_GPU)
-    void Coating::freeDevPtr() const {
-        if(_devPtr) {
-            Coating* ptr = _devPtr;
-            _devPtr = nullptr;
-            #pragma omp target is_device_ptr(ptr)
-            {
-                delete ptr;
-            }
-        }
-    }
-    #endif
+    ///////////////////
+    // CoatingHandle //
+    ///////////////////
 
-    const Coating* SimpleCoating::getDevPtr() const {
+    CoatingHandle::CoatingHandle() :
+        _hostPtr(nullptr),
+        _devicePtr(nullptr)
+    {}
+
+    CoatingHandle::~CoatingHandle() {}
+
+    const Coating* CoatingHandle::getPtr() const {
         #if defined(BATOID_GPU)
-            if (!_devPtr) {
-                Coating* ptr;
-                #pragma omp target map(from:ptr)
-                {
-                    ptr = new SimpleCoating(_reflectivity, _transmissivity);
-                }
-                _devPtr = ptr;
-            }
-            return _devPtr;
+            return _devicePtr;
         #else
-            return this;
+            return _hostPtr;
         #endif
     }
 
+    const Coating* CoatingHandle::getHostPtr() const {
+        return _hostPtr;
+    }
+
+
+    /////////////////////////
+    // SimpleCoatingHandle //
+    /////////////////////////
+
+    SimpleCoatingHandle::SimpleCoatingHandle(double reflectivity, double transmissivity) :
+        CoatingHandle()
+    {
+        _hostPtr = new SimpleCoating(reflectivity, transmissivity);
+        #if defined(BATOID_GPU)
+            auto alloc = omp_target_alloc(sizeof(SimpleCoating), omp_get_default_device());
+            #pragma omp target map(from:_devicePtr), is_device_ptr(alloc)
+            {
+                _devicePtr = new (alloc) SimpleCoating(reflectivity, transmissivity);
+            }
+        #endif
+    }
+
+    SimpleCoatingHandle::~SimpleCoatingHandle() {
+        #if defined(BATOID_GPU)
+            // We know following is a noop, but compiler might not.
+            // This is what it'd look like though if we wanted to destruct on the device.
+
+            // auto devPtr = static_cast<SimpleCoating *>(_devicePtr);
+            // #pragma omp target is_device_ptr(devPtr)
+            // {
+            //     devPtr->~SimpleCoating();
+            // }
+
+            omp_target_free(_devicePtr, omp_get_default_device());
+        #endif
+        delete _hostPtr;
+    }
 
 }

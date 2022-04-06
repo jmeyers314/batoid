@@ -17,20 +17,20 @@ namespace batoid {
     void obscure(const ObscurationHandle& obsc, RayVector& rv);
     void intersect(
         const SurfaceHandle& surface, const vec3 dr, const mat3 drot, RayVector& rv,
-        const Coating* coating
+        const CoatingHandle* coating
     );
     void reflect(
         const SurfaceHandle& surface, const vec3 dr, const mat3 drot, RayVector& rv,
-        const Coating* coating
+        const CoatingHandle* coating
     );
     void refract(
         const SurfaceHandle& surface, const vec3 dr, const mat3 drot,
-        const MediumHandle& m1, const MediumHandle& m2, RayVector& rv, const Coating* coating
+        const MediumHandle& m1, const MediumHandle& m2, RayVector& rv, const CoatingHandle* coating
     );
     void rSplit(
         const SurfaceHandle& surface, const vec3 dr, const mat3 drot,
         const MediumHandle& m1, const MediumHandle& m2,
-        const Coating& coating,
+        const CoatingHandle& coating,
         RayVector& rv, RayVector& rvSplit
     );
     void refractScreen(

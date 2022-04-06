@@ -7,6 +7,11 @@ namespace batoid {
         #pragma omp declare target
     #endif
 
+
+    /////////////
+    // Coating //
+    /////////////
+
     class Coating {
     public:
         Coating();
@@ -15,17 +20,12 @@ namespace batoid {
         virtual void getCoefs(double wavelength, double cosIncidenceAngle, double& reflect, double&transmit) const = 0;
         virtual double getReflect(double wavelength, double cosIncidenceAngle) const = 0;
         virtual double getTransmit(double wavelength, double cosIncidenceAngle) const = 0;
-
-        virtual const Coating* getDevPtr() const = 0;
-
-    protected:
-        mutable Coating* _devPtr;
-
-    private:
-        #if defined(BATOID_GPU)
-        void freeDevPtr() const;
-        #endif
     };
+
+
+    ///////////////////
+    // SimpleCoating //
+    ///////////////////
 
     class SimpleCoating : public Coating {
     public:
@@ -36,16 +36,46 @@ namespace batoid {
         double getReflect(double wavelength, double cosIncidenceAngle) const override;
         double getTransmit(double wavelength, double cosIncidenceAngle) const override;
 
-        virtual const Coating* getDevPtr() const override;
-
     private:
         double _reflectivity;
         double _transmissivity;
     };
 
+
     #if defined(BATOID_GPU)
         #pragma omp end declare target
     #endif
+
+
+    ///////////////////
+    // CoatingHandle //
+    ///////////////////
+
+    class CoatingHandle {
+    public:
+        CoatingHandle();
+
+        virtual ~CoatingHandle();
+
+        const Coating* getPtr() const;
+
+        const Coating* getHostPtr() const;
+
+    protected:
+        Coating* _hostPtr;
+        Coating* _devicePtr;
+    };
+
+
+    /////////////////////////
+    // SimpleCoatingHandle //
+    /////////////////////////
+
+    class SimpleCoatingHandle : public CoatingHandle {
+    public:
+        SimpleCoatingHandle(double reflectivity, double transmissivity);
+        virtual ~SimpleCoatingHandle();
+    };
 
 }
 

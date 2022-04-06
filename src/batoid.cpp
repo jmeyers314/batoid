@@ -174,7 +174,7 @@ namespace batoid {
         const SurfaceHandle& surface,
         const vec3 dr, const mat3 drot,
         RayVector& rv,
-        const Coating* coating
+        const CoatingHandle* coating
     ) {
         rv.x.syncToDevice();
         rv.y.syncToDevice();
@@ -207,7 +207,7 @@ namespace batoid {
         const double* drotptr = drot.data();
         const Coating* coatingPtr = nullptr;
         if (coating)
-            coatingPtr = coating->getDevPtr();
+            coatingPtr = coating->getPtr();
 
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for \
@@ -270,7 +270,7 @@ namespace batoid {
         const SurfaceHandle& surface,
         const vec3 dr, const mat3 drot,
         RayVector& rv,
-        const Coating* coating
+        const CoatingHandle* coating
     ) {
         rv.x.syncToDevice();
         rv.y.syncToDevice();
@@ -303,7 +303,7 @@ namespace batoid {
         const double* drotptr = drot.data();
         const Coating* coatingPtr = nullptr;
         if (coating)
-            coatingPtr = coating->getDevPtr();
+            coatingPtr = coating->getPtr();
 
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for \
@@ -377,7 +377,7 @@ namespace batoid {
         const vec3 dr, const mat3 drot,
         const MediumHandle& m1, const MediumHandle& m2,
         RayVector& rv,
-        const Coating* coating
+        const CoatingHandle* coating
     ) {
         rv.x.syncToDevice();
         rv.y.syncToDevice();
@@ -411,7 +411,7 @@ namespace batoid {
         const Medium* mPtr = m2.getPtr();
         const Coating* coatingPtr = nullptr;
         if (coating)
-            coatingPtr = coating->getDevPtr();
+            coatingPtr = coating->getPtr();
 
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for \
@@ -494,7 +494,7 @@ namespace batoid {
         const SurfaceHandle& surface,
         const vec3 dr, const mat3 drot,
         const MediumHandle& m1, const MediumHandle& m2,
-        const Coating& coating,
+        const CoatingHandle& coating,
         RayVector& rv, RayVector& rvSplit
     ) {
         rv.x.syncToDevice();
@@ -551,7 +551,7 @@ namespace batoid {
         const double* drptr = dr.data();
         const double* drotptr = drot.data();
         const Medium* mPtr = m2.getPtr();
-        const Coating* cPtr = coating.getDevPtr();
+        const Coating* cPtr = coating.getPtr();
 
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for \
