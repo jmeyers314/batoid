@@ -158,9 +158,8 @@ namespace batoid {
         const Obscuration* obscPtr = obsc.getPtr();
 
         #if defined(BATOID_GPU)
-        #pragma omp target teams distribute parallel for \
-            is_device_ptr(obscPtr) \
-            map(to:xptr[:size], yptr[:size]) map(from:vigptr[:size])
+            #pragma omp target teams distribute parallel for \
+                is_device_ptr(obscPtr)
         #else
             #pragma omp parallel for
         #endif
