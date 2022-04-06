@@ -70,6 +70,7 @@ def parallel_trace_timing(args):
         telescope[pm].surface = batoid.Sum([orig, bc])
 
     copying = []
+    syncing = []
     tracing = []
     overall = []
 
@@ -77,6 +78,8 @@ def parallel_trace_timing(args):
         t1 = time.time()
         rays_out = rays.copy()
         t2 = time.time()
+        rays_out._syncToDevice()
+        t3 = time.time()
         telescope.trace(rays_out)
         rays_out.r # force copy back to host if doing gpu
         rays_out.v
@@ -84,11 +87,13 @@ def parallel_trace_timing(args):
         rays_out.flux
         rays_out.vignetted
         rays_out.failed
-        t3 = time.time()
+        t4 = time.time()
         copying.append(t2-t1)
-        tracing.append(t3-t2)
-        overall.append(t3-t1)
+        syncing.append(t3-t2)
+        tracing.append(t4-t3)
+        overall.append(t4-t1)
     copying = np.array(copying)
+    syncing = np.array(syncing)
     tracing = np.array(tracing)
     overall = np.array(overall)
 
@@ -97,6 +102,11 @@ def parallel_trace_timing(args):
         print("copying: {:_} +/- {:_} rays per second".format(
             int(np.mean(nrays/copying)),
             int(np.std(nrays/copying)/np.sqrt(args.nrepeat))
+        ))
+        print()
+        print("syncing: {:_} +/- {:_} rays per second".format(
+            int(np.mean(nrays/syncing)),
+            int(np.std(nrays/syncing)/np.sqrt(args.nrepeat))
         ))
         print()
         print("tracing: {:_} +/- {:_} rays per second".format(
@@ -114,6 +124,8 @@ def parallel_trace_timing(args):
     else:
         print()
         print("copying: {:_} rays per second".format(int(nrays/copying)))
+        print()
+        print("syncing: {:_} rays per second".format(int(nrays/syncing)))
         print()
         print("tracing: {:_} rays per second".format(int(nrays/tracing)))
         print()
