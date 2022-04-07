@@ -82,14 +82,16 @@ if (DEFINED ENV{BATOID_GPU})
   add_cxx_flag_if_avail(batoid-compile-flags "-Wno-openmp-mapping" CXX_W_NO_OPENMP_MAPPING)
   add_cxx_flag_if_avail(batoid-compile-flags "-fopenmp" CXX_FOPENMP)
   target_compile_options(batoid-compile-flags INTERFACE
-    $<$<COMPILE_LANGUAGE:CXX>:-fopenmp -fopenmp-targets=nvptx64-nvidia-cuda -Wno-openmp-mapping -Wno-unknown-cuda-version -I/global/cfs/cdirs/m1759/csdaley/software/perlmutter/llvm/12-main-2020Dec20/include>
+    $<$<COMPILE_LANGUAGE:CXX>:-fopenmp -fopenmp-targets=nvptx64-nvidia-cuda -Wno-openmp-mapping -Wno-unknown-cuda-version -fopenmp-assume-no-thread-state -fopenmp-cuda-mode -mllvm -openmp-opt-inline-device>
+    # $<$<COMPILE_LANGUAGE:CXX>:-fopenmp -fopenmp-targets=nvptx64-nvidia-cuda -Wno-openmp-mapping -Wno-unknown-cuda-version -fopenmp-assume-no-thread-state -fopenmp-cuda-mode -mllvm -openmp-opt-inline-device -fopenmp-new-driver -foffload-lto>
   )
 
   set(ALL_FILES ${SRC_FILES} ${PYSRC_FILES})
 
   add_definitions(-DBATOID_GPU)
   pybind11_add_module(_batoid SYSTEM ${ALL_FILES})
-  target_link_libraries(_batoid PUBLIC batoid-compile-flags "-fopenmp -fopenmp-targets=nvptx64-nvidia-cuda -Wno-openmp-mapping -Wno-unknown-cuda-version -I/global/cfs/cdirs/m1759/csdaley/software/perlmutter/llvm/12-main-2020Dec20/include")
+  target_link_libraries(_batoid PUBLIC batoid-compile-flags "-fopenmp -fopenmp-targets=nvptx64-nvidia-cuda -Wno-openmp-mapping -Wno-unknown-cuda-version -fopenmp-assume-no-thread-state -fopenmp-cuda-mode -mllvm -openmp-opt-inline-device")
+  # target_link_libraries(_batoid PUBLIC batoid-compile-flags "-fopenmp -fopenmp-targets=nvptx64-nvidia-cuda -Wno-openmp-mapping -Wno-unknown-cuda-version -fopenmp-assume-no-thread-state -fopenmp-cuda-mode -mllvm -openmp-opt-inline-device -fopenmp-new-driver -foffload-lto")
 
   set_target_properties(_batoid
     PROPERTIES
