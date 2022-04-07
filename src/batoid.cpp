@@ -407,14 +407,14 @@ namespace batoid {
         const Surface* surfacePtr = surface.getPtr();
         const double* drptr = dr.data();
         const double* drotptr = drot.data();
-        const Medium* mPtr = m2.getPtr();
+        const Medium* m2Ptr = m2.getPtr();
         const Coating* coatingPtr = nullptr;
         if (coating)
             coatingPtr = coating->getPtr();
 
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for \
-                is_device_ptr(surfacePtr, mPtr, coatingPtr) \
+                is_device_ptr(surfacePtr, m2Ptr, coatingPtr) \
                 map(to:drptr[:3], drotptr[:9])
         #else
             #pragma omp parallel for
@@ -462,7 +462,7 @@ namespace batoid {
                         nz *= -1;
                         alpha *= -1;
                     }
-                    double n2 = mPtr->getN(wptr[i]);
+                    double n2 = m2Ptr->getN(wptr[i]);
                     double eta = n1/n2;
                     double sinsqr = eta*eta*(1-alpha*alpha);
                     double nfactor = eta*alpha + sqrt(1-sinsqr);
@@ -549,12 +549,12 @@ namespace batoid {
         const Surface* surfacePtr = surface.getPtr();
         const double* drptr = dr.data();
         const double* drotptr = drot.data();
-        const Medium* mPtr = m2.getPtr();
+        const Medium* m2Ptr = m2.getPtr();
         const Coating* cPtr = coating.getPtr();
 
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for \
-                is_device_ptr(surfacePtr, mPtr, cPtr) \
+                is_device_ptr(surfacePtr, m2Ptr, cPtr) \
                 map(to:drptr[:3], drotptr[:9])
         #else
             #pragma omp parallel for
@@ -621,7 +621,7 @@ namespace batoid {
                     failptr2[i] = failptr[i];
 
                     // refraction
-                    double n2 = mPtr->getN(wptr[i]);
+                    double n2 = m2Ptr->getN(wptr[i]);
                     double eta = n1/n2;
                     double sinsqr = eta*eta*(1-alpha*alpha);
                     double nfactor = eta*alpha + sqrt(1-sinsqr);
