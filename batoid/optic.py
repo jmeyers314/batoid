@@ -514,9 +514,10 @@ class Interface(Optic):
         `Interface`
             Rotated interface.
         """
-        if rotOrigin is None and coordSys is None:
-            coordSys = self.coordSys
+        if rotOrigin is None:
             rotOrigin = [0,0,0]
+        if coordSys is None:
+            coordSys = self.coordSys
         ret = self.__class__.__new__(self.__class__)
         newDict = dict(self.__dict__)
         newDict['coordSys'] = self.coordSys.rotateLocal(
@@ -1288,9 +1289,10 @@ class CompoundOptic(Optic):
         `CompoundOptic`
             Rotated optic.
         """
-        if rotOrigin is None and coordSys is None:
-            coordSys = self.coordSys
+        if rotOrigin is None:
             rotOrigin = [0,0,0]
+        if coordSys is None:
+            coordSys = self.coordSys
         newItems = [item.withLocalRotation(rot, rotOrigin, coordSys)
                     for item in self.items]
         ret = self.__class__.__new__(self.__class__)
@@ -1338,9 +1340,10 @@ class CompoundOptic(Optic):
             raise ValueError("Optic {} not found".format(name))
         if name == self.name:
             return self.withLocalRotation(rot, rotOrigin, coordSys)
-        if rotOrigin is None and coordSys is None:
-            coordSys = self.itemDict[name].coordSys
+        if rotOrigin is None:
             rotOrigin = [0,0,0]
+        if coordSys is None:
+            coordSys = self.itemDict[name].coordSys
         # Clip off leading token
         assert name[:len(self.name)+1] == \
             self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
