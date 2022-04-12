@@ -472,6 +472,10 @@ class Interface(Optic):
         ret = self.__class__.__new__(self.__class__)
         newDict = dict(self.__dict__)
         newDict['coordSys'] = self.coordSys.shiftGlobal(shift)
+        if 'stopSurface' in newDict:
+            newDict['stopSurface'] = (
+                newDict['stopSurface'].withGlobalShift(shift)
+            )
         del newDict['surface']
         ret.__init__(
             self.surface,
@@ -523,6 +527,10 @@ class Interface(Optic):
         newDict['coordSys'] = self.coordSys.rotateLocal(
             rot, rotOrigin, coordSys
         )
+        if 'stopSurface' in newDict:
+            newDict['stopSurface'] = newDict['stopSurface'].withLocalRotation(
+                rot, rotOrigin, coordSys
+            )
         del newDict['surface']
         ret.__init__(
             self.surface,
@@ -1148,6 +1156,10 @@ class CompoundOptic(Optic):
         newDict = dict(self.__dict__)
         newDict['coordSys'] = self.coordSys.shiftGlobal(shift)
         del newDict['items']
+        if 'stopSurface' in newDict:
+            newDict['stopSurface'] = (
+                newDict['stopSurface'].withGlobalShift(shift)
+            )
         ret.__init__(
             newItems,
             **newDict
@@ -1238,37 +1250,10 @@ class CompoundOptic(Optic):
         `CompoundOptic`
             Optic with shifted subitem.
         """
-        # If name is one of items.names, the we use withGlobalShift, and we're
-        # done.  If not, then we need to recurse down to whichever item
-        # contains name.  Verify that name is in self.itemDict, but first
-        # convert partially qualified name to fully qualified.
-        if name in self._names:
-            name = self._names[name]
-        if name not in self.itemDict:
-            raise ValueError("Optic {} not found".format(name))
-        if name == self.name:
-            return self.withLocalShift(shift)
-        # Clip off leading token
-        assert name[:len(self.name)+1] == \
-            self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
-        name = name[len(self.name)+1:]
-        newItems = []
-        newDict = dict(self.__dict__)
-        del newDict['items']
-        for i, item in enumerate(self.items):
-            if name.startswith(item.name):
-                if name == item.name:
-                    newItems.append(item.withLocalShift(shift))
-                else:
-                    newItems.append(item.withLocallyShiftedOptic(name, shift))
-                newItems.extend(self.items[i+1:])
-                return self.__class__(
-                    newItems,
-                    **newDict
-                )
-            newItems.append(item)
-        raise RuntimeError(
-            "Error in withLocallyShiftedOptic!, Shouldn't get here!"
+        # Just apply the rotated global shift.
+        return self.withGloballyShiftedOptic(
+            name,
+            np.dot(self.coordSys.rot, shift)
         )
 
     def withLocalRotation(self, rot, rotOrigin=None, coordSys=None):
@@ -1293,14 +1278,25 @@ class CompoundOptic(Optic):
             rotOrigin = [0,0,0]
         if coordSys is None:
             coordSys = self.coordSys
-        newItems = [item.withLocalRotation(rot, rotOrigin, coordSys)
-                    for item in self.items]
+        newItems = [
+            item.withLocalRotation(
+                self.coordSys.rot@item.coordSys.rot.T@rot@item.coordSys.rot@self.coordSys.rot.T,
+                # rot,
+                rotOrigin,
+                coordSys
+            )
+            for item in self.items
+        ]
         ret = self.__class__.__new__(self.__class__)
         newDict = dict(self.__dict__)
         newDict['coordSys'] = self.coordSys.rotateLocal(
             rot, rotOrigin, coordSys
         )
         del newDict['items']
+        if 'stopSurface' in newDict:
+            newDict['stopSurface'] = newDict['stopSurface'].withLocalRotation(
+                rot, rotOrigin, coordSys
+            )
         ret.__init__(
             newItems,
             **newDict
