@@ -139,13 +139,15 @@ class Interface(Optic):
         return hash((self.__class__.__name__, self.surface, self.obscuration,
                      self.name, self.inMedium, self.outMedium, self.coordSys))
 
-    def draw3d(self, ax, **kwargs):
+    def draw3d(self, ax, plotly=False, **kwargs):
         """Draw this interface on a mplot3d axis.
 
         Parameters
         ----------
-        ax : mplot3d.Axis
+        ax : mplot3d.Axis or plotly.graph_objs.Figure
             Axis on which to draw this optic.
+        plotly : bool
+            Set True to use plotly API instead of ipyvolume/matplotlib API
         """
         if self.outRadius is None:
             return
@@ -159,7 +161,10 @@ class Interface(Optic):
             y = self.inRadius * sth
             z = self.surface.sag(x, y)
             x, y, z = transform.applyForwardArray(x, y, z)
-            ax.plot(x, y, z, **kwargs)
+            if plotly:
+                ax.add_scatter3d(x=x, y=y, z=z, **kwargs)
+            else:
+                ax.plot(x, y, z, **kwargs)
 
         #outer circle
         th = np.linspace(0, 2*np.pi, 100)
@@ -168,31 +173,46 @@ class Interface(Optic):
         y = self.outRadius * sth
         z = self.surface.sag(x, y)
         x, y, z = transform.applyForwardArray(x, y, z)
-        ax.plot(x, y, z, **kwargs)
+        if plotly:
+            ax.add_scatter3d(x=x, y=y, z=z, **kwargs)
+        else:
+            ax.plot(x, y, z, **kwargs)
 
         #next, a line at X=0
         y = np.linspace(-self.outRadius, -self.inRadius)
         x = np.zeros_like(y)
         z = self.surface.sag(x, y)
         x, y, z = transform.applyForwardArray(x, y, z)
-        ax.plot(x, y, z, **kwargs)
+        if plotly:
+            ax.add_scatter3d(x=x, y=y, z=z, **kwargs)
+        else:
+            ax.plot(x, y, z, **kwargs)
         y = np.linspace(self.inRadius, self.outRadius)
         x = np.zeros_like(y)
         z = self.surface.sag(x, y)
         x, y, z = transform.applyForwardArray(x, y, z)
-        ax.plot(x, y, z, **kwargs)
+        if plotly:
+            ax.add_scatter3d(x=x, y=y, z=z, **kwargs)
+        else:
+            ax.plot(x, y, z, **kwargs)
 
         #next, a line at Y=0
         x = np.linspace(-self.outRadius, -self.inRadius)
         y = np.zeros_like(x)
         z = self.surface.sag(x, y)
         x, y, z = transform.applyForwardArray(x, y, z)
-        ax.plot(x, y, z, **kwargs)
+        if plotly:
+            ax.add_scatter3d(x=x, y=y, z=z, **kwargs)
+        else:
+            ax.plot(x, y, z, **kwargs)
         x = np.linspace(self.inRadius, self.outRadius)
         y = np.zeros_like(x)
         z = self.surface.sag(x, y)
         x, y, z = transform.applyForwardArray(x, y, z)
-        ax.plot(x, y, z, **kwargs)
+        if plotly:
+            ax.add_scatter3d(x=x, y=y, z=z, **kwargs)
+        else:
+            ax.plot(x, y, z, **kwargs)
 
     def getXZSlice(self, nslice=0):
         """Calculate global coordinates for an (x,z) slice through this
@@ -1074,8 +1094,10 @@ class CompoundOptic(Optic):
 
         Parameters
         ----------
-        ax : mplot3d.Axis
+        ax : mplot3d.Axis or plotly.graph_objs.Figure
             Axis on which to draw this optic.
+        plotly : bool
+            Set True to use plotly API instead of ipyvolume/matplotlib API
         """
         for item in self.items:
             item.draw3d(ax, **kwargs)
@@ -1531,12 +1553,12 @@ def getGlobalRays(traceFull, start=None, end=None, globalSys=globalCoordSys):
     return xyz, raylen
 
 
-def drawTrace3d(ax, traceFull, start=None, end=None, **kwargs):
+def drawTrace3d(ax, traceFull, start=None, end=None, plotly=False, **kwargs):
     """Draw 3D rays in global coordinates on the specified axis.
 
     Parameters
     ----------
-    ax : mplot3d.Axis
+    ax : mplot3d.Axis or plotly.graph_objs.Figure
         Axis on which to draw rays.
     traceFull : OrderedDict
         Array of per-surface ray-tracing output from traceFull()
@@ -1546,12 +1568,22 @@ def drawTrace3d(ax, traceFull, start=None, end=None, **kwargs):
     end : str or None
         Name of the last surface to include in the output, or use the last
         surface in the model when None.
+    plotly : bool
+        Set True to use plotly API instead of ipyvolume/matplotlib API
     globalSys : `batoid.CoordSys`
         Global coordinate system to use.
     """
     xyz, raylen = getGlobalRays(traceFull, start, end)
     for line, nline in zip(xyz, raylen):
-        ax.plot(line[0, :nline], line[1, :nline], line[2, :nline], **kwargs)
+        if plotly:
+            ax.add_scatter3d(
+                x=line[0, :nline],
+                y=line[1, :nline],
+                z=line[2, :nline],
+                **kwargs
+            )
+        else:
+            ax.plot(line[0, :nline], line[1, :nline], line[2, :nline], **kwargs)
 
 
 def drawTrace2d(ax, traceFull, start=None, end=None, **kwargs):
