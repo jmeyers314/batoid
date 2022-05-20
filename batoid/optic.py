@@ -214,6 +214,92 @@ class Interface(Optic):
         else:
             ax.plot(x, y, z, **kwargs)
 
+    def get3dmesh(self):
+        if self.outRadius is None:
+            return
+        transform = CoordTransform(self.coordSys, globalCoordSys)
+        # Going to draw 4 objects here: inner circle, outer circle, sag along
+        # x=0, sag along y=0 inner circle
+        xs = []
+        ys = []
+        zs = []
+        if self.inRadius != 0.0:
+            th = np.linspace(0, 2*np.pi, 100)
+            cth, sth = np.cos(th), np.sin(th)
+            x = self.inRadius * cth
+            y = self.inRadius * sth
+            z = self.surface.sag(x, y)
+            x, y, z = transform.applyForwardArray(x, y, z)
+            xs.extend(x)
+            ys.extend(y)
+            zs.extend(z)
+            # Separate by adding a nan
+            xs.append(np.nan)
+            ys.append(np.nan)
+            zs.append(np.nan)
+
+        #outer circle
+        th = np.linspace(0, 2*np.pi, 100)
+        cth, sth = np.cos(th), np.sin(th)
+        x = self.outRadius * cth
+        y = self.outRadius * sth
+        z = self.surface.sag(x, y)
+        x, y, z = transform.applyForwardArray(x, y, z)
+        xs.extend(x)
+        ys.extend(y)
+        zs.extend(z)
+        xs.append(np.nan)
+        ys.append(np.nan)
+        zs.append(np.nan)
+
+        #next, a line at X=0
+        y = np.linspace(-self.outRadius, -self.inRadius)
+        x = np.zeros_like(y)
+        z = self.surface.sag(x, y)
+        x, y, z = transform.applyForwardArray(x, y, z)
+        xs.extend(x)
+        ys.extend(y)
+        zs.extend(z)
+        xs.append(np.nan)
+        ys.append(np.nan)
+        zs.append(np.nan)
+
+        y = np.linspace(self.inRadius, self.outRadius)
+        x = np.zeros_like(y)
+        z = self.surface.sag(x, y)
+        x, y, z = transform.applyForwardArray(x, y, z)
+        xs.extend(x)
+        ys.extend(y)
+        zs.extend(z)
+        xs.append(np.nan)
+        ys.append(np.nan)
+        zs.append(np.nan)
+
+        #next, a line at Y=0
+        x = np.linspace(-self.outRadius, -self.inRadius)
+        y = np.zeros_like(x)
+        z = self.surface.sag(x, y)
+        x, y, z = transform.applyForwardArray(x, y, z)
+        xs.extend(x)
+        ys.extend(y)
+        zs.extend(z)
+        xs.append(np.nan)
+        ys.append(np.nan)
+        zs.append(np.nan)
+
+        x = np.linspace(self.inRadius, self.outRadius)
+        y = np.zeros_like(x)
+        z = self.surface.sag(x, y)
+        x, y, z = transform.applyForwardArray(x, y, z)
+        xs.extend(x)
+        ys.extend(y)
+        zs.extend(z)
+        xs.append(np.nan)
+        ys.append(np.nan)
+        zs.append(np.nan)
+
+        return np.array(xs), np.array(ys), np.array(zs)
+
     def getXZSlice(self, nslice=0):
         """Calculate global coordinates for an (x,z) slice through this
         interface.
@@ -1101,6 +1187,17 @@ class CompoundOptic(Optic):
         """
         for item in self.items:
             item.draw3d(ax, **kwargs)
+
+    def get3dmesh(self):
+        xs = []
+        ys = []
+        zs = []
+        for item in self.items:
+            x, y, z = item.get3dmesh()
+            xs.append(x)
+            ys.append(y)
+            zs.append(z)
+        return np.hstack(xs), np.hstack(ys), np.hstack(zs)
 
     def draw2d(self, ax, **kwargs):
         """Draw a 2D slice of this `CompoundOptic` in the (x,z) plane.
