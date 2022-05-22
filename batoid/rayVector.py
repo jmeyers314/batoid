@@ -404,6 +404,19 @@ class RayVector:
         )
 
     @classmethod
+    def asFan(
+        cls,
+        nx=None, ny=None,
+        **kwargs
+    ):
+        rvs = []
+        if nx > 1:
+            rvs.append(RayVector.asGrid(nx=nx, ny=1, **kwargs))
+        if ny > 1:
+            rvs.append(RayVector.asGrid(nx=1, ny=ny, **kwargs))
+        return concatenateRayVectors(rvs)
+
+    @classmethod
     def asPolar(
         cls,
         optic=None, backDist=None, medium=None, stopSurface=None,
