@@ -122,16 +122,17 @@ class RubinCSApp:
         self.clip_horizon = False
         self.lst = 0.0
         self.rtp = 0.0
-        self.alt = 45.0
+        self.alt = 30.0
         self.az = 45.0
         self.thx = 0.0
         self.thy = 0.0
+        self.z_offset = 0.0
         self.show_rays = True
         self.show_CCS = False
         self.show_OCS = False
         self.show_ZCS = False
         self.show_DVCS = False
-        self.show_EDCS = False
+        self.show_EDCS = True
 
         # IPV Scatters
         self.constellations = self._constellations_view()
@@ -142,20 +143,23 @@ class RubinCSApp:
         self.elevation_bearings = self._elevation_bearings_view()
         self.rays = self._rays_view()
         self.CCS = self._ccs_views()
+        self.EDCS = self._edcs_views()
 
         # Matplotlib
         self.mpl = self._mpl_view()
 
         # Controls
-        self.alt_control = ipywidgets.FloatText(value=45.0, step=5.0, description='alt (deg)')
-        self.az_control = ipywidgets.FloatText(value=45.0, step=5.0, description='az (deg)')
-        self.rtp_control = ipywidgets.FloatText(value=0.0, step=5.0, description='RTP (deg)')
+        self.alt_control = ipywidgets.FloatText(value=self.alt, step=3.0, description='alt (deg)')
+        self.az_control = ipywidgets.FloatText(value=self.az, step=3.0, description='az (deg)')
+        self.rtp_control = ipywidgets.FloatText(value=0.0, step=3.0, description='RTP (deg)')
         self.thx_control = ipywidgets.FloatText(value=0.0, step=0.25, description='Field x (deg)')
         self.thy_control = ipywidgets.FloatText(value=0.0, step=0.25, description='Field y (deg)')
         self.lst_control = ipywidgets.FloatText(value=0.0, step=0.01, description='LST (hr)')
+        self.z_control = ipywidgets.FloatText(value=0.0, step=0.1, description="Det z (mm)")
         self.horizon_control = ipywidgets.Checkbox(value=self.clip_horizon, description='horizon')
         self.rays_control = ipywidgets.Checkbox(value=self.show_rays, description="Show rays")
         self.CCS_control = ipywidgets.Checkbox(value=self.show_CCS, description='CCS')
+        self.EDCS_control = ipywidgets.Checkbox(value=self.show_EDCS, description='EDCS')
 
         # observe
         self.alt_control.observe(self.handle_alt, 'value')
@@ -164,18 +168,20 @@ class RubinCSApp:
         self.thx_control.observe(self.handle_thx, 'value')
         self.thy_control.observe(self.handle_thy, 'value')
         self.lst_control.observe(self.handle_lst, 'value')
+        self.z_control.observe(self.handle_z, 'value')
         self.horizon_control.observe(self.handle_horizon, 'value')
         self.rays_control.observe(self.handle_rays, 'value')
         self.CCS_control.observe(self.handle_CCS, 'value')
+        self.EDCS_control.observe(self.handle_EDCS, 'value')
 
         self.update_constellations()
         self.update_telescope()
         self.update_fp()
         self.update_elevation_bearings()
         self.update_rays()
+        self.update_CCS()
         self.update_spot()
         self.update_wf()
-        self.update_CCS()
 
         self.scatters = [
             self.constellations,
@@ -185,7 +191,8 @@ class RubinCSApp:
             self.azimuth_ring,
             self.elevation_bearings,
             self.rays,
-            *self.CCS
+            *self.CCS,
+            *self.EDCS
         ]
 
         self.controls = [
@@ -195,66 +202,12 @@ class RubinCSApp:
             self.thx_control,
             self.thy_control,
             self.lst_control,
+            self.z_control,
             self.horizon_control,
             self.rays_control,
-            self.CCS_control
+            self.CCS_control,
+            self.EDCS_control
         ]
-
-    def _cs_xyz(self, coordSys, length=2):
-        p0 = coordSys.origin
-        px = p0 + coordSys.xhat * length
-        py = p0 + coordSys.yhat * length
-        pz = p0 + coordSys.zhat * length
-        return (
-            np.vstack([p0, px]).T,
-            np.vstack([p0, py]).T,
-            np.vstack([p0, pz]).T
-        )
-
-    def _cs_views(self, coordSys, length=2):
-        x_xyz, y_xyz, z_xyz = self._cs_xyz(coordSys, length=length)
-
-        xscat = ipv.Scatter(
-            x=x_xyz[0], y=x_xyz[1], z=x_xyz[2],
-            color="blue",
-            visible_lines=True,
-            color_selected=None,
-            size_selected=1,
-            size=0,
-            connected=True,
-            visible_markers=False,
-            cast_shadow=True,
-            receive_shadow=True
-        )
-        yscat = ipv.Scatter(
-            x=y_xyz[0], y=y_xyz[1], z=y_xyz[2],
-            color="red",
-            visible_lines=True,
-            color_selected=None,
-            size_selected=1,
-            size=0,
-            connected=True,
-            visible_markers=False,
-            cast_shadow=True,
-            receive_shadow=True
-        )
-        zscat = ipv.Scatter(
-            x=z_xyz[0], y=z_xyz[1], z=z_xyz[2],
-            color="white",
-            visible_lines=True,
-            color_selected=None,
-            size_selected=1,
-            size=0,
-            connected=True,
-            visible_markers=False,
-            cast_shadow=True,
-            receive_shadow=True
-        )
-        return xscat, yscat, zscat
-
-    def _ccs_views(self):
-        # Assume actual_telescope is up-to-date
-        return self._cs_views(self.actual_telescope['LSSTCamera'].coordSys, 2)
 
     def _constellations_xyz(self, lst):
         ctf = batoid.CoordTransform(
@@ -528,6 +481,72 @@ class RubinCSApp:
             receive_shadow=True
         )
 
+    def _cs_xyz(self, coordSys, length=2):
+        p0 = coordSys.origin
+        px = p0 + coordSys.xhat * length
+        py = p0 + coordSys.yhat * length
+        pz = p0 + coordSys.zhat * length
+        return (
+            np.vstack([p0, px]).T,
+            np.vstack([p0, py]).T,
+            np.vstack([p0, pz]).T
+        )
+
+    def _cs_views(self, coordSys, length=2):
+        x_xyz, y_xyz, z_xyz = self._cs_xyz(coordSys, length=length)
+
+        xscat = ipv.Scatter(
+            x=x_xyz[0], y=x_xyz[1], z=x_xyz[2],
+            color="cyan",
+            visible_lines=True,
+            color_selected=None,
+            size_selected=1,
+            size=0,
+            connected=True,
+            visible_markers=False,
+            cast_shadow=True,
+            receive_shadow=True
+        )
+        yscat = ipv.Scatter(
+            x=y_xyz[0], y=y_xyz[1], z=y_xyz[2],
+            color="magenta",
+            visible_lines=True,
+            color_selected=None,
+            size_selected=1,
+            size=0,
+            connected=True,
+            visible_markers=False,
+            cast_shadow=True,
+            receive_shadow=True
+        )
+        zscat = ipv.Scatter(
+            x=z_xyz[0], y=z_xyz[1], z=z_xyz[2],
+            color="yellow",
+            visible_lines=True,
+            color_selected=None,
+            size_selected=1,
+            size=0,
+            connected=True,
+            visible_markers=False,
+            cast_shadow=True,
+            receive_shadow=True
+        )
+        return xscat, yscat, zscat
+
+    def _ccs_views(self):
+        # Assume actual_telescope is up-to-date
+        return self._cs_views(self.actual_telescope['LSSTCamera'].coordSys, 2)
+
+    def _edcs_views(self):
+        # Use two views here, one for detector plane and one for sky
+        det_coordSys = self.actual_telescope['Detector'].coordSys
+        sky_coordSys = det_coordSys.rotateLocal(batoid.RotZ(np.pi))
+        sky_coordSys.origin = sky_coordSys.zhat * self.sky_dist
+
+        edcs_detector = self._cs_views(det_coordSys, 2)
+        edcs_sky = self._cs_views(sky_coordSys, np.deg2rad(5.0)*self.sky_dist)
+        return edcs_detector+edcs_sky
+
     def _mpl_view(self):
         fig, axes = plt.subplots(
             nrows=3, ncols=1,
@@ -535,11 +554,24 @@ class RubinCSApp:
             facecolor='k'
         )
         fig.canvas.header_visible=False
+
+        # Spot diagram
         self.spot_ax = axes[0]
-        self.spot_scatter = self.spot_ax.scatter([], [], s=1)
-        self.spot_ax.set_xlim(-1, 1)
+        self.spot_scatter = self.spot_ax.scatter(
+            [], [], s=0.1, c=[], cmap='plasma',
+            vmin=2.55, vmax=4.18
+        )
+        self.spot_ax.set_xlim(1, -1)
         self.spot_ax.set_ylim(-1, 1)
 
+        # Add EDCS rose to spot diagram
+        edcs_x = self.spot_ax.arrow(-0.9, -0.9, 1.0, 0.0, width=0.02, color='cyan')
+        edcs_y = self.spot_ax.arrow(-0.9, -0.9, 0.0, 1.0, width=0.02, color='magenta')
+        edcs_x_text = self.spot_ax.text(1.0, -0.9, "EDCS +x", color='cyan', fontsize=8)
+        edcs_y_text = self.spot_ax.text(-0.9, 0.3, "EDCS +y", color='magenta', fontsize=8, rotation='vertical')
+        self.EDCS_mpl = (edcs_x, edcs_y, edcs_x_text, edcs_y_text)
+
+        # Wavefront
         self.wf_ax = axes[1]
         self.wf_imshow = self.wf_ax.imshow(
             np.zeros((256, 256)),
@@ -570,6 +602,8 @@ class RubinCSApp:
         self.update_telescope()
         self.update_spot()
         self.update_wf()
+        self.update_CCS()
+        self.update_EDCS()
 
     def handle_lst(self, change):
         self.lst = change['new']
@@ -588,6 +622,10 @@ class RubinCSApp:
         self.update_spot()
         self.update_wf()
 
+    def handle_z(self, change):
+        self.z_offset = change['new']
+        self.update_spot()
+
     def handle_horizon(self, change):
         self.clip_horizon = not self.clip_horizon
         self.update_constellations()
@@ -601,6 +639,10 @@ class RubinCSApp:
         self.show_CCS = not self.show_CCS
         self.update_CCS()
 
+    def handle_EDCS(self, change):
+        self.show_EDCS = not self.show_EDCS
+        self.update_EDCS()
+
     def update_CCS(self):
         if self.show_CCS:
             coordSys = self.actual_telescope['LSSTCamera'].coordSys
@@ -610,6 +652,36 @@ class RubinCSApp:
                 axis.z = xyz[2]
         for axis in self.CCS:
             axis.visible = self.show_CCS
+
+    def update_EDCS(self):
+        if self.show_EDCS:
+            det_coordSys = self.actual_telescope['Detector'].coordSys
+            # Detector
+            for axis, xyz in zip(
+                self.EDCS[:3],
+                self._cs_xyz(det_coordSys, length=2)
+            ):
+                axis.x = xyz[0]
+                axis.y = xyz[1]
+                axis.z = xyz[2]
+
+            # Sky
+            sky_coordSys = det_coordSys.rotateLocal(batoid.RotZ(np.pi))
+            sky_coordSys.origin = sky_coordSys.zhat * self.sky_dist
+            for axis, xyz in zip(
+                self.EDCS[3:],
+                self._cs_xyz(sky_coordSys, length=np.deg2rad(5.0)*self.sky_dist)
+            ):
+                axis.x = xyz[0]
+                axis.y = xyz[1]
+                axis.z = xyz[2]
+
+        for item in self.EDCS_mpl:
+            item.set_visible(self.show_EDCS)
+        for axis in self.EDCS:
+            axis.visible = self.show_EDCS
+
+
 
     def update_constellations(self):
         x, y, z = self._constellations_xyz(self.lst)*self.sky_dist
@@ -643,6 +715,7 @@ class RubinCSApp:
         self.telescope.z = z
         self.update_rays()
         self.update_fp()
+        self.update_EDCS()
 
     def update_elevation_bearings(self):
         x, y, z = self._elevation_bearings_xyz(self.az)
@@ -665,17 +738,29 @@ class RubinCSApp:
         self.fp.z = z
 
     def update_spot(self):
-        perturbed = self.actual_telescope.withLocallyShiftedOptic("Detector", (0, 0, -0.0015))  # intra-focal
-        nx = 128
-        rays = batoid.RayVector.asGrid(
+        perturbed = self.actual_telescope.withLocallyShiftedOptic(
+            "Detector",
+            (0, 0, self.z_offset*1e-3)
+        )
+        rays = batoid.RayVector.asPolar(
             optic=perturbed, wavelength=620e-9,
-            nx=nx,
+            nrad=50, naz=300,
             theta_x=np.deg2rad(self.thx),
             theta_y=np.deg2rad(self.thy)
         )
+        rv = batoid.intersect(
+            self.actual_telescope.stopSurface.surface, rays.copy()
+        )
+        r = np.hypot(rv.x, rv.y)
         perturbed.trace(rays)
-        cridx = (nx//2)*nx+nx//2 if (nx%2)==0 else (nx*nx-1)//2
-        point = rays[cridx].r[0]
+        chief = batoid.RayVector.fromStop(
+            optic=perturbed, wavelength=620e-9,
+            x=0, y=0,
+            theta_x=np.deg2rad(self.thx),
+            theta_y=np.deg2rad(self.thy)
+        )
+        perturbed.trace(chief)
+        point = chief.r[0]
         targetCoordSys = rays.coordSys.shiftLocal(point)
         rays = rays.toCoordSys(targetCoordSys)
 
@@ -683,12 +768,14 @@ class RubinCSApp:
         x = rays.x * 1e6  # microns
         y = rays.y * 1e6  # microns
 
-        xmax = 1.5*np.quantile(np.abs(np.array([x[visible], y[visible]])), 0.95)
+        xmax = 1.5*np.quantile(np.abs(np.array([x[visible], y[visible]])), 0.98)
 
-        self.spot_ax.set_xlim(xmax, -xmax)
-        self.spot_ax.set_ylim(-xmax, xmax)
+        # Keep the axis limits fixed, rescale x,y instead.
+        x /= xmax
+        y /= xmax
 
-        self.spot_scatter.set_alpha(visible.astype(float)*0.1)
+        self.spot_scatter.set_array(r)
+        self.spot_scatter.set_alpha(visible.astype(float)*0.5)
         self.spot_scatter.set_offsets(np.array([x, y]).T)
 
     def update_wf(self):
