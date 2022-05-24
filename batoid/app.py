@@ -120,6 +120,7 @@ class RubinCSApp:
 
         # widget variables
         self.clip_horizon = False
+        self.show_telescope = True
         self.lst = 0.0
         self.rtp = 0.0
         self.alt = 30.0
@@ -144,6 +145,7 @@ class RubinCSApp:
         self.rays = self._rays_view()
         self.CCS = self._ccs_views()
         self.EDCS = self._edcs_views()
+        self.DVCS = self._dvcs_views()
 
         # Matplotlib
         self.mpl = self._mpl_view()
@@ -156,10 +158,12 @@ class RubinCSApp:
         self.thy_control = ipywidgets.FloatText(value=0.0, step=0.25, description='Field y (deg)')
         self.lst_control = ipywidgets.FloatText(value=0.0, step=0.01, description='LST (hr)')
         self.z_control = ipywidgets.FloatText(value=0.0, step=0.1, description="Det z (mm)")
+        self.telescope_control = ipywidgets.Checkbox(value=self.show_telescope, description="show telescope")
         self.horizon_control = ipywidgets.Checkbox(value=self.clip_horizon, description='horizon')
         self.rays_control = ipywidgets.Checkbox(value=self.show_rays, description="Show rays")
         self.CCS_control = ipywidgets.Checkbox(value=self.show_CCS, description='CCS')
         self.EDCS_control = ipywidgets.Checkbox(value=self.show_EDCS, description='EDCS')
+        self.DVCS_control = ipywidgets.Checkbox(value=self.show_DVCS, description='DVCS')
 
         # observe
         self.alt_control.observe(self.handle_alt, 'value')
@@ -169,10 +173,12 @@ class RubinCSApp:
         self.thy_control.observe(self.handle_thy, 'value')
         self.lst_control.observe(self.handle_lst, 'value')
         self.z_control.observe(self.handle_z, 'value')
+        self.telescope_control.observe(self.handle_telescope, 'value')
         self.horizon_control.observe(self.handle_horizon, 'value')
         self.rays_control.observe(self.handle_rays, 'value')
         self.CCS_control.observe(self.handle_CCS, 'value')
         self.EDCS_control.observe(self.handle_EDCS, 'value')
+        self.DVCS_control.observe(self.handle_DVCS, 'value')
 
         self.update_constellations()
         self.update_telescope()
@@ -182,6 +188,8 @@ class RubinCSApp:
         self.update_CCS()
         self.update_spot()
         self.update_wf()
+        self.update_EDCS()
+        self.update_DVCS()
 
         self.scatters = [
             self.constellations,
@@ -192,7 +200,8 @@ class RubinCSApp:
             self.elevation_bearings,
             self.rays,
             *self.CCS,
-            *self.EDCS
+            *self.EDCS,
+            *self.DVCS
         ]
 
         self.controls = [
@@ -204,9 +213,11 @@ class RubinCSApp:
             self.lst_control,
             self.z_control,
             self.horizon_control,
+            self.telescope_control,
             self.rays_control,
             self.CCS_control,
-            self.EDCS_control
+            self.EDCS_control,
+            self.DVCS_control
         ]
 
     def _constellations_xyz(self, lst):
@@ -545,7 +556,23 @@ class RubinCSApp:
 
         edcs_detector = self._cs_views(det_coordSys, 2)
         edcs_sky = self._cs_views(sky_coordSys, np.deg2rad(5.0)*self.sky_dist)
-        return edcs_detector+edcs_sky
+        return edcs_detector + edcs_sky
+
+    def _dvcs_views(self):
+        # Use two views here, one for detector plane and one for sky
+        # Start with same coordSys as EDCS.
+        det_coordSys = self.actual_telescope['Detector'].coordSys
+        sky_coordSys = det_coordSys.rotateLocal(batoid.RotZ(np.pi))
+        sky_coordSys.origin = sky_coordSys.zhat * self.sky_dist
+        # Then transpose x, y, which inverts z too.  We can implement this as a
+        # 180 degree rotation around x, followed by 90 rotation around z.
+        rot = batoid.RotZ(np.pi/2)@batoid.RotX(np.pi)
+        det_coordSys = det_coordSys.rotateLocal(rot)
+        sky_coordSys = sky_coordSys.rotateLocal(rot)
+
+        dvcs_detector = self._cs_views(det_coordSys, 2)
+        dvcs_sky = self._cs_views(sky_coordSys, np.deg2rad(5.0)*self.sky_dist)
+        return dvcs_detector + dvcs_sky
 
     def _mpl_view(self):
         fig, axes = plt.subplots(
@@ -570,6 +597,13 @@ class RubinCSApp:
         edcs_x_text = self.spot_ax.text(1.0, -0.9, "EDCS +x", color='cyan', fontsize=8)
         edcs_y_text = self.spot_ax.text(-0.9, 0.3, "EDCS +y", color='magenta', fontsize=8, rotation='vertical')
         self.EDCS_mpl = (edcs_x, edcs_y, edcs_x_text, edcs_y_text)
+
+        # Add DVCS rose to spot diagram.  This is just x/y transpose of EDCS
+        dvcs_y = self.spot_ax.arrow(-0.9, -0.9, 1.0, 0.0, width=0.02, color='magenta')
+        dvcs_x = self.spot_ax.arrow(-0.9, -0.9, 0.0, 1.0, width=0.02, color='cyan')
+        dvcs_y_text = self.spot_ax.text(1.0, -0.9, "DVCS +y", color='magenta', fontsize=8)
+        dvcs_x_text = self.spot_ax.text(-0.9, 0.3, "DVCS +x", color='cyan', fontsize=8, rotation='vertical')
+        self.DVCS_mpl = (dvcs_x, dvcs_y, dvcs_x_text, dvcs_y_text)
 
         # Wavefront
         self.wf_ax = axes[1]
@@ -604,6 +638,7 @@ class RubinCSApp:
         self.update_wf()
         self.update_CCS()
         self.update_EDCS()
+        self.update_DVCS()
 
     def handle_lst(self, change):
         self.lst = change['new']
@@ -626,6 +661,10 @@ class RubinCSApp:
         self.z_offset = change['new']
         self.update_spot()
 
+    def handle_telescope(self, change):
+        self.show_telescope = not self.show_telescope
+        self.update_telescope()
+
     def handle_horizon(self, change):
         self.clip_horizon = not self.clip_horizon
         self.update_constellations()
@@ -642,6 +681,10 @@ class RubinCSApp:
     def handle_EDCS(self, change):
         self.show_EDCS = not self.show_EDCS
         self.update_EDCS()
+
+    def handle_DVCS(self, change):
+        self.show_DVCS = not self.show_DVCS
+        self.update_DVCS()
 
     def update_CCS(self):
         if self.show_CCS:
@@ -681,7 +724,35 @@ class RubinCSApp:
         for axis in self.EDCS:
             axis.visible = self.show_EDCS
 
+    def update_DVCS(self):
+        if self.show_DVCS:
+            det_coordSys = self.actual_telescope['Detector'].coordSys
+            sky_coordSys = det_coordSys.rotateLocal(batoid.RotZ(np.pi))
+            sky_coordSys.origin = sky_coordSys.zhat * self.sky_dist
+            rot = batoid.RotZ(np.pi/2)@batoid.RotX(np.pi)
+            det_coordSys = det_coordSys.rotateLocal(rot)
+            sky_coordSys = sky_coordSys.rotateLocal(rot)
 
+            for axis, xyz in zip(
+                self.DVCS[:3],
+                self._cs_xyz(det_coordSys, length=2)
+            ):
+                axis.x = xyz[0]
+                axis.y = xyz[1]
+                axis.z = xyz[2]
+
+            for axis, xyz in zip(
+                self.DVCS[3:],
+                self._cs_xyz(sky_coordSys, length=np.deg2rad(5.0)*self.sky_dist)
+            ):
+                axis.x = xyz[0]
+                axis.y = xyz[1]
+                axis.z = xyz[2]
+
+        for item in self.DVCS_mpl:
+            item.set_visible(self.show_DVCS)
+        for axis in self.DVCS:
+            axis.visible = self.show_DVCS
 
     def update_constellations(self):
         x, y, z = self._constellations_xyz(self.lst)*self.sky_dist
@@ -716,6 +787,8 @@ class RubinCSApp:
         self.update_rays()
         self.update_fp()
         self.update_EDCS()
+        self.update_DVCS()
+        self.telescope.visible = self.show_telescope
 
     def update_elevation_bearings(self):
         x, y, z = self._elevation_bearings_xyz(self.az)
