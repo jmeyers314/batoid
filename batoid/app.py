@@ -148,6 +148,7 @@ class RubinCSApp:
         self.CCS = self._ccs_views()
         self.EDCS = self._edcs_views()
         self.DVCS = self._dvcs_views()
+        self.OCS = self._ocs_views()
 
         # Matplotlib
         self.mpl = self._mpl_view()
@@ -166,6 +167,7 @@ class RubinCSApp:
         self.CCS_control = ipywidgets.Checkbox(value=self.show_CCS, description='CCS')
         self.EDCS_control = ipywidgets.Checkbox(value=self.show_EDCS, description='EDCS')
         self.DVCS_control = ipywidgets.Checkbox(value=self.show_DVCS, description='DVCS')
+        self.OCS_control = ipywidgets.Checkbox(value=self.show_OCS, description='OCS')
         self.noll_control = ipywidgets.IntText(value=self.noll, description="Noll idx")
         self.perturb_control = ipywidgets.FloatText(value=self.perturb, description="Pert (µm)")
 
@@ -183,6 +185,7 @@ class RubinCSApp:
         self.CCS_control.observe(self.handle_CCS, 'value')
         self.EDCS_control.observe(self.handle_EDCS, 'value')
         self.DVCS_control.observe(self.handle_DVCS, 'value')
+        self.OCS_control.observe(self.handle_OCS, 'value')
         self.noll_control.observe(self.handle_noll, 'value')
         self.perturb_control.observe(self.handle_perturb, 'value')
 
@@ -196,6 +199,7 @@ class RubinCSApp:
         self.update_wf()
         self.update_EDCS()
         self.update_DVCS()
+        self.update_OCS()
 
         self.scatters = [
             self.constellations,
@@ -207,7 +211,8 @@ class RubinCSApp:
             self.rays,
             *self.CCS,
             *self.EDCS,
-            *self.DVCS
+            *self.DVCS,
+            *self.OCS,
         ]
 
         self.controls = [
@@ -224,6 +229,7 @@ class RubinCSApp:
             self.CCS_control,
             self.EDCS_control,
             self.DVCS_control,
+            self.OCS_control,
             self.noll_control,
             self.perturb_control
         ]
@@ -556,6 +562,10 @@ class RubinCSApp:
         # Assume actual_telescope is up-to-date
         return self._cs_views(self.actual_telescope['LSSTCamera'].coordSys, 2)
 
+    def _ocs_views(self):
+        # Assume actual_telescope is up-to-date
+        return self._cs_views(self.actual_telescope['M1'].coordSys, 3)
+
     def _edcs_views(self):
         # Use two views here, one for detector plane and one for sky
         det_coordSys = self.actual_telescope['Detector'].coordSys
@@ -618,8 +628,15 @@ class RubinCSApp:
         self.wf_imshow = self.wf_ax.imshow(
             np.zeros((256, 256)),
             vmin=-1.0, vmax=1.0,
-            cmap='seismic'
+            cmap='seismic',
+            extent=[4.18, -4.18, -4.18, 4.18]  # +x goes to the left in OCS
         )
+        # Add OCS rose.
+        ocs_x = self.wf_ax.arrow(-4.0, -4.0, 1.0, 0.0, width=0.02, color='cyan')
+        ocs_y = self.wf_ax.arrow(-4.0, -4.0, 0.0, 1.0, width=0.02, color='magenta')
+        ocs_x_text = self.wf_ax.text(0.0, -4.0, "OCS +x", color='cyan', fontsize=8)
+        ocs_y_text = self.wf_ax.text(-4.0, -2.5, "OCS +y", color='magenta', fontsize=8, rotation='vertical')
+        self.OCS_mpl = (ocs_x, ocs_y, ocs_x_text, ocs_y_text)
 
         for ax in axes:
             ax.set_aspect('equal')
@@ -694,6 +711,10 @@ class RubinCSApp:
         self.show_DVCS = not self.show_DVCS
         self.update_DVCS()
 
+    def handle_OCS(self, change):
+        self.show_OCS = not self.show_OCS
+        self.update_OCS()
+
     def handle_noll(self, change):
         self.noll = change['new']
         self.update_spot()
@@ -711,6 +732,18 @@ class RubinCSApp:
                 axis.z = xyz[2]
         for axis in self.CCS:
             axis.visible = self.show_CCS
+
+    def update_OCS(self):
+        if self.show_OCS:
+            coordSys = self.actual_telescope['M1'].coordSys
+            for axis, xyz in zip(self.OCS, self._cs_xyz(coordSys, length=2)):
+                axis.x = xyz[0]
+                axis.y = xyz[1]
+                axis.z = xyz[2]
+        for axis in self.OCS:
+            axis.visible = self.show_OCS
+        for item in self.OCS_mpl:
+            item.set_visible(self.show_OCS)
 
     def update_EDCS(self):
         if self.show_EDCS:
