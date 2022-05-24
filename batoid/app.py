@@ -134,6 +134,8 @@ class RubinCSApp:
         self.show_ZCS = False
         self.show_DVCS = False
         self.show_EDCS = True
+        self.noll = 4
+        self.perturb = 0.0
 
         # IPV Scatters
         self.constellations = self._constellations_view()
@@ -164,6 +166,8 @@ class RubinCSApp:
         self.CCS_control = ipywidgets.Checkbox(value=self.show_CCS, description='CCS')
         self.EDCS_control = ipywidgets.Checkbox(value=self.show_EDCS, description='EDCS')
         self.DVCS_control = ipywidgets.Checkbox(value=self.show_DVCS, description='DVCS')
+        self.noll_control = ipywidgets.IntText(value=self.noll, description="Noll idx")
+        self.perturb_control = ipywidgets.FloatText(value=self.perturb, description="Pert (µm)")
 
         # observe
         self.alt_control.observe(self.handle_alt, 'value')
@@ -179,6 +183,8 @@ class RubinCSApp:
         self.CCS_control.observe(self.handle_CCS, 'value')
         self.EDCS_control.observe(self.handle_EDCS, 'value')
         self.DVCS_control.observe(self.handle_DVCS, 'value')
+        self.noll_control.observe(self.handle_noll, 'value')
+        self.perturb_control.observe(self.handle_perturb, 'value')
 
         self.update_constellations()
         self.update_telescope()
@@ -217,7 +223,9 @@ class RubinCSApp:
             self.rays_control,
             self.CCS_control,
             self.EDCS_control,
-            self.DVCS_control
+            self.DVCS_control,
+            self.noll_control,
+            self.perturb_control
         ]
 
     def _constellations_xyz(self, lst):
@@ -686,6 +694,14 @@ class RubinCSApp:
         self.show_DVCS = not self.show_DVCS
         self.update_DVCS()
 
+    def handle_noll(self, change):
+        self.noll = change['new']
+        self.update_spot()
+
+    def handle_perturb(self, change):
+        self.perturb = change['new']
+        self.update_spot()
+
     def update_CCS(self):
         if self.show_CCS:
             coordSys = self.actual_telescope['LSSTCamera'].coordSys
@@ -815,6 +831,37 @@ class RubinCSApp:
             "Detector",
             (0, 0, self.z_offset*1e-3)
         )
+        if np.abs(self.perturb) > 1e-6:
+            # Add in phase screen by hand for a moment
+            j = self.noll
+            zern = batoid.Zernike(
+                np.array([0]*self.noll+[self.perturb*1e-6]),
+                R_outer=4.18, R_inner=0.61*4.18
+            )
+            perturbed = batoid.CompoundOptic(
+                (
+                    batoid.optic.OPDScreen(
+                        batoid.Plane(),
+                        zern,
+                        name='PS',
+                        obscuration=batoid.ObscNegation(batoid.ObscCircle(5.0)),
+                        coordSys=perturbed.stopSurface.coordSys
+                    ),
+                    *perturbed.items
+                ),
+                name='PS0',
+                backDist=perturbed.backDist,
+                pupilSize=perturbed.pupilSize,
+                inMedium=perturbed.inMedium,
+                stopSurface=perturbed.stopSurface,
+                sphereRadius=perturbed.sphereRadius,
+                pupilObscuration=perturbed.pupilObscuration,
+                coordSys=perturbed.coordSys
+            )
+            with(self.debug):
+                print("after")
+                print(perturbed)
+
         rays = batoid.RayVector.asPolar(
             optic=perturbed, wavelength=620e-9,
             nrad=50, naz=300,
