@@ -113,7 +113,7 @@ class RubinCSApp:
         self.sky_dist = 15000
         self.lat = -30.2446
         self.fiducial_telescope = batoid.Optic.fromYaml("LSST_r.yaml")
-        self.actual_telescope = self.fiducial_telescope # for now
+        self.actual_telescope = self.fiducial_telescope
         if debug is None:
             debug = contextlib.redirect_stdout(None)
         self.debug = debug
@@ -146,30 +146,33 @@ class RubinCSApp:
         self.elevation_bearings = self._elevation_bearings_view()
         self.rays = self._rays_view()
         self.CCS = self._ccs_views()
+        self.OCS = self._ocs_views()
+        self.ZCS = self._zcs_views()
         self.EDCS = self._edcs_views()
         self.DVCS = self._dvcs_views()
-        self.OCS = self._ocs_views()
 
         # Matplotlib
         self.mpl = self._mpl_view()
 
         # Controls
-        self.alt_control = ipywidgets.FloatText(value=self.alt, step=3.0, description='alt (deg)')
-        self.az_control = ipywidgets.FloatText(value=self.az, step=3.0, description='az (deg)')
-        self.rtp_control = ipywidgets.FloatText(value=0.0, step=3.0, description='RTP (deg)')
-        self.thx_control = ipywidgets.FloatText(value=0.0, step=0.25, description='Field x (deg)')
-        self.thy_control = ipywidgets.FloatText(value=0.0, step=0.25, description='Field y (deg)')
-        self.lst_control = ipywidgets.FloatText(value=0.0, step=0.01, description='LST (hr)')
-        self.z_control = ipywidgets.FloatText(value=0.0, step=0.1, description="Det z (mm)")
-        self.telescope_control = ipywidgets.Checkbox(value=self.show_telescope, description="show telescope")
-        self.horizon_control = ipywidgets.Checkbox(value=self.clip_horizon, description='horizon')
-        self.rays_control = ipywidgets.Checkbox(value=self.show_rays, description="Show rays")
-        self.CCS_control = ipywidgets.Checkbox(value=self.show_CCS, description='CCS')
-        self.EDCS_control = ipywidgets.Checkbox(value=self.show_EDCS, description='EDCS')
-        self.DVCS_control = ipywidgets.Checkbox(value=self.show_DVCS, description='DVCS')
-        self.OCS_control = ipywidgets.Checkbox(value=self.show_OCS, description='OCS')
-        self.noll_control = ipywidgets.IntText(value=self.noll, description="Noll idx")
-        self.perturb_control = ipywidgets.FloatText(value=self.perturb, description="Pert (µm)")
+        kwargs = {'layout':{'width':'180px'}}
+        self.alt_control = ipywidgets.FloatText(value=self.alt, step=3.0, description='alt (deg)', **kwargs)
+        self.az_control = ipywidgets.FloatText(value=self.az, step=3.0, description='az (deg)', **kwargs)
+        self.rtp_control = ipywidgets.FloatText(value=0.0, step=3.0, description='RTP (deg)', **kwargs)
+        self.thx_control = ipywidgets.FloatText(value=0.0, step=0.25, description='Field x (deg)', **kwargs)
+        self.thy_control = ipywidgets.FloatText(value=0.0, step=0.25, description='Field y (deg)', **kwargs)
+        self.lst_control = ipywidgets.FloatText(value=0.0, step=0.01, description='LST (hr)', **kwargs)
+        self.z_control = ipywidgets.FloatText(value=0.0, step=0.1, description="Det z (mm)", **kwargs)
+        self.telescope_control = ipywidgets.Checkbox(value=self.show_telescope, description="telescope", **kwargs)
+        self.horizon_control = ipywidgets.Checkbox(value=self.clip_horizon, description='horizon', **kwargs)
+        self.rays_control = ipywidgets.Checkbox(value=self.show_rays, description="rays", **kwargs)
+        self.CCS_control = ipywidgets.Checkbox(value=self.show_CCS, description='CCS', **kwargs)
+        self.OCS_control = ipywidgets.Checkbox(value=self.show_OCS, description='OCS', **kwargs)
+        self.ZCS_control = ipywidgets.Checkbox(value=self.show_ZCS, description='ZCS', **kwargs)
+        self.EDCS_control = ipywidgets.Checkbox(value=self.show_EDCS, description='EDCS', **kwargs)
+        self.DVCS_control = ipywidgets.Checkbox(value=self.show_DVCS, description='DVCS', **kwargs)
+        self.noll_control = ipywidgets.IntText(value=self.noll, description="Noll idx", **kwargs)
+        self.perturb_control = ipywidgets.FloatText(value=self.perturb, step=0.1, description="Pert (µm)", **kwargs)
 
         # observe
         self.alt_control.observe(self.handle_alt, 'value')
@@ -183,9 +186,10 @@ class RubinCSApp:
         self.horizon_control.observe(self.handle_horizon, 'value')
         self.rays_control.observe(self.handle_rays, 'value')
         self.CCS_control.observe(self.handle_CCS, 'value')
+        self.OCS_control.observe(self.handle_OCS, 'value')
+        self.ZCS_control.observe(self.handle_ZCS, 'value')
         self.EDCS_control.observe(self.handle_EDCS, 'value')
         self.DVCS_control.observe(self.handle_DVCS, 'value')
-        self.OCS_control.observe(self.handle_OCS, 'value')
         self.noll_control.observe(self.handle_noll, 'value')
         self.perturb_control.observe(self.handle_perturb, 'value')
 
@@ -197,9 +201,10 @@ class RubinCSApp:
         self.update_CCS()
         self.update_spot()
         self.update_wf()
+        self.update_OCS()
+        self.update_ZCS()
         self.update_EDCS()
         self.update_DVCS()
-        self.update_OCS()
 
         self.scatters = [
             self.constellations,
@@ -210,9 +215,10 @@ class RubinCSApp:
             self.elevation_bearings,
             self.rays,
             *self.CCS,
+            *self.OCS,
+            *self.ZCS,
             *self.EDCS,
             *self.DVCS,
-            *self.OCS,
         ]
 
         self.controls = [
@@ -227,9 +233,10 @@ class RubinCSApp:
             self.telescope_control,
             self.rays_control,
             self.CCS_control,
+            self.OCS_control,
+            self.ZCS_control,
             self.EDCS_control,
             self.DVCS_control,
-            self.OCS_control,
             self.noll_control,
             self.perturb_control
         ]
@@ -566,6 +573,12 @@ class RubinCSApp:
         # Assume actual_telescope is up-to-date
         return self._cs_views(self.actual_telescope['M1'].coordSys, 3)
 
+    def _zcs_views(self):
+        # ZCS is OCS rotated 180 about y
+        rot = batoid.RotY(np.pi)
+        cs = self.actual_telescope['M1'].coordSys.rotateLocal(rot)
+        return self._cs_views(cs, 3)
+
     def _edcs_views(self):
         # Use two views here, one for detector plane and one for sky
         det_coordSys = self.actual_telescope['Detector'].coordSys
@@ -604,7 +617,7 @@ class RubinCSApp:
         self.spot_ax = axes[0]
         self.spot_scatter = self.spot_ax.scatter(
             [], [], s=0.1, c=[], cmap='plasma',
-            vmin=2.55, vmax=4.18
+            vmin=0.0, vmax=1.0 # remember to scale data to this range
         )
         self.spot_ax.set_xlim(1, -1)
         self.spot_ax.set_ylim(-1, 1)
@@ -637,6 +650,13 @@ class RubinCSApp:
         ocs_x_text = self.wf_ax.text(0.0, -4.0, "OCS +x", color='cyan', fontsize=8)
         ocs_y_text = self.wf_ax.text(-4.0, -2.5, "OCS +y", color='magenta', fontsize=8, rotation='vertical')
         self.OCS_mpl = (ocs_x, ocs_y, ocs_x_text, ocs_y_text)
+
+        # Add ZCS rose.
+        zcs_x = self.wf_ax.arrow(4.0, -4.0, -1.0, 0.0, width=0.02, color='cyan')
+        zcs_y = self.wf_ax.arrow(4.0, -4.0, 0.0, 1.0, width=0.02, color='magenta')
+        zcs_x_text = self.wf_ax.text(2.5, -4.0, "ZCS +x", color='cyan', fontsize=8)
+        zcs_y_text = self.wf_ax.text(4.0, -2.5, "ZCS +y", color='magenta', fontsize=8, rotation='vertical')
+        self.ZCS_mpl = (zcs_x, zcs_y, zcs_x_text, zcs_y_text)
 
         for ax in axes:
             ax.set_aspect('equal')
@@ -715,13 +735,19 @@ class RubinCSApp:
         self.show_OCS = not self.show_OCS
         self.update_OCS()
 
+    def handle_ZCS(self, change):
+        self.show_ZCS = not self.show_ZCS
+        self.update_ZCS()
+
     def handle_noll(self, change):
         self.noll = change['new']
         self.update_spot()
+        self.update_wf()
 
     def handle_perturb(self, change):
         self.perturb = change['new']
         self.update_spot()
+        self.update_wf()
 
     def update_CCS(self):
         if self.show_CCS:
@@ -744,6 +770,19 @@ class RubinCSApp:
             axis.visible = self.show_OCS
         for item in self.OCS_mpl:
             item.set_visible(self.show_OCS)
+
+    def update_ZCS(self):
+        if self.show_ZCS:
+            coordSys = self.actual_telescope['M1'].coordSys
+            coordSys = coordSys.rotateLocal(batoid.RotY(np.pi))
+            for axis, xyz in zip(self.ZCS, self._cs_xyz(coordSys, length=2)):
+                axis.x = xyz[0]
+                axis.y = xyz[1]
+                axis.z = xyz[2]
+        for axis in self.ZCS:
+            axis.visible = self.show_ZCS
+        for item in self.ZCS_mpl:
+            item.set_visible(self.show_ZCS)
 
     def update_EDCS(self):
         if self.show_EDCS:
@@ -837,6 +876,8 @@ class RubinCSApp:
         self.update_fp()
         self.update_EDCS()
         self.update_DVCS()
+        self.update_OCS()
+        self.update_ZCS()
         self.telescope.visible = self.show_telescope
 
     def update_elevation_bearings(self):
@@ -860,13 +901,13 @@ class RubinCSApp:
         self.fp.z = z
 
     def update_spot(self):
+        # Spot respects z_offset, wf does not.
         perturbed = self.actual_telescope.withLocallyShiftedOptic(
             "Detector",
             (0, 0, self.z_offset*1e-3)
         )
         if np.abs(self.perturb) > 1e-6:
             # Add in phase screen by hand for a moment
-            j = self.noll
             zern = batoid.Zernike(
                 np.array([0]*self.noll+[self.perturb*1e-6]),
                 R_outer=4.18, R_inner=0.61*4.18
@@ -891,9 +932,6 @@ class RubinCSApp:
                 pupilObscuration=perturbed.pupilObscuration,
                 coordSys=perturbed.coordSys
             )
-            with(self.debug):
-                print("after")
-                print(perturbed)
 
         rays = batoid.RayVector.asPolar(
             optic=perturbed, wavelength=620e-9,
@@ -904,8 +942,9 @@ class RubinCSApp:
         rv = batoid.intersect(
             self.actual_telescope.stopSurface.surface, rays.copy()
         )
-        r = np.hypot(rv.x, rv.y)
+        r_pupil = np.hypot(rv.x, rv.y)
         perturbed.trace(rays)
+        r_focal = np.hypot(rays.x, rays.y)
         chief = batoid.RayVector.fromStop(
             optic=perturbed, wavelength=620e-9,
             x=0, y=0,
@@ -918,6 +957,9 @@ class RubinCSApp:
         rays = rays.toCoordSys(targetCoordSys)
 
         visible = ~rays.vignetted
+        if not np.any(visible):
+            self.spot_scatter.set_offsets(np.array([[],[]]).T)
+            return
         x = rays.x * 1e6  # microns
         y = rays.y * 1e6  # microns
 
@@ -927,20 +969,52 @@ class RubinCSApp:
         x /= xmax
         y /= xmax
 
+        r = r_pupil
+        # r = r_focal
+        r = (r - np.min(r[visible]))/np.ptp(r[visible])
+
         self.spot_scatter.set_array(r)
         self.spot_scatter.set_alpha(visible.astype(float)*0.5)
         self.spot_scatter.set_offsets(np.array([x, y]).T)
 
     def update_wf(self):
+        perturbed = self.actual_telescope
+        if np.abs(self.perturb) > 1e-6:
+            # Add in phase screen by hand for a moment
+            zern = batoid.Zernike(
+                np.array([0]*self.noll+[self.perturb*1e-6]),
+                R_outer=4.18, R_inner=0.61*4.18
+            )
+            perturbed = batoid.CompoundOptic(
+                (
+                    batoid.optic.OPDScreen(
+                        batoid.Plane(),
+                        zern,
+                        name='PS',
+                        obscuration=batoid.ObscNegation(batoid.ObscCircle(5.0)),
+                        coordSys=perturbed.stopSurface.coordSys
+                    ),
+                    *perturbed.items
+                ),
+                name='PS0',
+                backDist=perturbed.backDist,
+                pupilSize=perturbed.pupilSize,
+                inMedium=perturbed.inMedium,
+                stopSurface=perturbed.stopSurface,
+                sphereRadius=perturbed.sphereRadius,
+                pupilObscuration=perturbed.pupilObscuration,
+                coordSys=perturbed.coordSys
+            )
+
         nx = 256
         wf = batoid.wavefront(
-            self.fiducial_telescope,
+            perturbed,
             np.deg2rad(self.thx),
             np.deg2rad(self.thy),
             620e-9,
             nx=nx
         )
-        arr = sub_ptt(wf.array)
+        arr = np.fliplr(sub_ptt(wf.array))  # FLIP LR b/c +x is _left_
         self.wf_imshow.set_array(arr)
 
     def display(self):
@@ -957,8 +1031,9 @@ class RubinCSApp:
         ipvfig.animation = 100
         ipvfig.scatters = self.scatters
 
-        display(ipywidgets.HBox([
+        self.app = ipywidgets.HBox([
             self.mpl,
             ipvfig,
             ipywidgets.VBox(self.controls)
-        ]))
+        ])
+        display(self.app)
