@@ -606,18 +606,19 @@ class RubinCSApp:
         return dvcs_detector + dvcs_sky
 
     def _mpl_view(self):
-        fig, axes = plt.subplots(
+        self._mpl_fig, axes = plt.subplots(
             nrows=3, ncols=1,
             figsize=(2, 6.2), dpi=100,
             facecolor='k'
         )
-        fig.canvas.header_visible=False
+        self._mpl_canvas = self._mpl_fig.canvas
+        self._mpl_canvas.header_visible=False
 
         # Spot diagram
         self.spot_ax = axes[0]
         self.spot_scatter = self.spot_ax.scatter(
             [], [], s=0.1, c=[], cmap='plasma',
-            vmin=0.0, vmax=1.0 # remember to scale data to this range
+            vmin=0.0, vmax=1.0, # remember to scale data to this range
         )
         self.spot_ax.set_xlim(1, -1)
         self.spot_ax.set_ylim(-1, 1)
@@ -664,7 +665,7 @@ class RubinCSApp:
 
         out = ipywidgets.Output()
         with out:
-            plt.show(fig)
+            plt.show(self._mpl_fig)
         return out
 
     def handle_alt(self, change):
@@ -684,6 +685,7 @@ class RubinCSApp:
         self.update_CCS()
         self.update_EDCS()
         self.update_DVCS()
+        self._mpl_canvas.draw()
 
     def handle_lst(self, change):
         self.lst = change['new']
@@ -695,16 +697,19 @@ class RubinCSApp:
         self.update_rays()
         self.update_spot()
         self.update_wf()
+        self._mpl_canvas.draw()
 
     def handle_thy(self, change):
         self.thy = change['new']
         self.update_rays()
         self.update_spot()
         self.update_wf()
+        self._mpl_canvas.draw()
 
     def handle_z(self, change):
         self.z_offset = change['new']
         self.update_spot()
+        self._mpl_canvas.draw()
 
     def handle_telescope(self, change):
         self.show_telescope = not self.show_telescope
@@ -726,28 +731,34 @@ class RubinCSApp:
     def handle_EDCS(self, change):
         self.show_EDCS = not self.show_EDCS
         self.update_EDCS()
+        self._mpl_canvas.draw()
 
     def handle_DVCS(self, change):
         self.show_DVCS = not self.show_DVCS
         self.update_DVCS()
+        self._mpl_canvas.draw()
 
     def handle_OCS(self, change):
         self.show_OCS = not self.show_OCS
         self.update_OCS()
+        self._mpl_canvas.draw()
 
     def handle_ZCS(self, change):
         self.show_ZCS = not self.show_ZCS
         self.update_ZCS()
+        self._mpl_canvas.draw()
 
     def handle_noll(self, change):
         self.noll = change['new']
         self.update_spot()
         self.update_wf()
+        self._mpl_canvas.draw()
 
     def handle_perturb(self, change):
         self.perturb = change['new']
         self.update_spot()
         self.update_wf()
+        self._mpl_canvas.draw()
 
     def update_CCS(self):
         if self.show_CCS:
@@ -975,7 +986,11 @@ class RubinCSApp:
 
         self.spot_scatter.set_array(r)
         self.spot_scatter.set_alpha(visible.astype(float)*0.5)
-        self.spot_scatter.set_offsets(np.array([x, y]).T)
+        self.spot_scatter.set_offsets(
+            np.ma.masked_array(
+                np.array([x, y]).T
+            )
+        )
 
     def update_wf(self):
         perturbed = self.actual_telescope
@@ -1022,6 +1037,9 @@ class RubinCSApp:
         ipvfig = ipv.Figure(width=800, height=600)
         ipvfig.camera.far = 100000
         ipvfig.camera.near = 0.01
+        ipvfig.camera.position=(-2, 0, 0.2)
+        ipvfig.camera.up=(0, 0, 1)
+        ipvfig.camera_center=(0, 0, 0.4)
         ipvfig.style = ipv.styles.dark
         ipvfig.style['box'] = dict(visible=False)
         ipvfig.style['axes']['visible'] = False
