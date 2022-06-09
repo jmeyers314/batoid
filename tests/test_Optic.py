@@ -195,12 +195,12 @@ def test_rotation():
         np.testing.assert_allclose(
             telescope[k].coordSys.origin,
             rotTel[k].coordSys.origin,
-            rtol=0, atol=3e-14
+            rtol=0, atol=1e-13
         )
         np.testing.assert_allclose(
             telescope[k].coordSys.rot,
             rotTel[k].coordSys.rot,
-            rtol=0, atol=3e-14
+            rtol=0, atol=1e-13
         )
 
     np.testing.assert_allclose(
