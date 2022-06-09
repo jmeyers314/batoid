@@ -1,95 +1,36 @@
-import ipywidgets
-from tables import Description
-import batoid
-import numpy as np
-import ipyvolume as ipv
-from functools import lru_cache
-import matplotlib.pyplot as plt
-import galsim
 import contextlib
+import os
+from functools import lru_cache
+
+import ipywidgets
+
+import numpy as np
+import matplotlib.pyplot as plt
+from astropy.io import fits
+import ipyvolume as ipv
+
+import galsim
+import batoid
+
 
 @lru_cache
 def get_constellations_xyz():
-    from astropy.io import fits
-    try:
-        xyz = fits.getdata("../notebook/constellations.fits")
-    except:
-        from astroquery.simbad import Simbad
+    return fits.getdata(
+        os.path.join(batoid.datadir, 'misc', 'constellations.fits')
+    )
 
-        def ten(s):
-            ss = s.split()
-            h = float(ss[0])
-            sign = +1
-            if h < 0:
-                sign = -1
-                h *= -1
-            m = float(ss[1])
-            s = float(ss[2])
-            return sign * (h + m/60 + s/3600)
-
-        Simbad.add_votable_fields('typed_id')
-        HIPset = set()
-        with open("../notebook/constellationship.fab") as f:
-            lines = f.readlines()
-        for line in lines:
-            HIPset.update([int(s) for s in line.split()[2:]])
-        HIPlist = list(HIPset)
-        table = Simbad.query_objects(
-            [f"HIP {s}" for s in HIPlist]
-        )
-        table['HIPID'] = HIPlist
-
-        xs = []
-        ys = []
-        zs = []
-        for line in lines:
-            xs.append(np.nan)
-            ys.append(np.nan)
-            zs.append(np.nan)
-            prev_second = -1
-            endpoints = iter(line.split()[2:])
-            for first in endpoints:
-                second = next(endpoints)
-                first = int(first)
-                second = int(second)
-
-                secondrow = table[np.nonzero(table['HIPID'] == int(second))]
-                ra1 = np.deg2rad(15*ten(secondrow['RA'][0]))
-                dec1 = np.deg2rad(ten(secondrow['DEC'][0]))
-                x1 = np.cos(ra1)*np.cos(dec1)
-                y1 = np.sin(ra1)*np.cos(dec1)
-                z1 = np.sin(dec1)
-
-                if first == prev_second:
-                    # just append new second
-                    xs.append(x1)
-                    ys.append(y1)
-                    zs.append(z1)
-                else:
-                    firstrow = table[np.nonzero(table['HIPID'] == int(first))]
-                    ra0 = np.deg2rad(15*ten(firstrow['RA'][0]))
-                    dec0 = np.deg2rad(ten(firstrow['DEC'][0]))
-                    x0 = np.cos(ra0)*np.cos(dec0)
-                    y0 = np.sin(ra0)*np.cos(dec0)
-                    z0 = np.sin(dec0)
-                    xs.extend([np.nan, x0, x1])
-                    ys.extend([np.nan, y0, y1])
-                    zs.extend([np.nan, z0, z1])
-                prev_second = second
-        xyz = np.array([xs, ys, zs])
-        fits.writeto("constellations.fits", xyz)
-    return xyz
 
 @lru_cache
 def get_stars_xyzs():
-    #http://tdc-www.harvard.edu/catalogs/bsc5.dat.gz
-    from astropy.io import fits
-    table = fits.getdata("../notebook/BSC5.fits")
+    table = fits.getdata(
+        os.path.join(batoid.datadir, 'misc', 'BSC5.fits')
+    )
     table = table[table['mag'] < 5.5]
     x = np.cos(table['ra']) * np.cos(table['dec'])
     y = np.sin(table['ra']) * np.cos(table['dec'])
     z = np.sin(table['dec'])
     return x, y, z, 10**(3-0.2*table['mag'])
+
 
 def get_zk(opd):
     xs = np.linspace(-1, 1, opd.shape[0])
@@ -100,6 +41,7 @@ def get_zk(opd):
     zk, *_ = np.linalg.lstsq(basis.T, opd[w], rcond=None)
     return zk
 
+
 def sub_ptt(opd):
     xs = np.linspace(-1, 1, opd.shape[0])
     ys = np.linspace(-1, 1, opd.shape[1])
@@ -107,6 +49,7 @@ def sub_ptt(opd):
     zk = get_zk(opd)
     opd -= galsim.zernike.Zernike(zk[:4], R_inner=0.61)(xs, ys)
     return opd
+
 
 class RubinCSApp:
     def __init__(self, debug=None):
