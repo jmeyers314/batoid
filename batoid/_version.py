@@ -2,6 +2,6 @@
 
 __version__ = "0.3.7"
 tmp = __version__
-if "rc" in tmp:
+if "rc" in tmp:  # pragma: no cover
     tmp = tmp[:tmp.find("rc")]
 __version_info__ = tuple(map(int, tmp.split('.')))

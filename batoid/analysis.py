@@ -948,3 +948,40 @@ def exitPupilPos(optic, wavelength, smallAngle=np.deg2rad(1./3600), **kwargs):
             np.array([0., 0., 1.0])
         ))
     return np.mean(ps, axis=0)
+
+
+def focalLength(*args, **kwargs):
+    """Calculate focal length.
+
+    Parameters
+    ----------
+    optic : batoid.Optic
+        Optical system
+    theta_x, theta_y : float
+        Field angle in radians
+    wavelength : float
+        Wavelength in meters
+    nrad : int, optional
+        Number of ray radii to use.  (see RayVector.asPolar())
+    naz : int, optional
+        Approximate number of azimuthal angles in outermost ring.  (see
+        RayVector.asPolar())
+    projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}
+        Projection used to convert field angle to direction cosines.
+
+    Returns
+    -------
+    fL : float
+        Focal length in meters.
+
+    Notes
+    -----
+        Computed from Jacobian drdth, suitably averaged over azimuth.
+    """
+    return np.sqrt(
+        np.linalg.det(
+            batoid.analysis.drdth(
+                *args, **kwargs
+            )
+        )
+    )

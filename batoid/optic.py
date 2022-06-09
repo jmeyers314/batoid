@@ -139,13 +139,15 @@ class Interface(Optic):
         return hash((self.__class__.__name__, self.surface, self.obscuration,
                      self.name, self.inMedium, self.outMedium, self.coordSys))
 
-    def draw3d(self, ax, **kwargs):
+    def draw3d(self, ax, plotly=False, **kwargs):
         """Draw this interface on a mplot3d axis.
 
         Parameters
         ----------
-        ax : mplot3d.Axis
+        ax : mplot3d.Axis or plotly.graph_objs.Figure
             Axis on which to draw this optic.
+        plotly : bool
+            Set True to use plotly API instead of ipyvolume/matplotlib API
         """
         if self.outRadius is None:
             return
@@ -159,7 +161,10 @@ class Interface(Optic):
             y = self.inRadius * sth
             z = self.surface.sag(x, y)
             x, y, z = transform.applyForwardArray(x, y, z)
-            ax.plot(x, y, z, **kwargs)
+            if plotly:
+                ax.add_scatter3d(x=x, y=y, z=z, **kwargs)
+            else:
+                ax.plot(x, y, z, **kwargs)
 
         #outer circle
         th = np.linspace(0, 2*np.pi, 100)
@@ -168,31 +173,132 @@ class Interface(Optic):
         y = self.outRadius * sth
         z = self.surface.sag(x, y)
         x, y, z = transform.applyForwardArray(x, y, z)
-        ax.plot(x, y, z, **kwargs)
+        if plotly:
+            ax.add_scatter3d(x=x, y=y, z=z, **kwargs)
+        else:
+            ax.plot(x, y, z, **kwargs)
 
         #next, a line at X=0
         y = np.linspace(-self.outRadius, -self.inRadius)
         x = np.zeros_like(y)
         z = self.surface.sag(x, y)
         x, y, z = transform.applyForwardArray(x, y, z)
-        ax.plot(x, y, z, **kwargs)
+        if plotly:
+            ax.add_scatter3d(x=x, y=y, z=z, **kwargs)
+        else:
+            ax.plot(x, y, z, **kwargs)
         y = np.linspace(self.inRadius, self.outRadius)
         x = np.zeros_like(y)
         z = self.surface.sag(x, y)
         x, y, z = transform.applyForwardArray(x, y, z)
-        ax.plot(x, y, z, **kwargs)
+        if plotly:
+            ax.add_scatter3d(x=x, y=y, z=z, **kwargs)
+        else:
+            ax.plot(x, y, z, **kwargs)
 
         #next, a line at Y=0
         x = np.linspace(-self.outRadius, -self.inRadius)
         y = np.zeros_like(x)
         z = self.surface.sag(x, y)
         x, y, z = transform.applyForwardArray(x, y, z)
-        ax.plot(x, y, z, **kwargs)
+        if plotly:
+            ax.add_scatter3d(x=x, y=y, z=z, **kwargs)
+        else:
+            ax.plot(x, y, z, **kwargs)
         x = np.linspace(self.inRadius, self.outRadius)
         y = np.zeros_like(x)
         z = self.surface.sag(x, y)
         x, y, z = transform.applyForwardArray(x, y, z)
-        ax.plot(x, y, z, **kwargs)
+        if plotly:
+            ax.add_scatter3d(x=x, y=y, z=z, **kwargs)
+        else:
+            ax.plot(x, y, z, **kwargs)
+
+    def get3dmesh(self):
+        if self.outRadius is None:
+            return
+        transform = CoordTransform(self.coordSys, globalCoordSys)
+        # Going to draw 4 objects here: inner circle, outer circle, sag along
+        # x=0, sag along y=0 inner circle
+        xs = []
+        ys = []
+        zs = []
+        if self.inRadius != 0.0:
+            th = np.linspace(0, 2*np.pi, 100)
+            cth, sth = np.cos(th), np.sin(th)
+            x = self.inRadius * cth
+            y = self.inRadius * sth
+            z = self.surface.sag(x, y)
+            x, y, z = transform.applyForwardArray(x, y, z)
+            xs.extend(x)
+            ys.extend(y)
+            zs.extend(z)
+            # Separate by adding a nan
+            xs.append(np.nan)
+            ys.append(np.nan)
+            zs.append(np.nan)
+
+        #outer circle
+        th = np.linspace(0, 2*np.pi, 100)
+        cth, sth = np.cos(th), np.sin(th)
+        x = self.outRadius * cth
+        y = self.outRadius * sth
+        z = self.surface.sag(x, y)
+        x, y, z = transform.applyForwardArray(x, y, z)
+        xs.extend(x)
+        ys.extend(y)
+        zs.extend(z)
+        xs.append(np.nan)
+        ys.append(np.nan)
+        zs.append(np.nan)
+
+        #next, a line at X=0
+        y = np.linspace(-self.outRadius, -self.inRadius)
+        x = np.zeros_like(y)
+        z = self.surface.sag(x, y)
+        x, y, z = transform.applyForwardArray(x, y, z)
+        xs.extend(x)
+        ys.extend(y)
+        zs.extend(z)
+        xs.append(np.nan)
+        ys.append(np.nan)
+        zs.append(np.nan)
+
+        y = np.linspace(self.inRadius, self.outRadius)
+        x = np.zeros_like(y)
+        z = self.surface.sag(x, y)
+        x, y, z = transform.applyForwardArray(x, y, z)
+        xs.extend(x)
+        ys.extend(y)
+        zs.extend(z)
+        xs.append(np.nan)
+        ys.append(np.nan)
+        zs.append(np.nan)
+
+        #next, a line at Y=0
+        x = np.linspace(-self.outRadius, -self.inRadius)
+        y = np.zeros_like(x)
+        z = self.surface.sag(x, y)
+        x, y, z = transform.applyForwardArray(x, y, z)
+        xs.extend(x)
+        ys.extend(y)
+        zs.extend(z)
+        xs.append(np.nan)
+        ys.append(np.nan)
+        zs.append(np.nan)
+
+        x = np.linspace(self.inRadius, self.outRadius)
+        y = np.zeros_like(x)
+        z = self.surface.sag(x, y)
+        x, y, z = transform.applyForwardArray(x, y, z)
+        xs.extend(x)
+        ys.extend(y)
+        zs.extend(z)
+        xs.append(np.nan)
+        ys.append(np.nan)
+        zs.append(np.nan)
+
+        return np.array(xs), np.array(ys), np.array(zs)
 
     def getXZSlice(self, nslice=0):
         """Calculate global coordinates for an (x,z) slice through this
@@ -472,6 +578,10 @@ class Interface(Optic):
         ret = self.__class__.__new__(self.__class__)
         newDict = dict(self.__dict__)
         newDict['coordSys'] = self.coordSys.shiftGlobal(shift)
+        if 'stopSurface' in newDict:
+            newDict['stopSurface'] = (
+                newDict['stopSurface'].withGlobalShift(shift)
+            )
         del newDict['surface']
         ret.__init__(
             self.surface,
@@ -523,6 +633,10 @@ class Interface(Optic):
         newDict['coordSys'] = self.coordSys.rotateLocal(
             rot, rotOrigin, coordSys
         )
+        if 'stopSurface' in newDict:
+            newDict['stopSurface'] = newDict['stopSurface'].withLocalRotation(
+                rot, rotOrigin, coordSys
+            )
         del newDict['surface']
         ret.__init__(
             self.surface,
@@ -1066,11 +1180,24 @@ class CompoundOptic(Optic):
 
         Parameters
         ----------
-        ax : mplot3d.Axis
+        ax : mplot3d.Axis or plotly.graph_objs.Figure
             Axis on which to draw this optic.
+        plotly : bool
+            Set True to use plotly API instead of ipyvolume/matplotlib API
         """
         for item in self.items:
             item.draw3d(ax, **kwargs)
+
+    def get3dmesh(self):
+        xs = []
+        ys = []
+        zs = []
+        for item in self.items:
+            x, y, z = item.get3dmesh()
+            xs.append(x)
+            ys.append(y)
+            zs.append(z)
+        return np.hstack(xs), np.hstack(ys), np.hstack(zs)
 
     def draw2d(self, ax, **kwargs):
         """Draw a 2D slice of this `CompoundOptic` in the (x,z) plane.
@@ -1148,6 +1275,10 @@ class CompoundOptic(Optic):
         newDict = dict(self.__dict__)
         newDict['coordSys'] = self.coordSys.shiftGlobal(shift)
         del newDict['items']
+        if 'stopSurface' in newDict:
+            newDict['stopSurface'] = (
+                newDict['stopSurface'].withGlobalShift(shift)
+            )
         ret.__init__(
             newItems,
             **newDict
@@ -1238,37 +1369,10 @@ class CompoundOptic(Optic):
         `CompoundOptic`
             Optic with shifted subitem.
         """
-        # If name is one of items.names, the we use withGlobalShift, and we're
-        # done.  If not, then we need to recurse down to whichever item
-        # contains name.  Verify that name is in self.itemDict, but first
-        # convert partially qualified name to fully qualified.
-        if name in self._names:
-            name = self._names[name]
-        if name not in self.itemDict:
-            raise ValueError("Optic {} not found".format(name))
-        if name == self.name:
-            return self.withLocalShift(shift)
-        # Clip off leading token
-        assert name[:len(self.name)+1] == \
-            self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
-        name = name[len(self.name)+1:]
-        newItems = []
-        newDict = dict(self.__dict__)
-        del newDict['items']
-        for i, item in enumerate(self.items):
-            if name.startswith(item.name):
-                if name == item.name:
-                    newItems.append(item.withLocalShift(shift))
-                else:
-                    newItems.append(item.withLocallyShiftedOptic(name, shift))
-                newItems.extend(self.items[i+1:])
-                return self.__class__(
-                    newItems,
-                    **newDict
-                )
-            newItems.append(item)
-        raise RuntimeError(
-            "Error in withLocallyShiftedOptic!, Shouldn't get here!"
+        # Just apply the rotated global shift.
+        return self.withGloballyShiftedOptic(
+            name,
+            np.dot(self.coordSys.rot, shift)
         )
 
     def withLocalRotation(self, rot, rotOrigin=None, coordSys=None):
@@ -1293,14 +1397,25 @@ class CompoundOptic(Optic):
             rotOrigin = [0,0,0]
         if coordSys is None:
             coordSys = self.coordSys
-        newItems = [item.withLocalRotation(rot, rotOrigin, coordSys)
-                    for item in self.items]
+        newItems = [
+            item.withLocalRotation(
+                self.coordSys.rot@item.coordSys.rot.T@rot@item.coordSys.rot@self.coordSys.rot.T,
+                # rot,
+                rotOrigin,
+                coordSys
+            )
+            for item in self.items
+        ]
         ret = self.__class__.__new__(self.__class__)
         newDict = dict(self.__dict__)
         newDict['coordSys'] = self.coordSys.rotateLocal(
             rot, rotOrigin, coordSys
         )
         del newDict['items']
+        if 'stopSurface' in newDict:
+            newDict['stopSurface'] = newDict['stopSurface'].withLocalRotation(
+                rot, rotOrigin, coordSys
+            )
         ret.__init__(
             newItems,
             **newDict
@@ -1535,12 +1650,12 @@ def getGlobalRays(traceFull, start=None, end=None, globalSys=globalCoordSys):
     return xyz, raylen
 
 
-def drawTrace3d(ax, traceFull, start=None, end=None, **kwargs):
+def drawTrace3d(ax, traceFull, start=None, end=None, plotly=False, **kwargs):
     """Draw 3D rays in global coordinates on the specified axis.
 
     Parameters
     ----------
-    ax : mplot3d.Axis
+    ax : mplot3d.Axis or plotly.graph_objs.Figure
         Axis on which to draw rays.
     traceFull : OrderedDict
         Array of per-surface ray-tracing output from traceFull()
@@ -1550,12 +1665,22 @@ def drawTrace3d(ax, traceFull, start=None, end=None, **kwargs):
     end : str or None
         Name of the last surface to include in the output, or use the last
         surface in the model when None.
+    plotly : bool
+        Set True to use plotly API instead of ipyvolume/matplotlib API
     globalSys : `batoid.CoordSys`
         Global coordinate system to use.
     """
     xyz, raylen = getGlobalRays(traceFull, start, end)
     for line, nline in zip(xyz, raylen):
-        ax.plot(line[0, :nline], line[1, :nline], line[2, :nline], **kwargs)
+        if plotly:
+            ax.add_scatter3d(
+                x=line[0, :nline],
+                y=line[1, :nline],
+                z=line[2, :nline],
+                **kwargs
+            )
+        else:
+            ax.plot(line[0, :nline], line[1, :nline], line[2, :nline], **kwargs)
 
 
 def drawTrace2d(ax, traceFull, start=None, end=None, **kwargs):

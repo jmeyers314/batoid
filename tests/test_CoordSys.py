@@ -272,6 +272,23 @@ def test_combinations():
     np.testing.assert_allclose(coordSys1.origin, coordSys3.origin)
     np.testing.assert_allclose(coordSys1.rot, coordSys3.rot)
 
+    # Rotating LSST and LSSTCamera should commute
+    telescope = batoid.Optic.fromYaml("LSST_r.yaml")
+    telescope1 = (telescope
+        .withLocalRotation(batoid.RotX(0.2))
+        .withLocallyRotatedOptic("LSSTCamera", batoid.RotZ(-0.3))
+    )
+
+    telescope2 = (telescope
+        .withLocallyRotatedOptic("LSSTCamera", batoid.RotZ(-0.3))
+        .withLocalRotation(batoid.RotX(0.2))
+    )
+    for optic in telescope.itemDict.keys():
+        cs1 = telescope1[optic].coordSys
+        cs2 = telescope2[optic].coordSys
+        np.testing.assert_allclose(cs1.origin, cs2.origin, rtol=0, atol=1e-14)
+        np.testing.assert_allclose(cs1.rot, cs2.rot, rtol=0, atol=1e-14)
+
 
 @timer
 def test_ne():

@@ -54,7 +54,6 @@ notebooks = [
     "HSC pupil characterization.ipynb",
     "HSC trace.ipynb",
     "Huygens PSF.ipynb",
-    "LSST Coordinate Systems.ipynb",
     "LSST perturbations.ipynb",
     "LSST pupil characterization.ipynb",
     "LSST trace.ipynb",
