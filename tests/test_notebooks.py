@@ -43,6 +43,7 @@ notebooks = [
     "Aspheric Newtonian Telescope.ipynb",
     "AuxTel perturbations.ipynb",
     "AuxTel trace.ipynb",
+    "ComCam trace.ipynb",
     "DECam draw2d.ipynb",
     "DECam perturbations.ipynb",
     "DECam trace.ipynb",
