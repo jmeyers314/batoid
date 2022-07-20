@@ -51,10 +51,51 @@ def sub_ptt(opd):
     return opd
 
 
+def lst(jd, lon_deg):
+    """Local Sidereal Time from julian day and longitude"""
+    T = jd / 36525
+    return (
+        280.46061837
+        + 360.98564736629*(jd - 2451545)
+        + 0.000387933*T*T
+        - T*T*T/38710000
+        + lon_deg
+    ) % 360
+
+def eq_to_az(ra_deg, dec_deg, jd, lat_deg, lon_deg):
+    ra = np.deg2rad(ra_deg)
+    dec = np.deg2rad(dec_deg)
+    ha = np.deg2rad(lst(jd, lon_deg)) - ra
+    lat = np.deg2rad(lat_deg)
+    sinlat = np.sin(lat)
+    coslat = np.cos(lat)
+    sindec = np.sin(dec)
+
+    sinalt = sindec*sinlat + np.cos(dec)*coslat*np.cos(ha)
+    alt = np.arcsin(sinalt)
+
+    sinaz = -np.sin(ha)*np.cos(dec) / np.cos(alt)
+    cosaz = (sindec - sinalt*sinlat)/(np.cos(alt)*coslat)
+    az = np.arctan2(sinaz, cosaz)
+    return np.rad2deg(alt), np.rad2deg(az)
+
+def az_to_eq(alt_deg, az_deg, jd, lat_deg, lon_deg):
+    alt = np.deg2rad(alt_deg)
+    az = np.deg2rad(az_deg)
+    lat = np.deg2rad(lat_deg)
+    sindec = np.sin(alt)*np.sin(lat) + np.cos(alt)*np.cos(lat)*np.cos(az)
+    dec = np.arcsin(sindec)
+    sinha = -np.sin(az)*np.cos(alt)/np.cos(dec)
+    cosha = (np.sin(alt) - np.sin(dec)*np.sin(lat))/(np.cos(dec)*np.cos(lat))
+    ha = np.arctan2(sinha, cosha)
+    ra = np.deg2rad(lst(jd, lon_deg)) - ha
+    return np.rad2deg(ra), np.rad2deg(dec)
+
 class RubinCSApp:
     def __init__(self, debug=None):
         self.sky_dist = 15000
         self.lat = -30.2446
+        self.lon = -70.7494
         self.fiducial_telescope = batoid.Optic.fromYaml("LSST_r.yaml")
         self.actual_telescope = self.fiducial_telescope
         if debug is None:
@@ -64,10 +105,15 @@ class RubinCSApp:
         # widget variables
         self.clip_horizon = False
         self.show_telescope = True
-        self.lst = 0.0
+        self.ra = 186.65  # Approximately Acrux
+        self.dec = -63.1
+        self.jd = 2460676.25  # Start of 2025
         self.rtp = 0.0
-        self.alt = 30.0
-        self.az = 45.0
+
+        # compute
+        self.lst = lst(self.jd, self.lon)
+        self.alt, self.az = eq_to_az(self.ra, self.dec, self.jd, self.lat, self.lon)
+
         self.thx = 0.0
         self.thy = 0.0
         self.z_offset = 0.0
@@ -98,13 +144,16 @@ class RubinCSApp:
         self.mpl = self._mpl_view()
 
         # Controls
-        kwargs = {'layout':{'width':'180px'}}
+        kwargs = {'layout':{'width':'190px'}}
+        self.ra_control = ipywidgets.FloatText(value=self.ra, step=3.0, description='ra (deg)', **kwargs)
+        self.dec_control = ipywidgets.FloatText(value=self.dec, step=3.0, description='dec (deg)', **kwargs)
+        self.jd_control = ipywidgets.FloatText(value=self.jd, step=0.01, description="JD", **kwargs)
         self.alt_control = ipywidgets.FloatText(value=self.alt, step=3.0, description='alt (deg)', **kwargs)
         self.az_control = ipywidgets.FloatText(value=self.az, step=3.0, description='az (deg)', **kwargs)
+
         self.rtp_control = ipywidgets.FloatText(value=0.0, step=3.0, description='RTP (deg)', **kwargs)
         self.thx_control = ipywidgets.FloatText(value=0.0, step=0.25, description='Field x (deg)', **kwargs)
         self.thy_control = ipywidgets.FloatText(value=0.0, step=0.25, description='Field y (deg)', **kwargs)
-        self.lst_control = ipywidgets.FloatText(value=0.0, step=0.01, description='LST (hr)', **kwargs)
         self.z_control = ipywidgets.FloatText(value=0.0, step=0.1, description="Det z (mm)", **kwargs)
         self.telescope_control = ipywidgets.Checkbox(value=self.show_telescope, description="telescope", **kwargs)
         self.horizon_control = ipywidgets.Checkbox(value=self.clip_horizon, description='horizon', **kwargs)
@@ -118,12 +167,14 @@ class RubinCSApp:
         self.perturb_control = ipywidgets.FloatText(value=self.perturb, step=0.1, description="Pert (µm)", **kwargs)
 
         # observe
+        self.ra_control.observe(self.handle_ra, 'value')
+        self.dec_control.observe(self.handle_dec, 'value')
+        self.jd_control.observe(self.handle_jd, 'value')
         self.alt_control.observe(self.handle_alt, 'value')
         self.az_control.observe(self.handle_az, 'value')
         self.rtp_control.observe(self.handle_rtp, 'value')
         self.thx_control.observe(self.handle_thx, 'value')
         self.thy_control.observe(self.handle_thy, 'value')
-        self.lst_control.observe(self.handle_lst, 'value')
         self.z_control.observe(self.handle_z, 'value')
         self.telescope_control.observe(self.handle_telescope, 'value')
         self.horizon_control.observe(self.handle_horizon, 'value')
@@ -165,12 +216,14 @@ class RubinCSApp:
         ]
 
         self.controls = [
+            self.ra_control,
+            self.dec_control,
+            self.jd_control,
             self.alt_control,
             self.az_control,
             self.rtp_control,
             self.thx_control,
             self.thy_control,
-            self.lst_control,
             self.z_control,
             self.horizon_control,
             self.telescope_control,
@@ -189,7 +242,7 @@ class RubinCSApp:
             batoid.globalCoordSys,
             batoid.CoordSys(
                 (0, 0, 0),
-                batoid.RotZ(np.deg2rad(lst*15)) @ batoid.RotY(-np.deg2rad(90-self.lat))
+                batoid.RotZ(np.deg2rad(lst+180)) @ batoid.RotY(-np.deg2rad(90-self.lat))
             )
         )
         return ctf.applyForwardArray(*get_constellations_xyz())
@@ -214,7 +267,7 @@ class RubinCSApp:
             batoid.globalCoordSys,
             batoid.CoordSys(
                 (0, 0, 0),
-                batoid.RotZ(np.deg2rad(lst*15)) @ batoid.RotY(-np.deg2rad(90-self.lat))
+                batoid.RotZ(np.deg2rad(lst+180)) @ batoid.RotY(-np.deg2rad(90-self.lat))
             )
         )
         x, y, z, s = get_stars_xyzs()
@@ -611,12 +664,45 @@ class RubinCSApp:
             plt.show(self._mpl_fig)
         return out
 
+    def update_altaz(self):
+        self.alt, self.az = eq_to_az(
+            self.ra, self.dec, self.jd, self.lat, self.lon
+        )
+        self.alt_control.value = self.alt
+        self.az_control.value = self.az
+
+    def update_eq(self):
+        self.ra, self.dec = az_to_eq(
+            self.alt, self.az, self.jd, self.lat, self.lon
+        )
+        self.ra_control.value = self.ra
+        self.dec_control.value = self.dec
+
+    def handle_ra(self, change):
+        self.ra = change['new']
+        self.update_altaz()
+        self.update_telescope()
+
+    def handle_dec(self, change):
+        self.dec = change['new']
+        self.update_altaz()
+        self.update_telescope()
+
+    def handle_jd(self, change):
+        self.jd = change['new']
+        self.lst = lst(self.jd, self.lon)
+        self.update_eq()
+        self.update_constellations()
+        self.update_stars()
+
     def handle_alt(self, change):
         self.alt = change['new']
+        self.update_eq()
         self.update_telescope()
 
     def handle_az(self, change):
         self.az = change['new']
+        self.update_eq()
         self.update_telescope()
         self.update_elevation_bearings()
 
@@ -629,11 +715,6 @@ class RubinCSApp:
         self.update_EDCS()
         self.update_DVCS()
         self._mpl_canvas.draw()
-
-    def handle_lst(self, change):
-        self.lst = change['new']
-        self.update_constellations()
-        self.update_stars()
 
     def handle_thx(self, change):
         self.thx = change['new']
