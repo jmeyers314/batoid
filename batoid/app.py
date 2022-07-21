@@ -187,19 +187,6 @@ class RubinCSApp:
         self.noll_control.observe(self.handle_noll, 'value')
         self.perturb_control.observe(self.handle_perturb, 'value')
 
-        self.update_constellations()
-        self.update_telescope()
-        self.update_fp()
-        self.update_elevation_bearings()
-        self.update_rays()
-        self.update_CCS()
-        self.update_spot()
-        self.update_wf()
-        self.update_OCS()
-        self.update_ZCS()
-        self.update_EDCS()
-        self.update_DVCS()
-
         self.scatters = [
             self.constellations,
             self.stars,
@@ -1061,7 +1048,7 @@ class RubinCSApp:
         ipvfig = ipv.Figure(width=800, height=600)
         ipvfig.camera.far = 100000
         ipvfig.camera.near = 0.01
-        ipvfig.camera.position=(-2, 0, 0.2)
+        ipvfig.camera.position=(2, -0.5, 0.0)
         ipvfig.camera.up=(0, 0, 1)
         ipvfig.camera_center=(0, 0, 0.4)
         ipvfig.style = ipv.styles.dark
@@ -1078,4 +1065,18 @@ class RubinCSApp:
             ipvfig,
             ipywidgets.VBox(self.controls)
         ])
+        self.update_stars()
+        self.update_constellations()
+        self.update_telescope()
+        self.update_fp()
+        self.update_elevation_bearings()
+        self.update_rays()
+        self.update_CCS()
+        self.update_spot()
+        self.update_wf()
+        self.update_OCS()
+        self.update_ZCS()
+        self.update_EDCS()
+        self.update_DVCS()
+
         display(self.app)
