@@ -27,6 +27,9 @@ def parse_obscuration(config):
 
 def parse_surface(config):
     typ = config.pop('type')
+    if typ == 'Sum':
+        items = [parse_surface(c) for c in config['items']]
+        return batoid.Sum(items)
     evalstr = "batoid.{}(**config)".format(typ)
     return eval(evalstr)
 
