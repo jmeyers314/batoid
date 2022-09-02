@@ -161,15 +161,7 @@ def test_rotXYZ_parsing():
         config = yaml.safe_load(f)
     # Verify that we can parse the DESI model, which has some rotated lens
     # surfaces.
-    telescope = batoid.parse.parse_optic(config['opticalSystem'])
-    # Verify that only a single rotation is allowed.
-    with open(fn) as f:
-        config = yaml.safe_load(f)
-    coordSys = config['opticalSystem']['items'][0]['coordSys']
-    coordSys['rotX'] = 1.
-    coordSys['rotY'] = 1.
-    with pytest.raises(ValueError) as excinfo:
-        telescope = batoid.parse.parse_optic(config['opticalSystem'])
+    _ = batoid.parse.parse_optic(config['opticalSystem'])
 
 
 @timer
