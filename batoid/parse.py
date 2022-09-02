@@ -159,7 +159,9 @@ def parse_optic(config,
         ]
         return batoid.optic.Lens(
             items, name=name, coordSys=coordSys,
-            inMedium=inMedium, outMedium=outMedium)
+            inMedium=inMedium, outMedium=outMedium,
+            medium=medium
+        )
     elif typ == 'CompoundOptic':
         itemsConfig = config.pop('items')
         items = [

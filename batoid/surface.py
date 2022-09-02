@@ -3,7 +3,6 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 from . import _batoid
-from .constants import globalCoordSys
 from .trace import intersect, rSplit, reflect, refract, refractScreen
 
 
