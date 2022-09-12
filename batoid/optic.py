@@ -604,19 +604,59 @@ class Interface(Optic):
             Shifted interface.
         """
         # Clearer to apply the rotated global shift.
-        return self.withGlobalShift(np.dot(self.coordSys.rot, shift))
+        return self.withGlobalShift(self.coordSys.rot@shift)
 
-    def withLocalRotation(self, rot, rotOrigin=None, coordSys=None):
+    def withGlobalRotation(self, rot, rotCenter=None, coordSys=None):
+        """Return a new `Interface` with its coordinate system rotated.
+
+        Parameters
+        ----------
+        rot : array (3,3)
+            Rotation matrix wrt to the global coordinate system to apply.
+        rotCenter : array (3,)
+            Point about which to rotate.  Default: None means use [0,0,0]
+        coordSys : `batoid.CoordSys`
+            Coordinate system of rotCenter above.  Default: None means use
+            the global coordinate system.
+
+        Returns
+        -------
+        `Interface`
+            Rotated interface.
+        """
+        if rotCenter is None:
+            rotCenter = [0,0,0]
+        if coordSys is None:
+            coordSys = globalCoordSys
+        ret = self.__class__.__new__(self.__class__)
+        newDict = dict(self.__dict__)
+        newDict['coordSys'] = self.coordSys.rotateGlobal(
+            rot, rotCenter, coordSys
+        )
+        if 'stopSurface' in newDict:
+            newDict['stopSurface'] = (
+                newDict['stopSurface'].withGlobalRotation(
+                    rot, rotCenter, coordSys
+                )
+            )
+        del newDict['surface']
+        ret.__init__(
+            self.surface,
+            **newDict
+        )
+        return ret
+
+    def withLocalRotation(self, rot, rotCenter=None, coordSys=None):
         """Return a new `Interface` with its coordinate system rotated.
 
         Parameters
         ----------
         rot : array (3,3)
             Rotation matrix wrt to the local coordinate system to apply.
-        rotOrigin : array (3,)
-            Origin of rotation.  Default: None means use [0,0,0]
+        rotCenter : array (3,)
+            Point about which to rotate.  Default: None means use [0,0,0]
         coordSys : `batoid.CoordSys`
-            Coordinate system of rotOrigin above.  Default: None means use
+            Coordinate system of rotCenter above.  Default: None means use
             self.coordSys.
 
         Returns
@@ -624,18 +664,18 @@ class Interface(Optic):
         `Interface`
             Rotated interface.
         """
-        if rotOrigin is None:
-            rotOrigin = [0,0,0]
+        if rotCenter is None:
+            rotCenter = [0,0,0]
         if coordSys is None:
             coordSys = self.coordSys
         ret = self.__class__.__new__(self.__class__)
         newDict = dict(self.__dict__)
         newDict['coordSys'] = self.coordSys.rotateLocal(
-            rot, rotOrigin, coordSys
+            rot, rotCenter, coordSys
         )
         if 'stopSurface' in newDict:
             newDict['stopSurface'] = newDict['stopSurface'].withLocalRotation(
-                rot, rotOrigin, coordSys
+                rot, rotCenter, coordSys
             )
         del newDict['surface']
         ret.__init__(
@@ -1300,7 +1340,7 @@ class CompoundOptic(Optic):
             Shifted interface.
         """
         # Clearer to apply the rotated global shift.
-        return self.withGlobalShift(np.dot(self.coordSys.rot, shift))
+        return self.withGlobalShift(self.coordSys.rot@shift)
 
     def withGloballyShiftedOptic(self, name, shift):
         """Return a new `CompoundOptic` with the coordinate system of one of
@@ -1370,51 +1410,52 @@ class CompoundOptic(Optic):
             Optic with shifted subitem.
         """
         # Just apply the rotated global shift.
-        return self.withGloballyShiftedOptic(
-            name,
-            np.dot(self.coordSys.rot, shift)
-        )
+        return self.withGloballyShiftedOptic(name, self.coordSys.rot@shift)
 
-    def withLocalRotation(self, rot, rotOrigin=None, coordSys=None):
+    def withGlobalRotation(self, rot, rotCenter=None, coordSys=None):
         """Return a new `CompoundOptic` with its coordinate system rotated.
 
         Parameters
         ----------
         rot : array (3,3)
-            Rotation matrix wrt to the local coordinate system to apply.
-        rotOrigin : array (3,)
-            Origin of rotation.  Default: None means use [0,0,0]
+            Rotation matrix wrt to the global coordinate system to apply.
+        rotCenter : array (3,)
+            Point about which to rotate.  Default: None means use [0,0,0]
         coordSys : `batoid.CoordSys`
-            Coordinate system of rotOrigin above.  Default: None means use
-            self.coordSys.
+            Coordinate system of rotCenter above.  Default: None means use
+            the global coordinate system.
 
         Returns
         -------
         `CompoundOptic`
             Rotated optic.
         """
-        if rotOrigin is None:
-            rotOrigin = [0,0,0]
+        if rotCenter is None:
+            rotCenter = [0,0,0]
         if coordSys is None:
-            coordSys = self.coordSys
-        newItems = [
-            item.withLocalRotation(
-                self.coordSys.rot@item.coordSys.rot.T@rot@item.coordSys.rot@self.coordSys.rot.T,
-                # rot,
-                rotOrigin,
-                coordSys
+            coordSys = globalCoordSys
+
+        newItems = []
+        for item in self.items:
+            newItems.append(
+                item.withGlobalRotation(
+                    rot,
+                    rotCenter,
+                    coordSys
+                )
             )
-            for item in self.items
-        ]
+
         ret = self.__class__.__new__(self.__class__)
         newDict = dict(self.__dict__)
-        newDict['coordSys'] = self.coordSys.rotateLocal(
-            rot, rotOrigin, coordSys
+        newDict['coordSys'] = self.coordSys.rotateGlobal(
+            rot, rotCenter, coordSys
         )
         del newDict['items']
         if 'stopSurface' in newDict:
-            newDict['stopSurface'] = newDict['stopSurface'].withLocalRotation(
-                rot, rotOrigin, coordSys
+            newDict['stopSurface'] = (
+                newDict['stopSurface'].withGlobalRotation(
+                    rot, rotCenter, coordSys
+                )
             )
         ret.__init__(
             newItems,
@@ -1422,7 +1463,36 @@ class CompoundOptic(Optic):
         )
         return ret
 
-    def withLocallyRotatedOptic(self, name, rot, rotOrigin=None,
+    def withLocalRotation(self, rot, rotCenter=None, coordSys=None):
+        """Return a new `CompoundOptic` with its coordinate system rotated.
+
+        Parameters
+        ----------
+        rot : array (3,3)
+            Rotation matrix wrt to the local coordinate system to apply.
+        rotCenter : array (3,)
+            Point about which to rotate.  Default: None means use [0,0,0]
+        coordSys : `batoid.CoordSys`
+            Coordinate system of rotCenter above.  Default: None means use
+            self.coordSys.
+
+        Returns
+        -------
+        `CompoundOptic`
+            Rotated optic.
+        """
+        if rotCenter is None:
+            rotCenter = [0,0,0]
+        if coordSys is None:
+            coordSys = self.coordSys
+        # Convert to global rotation
+        return self.withGlobalRotation(
+            self.coordSys.rot@rot@self.coordSys.rot.T,
+            rotCenter,
+            coordSys
+        )
+
+    def withLocallyRotatedOptic(self, name, rot, rotCenter=None,
                                 coordSys=None):
         """Return a new `CompoundOptic` with the coordinate system of one of
         its subitems rotated.
@@ -1434,10 +1504,10 @@ class CompoundOptic(Optic):
         rot : array (3,3)
             Rotation matrix wrt to the subitem's local coordinate system to
             apply.
-        rotOrigin : array (3,)
-            Origin of rotation.  Default: None means use [0,0,0]
+        rotCenter : array (3,)
+            Point about which to rotate.  Default: None means use [0,0,0]
         coordSys : `batoid.CoordSys`
-            Coordinate system of rotOrigin above.  Default: None means use the
+            Coordinate system of rotCenter above.  Default: None means use the
             coordinate system of the subitem being rotated.
 
         Returns
@@ -1453,12 +1523,12 @@ class CompoundOptic(Optic):
             name = self._names[name]
         if name not in self.itemDict:
             raise ValueError("Optic {} not found".format(name))
-        if name == self.name:
-            return self.withLocalRotation(rot, rotOrigin, coordSys)
-        if rotOrigin is None:
-            rotOrigin = [0,0,0]
+        if rotCenter is None:
+            rotCenter = [0,0,0]
         if coordSys is None:
             coordSys = self.itemDict[name].coordSys
+        if name == self.name:
+            return self.withLocalRotation(rot, rotCenter, coordSys)
         # Clip off leading token
         assert name[:len(self.name)+1] == \
             self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
@@ -1470,11 +1540,11 @@ class CompoundOptic(Optic):
             if name.startswith(item.name):
                 if name == item.name:
                     newItems.append(item.withLocalRotation(
-                        rot, rotOrigin, coordSys
+                        rot, rotCenter, coordSys
                     ))
                 else:
                     newItems.append(item.withLocallyRotatedOptic(
-                        name, rot, rotOrigin, coordSys
+                        name, rot, rotCenter, coordSys
                     ))
                 newItems.extend(self.items[i+1:])
                 return self.__class__(

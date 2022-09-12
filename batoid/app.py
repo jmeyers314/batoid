@@ -62,6 +62,7 @@ def lst(jd, lon_deg):
         + lon_deg
     ) % 360
 
+
 def eq_to_az(ra_deg, dec_deg, jd, lat_deg, lon_deg):
     ra = np.deg2rad(ra_deg)
     dec = np.deg2rad(dec_deg)
@@ -79,6 +80,7 @@ def eq_to_az(ra_deg, dec_deg, jd, lat_deg, lon_deg):
     az = np.arctan2(sinaz, cosaz)
     return np.rad2deg(alt), np.rad2deg(az)
 
+
 def az_to_eq(alt_deg, az_deg, jd, lat_deg, lon_deg):
     alt = np.deg2rad(alt_deg)
     az = np.deg2rad(az_deg)
@@ -90,6 +92,7 @@ def az_to_eq(alt_deg, az_deg, jd, lat_deg, lon_deg):
     ha = np.arctan2(sinha, cosha)
     ra = np.deg2rad(lst(jd, lon_deg)) - ha
     return np.rad2deg(ra), np.rad2deg(dec)
+
 
 class RubinCSApp:
     def __init__(self, debug=None):

@@ -90,6 +90,36 @@ class CoordSys:
         # Rotate the shift into global coordinates, then do the shift globally
         return self.shiftGlobal(self.rot@dr)
 
+    def toGlobal(self, v):
+        """Convert vector(s) from local to global coordinates.
+
+        Parameters
+        ----------
+        v : ndarray of float, shape (n, 3)
+            Vector(s) in local coordinates.
+
+        Returns
+        -------
+        vv : ndarray of float, shape (n, 3)
+            Vector in global coordinates.
+        """
+        return self.rot@v + self.origin
+
+    def toLocal(self, v):
+        """Convert vector(s) from global to local coordinates.
+
+        Parameters
+        ----------
+        v : ndarray of float, shape (n, 3)
+            Vector(s) in global coordinates.
+
+        Returns
+        -------
+        vv : ndarray of float, shape (n, 3)
+            Vector in local coordinates.
+        """
+        return self.rot.T@(v - self.origin)
+
     def rotateGlobal(self, rot, rotCenter=(0,0,0), coordSys=None):
         """Return new CoordSys rotated with respect to global axes.
 
@@ -109,7 +139,7 @@ class CoordSys:
         if coordSys is None:
             coordSys = CoordSys()
         # Find rot center in global coordinates
-        globalRotCenter = coordSys.rot@rotCenter + coordSys.origin
+        globalRotCenter = coordSys.toGlobal(rotCenter)
         # Then rotate about this center
         return CoordSys(
             rot@(self.origin-globalRotCenter)+globalRotCenter,
@@ -135,7 +165,7 @@ class CoordSys:
         if coordSys is None:
             coordSys = self
         # Find rot center in global coordinates
-        globalRotCenter = coordSys.rot@rotCenter + coordSys.origin
+        globalRotCenter = coordSys.toGlobal(rotCenter)
         # first rotate rot into global coords: (self.rot rot self.rot.T),
         # then apply that: (self.rot rot self.rot.T) self.rot = self.rot rot
         rTmp = self.rot@rot
