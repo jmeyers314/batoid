@@ -288,6 +288,58 @@ def test_name():
         telescope['L1'].name
 
 
+def test_cbp_rotation():
+    from scipy.spatial.distance import pdist
+    # LSST Collimated Beam Projector has non-trivial rotations in it's design.
+    # We test here that we can coherently rotate it.
+    # The test criterion is that distances between vertices are retained, as
+    # well as distances between coordinate system unit vectors.
+    cbp = batoid.Optic.fromYaml("CBP.yaml")
+
+    rotated1 = cbp.withLocalRotation(batoid.RotX(np.deg2rad(30)))
+    rotated2 = cbp.withLocalRotation(batoid.RotY(np.deg2rad(30)))
+    rotated3 = cbp.withLocalRotation(batoid.RotZ(np.deg2rad(30)))
+    rotated4 = rotated1.withLocalRotation(batoid.RotZ(np.deg2rad(70)))
+    rotated5 = rotated2.withLocalRotation(batoid.RotZ(np.deg2rad(70)))
+    rotated6 = rotated3.withLocalRotation(batoid.RotX(np.deg2rad(10)))
+    # rotated7 = rotated4.withGlobalRotation(batoid.RotX(np.deg2rad(20)))
+
+    def getCoordSysData(optic):
+        origins = np.empty((len(optic.itemDict), 3))
+        unitVectors = np.empty((len(optic.itemDict), 3, 3))
+        for i, (k,v) in enumerate(optic.itemDict.items()):
+            origins[i] = v.coordSys.origin
+            unitVectors[i,::3] = v.coordSys.xhat
+            unitVectors[i,1::3] = v.coordSys.yhat
+            unitVectors[i,2::3] = v.coordSys.zhat
+        return origins, unitVectors
+
+    cbp_o, cbp_d = getCoordSysData(cbp)
+    rot1_o, rot1_d = getCoordSysData(rotated1)
+    rot2_o, rot2_d = getCoordSysData(rotated2)
+    rot3_o, rot3_d = getCoordSysData(rotated3)
+    rot4_o, rot4_d = getCoordSysData(rotated4)
+    rot5_o, rot5_d = getCoordSysData(rotated5)
+    rot6_o, rot6_d = getCoordSysData(rotated6)
+    # rot7_o, rot7_d = getCoordSysData(rotated7)
+
+    np.testing.assert_allclose(pdist(cbp_o), pdist(rot1_o), atol=1e-13)
+    np.testing.assert_allclose(pdist(cbp_o), pdist(rot2_o), atol=1e-13)
+    np.testing.assert_allclose(pdist(cbp_o), pdist(rot3_o), atol=1e-13)
+    np.testing.assert_allclose(pdist(cbp_o), pdist(rot4_o), atol=1e-13)
+    np.testing.assert_allclose(pdist(cbp_o), pdist(rot5_o), atol=1e-13)
+    np.testing.assert_allclose(pdist(cbp_o), pdist(rot6_o), atol=1e-13)
+    # np.testing.assert_allclose(pdist(cbp_o), pdist(rot7_o), atol=1e-13)
+
+    np.testing.assert_allclose(pdist(cbp_d.reshape(-1, 3)), pdist(rot1_d.reshape(-1, 3)), atol=1e-13)
+    np.testing.assert_allclose(pdist(cbp_d.reshape(-1, 3)), pdist(rot2_d.reshape(-1, 3)), atol=1e-13)
+    np.testing.assert_allclose(pdist(cbp_d.reshape(-1, 3)), pdist(rot3_d.reshape(-1, 3)), atol=1e-13)
+    np.testing.assert_allclose(pdist(cbp_d.reshape(-1, 3)), pdist(rot4_d.reshape(-1, 3)), atol=1e-13)
+    np.testing.assert_allclose(pdist(cbp_d.reshape(-1, 3)), pdist(rot5_d.reshape(-1, 3)), atol=1e-13)
+    np.testing.assert_allclose(pdist(cbp_d.reshape(-1, 3)), pdist(rot6_d.reshape(-1, 3)), atol=1e-13)
+    # np.testing.assert_allclose(pdist(cbp_d.reshape(-1, 3)), pdist(rot7_d.reshape(-1, 3)), atol=1e-13)
+
+
 if __name__ == '__main__':
     init_gpu()
     test_optic()
@@ -299,3 +351,4 @@ if __name__ == '__main__':
     test_rotation()
     test_ne()
     test_name()
+    test_cbp_rotation()
