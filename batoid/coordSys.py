@@ -103,7 +103,8 @@ class CoordSys:
         vv : ndarray of float, shape (n, 3)
             Vector in global coordinates.
         """
-        return self.rot@v + self.origin
+        v = np.array(v, dtype=float)
+        return (self.rot@v.T).T + self.origin
 
     def toLocal(self, v):
         """Convert vector(s) from global to local coordinates.
@@ -118,7 +119,9 @@ class CoordSys:
         vv : ndarray of float, shape (n, 3)
             Vector in local coordinates.
         """
-        return self.rot.T@(v - self.origin)
+        v = np.array(v, dtype=float)
+        v -= self.origin
+        return (self.rot.T@v.T).T
 
     def rotateGlobal(self, rot, rotCenter=(0,0,0), coordSys=None):
         """Return new CoordSys rotated with respect to global axes.

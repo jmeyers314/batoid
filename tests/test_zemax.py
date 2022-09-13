@@ -505,6 +505,7 @@ def test_DECam_trace(verbose=False):
             np.testing.assert_allclose(np.abs(r.vz*n), np.abs(arr[iz][5]), rtol=0, atol=1e-9)
 
 
+@timer
 def test_DECam_exit_pupil_pos():
     telescope = batoid.Optic.fromYaml("DECam.yaml")
     # From the Optics Prescription report, the exit pupil is
@@ -518,6 +519,7 @@ def test_DECam_exit_pupil_pos():
     )
 
 
+@timer
 def test_CBP_trace():
     cbp = batoid.Optic.fromYaml("CBP.yaml")
 
