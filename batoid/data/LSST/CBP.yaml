@@ -89,8 +89,7 @@ opticalSystem:
             type: ClearCircle
             radius: 0.04445
           coordSys:
-            # z: -0.5394  # from global vertex
-            z: -0.53944724154  # hand optimization
+            z: -0.5394  # from global vertex
             rotX: 0.3490658503988659
         -
           type: Lens

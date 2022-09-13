@@ -518,6 +518,83 @@ def test_DECam_exit_pupil_pos():
     )
 
 
+def test_CBP_trace():
+    cbp = batoid.Optic.fromYaml("CBP.yaml")
+
+    indices = {
+        'Schmidt_plate_entrance': 1,
+        'Schmidt_plate_exit': 2,
+        'stop': 3,
+        'turning_flat': 5,
+        'PM': 7,
+        'flat_hole': 9,
+        'L1_entrance': 11,
+        'L1_exit': 12,
+        'L2_entrance': 13,
+        'L2_exit': 14,
+        'L3_entrance': 15,
+        'L3_exit': 16,
+        'Detector': 17
+    }
+
+    for i in range(1, 5):
+    # for i in range(2, 3):
+        fn = os.path.join(directory, "testdata", f"CBP_SRT{i}.txt")
+        with open(fn, encoding='utf-16-le') as f:
+            wavelength = np.genfromtxt(f, skip_header=8, max_rows=1, usecols=(2,))
+        with open(fn, encoding='utf-16-le') as f:
+            Hx, Hy, Px, Py = np.genfromtxt(f, skip_header=13, max_rows=4, usecols=(6,))
+        with open(fn, encoding='utf-16-le') as f:
+            idxs, x, y, z, xcos, ycos, zcos, nx, ny, nz, cos, path = np.genfromtxt(
+                f, skip_header=22, max_rows=18, usecols=list(range(0, 12)), unpack=True
+            )
+        # Switch to batoid conventions.  x, y, z -> -x, y, -z
+        Hx *= -1
+        Px *= -1
+        x *= -1
+        z *= -1
+        xcos *= -1
+        zcos *= -1
+        nx *= -1
+        nz *= -1
+        # Wavelength to meters
+        wavelength *= 1e-6
+        # distances to meters
+        x *= 1e-3
+        y *= 1e-3
+        z *= 1e-3
+
+        # Initial ray conditions
+        r = np.r_[x[0], y[0], z[0]]
+        v = batoid.utils.zemaxToDirCos(Hx*np.deg2rad(2.05), Hy*np.deg2rad(2.05))
+
+        ray = batoid.RayVector(*r, *v, t=0, wavelength=wavelength)
+        ray.propagate(-0.1)  # rewind a bit
+
+        tf = cbp.traceFull(ray)
+
+        for k in tf:
+            if k == 'flat_hole':
+                continue  # Zemax is weird about the tilt here.  ignore.
+            idx = indices[k]
+            np.testing.assert_allclose(
+                tf[k]['out'].toCoordSys(batoid.globalCoordSys).r[0],
+                np.array([x[idx], y[idx], z[idx]]),
+                rtol=0, atol=1e-10
+            )
+
+            b_v = tf[k]['out'].toCoordSys(batoid.globalCoordSys).v[0]
+            b_v /= np.linalg.norm(b_v)
+            # Zemax always has zcos > 0
+            if b_v[2] > 0:
+                b_v *= -1
+            np.testing.assert_allclose(
+                b_v,
+                np.array([xcos[idx], ycos[idx], zcos[idx]]),
+                rtol=0, atol=1e-10
+            )
+
+
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
@@ -537,3 +614,4 @@ if __name__ == '__main__':
     test_LSST_trace(verbose=False)
     test_DECam_trace(verbose=False)
     test_DECam_exit_pupil_pos()
+    test_CBP_trace()
