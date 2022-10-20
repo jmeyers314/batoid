@@ -284,11 +284,21 @@ class RubinCSApp:
         )
 
     def _telescope_xyz(self, alt, az, rtp):
+        M1_height = 3.53  # LTS-213
+        elev_axis_height = 5.425  # LTS-213
         telescope = self.fiducial_telescope
-        telescope = telescope.withGlobalShift([0, 0, 3.53])  # Height of M1 vertex above azimuth ring
+        # Shift upwards to place M1 vertex prescribed distance above the ground
+        telescope = telescope.withGlobalShift([0, 0, M1_height])
+        # Apply camera rotator
         telescope = telescope.withLocallyRotatedOptic("LSSTCamera", batoid.RotZ(np.deg2rad(rtp)))
+        # Apply Azimuth
         telescope = telescope.withLocalRotation(batoid.RotZ(np.deg2rad(90-az)))
-        telescope = telescope.withLocalRotation(batoid.RotX(np.deg2rad(90-alt)), rotOrigin=[0, 0, 5.425], coordSys=batoid.globalCoordSys)
+        # Apply elevation.  Note height of elevation axis.
+        telescope = telescope.withLocalRotation(
+            batoid.RotX(np.deg2rad(90-alt)),
+            rotCenter=[0, 0, elev_axis_height],
+            coordSys=batoid.globalCoordSys
+        )
         self.actual_telescope = telescope
         return self.actual_telescope.get3dmesh()
 
