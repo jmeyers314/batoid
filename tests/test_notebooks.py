@@ -51,23 +51,23 @@ notebooks = [
     "DESI trace.ipynb",
     "Distortion.ipynb",
     "HSC 3D.ipynb",
-    "HSC perturbations.ipynb",
     "HSC pupil characterization.ipynb",
     "HSC trace.ipynb",
-    "Huygens PSF.ipynb",
-    "LSST perturbations.ipynb",
     "LSST pupil characterization.ipynb",
     "LSST trace.ipynb",
     "Newtonian Telescope.ipynb",
     # "Rays.ipynb",
     "Thin Lens.ipynb",
+    "PH != Pupil.ipynb"
 ]
 slow_notebooks = [
     "FFT vs Huygens.ipynb",
+    "Huygens PSF.ipynb",
     "HSC ghosts.ipynb",
-    "LSST donuts.ipynb",
+    "HSC perturbations.ipynb",
+    "LSST perturbations.ipynb",
     "LSST ghosts.ipynb",
-    "PH != Pupil.ipynb"
+    "LSST donuts.ipynb",
 ]
 
 if __name__ == '__main__':

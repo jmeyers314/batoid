@@ -64,7 +64,7 @@ def test_HSC_trace():
 
 
 @timer
-def test_HSC_huygensPSF():
+def test_HSC_huygensPSF(plot=False):
     fn = os.path.join(directory, "testdata", "HSC_huygensPSF.txt")
     with open(fn) as f:
         Zarr = np.loadtxt(f, skiprows=21)
@@ -117,9 +117,22 @@ def test_HSC_huygensPSF():
     optImg = modelimg(result.x, ii=ii)
     print("Done")
 
+    if plot:
+        import matplotlib.pyplot as plt
+        fig, axes = plt.subplots(ncols=3, figsize=(10,3))
+        i0 = axes[0].imshow(optImg.array)
+        i1 = axes[1].imshow(Zarr)
+        i2 = axes[2].imshow(optImg.array-Zarr)
+        plt.colorbar(i0, ax=axes[0])
+        plt.colorbar(i1, ax=axes[1])
+        plt.colorbar(i2, ax=axes[2])
+        plt.tight_layout()
+        plt.show()
+
+
     np.testing.assert_allclose(Zarr, optImg.array, rtol=0, atol=3e-2)
-    Zmom = galsim.hsm.FindAdaptiveMom(galsim.Image(Zarr, scale=0.25))
     bmom = galsim.hsm.FindAdaptiveMom(optImg)
+    Zmom = galsim.hsm.FindAdaptiveMom(galsim.Image(Zarr, copy=True))
     np.testing.assert_allclose(
         Zmom.observed_shape.g1,
         bmom.observed_shape.g1,
@@ -607,7 +620,7 @@ if __name__ == '__main__':
 
     init_gpu()
     test_HSC_trace()
-    test_HSC_huygensPSF()
+    test_HSC_huygensPSF(args.plotHuygens)
     test_HSC_wf()
     test_HSC_zernike()
     test_LSST_wf(args.plotWF)
