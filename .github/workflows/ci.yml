@@ -23,10 +23,10 @@ jobs:
         CC: [ gcc ]
         CXX: [ g++ ]
         include:
-          - os: macos-latest
-            py: 3.7
-            CC: cc
-            CXX: c++
+          # - os: macos-latest
+          #   py: 3.7
+          #   CC: cc
+          #   CXX: c++
           - os: ubuntu-latest
             py: 3.7
             CC: clang
