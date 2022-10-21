@@ -53,6 +53,8 @@ notebooks = [
     "HSC 3D.ipynb",
     "HSC pupil characterization.ipynb",
     "HSC trace.ipynb",
+    "LSST donuts.ipynb",
+    "LSST ghosts.ipynb",
     "LSST pupil characterization.ipynb",
     "LSST trace.ipynb",
     "Newtonian Telescope.ipynb",
@@ -64,22 +66,24 @@ slow_notebooks = [
     "FFT vs Huygens.ipynb",
     "Huygens PSF.ipynb",
     "HSC ghosts.ipynb",
-    "HSC perturbations.ipynb",
     "LSST perturbations.ipynb",
-    "LSST ghosts.ipynb",
-    "LSST donuts.ipynb",
+    "HSC perturbations.ipynb"
 ]
 
 if __name__ == '__main__':
     notebooks += slow_notebooks
 else:
+    notebooks = [
+        pytest.param(notebook, marks=pytest.mark.skip_gha)
+        for notebook in notebooks
+    ]
     notebooks += [
-        pytest.param(notebook, marks=pytest.mark.slow)
+        pytest.param(notebook, marks=[pytest.mark.skip_gha, pytest.mark.slow])
         for notebook in slow_notebooks
     ]
 
 
-@pytest.mark.timeout(600)
+@pytest.mark.timeout(300)
 @pytest.mark.parametrize("notebook_name", notebooks)
 @timer
 def test_notebook(notebook_name):
