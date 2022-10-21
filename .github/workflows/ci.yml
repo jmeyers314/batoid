@@ -112,7 +112,7 @@ jobs:
         run: CMAKE_VERBOSE_MAKEFILE=1 python setup.py develop
 
       - name: Run unit tests
-        run: pytest --cov=batoid --cov-report=xml --cov-config tests/.coveragerc
+        run: pytest --cov=batoid --cov-report=xml --cov-config tests/.coveragerc -n 2
 
       - name: Upload coverage to codecov
         run: |
