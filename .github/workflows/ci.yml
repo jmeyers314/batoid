@@ -59,10 +59,7 @@ jobs:
             ~/.cache/pip
             $HOME/Library/Caches/Homebrew
             /usr/local/Cellar
-          key: ${{ runner.os }}-${{ matrix.py }}-pip-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-              ${{ runner.os }}-${{ matrix.py }}-pip-
-              ${{ runner.os }}-
+          key: ${{ runner.os }}-${{ matrix.py }}-${{ matrix.CXX}}-pip-${{ hashFiles('requirements.txt') }}
 
       - name: Install libfftw, etc. on linux (needed for GalSim)
         if: matrix.os == 'ubuntu-latest'
