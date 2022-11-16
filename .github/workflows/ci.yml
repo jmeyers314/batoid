@@ -19,7 +19,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest ]
-        py: [3.6, 3.7, 3.8, 3.9, "3.10"]
+        py: [3.6, 3.7, 3.8, 3.9, "3.10", "3.11"]
         CC: [ gcc ]
         CXX: [ g++ ]
         include:
@@ -32,7 +32,7 @@ jobs:
             CC: clang
             CXX: clang++
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
           fetch-depth: 2
@@ -48,21 +48,18 @@ jobs:
           echo 'event.after: ${{ github.event.after }}'
 
       - name: Set up Python ${{ matrix.py }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.py }}
 
       - name: Cache pip
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/.cache/pip
             $HOME/Library/Caches/Homebrew
             /usr/local/Cellar
-          key: ${{ runner.os }}-${{ matrix.py }}-pip-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-              ${{ runner.os }}-${{ matrix.py }}-pip-
-              ${{ runner.os }}-
+          key: ${{ runner.os }}-${{ matrix.py }}-${{ matrix.CXX}}-pip-${{ hashFiles('requirements.txt') }}
 
       - name: Install libfftw, etc. on linux (needed for GalSim)
         if: matrix.os == 'ubuntu-latest'
