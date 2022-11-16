@@ -12,7 +12,7 @@ namespace batoid {
     Table::Table(
         double x0, double y0, double dx, double dy,
         const double* z, const double* dzdx, const double* dzdy, const double* d2zdxdy,
-        size_t nx, size_t ny
+        size_t nx, size_t ny, bool use_nan
     ) :
         _devPtr(nullptr),
         _x0(x0), _y0(y0), _dx(dx), _dy(dy),
@@ -20,7 +20,8 @@ namespace batoid {
         _dzdx(dzdx),
         _dzdy(dzdy),
         _d2zdxdy(d2zdxdy),
-        _nx(nx), _ny(ny)
+        _nx(nx), _ny(ny),
+        _use_nan(use_nan)
     {}
 
     Table::~Table() {
@@ -58,7 +59,7 @@ namespace batoid {
         int ix = int(std::floor((x-_x0)/_dx));
         int iy = int(std::floor((y-_y0)/_dy));
         if ((ix >= _nx) or (ix < 0) or (iy >= _ny) or (iy < 0)) {
-            return NAN;
+            return _use_nan ? NAN : 0.0;
         }
         double xgrid = _x0 + ix*_dx;
         double ygrid = _y0 + iy*_dy;
@@ -95,8 +96,13 @@ namespace batoid {
         int ix = int(std::floor((x-_x0)/_dx));
         int iy = int(std::floor((y-_y0)/_dy));
         if ((ix >= _nx) or (ix < 0) or (iy >= _ny) or (iy < 0)) {
-            dzdx = NAN;
-            dzdy = NAN;
+            if (_use_nan) {
+                dzdx = NAN;
+                dzdy = NAN;
+            } else {
+                dzdx = 0.0;
+                dzdy = 0.0;
+            }
             return;
         }
         double xgrid = _x0 + ix*_dx;
@@ -181,7 +187,7 @@ namespace batoid {
                 #pragma omp target enter data map(to:z[:size], dzdx[:size], dzdy[:size], d2zdxdy[:size])
                 #pragma omp target map(from:ptr)
                 {
-                    ptr = new Table(_x0, _y0, _dx, _dy, z, dzdx, dzdy, d2zdxdy, _nx, _ny);
+                    ptr = new Table(_x0, _y0, _dx, _dy, z, dzdx, dzdy, d2zdxdy, _nx, _ny, _use_nan);
                 }
                 _devPtr = ptr;
             }
