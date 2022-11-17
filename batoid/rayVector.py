@@ -93,6 +93,23 @@ class RayVector:
         ret.coordSys = coordSys
         return ret
 
+    def _hash(self):
+        # Don't implement as __hash__ since RayVector is mutable.
+        return hash((
+            tuple(self.x.tolist()),
+            tuple(self.y.tolist()),
+            tuple(self.z.tolist()),
+            tuple(self.vx.tolist()),
+            tuple(self.vy.tolist()),
+            tuple(self.vz.tolist()),
+            tuple(self.t.tolist()),
+            tuple(self.wavelength.tolist()),
+            tuple(self.flux.tolist()),
+            tuple(self.vignetted.tolist()),
+            tuple(self.failed.tolist()),
+            self.coordSys
+        ))
+
     def positionAtTime(self, t):
         """Calculate the positions of the rays at a given time.
 
