@@ -58,7 +58,7 @@ namespace batoid {
     double Table::eval(double x, double y) const {
         int ix = int(std::floor((x-_x0)/_dx));
         int iy = int(std::floor((y-_y0)/_dy));
-        if ((ix >= _nx) or (ix < 0) or (iy >= _ny) or (iy < 0)) {
+        if ((ix >= (_nx-1)) or (ix < 0) or (iy >= (_ny-1)) or (iy < 0)) {
             return _use_nan ? NAN : 0.0;
         }
         double xgrid = _x0 + ix*_dx;
@@ -95,7 +95,7 @@ namespace batoid {
     ) const {
         int ix = int(std::floor((x-_x0)/_dx));
         int iy = int(std::floor((y-_y0)/_dy));
-        if ((ix >= _nx) or (ix < 0) or (iy >= _ny) or (iy < 0)) {
+        if ((ix >= (_nx-1)) or (ix < 0) or (iy >= (_ny-1)) or (iy < 0)) {
             if (_use_nan) {
                 dzdx = NAN;
                 dzdy = NAN;
