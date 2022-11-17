@@ -290,7 +290,6 @@ def test_sumAmplitude():
 
 @timer
 def test_equals():
-    import time
     rng = np.random.default_rng(577215)
     size = 10_000
 
@@ -310,6 +309,7 @@ def test_equals():
     rv = batoid.RayVector(*args)
     rv2 = rv.copy()
     assert rv == rv2
+    assert rv._hash() == rv2._hash()
 
     for i in range(len(args)):
         newargs = [args[i].copy() for i in range(len(args))]
@@ -336,6 +336,7 @@ def test_equals():
     rv._rv.vignetted.syncToDevice()
     rv._rv.failed.syncToDevice()
     assert rv == rv2
+    assert rv._hash() == rv2._hash()
     for i in range(len(args)):
         newargs = [args[i].copy() for i in range(len(args))]
         ai = newargs[i]

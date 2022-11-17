@@ -20,6 +20,9 @@ def test_properties():
     with np.testing.assert_raises(AssertionError):
         batoid.Bicubic(xs, ys, zs, nanpolicy='Giraffe')
 
+    # Check reprability here for zero nanpolicy
+    do_pickle(batoid.Bicubic(xs, ys, zs, nanpolicy='ZERO'))
+
 @timer
 def test_sag():
     rng = np.random.default_rng(57)
@@ -60,10 +63,8 @@ def test_sag():
     # sag returns nan outside of grid domain
     assert np.isnan(bc.sag(-1, -1))
     # or zero if nanpolicy is set to 'zero'
-    # bc = batoid.Bicubic(xs, ys, zs, nanpolicy='ZERO')
-    bc = batoid.Bicubic(xs, ys, zs, nanpolicy='NAN')
-    # np.testing.assert_equal(bc.sag(-1, -1), 0.0)
-    do_pickle(bc, reprable=False)
+    bc = batoid.Bicubic(xs, ys, zs, nanpolicy='ZERO')
+    np.testing.assert_equal(bc.sag(-1, -1), 0.0)
 
 
 @timer
