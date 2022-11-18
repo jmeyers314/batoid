@@ -477,10 +477,13 @@ class Bicubic(Surface):
         2d array indicating derivatives dz/dy at grid points.
     d2zdxdys : array_like, optional
         2d array indicating mixed derivatives d^2 z / (dx dy) at grid points.
+    nanpolicy : {'zero', 'nan'}
+        Return zero or nan for requests outside input domain?
     """
     def __init__(
-        self, xs, ys, zs, dzdxs=None, dzdys=None, d2zdxdys=None
+        self, xs, ys, zs, dzdxs=None, dzdys=None, d2zdxdys=None, nanpolicy='nan'
     ):
+        assert nanpolicy.upper() in ['NAN', 'ZERO']
         self._xs = np.array(xs, dtype=float, order="C")
         self._ys = np.array(ys, dtype=float, order="C")
         self._zs = np.array(zs, dtype=float, order="C")
@@ -511,6 +514,7 @@ class Bicubic(Surface):
         self._dzdys = np.array(dzdys, dtype=float, order="C")
         self._d2zdxdys = np.array(d2zdxdys, dtype=float, order="C")
 
+        self.nanpolicy = nanpolicy
         self._table = _batoid.CPPTable(
             self._x0, self._y0, self._dx, self._dy,
             self._zs.ctypes.data,
@@ -518,7 +522,8 @@ class Bicubic(Surface):
             self._dzdys.ctypes.data,
             self._d2zdxdys.ctypes.data,
             len(self._xs),
-            len(self._ys)
+            len(self._ys),
+            True if self.nanpolicy.upper() == 'NAN' else False
         )
         self._surface = _batoid.CPPBicubic(self._table)
 
@@ -550,12 +555,12 @@ class Bicubic(Surface):
         return hash((
             "Bicubic", tuple(self.xs), tuple(self.ys), tuple(self.zs.ravel()),
             tuple(self.dzdxs.ravel()), tuple(self.dzdys.ravel()),
-            tuple(self.d2zdxdys.ravel())
+            tuple(self.d2zdxdys.ravel()), self.nanpolicy
         ))
 
     def __setstate__(self, args):
         (self._xs, self._ys, self._zs,
-         self._dzdxs, self._dzdys, self._d2zdxdys
+         self._dzdxs, self._dzdys, self._d2zdxdys, self.nanpolicy
         ) = args
         self._x0 = self._xs[0]
         self._y0 = self._ys[0]
@@ -569,14 +574,15 @@ class Bicubic(Surface):
             self._dzdys.ctypes.data,
             self._d2zdxdys.ctypes.data,
             len(self._xs),
-            len(self._ys)
+            len(self._ys),
+            True if self.nanpolicy.upper() == 'NAN' else False
         )
         self._surface = _batoid.CPPBicubic(self._table)
 
     def __getstate__(self):
         return (
             self.xs, self.ys, self.zs,
-            self.dzdxs, self.dzdys, self.d2zdxdys
+            self.dzdxs, self.dzdys, self.d2zdxdys, self.nanpolicy
         )
 
     def __eq__(self, rhs):
@@ -588,11 +594,16 @@ class Bicubic(Surface):
             and np.array_equal(self.dzdxs, rhs.dzdxs)
             and np.array_equal(self.dzdys, rhs.dzdys)
             and np.array_equal(self.d2zdxdys, rhs.d2zdxdys)
+            and self.nanpolicy.upper() == rhs.nanpolicy.upper()
         )
 
     def __repr__(self):
         out = f"Bicubic({self.xs!r}, {self.ys!r}, {self.zs!r}, "
-        out += f"{self.dzdxs!r}, {self.dzdys!r}, {self.d2zdxdys!r})"
+        out += f"{self.dzdxs!r}, {self.dzdys!r}, {self.d2zdxdys!r}"
+        if self.nanpolicy.upper() == "NAN":
+            out += ")"
+        else:
+            out += ", nanpolicy='zero')"
         return out
 
 

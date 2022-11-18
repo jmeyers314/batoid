@@ -14,7 +14,7 @@ namespace batoid {
         Table(
             double x0, double y0, double dx, double dy,
             const double* z, const double* dzdx, const double* dzdy, const double* d2zdxdy,
-            size_t nx, size_t ny
+            size_t nx, size_t ny, bool use_nan
         );
         ~Table();
 
@@ -41,6 +41,7 @@ namespace batoid {
         const double* _dzdy;
         const double* _d2zdxdy;
         const size_t _nx, _ny;
+        const bool _use_nan;
     };
 
     #if defined(BATOID_GPU)

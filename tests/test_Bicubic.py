@@ -17,6 +17,11 @@ def test_properties():
         np.testing.assert_array_equal(zs, bc.zs)
         do_pickle(bc)
 
+    with np.testing.assert_raises(AssertionError):
+        batoid.Bicubic(xs, ys, zs, nanpolicy='Giraffe')
+
+    # Check reprability here for zero nanpolicy
+    do_pickle(batoid.Bicubic(xs, ys, zs, nanpolicy='ZERO'))
 
 @timer
 def test_sag():
@@ -57,6 +62,9 @@ def test_sag():
 
     # sag returns nan outside of grid domain
     assert np.isnan(bc.sag(-1, -1))
+    # or zero if nanpolicy is set to 'zero'
+    bc = batoid.Bicubic(xs, ys, zs, nanpolicy='ZERO')
+    np.testing.assert_equal(bc.sag(-1, -1), 0.0)
 
 
 @timer
@@ -187,6 +195,16 @@ def test_normal():
     # normal returns (nan, nan, nan) outside of grid domain
     out = bc.normal(-1, -1)
     assert all(np.isnan(o) for o in out)
+    # unless nanpolicy == 'ZERO'
+    bc = batoid.Bicubic(
+        xs, ys, zs,
+        dzdxs=dzdxs, dzdys=dzdys, d2zdxdys=d2zdxdys,
+        nanpolicy='ZERO'
+    )
+    np.testing.assert_equal(
+        bc.normal(-1, -1),
+        np.array([0.0, 0.0, 1.0])
+    )
 
 
 @timer
@@ -404,7 +422,8 @@ def test_ne():
         batoid.Bicubic(xs1, ys2, zs1, zs1, zs1, zs1),
         batoid.Bicubic(xs1, ys2, zs1, zs1, zs1, zs2),
         batoid.Bicubic(xs1, ys2, zs1, zs1, zs2, zs2),
-        batoid.Bicubic(xs1, ys2, zs1, zs2, zs2, zs2)
+        batoid.Bicubic(xs1, ys2, zs1, zs2, zs2, zs2),
+        batoid.Bicubic(xs1, ys2, zs1, zs2, zs2, zs2, nanpolicy='ZERO')
     ]
     all_obj_diff(objs)
 
