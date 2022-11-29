@@ -703,6 +703,22 @@ class Interface(Optic):
         ret.__init__(surface, **newDict)
         return ret
 
+    def withPerturbedSurface(self, perturbation):
+        """Return a new `Interface` with its surface attribute perturbed by
+        adding the given perturbation to the original surface.
+
+        Parameters
+        ----------
+        perturbation : `batoid.Surface`
+            Perturbation to apply to the surface.
+
+        Returns
+        -------
+        `Interface`
+            Interface with perturbed surface.
+        """
+        return self.withSurface(self.surface + perturbation)
+
 
 class RefractiveInterface(Interface):
     """Specialization for refractive interfaces.
@@ -1596,6 +1612,28 @@ class CompoundOptic(Optic):
                 )
             newItems.append(item)
         raise RuntimeError("Error in withSurface.  Shouldn't get here!")
+
+    def withPerturbedSurface(self, name, perturbation):
+        """Return a new `CompoundOptic` with one of its subitem's surfaces
+        attribute perturbed by adding the given perturbation to the original
+        surface.
+
+        Parameters
+        ----------
+        name : str
+            Which subitem's surface to replace.
+        perturbation : `batoid.Surface`
+            Surface to add to the original surface.
+
+        Returns
+        -------
+        `CompoundOptic`
+            Optic with perturbed surface.
+        """
+        return self.withSurface(
+            name,
+            self.itemDict[name].surface + perturbation
+        )
 
 
 class Lens(CompoundOptic):

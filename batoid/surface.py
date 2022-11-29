@@ -156,6 +156,9 @@ class Surface(ABC):
     def __ne__(self, rhs):
         return not (self == rhs)
 
+    def __add__(self, rhs):
+        return Sum(self, rhs)
+
 
 class Plane(Surface):
     """Planar surface.  The surface sag follows the equation:
@@ -628,9 +631,14 @@ class Sum(Surface):
     surfaces : list of Surface
         `Surface` s to add together.
     """
-    def __init__(self, surfaces):
-        self.surfaces = surfaces
-        self._surface = _batoid.CPPSum([s._surface for s in surfaces])
+    def __init__(self, *args):
+        from collections.abc import Sequence
+        if len(args) == 1 and isinstance(args[0], Sequence):
+            args = args[0]
+        assert all(isinstance(arg, Surface) for arg in args)
+
+        self.surfaces = tuple(args)
+        self._surface = _batoid.CPPSum([s._surface for s in self.surfaces])
 
     def __hash__(self):
         return hash(("batoid.Sum", tuple(self.surfaces)))
@@ -643,7 +651,7 @@ class Sum(Surface):
 
     def __eq__(self, rhs):
         if not isinstance(rhs, Sum): return False
-        return self.surfaces == rhs.surfaces
+        return self.surfaces == rhs.surfaces  # order matters!
 
     def __repr__(self):
         return f"Sum({self.surfaces})"

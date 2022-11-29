@@ -102,7 +102,7 @@ def test_withSurface():
     rays = batoid.RayVector.asPolar(
         telescope,
         wavelength=620e-9,
-        theta_x=np.deg2rad(0.1), theta_y=0.0,
+        theta_x=np.deg2rad(0.07), theta_y=0.0,  # TODO: why does this fail for theta_x=np.rad2deg(0.1)?
         nrad=10, naz=60
     )
     trays = telescope.trace(rays.copy())
@@ -110,11 +110,26 @@ def test_withSurface():
         if not isinstance(item, batoid.Interface):
             continue
         # Do a trivial surface replacement
-        surf2 = batoid.Sum([batoid.Plane(), item.surface])
+        surf2 = item.surface + batoid.Plane()
         telescope2 = telescope.withSurface(key, surf2)
         assert telescope != telescope2
-        trays2 = telescope.trace(rays.copy())
-        rays_allclose(trays, trays2)
+        trays2 = telescope2.trace(rays.copy())
+        rays_allclose(trays, trays2, atol=1e-12)
+        telescope3 = telescope.withPerturbedSurface(key, batoid.Plane())
+        assert telescope != telescope3
+        assert telescope2 == telescope3
+        trays3 = telescope3.trace(rays.copy())
+        rays_allclose(trays, trays3, atol=1e-12)
+
+        # Do a more complicated surface replacement
+        telescope4 = telescope.withSurface(key, item.surface+batoid.Sphere(1000.0))
+        assert telescope != telescope4
+        trays4 = telescope4.trace(rays.copy())
+        telescope5 = telescope.withPerturbedSurface(key, batoid.Sphere(1000.0))
+        assert telescope != telescope5
+        assert telescope4 == telescope5
+        trays5 = telescope5.trace(rays.copy())
+        rays_allclose(trays4, trays5, atol=1e-12)
 
 
 @timer

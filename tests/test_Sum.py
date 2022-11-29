@@ -23,6 +23,12 @@ def test_properties():
         assert s2 is sum2.surfaces[1]
         assert s3 is sum2.surfaces[2]
 
+        # alternate constructions
+        sum3 = batoid.Sum(s1, s2)
+        sum4 = s1 + s2
+        assert sum == sum3
+        assert sum == sum4
+
 
 @timer
 def test_sag():
