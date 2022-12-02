@@ -1630,6 +1630,8 @@ class CompoundOptic(Optic):
         `CompoundOptic`
             Optic with perturbed surface.
         """
+        if name in self._names:
+            name = self._names[name]
         return self.withSurface(
             name,
             self.itemDict[name].surface + perturbation
