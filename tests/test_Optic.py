@@ -102,7 +102,7 @@ def test_withSurface():
     rays = batoid.RayVector.asPolar(
         telescope,
         wavelength=620e-9,
-        theta_x=np.deg2rad(0.07), theta_y=0.0,  # TODO: why does this fail for theta_x=np.rad2deg(0.1)?
+        theta_x=np.deg2rad(0.01), theta_y=0.0,  # TODO: why does this fail for theta_x=np.rad2deg(0.1)?
         nrad=10, naz=60
     )
     trays = telescope.trace(rays.copy())
