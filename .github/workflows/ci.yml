@@ -86,24 +86,12 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install -U pip
-          pip install -U numpy
-          pip install -U astropy
-          pip install -U astroquery
-          pip install -U future
-          pip install -U pyyaml
-          pip install -U LSSTDESC.Coord
-          pip install -U pybind11
-          pip install -U pandas
-          pip install -U "starlink-pyast>3.9.0,<=3.12"
-          pip install -U matplotlib
-          pip install -U scipy
 
-      - name: Install GalSim
-        # Without --no-deps, GalSim tries and fails to install eigency.
-        # I don't think it's actually required though, since eigen is either
-        # apt-get'd or brew'd above.
-        run: |
-          pip install --no-deps "galsim>=2.2.4"
+          # Do these first to clarify potential conflicts
+          pip install -U setuptools numpy
+
+          # Standard dependencies
+          pip install -U -r requirements.txt
 
       - name: Install remaining dependencies
         run: |
