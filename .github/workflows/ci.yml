@@ -71,10 +71,17 @@ jobs:
       - name: Install libfftw, etc. on MacOS
         if: matrix.os == 'macos-latest'
         run: |
-          echo ${{ matrix.os }}
-          brew update
-          brew install fftw eigen
-          brew link fftw eigen
+          # brew update takes forever to run.  Hopefully won't need to enable this too often.
+          # Note: The || true bit here is because brew returns an error code if everything is
+          #       already installed, which is goofy.  So || true means these always give
+          #       non-error values.  If there really is an error, we should notice later
+          #       when trying to use whatever package failed to install.
+          #brew update || true
+          brew install fftw wget || true
+          brew upgrade wget || true
+          brew link --overwrite fftw gcc wget || true
+          brew install eigen || true
+          brew link --overwrite eigen || true
 
       - name: Install dependencies
         run: |
