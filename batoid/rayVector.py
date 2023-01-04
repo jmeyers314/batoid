@@ -93,6 +93,23 @@ class RayVector:
         ret.coordSys = coordSys
         return ret
 
+    def _hash(self):
+        # Don't implement as __hash__ since RayVector is mutable.
+        return hash((
+            tuple(self.x.tolist()),
+            tuple(self.y.tolist()),
+            tuple(self.z.tolist()),
+            tuple(self.vx.tolist()),
+            tuple(self.vy.tolist()),
+            tuple(self.vz.tolist()),
+            tuple(self.t.tolist()),
+            tuple(self.wavelength.tolist()),
+            tuple(self.flux.tolist()),
+            tuple(self.vignetted.tolist()),
+            tuple(self.failed.tolist()),
+            self.coordSys
+        ))
+
     def positionAtTime(self, t):
         """Calculate the positions of the rays at a given time.
 
@@ -186,6 +203,7 @@ class RayVector:
     def asGrid(
         cls,
         optic=None, backDist=None, medium=None, stopSurface=None,
+        coordSys=None,
         wavelength=None,
         source=None, dirCos=None,
         theta_x=None, theta_y=None, projection='postel',
@@ -309,6 +327,8 @@ class RayVector:
                 # them.  Otherwise, infer from optic.
                 if nx is None or dx is None:
                     lx = optic.pupilSize
+            if coordSys is None:
+                coordSys = optic.coordSys
 
         if backDist is None:
             backDist = 40.0
@@ -316,6 +336,8 @@ class RayVector:
             stopSurface = Interface(Plane())
         if medium is None:
             medium = vacuum
+        if coordSys is None:
+            coordSys = globalCoordSys
 
         if dirCos is None and source is None:
             dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
@@ -388,18 +410,34 @@ class RayVector:
         y = np.dot(ly, stack)
         del xx, yy, stack
         z = stopSurface.surface.sag(x, y)
-        transform = CoordTransform(stopSurface.coordSys, globalCoordSys)
+        transform = CoordTransform(stopSurface.coordSys, coordSys)
         applyForwardTransformArrays(transform, x, y, z)
         w = np.empty_like(x)
         w.fill(wavelength)
         n = medium.getN(wavelength)
 
-        return cls._finish(backDist, source, dirCos, n, x, y, z, w, flux)
+        return cls._finish(
+            backDist, source, dirCos, n, x, y, z, w, flux, coordSys
+        )
+
+    @classmethod
+    def asFan(
+        cls,
+        nx=None, ny=None,
+        **kwargs
+    ):
+        rvs = []
+        if nx > 1:
+            rvs.append(RayVector.asGrid(nx=nx, ny=1, **kwargs))
+        if ny > 1:
+            rvs.append(RayVector.asGrid(nx=1, ny=ny, **kwargs))
+        return concatenateRayVectors(rvs)
 
     @classmethod
     def asPolar(
         cls,
         optic=None, backDist=None, medium=None, stopSurface=None,
+        coordSys=None,
         wavelength=None,
         outer=None, inner=None,
         source=None, dirCos=None,
@@ -523,6 +561,9 @@ class RayVector:
                     inner = optic.pupilSize*optic.pupilObscuration/2
                 else:
                     inner = 0.0
+            if coordSys is None:
+                coordSys = optic.coordSys
+
         else:
             if inner is None:
                 inner = 0.0
@@ -533,6 +574,8 @@ class RayVector:
             stopSurface = Interface(Plane())
         if medium is None:
             medium = vacuum
+        if coordSys is None:
+            coordSys = globalCoordSys
 
         if dirCos is None and source is None:
             dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
@@ -567,18 +610,21 @@ class RayVector:
         y = rr*np.sin(th)
         del rr, th
         z = stopSurface.surface.sag(x, y)
-        transform = CoordTransform(stopSurface.coordSys, globalCoordSys)
+        transform = CoordTransform(stopSurface.coordSys, coordSys)
         applyForwardTransformArrays(transform, x, y, z)
         w = np.empty_like(x)
         w.fill(wavelength)
         n = medium.getN(wavelength)
 
-        return cls._finish(backDist, source, dirCos, n, x, y, z, w, flux)
+        return cls._finish(
+            backDist, source, dirCos, n, x, y, z, w, flux, coordSys
+        )
 
     @classmethod
     def asSpokes(
         cls,
         optic=None, backDist=None, medium=None, stopSurface=None,
+        coordSys=None,
         wavelength=None,
         outer=None, inner=0.0,
         source=None, dirCos=None,
@@ -695,6 +741,8 @@ class RayVector:
                 stopSurface = optic.stopSurface
             if outer is None:
                 outer = optic.pupilSize/2
+            if coordSys is None:
+                coordSys = optic.coordSys
 
         if backDist is None:
             backDist = 40.0
@@ -702,6 +750,8 @@ class RayVector:
             stopSurface = Interface(Plane())
         if medium is None:
             medium = vacuum
+        if coordSys is None:
+            coordSys = globalCoordSys
 
         if dirCos is None and source is None:
             dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
@@ -732,15 +782,19 @@ class RayVector:
         y = rings*np.sin(spokes)
         del rings, spokes
         z = stopSurface.surface.sag(x, y)
-        transform = CoordTransform(stopSurface.coordSys, globalCoordSys)
+        transform = CoordTransform(stopSurface.coordSys, coordSys)
         applyForwardTransformArrays(transform, x, y, z)
         w = np.empty_like(x)
         w.fill(wavelength)
         n = medium.getN(wavelength)
-        return cls._finish(backDist, source, dirCos, n, x, y, z, w, flux)
+        return cls._finish(
+            backDist, source, dirCos, n, x, y, z, w, flux, coordSys
+        )
 
     @classmethod
-    def _finish(cls, backDist, source, dirCos, n, x, y, z, w, flux):
+    def _finish(
+        cls, backDist, source, dirCos, n, x, y, z, w, flux, coordSys
+    ):
         """Map rays backwards to their source position."""
         if isinstance(flux, Real):
             flux = np.full(len(x), float(flux))
@@ -766,7 +820,7 @@ class RayVector:
             failed = np.zeros(len(x), dtype=bool)
             return RayVector._directInit(
                 x, y, z, vx, vy, vz, t, w,
-                flux, vignetted, failed, globalCoordSys
+                flux, vignetted, failed, coordSys
             )
         else:
             pass
@@ -778,13 +832,14 @@ class RayVector:
             # vignetted = np.zeros(len(r), dtype=bool)
             # failed = np.zeros(len(r), dtype=bool)
             # return RayVector._directInit(
-            #     r, v, t, w, flux, vignetted, failed, globalCoordSys
+            #     r, v, t, w, flux, vignetted, failed, coordSys
             # )
 
     @classmethod
     def fromStop(
         cls, x, y,
         optic=None, backDist=None, medium=None, stopSurface=None,
+        coordSys=None,
         wavelength=None,
         source=None, dirCos=None,
         theta_x=None, theta_y=None, projection='postel',
@@ -872,6 +927,8 @@ class RayVector:
                 medium = optic.inMedium
             if stopSurface is None:
                 stopSurface = optic.stopSurface
+            if coordSys is None:
+                coordSys = optic.coordSys
 
         if backDist is None:
             backDist = 40.0
@@ -879,6 +936,8 @@ class RayVector:
             stopSurface = Interface(Plane())
         if medium is None:
             medium = vacuum
+        if coordSys is None:
+            coordSys = globalCoordSys
 
         if dirCos is None and source is None:
             dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
@@ -889,14 +948,16 @@ class RayVector:
         x = np.atleast_1d(x).astype(float, copy=False)
         y = np.atleast_1d(y).astype(float, copy=False)
         z = stopSurface.surface.sag(x, y)
-        transform = CoordTransform(stopSurface.coordSys, globalCoordSys)
+        transform = CoordTransform(stopSurface.coordSys, coordSys)
         applyForwardTransformArrays(transform, x, y, z)
 
         w = np.empty_like(x)
         w.fill(wavelength)
         n = medium.getN(wavelength)
 
-        return cls._finish(backDist, source, dirCos, n, x, y, z, w, flux)
+        return cls._finish(
+            backDist, source, dirCos, n, x, y, z, w, flux, coordSys
+        )
 
     @classmethod
     def fromFieldAngles(
@@ -1155,12 +1216,12 @@ class RayVector:
         self._rv.failed.syncToHost()
 
     def _syncToDevice(self):
-        self._rv.x.syncToHost()
-        self._rv.y.syncToHost()
-        self._rv.z.syncToHost()
-        self._rv.vx.syncToHost()
-        self._rv.vy.syncToHost()
-        self._rv.vz.syncToHost()
+        self._rv.x.syncToDevice()
+        self._rv.y.syncToDevice()
+        self._rv.z.syncToDevice()
+        self._rv.vx.syncToDevice()
+        self._rv.vy.syncToDevice()
+        self._rv.vz.syncToDevice()
         self._rv.t.syncToDevice()
         self._rv.wavelength.syncToDevice()
         self._rv.flux.syncToDevice()

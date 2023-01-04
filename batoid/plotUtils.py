@@ -2,8 +2,11 @@ from matplotlib.figure import Figure
 from matplotlib.gridspec import GridSpec
 
 
-def zernikePyramid(xs, ys, zs, figsize=(13, 8), vmin=-1, vmax=1, vdim=True,
-                   s=5, title=None, filename=None, fig=None, **kwargs):
+def zernikePyramid(
+    xs, ys, zs, figsize=(13, 8), vmin=-1, vmax=1, vdim=True,
+    s=5, title=None, filename=None, fig=None, cmap='Spectral_r',
+    **kwargs
+):
     """Make a multi-zernike plot in a pyramid shape.
 
     Subplots show individual Zernikes over a range of x and y (presumably a
@@ -65,7 +68,7 @@ def zernikePyramid(xs, ys, zs, figsize=(13, 8), vmin=-1, vmax=1, vdim=True,
             _vmin = vmin
             _vmax = vmax
         scat = ax.scatter(
-            xs, ys, c=zs[j-4], s=s, linewidths=0.5, cmap='Spectral_r',
+            xs, ys, c=zs[j-4], s=s, linewidths=0.5, cmap=cmap,
             rasterized=True, vmin=_vmin, vmax=_vmax
         )
         cbar[j] = fig.colorbar(scat, ax=ax)

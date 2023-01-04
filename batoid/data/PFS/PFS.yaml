@@ -1,0 +1,167 @@
+opticalSystem:
+  type: CompoundOptic
+  name: PFS
+  inMedium: &vacuum 1.0
+  medium: *vacuum
+  stopSurface:
+    type: Interface
+    name: stop
+    surface:
+      type: Plane
+    coordSys:
+      z: 0.02184844738536455
+  XPSurface:
+    type: Interface
+    name: exit pupil
+    surface:
+      type: Plane
+    coordSys:
+      z: 0.018  # ~ or so
+  backDist: 1.0
+  pupilSize: 0.36
+  sphereRadius: 0.1  # rough guess based on pdf image
+  items:
+    - # Camera Corrector
+      type: Lens
+      name: CCL1
+      medium: &silica
+        type: SellmeierMedium
+        B1: 0.6961663
+        B2: 0.4079426
+        B3: 0.8974794
+        C1: 0.00467914825849
+        C2: 0.013512063073959999
+        C3: 97.93400253792099
+      items:
+        -   # zmx=29 / pdf=30
+          type: RefractiveInterface
+          name: CCL1S1
+          surface:
+            type: Asphere
+            R: 0.7535735724548
+            conic: 0.0
+            coefs: [0.1496124565505, -3.7255131470860002, 53.59118949244, -1518.896313582]
+          obscuration:
+            type: ClearCircle
+            radius: 0.18
+        -   # zmx=30 / pdf=31
+          type: RefractiveInterface
+          name: CCL1S2
+          surface:
+            type: Sphere
+            R: -1.4855596316754
+          obscuration:
+            type: ClearCircle
+            radius: 0.18
+          coordSys:
+            z: -0.035
+    - # CCL2
+      type: Lens
+      name: CCL2
+      medium: *silica
+      coordSys:
+        z: -0.0516618211397
+      items:
+        -   # zmx=31 / pdf=32
+          type: RefractiveInterface
+          name: CCL2S1
+          surface:
+            type: Sphere
+            R: -0.6883499038406
+          obscuration:
+            type: ClearCircle
+            radius: 0.19
+        -   # zmx=32 / pdf=33
+          type: RefractiveInterface
+          name: CCL2S2
+          surface:
+            type: Asphere
+            R: 1.8566017939273
+            conic: 0.0
+            coefs: [-2.6915275397820002, -8.9718897091719997, 11.77244834514]
+          obscuration:
+            type: ClearCircle
+            radius: 0.19
+          coordSys:
+            z: -0.0425679606
+    -
+      type: CompoundOptic
+      name: Mirror
+      coordSys:
+        z: -0.50331178177391
+      items:
+        -  # zmx=36 / pdf=39
+          type: RefractiveInterface
+          name: M1S1
+          surface:
+            type: Sphere
+            R: 0.7530987194538
+          inMedium: *vacuum
+          outMedium: *silica
+          obscuration:
+            type: ClearCircle
+            radius: 0.235
+          coordSys:
+            z: 0.04
+        -  # zmx=37 / pdf=40
+          type: Mirror
+          name: M1
+          surface:
+            type: Sphere
+            R: 0.7003206317722
+          obscuration:
+            type: ClearCircle
+            radius: 0.235
+          coordSys:
+            z: 0.0
+        -  # zmx=38 / pdf=41
+          type: RefractiveInterface
+          name: M1S2
+          surface:
+            type: Sphere
+            R: 0.7530987194538
+          inMedium: *silica
+          outMedium: *vacuum
+          obscuration:
+            type: ClearCircle
+            radius: 0.235
+          coordSys:
+            z: 0.04
+    -
+      type: Lens
+      name: FieldCorrector
+      medium: *silica
+      coordSys:
+        z: -0.18293183323111003
+      items:
+        -  # zmx=39 / pdf=42
+          type: RefractiveInterface
+          name: FCS1
+          surface:
+            type: Asphere
+            R: 0.145334483114
+            conic: 0.0
+            coefs: [100.096922784608]
+          obscuration:
+            type: ClearCircle
+            radius: 0.050862055306953572
+        -  # zmx=40 / pdf=43
+          type: RefractiveInterface
+          name: FCS2
+          surface:
+            type: Asphere
+            R: -0.8160784449707
+            conic: 0.0
+            coefs: [15.794016512640001, 1.096767066453e5, -5.9917366145880001e7, 1.119542606394e10]
+          obscuration:
+            type: ClearCircle
+            radius: 0.045264242758568948
+          coordSys:
+            z: 0.021
+    -  # zmx=42 / pdf=48
+      type: Detector
+      name: Detector
+      surface:
+        type: Plane
+      coordSys:
+        z: -0.16043183323111003

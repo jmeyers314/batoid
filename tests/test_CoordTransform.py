@@ -168,9 +168,43 @@ def test_ne():
     all_obj_diff(objs)
 
 
+@timer
+def test_global_local():
+    rng = np.random.default_rng(5772)
+    for _ in range(100):
+        coordSys = randomCoordSys(rng)
+        toLocal = batoid.CoordTransform(batoid.CoordSys(), coordSys)
+        toGlobal = batoid.CoordTransform(coordSys, batoid.CoordSys())
+
+        r = rng.uniform(-1, 1, size=3)
+        np.testing.assert_allclose(
+            coordSys.toGlobal(r),
+            toGlobal.applyForwardArray(*r),
+            rtol=0, atol=1e-15
+        )
+        np.testing.assert_allclose(
+            coordSys.toLocal(r),
+            toLocal.applyForwardArray(*r),
+            rtol=0, atol=1e-15
+        )
+
+        r = rng.uniform(-1, 1, size=(10, 3))
+        np.testing.assert_allclose(
+            coordSys.toGlobal(r),
+            toGlobal.applyForwardArray(*r.T).T,
+            rtol=0, atol=1e-15
+        )
+        np.testing.assert_allclose(
+            coordSys.toLocal(r),
+            toLocal.applyForwardArray(*r.T).T,
+            rtol=0, atol=1e-15
+        )
+
+
 if __name__ == '__main__':
     init_gpu()
     test_simple_transform()
     test_roundtrip()
     test_composition()
     test_ne()
+    test_global_local()

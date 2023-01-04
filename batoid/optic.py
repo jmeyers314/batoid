@@ -139,13 +139,15 @@ class Interface(Optic):
         return hash((self.__class__.__name__, self.surface, self.obscuration,
                      self.name, self.inMedium, self.outMedium, self.coordSys))
 
-    def draw3d(self, ax, **kwargs):
+    def draw3d(self, ax, plotly=False, **kwargs):
         """Draw this interface on a mplot3d axis.
 
         Parameters
         ----------
-        ax : mplot3d.Axis
+        ax : mplot3d.Axis or plotly.graph_objs.Figure
             Axis on which to draw this optic.
+        plotly : bool
+            Set True to use plotly API instead of ipyvolume/matplotlib API
         """
         if self.outRadius is None:
             return
@@ -159,7 +161,10 @@ class Interface(Optic):
             y = self.inRadius * sth
             z = self.surface.sag(x, y)
             x, y, z = transform.applyForwardArray(x, y, z)
-            ax.plot(x, y, z, **kwargs)
+            if plotly:
+                ax.add_scatter3d(x=x, y=y, z=z, **kwargs)
+            else:
+                ax.plot(x, y, z, **kwargs)
 
         #outer circle
         th = np.linspace(0, 2*np.pi, 100)
@@ -168,31 +173,132 @@ class Interface(Optic):
         y = self.outRadius * sth
         z = self.surface.sag(x, y)
         x, y, z = transform.applyForwardArray(x, y, z)
-        ax.plot(x, y, z, **kwargs)
+        if plotly:
+            ax.add_scatter3d(x=x, y=y, z=z, **kwargs)
+        else:
+            ax.plot(x, y, z, **kwargs)
 
         #next, a line at X=0
         y = np.linspace(-self.outRadius, -self.inRadius)
         x = np.zeros_like(y)
         z = self.surface.sag(x, y)
         x, y, z = transform.applyForwardArray(x, y, z)
-        ax.plot(x, y, z, **kwargs)
+        if plotly:
+            ax.add_scatter3d(x=x, y=y, z=z, **kwargs)
+        else:
+            ax.plot(x, y, z, **kwargs)
         y = np.linspace(self.inRadius, self.outRadius)
         x = np.zeros_like(y)
         z = self.surface.sag(x, y)
         x, y, z = transform.applyForwardArray(x, y, z)
-        ax.plot(x, y, z, **kwargs)
+        if plotly:
+            ax.add_scatter3d(x=x, y=y, z=z, **kwargs)
+        else:
+            ax.plot(x, y, z, **kwargs)
 
         #next, a line at Y=0
         x = np.linspace(-self.outRadius, -self.inRadius)
         y = np.zeros_like(x)
         z = self.surface.sag(x, y)
         x, y, z = transform.applyForwardArray(x, y, z)
-        ax.plot(x, y, z, **kwargs)
+        if plotly:
+            ax.add_scatter3d(x=x, y=y, z=z, **kwargs)
+        else:
+            ax.plot(x, y, z, **kwargs)
         x = np.linspace(self.inRadius, self.outRadius)
         y = np.zeros_like(x)
         z = self.surface.sag(x, y)
         x, y, z = transform.applyForwardArray(x, y, z)
-        ax.plot(x, y, z, **kwargs)
+        if plotly:
+            ax.add_scatter3d(x=x, y=y, z=z, **kwargs)
+        else:
+            ax.plot(x, y, z, **kwargs)
+
+    def get3dmesh(self):
+        if self.outRadius is None:
+            return
+        transform = CoordTransform(self.coordSys, globalCoordSys)
+        # Going to draw 4 objects here: inner circle, outer circle, sag along
+        # x=0, sag along y=0 inner circle
+        xs = []
+        ys = []
+        zs = []
+        if self.inRadius != 0.0:
+            th = np.linspace(0, 2*np.pi, 100)
+            cth, sth = np.cos(th), np.sin(th)
+            x = self.inRadius * cth
+            y = self.inRadius * sth
+            z = self.surface.sag(x, y)
+            x, y, z = transform.applyForwardArray(x, y, z)
+            xs.extend(x)
+            ys.extend(y)
+            zs.extend(z)
+            # Separate by adding a nan
+            xs.append(np.nan)
+            ys.append(np.nan)
+            zs.append(np.nan)
+
+        #outer circle
+        th = np.linspace(0, 2*np.pi, 100)
+        cth, sth = np.cos(th), np.sin(th)
+        x = self.outRadius * cth
+        y = self.outRadius * sth
+        z = self.surface.sag(x, y)
+        x, y, z = transform.applyForwardArray(x, y, z)
+        xs.extend(x)
+        ys.extend(y)
+        zs.extend(z)
+        xs.append(np.nan)
+        ys.append(np.nan)
+        zs.append(np.nan)
+
+        #next, a line at X=0
+        y = np.linspace(-self.outRadius, -self.inRadius)
+        x = np.zeros_like(y)
+        z = self.surface.sag(x, y)
+        x, y, z = transform.applyForwardArray(x, y, z)
+        xs.extend(x)
+        ys.extend(y)
+        zs.extend(z)
+        xs.append(np.nan)
+        ys.append(np.nan)
+        zs.append(np.nan)
+
+        y = np.linspace(self.inRadius, self.outRadius)
+        x = np.zeros_like(y)
+        z = self.surface.sag(x, y)
+        x, y, z = transform.applyForwardArray(x, y, z)
+        xs.extend(x)
+        ys.extend(y)
+        zs.extend(z)
+        xs.append(np.nan)
+        ys.append(np.nan)
+        zs.append(np.nan)
+
+        #next, a line at Y=0
+        x = np.linspace(-self.outRadius, -self.inRadius)
+        y = np.zeros_like(x)
+        z = self.surface.sag(x, y)
+        x, y, z = transform.applyForwardArray(x, y, z)
+        xs.extend(x)
+        ys.extend(y)
+        zs.extend(z)
+        xs.append(np.nan)
+        ys.append(np.nan)
+        zs.append(np.nan)
+
+        x = np.linspace(self.inRadius, self.outRadius)
+        y = np.zeros_like(x)
+        z = self.surface.sag(x, y)
+        x, y, z = transform.applyForwardArray(x, y, z)
+        xs.extend(x)
+        ys.extend(y)
+        zs.extend(z)
+        xs.append(np.nan)
+        ys.append(np.nan)
+        zs.append(np.nan)
+
+        return np.array(xs), np.array(ys), np.array(zs)
 
     def getXZSlice(self, nslice=0):
         """Calculate global coordinates for an (x,z) slice through this
@@ -472,6 +578,10 @@ class Interface(Optic):
         ret = self.__class__.__new__(self.__class__)
         newDict = dict(self.__dict__)
         newDict['coordSys'] = self.coordSys.shiftGlobal(shift)
+        if 'stopSurface' in newDict:
+            newDict['stopSurface'] = (
+                newDict['stopSurface'].withGlobalShift(shift)
+            )
         del newDict['surface']
         ret.__init__(
             self.surface,
@@ -494,19 +604,59 @@ class Interface(Optic):
             Shifted interface.
         """
         # Clearer to apply the rotated global shift.
-        return self.withGlobalShift(np.dot(self.coordSys.rot, shift))
+        return self.withGlobalShift(self.coordSys.rot@shift)
 
-    def withLocalRotation(self, rot, rotOrigin=None, coordSys=None):
+    def withGlobalRotation(self, rot, rotCenter=None, coordSys=None):
+        """Return a new `Interface` with its coordinate system rotated.
+
+        Parameters
+        ----------
+        rot : array (3,3)
+            Rotation matrix wrt to the global coordinate system to apply.
+        rotCenter : array (3,)
+            Point about which to rotate.  Default: None means use [0,0,0]
+        coordSys : `batoid.CoordSys`
+            Coordinate system of rotCenter above.  Default: None means use
+            the global coordinate system.
+
+        Returns
+        -------
+        `Interface`
+            Rotated interface.
+        """
+        if rotCenter is None:
+            rotCenter = [0,0,0]
+        if coordSys is None:
+            coordSys = globalCoordSys
+        ret = self.__class__.__new__(self.__class__)
+        newDict = dict(self.__dict__)
+        newDict['coordSys'] = self.coordSys.rotateGlobal(
+            rot, rotCenter, coordSys
+        )
+        if 'stopSurface' in newDict:
+            newDict['stopSurface'] = (
+                newDict['stopSurface'].withGlobalRotation(
+                    rot, rotCenter, coordSys
+                )
+            )
+        del newDict['surface']
+        ret.__init__(
+            self.surface,
+            **newDict
+        )
+        return ret
+
+    def withLocalRotation(self, rot, rotCenter=None, coordSys=None):
         """Return a new `Interface` with its coordinate system rotated.
 
         Parameters
         ----------
         rot : array (3,3)
             Rotation matrix wrt to the local coordinate system to apply.
-        rotOrigin : array (3,)
-            Origin of rotation.  Default: None means use [0,0,0]
+        rotCenter : array (3,)
+            Point about which to rotate.  Default: None means use [0,0,0]
         coordSys : `batoid.CoordSys`
-            Coordinate system of rotOrigin above.  Default: None means use
+            Coordinate system of rotCenter above.  Default: None means use
             self.coordSys.
 
         Returns
@@ -514,14 +664,19 @@ class Interface(Optic):
         `Interface`
             Rotated interface.
         """
-        if rotOrigin is None and coordSys is None:
+        if rotCenter is None:
+            rotCenter = [0,0,0]
+        if coordSys is None:
             coordSys = self.coordSys
-            rotOrigin = [0,0,0]
         ret = self.__class__.__new__(self.__class__)
         newDict = dict(self.__dict__)
         newDict['coordSys'] = self.coordSys.rotateLocal(
-            rot, rotOrigin, coordSys
+            rot, rotCenter, coordSys
         )
+        if 'stopSurface' in newDict:
+            newDict['stopSurface'] = newDict['stopSurface'].withLocalRotation(
+                rot, rotCenter, coordSys
+            )
         del newDict['surface']
         ret.__init__(
             self.surface,
@@ -547,6 +702,22 @@ class Interface(Optic):
         del newDict['surface']
         ret.__init__(surface, **newDict)
         return ret
+
+    def withPerturbedSurface(self, perturbation):
+        """Return a new `Interface` with its surface attribute perturbed by
+        adding the given perturbation to the original surface.
+
+        Parameters
+        ----------
+        perturbation : `batoid.Surface`
+            Perturbation to apply to the surface.
+
+        Returns
+        -------
+        `Interface`
+            Interface with perturbed surface.
+        """
+        return self.withSurface(self.surface + perturbation)
 
 
 class RefractiveInterface(Interface):
@@ -1065,11 +1236,24 @@ class CompoundOptic(Optic):
 
         Parameters
         ----------
-        ax : mplot3d.Axis
+        ax : mplot3d.Axis or plotly.graph_objs.Figure
             Axis on which to draw this optic.
+        plotly : bool
+            Set True to use plotly API instead of ipyvolume/matplotlib API
         """
         for item in self.items:
             item.draw3d(ax, **kwargs)
+
+    def get3dmesh(self):
+        xs = []
+        ys = []
+        zs = []
+        for item in self.items:
+            x, y, z = item.get3dmesh()
+            xs.append(x)
+            ys.append(y)
+            zs.append(z)
+        return np.hstack(xs), np.hstack(ys), np.hstack(zs)
 
     def draw2d(self, ax, **kwargs):
         """Draw a 2D slice of this `CompoundOptic` in the (x,z) plane.
@@ -1147,6 +1331,10 @@ class CompoundOptic(Optic):
         newDict = dict(self.__dict__)
         newDict['coordSys'] = self.coordSys.shiftGlobal(shift)
         del newDict['items']
+        if 'stopSurface' in newDict:
+            newDict['stopSurface'] = (
+                newDict['stopSurface'].withGlobalShift(shift)
+            )
         ret.__init__(
             newItems,
             **newDict
@@ -1168,7 +1356,7 @@ class CompoundOptic(Optic):
             Shifted interface.
         """
         # Clearer to apply the rotated global shift.
-        return self.withGlobalShift(np.dot(self.coordSys.rot, shift))
+        return self.withGlobalShift(self.coordSys.rot@shift)
 
     def withGloballyShiftedOptic(self, name, shift):
         """Return a new `CompoundOptic` with the coordinate system of one of
@@ -1237,50 +1425,71 @@ class CompoundOptic(Optic):
         `CompoundOptic`
             Optic with shifted subitem.
         """
-        # If name is one of items.names, the we use withGlobalShift, and we're
-        # done.  If not, then we need to recurse down to whichever item
-        # contains name.  Verify that name is in self.itemDict, but first
-        # convert partially qualified name to fully qualified.
-        if name in self._names:
-            name = self._names[name]
-        if name not in self.itemDict:
-            raise ValueError("Optic {} not found".format(name))
-        if name == self.name:
-            return self.withLocalShift(shift)
-        # Clip off leading token
-        assert name[:len(self.name)+1] == \
-            self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
-        name = name[len(self.name)+1:]
-        newItems = []
-        newDict = dict(self.__dict__)
-        del newDict['items']
-        for i, item in enumerate(self.items):
-            if name.startswith(item.name):
-                if name == item.name:
-                    newItems.append(item.withLocalShift(shift))
-                else:
-                    newItems.append(item.withLocallyShiftedOptic(name, shift))
-                newItems.extend(self.items[i+1:])
-                return self.__class__(
-                    newItems,
-                    **newDict
-                )
-            newItems.append(item)
-        raise RuntimeError(
-            "Error in withLocallyShiftedOptic!, Shouldn't get here!"
-        )
+        # Just apply the rotated global shift.
+        return self.withGloballyShiftedOptic(name, self.coordSys.rot@shift)
 
-    def withLocalRotation(self, rot, rotOrigin=None, coordSys=None):
+    def withGlobalRotation(self, rot, rotCenter=None, coordSys=None):
+        """Return a new `CompoundOptic` with its coordinate system rotated.
+
+        Parameters
+        ----------
+        rot : array (3,3)
+            Rotation matrix wrt to the global coordinate system to apply.
+        rotCenter : array (3,)
+            Point about which to rotate.  Default: None means use [0,0,0]
+        coordSys : `batoid.CoordSys`
+            Coordinate system of rotCenter above.  Default: None means use
+            the global coordinate system.
+
+        Returns
+        -------
+        `CompoundOptic`
+            Rotated optic.
+        """
+        if rotCenter is None:
+            rotCenter = [0,0,0]
+        if coordSys is None:
+            coordSys = globalCoordSys
+
+        newItems = []
+        for item in self.items:
+            newItems.append(
+                item.withGlobalRotation(
+                    rot,
+                    rotCenter,
+                    coordSys
+                )
+            )
+
+        ret = self.__class__.__new__(self.__class__)
+        newDict = dict(self.__dict__)
+        newDict['coordSys'] = self.coordSys.rotateGlobal(
+            rot, rotCenter, coordSys
+        )
+        del newDict['items']
+        if 'stopSurface' in newDict:
+            newDict['stopSurface'] = (
+                newDict['stopSurface'].withGlobalRotation(
+                    rot, rotCenter, coordSys
+                )
+            )
+        ret.__init__(
+            newItems,
+            **newDict
+        )
+        return ret
+
+    def withLocalRotation(self, rot, rotCenter=None, coordSys=None):
         """Return a new `CompoundOptic` with its coordinate system rotated.
 
         Parameters
         ----------
         rot : array (3,3)
             Rotation matrix wrt to the local coordinate system to apply.
-        rotOrigin : array (3,)
-            Origin of rotation.  Default: None means use [0,0,0]
+        rotCenter : array (3,)
+            Point about which to rotate.  Default: None means use [0,0,0]
         coordSys : `batoid.CoordSys`
-            Coordinate system of rotOrigin above.  Default: None means use
+            Coordinate system of rotCenter above.  Default: None means use
             self.coordSys.
 
         Returns
@@ -1288,24 +1497,18 @@ class CompoundOptic(Optic):
         `CompoundOptic`
             Rotated optic.
         """
-        if rotOrigin is None and coordSys is None:
+        if rotCenter is None:
+            rotCenter = [0,0,0]
+        if coordSys is None:
             coordSys = self.coordSys
-            rotOrigin = [0,0,0]
-        newItems = [item.withLocalRotation(rot, rotOrigin, coordSys)
-                    for item in self.items]
-        ret = self.__class__.__new__(self.__class__)
-        newDict = dict(self.__dict__)
-        newDict['coordSys'] = self.coordSys.rotateLocal(
-            rot, rotOrigin, coordSys
+        # Convert to global rotation
+        return self.withGlobalRotation(
+            self.coordSys.rot@rot@self.coordSys.rot.T,
+            rotCenter,
+            coordSys
         )
-        del newDict['items']
-        ret.__init__(
-            newItems,
-            **newDict
-        )
-        return ret
 
-    def withLocallyRotatedOptic(self, name, rot, rotOrigin=None,
+    def withLocallyRotatedOptic(self, name, rot, rotCenter=None,
                                 coordSys=None):
         """Return a new `CompoundOptic` with the coordinate system of one of
         its subitems rotated.
@@ -1317,10 +1520,10 @@ class CompoundOptic(Optic):
         rot : array (3,3)
             Rotation matrix wrt to the subitem's local coordinate system to
             apply.
-        rotOrigin : array (3,)
-            Origin of rotation.  Default: None means use [0,0,0]
+        rotCenter : array (3,)
+            Point about which to rotate.  Default: None means use [0,0,0]
         coordSys : `batoid.CoordSys`
-            Coordinate system of rotOrigin above.  Default: None means use the
+            Coordinate system of rotCenter above.  Default: None means use the
             coordinate system of the subitem being rotated.
 
         Returns
@@ -1336,11 +1539,12 @@ class CompoundOptic(Optic):
             name = self._names[name]
         if name not in self.itemDict:
             raise ValueError("Optic {} not found".format(name))
-        if name == self.name:
-            return self.withLocalRotation(rot, rotOrigin, coordSys)
-        if rotOrigin is None and coordSys is None:
+        if rotCenter is None:
+            rotCenter = [0,0,0]
+        if coordSys is None:
             coordSys = self.itemDict[name].coordSys
-            rotOrigin = [0,0,0]
+        if name == self.name:
+            return self.withLocalRotation(rot, rotCenter, coordSys)
         # Clip off leading token
         assert name[:len(self.name)+1] == \
             self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
@@ -1352,11 +1556,11 @@ class CompoundOptic(Optic):
             if name.startswith(item.name):
                 if name == item.name:
                     newItems.append(item.withLocalRotation(
-                        rot, rotOrigin, coordSys
+                        rot, rotCenter, coordSys
                     ))
                 else:
                     newItems.append(item.withLocallyRotatedOptic(
-                        name, rot, rotOrigin, coordSys
+                        name, rot, rotCenter, coordSys
                     ))
                 newItems.extend(self.items[i+1:])
                 return self.__class__(
@@ -1408,6 +1612,30 @@ class CompoundOptic(Optic):
                 )
             newItems.append(item)
         raise RuntimeError("Error in withSurface.  Shouldn't get here!")
+
+    def withPerturbedSurface(self, name, perturbation):
+        """Return a new `CompoundOptic` with one of its subitem's surfaces
+        attribute perturbed by adding the given perturbation to the original
+        surface.
+
+        Parameters
+        ----------
+        name : str
+            Which subitem's surface to replace.
+        perturbation : `batoid.Surface`
+            Surface to add to the original surface.
+
+        Returns
+        -------
+        `CompoundOptic`
+            Optic with perturbed surface.
+        """
+        if name in self._names:
+            name = self._names[name]
+        return self.withSurface(
+            name,
+            self.itemDict[name].surface + perturbation
+        )
 
 
 class Lens(CompoundOptic):
@@ -1532,12 +1760,12 @@ def getGlobalRays(traceFull, start=None, end=None, globalSys=globalCoordSys):
     return xyz, raylen
 
 
-def drawTrace3d(ax, traceFull, start=None, end=None, **kwargs):
+def drawTrace3d(ax, traceFull, start=None, end=None, plotly=False, **kwargs):
     """Draw 3D rays in global coordinates on the specified axis.
 
     Parameters
     ----------
-    ax : mplot3d.Axis
+    ax : mplot3d.Axis or plotly.graph_objs.Figure
         Axis on which to draw rays.
     traceFull : OrderedDict
         Array of per-surface ray-tracing output from traceFull()
@@ -1547,12 +1775,22 @@ def drawTrace3d(ax, traceFull, start=None, end=None, **kwargs):
     end : str or None
         Name of the last surface to include in the output, or use the last
         surface in the model when None.
+    plotly : bool
+        Set True to use plotly API instead of ipyvolume/matplotlib API
     globalSys : `batoid.CoordSys`
         Global coordinate system to use.
     """
     xyz, raylen = getGlobalRays(traceFull, start, end)
     for line, nline in zip(xyz, raylen):
-        ax.plot(line[0, :nline], line[1, :nline], line[2, :nline], **kwargs)
+        if plotly:
+            ax.add_scatter3d(
+                x=line[0, :nline],
+                y=line[1, :nline],
+                z=line[2, :nline],
+                **kwargs
+            )
+        else:
+            ax.plot(line[0, :nline], line[1, :nline], line[2, :nline], **kwargs)
 
 
 def drawTrace2d(ax, traceFull, start=None, end=None, **kwargs):

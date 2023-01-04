@@ -2,6 +2,7 @@ pytest
 pytest-timeout
 pytest-cov
 pytest-xdist
+pytest-astropy
 jupyter
 ipyvolume
 scipy

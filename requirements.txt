@@ -3,3 +3,5 @@ numpy
 scipy
 galsim
 matplotlib
+astropy
+astroquery

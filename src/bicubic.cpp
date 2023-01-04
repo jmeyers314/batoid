@@ -34,14 +34,9 @@ namespace batoid {
         }
 
         // This works
-        double norm = dxdz*dxdz;
-        norm += dydz*dydz;
-        norm += 1;
-        norm = 1/std::sqrt(norm);
-
-        nx = -dxdz*norm;
-        ny = -dydz*norm;
-        nz = norm;
+        nz = 1/std::sqrt(1 + dxdz*dxdz + dydz*dydz);
+        nx = -dxdz*nz;
+        ny = -dydz*nz;
     }
 
     #if defined(BATOID_GPU)

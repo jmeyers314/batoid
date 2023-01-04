@@ -4,6 +4,62 @@ from test_helpers import timer, do_pickle, all_obj_diff
 
 
 @timer
+def test_rot_matrix():
+    xhat = np.array([1, 0, 0])
+    yhat = np.array([0, 1, 0])
+    zhat = np.array([0, 0, 1])
+
+    # small +ve around X means
+    #   xhat stays the same,
+    #   yhat tilts up towards +zhat
+    #   zhat tilts down towards -yhat
+    rot = batoid.RotX(0.1)
+    np.testing.assert_equal(
+        rot@xhat,
+        xhat
+    )
+    np.testing.assert_equal(
+        rot@yhat,
+        np.array([0, np.cos(0.1), np.sin(0.1)])
+    )
+    np.testing.assert_equal(
+        rot@zhat,
+        np.array([0, -np.sin(0.1), np.cos(0.1)])
+    )
+
+    # similar small rot around Y
+    rot = batoid.RotY(0.1)
+    np.testing.assert_equal(
+        rot@xhat,
+        np.array([np.cos(0.1), 0, -np.sin(0.1)])
+    )
+    np.testing.assert_equal(
+        rot@yhat,
+        yhat
+    )
+    np.testing.assert_equal(
+        rot@zhat,
+        np.array([np.sin(0.1), 0, np.cos(0.1)])
+    )
+
+    # and Z
+    rot = batoid.RotZ(0.1)
+    np.testing.assert_equal(
+        rot@xhat,
+        np.array([np.cos(0.1), np.sin(0.1), 0])
+    )
+    np.testing.assert_equal(
+        rot@yhat,
+        np.array([-np.sin(0.1), np.cos(0.1), 0])
+    )
+    np.testing.assert_equal(
+        rot@zhat,
+        zhat
+    )
+
+
+
+@timer
 def test_params():
     rng = np.random.default_rng(5)
     for _ in range(30):
@@ -19,6 +75,9 @@ def test_params():
         np.testing.assert_equal(coordSys.xhat, rot[:,0])
         np.testing.assert_equal(coordSys.yhat, rot[:,1])
         np.testing.assert_equal(coordSys.zhat, rot[:,2])
+        np.testing.assert_equal(rot@np.array([1,0,0]), coordSys.xhat)
+        np.testing.assert_equal(rot@np.array([0,1,0]), coordSys.yhat)
+        np.testing.assert_equal(rot@np.array([0,0,1]), coordSys.zhat)
 
         coordSys = batoid.CoordSys(origin=origin)
         np.testing.assert_equal(coordSys.origin, origin)
@@ -48,6 +107,9 @@ def test_params():
         np.testing.assert_equal(coordSys.xhat, rot[:,0])
         np.testing.assert_equal(coordSys.yhat, rot[:,1])
         np.testing.assert_equal(coordSys.zhat, rot[:,2])
+        np.testing.assert_equal(rot@np.array([1,0,0]), coordSys.xhat)
+        np.testing.assert_equal(rot@np.array([0,1,0]), coordSys.yhat)
+        np.testing.assert_equal(rot@np.array([0,0,1]), coordSys.zhat)
 
         coordSys = batoid.CoordSys()
         coordSys = coordSys.rotateLocal(rot).shiftGlobal(origin)
@@ -56,6 +118,9 @@ def test_params():
         np.testing.assert_equal(coordSys.xhat, rot[:,0])
         np.testing.assert_equal(coordSys.yhat, rot[:,1])
         np.testing.assert_equal(coordSys.zhat, rot[:,2])
+        np.testing.assert_equal(rot@np.array([1,0,0]), coordSys.xhat)
+        np.testing.assert_equal(rot@np.array([0,1,0]), coordSys.yhat)
+        np.testing.assert_equal(rot@np.array([0,0,1]), coordSys.zhat)
 
         coordSys = batoid.CoordSys()
         coordSys = coordSys.shiftLocal(origin).rotateLocal(rot)
@@ -64,6 +129,9 @@ def test_params():
         np.testing.assert_equal(coordSys.xhat, rot[:,0])
         np.testing.assert_equal(coordSys.yhat, rot[:,1])
         np.testing.assert_equal(coordSys.zhat, rot[:,2])
+        np.testing.assert_equal(rot@np.array([1,0,0]), coordSys.xhat)
+        np.testing.assert_equal(rot@np.array([0,1,0]), coordSys.yhat)
+        np.testing.assert_equal(rot@np.array([0,0,1]), coordSys.zhat)
 
         coordSys = batoid.CoordSys()
         coordSys = coordSys.shiftGlobal(origin).rotateLocal(rot)
@@ -72,6 +140,9 @@ def test_params():
         np.testing.assert_equal(coordSys.xhat, rot[:,0])
         np.testing.assert_equal(coordSys.yhat, rot[:,1])
         np.testing.assert_equal(coordSys.zhat, rot[:,2])
+        np.testing.assert_equal(rot@np.array([1,0,0]), coordSys.xhat)
+        np.testing.assert_equal(rot@np.array([0,1,0]), coordSys.yhat)
+        np.testing.assert_equal(rot@np.array([0,0,1]), coordSys.zhat)
 
         # Can't simply do a global rotation after a shift, since that will
         # change the origin too.  Works if we manually specify the rotation
@@ -84,6 +155,9 @@ def test_params():
         np.testing.assert_equal(coordSys.xhat, rot[:,0])
         np.testing.assert_equal(coordSys.yhat, rot[:,1])
         np.testing.assert_equal(coordSys.zhat, rot[:,2])
+        np.testing.assert_equal(rot@np.array([1,0,0]), coordSys.xhat)
+        np.testing.assert_equal(rot@np.array([0,1,0]), coordSys.yhat)
+        np.testing.assert_equal(rot@np.array([0,0,1]), coordSys.zhat)
 
 
 @timer
@@ -272,6 +346,22 @@ def test_combinations():
     np.testing.assert_allclose(coordSys1.origin, coordSys3.origin)
     np.testing.assert_allclose(coordSys1.rot, coordSys3.rot)
 
+    # Rotating LSST and LSSTCamera should commute
+    telescope = batoid.Optic.fromYaml("LSST_r.yaml")
+    telescope1 = (telescope
+        .withLocalRotation(batoid.RotX(0.2))
+        .withLocallyRotatedOptic("LSSTCamera", batoid.RotZ(-0.3))
+    )
+    telescope2 = (telescope
+        .withLocallyRotatedOptic("LSSTCamera", batoid.RotZ(-0.3))
+        .withLocalRotation(batoid.RotX(0.2))
+    )
+    for optic in telescope.itemDict.keys():
+        cs1 = telescope1[optic].coordSys
+        cs2 = telescope2[optic].coordSys
+        np.testing.assert_allclose(cs1.origin, cs2.origin, rtol=0, atol=1e-14)
+        np.testing.assert_allclose(cs1.rot, cs2.rot, rtol=0, atol=1e-14)
+
 
 @timer
 def test_ne():
@@ -288,6 +378,7 @@ def test_ne():
 
 
 if __name__ == '__main__':
+    test_rot_matrix()
     test_params()
     test_shift()
     test_rotate_identity()

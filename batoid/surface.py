@@ -3,7 +3,6 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 from . import _batoid
-from .constants import globalCoordSys
 from .trace import intersect, rSplit, reflect, refract, refractScreen
 
 
@@ -156,6 +155,9 @@ class Surface(ABC):
 
     def __ne__(self, rhs):
         return not (self == rhs)
+
+    def __add__(self, rhs):
+        return Sum(self, rhs)
 
 
 class Plane(Surface):
@@ -478,10 +480,13 @@ class Bicubic(Surface):
         2d array indicating derivatives dz/dy at grid points.
     d2zdxdys : array_like, optional
         2d array indicating mixed derivatives d^2 z / (dx dy) at grid points.
+    nanpolicy : {'zero', 'nan'}
+        Return zero or nan for requests outside input domain?
     """
     def __init__(
-        self, xs, ys, zs, dzdxs=None, dzdys=None, d2zdxdys=None
+        self, xs, ys, zs, dzdxs=None, dzdys=None, d2zdxdys=None, nanpolicy='nan'
     ):
+        assert nanpolicy.upper() in ['NAN', 'ZERO']
         self._xs = np.array(xs, dtype=float, order="C")
         self._ys = np.array(ys, dtype=float, order="C")
         self._zs = np.array(zs, dtype=float, order="C")
@@ -491,16 +496,18 @@ class Bicubic(Surface):
         dy = self._dy = (self._ys[-1] - self._ys[0])/(len(self._ys)-1)
 
         if dzdxs is None:
-            dzdys = np.empty_like(self._zs)
-            dzdys[1:-1, :] = (self._zs[2:, :] - self._zs[:-2, :])/(2*dy)
-            dzdys[0, :] = (self._zs[1, :] - self._zs[0, :])/dy
-            dzdys[-1, :] = (self._zs[-1, :] - self._zs[-2, :])/dy
-
             dzdxs = np.empty_like(self._zs)
             dzdxs[:, 1:-1] = (self._zs[:, 2:] - self._zs[:, :-2])/(2*dx)
             dzdxs[:, 0] = (self._zs[:, 1] - self._zs[:, 0])/dx
             dzdxs[:, -1] = (self._zs[:, -1] - self._zs[:, -2])/dx
 
+        if dzdys is None:
+            dzdys = np.empty_like(self._zs)
+            dzdys[1:-1, :] = (self._zs[2:, :] - self._zs[:-2, :])/(2*dy)
+            dzdys[0, :] = (self._zs[1, :] - self._zs[0, :])/dy
+            dzdys[-1, :] = (self._zs[-1, :] - self._zs[-2, :])/dy
+
+        if d2zdxdys is None:
             d2zdxdys = np.empty_like(self._zs)
             d2zdxdys[:, 1:-1] = (dzdys[:, 2:] - dzdys[:, :-2])/(2*dx)
             d2zdxdys[:, 0] = (dzdys[:, 1] - dzdys[:, 0])/dx
@@ -510,6 +517,7 @@ class Bicubic(Surface):
         self._dzdys = np.array(dzdys, dtype=float, order="C")
         self._d2zdxdys = np.array(d2zdxdys, dtype=float, order="C")
 
+        self.nanpolicy = nanpolicy
         self._table = _batoid.CPPTable(
             self._x0, self._y0, self._dx, self._dy,
             self._zs.ctypes.data,
@@ -517,7 +525,8 @@ class Bicubic(Surface):
             self._dzdys.ctypes.data,
             self._d2zdxdys.ctypes.data,
             len(self._xs),
-            len(self._ys)
+            len(self._ys),
+            True if self.nanpolicy.upper() == 'NAN' else False
         )
         self._surface = _batoid.CPPBicubic(self._table)
 
@@ -549,12 +558,12 @@ class Bicubic(Surface):
         return hash((
             "Bicubic", tuple(self.xs), tuple(self.ys), tuple(self.zs.ravel()),
             tuple(self.dzdxs.ravel()), tuple(self.dzdys.ravel()),
-            tuple(self.d2zdxdys.ravel())
+            tuple(self.d2zdxdys.ravel()), self.nanpolicy
         ))
 
     def __setstate__(self, args):
         (self._xs, self._ys, self._zs,
-         self._dzdxs, self._dzdys, self._d2zdxdys
+         self._dzdxs, self._dzdys, self._d2zdxdys, self.nanpolicy
         ) = args
         self._x0 = self._xs[0]
         self._y0 = self._ys[0]
@@ -568,14 +577,15 @@ class Bicubic(Surface):
             self._dzdys.ctypes.data,
             self._d2zdxdys.ctypes.data,
             len(self._xs),
-            len(self._ys)
+            len(self._ys),
+            True if self.nanpolicy.upper() == 'NAN' else False
         )
         self._surface = _batoid.CPPBicubic(self._table)
 
     def __getstate__(self):
         return (
             self.xs, self.ys, self.zs,
-            self.dzdxs, self.dzdys, self.d2zdxdys
+            self.dzdxs, self.dzdys, self.d2zdxdys, self.nanpolicy
         )
 
     def __eq__(self, rhs):
@@ -587,11 +597,16 @@ class Bicubic(Surface):
             and np.array_equal(self.dzdxs, rhs.dzdxs)
             and np.array_equal(self.dzdys, rhs.dzdys)
             and np.array_equal(self.d2zdxdys, rhs.d2zdxdys)
+            and self.nanpolicy.upper() == rhs.nanpolicy.upper()
         )
 
     def __repr__(self):
         out = f"Bicubic({self.xs!r}, {self.ys!r}, {self.zs!r}, "
-        out += f"{self.dzdxs!r}, {self.dzdys!r}, {self.d2zdxdys!r})"
+        out += f"{self.dzdxs!r}, {self.dzdys!r}, {self.d2zdxdys!r}"
+        if self.nanpolicy.upper() == "NAN":
+            out += ")"
+        else:
+            out += ", nanpolicy='zero')"
         return out
 
 
@@ -616,9 +631,14 @@ class Sum(Surface):
     surfaces : list of Surface
         `Surface` s to add together.
     """
-    def __init__(self, surfaces):
-        self.surfaces = surfaces
-        self._surface = _batoid.CPPSum([s._surface for s in surfaces])
+    def __init__(self, *args):
+        from collections.abc import Sequence
+        if len(args) == 1 and isinstance(args[0], Sequence):
+            args = args[0]
+        assert all(isinstance(arg, Surface) for arg in args)
+
+        self.surfaces = tuple(args)
+        self._surface = _batoid.CPPSum([s._surface for s in self.surfaces])
 
     def __hash__(self):
         return hash(("batoid.Sum", tuple(self.surfaces)))
@@ -631,7 +651,7 @@ class Sum(Surface):
 
     def __eq__(self, rhs):
         if not isinstance(rhs, Sum): return False
-        return self.surfaces == rhs.surfaces
+        return self.surfaces == rhs.surfaces  # order matters!
 
     def __repr__(self):
         return f"Sum({self.surfaces})"

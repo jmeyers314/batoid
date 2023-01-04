@@ -68,7 +68,8 @@ opticalSystem:
         -
           type: Lens
           name: L1
-          medium: &silica 1.462326484507719
+          medium: &silica 1.462326484507719   # Zemax? value
+          # medium: &silica 1.46232650043166678699  # PhoSim value
           items:
             -
               type: RefractiveInterface

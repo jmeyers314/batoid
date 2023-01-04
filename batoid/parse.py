@@ -27,6 +27,9 @@ def parse_obscuration(config):
 
 def parse_surface(config):
     typ = config.pop('type')
+    if typ == 'Sum':
+        items = [parse_surface(c) for c in config['items']]
+        return batoid.Sum(items)
     evalstr = "batoid.{}(**config)".format(typ)
     return eval(evalstr)
 
@@ -36,28 +39,51 @@ def parse_coordSys(config, coordSys=batoid.CoordSys()):
     @param config  configuration dictionary
     @param coordSys  sys to which transformations in config are added
     """
-    shift = [0.0, 0.0, 0.0]
-    if any(x in config for x in ['x', 'y', 'z']):
-        if 'shift' in config:
-            raise ValueError("Cannot specify both shift and x/y/z")
-        x = config.pop('x', 0.0)
-        y = config.pop('y', 0.0)
-        z = config.pop('z', 0.0)
-        shift = [x, y, z]
-    elif 'shift' in config:
-        shift = config.pop('shift')
-    if shift != [0.0, 0.0, 0.0]:
-        coordSys = coordSys.shiftLocal(shift)
-    # At most one (nonzero) rotation can be included and is applied after the shift.
-    rotXYZ = np.array([config.pop('rot' + axis, 0.0) for axis in 'XYZ'])
-    axes = np.where(rotXYZ != 0)[0]
-    if len(axes) > 1:
-        raise ValueError('Cannot specify rotation about more than one axis.')
-    elif len(axes) == 1:
-        axis, angle = axes[0], rotXYZ[axes[0]]
-        rotator = (batoid.RotX, batoid.RotY, batoid.RotZ)[axis](angle)
-        coordSys = coordSys.rotateLocal(rotator)
+    for k, v in config.items():
+        if k == 'x':
+            coordSys = coordSys.shiftLocal([v, 0.0, 0.0])
+        if k == 'y':
+            coordSys = coordSys.shiftLocal([0.0, v, 0.0])
+        if k == 'z':
+            coordSys = coordSys.shiftLocal([0.0, 0.0, v])
+        if k == 'shift':
+            coordSys = coordSys.shiftLocal(v)
+        if k == 'rotX':
+            coordSys = coordSys.rotateLocal(batoid.RotX(v))
+        if k == 'rotY':
+            coordSys = coordSys.rotateLocal(batoid.RotY(v))
+        if k == 'rotZ':
+            coordSys = coordSys.rotateLocal(batoid.RotZ(v))
     return coordSys
+
+
+# def parse_coordSys(config, coordSys=batoid.CoordSys()):
+#     """
+#     @param config  configuration dictionary
+#     @param coordSys  sys to which transformations in config are added
+#     """
+#     shift = [0.0, 0.0, 0.0]
+#     if any(x in config for x in ['x', 'y', 'z']):
+#         if 'shift' in config:
+#             raise ValueError("Cannot specify both shift and x/y/z")
+#         x = config.pop('x', 0.0)
+#         y = config.pop('y', 0.0)
+#         z = config.pop('z', 0.0)
+#         shift = [x, y, z]
+#     elif 'shift' in config:
+#         shift = config.pop('shift')
+#     if shift != [0.0, 0.0, 0.0]:
+#         coordSys = coordSys.shiftLocal(shift)
+#     # At most one (nonzero) rotation can be included and is applied after the shift.
+#     rotXYZ = np.array([config.pop('rot' + axis, 0.0) for axis in 'XYZ'])
+#     axes = np.where(rotXYZ != 0)[0]
+#     if len(axes) > 1:
+#         raise ValueError('Cannot specify rotation about more than one axis.')
+#     elif len(axes) == 1:
+#         axis, angle = axes[0], rotXYZ[axes[0]]
+#         rotator = (batoid.RotX, batoid.RotY, batoid.RotZ)[axis](angle)
+#         coordSys = coordSys.rotateLocal(rotator)
+#     return coordSys
 
 
 def parse_optic(config,
@@ -133,7 +159,9 @@ def parse_optic(config,
         ]
         return batoid.optic.Lens(
             items, name=name, coordSys=coordSys,
-            inMedium=inMedium, outMedium=outMedium)
+            inMedium=inMedium, outMedium=outMedium,
+            medium=medium
+        )
     elif typ == 'CompoundOptic':
         itemsConfig = config.pop('items')
         items = [

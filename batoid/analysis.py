@@ -907,7 +907,7 @@ def _closestApproach(P, u, Q, v):
     return P + sc*u
 
 
-def exitPupilPos(optic, wavelength, smallAngle=np.deg2rad(1./3600)):
+def exitPupilPos(optic, wavelength, smallAngle=np.deg2rad(1./3600), **kwargs):
     """Compute position of the exit pupil.
 
     Traces a collection of small angle chief rays into object space, and then
@@ -932,7 +932,8 @@ def exitPupilPos(optic, wavelength, smallAngle=np.deg2rad(1./3600)):
     rays = batoid.RayVector.fromFieldAngles(
         thx, thy,
         optic=optic,
-        wavelength=wavelength
+        wavelength=wavelength,
+        **kwargs
     )
     optic.trace(rays)
     rays.toCoordSys(batoid.globalCoordSys)
@@ -947,3 +948,40 @@ def exitPupilPos(optic, wavelength, smallAngle=np.deg2rad(1./3600)):
             np.array([0., 0., 1.0])
         ))
     return np.mean(ps, axis=0)
+
+
+def focalLength(*args, **kwargs):
+    """Calculate focal length.
+
+    Parameters
+    ----------
+    optic : batoid.Optic
+        Optical system
+    theta_x, theta_y : float
+        Field angle in radians
+    wavelength : float
+        Wavelength in meters
+    nrad : int, optional
+        Number of ray radii to use.  (see RayVector.asPolar())
+    naz : int, optional
+        Approximate number of azimuthal angles in outermost ring.  (see
+        RayVector.asPolar())
+    projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}
+        Projection used to convert field angle to direction cosines.
+
+    Returns
+    -------
+    fL : float
+        Focal length in meters.
+
+    Notes
+    -----
+        Computed from Jacobian drdth, suitably averaged over azimuth.
+    """
+    return np.sqrt(
+        np.linalg.det(
+            batoid.analysis.drdth(
+                *args, **kwargs
+            )
+        )
+    )

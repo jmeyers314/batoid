@@ -1,0 +1,190 @@
+opticalSystem:
+  type: CompoundOptic
+  name: CPB
+  inMedium: &vacuum 1.0
+  medium: *vacuum
+  items:
+    -
+      type: Lens
+      name: Schmidt_plate
+      medium: &silica
+        # from fitting Sellmeier coefs to prescription index data
+        # Note: this is slightly different than Rubin silica prescription fit.
+        type: SellmeierMedium
+        B1: 0.6961528427747403
+        B2: 0.4079560592398538
+        B3: 0.8974871563882886
+        C1: 0.004679054114260956
+        C2: 0.013511927136469717
+        C3: 97.93482177451878
+      items:
+        -
+          type: RefractiveInterface
+          name: Schmidt_plate_entrance
+          surface:
+            type: Asphere
+            R: -55.359449738749
+            conic: 0.0
+            coefs: [1.2394797257860001e-1]
+          obscuration:
+            type: ClearCircle
+            radius: 0.127
+        -
+          type: RefractiveInterface
+          name: Schmidt_plate_exit
+          surface:
+            type: Asphere
+            R: 55.359449738749
+            conic: 0.0
+            coefs: [-1.2394797257860001e-1]
+          obscuration:
+            type: ClearCircle
+            radius: 0.127
+          coordSys:
+            z: -0.009
+      coordSys:
+        z: 0.349
+    -
+      type: Baffle
+      name: stop
+      surface:
+        type: Plane
+      obscuration:
+        type: ClearCircle
+        radius: 0.12065
+    -
+      type: Mirror
+      name: turning_flat
+      surface:
+        type: Plane
+      coordSys:
+        z: -0.3957
+        rotX: -0.3490658503988659  # 20 degrees
+      obscuration:
+        type: ClearCircle
+        radius: 0.16
+    - type: CompoundOptic
+      name: Cassegrain
+      coordSys:
+        x: 0.0                     # Primary mirror vertex
+        y: 0.3467196367
+        z: 0.01750437262
+        rotX: -0.6981317007977318  # 40 degrees
+      items:
+        -
+          type: Mirror
+          name: PM
+          surface:
+            type: Sphere
+            R: -1.2547754873643
+          obscuration:
+            type: ClearCircle
+            radius: 0.165
+        -
+          type: Baffle
+          name: flat_hole
+          surface:
+            type: Plane
+          obscuration:
+            type: ClearCircle
+            radius: 0.04445
+          coordSys:
+            z: -0.5394  # from global vertex
+            rotX: 0.3490658503988659
+        -
+          type: Lens
+          name: L1
+          medium: *silica
+          coordSys:
+            z: -0.5823511425
+          items:
+            -
+              type: RefractiveInterface
+              name: L1_entrance
+              surface:
+                type: Sphere
+                R: 0.1650689410421
+              obscuration:
+                type: ClearCircle
+                radius: 0.032
+            -
+              type: RefractiveInterface
+              name: L1_exit
+              surface:
+                type: Plane
+              coordSys:
+                z: -0.005
+              obscuration:
+                type: ClearCircle
+                radius: 0.031
+        -
+          type: Lens
+          name: L2
+          medium: &caf2
+            # from fitting Sellmeier coefs to prescription index data
+            type: SellmeierMedium
+            B1: 0.567627248786043
+            B2: 0.47105294838671524
+            B3: 3.8471119581984756
+            C1: 0.0025267060906835463
+            C2: 0.010078619031827501
+            C3: 1200.132713928507
+          coordSys:
+            z: -0.5923511425
+          items:
+            -
+              type: RefractiveInterface
+              name: L2_entrance
+              surface:
+                type: Plane
+              obscuration:
+                type: ClearCircle
+                radius: 0.0305
+            -
+              type: RefractiveInterface
+              name: L2_exit
+              coordSys:
+                z: -0.009
+              surface:
+                type: Sphere
+                R: 0.1650689410421
+              obscuration:
+                type: ClearCircle
+                radius: 0.03
+        -
+          type: Lens
+          name: L3
+          medium: *silica
+          coordSys:
+            z: -0.6023511425
+          items:
+            -
+              type: RefractiveInterface
+              name: L3_entrance
+              surface:
+                type: Sphere
+                R: -0.3745716282208
+              obscuration:
+                type: ClearCircle
+                radius: 0.029
+            -
+              type: RefractiveInterface
+              name: L3_exit
+              coordSys:
+                z: -0.006
+              surface:
+                type: Sphere
+                R: 0.3745716282208
+              obscuration:
+                type: ClearCircle
+                radius: 0.0285
+        -
+          type: Detector
+          name: Detector
+          coordSys:
+            z: -0.6283511425
+          surface:
+            type: Plane
+          obscuration:
+            type: ClearCircle
+            radius: 0.0225

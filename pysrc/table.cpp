@@ -18,7 +18,8 @@ namespace batoid {
                     size_t dzdy_ptr,
                     size_t d2zdxdy_ptr,
                     size_t nx,
-                    size_t ny
+                    size_t ny,
+                    bool use_nan
                 ){
                     return new Table(
                         x0, y0, dx, dy,
@@ -26,7 +27,7 @@ namespace batoid {
                         reinterpret_cast<double*>(dzdx_ptr),
                         reinterpret_cast<double*>(dzdy_ptr),
                         reinterpret_cast<double*>(d2zdxdy_ptr),
-                        nx, ny
+                        nx, ny, use_nan
                     );
                 }
             ));

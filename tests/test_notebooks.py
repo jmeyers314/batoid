@@ -43,6 +43,7 @@ notebooks = [
     "Aspheric Newtonian Telescope.ipynb",
     "AuxTel perturbations.ipynb",
     "AuxTel trace.ipynb",
+    "ComCam trace.ipynb",
     "DECam draw2d.ipynb",
     "DECam perturbations.ipynb",
     "DECam trace.ipynb",
@@ -50,36 +51,39 @@ notebooks = [
     "DESI trace.ipynb",
     "Distortion.ipynb",
     "HSC 3D.ipynb",
-    "HSC perturbations.ipynb",
     "HSC pupil characterization.ipynb",
     "HSC trace.ipynb",
-    "Huygens PSF.ipynb",
-    "LSST Coordinate Systems.ipynb",
-    "LSST perturbations.ipynb",
+    "LSST donuts.ipynb",
+    "LSST ghosts.ipynb",
     "LSST pupil characterization.ipynb",
     "LSST trace.ipynb",
     "Newtonian Telescope.ipynb",
     # "Rays.ipynb",
     "Thin Lens.ipynb",
+    "PH != Pupil.ipynb"
 ]
 slow_notebooks = [
     "FFT vs Huygens.ipynb",
+    "Huygens PSF.ipynb",
     "HSC ghosts.ipynb",
-    "LSST donuts.ipynb",
-    "LSST ghosts.ipynb",
-    "PH != Pupil.ipynb"
+    "LSST perturbations.ipynb",
+    "HSC perturbations.ipynb"
 ]
 
 if __name__ == '__main__':
     notebooks += slow_notebooks
 else:
+    notebooks = [
+        pytest.param(notebook, marks=pytest.mark.skip_gha)
+        for notebook in notebooks
+    ]
     notebooks += [
-        pytest.param(notebook, marks=pytest.mark.slow)
+        pytest.param(notebook, marks=[pytest.mark.skip_gha, pytest.mark.slow])
         for notebook in slow_notebooks
     ]
 
 
-@pytest.mark.timeout(600)
+@pytest.mark.timeout(300)
 @pytest.mark.parametrize("notebook_name", notebooks)
 @timer
 def test_notebook(notebook_name):
