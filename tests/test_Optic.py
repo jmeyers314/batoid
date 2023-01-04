@@ -96,6 +96,7 @@ def test_traceReverse():
     np.testing.assert_allclose(final_rays.t[w], 0)
 
 
+@pytest.mark.skip_gha
 @timer
 def test_withSurface():
     telescope = batoid.Optic.fromYaml("HSC.yaml")
