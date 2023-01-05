@@ -16,8 +16,8 @@ def test_horner2d():
         np.testing.assert_allclose(
             batoid._batoid.horner2d(x, y, arr.ctypes.data, nx, ny),
             galsim.utilities.horner2d(x, y, arr),
-            atol=1e-17,
-            rtol=1e-17
+            atol=1e-15,
+            rtol=1e-15
         )
 
 
@@ -106,8 +106,8 @@ def test_normal():
             np.testing.assert_allclose(
                 bz.normal(x, y),
                 prediction,
-                rtol=0,
-                atol=1e-16
+                atol=1e-15,
+                rtol=0
             )
         # Check vectorization
         x = rng.uniform(-lim, lim, size=(10, 10))

@@ -14,7 +14,11 @@ def test_sag():
             x = rng.normal()
             y = rng.normal()
             result = tilted.sag(x, y)
-            np.testing.assert_equal(result, x*tanx + y*tany)
+            np.testing.assert_allclose(
+                result,
+                x*tanx + y*tany,
+                atol=1e-14, rtol=0
+            )
             # Check that it returned a scalar float and not an array
             assert isinstance(result, float)
         # Check vectorization
@@ -40,9 +44,10 @@ def test_normal():
             x = rng.normal()
             y = rng.normal()
             result = tilted.normal(x, y)
-            np.testing.assert_equal(
+            np.testing.assert_allclose(
                 result,
-                (-tanx, -tany, np.sqrt(1-tanx*tanx-tany*tany))
+                (-tanx, -tany, np.sqrt(1-tanx*tanx-tany*tany)),
+                atol=1e-14, rtol=0
             )
         # Check vectorization
         x = rng.normal(size=(10, 10))

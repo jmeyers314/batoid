@@ -90,9 +90,9 @@ def test_traceSplit_simple():
     for r in rForward:
         r2 = telescope.trace(rays.copy(), path=r.path)
         w = ~r2.vignetted
-        np.testing.assert_allclose(r.r, r2.r[w])
-        np.testing.assert_allclose(r.v, r2.v[w])
-        np.testing.assert_allclose(r.t, r2.t[w])
+        np.testing.assert_allclose(r.r, r2.r[w], atol=1e-14, rtol=0)
+        np.testing.assert_allclose(r.v, r2.v[w], atol=1e-14, rtol=0)
+        np.testing.assert_allclose(r.t, r2.t[w], atol=1e-14, rtol=0)
 
         tf = telescope.traceFull(rays.copy(), path=r.path)
         keys = []
@@ -107,9 +107,9 @@ def test_traceSplit_simple():
 
         r3 = tf[keys[-1]]['out']
         w = ~r3.vignetted
-        np.testing.assert_allclose(r.r, r3.r[w])
-        np.testing.assert_allclose(r.v, r3.v[w])
-        np.testing.assert_allclose(r.t, r3.t[w])
+        np.testing.assert_allclose(r.r, r3.r[w], atol=1e-14, rtol=0)
+        np.testing.assert_allclose(r.v, r3.v[w], atol=1e-14, rtol=0)
+        np.testing.assert_allclose(r.t, r3.t[w], atol=1e-14, rtol=0)
 
     for r in rReverse:
         r2 = telescope.trace(rays.copy(), path=r.path)

@@ -39,9 +39,9 @@ def test_optic():
     assert np.all(rays1.vignetted[w])
     # and every place rays1 is not vignetted has some coords as in rays2
     w = ~rays1.vignetted
-    np.testing.assert_allclose(rays1.r[w], rays2.r[w])
-    np.testing.assert_allclose(rays1.v[w], rays2.v[w])
-    np.testing.assert_allclose(rays1.t[w], rays2.t[w])
+    np.testing.assert_allclose(rays1.r[w], rays2.r[w], atol=1e-12, rtol=0)
+    np.testing.assert_allclose(rays1.v[w], rays2.v[w], atol=1e-12, rtol=0)
+    np.testing.assert_allclose(rays1.t[w], rays2.t[w], atol=1e-12, rtol=0)
 
 
 @timer
