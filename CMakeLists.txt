@@ -22,7 +22,7 @@ if (DEFINED ENV{CMAKE_COVER})
 endif()
 
 include_directories(include)
-add_subdirectory(pybind11)
+find_package(pybind11 REQUIRED)
 
 
 set(SRC_FILES
