@@ -47,6 +47,8 @@ jobs:
           CIBW_SKIP: cp36* pp*
           CIBW_BEFORE_TEST: >
             (apk add --upgrade jpeg-dev || apt install libjpeg-dev zlib1g-dev) &&
+            pip install --upgrade pip &&
+            pip install markupsafe==2.0.1 &&
             pip install -U -r test_requirements.txt
           CIBW_TEST_COMMAND: pytest --skip_gha {package}/tests
 
