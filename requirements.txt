@@ -4,4 +4,3 @@ scipy
 galsim
 matplotlib
 astropy
-astroquery
