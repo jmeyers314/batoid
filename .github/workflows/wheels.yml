@@ -25,7 +25,7 @@ jobs:
           CIBW_BUILD: "*manylinux*"
           CIBW_SKIP: cp36* pp*
           CIBW_BEFORE_TEST: pip install -U -r test_requirements.txt
-          CIBW_TEST_COMMAND: pytest {package}/tests
+          CIBW_TEST_COMMAND: pytest --skip_gha {package}/tests
 
       - uses: actions/upload-artifact@v3
         with:
@@ -46,7 +46,7 @@ jobs:
           CIBW_BUILD: "*musllinux*"
           CIBW_SKIP: cp36* pp*
           CIBW_BEFORE_TEST: pip install -U -r test_requirements.txt
-          CIBW_TEST_COMMAND: pytest {package}/tests
+          CIBW_TEST_COMMAND: pytest --skip_gha {package}/tests
 
       - uses: actions/upload-artifact@v3
         with:
@@ -67,7 +67,7 @@ jobs:
           CIBW_BUILD: "*macosx*"
           CIBW_SKIP: cp36* pp*
           CIBW_BEFORE_TEST: pip install -U -r test_requirements.txt
-          CIBW_TEST_COMMAND: pytest {package}/tests
+          CIBW_TEST_COMMAND: pytest --skip_gha {package}/tests
 
       - uses: actions/upload-artifact@v3
         with:
