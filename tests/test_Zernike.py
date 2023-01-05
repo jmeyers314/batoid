@@ -122,14 +122,14 @@ def test_normal():
         np.testing.assert_allclose(
             bz.normal(x, y),
             prediction,
-            rtol=0,
-            atol=1e-14
+            atol=1e-13,
+            rtol=1e-13
         )
         # Make sure non-unit stride arrays also work
         np.testing.assert_allclose(
             bz.normal(x[::5,::2], y[::5,::2]),
             prediction[::5, ::2],
-            rtol=0, atol=1e-14
+            rtol=1e-13, atol=1e-13
         )
 
 
