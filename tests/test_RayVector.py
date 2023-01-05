@@ -38,9 +38,11 @@ def test_properties():
         np.testing.assert_array_equal(rv.v[:, 0], vx)
         np.testing.assert_array_equal(rv.v[:, 1], vy)
         np.testing.assert_array_equal(rv.v[:, 2], vz)
-        np.testing.assert_array_equal(rv.k[:, 0], rv.kx)
-        np.testing.assert_array_equal(rv.k[:, 1], rv.ky)
-        np.testing.assert_array_equal(rv.k[:, 2], rv.kz)
+        # These really ought to be exactly equal, but i686 linux numpy seems to
+        # end up with slightly different values here.
+        np.testing.assert_allclose(rv.k[:, 0], rv.kx, atol=1e-14, rtol=0)
+        np.testing.assert_allclose(rv.k[:, 1], rv.ky, atol=1e-14, rtol=0)
+        np.testing.assert_allclose(rv.k[:, 2], rv.kz, atol=1e-14, rtol=0)
         np.testing.assert_array_equal(rv.t, t)
         np.testing.assert_array_equal(rv.wavelength, w)
         np.testing.assert_array_equal(rv.flux, fx)
@@ -493,7 +495,7 @@ def test_asGrid():
         # Check that projected points are inside region
         pupil = batoid.Plane()
         pupil.intersect(rays)
-        np.testing.assert_allclose(rays.z, 0.0, rtol=1e-14, atol=0)
+        np.testing.assert_allclose(rays.z, 0.0, atol=1e-14, rtol=0)
         np.testing.assert_array_less(rays.x, 0.5)
         np.testing.assert_array_less(rays.y, 0.5)
         np.testing.assert_array_less(-0.5, rays.x)
