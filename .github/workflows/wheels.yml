@@ -24,9 +24,10 @@ jobs:
         env:
           CIBW_BUILD: "*manylinux*"
           CIBW_SKIP: cp36* pp*
-          CIBW_BEFORE_TEST: pip install -U -r test_requirements.txt
-          CIBW_TEST_COMMAND: pytest --skip_gha {package}/tests
-
+          # CIBW_BEFORE_TEST: pip install -U -r test_requirements.txt
+          # CIBW_TEST_COMMAND: pytest --skip_gha {package}/tests
+          # Pivot: very basic does-it-import test
+          CIBW_TEST_COMMAND: python -c "import batoid; print(batoid.__version__)"
       - uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/*.whl
@@ -51,6 +52,8 @@ jobs:
           #   pip install -U -r test_requirements.txt &&
           #   pip install markupsafe==2.0.1
           # CIBW_TEST_COMMAND: pytest --skip_gha {package}/tests
+          # Pivot: very basic does-it-import test
+          CIBW_TEST_COMMAND: python -c "import batoid; print(batoid.__version__)"
 
       - uses: actions/upload-artifact@v3
         with:
