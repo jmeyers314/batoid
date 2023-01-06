@@ -24,9 +24,7 @@ jobs:
         env:
           CIBW_BUILD: "*manylinux*"
           CIBW_SKIP: cp36* pp*
-          # CIBW_BEFORE_TEST: pip install -U -r test_requirements.txt
-          # CIBW_TEST_COMMAND: pytest --skip_gha {package}/tests
-          # Pivot: very basic does-it-import test
+          CIBW_BEFORE_BUILD: pip install -U pybind11-global
       - uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/*.whl
@@ -45,12 +43,7 @@ jobs:
         env:
           CIBW_BUILD: "*musllinux*"
           CIBW_SKIP: cp36* pp*
-          # CIBW_BEFORE_TEST: >
-          #   (apk add --upgrade jpeg-dev || apt install libjpeg-dev zlib1g-dev) &&
-          #   pip install --upgrade pip &&
-          #   pip install -U -r test_requirements.txt &&
-          #   pip install markupsafe==2.0.1
-          # CIBW_TEST_COMMAND: pytest --skip_gha {package}/tests
+          CIBW_BEFORE_BUILD: pip install -U pybind11-global
       - uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/*.whl
@@ -69,6 +62,7 @@ jobs:
         env:
           CIBW_BUILD: "*macosx*"
           CIBW_SKIP: cp36* pp*
+          CIBW_BEFORE_BUILD: pip install -U pybind11-global
           CIBW_BEFORE_TEST: pip install -U -r test_requirements.txt
           CIBW_TEST_COMMAND: pytest --skip_gha {package}/tests
 
@@ -102,6 +96,7 @@ jobs:
           python -m pip install -U pip
           pip install -U numpy setuptools
           pip install -U -r requirements.txt
+          pip install -U pybind11-global
 
       - name: Download wheels
         uses: actions/download-artifact@v3
