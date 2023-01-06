@@ -17,7 +17,7 @@ https://jmeyers314.github.io/batoid/overview.html
 Requirements
 ============
 
-Batoid is known to work on MacOS and linux, using Python version 3.6+, and
+Batoid is known to work on MacOS and linux, using Python version 3.7+, and
 either the clang or gcc compiler with support for c++14.
 
 Installation
@@ -36,19 +36,16 @@ case, the following ought to work::
 Github
 ------
 
-If Pypi doesn't work, then you can try cloning the source from github and
-running setup.py.  One minor hiccup in this case is that the batoid repo
-includes ``pybind11`` as a submodule, so when cloning for the first time, a
-command similar to one of the following should be used ::
+If PyPI doesn't work, then you can try cloning the source from github and
+running setup.py.  Clone the repo with either ::
 
-    git clone --recurse-submodules git@github.com:jmeyers314/batoid.git
+    git clone git@github.com:jmeyers314/batoid.git
 
 or ::
 
-    git clone --recurse-submodules https://github.com/jmeyers314/batoid.git
+    git clone https://github.com/jmeyers314/batoid.git
 
-Once the repo and the submodules have been cloned, then compile and install
-with ::
+Once the repo has been cloned, then compile and install with ::
 
     python setup.py install
 
@@ -64,6 +61,6 @@ requirements ::
 
     pip install -r test_requirements.txt
 
-And then run the tests using setup.py ::
+And then run the tests using pytest ::
 
-    python setup.py test
+    pytest
