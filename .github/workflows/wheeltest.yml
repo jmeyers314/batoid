@@ -14,7 +14,7 @@ jobs:
           fetch-depth: 2
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.9.0
+        uses: pypa/cibuildwheel@v2.11.3
         env:
           CIBW_BUILD: "*manylinux*"
           CIBW_SKIP: cp36* pp*
@@ -34,7 +34,7 @@ jobs:
           fetch-depth: 2
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.9.0
+        uses: pypa/cibuildwheel@v2.11.3
         env:
           CIBW_BUILD: "*musllinux*"
           CIBW_SKIP: cp36* pp*
@@ -54,7 +54,7 @@ jobs:
           fetch-depth: 2
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.9.0
+        uses: pypa/cibuildwheel@v2.11.3
         env:
           CIBW_BUILD: "*macosx*"
           CIBW_SKIP: cp36* pp*
