@@ -21,6 +21,7 @@ jobs:
         env:
           CIBW_BUILD: "*manylinux*"
           CIBW_SKIP: cp36* pp*
+          CIBW_BUILD_VERBOSITY: 3
           CIBW_BEFORE_BUILD: pip install -U pybind11-global
       - uses: actions/upload-artifact@v3
         with:
@@ -40,6 +41,7 @@ jobs:
         env:
           CIBW_BUILD: "*musllinux*"
           CIBW_SKIP: cp36* pp*
+          CIBW_BUILD_VERBOSITY: 3
           CIBW_BEFORE_BUILD: pip install -U pybind11-global
       - uses: actions/upload-artifact@v3
         with:
@@ -59,6 +61,7 @@ jobs:
         env:
           CIBW_BUILD: "*macosx*"
           CIBW_SKIP: cp36* pp*
+          CIBW_BUILD_VERBOSITY: 3
           CIBW_BEFORE_BUILD: pip install -U pybind11-global
           CIBW_BEFORE_TEST: pip install -U -r test_requirements.txt
           CIBW_TEST_COMMAND: pytest --skip_gha {package}/tests
