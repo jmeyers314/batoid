@@ -53,6 +53,7 @@ notebooks = [
     "HSC 3D.ipynb",
     "HSC pupil characterization.ipynb",
     "HSC trace.ipynb",
+    "LSST+CBP.ipynb",
     "LSST donuts.ipynb",
     "LSST ghosts.ipynb",
     "LSST pupil characterization.ipynb",
