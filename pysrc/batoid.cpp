@@ -2,6 +2,10 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#if defined(_OPENMP)
+#include "omp.h"
+#endif
+
 namespace py = pybind11;
 
 namespace batoid {
@@ -111,6 +115,16 @@ namespace batoid {
                     n
                 );
             });
+#if defined(_OPENMP)
+        m.def(
+            "get_nthreads",
+            []() { return omp_get_max_threads(); }
+        )
+        .def(
+            "set_nthreads",
+            [](int nthreads) { omp_set_num_threads(nthreads); }
+        );
+#endif
         // #if defined(BATOID_GPU)
         //     m.def(
         //         "get_omp_environment",
