@@ -4,7 +4,6 @@ import numpy as np
 
 from . import _batoid
 from .constants import globalCoordSys, vacuum
-from .coordSys import CoordSys
 from .coordTransform import CoordTransform
 from .trace import applyForwardTransform, applyForwardTransformArrays
 from .utils import lazy_property, fieldToDirCos
@@ -211,7 +210,7 @@ class RayVector:
         dx=None, dy=None,
         lx=None, ly=None,
         flux=1,
-        nrandom=None
+        nrandom=None, rng=None
     ):
         """Create RayVector on a parallelogram shaped region.
 
@@ -308,6 +307,8 @@ class RayVector:
         nrandom : None or int, optional
             If not None, then uniformly sample this many rays from
             parallelogram region instead of sampling on a regular grid.
+        rng : None or int or `np.random.Generator`, optional
+            Random number generator or seed to use for random sampling.
         """
         from .optic import Interface
         from .surface import Plane
@@ -389,8 +390,12 @@ class RayVector:
             ly = (0.0, ly)
 
         if nrandom is not None:
-            xx = np.random.uniform(-0.5, 0.5, size=nrandom)
-            yy = np.random.uniform(-0.5, 0.5, size=nrandom)
+            if rng is None:
+                rng = np.random.default_rng()
+            elif isinstance(rng, int):
+                rng = np.random.default_rng(rng)
+            xx = rng.uniform(-0.5, 0.5, size=nrandom)
+            yy = rng.uniform(-0.5, 0.5, size=nrandom)
         else:
             if nx <= 2:
                 x_d = 1.
@@ -444,7 +449,7 @@ class RayVector:
         theta_x=None, theta_y=None, projection='postel',
         nrad=None, naz=None,
         flux=1,
-        nrandom=None
+        nrandom=None, rng=None
     ):
         """Create RayVector on an annular region using a hexapolar grid.
 
@@ -544,6 +549,8 @@ class RayVector:
         nrandom : int, optional
             If not None, then uniformly sample this many rays from annular
             region instead of sampling on a hexapolar grid.
+        rng : None or int or `np.random.Generator`, optional
+            Random number generator or seed to use for random sampling.
         """
         from .optic import Interface
 
@@ -604,8 +611,12 @@ class RayVector:
                 rr[-1] = 0.0
                 th[-1] = 0.0
         else:
-            rr = np.sqrt(np.random.uniform(inner**2, outer**2, size=nrandom))
-            th = np.random.uniform(0, 2*np.pi, size=nrandom)
+            if rng is None:
+                rng = np.random.default_rng()
+            elif isinstance(rng, int):
+                rng = np.random.default_rng(rng)
+            rr = np.sqrt(rng.uniform(inner**2, outer**2, size=nrandom))
+            th = rng.uniform(0, 2*np.pi, size=nrandom)
         x = rr*np.cos(th)
         y = rr*np.sin(th)
         del rr, th

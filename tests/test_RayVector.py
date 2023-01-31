@@ -483,6 +483,18 @@ def test_asGrid():
             lx=1.0, nx=1,
             nrandom=1000, dirCos=dirCos
         )
+        rays2 = batoid.RayVector.asGrid(
+            backDist=backDist, wavelength=wavelength,
+            lx=1.0, nx=1,
+            nrandom=1000, dirCos=dirCos, rng=2
+        )
+        rng = np.random.default_rng(2)
+        rays3 = batoid.RayVector.asGrid(
+            backDist=backDist, wavelength=wavelength,
+            lx=1.0, nx=1,
+            nrandom=1000, dirCos=dirCos, rng=rng
+        )
+        rays_allclose(rays2, rays3)
 
         np.testing.assert_allclose(rays.t, 0)
         np.testing.assert_allclose(rays.wavelength, wavelength)
@@ -554,6 +566,28 @@ def test_asPolar():
         np.testing.assert_allclose(rays.x[-1], 0, atol=1e-14)
         np.testing.assert_allclose(rays.y[-1], 0, atol=1e-14)
         np.testing.assert_allclose(rays.z[-1], 0, atol=1e-14)
+
+    # Check nrandom
+    rays = batoid.RayVector.asPolar(
+        backDist=backDist, wavelength=wavelength,
+        inner=0.1, outer=0.2,
+        theta_x=0.01, theta_y=-0.02,
+        nrandom=1000
+    )
+    rays2 = batoid.RayVector.asPolar(
+        backDist=backDist, wavelength=wavelength,
+        inner=0.1, outer=0.2,
+        theta_x=0.01, theta_y=-0.02,
+        nrandom=1000, rng=2
+    )
+    rng = np.random.default_rng(2)
+    rays3 = batoid.RayVector.asPolar(
+        backDist=backDist, wavelength=wavelength,
+        inner=0.1, outer=0.2,
+        theta_x=0.01, theta_y=-0.02,
+        nrandom=1000, rng=rng
+    )
+    rays_allclose(rays2, rays3)
 
 
 @timer
