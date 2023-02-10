@@ -7,6 +7,7 @@ import time
 @timer
 def parallel_trace_timing(args):
     print("Using nrad of {:_d}".format(args.nrad))
+    print(f"Using {batoid._batoid.get_nthreads()} threads")
 
     if args.lsst:
         print("Tracing through LSST optics")

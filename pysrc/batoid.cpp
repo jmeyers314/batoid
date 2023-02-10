@@ -115,16 +115,22 @@ namespace batoid {
                     n
                 );
             });
-#if defined(_OPENMP)
         m.def(
             "get_nthreads",
+#if defined(_OPENMP)
             []() { return omp_get_max_threads(); }
+#else
+            []() { return 1; }
+#endif
         )
         .def(
             "set_nthreads",
+#if defined(_OPENMP)
             [](int nthreads) { omp_set_num_threads(nthreads); }
-        );
+#else
+            [](int nthreads) { }
 #endif
+        );
         // #if defined(BATOID_GPU)
         //     m.def(
         //         "get_omp_environment",
