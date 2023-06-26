@@ -1171,7 +1171,7 @@ class CompoundOptic(Optic):
         -----
         Returned forward (reverse) rays will be expressed in the local
         coordinate system of the last (first) element of the CompoundOptic.
-        See `RayVector.toCoordSys to express rays in a different coordinate system.
+        See `RayVector.toCoordSys` to express rays in a different coordinate system.
         """
         if _verbose:
             s = "reverse" if reverse else "forward"

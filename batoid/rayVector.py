@@ -307,7 +307,7 @@ class RayVector:
         nrandom : None or int, optional
             If not None, then uniformly sample this many rays from
             parallelogram region instead of sampling on a regular grid.
-        rng : None or int or `np.random.Generator`, optional
+        rng : None or int or `numpy.random.Generator`, optional
             Random number generator or seed to use for random sampling.
         """
         from .optic import Interface
@@ -549,7 +549,7 @@ class RayVector:
         nrandom : int, optional
             If not None, then uniformly sample this many rays from annular
             region instead of sampling on a hexapolar grid.
-        rng : None or int or `np.random.Generator`, optional
+        rng : None or int or `numpy.random.Generator`, optional
             Random number generator or seed to use for random sampling.
         """
         from .optic import Interface
@@ -985,7 +985,8 @@ class RayVector:
         currently less effort paid to synchronizing the ``t`` values of the
         created rays, as they don't correspond to points on a physical incoming
         wavefront in this case.  The primary intended use case is to map chief
-        rays (``x``=``y``=0) from incoming field angle to focal plane position.
+        rays (``x`` = ``y`` = 0) from incoming field angle to focal plane
+        position.
 
         Parameters
         ----------
