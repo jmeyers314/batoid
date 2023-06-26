@@ -1,94 +1,47 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>batoid.optic &mdash; batoid 0.3.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>batoid.optic &mdash; batoid 0.4.2 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="../../index.html" class="icon icon-home"> batoid
           
-
-          
+          <a href="../../index.html" class="icon icon-home">
+            batoid
           </a>
-
-          
-            
-            
               <div class="version">
-                0.3
+                0.4
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../rays.html">Rays</a></li>
@@ -102,69 +55,30 @@
 <li class="toctree-l1"><a class="reference internal" href="../../lattice.html">Lattices</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">batoid</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-        
-      <li>batoid.optic</li>
-    
-    
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">batoid.optic</li>
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for batoid.optic</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
 
@@ -179,7 +93,7 @@
 
 
 <div class="viewcode-block" id="Optic"><a class="viewcode-back" href="../../optic.html#batoid.Optic">[docs]</a><span class="k">class</span> <span class="nc">Optic</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;The base class for all varieties of batoid optics and optical systems.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The base class for all varieties of batoid optics and optical systems.</span>
 
 <span class="sd">    An `Optic` can include anything from a single reflective or refractive</span>
 <span class="sd">    surface to an entire telescope including multiple mirrors and/or lenses.</span>
@@ -226,7 +140,7 @@
 
 <div class="viewcode-block" id="Optic.fromYaml"><a class="viewcode-back" href="../../optic.html#batoid.Optic.fromYaml">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">fromYaml</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Load an `Optic` (commonly a complete telescope) from the given yaml</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load an `Optic` (commonly a complete telescope) from the given yaml</span>
 <span class="sd">        file.  This is the most common way to create an `Optic`.  If the file</span>
 <span class="sd">        is not initially found, then look in the ``batoid.datadir`` directory</span>
 <span class="sd">        and subdirectories for the first matching filename and use that.</span>
@@ -264,7 +178,7 @@
 
 
 <div class="viewcode-block" id="Interface"><a class="viewcode-back" href="../../optic.html#batoid.Interface">[docs]</a><span class="k">class</span> <span class="nc">Interface</span><span class="p">(</span><span class="n">Optic</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;An `Optic` representing a single surface.  Almost always one of the</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An `Optic` representing a single surface.  Almost always one of the</span>
 <span class="sd">    concrete subclasses (`Mirror`, `RefractiveInterface`, `Baffle`, `Detector`)</span>
 <span class="sd">    should be instantiated, depending on whether rays should reflect, refract,</span>
 <span class="sd">    vignette/pass-through, or stop at this surface.</span>
@@ -307,13 +221,15 @@
         <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">surface</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">obscuration</span><span class="p">,</span>
                      <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inMedium</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outMedium</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span><span class="p">))</span>
 
-<div class="viewcode-block" id="Interface.draw3d"><a class="viewcode-back" href="../../optic.html#batoid.Interface.draw3d">[docs]</a>    <span class="k">def</span> <span class="nf">draw3d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Draw this interface on a mplot3d axis.</span>
+<div class="viewcode-block" id="Interface.draw3d"><a class="viewcode-back" href="../../optic.html#batoid.Interface.draw3d">[docs]</a>    <span class="k">def</span> <span class="nf">draw3d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">plotly</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Draw this interface on a mplot3d axis.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        ax : mplot3d.Axis</span>
+<span class="sd">        ax : mplot3d.Axis or plotly.graph_objs.Figure</span>
 <span class="sd">            Axis on which to draw this optic.</span>
+<span class="sd">        plotly : bool</span>
+<span class="sd">            Set True to use plotly API instead of ipyvolume/matplotlib API</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">outRadius</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span>
@@ -327,7 +243,10 @@
             <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inRadius</span> <span class="o">*</span> <span class="n">sth</span>
             <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">sag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
             <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">applyForwardArray</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
-            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">plotly</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">add_scatter3d</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="n">z</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="c1">#outer circle</span>
         <span class="n">th</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
@@ -336,34 +255,135 @@
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outRadius</span> <span class="o">*</span> <span class="n">sth</span>
         <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">sag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">applyForwardArray</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">plotly</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">add_scatter3d</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="n">z</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="c1">#next, a line at X=0</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">outRadius</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">inRadius</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
         <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">sag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">applyForwardArray</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">plotly</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">add_scatter3d</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="n">z</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inRadius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outRadius</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
         <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">sag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">applyForwardArray</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">plotly</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">add_scatter3d</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="n">z</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="c1">#next, a line at Y=0</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">outRadius</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">inRadius</span><span class="p">)</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">sag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">applyForwardArray</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">plotly</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">add_scatter3d</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="n">z</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inRadius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outRadius</span><span class="p">)</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">sag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">applyForwardArray</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="n">plotly</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">add_scatter3d</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="n">z</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">get3dmesh</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">outRadius</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">transform</span> <span class="o">=</span> <span class="n">CoordTransform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span><span class="p">,</span> <span class="n">globalCoordSys</span><span class="p">)</span>
+        <span class="c1"># Going to draw 4 objects here: inner circle, outer circle, sag along</span>
+        <span class="c1"># x=0, sag along y=0 inner circle</span>
+        <span class="n">xs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">zs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inRadius</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="n">th</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+            <span class="n">cth</span><span class="p">,</span> <span class="n">sth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">th</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">th</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inRadius</span> <span class="o">*</span> <span class="n">cth</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inRadius</span> <span class="o">*</span> <span class="n">sth</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">sag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">applyForwardArray</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+            <span class="n">xs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">ys</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+            <span class="n">zs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+            <span class="c1"># Separate by adding a nan</span>
+            <span class="n">xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+            <span class="n">ys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+            <span class="n">zs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+
+        <span class="c1">#outer circle</span>
+        <span class="n">th</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">cth</span><span class="p">,</span> <span class="n">sth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">th</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">th</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outRadius</span> <span class="o">*</span> <span class="n">cth</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outRadius</span> <span class="o">*</span> <span class="n">sth</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">sag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">applyForwardArray</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+        <span class="n">xs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">ys</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">zs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+        <span class="n">xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="n">ys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="n">zs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+
+        <span class="c1">#next, a line at X=0</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">outRadius</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">inRadius</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">sag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">applyForwardArray</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+        <span class="n">xs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">ys</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">zs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+        <span class="n">xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="n">ys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="n">zs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inRadius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outRadius</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">sag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">applyForwardArray</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+        <span class="n">xs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">ys</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">zs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+        <span class="n">xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="n">ys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="n">zs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+
+        <span class="c1">#next, a line at Y=0</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">outRadius</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">inRadius</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">sag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">applyForwardArray</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+        <span class="n">xs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">ys</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">zs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+        <span class="n">xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="n">ys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="n">zs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inRadius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outRadius</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">sag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">applyForwardArray</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+        <span class="n">xs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">ys</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">zs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+        <span class="n">xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="n">ys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="n">zs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">xs</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ys</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">zs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Interface.getXZSlice"><a class="viewcode-back" href="../../optic.html#batoid.Interface.getXZSlice">[docs]</a>    <span class="k">def</span> <span class="nf">getXZSlice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nslice</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Calculate global coordinates for an (x,z) slice through this</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate global coordinates for an (x,z) slice through this</span>
 <span class="sd">        interface.</span>
 
 <span class="sd">        The calculation is split into two half slices: xlocal &lt;= 0 and xlocal</span>
@@ -434,7 +454,7 @@
             <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Interface.draw2d"><a class="viewcode-back" href="../../optic.html#batoid.Interface.draw2d">[docs]</a>    <span class="k">def</span> <span class="nf">draw2d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Draw this interface on a 2d matplotlib axis.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Draw this interface on a 2d matplotlib axis.</span>
 <span class="sd">        May not work if elements are non-circular or not axis-aligned.</span>
 
 <span class="sd">        Parameters</span>
@@ -447,7 +467,7 @@
             <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Interface.trace"><a class="viewcode-back" href="../../optic.html#batoid.Interface.trace">[docs]</a>    <span class="k">def</span> <span class="nf">trace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rv</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Trace ray through this optical element.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Trace ray through this optical element.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -482,7 +502,7 @@
         <span class="k">return</span> <span class="n">rv</span></div>
 
 <div class="viewcode-block" id="Interface.traceFull"><a class="viewcode-back" href="../../optic.html#batoid.Interface.traceFull">[docs]</a>    <span class="k">def</span> <span class="nf">traceFull</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rv</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Trace rays through this optical element, returning a full history of</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Trace rays through this optical element, returning a full history of</span>
 <span class="sd">        all surface intersections.</span>
 
 <span class="sd">        Parameters</span>
@@ -522,7 +542,7 @@
         <span class="k">return</span> <span class="n">result</span></div>
 
 <div class="viewcode-block" id="Interface.traceSplit"><a class="viewcode-back" href="../../optic.html#batoid.Interface.traceSplit">[docs]</a>    <span class="k">def</span> <span class="nf">traceSplit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rv</span><span class="p">,</span> <span class="n">minFlux</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">_verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Trace rays through this optical element, splitting the return values</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Trace rays through this optical element, splitting the return values</span>
 <span class="sd">        into rays that continue propagating in the &quot;forward&quot; direction, and</span>
 <span class="sd">        those that were reflected into the &quot;reverse&quot; direction.  Fluxes of</span>
 <span class="sd">        output rays are proportional to reflection/transmission coefficients of</span>
@@ -624,7 +644,7 @@
         <span class="k">return</span> <span class="n">out</span>
 
 <div class="viewcode-block" id="Interface.withGlobalShift"><a class="viewcode-back" href="../../optic.html#batoid.Interface.withGlobalShift">[docs]</a>    <span class="k">def</span> <span class="nf">withGlobalShift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shift</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return a new `Interface` with its coordinate system shifted.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new `Interface` with its coordinate system shifted.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -640,6 +660,10 @@
         <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span>
         <span class="n">newDict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
         <span class="n">newDict</span><span class="p">[</span><span class="s1">&#39;coordSys&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span><span class="o">.</span><span class="n">shiftGlobal</span><span class="p">(</span><span class="n">shift</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;stopSurface&#39;</span> <span class="ow">in</span> <span class="n">newDict</span><span class="p">:</span>
+            <span class="n">newDict</span><span class="p">[</span><span class="s1">&#39;stopSurface&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">newDict</span><span class="p">[</span><span class="s1">&#39;stopSurface&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">withGlobalShift</span><span class="p">(</span><span class="n">shift</span><span class="p">)</span>
+            <span class="p">)</span>
         <span class="k">del</span> <span class="n">newDict</span><span class="p">[</span><span class="s1">&#39;surface&#39;</span><span class="p">]</span>
         <span class="n">ret</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">surface</span><span class="p">,</span>
@@ -648,7 +672,7 @@
         <span class="k">return</span> <span class="n">ret</span></div>
 
 <div class="viewcode-block" id="Interface.withLocalShift"><a class="viewcode-back" href="../../optic.html#batoid.Interface.withLocalShift">[docs]</a>    <span class="k">def</span> <span class="nf">withLocalShift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shift</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return a new `Interface` with its coordinate system shifted.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new `Interface` with its coordinate system shifted.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -662,19 +686,59 @@
 <span class="sd">            Shifted interface.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Clearer to apply the rotated global shift.</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">withGlobalShift</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span><span class="o">.</span><span class="n">rot</span><span class="p">,</span> <span class="n">shift</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">withGlobalShift</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span><span class="o">.</span><span class="n">rot</span><span class="nd">@shift</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Interface.withLocalRotation"><a class="viewcode-back" href="../../optic.html#batoid.Interface.withLocalRotation">[docs]</a>    <span class="k">def</span> <span class="nf">withLocalRotation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rot</span><span class="p">,</span> <span class="n">rotOrigin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">coordSys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return a new `Interface` with its coordinate system rotated.</span>
+<div class="viewcode-block" id="Interface.withGlobalRotation"><a class="viewcode-back" href="../../optic.html#batoid.Interface.withGlobalRotation">[docs]</a>    <span class="k">def</span> <span class="nf">withGlobalRotation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rot</span><span class="p">,</span> <span class="n">rotCenter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">coordSys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new `Interface` with its coordinate system rotated.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rot : array (3,3)</span>
+<span class="sd">            Rotation matrix wrt to the global coordinate system to apply.</span>
+<span class="sd">        rotCenter : array (3,)</span>
+<span class="sd">            Point about which to rotate.  Default: None means use [0,0,0]</span>
+<span class="sd">        coordSys : `batoid.CoordSys`</span>
+<span class="sd">            Coordinate system of rotCenter above.  Default: None means use</span>
+<span class="sd">            the global coordinate system.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        `Interface`</span>
+<span class="sd">            Rotated interface.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">rotCenter</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rotCenter</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">coordSys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">coordSys</span> <span class="o">=</span> <span class="n">globalCoordSys</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span>
+        <span class="n">newDict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+        <span class="n">newDict</span><span class="p">[</span><span class="s1">&#39;coordSys&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span><span class="o">.</span><span class="n">rotateGlobal</span><span class="p">(</span>
+            <span class="n">rot</span><span class="p">,</span> <span class="n">rotCenter</span><span class="p">,</span> <span class="n">coordSys</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;stopSurface&#39;</span> <span class="ow">in</span> <span class="n">newDict</span><span class="p">:</span>
+            <span class="n">newDict</span><span class="p">[</span><span class="s1">&#39;stopSurface&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">newDict</span><span class="p">[</span><span class="s1">&#39;stopSurface&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">withGlobalRotation</span><span class="p">(</span>
+                    <span class="n">rot</span><span class="p">,</span> <span class="n">rotCenter</span><span class="p">,</span> <span class="n">coordSys</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">del</span> <span class="n">newDict</span><span class="p">[</span><span class="s1">&#39;surface&#39;</span><span class="p">]</span>
+        <span class="n">ret</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">surface</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">newDict</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+<div class="viewcode-block" id="Interface.withLocalRotation"><a class="viewcode-back" href="../../optic.html#batoid.Interface.withLocalRotation">[docs]</a>    <span class="k">def</span> <span class="nf">withLocalRotation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rot</span><span class="p">,</span> <span class="n">rotCenter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">coordSys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new `Interface` with its coordinate system rotated.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        rot : array (3,3)</span>
 <span class="sd">            Rotation matrix wrt to the local coordinate system to apply.</span>
-<span class="sd">        rotOrigin : array (3,)</span>
-<span class="sd">            Origin of rotation.  Default: None means use [0,0,0]</span>
+<span class="sd">        rotCenter : array (3,)</span>
+<span class="sd">            Point about which to rotate.  Default: None means use [0,0,0]</span>
 <span class="sd">        coordSys : `batoid.CoordSys`</span>
-<span class="sd">            Coordinate system of rotOrigin above.  Default: None means use</span>
+<span class="sd">            Coordinate system of rotCenter above.  Default: None means use</span>
 <span class="sd">            self.coordSys.</span>
 
 <span class="sd">        Returns</span>
@@ -682,14 +746,19 @@
 <span class="sd">        `Interface`</span>
 <span class="sd">            Rotated interface.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">rotOrigin</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">coordSys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">rotCenter</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rotCenter</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">coordSys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">coordSys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span>
-            <span class="n">rotOrigin</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span>
         <span class="n">newDict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
         <span class="n">newDict</span><span class="p">[</span><span class="s1">&#39;coordSys&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span><span class="o">.</span><span class="n">rotateLocal</span><span class="p">(</span>
-            <span class="n">rot</span><span class="p">,</span> <span class="n">rotOrigin</span><span class="p">,</span> <span class="n">coordSys</span>
+            <span class="n">rot</span><span class="p">,</span> <span class="n">rotCenter</span><span class="p">,</span> <span class="n">coordSys</span>
         <span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;stopSurface&#39;</span> <span class="ow">in</span> <span class="n">newDict</span><span class="p">:</span>
+            <span class="n">newDict</span><span class="p">[</span><span class="s1">&#39;stopSurface&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">newDict</span><span class="p">[</span><span class="s1">&#39;stopSurface&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">withLocalRotation</span><span class="p">(</span>
+                <span class="n">rot</span><span class="p">,</span> <span class="n">rotCenter</span><span class="p">,</span> <span class="n">coordSys</span>
+            <span class="p">)</span>
         <span class="k">del</span> <span class="n">newDict</span><span class="p">[</span><span class="s1">&#39;surface&#39;</span><span class="p">]</span>
         <span class="n">ret</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">surface</span><span class="p">,</span>
@@ -698,7 +767,7 @@
         <span class="k">return</span> <span class="n">ret</span></div>
 
 <div class="viewcode-block" id="Interface.withSurface"><a class="viewcode-back" href="../../optic.html#batoid.Interface.withSurface">[docs]</a>    <span class="k">def</span> <span class="nf">withSurface</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surface</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return a new `Interface` with its surface attribute replaced.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new `Interface` with its surface attribute replaced.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -714,11 +783,27 @@
         <span class="n">newDict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
         <span class="k">del</span> <span class="n">newDict</span><span class="p">[</span><span class="s1">&#39;surface&#39;</span><span class="p">]</span>
         <span class="n">ret</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">surface</span><span class="p">,</span> <span class="o">**</span><span class="n">newDict</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">ret</span></div></div>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+<div class="viewcode-block" id="Interface.withPerturbedSurface"><a class="viewcode-back" href="../../optic.html#batoid.Interface.withPerturbedSurface">[docs]</a>    <span class="k">def</span> <span class="nf">withPerturbedSurface</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">perturbation</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new `Interface` with its surface attribute perturbed by</span>
+<span class="sd">        adding the given perturbation to the original surface.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        perturbation : `batoid.Surface`</span>
+<span class="sd">            Perturbation to apply to the surface.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        `Interface`</span>
+<span class="sd">            Interface with perturbed surface.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">withSurface</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surface</span> <span class="o">+</span> <span class="n">perturbation</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="RefractiveInterface"><a class="viewcode-back" href="../../optic.html#batoid.RefractiveInterface">[docs]</a><span class="k">class</span> <span class="nc">RefractiveInterface</span><span class="p">(</span><span class="n">Interface</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Specialization for refractive interfaces.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Specialization for refractive interfaces.</span>
 
 <span class="sd">    Rays will interact with this surface by refracting through it.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -753,7 +838,7 @@
 
 
 <div class="viewcode-block" id="Mirror"><a class="viewcode-back" href="../../optic.html#batoid.Mirror">[docs]</a><span class="k">class</span> <span class="nc">Mirror</span><span class="p">(</span><span class="n">Interface</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Specialization for reflective interfaces.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Specialization for reflective interfaces.</span>
 
 <span class="sd">    Rays will interact with this surface by reflecting off of it.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -776,7 +861,7 @@
 
 
 <div class="viewcode-block" id="Detector"><a class="viewcode-back" href="../../optic.html#batoid.Detector">[docs]</a><span class="k">class</span> <span class="nc">Detector</span><span class="p">(</span><span class="n">Interface</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Specialization for detector interfaces.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Specialization for detector interfaces.</span>
 
 <span class="sd">    Rays will interact with this surface by passing through it.  Usually,</span>
 <span class="sd">    however, this is the last `Optic` in a `CompoundOptic`, so tracing will</span>
@@ -798,7 +883,7 @@
 
 
 <div class="viewcode-block" id="Baffle"><a class="viewcode-back" href="../../optic.html#batoid.Baffle">[docs]</a><span class="k">class</span> <span class="nc">Baffle</span><span class="p">(</span><span class="n">Interface</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Specialization for baffle interfaces.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Specialization for baffle interfaces.</span>
 
 <span class="sd">    Rays will interact with this optic by passing straight through.  However,</span>
 <span class="sd">    the vignetting calculation will still be applied at this `Interface`.</span>
@@ -817,7 +902,7 @@
 
 
 <span class="k">class</span> <span class="nc">OPDScreen</span><span class="p">(</span><span class="n">Interface</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;An `Optic` defined by a surface and an Optical Path Difference function.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An `Optic` defined by a surface and an Optical Path Difference function.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -880,7 +965,7 @@
 
 
 <div class="viewcode-block" id="CompoundOptic"><a class="viewcode-back" href="../../optic.html#batoid.CompoundOptic">[docs]</a><span class="k">class</span> <span class="nc">CompoundOptic</span><span class="p">(</span><span class="n">Optic</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;An `Optic` containing two or more `Optic` s as subitems.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An `Optic` containing two or more `Optic` s as subitems.</span>
 
 <span class="sd">    Ray traces will be carried out sequentially for the subitems.</span>
 
@@ -898,7 +983,7 @@
 
     <span class="nd">@lazy_property</span>
     <span class="k">def</span> <span class="nf">itemDict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Dictionary access of the entire hierarchy of subitems of this</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dictionary access of the entire hierarchy of subitems of this</span>
 <span class="sd">        `CompoundOptic`.</span>
 
 <span class="sd">        The key for the first level is just the name of the `CompoundOptic`,</span>
@@ -921,7 +1006,7 @@
         <span class="k">return</span> <span class="n">out</span>
 
 <div class="viewcode-block" id="CompoundOptic.__getitem__"><a class="viewcode-back" href="../../optic.html#batoid.CompoundOptic.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Dictionary access to the entire hierarchy of subitems of this</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dictionary access to the entire hierarchy of subitems of this</span>
 <span class="sd">        `CompoundOptic`.</span>
 
 <span class="sd">        Either access through the fully-qualified name</span>
@@ -959,7 +1044,7 @@
         <span class="k">return</span> <span class="n">nameDict</span>
 
 <div class="viewcode-block" id="CompoundOptic.trace"><a class="viewcode-back" href="../../optic.html#batoid.CompoundOptic.trace">[docs]</a>    <span class="k">def</span> <span class="nf">trace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rv</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Recursively trace through all subitems of this `CompoundOptic`.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Recursively trace through all subitems of this `CompoundOptic`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1031,7 +1116,7 @@
         <span class="k">return</span> <span class="n">rv</span></div>
 
 <div class="viewcode-block" id="CompoundOptic.traceFull"><a class="viewcode-back" href="../../optic.html#batoid.CompoundOptic.traceFull">[docs]</a>    <span class="k">def</span> <span class="nf">traceFull</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rv</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Recursively trace rays through this `CompoundOptic`, returning a full</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Recursively trace rays through this `CompoundOptic`, returning a full</span>
 <span class="sd">        history of all surface intersections.</span>
 
 <span class="sd">        Parameters</span>
@@ -1130,7 +1215,7 @@
         <span class="k">return</span> <span class="n">result</span></div>
 
 <div class="viewcode-block" id="CompoundOptic.traceSplit"><a class="viewcode-back" href="../../optic.html#batoid.CompoundOptic.traceSplit">[docs]</a>    <span class="k">def</span> <span class="nf">traceSplit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rv</span><span class="p">,</span> <span class="n">minFlux</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">_verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Recursively trace rays through this `CompoundOptic`, splitting at</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Recursively trace rays through this `CompoundOptic`, splitting at</span>
 <span class="sd">        each surface.</span>
 
 <span class="sd">        The return values are rays that continuing in the &quot;forward&quot; direction,</span>
@@ -1168,7 +1253,7 @@
 <span class="sd">        -----</span>
 <span class="sd">        Returned forward (reverse) rays will be expressed in the local</span>
 <span class="sd">        coordinate system of the last (first) element of the CompoundOptic.</span>
-<span class="sd">        See `RayVector.toCoordSys to express rays in a different coordinate system.</span>
+<span class="sd">        See `RayVector.toCoordSys` to express rays in a different coordinate system.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">_verbose</span><span class="p">:</span>
             <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;reverse&quot;</span> <span class="k">if</span> <span class="n">reverse</span> <span class="k">else</span> <span class="s2">&quot;forward&quot;</span>
@@ -1228,19 +1313,32 @@
         <span class="k">return</span> <span class="n">outRForward</span><span class="p">,</span> <span class="n">outRReverse</span></div>
 
 <div class="viewcode-block" id="CompoundOptic.draw3d"><a class="viewcode-back" href="../../optic.html#batoid.CompoundOptic.draw3d">[docs]</a>    <span class="k">def</span> <span class="nf">draw3d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Recursively draw this `CompoundOptic` on a mplot3d axis by drawing</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Recursively draw this `CompoundOptic` on a mplot3d axis by drawing</span>
 <span class="sd">        all subitems.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        ax : mplot3d.Axis</span>
+<span class="sd">        ax : mplot3d.Axis or plotly.graph_objs.Figure</span>
 <span class="sd">            Axis on which to draw this optic.</span>
+<span class="sd">        plotly : bool</span>
+<span class="sd">            Set True to use plotly API instead of ipyvolume/matplotlib API</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">:</span>
             <span class="n">item</span><span class="o">.</span><span class="n">draw3d</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
+    <span class="k">def</span> <span class="nf">get3dmesh</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">xs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">zs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">:</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get3dmesh</span><span class="p">()</span>
+            <span class="n">xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">ys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+            <span class="n">zs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">xs</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">ys</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">zs</span><span class="p">)</span>
+
 <div class="viewcode-block" id="CompoundOptic.draw2d"><a class="viewcode-back" href="../../optic.html#batoid.CompoundOptic.draw2d">[docs]</a>    <span class="k">def</span> <span class="nf">draw2d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Draw a 2D slice of this `CompoundOptic` in the (x,z) plane.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Draw a 2D slice of this `CompoundOptic` in the (x,z) plane.</span>
 
 <span class="sd">        Calls draw2d recursively on each of our items, with the actual</span>
 <span class="sd">        drawing taking place in Interface and (optionally) Lens instances.</span>
@@ -1295,7 +1393,7 @@
                      <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inMedium</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outMedium</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span><span class="p">))</span>
 
 <div class="viewcode-block" id="CompoundOptic.withGlobalShift"><a class="viewcode-back" href="../../optic.html#batoid.CompoundOptic.withGlobalShift">[docs]</a>    <span class="k">def</span> <span class="nf">withGlobalShift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shift</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return a new `CompoundOptic` with its coordinate system shifted (and</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new `CompoundOptic` with its coordinate system shifted (and</span>
 <span class="sd">        the coordinate systems of all subitems)</span>
 
 <span class="sd">        Parameters</span>
@@ -1315,6 +1413,10 @@
         <span class="n">newDict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
         <span class="n">newDict</span><span class="p">[</span><span class="s1">&#39;coordSys&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span><span class="o">.</span><span class="n">shiftGlobal</span><span class="p">(</span><span class="n">shift</span><span class="p">)</span>
         <span class="k">del</span> <span class="n">newDict</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;stopSurface&#39;</span> <span class="ow">in</span> <span class="n">newDict</span><span class="p">:</span>
+            <span class="n">newDict</span><span class="p">[</span><span class="s1">&#39;stopSurface&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">newDict</span><span class="p">[</span><span class="s1">&#39;stopSurface&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">withGlobalShift</span><span class="p">(</span><span class="n">shift</span><span class="p">)</span>
+            <span class="p">)</span>
         <span class="n">ret</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">newItems</span><span class="p">,</span>
             <span class="o">**</span><span class="n">newDict</span>
@@ -1322,7 +1424,7 @@
         <span class="k">return</span> <span class="n">ret</span></div>
 
 <div class="viewcode-block" id="CompoundOptic.withLocalShift"><a class="viewcode-back" href="../../optic.html#batoid.CompoundOptic.withLocalShift">[docs]</a>    <span class="k">def</span> <span class="nf">withLocalShift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shift</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return a new `CompoundOptic` with its coordinate system shifted.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new `CompoundOptic` with its coordinate system shifted.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1336,10 +1438,10 @@
 <span class="sd">            Shifted interface.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Clearer to apply the rotated global shift.</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">withGlobalShift</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span><span class="o">.</span><span class="n">rot</span><span class="p">,</span> <span class="n">shift</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">withGlobalShift</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span><span class="o">.</span><span class="n">rot</span><span class="nd">@shift</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CompoundOptic.withGloballyShiftedOptic"><a class="viewcode-back" href="../../optic.html#batoid.CompoundOptic.withGloballyShiftedOptic">[docs]</a>    <span class="k">def</span> <span class="nf">withGloballyShiftedOptic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">shift</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return a new `CompoundOptic` with the coordinate system of one of</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new `CompoundOptic` with the coordinate system of one of</span>
 <span class="sd">        its subitems shifted.</span>
 
 <span class="sd">        Parameters</span>
@@ -1389,7 +1491,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="CompoundOptic.withLocallyShiftedOptic"><a class="viewcode-back" href="../../optic.html#batoid.CompoundOptic.withLocallyShiftedOptic">[docs]</a>    <span class="k">def</span> <span class="nf">withLocallyShiftedOptic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">shift</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return a new `CompoundOptic` with the coordinate system of one of</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new `CompoundOptic` with the coordinate system of one of</span>
 <span class="sd">        its subitems shifted.</span>
 
 <span class="sd">        Parameters</span>
@@ -1405,50 +1507,71 @@
 <span class="sd">        `CompoundOptic`</span>
 <span class="sd">            Optic with shifted subitem.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># If name is one of items.names, the we use withGlobalShift, and we&#39;re</span>
-        <span class="c1"># done.  If not, then we need to recurse down to whichever item</span>
-        <span class="c1"># contains name.  Verify that name is in self.itemDict, but first</span>
-        <span class="c1"># convert partially qualified name to fully qualified.</span>
-        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_names</span><span class="p">:</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_names</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">itemDict</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Optic </span><span class="si">{}</span><span class="s2"> not found&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">withLocalShift</span><span class="p">(</span><span class="n">shift</span><span class="p">)</span>
-        <span class="c1"># Clip off leading token</span>
-        <span class="k">assert</span> <span class="n">name</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">+</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot; != &quot;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">+</span><span class="s2">&quot;.&quot;</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span>
-        <span class="n">newItems</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">newDict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
-        <span class="k">del</span> <span class="n">newDict</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="n">item</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
-                    <span class="n">newItems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">withLocalShift</span><span class="p">(</span><span class="n">shift</span><span class="p">))</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">newItems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">withLocallyShiftedOptic</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">shift</span><span class="p">))</span>
-                <span class="n">newItems</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:])</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span>
-                    <span class="n">newItems</span><span class="p">,</span>
-                    <span class="o">**</span><span class="n">newDict</span>
-                <span class="p">)</span>
-            <span class="n">newItems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-            <span class="s2">&quot;Error in withLocallyShiftedOptic!, Shouldn&#39;t get here!&quot;</span>
-        <span class="p">)</span></div>
+        <span class="c1"># Just apply the rotated global shift.</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">withGloballyShiftedOptic</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span><span class="o">.</span><span class="n">rot</span><span class="nd">@shift</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CompoundOptic.withLocalRotation"><a class="viewcode-back" href="../../optic.html#batoid.CompoundOptic.withLocalRotation">[docs]</a>    <span class="k">def</span> <span class="nf">withLocalRotation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rot</span><span class="p">,</span> <span class="n">rotOrigin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">coordSys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return a new `CompoundOptic` with its coordinate system rotated.</span>
+<div class="viewcode-block" id="CompoundOptic.withGlobalRotation"><a class="viewcode-back" href="../../optic.html#batoid.CompoundOptic.withGlobalRotation">[docs]</a>    <span class="k">def</span> <span class="nf">withGlobalRotation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rot</span><span class="p">,</span> <span class="n">rotCenter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">coordSys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new `CompoundOptic` with its coordinate system rotated.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rot : array (3,3)</span>
+<span class="sd">            Rotation matrix wrt to the global coordinate system to apply.</span>
+<span class="sd">        rotCenter : array (3,)</span>
+<span class="sd">            Point about which to rotate.  Default: None means use [0,0,0]</span>
+<span class="sd">        coordSys : `batoid.CoordSys`</span>
+<span class="sd">            Coordinate system of rotCenter above.  Default: None means use</span>
+<span class="sd">            the global coordinate system.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        `CompoundOptic`</span>
+<span class="sd">            Rotated optic.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">rotCenter</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rotCenter</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">coordSys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">coordSys</span> <span class="o">=</span> <span class="n">globalCoordSys</span>
+
+        <span class="n">newItems</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">:</span>
+            <span class="n">newItems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">item</span><span class="o">.</span><span class="n">withGlobalRotation</span><span class="p">(</span>
+                    <span class="n">rot</span><span class="p">,</span>
+                    <span class="n">rotCenter</span><span class="p">,</span>
+                    <span class="n">coordSys</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span>
+        <span class="n">newDict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+        <span class="n">newDict</span><span class="p">[</span><span class="s1">&#39;coordSys&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span><span class="o">.</span><span class="n">rotateGlobal</span><span class="p">(</span>
+            <span class="n">rot</span><span class="p">,</span> <span class="n">rotCenter</span><span class="p">,</span> <span class="n">coordSys</span>
+        <span class="p">)</span>
+        <span class="k">del</span> <span class="n">newDict</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;stopSurface&#39;</span> <span class="ow">in</span> <span class="n">newDict</span><span class="p">:</span>
+            <span class="n">newDict</span><span class="p">[</span><span class="s1">&#39;stopSurface&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">newDict</span><span class="p">[</span><span class="s1">&#39;stopSurface&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">withGlobalRotation</span><span class="p">(</span>
+                    <span class="n">rot</span><span class="p">,</span> <span class="n">rotCenter</span><span class="p">,</span> <span class="n">coordSys</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="n">ret</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">newItems</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">newDict</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+<div class="viewcode-block" id="CompoundOptic.withLocalRotation"><a class="viewcode-back" href="../../optic.html#batoid.CompoundOptic.withLocalRotation">[docs]</a>    <span class="k">def</span> <span class="nf">withLocalRotation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rot</span><span class="p">,</span> <span class="n">rotCenter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">coordSys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new `CompoundOptic` with its coordinate system rotated.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        rot : array (3,3)</span>
 <span class="sd">            Rotation matrix wrt to the local coordinate system to apply.</span>
-<span class="sd">        rotOrigin : array (3,)</span>
-<span class="sd">            Origin of rotation.  Default: None means use [0,0,0]</span>
+<span class="sd">        rotCenter : array (3,)</span>
+<span class="sd">            Point about which to rotate.  Default: None means use [0,0,0]</span>
 <span class="sd">        coordSys : `batoid.CoordSys`</span>
-<span class="sd">            Coordinate system of rotOrigin above.  Default: None means use</span>
+<span class="sd">            Coordinate system of rotCenter above.  Default: None means use</span>
 <span class="sd">            self.coordSys.</span>
 
 <span class="sd">        Returns</span>
@@ -1456,26 +1579,20 @@
 <span class="sd">        `CompoundOptic`</span>
 <span class="sd">            Rotated optic.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">rotOrigin</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">coordSys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">rotCenter</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rotCenter</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">coordSys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">coordSys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span>
-            <span class="n">rotOrigin</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">newItems</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">withLocalRotation</span><span class="p">(</span><span class="n">rot</span><span class="p">,</span> <span class="n">rotOrigin</span><span class="p">,</span> <span class="n">coordSys</span><span class="p">)</span>
-                    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">]</span>
-        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span>
-        <span class="n">newDict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
-        <span class="n">newDict</span><span class="p">[</span><span class="s1">&#39;coordSys&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span><span class="o">.</span><span class="n">rotateLocal</span><span class="p">(</span>
-            <span class="n">rot</span><span class="p">,</span> <span class="n">rotOrigin</span><span class="p">,</span> <span class="n">coordSys</span>
-        <span class="p">)</span>
-        <span class="k">del</span> <span class="n">newDict</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">]</span>
-        <span class="n">ret</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">newItems</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">newDict</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">ret</span></div>
+        <span class="c1"># Convert to global rotation</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">withGlobalRotation</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span><span class="o">.</span><span class="n">rot</span><span class="nd">@rot@self</span><span class="o">.</span><span class="n">coordSys</span><span class="o">.</span><span class="n">rot</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
+            <span class="n">rotCenter</span><span class="p">,</span>
+            <span class="n">coordSys</span>
+        <span class="p">)</span></div>
 
-<div class="viewcode-block" id="CompoundOptic.withLocallyRotatedOptic"><a class="viewcode-back" href="../../optic.html#batoid.CompoundOptic.withLocallyRotatedOptic">[docs]</a>    <span class="k">def</span> <span class="nf">withLocallyRotatedOptic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">rot</span><span class="p">,</span> <span class="n">rotOrigin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="CompoundOptic.withLocallyRotatedOptic"><a class="viewcode-back" href="../../optic.html#batoid.CompoundOptic.withLocallyRotatedOptic">[docs]</a>    <span class="k">def</span> <span class="nf">withLocallyRotatedOptic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">rot</span><span class="p">,</span> <span class="n">rotCenter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                 <span class="n">coordSys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return a new `CompoundOptic` with the coordinate system of one of</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new `CompoundOptic` with the coordinate system of one of</span>
 <span class="sd">        its subitems rotated.</span>
 
 <span class="sd">        Parameters</span>
@@ -1485,10 +1602,10 @@
 <span class="sd">        rot : array (3,3)</span>
 <span class="sd">            Rotation matrix wrt to the subitem&#39;s local coordinate system to</span>
 <span class="sd">            apply.</span>
-<span class="sd">        rotOrigin : array (3,)</span>
-<span class="sd">            Origin of rotation.  Default: None means use [0,0,0]</span>
+<span class="sd">        rotCenter : array (3,)</span>
+<span class="sd">            Point about which to rotate.  Default: None means use [0,0,0]</span>
 <span class="sd">        coordSys : `batoid.CoordSys`</span>
-<span class="sd">            Coordinate system of rotOrigin above.  Default: None means use the</span>
+<span class="sd">            Coordinate system of rotCenter above.  Default: None means use the</span>
 <span class="sd">            coordinate system of the subitem being rotated.</span>
 
 <span class="sd">        Returns</span>
@@ -1504,11 +1621,12 @@
             <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_names</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">itemDict</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Optic </span><span class="si">{}</span><span class="s2"> not found&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">withLocalRotation</span><span class="p">(</span><span class="n">rot</span><span class="p">,</span> <span class="n">rotOrigin</span><span class="p">,</span> <span class="n">coordSys</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">rotOrigin</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">coordSys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">rotCenter</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rotCenter</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">coordSys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">coordSys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itemDict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">coordSys</span>
-            <span class="n">rotOrigin</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">withLocalRotation</span><span class="p">(</span><span class="n">rot</span><span class="p">,</span> <span class="n">rotCenter</span><span class="p">,</span> <span class="n">coordSys</span><span class="p">)</span>
         <span class="c1"># Clip off leading token</span>
         <span class="k">assert</span> <span class="n">name</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> \
             <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">+</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot; != &quot;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">+</span><span class="s2">&quot;.&quot;</span>
@@ -1520,11 +1638,11 @@
             <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="n">item</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
                     <span class="n">newItems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">withLocalRotation</span><span class="p">(</span>
-                        <span class="n">rot</span><span class="p">,</span> <span class="n">rotOrigin</span><span class="p">,</span> <span class="n">coordSys</span>
+                        <span class="n">rot</span><span class="p">,</span> <span class="n">rotCenter</span><span class="p">,</span> <span class="n">coordSys</span>
                     <span class="p">))</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">newItems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">withLocallyRotatedOptic</span><span class="p">(</span>
-                        <span class="n">name</span><span class="p">,</span> <span class="n">rot</span><span class="p">,</span> <span class="n">rotOrigin</span><span class="p">,</span> <span class="n">coordSys</span>
+                        <span class="n">name</span><span class="p">,</span> <span class="n">rot</span><span class="p">,</span> <span class="n">rotCenter</span><span class="p">,</span> <span class="n">coordSys</span>
                     <span class="p">))</span>
                 <span class="n">newItems</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:])</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span>
@@ -1537,7 +1655,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="CompoundOptic.withSurface"><a class="viewcode-back" href="../../optic.html#batoid.CompoundOptic.withSurface">[docs]</a>    <span class="k">def</span> <span class="nf">withSurface</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">surface</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return a new `CompoundOptic` with one of its subitem&#39;s surfaces</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new `CompoundOptic` with one of its subitem&#39;s surfaces</span>
 <span class="sd">        attribute replaced.</span>
 
 <span class="sd">        Parameters</span>
@@ -1575,11 +1693,35 @@
                     <span class="o">**</span><span class="n">newDict</span>
                 <span class="p">)</span>
             <span class="n">newItems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Error in withSurface.  Shouldn&#39;t get here!&quot;</span><span class="p">)</span></div></div>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Error in withSurface.  Shouldn&#39;t get here!&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CompoundOptic.withPerturbedSurface"><a class="viewcode-back" href="../../optic.html#batoid.CompoundOptic.withPerturbedSurface">[docs]</a>    <span class="k">def</span> <span class="nf">withPerturbedSurface</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">perturbation</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new `CompoundOptic` with one of its subitem&#39;s surfaces</span>
+<span class="sd">        attribute perturbed by adding the given perturbation to the original</span>
+<span class="sd">        surface.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name : str</span>
+<span class="sd">            Which subitem&#39;s surface to replace.</span>
+<span class="sd">        perturbation : `batoid.Surface`</span>
+<span class="sd">            Surface to add to the original surface.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        `CompoundOptic`</span>
+<span class="sd">            Optic with perturbed surface.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_names</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_names</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">withSurface</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">itemDict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">surface</span> <span class="o">+</span> <span class="n">perturbation</span>
+        <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="Lens"><a class="viewcode-back" href="../../optic.html#batoid.Lens">[docs]</a><span class="k">class</span> <span class="nc">Lens</span><span class="p">(</span><span class="n">CompoundOptic</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;An lens with two `Interface` s as front and back surfaces.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An lens with two `Interface` s as front and back surfaces.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1594,7 +1736,7 @@
         <span class="k">assert</span> <span class="n">items</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">outMedium</span> <span class="o">==</span> <span class="n">items</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">inMedium</span>
 
 <div class="viewcode-block" id="Lens.draw2d"><a class="viewcode-back" href="../../optic.html#batoid.Lens.draw2d">[docs]</a>    <span class="k">def</span> <span class="nf">draw2d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Specialized draw2d for `Lens` instances.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Specialized draw2d for `Lens` instances.</span>
 
 <span class="sd">        If the optional keyword &#39;only&#39; equals `Lens`, then fill the area</span>
 <span class="sd">        between the lens refractive interfaces using the remaining specified</span>
@@ -1638,7 +1780,7 @@
 
 
 <span class="k">def</span> <span class="nf">getGlobalRays</span><span class="p">(</span><span class="n">traceFull</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">globalSys</span><span class="o">=</span><span class="n">globalCoordSys</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Calculate an array of ray vertices in global coordinates.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate an array of ray vertices in global coordinates.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1700,12 +1842,12 @@
     <span class="k">return</span> <span class="n">xyz</span><span class="p">,</span> <span class="n">raylen</span>
 
 
-<span class="k">def</span> <span class="nf">drawTrace3d</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">traceFull</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Draw 3D rays in global coordinates on the specified axis.</span>
+<span class="k">def</span> <span class="nf">drawTrace3d</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">traceFull</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plotly</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Draw 3D rays in global coordinates on the specified axis.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    ax : mplot3d.Axis</span>
+<span class="sd">    ax : mplot3d.Axis or plotly.graph_objs.Figure</span>
 <span class="sd">        Axis on which to draw rays.</span>
 <span class="sd">    traceFull : OrderedDict</span>
 <span class="sd">        Array of per-surface ray-tracing output from traceFull()</span>
@@ -1715,16 +1857,26 @@
 <span class="sd">    end : str or None</span>
 <span class="sd">        Name of the last surface to include in the output, or use the last</span>
 <span class="sd">        surface in the model when None.</span>
+<span class="sd">    plotly : bool</span>
+<span class="sd">        Set True to use plotly API instead of ipyvolume/matplotlib API</span>
 <span class="sd">    globalSys : `batoid.CoordSys`</span>
 <span class="sd">        Global coordinate system to use.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">xyz</span><span class="p">,</span> <span class="n">raylen</span> <span class="o">=</span> <span class="n">getGlobalRays</span><span class="p">(</span><span class="n">traceFull</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">line</span><span class="p">,</span> <span class="n">nline</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">xyz</span><span class="p">,</span> <span class="n">raylen</span><span class="p">):</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:</span><span class="n">nline</span><span class="p">],</span> <span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="n">nline</span><span class="p">],</span> <span class="n">line</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:</span><span class="n">nline</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">plotly</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">add_scatter3d</span><span class="p">(</span>
+                <span class="n">x</span><span class="o">=</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:</span><span class="n">nline</span><span class="p">],</span>
+                <span class="n">y</span><span class="o">=</span><span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="n">nline</span><span class="p">],</span>
+                <span class="n">z</span><span class="o">=</span><span class="n">line</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:</span><span class="n">nline</span><span class="p">],</span>
+                <span class="o">**</span><span class="n">kwargs</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:</span><span class="n">nline</span><span class="p">],</span> <span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="n">nline</span><span class="p">],</span> <span class="n">line</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:</span><span class="n">nline</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">drawTrace2d</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">traceFull</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Draw 2D rays in global coordinates on the specified axis.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Draw 2D rays in global coordinates on the specified axis.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1749,46 +1901,30 @@
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017-2021, Josh Meyers.
-
-    </p>
+    <p>&#169; Copyright 2017-2021, Josh Meyers.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

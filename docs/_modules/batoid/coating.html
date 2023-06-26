@@ -1,94 +1,47 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>batoid.coating &mdash; batoid 0.3.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>batoid.coating &mdash; batoid 0.4.2 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="../../index.html" class="icon icon-home"> batoid
           
-
-          
+          <a href="../../index.html" class="icon icon-home">
+            batoid
           </a>
-
-          
-            
-            
               <div class="version">
-                0.3
+                0.4
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../rays.html">Rays</a></li>
@@ -102,76 +55,37 @@
 <li class="toctree-l1"><a class="reference internal" href="../../lattice.html">Lattices</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">batoid</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-        
-      <li>batoid.coating</li>
-    
-    
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">batoid.coating</li>
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for batoid.coating</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">batoid.trace</span> <span class="kn">import</span> <span class="n">reflect</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_batoid</span>
 
 
 <div class="viewcode-block" id="Coating"><a class="viewcode-back" href="../../coatings.html#batoid.Coating">[docs]</a><span class="k">class</span> <span class="nc">Coating</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Class to control ray reflection/transmission at an `Interface`.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to control ray reflection/transmission at an `Interface`.</span>
 
 <span class="sd">    Coatings can be used to split a ray into reflected/refracted components</span>
 <span class="sd">    using `Surface.rSplit`, or control the transmission or reflection</span>
@@ -183,7 +97,7 @@
 <span class="sd">    between the incoming ray and the surface normal.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="Coating.getCoefs"><a class="viewcode-back" href="../../coatings.html#batoid.Coating.getCoefs">[docs]</a>    <span class="k">def</span> <span class="nf">getCoefs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span> <span class="n">cosIncidenceAngle</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return reflection and transmission coefficients.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return reflection and transmission coefficients.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -200,7 +114,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coating</span><span class="o">.</span><span class="n">getCoefs</span><span class="p">(</span><span class="n">wavelength</span><span class="p">,</span> <span class="n">cosIncidenceAngle</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Coating.getReflect"><a class="viewcode-back" href="../../coatings.html#batoid.Coating.getReflect">[docs]</a>    <span class="k">def</span> <span class="nf">getReflect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span> <span class="n">cosIncidenceAngle</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return reflection coefficient.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return reflection coefficient.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -216,7 +130,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coating</span><span class="o">.</span><span class="n">getReflect</span><span class="p">(</span><span class="n">wavelength</span><span class="p">,</span> <span class="n">cosIncidenceAngle</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Coating.getTransmit"><a class="viewcode-back" href="../../coatings.html#batoid.Coating.getTransmit">[docs]</a>    <span class="k">def</span> <span class="nf">getTransmit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span> <span class="n">cosIncidenceAngle</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return transmission coefficient.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return transmission coefficient.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -236,7 +150,7 @@
 
 
 <div class="viewcode-block" id="SimpleCoating"><a class="viewcode-back" href="../../coatings.html#batoid.SimpleCoating">[docs]</a><span class="k">class</span> <span class="nc">SimpleCoating</span><span class="p">(</span><span class="n">Coating</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Coating with reflectivity and transmissivity that are both constant with</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Coating with reflectivity and transmissivity that are both constant with</span>
 <span class="sd">    wavelength and incidence angle.</span>
 
 <span class="sd">    Parameters</span>
@@ -274,46 +188,30 @@
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017-2021, Josh Meyers.
-
-    </p>
+    <p>&#169; Copyright 2017-2021, Josh Meyers.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

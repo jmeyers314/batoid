@@ -1,179 +1,106 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Obscurations &mdash; batoid 0.3.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>Obscurations &mdash; batoid 0.4.2 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Media" href="media.html" />
     <link rel="prev" title="Coordinate Systems" href="coords.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="index.html" class="icon icon-home"> batoid
           
-
-          
+          <a href="index.html" class="icon icon-home">
+            batoid
           </a>
-
-          
-            
-            
               <div class="version">
-                0.3
+                0.4
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rays.html">Rays</a></li>
 <li class="toctree-l1"><a class="reference internal" href="surfaces.html">Surfaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="optic.html">Optics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="coords.html">Coordinate Systems</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Obscurations</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Obscurations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#batoid.Obscuration"><code class="docutils literal notranslate"><span class="pre">Obscuration</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.Obscuration.contains"><code class="docutils literal notranslate"><span class="pre">Obscuration.contains()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.Obscuration.obscure"><code class="docutils literal notranslate"><span class="pre">Obscuration.obscure()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#batoid.ObscCircle"><code class="docutils literal notranslate"><span class="pre">ObscCircle</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#batoid.ObscAnnulus"><code class="docutils literal notranslate"><span class="pre">ObscAnnulus</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#batoid.ObscRectangle"><code class="docutils literal notranslate"><span class="pre">ObscRectangle</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#batoid.ObscRay"><code class="docutils literal notranslate"><span class="pre">ObscRay</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#batoid.ObscNegation"><code class="docutils literal notranslate"><span class="pre">ObscNegation</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#batoid.ObscUnion"><code class="docutils literal notranslate"><span class="pre">ObscUnion</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#batoid.ObscIntersection"><code class="docutils literal notranslate"><span class="pre">ObscIntersection</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="media.html">Media</a></li>
 <li class="toctree-l1"><a class="reference internal" href="coatings.html">Coatings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lattice.html">Lattices</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">batoid</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
-      <li>Obscurations</li>
-    
-    
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Obscurations</li>
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/obscurations.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="obscurations">
-<h1>Obscurations<a class="headerlink" href="#obscurations" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="obscurations">
+<h1>Obscurations<a class="headerlink" href="#obscurations" title="Permalink to this heading"></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="batoid.Obscuration">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">batoid.</span></span><span class="sig-name descname"><span class="pre">Obscuration</span></span><a class="reference internal" href="_modules/batoid/obscuration.html#Obscuration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.Obscuration" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">batoid.</span></span><span class="sig-name descname"><span class="pre">Obscuration</span></span><a class="reference internal" href="_modules/batoid/obscuration.html#Obscuration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.Obscuration" title="Permalink to this definition"></a></dt>
 <dd><p>An <a class="reference internal" href="#batoid.Obscuration" title="batoid.Obscuration"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Obscuration</span></code></a> instance is used to mark as vignetted (i.e., obscured)
 if their x/y coordinates lie in a particular region.</p>
 <p><a class="reference internal" href="#batoid.Obscuration" title="batoid.Obscuration"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Obscuration</span></code></a> s are useful for modeling pupils, clear apertures of optical
@@ -182,13 +109,13 @@ Note that only the x and y local coordinates of rays are considered; the z
 coordinate is ignored.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="batoid.Obscuration.contains">
-<span class="sig-name descname"><span class="pre">contains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/obscuration.html#Obscuration.contains"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.Obscuration.contains" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">contains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/obscuration.html#Obscuration.contains"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.Obscuration.contains" title="Permalink to this definition"></a></dt>
 <dd><p>Return True if the point (x,y) is obscured.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x, y</strong> (<em>float</em>) – X/Y coordinates of point in meters.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>obscured</strong> (<em>bool</em>) – True if point is obscured.  False otherwise.</p>
 </dd>
 </dl>
@@ -196,13 +123,13 @@ coordinate is ignored.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="batoid.Obscuration.obscure">
-<span class="sig-name descname"><span class="pre">obscure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rv</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/obscuration.html#Obscuration.obscure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.Obscuration.obscure" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">obscure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rv</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/obscuration.html#Obscuration.obscure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.Obscuration.obscure" title="Permalink to this definition"></a></dt>
 <dd><p>Mark rays for potential vignetting.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>rv</strong> (<a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RayVector</span></code></a>) – Rays to analyze.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>out</strong> (<a class="reference internal" href="rays.html#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RayVector</span></code></a>) – Returned object will have appropriate elements marked as vignetted.</p>
 </dd>
 </dl>
@@ -212,11 +139,11 @@ coordinate is ignored.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="batoid.ObscCircle">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">batoid.</span></span><span class="sig-name descname"><span class="pre">ObscCircle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/obscuration.html#ObscCircle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.ObscCircle" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#batoid.Obscuration" title="batoid.obscuration.Obscuration"><code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.obscuration.Obscuration</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">batoid.</span></span><span class="sig-name descname"><span class="pre">ObscCircle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/obscuration.html#ObscCircle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.ObscCircle" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#batoid.Obscuration" title="batoid.obscuration.Obscuration"><code class="xref py py-class docutils literal notranslate"><span class="pre">Obscuration</span></code></a></p>
 <p>A circular obscuration.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>radius</strong> (<em>float</em>) – Radius of circle in meters.</p></li>
 <li><p><strong>x, y</strong> (<em>float, optional</em>) – Coordinates of circle center in meters.  [default: 0.0]</p></li>
@@ -227,11 +154,11 @@ coordinate is ignored.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="batoid.ObscAnnulus">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">batoid.</span></span><span class="sig-name descname"><span class="pre">ObscAnnulus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/obscuration.html#ObscAnnulus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.ObscAnnulus" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#batoid.Obscuration" title="batoid.obscuration.Obscuration"><code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.obscuration.Obscuration</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">batoid.</span></span><span class="sig-name descname"><span class="pre">ObscAnnulus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/obscuration.html#ObscAnnulus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.ObscAnnulus" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#batoid.Obscuration" title="batoid.obscuration.Obscuration"><code class="xref py py-class docutils literal notranslate"><span class="pre">Obscuration</span></code></a></p>
 <p>An annular obscuration.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>inner</strong> (<em>float</em>) – Inner radius of annulus in meters.</p></li>
 <li><p><strong>outer</strong> (<em>float</em>) – Outer radius of annulus in meters.</p></li>
@@ -243,11 +170,11 @@ coordinate is ignored.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="batoid.ObscRectangle">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">batoid.</span></span><span class="sig-name descname"><span class="pre">ObscRectangle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/obscuration.html#ObscRectangle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.ObscRectangle" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#batoid.Obscuration" title="batoid.obscuration.Obscuration"><code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.obscuration.Obscuration</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">batoid.</span></span><span class="sig-name descname"><span class="pre">ObscRectangle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/obscuration.html#ObscRectangle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.ObscRectangle" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#batoid.Obscuration" title="batoid.obscuration.Obscuration"><code class="xref py py-class docutils literal notranslate"><span class="pre">Obscuration</span></code></a></p>
 <p>A rectangular obscuration.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>width</strong> (<em>float</em>) – Width (X-extent) of rectangle in meters.</p></li>
 <li><p><strong>height</strong> (<em>float</em>) – Height (Y-extent) of rectangle in meters.</p></li>
@@ -260,12 +187,12 @@ coordinate is ignored.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="batoid.ObscRay">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">batoid.</span></span><span class="sig-name descname"><span class="pre">ObscRay</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/obscuration.html#ObscRay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.ObscRay" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#batoid.Obscuration" title="batoid.obscuration.Obscuration"><code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.obscuration.Obscuration</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">batoid.</span></span><span class="sig-name descname"><span class="pre">ObscRay</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/obscuration.html#ObscRay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.ObscRay" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#batoid.Obscuration" title="batoid.obscuration.Obscuration"><code class="xref py py-class docutils literal notranslate"><span class="pre">Obscuration</span></code></a></p>
 <p>A finite-width ray-like obscuration.</p>
 <p>(Like a rectangle, but infinitely long in one direction.)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>width</strong> (<em>float</em>) – Width of ray obscuration in meters.</p></li>
 <li><p><strong>theta</strong> (<em>float</em>) – Rotation angle of ray in radians.</p></li>
@@ -277,13 +204,13 @@ coordinate is ignored.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="batoid.ObscNegation">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">batoid.</span></span><span class="sig-name descname"><span class="pre">ObscNegation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/obscuration.html#ObscNegation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.ObscNegation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#batoid.Obscuration" title="batoid.obscuration.Obscuration"><code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.obscuration.Obscuration</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">batoid.</span></span><span class="sig-name descname"><span class="pre">ObscNegation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/obscuration.html#ObscNegation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.ObscNegation" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#batoid.Obscuration" title="batoid.obscuration.Obscuration"><code class="xref py py-class docutils literal notranslate"><span class="pre">Obscuration</span></code></a></p>
 <p>A negated obscuration.</p>
 <p>The originally obscured regions become clear, and the originally clear
 regions become obscured.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>original</strong> (<a class="reference internal" href="#batoid.Obscuration" title="batoid.Obscuration"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Obscuration</span></code></a>) – The obscuration to negate.</p>
 </dd>
 </dl>
@@ -291,11 +218,11 @@ regions become obscured.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="batoid.ObscUnion">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">batoid.</span></span><span class="sig-name descname"><span class="pre">ObscUnion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">items</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/obscuration.html#ObscUnion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.ObscUnion" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#batoid.Obscuration" title="batoid.obscuration.Obscuration"><code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.obscuration.Obscuration</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">batoid.</span></span><span class="sig-name descname"><span class="pre">ObscUnion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">items</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/obscuration.html#ObscUnion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.ObscUnion" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#batoid.Obscuration" title="batoid.obscuration.Obscuration"><code class="xref py py-class docutils literal notranslate"><span class="pre">Obscuration</span></code></a></p>
 <p>A union of <a class="reference internal" href="#batoid.Obscuration" title="batoid.Obscuration"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Obscuration</span></code></a> s.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>*items</strong> (<a class="reference internal" href="#batoid.Obscuration" title="batoid.Obscuration"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Obscuration</span></code></a> s) – The <a class="reference internal" href="#batoid.Obscuration" title="batoid.Obscuration"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Obscuration</span></code></a> s to unionize.</p>
 </dd>
 </dl>
@@ -327,11 +254,11 @@ above, their behavior with respect to obscuring rays is the same:</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="batoid.ObscIntersection">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">batoid.</span></span><span class="sig-name descname"><span class="pre">ObscIntersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">items</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/obscuration.html#ObscIntersection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.ObscIntersection" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#batoid.Obscuration" title="batoid.obscuration.Obscuration"><code class="xref py py-class docutils literal notranslate"><span class="pre">batoid.obscuration.Obscuration</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">batoid.</span></span><span class="sig-name descname"><span class="pre">ObscIntersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">items</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/obscuration.html#ObscIntersection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.ObscIntersection" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#batoid.Obscuration" title="batoid.obscuration.Obscuration"><code class="xref py py-class docutils literal notranslate"><span class="pre">Obscuration</span></code></a></p>
 <p>An intersection of <a class="reference internal" href="#batoid.Obscuration" title="batoid.Obscuration"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Obscuration</span></code></a> s.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>*items</strong> (<a class="reference internal" href="#batoid.Obscuration" title="batoid.Obscuration"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Obscuration</span></code></a> s) – The <a class="reference internal" href="#batoid.Obscuration" title="batoid.Obscuration"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Obscuration</span></code></a> s to intersect.</p>
 </dd>
 </dl>
@@ -367,54 +294,37 @@ above, their behavior with respect to obscuring rays is the same:</p>
 </div>
 </dd></dl>
 
-</div>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="media.html" class="btn btn-neutral float-right" title="Media" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="coords.html" class="btn btn-neutral float-left" title="Coordinate Systems" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="media.html" class="btn btn-neutral float-right" title="Media" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017-2021, Josh Meyers.
-
-    </p>
+    <p>&#169; Copyright 2017-2021, Josh Meyers.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

@@ -1,100 +1,88 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Rays &mdash; batoid 0.3.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>Rays &mdash; batoid 0.4.2 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Surfaces" href="surfaces.html" />
     <link rel="prev" title="Overview" href="overview.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="index.html" class="icon icon-home"> batoid
           
-
-          
+          <a href="index.html" class="icon icon-home">
+            batoid
           </a>
-
-          
-            
-            
               <div class="version">
-                0.3
+                0.4
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Rays</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Rays</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#batoid.RayVector"><code class="docutils literal notranslate"><span class="pre">RayVector</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.positionAtTime"><code class="docutils literal notranslate"><span class="pre">RayVector.positionAtTime()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.propagate"><code class="docutils literal notranslate"><span class="pre">RayVector.propagate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.phase"><code class="docutils literal notranslate"><span class="pre">RayVector.phase()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.amplitude"><code class="docutils literal notranslate"><span class="pre">RayVector.amplitude()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.sumAmplitude"><code class="docutils literal notranslate"><span class="pre">RayVector.sumAmplitude()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.asGrid"><code class="docutils literal notranslate"><span class="pre">RayVector.asGrid()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.asPolar"><code class="docutils literal notranslate"><span class="pre">RayVector.asPolar()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.asSpokes"><code class="docutils literal notranslate"><span class="pre">RayVector.asSpokes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.fromStop"><code class="docutils literal notranslate"><span class="pre">RayVector.fromStop()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.fromFieldAngles"><code class="docutils literal notranslate"><span class="pre">RayVector.fromFieldAngles()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.r"><code class="docutils literal notranslate"><span class="pre">RayVector.r</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.x"><code class="docutils literal notranslate"><span class="pre">RayVector.x</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.y"><code class="docutils literal notranslate"><span class="pre">RayVector.y</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.z"><code class="docutils literal notranslate"><span class="pre">RayVector.z</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.v"><code class="docutils literal notranslate"><span class="pre">RayVector.v</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.vx"><code class="docutils literal notranslate"><span class="pre">RayVector.vx</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.vy"><code class="docutils literal notranslate"><span class="pre">RayVector.vy</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.vz"><code class="docutils literal notranslate"><span class="pre">RayVector.vz</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.t"><code class="docutils literal notranslate"><span class="pre">RayVector.t</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.wavelength"><code class="docutils literal notranslate"><span class="pre">RayVector.wavelength</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.flux"><code class="docutils literal notranslate"><span class="pre">RayVector.flux</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.vignetted"><code class="docutils literal notranslate"><span class="pre">RayVector.vignetted</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.failed"><code class="docutils literal notranslate"><span class="pre">RayVector.failed</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.k"><code class="docutils literal notranslate"><span class="pre">RayVector.k</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.kx"><code class="docutils literal notranslate"><span class="pre">RayVector.kx</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.ky"><code class="docutils literal notranslate"><span class="pre">RayVector.ky</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.kz"><code class="docutils literal notranslate"><span class="pre">RayVector.kz</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.omega"><code class="docutils literal notranslate"><span class="pre">RayVector.omega</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batoid.RayVector.toCoordSys"><code class="docutils literal notranslate"><span class="pre">RayVector.toCoordSys()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="surfaces.html">Surfaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="optic.html">Optics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="coords.html">Coordinate Systems</a></li>
@@ -105,84 +93,43 @@
 <li class="toctree-l1"><a class="reference internal" href="lattice.html">Lattices</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">batoid</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
-      <li>Rays</li>
-    
-    
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Rays</li>
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/rays.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="rays">
-<h1>Rays<a class="headerlink" href="#rays" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="rays">
+<h1>Rays<a class="headerlink" href="#rays" title="Permalink to this heading"></a></h1>
 <p>The most fundamental type in batoid is the <a class="reference internal" href="#batoid.RayVector" title="batoid.RayVector"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RayVector</span></code></a>.  This class represents
 a collection of geometric rays.  These rays can be generated, traced through
 optical systems, and then interrogated to provide insight into PSFs,
 aberrations, vignetting, and more.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="batoid.RayVector">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">batoid.</span></span><span class="sig-name descname"><span class="pre">RayVector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vignetted</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">failed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coordSys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">CoordSys(array([0.,</span> <span class="pre">0.,</span> <span class="pre">0.]),</span> <span class="pre">array([[1.,</span> <span class="pre">0.,</span> <span class="pre">0.],</span> <span class="pre">[0.,</span> <span class="pre">1.,</span> <span class="pre">0.],</span> <span class="pre">[0.,</span> <span class="pre">0.,</span> <span class="pre">1.]]))</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.RayVector" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">batoid.</span></span><span class="sig-name descname"><span class="pre">RayVector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vignetted</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">failed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coordSys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">CoordSys(array([0.,</span> <span class="pre">0.,</span> <span class="pre">0.]),</span> <span class="pre">array([[1.,</span> <span class="pre">0.,</span> <span class="pre">0.],</span> <span class="pre">[0.,</span> <span class="pre">1.,</span> <span class="pre">0.],</span> <span class="pre">[0.,</span> <span class="pre">0.,</span> <span class="pre">1.]]))</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.RayVector" title="Permalink to this definition"></a></dt>
 <dd><p>Create RayVector from 1d parameter arrays.  Always makes a copy
 of input arrays.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x, y, z</strong> (<em>ndarray of float, shape (n,)</em>) – Positions of rays in meters.</p></li>
 <li><p><strong>vx, vy, vz</strong> (<em>ndarray of float, shape (n,)</em>) – Velocities of rays in units of the speed of light in vacuum.</p></li>
@@ -198,13 +145,13 @@ global coordinate system.</p></li>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="batoid.RayVector.positionAtTime">
-<span class="sig-name descname"><span class="pre">positionAtTime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.positionAtTime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.RayVector.positionAtTime" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">positionAtTime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.positionAtTime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.RayVector.positionAtTime" title="Permalink to this definition"></a></dt>
 <dd><p>Calculate the positions of the rays at a given time.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time (over vacuum speed of light; in meters).</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>ndarray of float, shape (n, 3)</em> – Positions in meters.</p>
 </dd>
 </dl>
@@ -212,13 +159,13 @@ global coordinate system.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="batoid.RayVector.propagate">
-<span class="sig-name descname"><span class="pre">propagate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.propagate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.RayVector.propagate" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">propagate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.propagate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.RayVector.propagate" title="Permalink to this definition"></a></dt>
 <dd><p>Propagate this RayVector to given time.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – Time (over vacuum speed of light; in meters).</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>RayVector</em> – Reference to self, no copy is made.</p>
 </dd>
 </dl>
@@ -226,16 +173,16 @@ global coordinate system.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="batoid.RayVector.phase">
-<span class="sig-name descname"><span class="pre">phase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.phase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.RayVector.phase" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">phase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.phase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.RayVector.phase" title="Permalink to this definition"></a></dt>
 <dd><p>Calculate plane wave phases at given position and time.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>r</strong> (<em>ndarray of float, shape (3,)</em>) – Position in meters at which to compute phase</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Time (over vacuum speed of light; in meters).</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>ndarray of float, shape(n,)</em></p>
 </dd>
 </dl>
@@ -243,17 +190,17 @@ global coordinate system.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="batoid.RayVector.amplitude">
-<span class="sig-name descname"><span class="pre">amplitude</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.amplitude"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.RayVector.amplitude" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">amplitude</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.amplitude"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.RayVector.amplitude" title="Permalink to this definition"></a></dt>
 <dd><p>Calculate (scalar) complex electric-field amplitudes at given
 position and time.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>r</strong> (<em>ndarray of float, shape (3,)</em>) – Position in meters.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Time (over vacuum speed of light; in meters).</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>ndarray of complex, shape (n,)</em></p>
 </dd>
 </dl>
@@ -261,17 +208,17 @@ position and time.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="batoid.RayVector.sumAmplitude">
-<span class="sig-name descname"><span class="pre">sumAmplitude</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignoreVignetted</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.sumAmplitude"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.RayVector.sumAmplitude" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">sumAmplitude</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignoreVignetted</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.sumAmplitude"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.RayVector.sumAmplitude" title="Permalink to this definition"></a></dt>
 <dd><p>Calculate the sum of (scalar) complex electric-field amplitudes of
 all rays at given position and time.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>r</strong> (<em>ndarray of float, shape (3,)</em>) – Position in meters.</p></li>
 <li><p><strong>t</strong> (<em>float</em>) – Time (over vacuum speed of light; in meters).</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>complex</em></p>
 </dd>
 </dl>
@@ -279,7 +226,7 @@ all rays at given position and time.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="batoid.RayVector.asGrid">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">asGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backDist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">medium</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stopSurface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dirCos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'postel'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ny</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nrandom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.asGrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.RayVector.asGrid" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">asGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backDist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">medium</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stopSurface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coordSys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dirCos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'postel'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ny</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nrandom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.asGrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.RayVector.asGrid" title="Permalink to this definition"></a></dt>
 <dd><p>Create RayVector on a parallelogram shaped region.</p>
 <p>This function will often be used to create a grid of rays on a square
 grid, but is flexible enough to also create grids on an arbitrary
@@ -300,7 +247,7 @@ surface for the stop surface is allowed, but is usually a bad idea as
 this may lead to a non-uniformly illuminated pupil and is inconsistent
 with, say, an incoming uniform spherical wave or uniform plane wave.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>optic</strong> (<a class="reference internal" href="optic.html#batoid.Optic" title="batoid.Optic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Optic</span></code></a>, optional) – If present, then try to extract values for <code class="docutils literal notranslate"><span class="pre">backDist</span></code>,
 <code class="docutils literal notranslate"><span class="pre">medium</span></code>, <code class="docutils literal notranslate"><span class="pre">stopSurface</span></code>, and <code class="docutils literal notranslate"><span class="pre">lx</span></code> from the Optic.  Note that
@@ -357,6 +304,7 @@ infer a value from <code class="docutils literal notranslate"><span class="pre">
 <li><p><strong>flux</strong> (<em>float, optional</em>) – Flux to assign each ray.  Default is 1.0.</p></li>
 <li><p><strong>nrandom</strong> (<em>None or int, optional</em>) – If not None, then uniformly sample this many rays from
 parallelogram region instead of sampling on a regular grid.</p></li>
+<li><p><strong>rng</strong> (None or int or <code class="xref any docutils literal notranslate"><span class="pre">numpy.random.Generator</span></code>, optional) – Random number generator or seed to use for random sampling.</p></li>
 </ul>
 </dd>
 </dl>
@@ -364,7 +312,7 @@ parallelogram region instead of sampling on a regular grid.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="batoid.RayVector.asPolar">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">asPolar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backDist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">medium</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stopSurface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dirCos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'postel'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nrad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">naz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nrandom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.asPolar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.RayVector.asPolar" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">asPolar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backDist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">medium</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stopSurface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coordSys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dirCos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'postel'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nrad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">naz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nrandom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.asPolar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.RayVector.asPolar" title="Permalink to this definition"></a></dt>
 <dd><p>Create RayVector on an annular region using a hexapolar grid.</p>
 <p>This function can be used to regularly sample the entrance pupil of a
 telescope using polar symmetry (really, hexagonal symmetry).  Rings of
@@ -390,7 +338,7 @@ surface for the stop surface is allowed, but is usually a bad idea as
 this may lead to a non-uniformly illuminated pupil and is inconsistent
 with, say, an incoming uniform spherical wave or uniform plane wave.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>optic</strong> (<a class="reference internal" href="optic.html#batoid.Optic" title="batoid.Optic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Optic</span></code></a>, optional) – If present, then try to extract values for <code class="docutils literal notranslate"><span class="pre">backDist</span></code>,
 <code class="docutils literal notranslate"><span class="pre">medium</span></code>, <code class="docutils literal notranslate"><span class="pre">stopSurface</span></code>, and <code class="docutils literal notranslate"><span class="pre">outer</span></code> from the Optic.  Note
@@ -443,6 +391,7 @@ multiple of 6.  (If the innermost ring has radius 0, then exactly
 <li><p><strong>flux</strong> (<em>float, optional</em>) – Flux to assign each ray.  Default is 1.0.</p></li>
 <li><p><strong>nrandom</strong> (<em>int, optional</em>) – If not None, then uniformly sample this many rays from annular
 region instead of sampling on a hexapolar grid.</p></li>
+<li><p><strong>rng</strong> (None or int or <code class="xref any docutils literal notranslate"><span class="pre">numpy.random.Generator</span></code>, optional) – Random number generator or seed to use for random sampling.</p></li>
 </ul>
 </dd>
 </dl>
@@ -450,7 +399,7 @@ region instead of sampling on a hexapolar grid.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="batoid.RayVector.asSpokes">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">asSpokes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backDist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">medium</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stopSurface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dirCos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'postel'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spokes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spacing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'uniform'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.asSpokes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.RayVector.asSpokes" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">asSpokes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backDist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">medium</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stopSurface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coordSys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dirCos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'postel'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spokes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spacing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'uniform'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.asSpokes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.RayVector.asSpokes" title="Permalink to this definition"></a></dt>
 <dd><p>Create RayVector on an annular region using a spokes pattern.</p>
 <p>The function generates rays on a rings-and-spokes pattern, with a fixed
 number of radii for each azimuth and a fixed number of azimuths for
@@ -473,7 +422,7 @@ surface for the stop surface is allowed, but is usually a bad idea as
 this may lead to a non-uniformly illuminated pupil and is inconsistent
 with, say, an incoming uniform spherical wave or uniform plane wave.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>optic</strong> (<a class="reference internal" href="optic.html#batoid.Optic" title="batoid.Optic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">batoid.Optic</span></code></a>, optional) – If present, then try to extract values for <code class="docutils literal notranslate"><span class="pre">backDist</span></code>,
 <code class="docutils literal notranslate"><span class="pre">medium</span></code>, <code class="docutils literal notranslate"><span class="pre">stopSurface</span></code>, and <code class="docutils literal notranslate"><span class="pre">outer</span></code> from the Optic.  Note
@@ -534,7 +483,7 @@ will be ignored).</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="batoid.RayVector.fromStop">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">fromStop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backDist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">medium</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stopSurface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dirCos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'postel'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.fromStop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.RayVector.fromStop" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fromStop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backDist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">medium</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stopSurface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coordSys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dirCos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'postel'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.fromStop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.RayVector.fromStop" title="Permalink to this definition"></a></dt>
 <dd><p>Create rays that intersects the “stop” surface at given points.</p>
 <p>The algorithm used here starts by placing the rays on the “stop”
 surface, and then backing them up such that they are in front of any
@@ -551,7 +500,7 @@ surface for the stop surface is allowed, but is usually a bad idea as
 this may lead to a non-uniformly illuminated pupil and is inconsistent
 with, say, an incoming uniform spherical wave or uniform plane wave.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x, y</strong> (<em>ndarray</em>) – X/Y coordinates on the stop surface where the rays would intersect
 if not refracted or reflected first.</p></li>
@@ -599,16 +548,17 @@ this keyword.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="batoid.RayVector.fromFieldAngles">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">fromFieldAngles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'postel'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backDist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">medium</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stopSurface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.fromFieldAngles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.RayVector.fromFieldAngles" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fromFieldAngles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'postel'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backDist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">medium</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stopSurface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.fromFieldAngles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.RayVector.fromFieldAngles" title="Permalink to this definition"></a></dt>
 <dd><p>Create RayVector with one stop surface point but many field angles.</p>
 <p>This method is similar to <a class="reference internal" href="#batoid.RayVector.fromStop" title="batoid.RayVector.fromStop"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">fromStop</span></code></a> but broadcasts over <code class="docutils literal notranslate"><span class="pre">theta_x</span></code>
 and <code class="docutils literal notranslate"><span class="pre">theta_y</span></code> instead of over <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code>.  There is less
 currently less effort paid to synchronizing the <code class="docutils literal notranslate"><span class="pre">t</span></code> values of the
 created rays, as they don’t correspond to points on a physical incoming
 wavefront in this case.  The primary intended use case is to map chief
-rays (<a href="#id1"><span class="problematic" id="id2">``</span></a>x``=``y``=0) from incoming field angle to focal plane position.</p>
+rays (<code class="docutils literal notranslate"><span class="pre">x</span></code> = <code class="docutils literal notranslate"><span class="pre">y</span></code> = 0) from incoming field angle to focal plane
+position.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>theta_x, theta_y</strong> (<em>ndarray</em>) – Field angles in radians.</p></li>
 <li><p><strong>projection</strong> (<em>{‘postel’, ‘zemax’, ‘gnomonic’, ‘stereographic’, ‘lambert’, ‘orthographic’}, optional</em>) – Projection used to convert field angle to direction cosines.</p></li>
@@ -643,10 +593,10 @@ if not refracted or reflected first.</p></li>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="batoid.RayVector.r">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">r</span></span><a class="headerlink" href="#batoid.RayVector.r" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">r</span></span><a class="headerlink" href="#batoid.RayVector.r" title="Permalink to this definition"></a></dt>
 <dd><p>Positions of rays in meters.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>ndarray of float, shape (n, 3)</p>
 </dd>
 </dl>
@@ -654,30 +604,30 @@ if not refracted or reflected first.</p></li>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="batoid.RayVector.x">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#batoid.RayVector.x" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#batoid.RayVector.x" title="Permalink to this definition"></a></dt>
 <dd><p>The x components of ray positions in meters.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="batoid.RayVector.y">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#batoid.RayVector.y" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#batoid.RayVector.y" title="Permalink to this definition"></a></dt>
 <dd><p>The y components of ray positions in meters.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="batoid.RayVector.z">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">z</span></span><a class="headerlink" href="#batoid.RayVector.z" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">z</span></span><a class="headerlink" href="#batoid.RayVector.z" title="Permalink to this definition"></a></dt>
 <dd><p>The z components of ray positions in meters.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="batoid.RayVector.v">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">v</span></span><a class="headerlink" href="#batoid.RayVector.v" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">v</span></span><a class="headerlink" href="#batoid.RayVector.v" title="Permalink to this definition"></a></dt>
 <dd><p>Velocities of rays in units of the
 speed of light in vacuum.  Note that these may have magnitudes &lt; 1 if
 the rays are inside a refractive medium.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>ndarray of float, shape (n, 3)</p>
 </dd>
 </dl>
@@ -685,66 +635,66 @@ the rays are inside a refractive medium.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="batoid.RayVector.vx">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">vx</span></span><a class="headerlink" href="#batoid.RayVector.vx" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vx</span></span><a class="headerlink" href="#batoid.RayVector.vx" title="Permalink to this definition"></a></dt>
 <dd><p>The x components of ray velocities units of the vacuum speed of
 light.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="batoid.RayVector.vy">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">vy</span></span><a class="headerlink" href="#batoid.RayVector.vy" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vy</span></span><a class="headerlink" href="#batoid.RayVector.vy" title="Permalink to this definition"></a></dt>
 <dd><p>The y components of ray velocities units of the vacuum speed of
 light.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="batoid.RayVector.vz">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">vz</span></span><a class="headerlink" href="#batoid.RayVector.vz" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vz</span></span><a class="headerlink" href="#batoid.RayVector.vz" title="Permalink to this definition"></a></dt>
 <dd><p>The z components of ray velocities units of the vacuum speed of
 light.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="batoid.RayVector.t">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">t</span></span><a class="headerlink" href="#batoid.RayVector.t" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">t</span></span><a class="headerlink" href="#batoid.RayVector.t" title="Permalink to this definition"></a></dt>
 <dd><p>Reference times (divided by the speed of light in vacuum) in units
 of meters, also known as the optical path lengths.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="batoid.RayVector.wavelength">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">wavelength</span></span><a class="headerlink" href="#batoid.RayVector.wavelength" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">wavelength</span></span><a class="headerlink" href="#batoid.RayVector.wavelength" title="Permalink to this definition"></a></dt>
 <dd><p>Vacuum wavelengths in meters.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="batoid.RayVector.flux">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">flux</span></span><a class="headerlink" href="#batoid.RayVector.flux" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">flux</span></span><a class="headerlink" href="#batoid.RayVector.flux" title="Permalink to this definition"></a></dt>
 <dd><p>Fluxes in arbitrary units.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="batoid.RayVector.vignetted">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">vignetted</span></span><a class="headerlink" href="#batoid.RayVector.vignetted" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vignetted</span></span><a class="headerlink" href="#batoid.RayVector.vignetted" title="Permalink to this definition"></a></dt>
 <dd><p>True for rays that have been vignetted.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="batoid.RayVector.failed">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">failed</span></span><a class="headerlink" href="#batoid.RayVector.failed" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">failed</span></span><a class="headerlink" href="#batoid.RayVector.failed" title="Permalink to this definition"></a></dt>
 <dd><p>True for rays that have failed.  This may occur, for example, if
 batoid failed to find the intersection of a ray wiht a surface.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="batoid.RayVector.k">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">k</span></span><a class="headerlink" href="#batoid.RayVector.k" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">k</span></span><a class="headerlink" href="#batoid.RayVector.k" title="Permalink to this definition"></a></dt>
 <dd><p>Wavevectors of plane waves in units
 of radians per meter.  The magnitude of each wavevector is equal to
 <span class="math notranslate nohighlight">\(2 \pi n / \lambda\)</span>, where <span class="math notranslate nohighlight">\(n\)</span> is the refractive index and
 <span class="math notranslate nohighlight">\(\lambda\)</span> is the wavelength.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>ndarray of float, shape (n, 3)</p>
 </dd>
 </dl>
@@ -752,25 +702,25 @@ of radians per meter.  The magnitude of each wavevector is equal to
 
 <dl class="py property">
 <dt class="sig sig-object py" id="batoid.RayVector.kx">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">kx</span></span><a class="headerlink" href="#batoid.RayVector.kx" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kx</span></span><a class="headerlink" href="#batoid.RayVector.kx" title="Permalink to this definition"></a></dt>
 <dd><p>The x component of each ray wavevector in radians per meter.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="batoid.RayVector.ky">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">ky</span></span><a class="headerlink" href="#batoid.RayVector.ky" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ky</span></span><a class="headerlink" href="#batoid.RayVector.ky" title="Permalink to this definition"></a></dt>
 <dd><p>The y component of each ray wavevector in radians per meter.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="batoid.RayVector.kz">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">kz</span></span><a class="headerlink" href="#batoid.RayVector.kz" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kz</span></span><a class="headerlink" href="#batoid.RayVector.kz" title="Permalink to this definition"></a></dt>
 <dd><p>The z component of each ray wavevector in radians per meter.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="batoid.RayVector.omega">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">omega</span></span><a class="headerlink" href="#batoid.RayVector.omega" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">omega</span></span><a class="headerlink" href="#batoid.RayVector.omega" title="Permalink to this definition"></a></dt>
 <dd><p>The temporal angular frequency of each plane wave divided by the
 vacuum speed of light in units of radians per meter.  Equals
 <span class="math notranslate nohighlight">\(2 \pi / \lambda\)</span>.</p>
@@ -778,13 +728,13 @@ vacuum speed of light in units of radians per meter.  Equals
 
 <dl class="py method">
 <dt class="sig sig-object py" id="batoid.RayVector.toCoordSys">
-<span class="sig-name descname"><span class="pre">toCoordSys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coordSys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.toCoordSys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.RayVector.toCoordSys" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">toCoordSys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coordSys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/batoid/rayVector.html#RayVector.toCoordSys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#batoid.RayVector.toCoordSys" title="Permalink to this definition"></a></dt>
 <dd><p>Transform this RayVector into a new coordinate system.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>coordSys</strong> (<em>batoid.CoordSys</em>) – Destination coordinate system.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>RayVector</em> – Reference to self, no copy is made.</p>
 </dd>
 </dl>
@@ -792,54 +742,37 @@ vacuum speed of light in units of radians per meter.  Equals
 
 </dd></dl>
 
-</div>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="surfaces.html" class="btn btn-neutral float-right" title="Surfaces" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="overview.html" class="btn btn-neutral float-left" title="Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="surfaces.html" class="btn btn-neutral float-right" title="Surfaces" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017-2021, Josh Meyers.
-
-    </p>
+    <p>&#169; Copyright 2017-2021, Josh Meyers.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

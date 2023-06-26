@@ -1,94 +1,47 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>batoid.utils &mdash; batoid 0.3.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>batoid.utils &mdash; batoid 0.4.2 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="../../index.html" class="icon icon-home"> batoid
           
-
-          
+          <a href="../../index.html" class="icon icon-home">
+            batoid
           </a>
-
-          
-            
-            
               <div class="version">
-                0.3
+                0.4
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../rays.html">Rays</a></li>
@@ -102,69 +55,30 @@
 <li class="toctree-l1"><a class="reference internal" href="../../lattice.html">Lattices</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">batoid</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-        
-      <li>batoid.utils</li>
-    
-    
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">batoid.utils</li>
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for batoid.utils</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -189,7 +103,7 @@
 
 
 <div class="viewcode-block" id="gnomonicToDirCos"><a class="viewcode-back" href="../../coords.html#batoid.utils.gnomonicToDirCos">[docs]</a><span class="k">def</span> <span class="nf">gnomonicToDirCos</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Convert gnomonic tangent plane projection u,v to direction cosines.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert gnomonic tangent plane projection u,v to direction cosines.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -215,7 +129,7 @@
 
 
 <div class="viewcode-block" id="dirCosToGnomonic"><a class="viewcode-back" href="../../coords.html#batoid.utils.dirCosToGnomonic">[docs]</a><span class="k">def</span> <span class="nf">dirCosToGnomonic</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Convert direction cosines to gnomonic tangent plane projection.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert direction cosines to gnomonic tangent plane projection.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -240,7 +154,7 @@
 
 
 <div class="viewcode-block" id="postelToDirCos"><a class="viewcode-back" href="../../coords.html#batoid.utils.postelToDirCos">[docs]</a><span class="k">def</span> <span class="nf">postelToDirCos</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Convert Postel azimuthal equidistant tangent plane projection u,v to</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert Postel azimuthal equidistant tangent plane projection u,v to</span>
 <span class="sd">    direction cosines.</span>
 
 <span class="sd">    Parameters</span>
@@ -281,7 +195,7 @@
 
 
 <div class="viewcode-block" id="dirCosToPostel"><a class="viewcode-back" href="../../coords.html#batoid.utils.dirCosToPostel">[docs]</a><span class="k">def</span> <span class="nf">dirCosToPostel</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Convert direction cosines to Postel azimuthal equidistant tangent plane</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert direction cosines to Postel azimuthal equidistant tangent plane</span>
 <span class="sd">    projection.</span>
 
 <span class="sd">    Parameters</span>
@@ -319,7 +233,7 @@
 
 
 <div class="viewcode-block" id="zemaxToDirCos"><a class="viewcode-back" href="../../coords.html#batoid.utils.zemaxToDirCos">[docs]</a><span class="k">def</span> <span class="nf">zemaxToDirCos</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Convert Zemax field angles u,v to direction cosines.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert Zemax field angles u,v to direction cosines.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -348,7 +262,7 @@
 
 
 <div class="viewcode-block" id="dirCosToZemax"><a class="viewcode-back" href="../../coords.html#batoid.utils.dirCosToZemax">[docs]</a><span class="k">def</span> <span class="nf">dirCosToZemax</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Convert direction cosines to Postel azimuthal equidistant tangent plane</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert direction cosines to Postel azimuthal equidistant tangent plane</span>
 <span class="sd">    projection.</span>
 
 <span class="sd">    Parameters</span>
@@ -375,7 +289,7 @@
 
 
 <div class="viewcode-block" id="stereographicToDirCos"><a class="viewcode-back" href="../../coords.html#batoid.utils.stereographicToDirCos">[docs]</a><span class="k">def</span> <span class="nf">stereographicToDirCos</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Convert stereographic tangent plane projection u,v to direction cosines.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert stereographic tangent plane projection u,v to direction cosines.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -415,7 +329,7 @@
 
 
 <div class="viewcode-block" id="dirCosToStereographic"><a class="viewcode-back" href="../../coords.html#batoid.utils.dirCosToStereographic">[docs]</a><span class="k">def</span> <span class="nf">dirCosToStereographic</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Convert direction cosines to stereographic tangent plane projection.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert direction cosines to stereographic tangent plane projection.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -453,7 +367,7 @@
 
 
 <div class="viewcode-block" id="orthographicToDirCos"><a class="viewcode-back" href="../../coords.html#batoid.utils.orthographicToDirCos">[docs]</a><span class="k">def</span> <span class="nf">orthographicToDirCos</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Convert orthographic tangent plane projection u,v to direction cosines.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert orthographic tangent plane projection u,v to direction cosines.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -480,7 +394,7 @@
 
 
 <div class="viewcode-block" id="dirCosToOrthographic"><a class="viewcode-back" href="../../coords.html#batoid.utils.dirCosToOrthographic">[docs]</a><span class="k">def</span> <span class="nf">dirCosToOrthographic</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Convert direction cosines to orthographic tangent plane projection.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert direction cosines to orthographic tangent plane projection.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -504,7 +418,7 @@
 
 
 <div class="viewcode-block" id="lambertToDirCos"><a class="viewcode-back" href="../../coords.html#batoid.utils.lambertToDirCos">[docs]</a><span class="k">def</span> <span class="nf">lambertToDirCos</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Convert Lambert azimuthal equal-area tangent plane projection u,v to</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert Lambert azimuthal equal-area tangent plane projection u,v to</span>
 <span class="sd">    direction cosines.</span>
 
 <span class="sd">    Parameters</span>
@@ -545,7 +459,7 @@
 
 
 <div class="viewcode-block" id="dirCosToLambert"><a class="viewcode-back" href="../../coords.html#batoid.utils.dirCosToLambert">[docs]</a><span class="k">def</span> <span class="nf">dirCosToLambert</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Convert direction cosines to Lambert azimuthal equal-area tangent plane</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert direction cosines to Lambert azimuthal equal-area tangent plane</span>
 <span class="sd">    projection.</span>
 
 <span class="sd">    Parameters</span>
@@ -583,7 +497,7 @@
 
 
 <div class="viewcode-block" id="fieldToDirCos"><a class="viewcode-back" href="../../coords.html#batoid.utils.fieldToDirCos">[docs]</a><span class="k">def</span> <span class="nf">fieldToDirCos</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;postel&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Convert field angle to direction cosines using specified projection.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert field angle to direction cosines using specified projection.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -620,7 +534,7 @@
 
 
 <div class="viewcode-block" id="dirCosToField"><a class="viewcode-back" href="../../coords.html#batoid.utils.dirCosToField">[docs]</a><span class="k">def</span> <span class="nf">dirCosToField</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;postel&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Convert direction cosines to field angle using specified projection.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert direction cosines to field angle using specified projection.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -658,7 +572,7 @@
 
 <span class="c1"># http://stackoverflow.com/a/6849299</span>
 <span class="k">class</span> <span class="nc">lazy_property</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    meant to be used for lazy evaluation of an object attribute.</span>
 <span class="sd">    property should represent non-mutable data, as it replaces itself.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -675,46 +589,30 @@
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017-2021, Josh Meyers.
-
-    </p>
+    <p>&#169; Copyright 2017-2021, Josh Meyers.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

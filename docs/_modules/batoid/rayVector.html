@@ -1,94 +1,47 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>batoid.rayVector &mdash; batoid 0.3.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>batoid.rayVector &mdash; batoid 0.4.2 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="../../index.html" class="icon icon-home"> batoid
           
-
-          
+          <a href="../../index.html" class="icon icon-home">
+            batoid
           </a>
-
-          
-            
-            
               <div class="version">
-                0.3
+                0.4
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../rays.html">Rays</a></li>
@@ -102,69 +55,30 @@
 <li class="toctree-l1"><a class="reference internal" href="../../lattice.html">Lattices</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">batoid</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-        
-      <li>batoid.rayVector</li>
-    
-    
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">batoid.rayVector</li>
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for batoid.rayVector</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Real</span><span class="p">,</span> <span class="n">Integral</span>
 
@@ -172,7 +86,6 @@
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_batoid</span>
 <span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="n">globalCoordSys</span><span class="p">,</span> <span class="n">vacuum</span>
-<span class="kn">from</span> <span class="nn">.coordSys</span> <span class="kn">import</span> <span class="n">CoordSys</span>
 <span class="kn">from</span> <span class="nn">.coordTransform</span> <span class="kn">import</span> <span class="n">CoordTransform</span>
 <span class="kn">from</span> <span class="nn">.trace</span> <span class="kn">import</span> <span class="n">applyForwardTransform</span><span class="p">,</span> <span class="n">applyForwardTransformArrays</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">lazy_property</span><span class="p">,</span> <span class="n">fieldToDirCos</span>
@@ -189,7 +102,7 @@
 
 
 <div class="viewcode-block" id="RayVector"><a class="viewcode-back" href="../../rays.html#batoid.RayVector">[docs]</a><span class="k">class</span> <span class="nc">RayVector</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Create RayVector from 1d parameter arrays.  Always makes a copy</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create RayVector from 1d parameter arrays.  Always makes a copy</span>
 <span class="sd">    of input arrays.</span>
 
 <span class="sd">    Parameters</span>
@@ -228,8 +141,12 @@
             <span class="nb">bool</span>
         <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">([</span><span class="n">vx</span><span class="p">,</span> <span class="n">vy</span><span class="p">,</span> <span class="n">vz</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">=</span> <span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_z</span> <span class="o">=</span> <span class="n">z</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vx</span> <span class="o">=</span> <span class="n">vx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vy</span> <span class="o">=</span> <span class="n">vy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vz</span> <span class="o">=</span> <span class="n">vz</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_t</span> <span class="o">=</span> <span class="n">t</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_wavelength</span> <span class="o">=</span> <span class="n">wavelength</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_flux</span> <span class="o">=</span> <span class="n">flux</span>
@@ -240,11 +157,15 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_directInit</span><span class="p">(</span>
-        <span class="n">r</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">vignetted</span><span class="p">,</span> <span class="n">failed</span><span class="p">,</span> <span class="n">coordSys</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">vx</span><span class="p">,</span> <span class="n">vy</span><span class="p">,</span> <span class="n">vz</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">vignetted</span><span class="p">,</span> <span class="n">failed</span><span class="p">,</span> <span class="n">coordSys</span>
     <span class="p">):</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="n">RayVector</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="n">RayVector</span><span class="p">)</span>
-        <span class="n">ret</span><span class="o">.</span><span class="n">_r</span> <span class="o">=</span> <span class="n">r</span>
-        <span class="n">ret</span><span class="o">.</span><span class="n">_v</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">_x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">_y</span> <span class="o">=</span> <span class="n">y</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">_z</span> <span class="o">=</span> <span class="n">z</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">_vx</span> <span class="o">=</span> <span class="n">vx</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">_vy</span> <span class="o">=</span> <span class="n">vy</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">_vz</span> <span class="o">=</span> <span class="n">vz</span>
         <span class="n">ret</span><span class="o">.</span><span class="n">_t</span> <span class="o">=</span> <span class="n">t</span>
         <span class="n">ret</span><span class="o">.</span><span class="n">_wavelength</span> <span class="o">=</span> <span class="n">wavelength</span>
         <span class="n">ret</span><span class="o">.</span><span class="n">_flux</span> <span class="o">=</span> <span class="n">flux</span>
@@ -253,8 +174,25 @@
         <span class="n">ret</span><span class="o">.</span><span class="n">coordSys</span> <span class="o">=</span> <span class="n">coordSys</span>
         <span class="k">return</span> <span class="n">ret</span>
 
+    <span class="k">def</span> <span class="nf">_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Don&#39;t implement as __hash__ since RayVector is mutable.</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span>
+            <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">tolist</span><span class="p">()),</span>
+            <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">tolist</span><span class="p">()),</span>
+            <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">tolist</span><span class="p">()),</span>
+            <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vx</span><span class="o">.</span><span class="n">tolist</span><span class="p">()),</span>
+            <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vy</span><span class="o">.</span><span class="n">tolist</span><span class="p">()),</span>
+            <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vz</span><span class="o">.</span><span class="n">tolist</span><span class="p">()),</span>
+            <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="o">.</span><span class="n">tolist</span><span class="p">()),</span>
+            <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wavelength</span><span class="o">.</span><span class="n">tolist</span><span class="p">()),</span>
+            <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">tolist</span><span class="p">()),</span>
+            <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vignetted</span><span class="o">.</span><span class="n">tolist</span><span class="p">()),</span>
+            <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">failed</span><span class="o">.</span><span class="n">tolist</span><span class="p">()),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span>
+        <span class="p">))</span>
+
 <div class="viewcode-block" id="RayVector.positionAtTime"><a class="viewcode-back" href="../../rays.html#batoid.RayVector.positionAtTime">[docs]</a>    <span class="k">def</span> <span class="nf">positionAtTime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Calculate the positions of the rays at a given time.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the positions of the rays at a given time.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -266,12 +204,14 @@
 <span class="sd">        ndarray of float, shape (n, 3)</span>
 <span class="sd">            Positions in meters.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">positionAtTime</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">out</span></div>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">))</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">))</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">positionAtTime</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">])</span><span class="o">.</span><span class="n">T</span></div>
 
 <div class="viewcode-block" id="RayVector.propagate"><a class="viewcode-back" href="../../rays.html#batoid.RayVector.propagate">[docs]</a>    <span class="k">def</span> <span class="nf">propagate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Propagate this RayVector to given time.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Propagate this RayVector to given time.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -287,7 +227,7 @@
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="RayVector.phase"><a class="viewcode-back" href="../../rays.html#batoid.RayVector.phase">[docs]</a>    <span class="k">def</span> <span class="nf">phase</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Calculate plane wave phases at given position and time.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate plane wave phases at given position and time.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -305,7 +245,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="RayVector.amplitude"><a class="viewcode-back" href="../../rays.html#batoid.RayVector.amplitude">[docs]</a>    <span class="k">def</span> <span class="nf">amplitude</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Calculate (scalar) complex electric-field amplitudes at given</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate (scalar) complex electric-field amplitudes at given</span>
 <span class="sd">        position and time.</span>
 
 <span class="sd">        Parameters</span>
@@ -324,7 +264,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="RayVector.sumAmplitude"><a class="viewcode-back" href="../../rays.html#batoid.RayVector.sumAmplitude">[docs]</a>    <span class="k">def</span> <span class="nf">sumAmplitude</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">ignoreVignetted</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Calculate the sum of (scalar) complex electric-field amplitudes of</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the sum of (scalar) complex electric-field amplitudes of</span>
 <span class="sd">        all rays at given position and time.</span>
 
 <span class="sd">        Parameters</span>
@@ -344,6 +284,7 @@
     <span class="k">def</span> <span class="nf">asGrid</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">optic</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">backDist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">medium</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stopSurface</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">coordSys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">wavelength</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dirCos</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">theta_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">theta_y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;postel&#39;</span><span class="p">,</span>
@@ -351,9 +292,9 @@
         <span class="n">dx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">lx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ly</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">flux</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">nrandom</span><span class="o">=</span><span class="kc">None</span>
+        <span class="n">nrandom</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Create RayVector on a parallelogram shaped region.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create RayVector on a parallelogram shaped region.</span>
 
 <span class="sd">        This function will often be used to create a grid of rays on a square</span>
 <span class="sd">        grid, but is flexible enough to also create grids on an arbitrary</span>
@@ -448,6 +389,8 @@
 <span class="sd">        nrandom : None or int, optional</span>
 <span class="sd">            If not None, then uniformly sample this many rays from</span>
 <span class="sd">            parallelogram region instead of sampling on a regular grid.</span>
+<span class="sd">        rng : None or int or `numpy.random.Generator`, optional</span>
+<span class="sd">            Random number generator or seed to use for random sampling.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">.optic</span> <span class="kn">import</span> <span class="n">Interface</span>
         <span class="kn">from</span> <span class="nn">.surface</span> <span class="kn">import</span> <span class="n">Plane</span>
@@ -467,6 +410,8 @@
                 <span class="c1"># them.  Otherwise, infer from optic.</span>
                 <span class="k">if</span> <span class="n">nx</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">dx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">lx</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">pupilSize</span>
+            <span class="k">if</span> <span class="n">coordSys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">coordSys</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">coordSys</span>
 
         <span class="k">if</span> <span class="n">backDist</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">backDist</span> <span class="o">=</span> <span class="mf">40.0</span>
@@ -474,6 +419,8 @@
             <span class="n">stopSurface</span> <span class="o">=</span> <span class="n">Interface</span><span class="p">(</span><span class="n">Plane</span><span class="p">())</span>
         <span class="k">if</span> <span class="n">medium</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">medium</span> <span class="o">=</span> <span class="n">vacuum</span>
+        <span class="k">if</span> <span class="n">coordSys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">coordSys</span> <span class="o">=</span> <span class="n">globalCoordSys</span>
 
         <span class="k">if</span> <span class="n">dirCos</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dirCos</span> <span class="o">=</span> <span class="n">fieldToDirCos</span><span class="p">(</span><span class="n">theta_x</span><span class="p">,</span> <span class="n">theta_y</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="n">projection</span><span class="p">)</span>
@@ -525,8 +472,12 @@
             <span class="n">ly</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">ly</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">nrandom</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nrandom</span><span class="p">)</span>
-            <span class="n">yy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nrandom</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rng</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">rng</span><span class="p">)</span>
+            <span class="n">xx</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nrandom</span><span class="p">)</span>
+            <span class="n">yy</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nrandom</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">nx</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="n">x_d</span> <span class="o">=</span> <span class="mf">1.</span>
@@ -541,36 +492,48 @@
             <span class="n">xx</span><span class="p">,</span> <span class="n">yy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">)</span>
             <span class="n">xx</span> <span class="o">=</span> <span class="n">xx</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
             <span class="n">yy</span> <span class="o">=</span> <span class="n">yy</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">xx</span><span class="p">),</span> <span class="mi">3</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">r</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">r</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
-        <span class="n">z</span> <span class="o">=</span> <span class="n">r</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
         <span class="n">stack</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">])</span>
-        <span class="n">x</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">lx</span><span class="p">,</span> <span class="n">stack</span><span class="p">)</span>
-        <span class="n">y</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ly</span><span class="p">,</span> <span class="n">stack</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">lx</span><span class="p">,</span> <span class="n">stack</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ly</span><span class="p">,</span> <span class="n">stack</span><span class="p">)</span>
         <span class="k">del</span> <span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">stack</span>
-        <span class="n">z</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">stopSurface</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">sag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-        <span class="n">transform</span> <span class="o">=</span> <span class="n">CoordTransform</span><span class="p">(</span><span class="n">stopSurface</span><span class="o">.</span><span class="n">coordSys</span><span class="p">,</span> <span class="n">globalCoordSys</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">stopSurface</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">sag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">transform</span> <span class="o">=</span> <span class="n">CoordTransform</span><span class="p">(</span><span class="n">stopSurface</span><span class="o">.</span><span class="n">coordSys</span><span class="p">,</span> <span class="n">coordSys</span><span class="p">)</span>
         <span class="n">applyForwardTransformArrays</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
         <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">w</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">wavelength</span><span class="p">)</span>
         <span class="n">n</span> <span class="o">=</span> <span class="n">medium</span><span class="o">.</span><span class="n">getN</span><span class="p">(</span><span class="n">wavelength</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_finish</span><span class="p">(</span><span class="n">backDist</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">dirCos</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">flux</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_finish</span><span class="p">(</span>
+            <span class="n">backDist</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">dirCos</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">coordSys</span>
+        <span class="p">)</span></div>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">asFan</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">nx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ny</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
+        <span class="n">rvs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">nx</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">rvs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">RayVector</span><span class="o">.</span><span class="n">asGrid</span><span class="p">(</span><span class="n">nx</span><span class="o">=</span><span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">ny</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">rvs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">RayVector</span><span class="o">.</span><span class="n">asGrid</span><span class="p">(</span><span class="n">nx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ny</span><span class="o">=</span><span class="n">ny</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">concatenateRayVectors</span><span class="p">(</span><span class="n">rvs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="RayVector.asPolar"><a class="viewcode-back" href="../../rays.html#batoid.RayVector.asPolar">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">asPolar</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">optic</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">backDist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">medium</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stopSurface</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">coordSys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">wavelength</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">outer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inner</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">outer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inner</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dirCos</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">theta_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">theta_y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;postel&#39;</span><span class="p">,</span>
         <span class="n">nrad</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">naz</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">flux</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">nrandom</span><span class="o">=</span><span class="kc">None</span>
+        <span class="n">nrandom</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Create RayVector on an annular region using a hexapolar grid.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create RayVector on an annular region using a hexapolar grid.</span>
 
 <span class="sd">        This function can be used to regularly sample the entrance pupil of a</span>
 <span class="sd">        telescope using polar symmetry (really, hexagonal symmetry).  Rings of</span>
@@ -668,6 +631,8 @@
 <span class="sd">        nrandom : int, optional</span>
 <span class="sd">            If not None, then uniformly sample this many rays from annular</span>
 <span class="sd">            region instead of sampling on a hexapolar grid.</span>
+<span class="sd">        rng : None or int or `numpy.random.Generator`, optional</span>
+<span class="sd">            Random number generator or seed to use for random sampling.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">.optic</span> <span class="kn">import</span> <span class="n">Interface</span>
 
@@ -680,6 +645,17 @@
                 <span class="n">stopSurface</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">stopSurface</span>
             <span class="k">if</span> <span class="n">outer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">outer</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">pupilSize</span><span class="o">/</span><span class="mi">2</span>
+            <span class="k">if</span> <span class="n">inner</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">optic</span><span class="p">,</span> <span class="s1">&#39;pupilObscuration&#39;</span><span class="p">):</span>
+                    <span class="n">inner</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">pupilSize</span><span class="o">*</span><span class="n">optic</span><span class="o">.</span><span class="n">pupilObscuration</span><span class="o">/</span><span class="mi">2</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">inner</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="k">if</span> <span class="n">coordSys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">coordSys</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">coordSys</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">inner</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">inner</span> <span class="o">=</span> <span class="mf">0.0</span>
 
         <span class="k">if</span> <span class="n">backDist</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">backDist</span> <span class="o">=</span> <span class="mf">40.0</span>
@@ -687,6 +663,8 @@
             <span class="n">stopSurface</span> <span class="o">=</span> <span class="n">Interface</span><span class="p">(</span><span class="n">Plane</span><span class="p">())</span>
         <span class="k">if</span> <span class="n">medium</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">medium</span> <span class="o">=</span> <span class="n">vacuum</span>
+        <span class="k">if</span> <span class="n">coordSys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">coordSys</span> <span class="o">=</span> <span class="n">globalCoordSys</span>
 
         <span class="k">if</span> <span class="n">dirCos</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dirCos</span> <span class="o">=</span> <span class="n">fieldToDirCos</span><span class="p">(</span><span class="n">theta_x</span><span class="p">,</span> <span class="n">theta_y</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="n">projection</span><span class="p">)</span>
@@ -715,28 +693,31 @@
                 <span class="n">rr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
                 <span class="n">th</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">rr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">inner</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">outer</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nrandom</span><span class="p">))</span>
-            <span class="n">th</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nrandom</span><span class="p">)</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">rr</span><span class="p">),</span> <span class="mi">3</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">r</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">r</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
-        <span class="n">z</span> <span class="o">=</span> <span class="n">r</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
-        <span class="n">x</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">rr</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">th</span><span class="p">)</span>
-        <span class="n">y</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">rr</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">th</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rng</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">rng</span><span class="p">)</span>
+            <span class="n">rr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">inner</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">outer</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nrandom</span><span class="p">))</span>
+            <span class="n">th</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nrandom</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">rr</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">th</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">rr</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">th</span><span class="p">)</span>
         <span class="k">del</span> <span class="n">rr</span><span class="p">,</span> <span class="n">th</span>
-        <span class="n">z</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">stopSurface</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">sag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-        <span class="n">transform</span> <span class="o">=</span> <span class="n">CoordTransform</span><span class="p">(</span><span class="n">stopSurface</span><span class="o">.</span><span class="n">coordSys</span><span class="p">,</span> <span class="n">globalCoordSys</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">stopSurface</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">sag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">transform</span> <span class="o">=</span> <span class="n">CoordTransform</span><span class="p">(</span><span class="n">stopSurface</span><span class="o">.</span><span class="n">coordSys</span><span class="p">,</span> <span class="n">coordSys</span><span class="p">)</span>
         <span class="n">applyForwardTransformArrays</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
         <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">w</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">wavelength</span><span class="p">)</span>
         <span class="n">n</span> <span class="o">=</span> <span class="n">medium</span><span class="o">.</span><span class="n">getN</span><span class="p">(</span><span class="n">wavelength</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_finish</span><span class="p">(</span><span class="n">backDist</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">dirCos</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">flux</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_finish</span><span class="p">(</span>
+            <span class="n">backDist</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">dirCos</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">coordSys</span>
+        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="RayVector.asSpokes"><a class="viewcode-back" href="../../rays.html#batoid.RayVector.asSpokes">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">asSpokes</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">optic</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">backDist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">medium</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stopSurface</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">coordSys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">wavelength</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">outer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inner</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
         <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dirCos</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -745,7 +726,7 @@
         <span class="n">spacing</span><span class="o">=</span><span class="s1">&#39;uniform&#39;</span><span class="p">,</span>
         <span class="n">flux</span><span class="o">=</span><span class="mi">1</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Create RayVector on an annular region using a spokes pattern.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create RayVector on an annular region using a spokes pattern.</span>
 
 <span class="sd">        The function generates rays on a rings-and-spokes pattern, with a fixed</span>
 <span class="sd">        number of radii for each azimuth and a fixed number of azimuths for</span>
@@ -853,6 +834,8 @@
                 <span class="n">stopSurface</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">stopSurface</span>
             <span class="k">if</span> <span class="n">outer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">outer</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">pupilSize</span><span class="o">/</span><span class="mi">2</span>
+            <span class="k">if</span> <span class="n">coordSys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">coordSys</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">coordSys</span>
 
         <span class="k">if</span> <span class="n">backDist</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">backDist</span> <span class="o">=</span> <span class="mf">40.0</span>
@@ -860,6 +843,8 @@
             <span class="n">stopSurface</span> <span class="o">=</span> <span class="n">Interface</span><span class="p">(</span><span class="n">Plane</span><span class="p">())</span>
         <span class="k">if</span> <span class="n">medium</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">medium</span> <span class="o">=</span> <span class="n">vacuum</span>
+        <span class="k">if</span> <span class="n">coordSys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">coordSys</span> <span class="o">=</span> <span class="n">globalCoordSys</span>
 
         <span class="k">if</span> <span class="n">dirCos</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dirCos</span> <span class="o">=</span> <span class="n">fieldToDirCos</span><span class="p">(</span><span class="n">theta_x</span><span class="p">,</span> <span class="n">theta_y</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="n">projection</span><span class="p">)</span>
@@ -886,28 +871,27 @@
         <span class="n">spokes</span> <span class="o">=</span> <span class="n">spokes</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
         <span class="n">flux</span> <span class="o">=</span> <span class="n">flux</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
 
-        <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">rings</span><span class="p">),</span> <span class="mi">3</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">r</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">r</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
-        <span class="n">z</span> <span class="o">=</span> <span class="n">r</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
-        <span class="n">x</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">rings</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">spokes</span><span class="p">)</span>
-        <span class="n">y</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">rings</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">spokes</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">rings</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">spokes</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">rings</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">spokes</span><span class="p">)</span>
         <span class="k">del</span> <span class="n">rings</span><span class="p">,</span> <span class="n">spokes</span>
-        <span class="n">z</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">stopSurface</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">sag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-        <span class="n">transform</span> <span class="o">=</span> <span class="n">CoordTransform</span><span class="p">(</span><span class="n">stopSurface</span><span class="o">.</span><span class="n">coordSys</span><span class="p">,</span> <span class="n">globalCoordSys</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">stopSurface</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">sag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">transform</span> <span class="o">=</span> <span class="n">CoordTransform</span><span class="p">(</span><span class="n">stopSurface</span><span class="o">.</span><span class="n">coordSys</span><span class="p">,</span> <span class="n">coordSys</span><span class="p">)</span>
         <span class="n">applyForwardTransformArrays</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
         <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">w</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">wavelength</span><span class="p">)</span>
         <span class="n">n</span> <span class="o">=</span> <span class="n">medium</span><span class="o">.</span><span class="n">getN</span><span class="p">(</span><span class="n">wavelength</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_finish</span><span class="p">(</span><span class="n">backDist</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">dirCos</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">flux</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_finish</span><span class="p">(</span>
+            <span class="n">backDist</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">dirCos</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">coordSys</span>
+        <span class="p">)</span></div>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_finish</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">backDist</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">dirCos</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">flux</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Map rays backwards to their source position.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_finish</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">backDist</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">dirCos</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">coordSys</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Map rays backwards to their source position.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="n">Real</span><span class="p">):</span>
-            <span class="n">flux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">flux</span><span class="p">))</span>
+            <span class="n">flux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">flux</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">._batoid</span> <span class="kn">import</span> <span class="n">finishParallel</span>
             <span class="n">vv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dirCos</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
             <span class="n">vv</span> <span class="o">/=</span> <span class="n">n</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">vv</span><span class="p">,</span> <span class="n">vv</span><span class="p">))</span>
             <span class="n">zhat</span> <span class="o">=</span> <span class="o">-</span><span class="n">n</span><span class="o">*</span><span class="n">vv</span>
@@ -916,36 +900,45 @@
             <span class="n">yhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">xhat</span><span class="p">,</span> <span class="n">zhat</span><span class="p">)</span>
             <span class="n">origin</span> <span class="o">=</span> <span class="n">zhat</span><span class="o">*</span><span class="n">backDist</span>
             <span class="n">rot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">xhat</span><span class="p">,</span> <span class="n">yhat</span><span class="p">,</span> <span class="n">zhat</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
-            <span class="n">finishParallel</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">rot</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">vv</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">))</span>
-            <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">vv</span><span class="p">)</span>
-            <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-            <span class="n">vignetted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-            <span class="n">failed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+            <span class="n">_batoid</span><span class="o">.</span><span class="n">finishParallel</span><span class="p">(</span>
+                <span class="n">origin</span><span class="p">,</span> <span class="n">rot</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">vv</span><span class="p">,</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">vx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">vv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">vy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">vv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">vz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">vv</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="n">vignetted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+            <span class="n">failed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">RayVector</span><span class="o">.</span><span class="n">_directInit</span><span class="p">(</span>
-                <span class="n">r</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">vignetted</span><span class="p">,</span> <span class="n">failed</span><span class="p">,</span> <span class="n">globalCoordSys</span>
+                <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">vx</span><span class="p">,</span> <span class="n">vy</span><span class="p">,</span> <span class="n">vz</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span>
+                <span class="n">flux</span><span class="p">,</span> <span class="n">vignetted</span><span class="p">,</span> <span class="n">failed</span><span class="p">,</span> <span class="n">coordSys</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
-            <span class="n">v</span> <span class="o">-=</span> <span class="n">source</span>
-            <span class="n">v</span> <span class="o">/=</span> <span class="n">n</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ab,ab-&gt;b&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
-            <span class="n">r</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">source</span>
-            <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-            <span class="n">vignetted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-            <span class="n">failed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">RayVector</span><span class="o">.</span><span class="n">_directInit</span><span class="p">(</span>
-                <span class="n">r</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">vignetted</span><span class="p">,</span> <span class="n">failed</span><span class="p">,</span> <span class="n">globalCoordSys</span>
-            <span class="p">)</span>
+            <span class="k">pass</span>
+            <span class="c1"># v = np.copy(r)</span>
+            <span class="c1"># v -= source</span>
+            <span class="c1"># v /= n*np.einsum(&#39;ab,ab-&gt;b&#39;, v, v)</span>
+            <span class="c1"># r[:] = source</span>
+            <span class="c1"># t = np.zeros(len(r), dtype=float)</span>
+            <span class="c1"># vignetted = np.zeros(len(r), dtype=bool)</span>
+            <span class="c1"># failed = np.zeros(len(r), dtype=bool)</span>
+            <span class="c1"># return RayVector._directInit(</span>
+            <span class="c1">#     r, v, t, w, flux, vignetted, failed, coordSys</span>
+            <span class="c1"># )</span>
 
 <div class="viewcode-block" id="RayVector.fromStop"><a class="viewcode-back" href="../../rays.html#batoid.RayVector.fromStop">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">fromStop</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span>
         <span class="n">optic</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">backDist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">medium</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stopSurface</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">coordSys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">wavelength</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dirCos</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">theta_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">theta_y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;postel&#39;</span><span class="p">,</span>
         <span class="n">flux</span><span class="o">=</span><span class="mi">1</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Create rays that intersects the &quot;stop&quot; surface at given points.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create rays that intersects the &quot;stop&quot; surface at given points.</span>
 
 <span class="sd">        The algorithm used here starts by placing the rays on the &quot;stop&quot;</span>
 <span class="sd">        surface, and then backing them up such that they are in front of any</span>
@@ -1027,6 +1020,8 @@
                 <span class="n">medium</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">inMedium</span>
             <span class="k">if</span> <span class="n">stopSurface</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">stopSurface</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">stopSurface</span>
+            <span class="k">if</span> <span class="n">coordSys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">coordSys</span> <span class="o">=</span> <span class="n">optic</span><span class="o">.</span><span class="n">coordSys</span>
 
         <span class="k">if</span> <span class="n">backDist</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">backDist</span> <span class="o">=</span> <span class="mf">40.0</span>
@@ -1034,6 +1029,8 @@
             <span class="n">stopSurface</span> <span class="o">=</span> <span class="n">Interface</span><span class="p">(</span><span class="n">Plane</span><span class="p">())</span>
         <span class="k">if</span> <span class="n">medium</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">medium</span> <span class="o">=</span> <span class="n">vacuum</span>
+        <span class="k">if</span> <span class="n">coordSys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">coordSys</span> <span class="o">=</span> <span class="n">globalCoordSys</span>
 
         <span class="k">if</span> <span class="n">dirCos</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dirCos</span> <span class="o">=</span> <span class="n">fieldToDirCos</span><span class="p">(</span><span class="n">theta_x</span><span class="p">,</span> <span class="n">theta_y</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="n">projection</span><span class="p">)</span>
@@ -1041,24 +1038,19 @@
         <span class="k">if</span> <span class="n">wavelength</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Missing wavelength keyword&quot;</span><span class="p">)</span>
 
-        <span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">yy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-
-        <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">xx</span><span class="p">),</span> <span class="mi">3</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">r</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">r</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
-        <span class="n">z</span> <span class="o">=</span> <span class="n">r</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
-        <span class="n">x</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">xx</span>
-        <span class="n">y</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">yy</span>
-        <span class="n">z</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">stopSurface</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">sag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-        <span class="n">transform</span> <span class="o">=</span> <span class="n">CoordTransform</span><span class="p">(</span><span class="n">stopSurface</span><span class="o">.</span><span class="n">coordSys</span><span class="p">,</span> <span class="n">globalCoordSys</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">stopSurface</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">sag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">transform</span> <span class="o">=</span> <span class="n">CoordTransform</span><span class="p">(</span><span class="n">stopSurface</span><span class="o">.</span><span class="n">coordSys</span><span class="p">,</span> <span class="n">coordSys</span><span class="p">)</span>
         <span class="n">applyForwardTransformArrays</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
 
         <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">w</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">wavelength</span><span class="p">)</span>
         <span class="n">n</span> <span class="o">=</span> <span class="n">medium</span><span class="o">.</span><span class="n">getN</span><span class="p">(</span><span class="n">wavelength</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_finish</span><span class="p">(</span><span class="n">backDist</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">dirCos</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">flux</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_finish</span><span class="p">(</span>
+            <span class="n">backDist</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">dirCos</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">coordSys</span>
+        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="RayVector.fromFieldAngles"><a class="viewcode-back" href="../../rays.html#batoid.RayVector.fromFieldAngles">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">fromFieldAngles</span><span class="p">(</span>
@@ -1068,14 +1060,15 @@
         <span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">flux</span><span class="o">=</span><span class="mi">1</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Create RayVector with one stop surface point but many field angles.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create RayVector with one stop surface point but many field angles.</span>
 
 <span class="sd">        This method is similar to `fromStop` but broadcasts over ``theta_x``</span>
 <span class="sd">        and ``theta_y`` instead of over ``x`` and ``y``.  There is less</span>
 <span class="sd">        currently less effort paid to synchronizing the ``t`` values of the</span>
 <span class="sd">        created rays, as they don&#39;t correspond to points on a physical incoming</span>
 <span class="sd">        wavefront in this case.  The primary intended use case is to map chief</span>
-<span class="sd">        rays (``x``=``y``=0) from incoming field angle to focal plane position.</span>
+<span class="sd">        rays (``x`` = ``y`` = 0) from incoming field angle to focal plane</span>
+<span class="sd">        position.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1158,67 +1151,70 @@
 
         <span class="k">return</span> <span class="n">rv</span></div>
 
-
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">r</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;ndarray of float, shape (n, 3): Positions of rays in meters.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">r</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ndarray of float, shape (n, 3): Positions of rays in meters.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">x</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;The x components of ray positions in meters.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">r</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The x components of ray positions in meters.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">y</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;The y components of ray positions in meters.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">r</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The y components of ray positions in meters.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">z</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;The z components of ray positions in meters.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">r</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The z components of ray positions in meters.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">v</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;ndarray of float, shape (n, 3): Velocities of rays in units of the</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ndarray of float, shape (n, 3): Velocities of rays in units of the</span>
 <span class="sd">        speed of light in vacuum.  Note that these may have magnitudes &lt; 1 if</span>
 <span class="sd">        the rays are inside a refractive medium.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_v</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">vx</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">vy</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">vz</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_vx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vz</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">vx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;The x components of ray velocities units of the vacuum speed of</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The x components of ray velocities units of the vacuum speed of</span>
 <span class="sd">        light.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_v</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">vx</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vx</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">vy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;The y components of ray velocities units of the vacuum speed of</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The y components of ray velocities units of the vacuum speed of</span>
 <span class="sd">        light.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_v</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">vy</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vy</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">vz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;The z components of ray velocities units of the vacuum speed of</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The z components of ray velocities units of the vacuum speed of</span>
 <span class="sd">        light.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_v</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">vz</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vz</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">t</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Reference times (divided by the speed of light in vacuum) in units</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reference times (divided by the speed of light in vacuum) in units</span>
 <span class="sd">        of meters, also known as the optical path lengths.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">t</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
@@ -1226,25 +1222,25 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">wavelength</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Vacuum wavelengths in meters.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Vacuum wavelengths in meters.&quot;&quot;&quot;</span>
         <span class="c1"># wavelength is constant, so no need to synchronize</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wavelength</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">flux</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Fluxes in arbitrary units.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Fluxes in arbitrary units.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flux</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">vignetted</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;True for rays that have been vignetted.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;True for rays that have been vignetted.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">vignetted</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vignetted</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">failed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;True for rays that have failed.  This may occur, for example, if</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;True for rays that have failed.  This may occur, for example, if</span>
 <span class="sd">        batoid failed to find the intersection of a ray wiht a surface.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">failed</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
@@ -1252,34 +1248,35 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">k</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;ndarray of float, shape (n, 3): Wavevectors of plane waves in units</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;ndarray of float, shape (n, 3): Wavevectors of plane waves in units</span>
 <span class="sd">        of radians per meter.  The magnitude of each wavevector is equal to</span>
 <span class="sd">        :math:`2 \pi n / \lambda`, where :math:`n` is the refractive index and</span>
 <span class="sd">        :math:`\lambda` is the wavelength.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">)</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">v</span>
         <span class="n">out</span> <span class="o">/=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wavelength</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
-        <span class="n">out</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="n">out</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">v</span><span class="o">*</span><span class="n">v</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">out</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">kx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;The x component of each ray wavevector in radians per meter.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The x component of each ray wavevector in radians per meter.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ky</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;The y component of each ray wavevector in radians per meter.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The y component of each ray wavevector in radians per meter.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">kz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;The z component of each ray wavevector in radians per meter.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The z component of each ray wavevector in radians per meter.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">omega</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;The temporal angular frequency of each plane wave divided by the</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The temporal angular frequency of each plane wave divided by the</span>
 <span class="sd">        vacuum speed of light in units of radians per meter.  Equals</span>
 <span class="sd">        :math:`2 \pi / \lambda`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1288,7 +1285,9 @@
     <span class="nd">@lazy_property</span>
     <span class="k">def</span> <span class="nf">_rv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_batoid</span><span class="o">.</span><span class="n">CPPRayVector</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_v</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_t</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_vx</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vy</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vz</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_t</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_wavelength</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flux</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_vignetted</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_failed</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
             <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wavelength</span><span class="p">)</span>
@@ -1298,8 +1297,12 @@
         <span class="k">if</span> <span class="s2">&quot;_rv&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
             <span class="c1"># Was never copied to device, so still synchronized.</span>
             <span class="k">return</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">r</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">vx</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">vy</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">vz</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">t</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">wavelength</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
@@ -1307,8 +1310,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">failed</span><span class="o">.</span><span class="n">syncToHost</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_syncToDevice</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">r</span><span class="o">.</span><span class="n">syncToDevice</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">syncToDevice</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">syncToDevice</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">syncToDevice</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">syncToDevice</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">vx</span><span class="o">.</span><span class="n">syncToDevice</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">vy</span><span class="o">.</span><span class="n">syncToDevice</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">vz</span><span class="o">.</span><span class="n">syncToDevice</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">t</span><span class="o">.</span><span class="n">syncToDevice</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">wavelength</span><span class="o">.</span><span class="n">syncToDevice</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rv</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">syncToDevice</span><span class="p">()</span>
@@ -1319,8 +1326,12 @@
         <span class="c1"># copy on host side for now...</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_syncToHost</span><span class="p">()</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="n">RayVector</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="n">RayVector</span><span class="p">)</span>
-        <span class="n">ret</span><span class="o">.</span><span class="n">_r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">)</span>
-        <span class="n">ret</span><span class="o">.</span><span class="n">_v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_v</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">)</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">)</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">_z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_z</span><span class="p">)</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">_vx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vx</span><span class="p">)</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">_vy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vy</span><span class="p">)</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">_vz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vz</span><span class="p">)</span>
         <span class="n">ret</span><span class="o">.</span><span class="n">_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_t</span><span class="p">)</span>
         <span class="n">ret</span><span class="o">.</span><span class="n">_wavelength</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wavelength</span><span class="p">)</span>
         <span class="n">ret</span><span class="o">.</span><span class="n">_flux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_flux</span><span class="p">)</span>
@@ -1330,7 +1341,7 @@
         <span class="k">return</span> <span class="n">ret</span>
 
 <div class="viewcode-block" id="RayVector.toCoordSys"><a class="viewcode-back" href="../../rays.html#batoid.RayVector.toCoordSys">[docs]</a>    <span class="k">def</span> <span class="nf">toCoordSys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coordSys</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Transform this RayVector into a new coordinate system.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transform this RayVector into a new coordinate system.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1364,13 +1375,16 @@
 
     <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vz</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">wavelength</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">vignetted</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">failed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_v</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_t</span><span class="p">,</span>
+        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z</span><span class="p">,</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">_vx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vz</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_t</span><span class="p">,</span>
          <span class="bp">self</span><span class="o">.</span><span class="n">_wavelength</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vignetted</span><span class="p">,</span>
          <span class="bp">self</span><span class="o">.</span><span class="n">_failed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordSys</span><span class="p">)</span> <span class="o">=</span> <span class="n">args</span>
 
@@ -1391,8 +1405,12 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_syncToHost</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">RayVector</span><span class="o">.</span><span class="n">_directInit</span><span class="p">(</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_r</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">),</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_v</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">[</span><span class="n">idx</span><span class="p">]),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">[</span><span class="n">idx</span><span class="p">]),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_z</span><span class="p">[</span><span class="n">idx</span><span class="p">]),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vx</span><span class="p">[</span><span class="n">idx</span><span class="p">]),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vy</span><span class="p">[</span><span class="n">idx</span><span class="p">]),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vz</span><span class="p">[</span><span class="n">idx</span><span class="p">]),</span>
             <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_t</span><span class="p">[</span><span class="n">idx</span><span class="p">]),</span>
             <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wavelength</span><span class="p">[</span><span class="n">idx</span><span class="p">]),</span>
             <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_flux</span><span class="p">[</span><span class="n">idx</span><span class="p">]),</span>
@@ -1419,46 +1437,30 @@
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017-2021, Josh Meyers.
-
-    </p>
+    <p>&#169; Copyright 2017-2021, Josh Meyers.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>
