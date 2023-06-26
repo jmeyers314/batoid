@@ -1,0 +1,304 @@
+opticalSystem:
+  type: CompoundOptic
+  name: LSST
+  inMedium: &vacuum 1.0
+  medium: *vacuum
+  backDist: 15.0  # distance from global vertex to use to start tracing rays
+  sphereRadius: 5.0  # reference sphere radius to use for wavefront calculation
+  pupilSize: 8.36  # Pupil fits inside a square with this side length
+  pupilObscuration: 0.612  # Fractional pupil central obscuration
+  stopSurface:
+    type: Interface
+    name: entrancePupil
+    surface:
+      type: Plane
+    coordSys:
+      z: 0.4393899
+  items:
+    -
+      type: Mirror
+      name: M1
+      surface:
+        type: Asphere
+        R: 19.8346                # 1/CURV
+        conic: -1.21502           # CONI
+        coefs: [0.0, -1.381e-9]   # PARM
+      obscuration:
+        type: ClearAnnulus
+        outer: 4.18
+        inner: 2.558
+    -
+      type: Mirror
+      name: M2
+      surface:
+        type: Asphere
+        R: 6.79005                # 1/CURV
+        conic: -0.222             # CONI
+        coefs: [0.0, 1.274e-5, 9.68e-7] # PARM
+      obscuration:
+        type: ClearAnnulus
+        outer: 1.71
+        inner: 0.9
+      coordSys:
+        # 2.2716407559273347 # coord break PARM 1
+        # 1.2674857714490647 # coord break PARM 2
+        x: -2.271639439E-05  # from global vertex.  Could do better by derotating lines above
+        y: 1.267487976E-05   # global vertex
+        z: 6.155355062       # global vertex.  Maybe do better using DISZ?
+        # rotation angles are
+        rotX: 1.0166842677385737e-05
+        rotY: -6.074323741867224e-06
+        # rx = np.deg2rad(0.0005825171763876887)
+        # ry = np.deg2rad(-0.00034803311380510562)
+    -
+      type: Mirror
+      name: M3
+      surface:
+        type: Asphere
+        R: 8.3439       # 1/CURV
+        conic: 0.15497  # CONI
+        coefs: [0.0, 4.5e-7, 8.15e-9]  # PARM
+      obscuration:
+        type: ClearAnnulus
+        outer: 2.508
+        inner: 0.55
+      coordSys:
+        # SCBD says 3.630000000000E-01 -1.690000000000E-01
+        # SCBD says rot is 1.340000000000E-03 2.520000000000E-03 in degrees
+        x: -3.629999868E-04  # global vertex
+        y: -1.689999779E-04  # global vertex
+        z: -0.2344  # global vertex
+        rotX: -2.3387411976724018e-05
+        rotY: 4.3982297150257105e-05
+    -
+      type: CompoundOptic
+      name: LSSTCamera
+      coordSys:
+        # from global vertex of L1
+        x: -7.361390032E-04
+        y: -2.460487516E-04
+        z: 3.394369280
+        rotX: 5.3424230929628713e-05
+        rotY: 6.244064219744373e-05
+        rotZ: 1.1482249287659757e-08
+        # rotation is 3.060982956E-03  3.577585268E-03  6.578844235E-07  from prescription
+      items:
+        -
+          type: Lens
+          name: L1
+          medium: &silica
+            # from fitting Sellmeier coefs to [ugriz]_prescription index data
+            type: SellmeierMedium
+            B1: 0.6961829842616872
+            B2: 0.4079259129074905
+            B3: 0.8974643319456314
+            C1: 0.004679264915537484
+            C2: 0.013512224089229979
+            C3: 97.93239315034683
+          items:
+            -
+              type: RefractiveInterface
+              name: L1_entrance
+              surface:
+                type: Sum
+                items:
+                  -
+                    type: Sphere
+                    R: 2.823354  # 1/CURV
+                  -
+                    type: Zernike
+                    R_outer: 0.775
+                    # To convert Zemax -> batoid, need to flip x, y, z => -x, y, -z
+                    # Amounts to flipping signs of
+                    # Z1, Z3, Z4, Z6, Z7, Z9, Z11, Z12, Z14, Z17, Z19, Z21, Z22, Z24, Z26, Z28
+                    coef:
+                      -  0.0
+                      - -5.099E-10  # Z1
+                      -  9.089E-11  # Z2
+                      -  2.151E-10  # Z3
+                      -  4.171E-08  # Z4
+                      -  4.549E-09  # Z5
+                      - -3.728E-08  # Z6
+                      -  1.441E-08  # Z7
+                      -  1.791E-08  # Z8
+                      -  3.841E-09  # Z9
+                      - -1.684E-08  # Z10
+                      - -3.002E-08  # Z11
+                      - -1.249E-08  # Z12
+                      - -4.490E-09  # Z13
+                      - -7.715E-09  # Z14
+                      -  1.197E-09  # Z15
+                      -  7.780E-09  # Z16
+                      - -1.189E-08  # Z17
+                      - -1.902E-09  # Z18
+                      -  5.311E-09  # Z19
+                      - -5.026E-09  # Z20
+                      -  8.985E-09  # Z21
+                      - -1.321E-08  # Z22
+                      - -7.393E-09  # Z23
+                      - -9.319E-09  # Z24
+                      - -3.555E-09  # Z25
+                      - -5.699E-09  # Z26
+                      - -7.704E-09  # Z27
+                      - -1.860E-08  # Z28
+              obscuration:
+                type: ClearCircle
+                radius: 0.775
+            -
+              type: RefractiveInterface
+              name: L1_exit
+              surface:
+                type: Sphere
+                R: 5.018956  # 1/CURV
+              obscuration:
+                type: ClearCircle
+                radius: 0.775
+              coordSys:
+                z: 0.08231  # DISZ
+        -
+          type: Lens
+          name: L2
+          medium: *silica
+          coordSys:
+            z: 0.494881  # cumsum of some DISZ, checked against global vertex coord
+          items:
+            -
+              type: RefractiveInterface
+              name: L2_entrance
+              surface:
+                type: Sum
+                items:
+                  -
+                    type: Sphere
+                    R: -48040.0  # 1/CURV
+                  -
+                    type: Zernike
+                    R_outer: 0.551
+                    coef:
+                      - -0.0
+                      -  8.408e-09
+                      -  1.927e-09
+                      -  1.502e-09
+                      - -4.473e-08
+                      -  2.731e-09
+                      -  6.184e-08
+                      -  1.834e-09
+                      -  2.354e-09
+                      - -3.440e-08
+                      - -1.255e-08
+                      -  5.409e-08
+                      -  7.787e-09
+                      - -3.49e-09
+                      - -1.172e-09
+                      - -4.626e-09
+                      -  4.564e-09
+                      -  3.556e-09
+                      -  3.987e-09
+                      -  5.803e-09
+                      - -2.950e-09
+                      -  2.986e-09
+                      -  4.575e-08
+                      - -9.143e-10
+                      - -5.526e-10
+                      - -4.372e-09
+                      - -5.158e-10
+                      -  1.471e-09
+                      -  1.916e-09
+              obscuration:
+                type: ClearCircle
+                radius: 0.551
+            -
+              type: RefractiveInterface
+              name: L2_exit
+              surface:
+                type: Asphere
+                R: 2.5291       # 1/CURV
+                conic: -1.57    # CONI
+                coefs: [0.0, -0.001656]  # PARM
+              obscuration:
+                type: ClearCircle
+                radius: 0.551
+              coordSys:
+                z: 0.03005
+        -
+          type: Lens
+          name: Filter
+          medium: *silica
+          coordSys:
+            # inferred from global vertex and rot
+            x: 2.47212402e-05
+            y: -7.99160061e-05
+            z: 0.871168396
+            rotX: 0.00011657042290169468
+            rotY: 3.6059894624233535e-05
+          items:
+            -
+              type: RefractiveInterface
+              name: Filter_entrance
+              surface:
+                type: Sphere
+                R: 5.632  # 1/CURV
+                # Note: For r and i band, read Zernike coefficients from multi-config data.
+              obscuration:
+                type: ClearCircle
+                radius: 0.375
+            -
+              type: RefractiveInterface
+              name: Filter_exit
+              surface:
+                type: Sphere
+                R: 5.640  # 1/CRVT from multi-configuration
+              obscuration:
+                type: ClearCircle
+                radius: 0.375
+              coordSys:
+                z: 0.0136  # THIC from multi-configuration
+        -
+          type: Lens
+          name: L3
+          medium: *silica
+          coordSys:
+            # inferred from global vertex and rot
+            x: 2.73175526e-05
+            y: -8.83090766e-05
+            z: 0.943168396
+            rotX: 0.00011657042290169468
+            rotY: 3.6059894624233535e-05
+          items:
+            -
+              type: RefractiveInterface
+              name: L3_entrance
+              surface:
+                type: Quadric
+                R: 3.169       # 1/CURV
+                conic: -0.962  # CONI
+              obscuration:
+                type: ClearCircle
+                radius: 0.361
+            -
+              type: RefractiveInterface
+              name: L3_exit
+              surface:
+                type: Sphere
+                R: -13.36   # 1/CURV
+              obscuration:
+                type: ClearCircle
+                radius: 0.361
+              coordSys:
+                z: 0.06  #DISZ
+        -
+          type: Detector
+          name: Detector
+          surface:
+            type: Plane
+          obscuration:
+            type: ClearCircle
+            radius: 0.4
+          coordSys:
+            # inferred from global vertex and rot
+            x: 3.05240345e-05
+            y: -9.86746351e-05
+            z: 1.03208939466
+            rotX: -8.40726278917665e-05
+            rotY: -2.607382653415367e-05
+            rotZ: 5.2237452258141074e-09
