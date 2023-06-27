@@ -48,6 +48,7 @@ class CMakeBuild(build_ext):
             f"-DPYTHON_EXECUTABLE={sys.executable}",
             f"-DCMAKE_BUILD_TYPE={cfg}",  # not used on MSVC, but no harm
             f"-DMACOSX_DEPLOYMENT_TARGET=12.0",
+            f"-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0"
         ]
         build_args = []
         # Adding CMake arguments set as environment variable
