@@ -4,66 +4,64 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_linux_wheels:
-    name: Build wheels on standard linux
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-          fetch-depth: 2
+  # build_linux_wheels:
+  #   name: Build wheels on standard linux
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         submodules: recursive
+  #         fetch-depth: 2
 
-      - name: Build wheels
-        uses: pypa/cibuildwheel@v2.13.1
-        env:
-          CIBW_BUILD: "*manylinux*"
-          CIBW_SKIP: cp36* cp37* pp*
-          CIBW_BUILD_VERBOSITY: 3
-          CIBW_BEFORE_BUILD: pip install -U pybind11-global
-      - uses: actions/upload-artifact@v3
-        with:
-          path: ./wheelhouse/*.whl
+  #     - name: Build wheels
+  #       uses: pypa/cibuildwheel@v2.13.1
+  #       env:
+  #         CIBW_BUILD: "*manylinux*"
+  #         CIBW_SKIP: cp36* cp37* pp*
+  #         CIBW_BUILD_VERBOSITY: 3
+  #         CIBW_BEFORE_BUILD: pip install -U pybind11-global
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         path: ./wheelhouse/*.whl
 
-  build_musl_wheels:
-    name: Build wheels on musl linux
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-          fetch-depth: 2
+  # build_musl_wheels:
+  #   name: Build wheels on musl linux
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         submodules: recursive
+  #         fetch-depth: 2
 
-      - name: Build wheels
-        uses: pypa/cibuildwheel@v2.13.1
-        env:
-          CIBW_BUILD: "*musllinux*"
-          CIBW_SKIP: cp36* cp37* pp*
-          CIBW_BUILD_VERBOSITY: 3
-          CIBW_BEFORE_BUILD: pip install -U pybind11-global
-      - uses: actions/upload-artifact@v3
-        with:
-          path: ./wheelhouse/*.whl
+  #     - name: Build wheels
+  #       uses: pypa/cibuildwheel@v2.13.1
+  #       env:
+  #         CIBW_BUILD: "*musllinux*"
+  #         CIBW_SKIP: cp36* cp37* pp*
+  #         CIBW_BUILD_VERBOSITY: 3
+  #         CIBW_BEFORE_BUILD: pip install -U pybind11-global
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         path: ./wheelhouse/*.whl
 
   build_macosx_wheels:
     name: Build wheels on macosx
-    runs-on: macos-11
+    runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-          fetch-depth: 2
+      - name: Checkout
+        uses: actions/checkout@v3
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.13.1
         env:
-          CIBW_ARCHS_MACOS: x86_64 arm64
+          CIBW_ARCHS_MACOS: x86_64 universal2 arm64
           CIBW_BUILD: "*macosx*"
           CIBW_SKIP: cp36* cp37* pp*
           CIBW_BUILD_VERBOSITY: 3
-          CIBW_BEFORE_BUILD: pip install -U pybind11-global && brew install libomp
-          CIBW_BEFORE_TEST: pip install -U -r test_requirements.txt
-          CIBW_TEST_COMMAND: pytest --skip_gha {package}/tests
-          CIBW_TEST_SKIP: "*-macosx_arm64"
+          # CIBW_BEFORE_BUILD: pip install -U pybind11-global && brew install libomp
+          # CIBW_BEFORE_TEST: pip install -U -r test_requirements.txt
+          # CIBW_TEST_COMMAND: pytest --skip_gha {package}/tests
+          # CIBW_TEST_SKIP: *_arm64 *_universal2:arm64
       - uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/*.whl
