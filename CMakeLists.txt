@@ -78,35 +78,12 @@ endmacro()
 add_library(batoid-compile-flags INTERFACE)
 add_cxx_flag_if_avail(batoid-compile-flags "-Wno-unused-value" CXX_W_NO_UNUSED_VALUE)
 
-if (DEFINED ENV{BATOID_GPU})
-
-  add_cxx_flag_if_avail(batoid-compile-flags "-Wno-openmp-mapping" CXX_W_NO_OPENMP_MAPPING)
-  add_cxx_flag_if_avail(batoid-compile-flags "-fopenmp" CXX_FOPENMP)
-  target_compile_options(batoid-compile-flags INTERFACE
-    $<$<COMPILE_LANGUAGE:CXX>:-fopenmp -fopenmp-targets=nvptx64-nvidia-cuda -Wno-openmp-mapping -Wno-unknown-cuda-version -I/global/cfs/cdirs/m1759/csdaley/software/perlmutter/llvm/12-main-2020Dec20/include>
-  )
-
-  set(ALL_FILES ${SRC_FILES} ${PYSRC_FILES})
-
-  add_definitions(-DBATOID_GPU)
-  pybind11_add_module(_batoid SYSTEM ${ALL_FILES})
-  target_link_libraries(_batoid PUBLIC batoid-compile-flags "-fopenmp -fopenmp-targets=nvptx64-nvidia-cuda -Wno-openmp-mapping -Wno-unknown-cuda-version -I/global/cfs/cdirs/m1759/csdaley/software/perlmutter/llvm/12-main-2020Dec20/include")
-
-  set_target_properties(_batoid
-    PROPERTIES
-    DEFINE_SYMBOL ""
-  )
-
+add_library(batoid ${SRC_FILES})
+find_package(OpenMP)
+if(OpenMP_CXX_FOUND)
+  target_link_libraries(batoid batoid-compile-flags OpenMP::OpenMP_CXX)
 else()
-
-  add_library(batoid ${SRC_FILES})
-  find_package(OpenMP)
-  if(OpenMP_CXX_FOUND)
-    target_link_libraries(batoid batoid-compile-flags OpenMP::OpenMP_CXX)
-  else()
-    target_link_libraries(batoid batoid-compile-flags)
-  endif()
-  pybind11_add_module(_batoid SYSTEM ${PYSRC_FILES})
-  target_link_libraries(_batoid PRIVATE batoid INTERFACE batoid-compile-flags)
-
+  target_link_libraries(batoid batoid-compile-flags)
 endif()
+pybind11_add_module(_batoid SYSTEM ${PYSRC_FILES})
+target_link_libraries(_batoid PRIVATE batoid INTERFACE batoid-compile-flags)

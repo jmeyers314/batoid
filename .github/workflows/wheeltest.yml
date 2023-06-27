@@ -51,22 +51,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Compile a universal OpenMP
-        run: brew reinstall -v --build-from-source --formula ./recipe/libomp.rb
+      # Tinkering with https://github.com/actions/runner-images/issues/5555
+      # to get OpenMP working on MacOS
+      # Currently I get
+      #   OMP: Error #15: Initializing libomp.dylib, but found libomp.dylib already initialized.
+      #   OMP: Hint This means that multiple copies of the OpenMP runtime have been linked into the program. ...
+      # - name: Compile a universal OpenMP
+      #   run: brew reinstall -v --build-from-source --formula ./recipe/libomp.rb
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.13.1
         env:
-          # CIBW_ARCHS_MACOS: x86_64 universal2 arm64
-          CIBW_ARCHS_MACOS: arm64
-          CIBW_BUILD: cp310*
-          # CIBW_SKIP: cp36* cp37* cp38* cp39* cp311* cp312* pp*
+          CIBW_ARCHS_MACOS: x86_64 arm64
+          CIBW_SKIP: cp36* cp37* pp*
           CIBW_BUILD_VERBOSITY: 3
           CIBW_BEFORE_BUILD: pip install -U pybind11-global
-          # CIBW_BEFORE_BUILD: pip install -U pybind11-global && brew install libomp
-          # CIBW_BEFORE_TEST: pip install -U -r test_requirements.txt
-          # CIBW_TEST_COMMAND: pytest --skip_gha {package}/tests
-          # CIBW_TEST_SKIP: *_arm64 *_universal2:arm64
+          CIBW_BEFORE_TEST: pip install -U -r test_requirements.txt
+          CIBW_TEST_COMMAND: pytest --skip_gha {package}/tests
+          CIBW_TEST_SKIP: *_arm64 *_universal2:arm64
       - uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/*.whl
