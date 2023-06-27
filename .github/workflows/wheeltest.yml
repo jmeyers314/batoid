@@ -69,6 +69,8 @@ jobs:
           CIBW_BEFORE_TEST: pip install -U -r test_requirements.txt
           CIBW_TEST_COMMAND: pytest --skip_gha {package}/tests
           CIBW_TEST_SKIP: *_arm64 *_universal2:arm64
-      - uses: actions/upload-artifact@v3
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/*.whl
