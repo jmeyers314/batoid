@@ -148,7 +148,7 @@ namespace batoid {
     }
 
 
-    void obscure(const Obscuration& obsc, RayVector& rv) {
+    void obscure(const Obscuration& obsc, RayVector& rv, int max_threads) {
         rv.x.syncToDevice();
         rv.y.syncToDevice();
         rv.z.syncToDevice();
@@ -164,7 +164,7 @@ namespace batoid {
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for is_device_ptr(obscPtr)
         #else
-            #pragma omp parallel for
+            #pragma omp parallel for num_threads(max_threads)
         #endif
         for(int i=0; i<size; i++) {
             vigptr[i] |= obscPtr->contains(xptr[i], yptr[i]);
@@ -176,7 +176,8 @@ namespace batoid {
         const Surface& surface,
         const vec3 dr, const mat3 drot,
         RayVector& rv,
-        const Coating* coating
+        const Coating* coating,
+        int max_threads
     ) {
         rv.x.syncToDevice();
         rv.y.syncToDevice();
@@ -216,7 +217,7 @@ namespace batoid {
                 is_device_ptr(surfacePtr, coatingPtr) \
                 map(to:drptr[:3], drotptr[:9])
         #else
-            #pragma omp parallel for
+            #pragma omp parallel for num_threads(max_threads)
         #endif
         for(int i=0; i<size; i++) {
             // Coordinate transformation
@@ -272,7 +273,8 @@ namespace batoid {
         const Surface& surface,
         const vec3 dr, const mat3 drot,
         RayVector& rv,
-        const Coating* coating
+        const Coating* coating,
+        int max_threads
     ) {
         rv.x.syncToDevice();
         rv.y.syncToDevice();
@@ -312,7 +314,7 @@ namespace batoid {
                 is_device_ptr(surfacePtr, coatingPtr) \
                 map(to:drptr[:3], drotptr[:9])
         #else
-            #pragma omp parallel for
+            #pragma omp parallel for num_threads(max_threads)
         #endif
         for(int i=0; i<size; i++) {
             // Coordinate transformation
@@ -379,7 +381,8 @@ namespace batoid {
         const vec3 dr, const mat3 drot,
         const Medium& m1, const Medium& m2,
         RayVector& rv,
-        const Coating* coating
+        const Coating* coating,
+        int max_threads
     ) {
         rv.x.syncToDevice();
         rv.y.syncToDevice();
@@ -420,7 +423,7 @@ namespace batoid {
                 is_device_ptr(surfacePtr, mPtr, coatingPtr) \
                 map(to:drptr[:3], drotptr[:9])
         #else
-            #pragma omp parallel for
+            #pragma omp parallel for num_threads(max_threads)
         #endif
         for(int i=0; i<size; i++) {
             // Coordinate transformation
@@ -497,7 +500,8 @@ namespace batoid {
         const vec3 dr, const mat3 drot,
         const Medium& m1, const Medium& m2,
         const Coating& coating,
-        RayVector& rv, RayVector& rvSplit
+        RayVector& rv, RayVector& rvSplit,
+        int max_threads
     ) {
         rv.x.syncToDevice();
         rv.y.syncToDevice();
@@ -560,7 +564,7 @@ namespace batoid {
                 is_device_ptr(surfacePtr, mPtr, cPtr) \
                 map(to:drptr[:3], drotptr[:9])
         #else
-            #pragma omp parallel for
+            #pragma omp parallel for num_threads(max_threads)
         #endif
         for(int i=0; i<size; i++) {
             // Coordinate transformation
@@ -654,7 +658,8 @@ namespace batoid {
         const Surface& surface,
         const vec3 dr, const mat3 drot,
         const Surface& screen,
-        RayVector& rv
+        RayVector& rv,
+        int max_threads
     ) {
         rv.x.syncToDevice();
         rv.y.syncToDevice();
@@ -689,7 +694,7 @@ namespace batoid {
                 is_device_ptr(surfacePtr, screenPtr) \
                 map(to:drptr[:3], drotptr[:9])
         #else
-            #pragma omp parallel for
+            #pragma omp parallel for num_threads(max_threads)
         #endif
         for(int i=0; i<size; i++) {
             // Coordinate transformation
