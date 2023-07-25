@@ -6,8 +6,9 @@ import time
 
 @timer
 def parallel_trace_timing(args):
+    batoid.trace._batoid_max_threads = args.j
     print("Using nrad of {:_d}".format(args.nrad))
-    print(f"Using {batoid._batoid.get_nthreads()} threads")
+    print(f"Using {batoid.trace._batoid_max_threads} threads")
 
     if args.lsst:
         print("Tracing through LSST optics")
@@ -17,6 +18,26 @@ def parallel_trace_timing(args):
         print("Tracing through DECam optics")
         telescope = batoid.Optic.fromYaml("DECam.yaml")
         pm = 'PM'
+    elif args.lsst_aos:
+        print("Tracing through LSST AOS optics")
+        fiducial = batoid.Optic.fromYaml("LSST_r.yaml")
+        from batoid_rubin import LSSTBuilder
+        builder = LSSTBuilder(fiducial)
+        zen = np.deg2rad(30.0)
+        rtp = np.deg2rad(24.0)
+        builder = (
+            builder
+            .with_m1m3_gravity(zen)
+            .with_m1m3_temperature(0.1, 0.1, 0.1, 0.1, 0.1)
+            .with_m1m3_lut(zen)
+            .with_m2_gravity(zen)
+            .with_m2_temperature(0.1, 0.1)
+            .with_camera_gravity(zen, rtp)
+            .with_camera_temperature(0.1)
+            .with_aos_dof([0.01]*50)
+        )
+        telescope = builder.build()
+        pm = 'M1'
     else:
         print("Tracing through HSC optics")
         telescope = batoid.Optic.fromYaml("HSC.yaml")
@@ -152,7 +173,9 @@ if __name__ == '__main__':
     parser.add_argument("--plot", action='store_true')
     parser.add_argument("--show", action='store_true')
     parser.add_argument("--lsst", action='store_true')
+    parser.add_argument("--lsst_aos", action='store_true')
     parser.add_argument("--decam", action='store_true')
+    parser.add_argument("-j", type=int, default=1)
     args = parser.parse_args()
 
     parallel_trace_timing(args)
