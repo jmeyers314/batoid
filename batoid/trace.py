@@ -1,33 +1,47 @@
 from . import _batoid
-from .coordSys import CoordSys
 from .coordTransform import CoordTransform
 
 
-def applyForwardTransform(ct, rv):
-    _batoid.applyForwardTransform(ct.dr, ct.drot.ravel(), rv._rv)
+_batoid_max_threads = 1
+
+
+def applyForwardTransform(ct, rv, max_threads=None):
+    if max_threads is None:
+        global _batoid_max_threads
+        max_threads = _batoid_max_threads
+    _batoid.applyForwardTransform(ct.dr, ct.drot.ravel(), rv._rv, max_threads)
     rv.coordSys = ct.toSys
     return rv
 
 
-def applyReverseTransform(ct, rv):
-    _batoid.applyReverseTransform(ct.dr, ct.drot.ravel(), rv._rv)
+def applyReverseTransform(ct, rv, max_threads=None):
+    if max_threads is None:
+        global _batoid_max_threads
+        max_threads = _batoid_max_threads
+    _batoid.applyReverseTransform(ct.dr, ct.drot.ravel(), rv._rv, max_threads)
     rv.coordSys = ct.fromSys
     return rv
 
 
-def applyForwardTransformArrays(ct, x, y, z):
+def applyForwardTransformArrays(ct, x, y, z, max_threads=None):
+    if max_threads is None:
+        global _batoid_max_threads
+        max_threads = _batoid_max_threads
     _batoid.applyForwardTransformArrays(
         ct.dr, ct.drot.ravel(),
         x.ctypes.data, y.ctypes.data, z.ctypes.data,
-        len(x)
+        len(x), max_threads
     )
 
 
-def applyReverseTransformArrays(ct, x, y, z):
+def applyReverseTransformArrays(ct, x, y, z, max_threads=None):
+    if max_threads is None:
+        global _batoid_max_threads
+        max_threads = _batoid_max_threads
     _batoid.applyReverseTransformArrays(
         ct.dr, ct.drot.ravel(),
         x.ctypes.data, y.ctypes.data, z.ctypes.data,
-        len(x)
+        len(x), max_threads
     )
 
 

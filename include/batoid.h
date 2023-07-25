@@ -12,8 +12,8 @@ namespace batoid {
     using vec3 = std::array<double, 3>;
     using mat3 = std::array<double, 9>;  // Column major rotation matrix.
 
-    void applyForwardTransform(const vec3 dr, const mat3 drot, RayVector& rv);
-    void applyReverseTransform(const vec3 dr, const mat3 drot, RayVector& rv);
+    void applyForwardTransform(const vec3 dr, const mat3 drot, RayVector& rv, int max_threads);
+    void applyReverseTransform(const vec3 dr, const mat3 drot, RayVector& rv, int max_threads);
     void obscure(const Obscuration& obsc, RayVector& rv);
     void intersect(
         const Surface& surface, const vec3 dr, const mat3 drot, RayVector& rv,
@@ -41,12 +41,12 @@ namespace batoid {
     void applyForwardTransformArrays(
         const vec3 dr, const mat3 drot,
         double* x, double* y, double* z,
-        size_t n
+        size_t n, int max_threads
     );
     void applyReverseTransformArrays(
         const vec3 dr, const mat3 drot,
         double* x, double* y, double* z,
-        size_t n
+        size_t n, int max_threads
     );
 
     void finishParallel(const vec3 dr, const mat3 drot, const vec3 vv, double* x, double* y, double* z, size_t n);

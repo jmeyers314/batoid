@@ -1,4 +1,6 @@
 #include "batoid.h"
+#include <iostream>
+#include <omp.h>
 
 namespace batoid {
 
@@ -6,8 +8,9 @@ namespace batoid {
     void applyForwardTransformArrays(
         const vec3 dr, const mat3 drot,
         double* x, double* y, double* z,
-        size_t n
+        size_t n, int max_threads
     ) {
+        #pragma omp parallel for num_threads(max_threads)
         for(size_t i=0; i<n; i++) {
             double dx = x[i]-dr[0];
             double dy = y[i]-dr[1];
@@ -21,8 +24,9 @@ namespace batoid {
     void applyReverseTransformArrays(
         const vec3 dr, const mat3 drot,
         double* x, double* y, double* z,
-        size_t n
+        size_t n, int max_threads
     ) {
+        #pragma omp parallel for num_threads(max_threads)
         for(size_t i=0; i<n; i++) {
             double xx = x[i]*drot[0] + y[i]*drot[1] + z[i]*drot[2] + dr[0];
             double yy = x[i]*drot[3] + y[i]*drot[4] + z[i]*drot[5] + dr[1];
@@ -64,7 +68,7 @@ namespace batoid {
         }
     }
 
-    void applyForwardTransform(const vec3 dr, const mat3 drot, RayVector& rv) {
+    void applyForwardTransform(const vec3 dr, const mat3 drot, RayVector& rv, int max_threads) {
         rv.x.syncToDevice();
         rv.y.syncToDevice();
         rv.z.syncToDevice();
@@ -85,7 +89,7 @@ namespace batoid {
             #pragma omp target teams distribute parallel for \
                 map(to:drptr[:3], drotptr[:9])
         #else
-            #pragma omp parallel for
+            #pragma omp parallel for num_threads(max_threads)
         #endif
         for(int i=0; i<size; i++) {
             double dx = xptr[i]-drptr[0];
@@ -104,7 +108,7 @@ namespace batoid {
     }
 
 
-    void applyReverseTransform(const vec3 dr, const mat3 drot, RayVector& rv) {
+    void applyReverseTransform(const vec3 dr, const mat3 drot, RayVector& rv, int max_threads) {
         rv.x.syncToDevice();
         rv.y.syncToDevice();
         rv.z.syncToDevice();
@@ -125,7 +129,7 @@ namespace batoid {
             #pragma omp target teams distribute parallel for \
                 map(to:drptr[:3], drotptr[:9])
         #else
-            #pragma omp parallel for
+            #pragma omp parallel for num_threads(max_threads)
         #endif
         for(int i=0; i<size; i++) {
             double x = xptr[i]*drotptr[0] + yptr[i]*drotptr[1] + zptr[i]*drotptr[2] + drptr[0];

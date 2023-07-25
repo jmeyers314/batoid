@@ -66,14 +66,16 @@ namespace batoid {
                 size_t x,
                 size_t y,
                 size_t z,
-                size_t n
+                size_t n,
+                int max_threads
             ){
                 applyForwardTransformArrays(
                     dr, drot,
                     reinterpret_cast<double*>(x),
                     reinterpret_cast<double*>(y),
                     reinterpret_cast<double*>(z),
-                    n
+                    n,
+                    max_threads
                 );
             }
         );
@@ -85,14 +87,16 @@ namespace batoid {
                 size_t x,
                 size_t y,
                 size_t z,
-                size_t n
+                size_t n,
+                int max_threads
             ){
                 applyReverseTransformArrays(
                     dr, drot,
                     reinterpret_cast<double*>(x),
                     reinterpret_cast<double*>(y),
                     reinterpret_cast<double*>(z),
-                    n
+                    n,
+                    max_threads
                 );
             }
         );
