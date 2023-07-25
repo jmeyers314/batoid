@@ -23,7 +23,9 @@ namespace batoid {
         size(_size)
     { }
 
-    void RayVector::positionAtTime(double _t, double* xout, double* yout, double* zout) const {
+    void RayVector::positionAtTime(
+        double _t, double* xout, double* yout, double* zout, int max_threads
+    ) const {
         x.syncToDevice();
         y.syncToDevice();
         z.syncToDevice();
@@ -42,7 +44,7 @@ namespace batoid {
             #pragma omp target teams distribute parallel for \
                 map(from:xout[:size],yout[:size],zout[:size])
         #else
-            #pragma omp parallel for
+            #pragma omp parallel for num_threads(max_threads)
         #endif
         for(int i=0; i<size; i++) {
             xout[i] = xptr[i] + vxptr[i] * (_t-tptr[i]);
@@ -51,7 +53,7 @@ namespace batoid {
         }
     }
 
-    void RayVector::propagateInPlace(double _t) {
+    void RayVector::propagateInPlace(double _t, int max_threads) {
         x.syncToDevice();
         y.syncToDevice();
         z.syncToDevice();
@@ -69,7 +71,7 @@ namespace batoid {
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for
         #else
-            #pragma omp parallel for
+            #pragma omp parallel for num_threads(max_threads)
         #endif
         for(int i=0; i<size; i++) {
             xptr[i] += vxptr[i] * (_t - tptr[i]);
@@ -79,7 +81,9 @@ namespace batoid {
         }
     }
 
-    void RayVector::phase(double _x, double _y, double _z, double _t, double* out) const {
+    void RayVector::phase(
+        double _x, double _y, double _z, double _t, double* out, int max_threads
+    ) const {
         const double PI = 3.14159265358979323846;
         x.syncToDevice();
         y.syncToDevice();
@@ -101,7 +105,7 @@ namespace batoid {
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for map(from:out[:size])
         #else
-            #pragma omp parallel for
+            #pragma omp parallel for num_threads(max_threads)
         #endif
         for(int i=0; i<size; i++) {
             // phi = k.(r-r0) - (t-t0)omega
@@ -117,7 +121,9 @@ namespace batoid {
         }
     }
 
-    void RayVector::amplitude(double _x, double _y, double _z, double _t, std::complex<double>* out) const {
+    void RayVector::amplitude(
+        double _x, double _y, double _z, double _t, std::complex<double>* out, int max_threads
+    ) const {
         const double PI = 3.14159265358979323846;
         x.syncToDevice();
         y.syncToDevice();
@@ -144,7 +150,7 @@ namespace batoid {
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for map(from:outptr[:2*size])
         #else
-            #pragma omp parallel for
+            #pragma omp parallel for num_threads(max_threads)
         #endif
         for(int i=0; i<size; i++) {
             double v2 = vxptr[i]*vxptr[i] + vyptr[i]*vyptr[i] + vzptr[i]*vzptr[i];
@@ -160,7 +166,9 @@ namespace batoid {
     }
 
 
-    std::complex<double> RayVector::sumAmplitude(double _x, double _y, double _z, double _t, bool ignoreVignetted) const {
+    std::complex<double> RayVector::sumAmplitude(
+        double _x, double _y, double _z, double _t, bool ignoreVignetted, int max_threads
+    ) const {
         const double PI = 3.14159265358979323846;
         x.syncToDevice();
         y.syncToDevice();
@@ -194,7 +202,7 @@ namespace batoid {
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for reduction(+:real,imag)
         #else
-            #pragma omp parallel for reduction(+:real, imag)
+            #pragma omp parallel for reduction(+:real, imag) num_threads(max_threads)
         #endif
         for(int i=0; i<size; i++) {
             double v2 = vxptr[i]*vxptr[i] + vyptr[i]*vyptr[i] + vzptr[i]*vzptr[i];

@@ -61,24 +61,38 @@ namespace batoid {
                 }
             ))
             .def("positionAtTime",
-                [](const RayVector& rv, double t, size_t xout_ptr, size_t yout_ptr, size_t zout_ptr){
+                [](const RayVector& rv, double t,
+                   size_t xout_ptr, size_t yout_ptr, size_t zout_ptr,
+                   int max_threads
+                ){
                     rv.positionAtTime(
                         t,
                         reinterpret_cast<double*>(xout_ptr),
                         reinterpret_cast<double*>(yout_ptr),
-                        reinterpret_cast<double*>(zout_ptr)
+                        reinterpret_cast<double*>(zout_ptr),
+                        max_threads
                     );
                 }
             )
             .def("propagateInPlace", &RayVector::propagateInPlace)
             .def("phase",
-                [](const RayVector& rv, double x, double y, double z, double t, size_t out_ptr){
-                    rv.phase(x, y, z, t, reinterpret_cast<double*>(out_ptr));
+                [](const RayVector& rv,
+                   double x, double y, double z, double t,
+                   size_t out_ptr, int max_threads
+                ){
+                    rv.phase(x, y, z, t, reinterpret_cast<double*>(out_ptr), max_threads);
                 }
             )
             .def("amplitude",
-                [](const RayVector& rv, double x, double y, double z, double t, size_t out_ptr){
-                    rv.amplitude(x, y, z, t, reinterpret_cast<std::complex<double>*>(out_ptr));
+                [](const RayVector& rv,
+                   double x, double y, double z, double t,
+                   size_t out_ptr, int max_threads
+                ){
+                    rv.amplitude(
+                        x, y, z, t,
+                        reinterpret_cast<std::complex<double>*>(out_ptr),
+                        max_threads
+                    );
                 }
             )
             .def("sumAmplitude", &RayVector::sumAmplitude)

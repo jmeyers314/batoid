@@ -18,11 +18,11 @@ namespace batoid {
 
         bool operator==(const RayVector& rhs) const;
         bool operator!=(const RayVector& rhs) const;
-        void positionAtTime(double t, double* xout, double* yout, double* zout) const;
-        void propagateInPlace(double t);
-        void phase(double x, double y, double z, double t, double* out) const;
-        void amplitude(double x, double y, double z, double t, std::complex<double>* out) const;
-        std::complex<double> sumAmplitude(double x, double y, double z, double t, bool ignoreVignetted=true) const;
+        void positionAtTime(double t, double* xout, double* yout, double* zout, int max_threads) const;
+        void propagateInPlace(double t, int max_threads);
+        void phase(double x, double y, double z, double t, double* out, int max_threads) const;
+        void amplitude(double x, double y, double z, double t, std::complex<double>* out, int max_threads) const;
+        std::complex<double> sumAmplitude(double x, double y, double z, double t, bool ignoreVignetted, int max_threads) const;
 
         DualView<double> x;           // 8
         DualView<double> y;           // 16

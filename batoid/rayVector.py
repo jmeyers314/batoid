@@ -109,42 +109,56 @@ class RayVector:
             self.coordSys
         ))
 
-    def positionAtTime(self, t):
+    def positionAtTime(self, t, max_threads=None):
         """Calculate the positions of the rays at a given time.
 
         Parameters
         ----------
         t : float
             Time (over vacuum speed of light; in meters).
+        max_threads: int
+            Maximum number of CPU threads to use.  If None, then use the value
+            from batoid.trace._batoid_max_threads.
 
         Returns
         -------
         ndarray of float, shape (n, 3)
             Positions in meters.
         """
+        if max_threads is None:
+            from .trace import _batoid_max_threads
+            max_threads = _batoid_max_threads
         x = np.empty(len(self._x))
         y = np.empty(len(self._x))
         z = np.empty(len(self._x))
-        self._rv.positionAtTime(t, x.ctypes.data, y.ctypes.data, z.ctypes.data)
+        self._rv.positionAtTime(
+            t, x.ctypes.data, y.ctypes.data, z.ctypes.data, max_threads
+        )
         return np.array([x, y, z]).T
 
-    def propagate(self, t):
+    def propagate(self, t, max_threads=None):
         """Propagate this RayVector to given time.
 
         Parameters
         ----------
         t : float
             Time (over vacuum speed of light; in meters).
+        max_threads: int
+            Maximum number of CPU threads to use.  If None, then use the value
+            from batoid.trace._batoid_max_threads.
 
         Returns
         -------
         RayVector
             Reference to self, no copy is made.
         """
-        self._rv.propagateInPlace(t)
+        if max_threads is None:
+            from .trace import _batoid_max_threads
+            max_threads = _batoid_max_threads
+        self._rv.propagateInPlace(t, max_threads)
         return self
 
-    def phase(self, r, t):
+    def phase(self, r, t, max_threads=None):
         """Calculate plane wave phases at given position and time.
 
         Parameters
@@ -153,16 +167,22 @@ class RayVector:
             Position in meters at which to compute phase
         t : float
             Time (over vacuum speed of light; in meters).
+        max_threads: int
+            Maximum number of CPU threads to use.  If None, then use the value
+            from batoid.trace._batoid_max_threads.
 
         Returns
         -------
         ndarray of float, shape(n,)
         """
+        if max_threads is None:
+            from .trace import _batoid_max_threads
+            max_threads = _batoid_max_threads
         out = np.empty_like(self._t)
-        self._rv.phase(r[0], r[1], r[2], t, out.ctypes.data)
+        self._rv.phase(r[0], r[1], r[2], t, out.ctypes.data, max_threads)
         return out
 
-    def amplitude(self, r, t):
+    def amplitude(self, r, t, max_threads=None):
         """Calculate (scalar) complex electric-field amplitudes at given
         position and time.
 
@@ -172,16 +192,22 @@ class RayVector:
             Position in meters.
         t : float
             Time (over vacuum speed of light; in meters).
+        max_threads: int
+            Maximum number of CPU threads to use.  If None, then use the value
+            from batoid.trace._batoid_max_threads.
 
         Returns
         -------
         ndarray of complex, shape (n,)
         """
+        if max_threads is None:
+            from .trace import _batoid_max_threads
+            max_threads = _batoid_max_threads
         out = np.empty_like(self._t, dtype=np.complex128)
-        self._rv.amplitude(r[0], r[1], r[2], t, out.ctypes.data)
+        self._rv.amplitude(r[0], r[1], r[2], t, out.ctypes.data, max_threads)
         return out
 
-    def sumAmplitude(self, r, t, ignoreVignetted=True):
+    def sumAmplitude(self, r, t, ignoreVignetted=True, max_threads=None):
         """Calculate the sum of (scalar) complex electric-field amplitudes of
         all rays at given position and time.
 
@@ -191,12 +217,20 @@ class RayVector:
             Position in meters.
         t : float
             Time (over vacuum speed of light; in meters).
+        max_threads: int
+            Maximum number of CPU threads to use.  If None, then use the value
+            from batoid.trace._batoid_max_threads.
 
         Returns
         -------
         complex
         """
-        return self._rv.sumAmplitude(r[0], r[1], r[2], t, ignoreVignetted)
+        if max_threads is None:
+            from .trace import _batoid_max_threads
+            max_threads = _batoid_max_threads
+        return self._rv.sumAmplitude(
+            r[0], r[1], r[2], t, ignoreVignetted, max_threads
+        )
 
     @classmethod
     def asGrid(
