@@ -47,12 +47,12 @@ namespace batoid {
     bool Sum::timeToIntersect(
         double x, double y, double z,
         double vx, double vy, double vz,
-        double& dt
+        double& dt, int niter
     ) const {
         // Use first surface as an initial guess
-        if (!_surfaces[0]->timeToIntersect(x, y, z, vx, vy, vz, dt))
+        if (!_surfaces[0]->timeToIntersect(x, y, z, vx, vy, vz, dt, niter))
             return false;
-        return Surface::timeToIntersect(x, y, z, vx, vy, vz, dt);
+        return Surface::timeToIntersect(x, y, z, vx, vy, vz, dt, niter);
     }
 
     #if defined(BATOID_GPU)

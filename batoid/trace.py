@@ -3,57 +3,47 @@ from .coordTransform import CoordTransform
 
 
 _batoid_max_threads = 1
+_batoid_niter = 5
 
 
-def applyForwardTransform(ct, rv, max_threads=None):
-    if max_threads is None:
-        global _batoid_max_threads
-        max_threads = _batoid_max_threads
-    _batoid.applyForwardTransform(ct.dr, ct.drot.ravel(), rv._rv, max_threads)
+def applyForwardTransform(ct, rv):
+    _batoid.applyForwardTransform(
+        ct.dr, ct.drot.ravel(), rv._rv, _batoid_max_threads
+    )
     rv.coordSys = ct.toSys
     return rv
 
 
-def applyReverseTransform(ct, rv, max_threads=None):
-    if max_threads is None:
-        global _batoid_max_threads
-        max_threads = _batoid_max_threads
-    _batoid.applyReverseTransform(ct.dr, ct.drot.ravel(), rv._rv, max_threads)
+def applyReverseTransform(ct, rv):
+    _batoid.applyReverseTransform(
+        ct.dr, ct.drot.ravel(), rv._rv, _batoid_max_threads
+    )
     rv.coordSys = ct.fromSys
     return rv
 
 
-def applyForwardTransformArrays(ct, x, y, z, max_threads=None):
-    if max_threads is None:
-        global _batoid_max_threads
-        max_threads = _batoid_max_threads
+def applyForwardTransformArrays(ct, x, y, z):
     _batoid.applyForwardTransformArrays(
         ct.dr, ct.drot.ravel(),
         x.ctypes.data, y.ctypes.data, z.ctypes.data,
-        len(x), max_threads
+        len(x), _batoid_max_threads
     )
 
 
-def applyReverseTransformArrays(ct, x, y, z, max_threads=None):
-    if max_threads is None:
-        global _batoid_max_threads
-        max_threads = _batoid_max_threads
+def applyReverseTransformArrays(ct, x, y, z):
     _batoid.applyReverseTransformArrays(
         ct.dr, ct.drot.ravel(),
         x.ctypes.data, y.ctypes.data, z.ctypes.data,
-        len(x), max_threads
+        len(x), _batoid_max_threads
     )
 
 
-def obscure(obsc, rv, max_threads=None):
-    if max_threads is None:
-        global _batoid_max_threads
-        max_threads = _batoid_max_threads
-    _batoid.obscure(obsc._obsc, rv._rv, max_threads)
+def obscure(obsc, rv):
+    _batoid.obscure(obsc._obsc, rv._rv, _batoid_max_threads)
     return rv
 
 
-def intersect(surface, rv, coordSys=None, coating=None, max_threads=None):
+def intersect(surface, rv, coordSys=None, coating=None):
     """Calculate intersection of rays with surface.
 
     Parameters
@@ -74,9 +64,6 @@ def intersect(surface, rv, coordSys=None, coating=None, max_threads=None):
         Reference to transformed input ray vector, which has been modified in
         place.
     """
-    if max_threads is None:
-        global _batoid_max_threads
-        max_threads = _batoid_max_threads
     if coordSys is None:
         coordSys = rv.coordSys
     ct = CoordTransform(rv.coordSys, coordSys)
@@ -86,16 +73,13 @@ def intersect(surface, rv, coordSys=None, coating=None, max_threads=None):
         surface._surface,
         ct.dr, ct.drot.ravel(),
         rv._rv, _coating,
-        max_threads
+        _batoid_max_threads, _batoid_niter
     )
     rv.coordSys = coordSys
     return rv
 
 
-def reflect(surface, rv, coordSys=None, coating=None, max_threads=None):
-    if max_threads is None:
-        global _batoid_max_threads
-        max_threads = _batoid_max_threads
+def reflect(surface, rv, coordSys=None, coating=None):
     if coordSys is None:
         coordSys = rv.coordSys
     ct = CoordTransform(rv.coordSys, coordSys)
@@ -105,16 +89,13 @@ def reflect(surface, rv, coordSys=None, coating=None, max_threads=None):
         surface._surface,
         ct.dr, ct.drot.ravel(),
         rv._rv, _coating,
-        max_threads
+        _batoid_max_threads, _batoid_niter
     )
     rv.coordSys = coordSys
     return rv
 
 
-def refract(surface, rv, m1, m2, coordSys=None, coating=None, max_threads=None):
-    if max_threads is None:
-        global _batoid_max_threads
-        max_threads = _batoid_max_threads
+def refract(surface, rv, m1, m2, coordSys=None, coating=None):
     if coordSys is None:
         coordSys = rv.coordSys
     ct = CoordTransform(rv.coordSys, coordSys)
@@ -125,19 +106,13 @@ def refract(surface, rv, m1, m2, coordSys=None, coating=None, max_threads=None):
         ct.dr, ct.drot.ravel(),
         m1._medium, m2._medium,
         rv._rv, _coating,
-        max_threads
+        _batoid_max_threads, _batoid_niter
     )
     rv.coordSys = coordSys
     return rv
 
 
-def rSplit(
-    surface, rv, inMedium, outMedium, coating, coordSys=None,
-    max_threads=None
-):
-    if max_threads is None:
-        global _batoid_max_threads
-        max_threads = _batoid_max_threads
+def rSplit(surface, rv, inMedium, outMedium, coating, coordSys=None):
     if coordSys is None:
         coordSys = rv.coordSys
     ct = CoordTransform(rv.coordSys, coordSys)
@@ -149,17 +124,14 @@ def rSplit(
         inMedium._medium, outMedium._medium,
         coating._coating,
         rv._rv, rvSplit._rv,
-        max_threads
+        _batoid_max_threads, _batoid_niter
     )
     rv.coordSys = coordSys
     rvSplit.coordSys = coordSys
     return rv, rvSplit
 
 
-def refractScreen(surface, rv, screen, coordSys=None, max_threads=None):
-    if max_threads is None:
-        global _batoid_max_threads
-        max_threads = _batoid_max_threads
+def refractScreen(surface, rv, screen, coordSys=None):
     if coordSys is None:
         coordSys = rv.coordSys
     ct = CoordTransform(rv.coordSys, coordSys)
@@ -169,7 +141,7 @@ def refractScreen(surface, rv, screen, coordSys=None, max_threads=None):
         ct.dr, ct.drot.ravel(),
         screen._surface,
         rv._rv,
-        max_threads
+        _batoid_max_threads, _batoid_niter
     )
     rv.coordSys = coordSys
     return rv

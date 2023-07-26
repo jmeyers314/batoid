@@ -7,6 +7,7 @@ import time
 @timer
 def parallel_trace_timing(args):
     batoid.trace._batoid_max_threads = args.j
+    batoid.trace._batoid_niter = args.k
     print("Using nrad of {:_d}".format(args.nrad))
     print(f"Using {batoid.trace._batoid_max_threads} threads")
 
@@ -176,6 +177,7 @@ if __name__ == '__main__':
     parser.add_argument("--lsst_aos", action='store_true')
     parser.add_argument("--decam", action='store_true')
     parser.add_argument("-j", type=int, default=1)
+    parser.add_argument("-k", type=int, default=5)
     args = parser.parse_args()
 
     parallel_trace_timing(args)

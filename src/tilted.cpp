@@ -27,7 +27,7 @@ namespace batoid {
     bool Tilted::timeToIntersect(
         double x, double y, double z,
         double vx, double vy, double vz,
-        double& dt
+        double& dt, int niter
     ) const {
         double num = z - x*_tanx - y*_tany;
         double den = vx*_tanx + vy*_tany - vz;

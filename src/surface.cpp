@@ -1,4 +1,5 @@
 #include "surface.h"
+#include <iostream>
 
 namespace batoid {
 
@@ -21,7 +22,8 @@ namespace batoid {
     bool Surface::timeToIntersect(
         const double x, const double y, const double z,
         const double vx, const double vy, const double vz,
-        double& dt  // Used as initial guess on input!
+        double& dt,  // Used as initial guess on input!
+        int niter
     ) const {
         // The better the initial estimate of dt, the better this will perform
         double rPx = x+vx*dt;
@@ -29,9 +31,10 @@ namespace batoid {
         double rPz = z+vz*dt;
 
         double sz = sag(rPx, rPy);
-        // Always do exactly 5 iterations.  GPUifies better this way.
-        // Unit tests pass (as of 20/10/13) with just 3 iterations.
-        for (int iter=0; iter<5; iter++) {
+
+        // std::cout << "Surface::timeToIntersect  niter = " << niter << "\n";
+
+        for (int iter=0; iter<niter; iter++) {
             // repeatedly intersect plane tangent to surface at (rPx, rPy, sz) with ray
             double nx, ny, nz;
             normal(rPx, rPy, nx, ny, nz);

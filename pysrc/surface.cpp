@@ -20,18 +20,6 @@ namespace batoid {
                         s.normal(xptr[i], yptr[i], outptr[i], outptr[i+size], outptr[i+2*size]);
                     }
                 }
-            )
-
-            // .def("intersect", &Surface::intersect, py::arg(), py::arg()=nullptr)
-            // .def("intersectInPlace", &Surface::intersectInPlace, py::arg(), py::arg()=nullptr)
-            // .def("reflect", &Surface::reflect, py::arg(), py::arg()=nullptr, py::arg()=nullptr)
-            // .def("reflectInPlace", &Surface::reflectInPlace, py::arg(), py::arg()=nullptr, py::arg()=nullptr)
-            //
-            // .def("refract", &Surface::refract, py::arg(), py::arg(), py::arg(), py::arg()=nullptr, py::arg()=nullptr)
-            // .def("refractInPlace", &Surface::refractInPlace, py::arg(), py::arg(), py::arg(), py::arg()=nullptr, py::arg()=nullptr)
-            //
-            // .def("rSplit", &Surface::rSplit, py::arg(), py::arg(), py::arg(), py::arg(), py::arg()=nullptr);
-            // .def("rSplitProb", &Surface::rSplitProb);
-            ;
+            );
     }
 }

@@ -85,6 +85,8 @@ namespace batoid {
         const double* drptr = dr.data();
         const double* drotptr = drot.data();
 
+        // std::cout << "batoid::applyForwardTransform   max_threads = " << max_threads << "\n";
+
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for \
                 map(to:drptr[:3], drotptr[:9])
@@ -125,6 +127,8 @@ namespace batoid {
         const double* drptr = dr.data();
         const double* drotptr = drot.data();
 
+        // std::cout << "batoid::applyReverseTransform   max_threads = " << max_threads << "\n";
+
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for \
                 map(to:drptr[:3], drotptr[:9])
@@ -161,6 +165,8 @@ namespace batoid {
 
         const Obscuration* obscPtr = obsc.getDevPtr();
 
+        // std::cout << "batoid::obscure   max_threads = " << max_threads << "\n";
+
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for is_device_ptr(obscPtr)
         #else
@@ -177,7 +183,8 @@ namespace batoid {
         const vec3 dr, const mat3 drot,
         RayVector& rv,
         const Coating* coating,
-        int max_threads
+        int max_threads,
+        int niter
     ) {
         rv.x.syncToDevice();
         rv.y.syncToDevice();
@@ -212,6 +219,8 @@ namespace batoid {
         if (coating)
             coatingPtr = coating->getDevPtr();
 
+        // std::cout << "batoid::intersect   max_threads = " << max_threads << "\n";
+
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for \
                 is_device_ptr(surfacePtr, coatingPtr) \
@@ -234,7 +243,7 @@ namespace batoid {
             // intersection
             if (!failptr[i]) {
                 double dt = 0.0;
-                bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt);
+                bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt, niter);
                 if (success) {
                     x += vx * dt;
                     y += vy * dt;
@@ -274,7 +283,8 @@ namespace batoid {
         const vec3 dr, const mat3 drot,
         RayVector& rv,
         const Coating* coating,
-        int max_threads
+        int max_threads,
+        int niter
     ) {
         rv.x.syncToDevice();
         rv.y.syncToDevice();
@@ -309,6 +319,8 @@ namespace batoid {
         if (coating)
             coatingPtr = coating->getDevPtr();
 
+        // std::cout << "batoid::reflect   max_threads = " << max_threads << "\n";
+
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for \
                 is_device_ptr(surfacePtr, coatingPtr) \
@@ -331,7 +343,7 @@ namespace batoid {
             if (!failptr[i]) {
                 // intersection
                 double dt = 0.0;
-                bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt);
+                bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt, niter);
                 if (success) {
                     // propagation
                     x += vx * dt;
@@ -382,7 +394,8 @@ namespace batoid {
         const Medium& m1, const Medium& m2,
         RayVector& rv,
         const Coating* coating,
-        int max_threads
+        int max_threads,
+        int niter
     ) {
         rv.x.syncToDevice();
         rv.y.syncToDevice();
@@ -418,6 +431,8 @@ namespace batoid {
         if (coating)
             coatingPtr = coating->getDevPtr();
 
+        // std::cout << "batoid::refract   max_threads = " << max_threads << "\n";
+
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for \
                 is_device_ptr(surfacePtr, mPtr, coatingPtr) \
@@ -440,7 +455,7 @@ namespace batoid {
             if (!failptr[i]) {
                 // intersection
                 double dt = 0.0;
-                bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt);
+                bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt, niter);
                 if (success) {
                     // propagation
                     x += vx * dt;
@@ -501,7 +516,8 @@ namespace batoid {
         const Medium& m1, const Medium& m2,
         const Coating& coating,
         RayVector& rv, RayVector& rvSplit,
-        int max_threads
+        int max_threads,
+        int niter
     ) {
         rv.x.syncToDevice();
         rv.y.syncToDevice();
@@ -559,6 +575,8 @@ namespace batoid {
         const Medium* mPtr = m2.getDevPtr();
         const Coating* cPtr = coating.getDevPtr();
 
+        // std::cout << "batoid::rSplit   max_threads = " << max_threads << "\n";
+
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for \
                 is_device_ptr(surfacePtr, mPtr, cPtr) \
@@ -581,7 +599,7 @@ namespace batoid {
             if (!failptr[i]) {
                 // intersection
                 double dt = 0.0;
-                bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt);
+                bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt, niter);
                 if (success) {
                     // propagation
                     x += vx * dt;
@@ -659,7 +677,8 @@ namespace batoid {
         const vec3 dr, const mat3 drot,
         const Surface& screen,
         RayVector& rv,
-        int max_threads
+        int max_threads,
+        int niter
     ) {
         rv.x.syncToDevice();
         rv.y.syncToDevice();
@@ -689,6 +708,8 @@ namespace batoid {
         const double* drptr = dr.data();
         const double* drotptr = drot.data();
 
+        // std::cout << "batoid::refractScreen   max_threads = " << max_threads << "\n";
+
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for \
                 is_device_ptr(surfacePtr, screenPtr) \
@@ -711,7 +732,7 @@ namespace batoid {
             if (!failptr[i]) {
                 // intersection
                 double dt = 0.0;
-                bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt);
+                bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt, niter);
                 if (success) {
                     // propagation
                     x += vx * dt;
