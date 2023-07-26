@@ -1,4 +1,3 @@
-import warnings
 import numpy as np
 
 
@@ -99,8 +98,7 @@ def postelToDirCos(u, v):
     except ValueError:
         pass
     srho = np.sin(rho)
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
+    with np.errstate(invalid='ignore'):
         alpha = u/rho*srho
         beta = v/rho*srho
     gamma = -np.cos(rho)
@@ -140,8 +138,7 @@ def dirCosToPostel(alpha, beta, gamma):
         pass
     rho = np.arccos(-gamma)
     srho = np.sin(rho)
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
+    with np.errstate(invalid='ignore'):
         u = alpha*rho/srho
         v = beta*rho/srho
     if np.any(wZero):
@@ -234,8 +231,7 @@ def stereographicToDirCos(u, v):
         pass
     theta = 2*np.arctan(rho/2)
     stheta = np.sin(theta)
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
+    with np.errstate(invalid='ignore'):
         alpha = u/rho*stheta
         beta = v/rho*stheta
     gamma = -np.cos(theta)
@@ -274,8 +270,7 @@ def dirCosToStereographic(alpha, beta, gamma):
     theta = np.arccos(-gamma)
     rho = 2*np.tan(theta/2)
     stheta = np.sin(theta)
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
+    with np.errstate(invalid='ignore'):
         u = alpha*rho/stheta
         v = beta*rho/stheta
     if np.any(wZero):
@@ -365,8 +360,7 @@ def lambertToDirCos(u, v):
     rho = np.sqrt(rhosqr)
     gamma = (2-rhosqr)/2
     r = np.sqrt(1-gamma*gamma)
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
+    with np.errstate(invalid='ignore'):
         alpha = u * r/rho
         beta = v * r/rho
     if np.any(wZero):
@@ -404,8 +398,7 @@ def dirCosToLambert(alpha, beta, gamma):
         pass
     rho = np.sqrt(2+2*gamma)
     norm = np.sqrt(1-gamma*gamma)
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
+    with np.errstate(invalid='ignore'):
         u = alpha*rho/norm
         v = beta*rho/norm
     if np.any(wZero):
