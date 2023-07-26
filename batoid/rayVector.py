@@ -6,7 +6,6 @@ from . import _batoid
 from .constants import globalCoordSys, vacuum
 from .coordTransform import CoordTransform
 from .trace import applyForwardTransform, applyForwardTransformArrays
-from .trace import _batoid_max_threads
 from .utils import lazy_property, fieldToDirCos
 from .surface import Plane
 
@@ -123,6 +122,7 @@ class RayVector:
         ndarray of float, shape (n, 3)
             Positions in meters.
         """
+        from .global_vars import _batoid_max_threads
         x = np.empty(len(self._x))
         y = np.empty(len(self._x))
         z = np.empty(len(self._x))
@@ -146,6 +146,7 @@ class RayVector:
         RayVector
             Reference to self, no copy is made.
         """
+        from .global_vars import _batoid_max_threads
         self._rv.propagateInPlace(t, _batoid_max_threads)
         return self
 
@@ -163,6 +164,7 @@ class RayVector:
         -------
         ndarray of float, shape(n,)
         """
+        from .global_vars import _batoid_max_threads
         out = np.empty_like(self._t)
         self._rv.phase(
             r[0], r[1], r[2], t, out.ctypes.data, _batoid_max_threads
@@ -184,6 +186,7 @@ class RayVector:
         -------
         ndarray of complex, shape (n,)
         """
+        from .global_vars import _batoid_max_threads
         out = np.empty_like(self._t, dtype=np.complex128)
         self._rv.amplitude(
             r[0], r[1], r[2], t, out.ctypes.data, _batoid_max_threads
@@ -205,6 +208,7 @@ class RayVector:
         -------
         complex
         """
+        from .global_vars import _batoid_max_threads
         return self._rv.sumAmplitude(
             r[0], r[1], r[2], t, ignoreVignetted, _batoid_max_threads
         )

@@ -6,10 +6,13 @@ import time
 
 @timer
 def parallel_trace_timing(args):
-    batoid.trace._batoid_max_threads = args.j
-    batoid.trace._batoid_niter = args.k
+    if args.j is not None:
+        batoid.global_vars._batoid_max_threads = args.j
+    if args.k is not None:
+        batoid.global_vars._batoid_niter = args.k
+    print(f"Using {batoid.global_vars._batoid_max_threads} threads")
+    print(f"Using {batoid.global_vars._batoid_niter} iterations")
     print("Using nrad of {:_d}".format(args.nrad))
-    print(f"Using {batoid.trace._batoid_max_threads} threads")
 
     if args.lsst:
         print("Tracing through LSST optics")
@@ -176,8 +179,8 @@ if __name__ == '__main__':
     parser.add_argument("--lsst", action='store_true')
     parser.add_argument("--lsst_aos", action='store_true')
     parser.add_argument("--decam", action='store_true')
-    parser.add_argument("-j", type=int, default=1)
-    parser.add_argument("-k", type=int, default=5)
+    parser.add_argument("-j", type=int, default=None)
+    parser.add_argument("-k", type=int, default=None)
     args = parser.parse_args()
 
     parallel_trace_timing(args)

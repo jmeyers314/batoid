@@ -46,3 +46,4 @@ from .analysis import (
     drdth, dthdr, exitPupilPos
 )
 from . import plotUtils
+from . import global_vars

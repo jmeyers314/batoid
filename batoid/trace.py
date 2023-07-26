@@ -2,11 +2,8 @@ from . import _batoid
 from .coordTransform import CoordTransform
 
 
-_batoid_max_threads = 1
-_batoid_niter = 5
-
-
 def applyForwardTransform(ct, rv):
+    from .global_vars import _batoid_max_threads
     _batoid.applyForwardTransform(
         ct.dr, ct.drot.ravel(), rv._rv, _batoid_max_threads
     )
@@ -15,6 +12,7 @@ def applyForwardTransform(ct, rv):
 
 
 def applyReverseTransform(ct, rv):
+    from .global_vars import _batoid_max_threads
     _batoid.applyReverseTransform(
         ct.dr, ct.drot.ravel(), rv._rv, _batoid_max_threads
     )
@@ -23,6 +21,7 @@ def applyReverseTransform(ct, rv):
 
 
 def applyForwardTransformArrays(ct, x, y, z):
+    from .global_vars import _batoid_max_threads
     _batoid.applyForwardTransformArrays(
         ct.dr, ct.drot.ravel(),
         x.ctypes.data, y.ctypes.data, z.ctypes.data,
@@ -31,6 +30,7 @@ def applyForwardTransformArrays(ct, x, y, z):
 
 
 def applyReverseTransformArrays(ct, x, y, z):
+    from .global_vars import _batoid_max_threads
     _batoid.applyReverseTransformArrays(
         ct.dr, ct.drot.ravel(),
         x.ctypes.data, y.ctypes.data, z.ctypes.data,
@@ -39,6 +39,7 @@ def applyReverseTransformArrays(ct, x, y, z):
 
 
 def obscure(obsc, rv):
+    from .global_vars import _batoid_max_threads
     _batoid.obscure(obsc._obsc, rv._rv, _batoid_max_threads)
     return rv
 
@@ -64,6 +65,7 @@ def intersect(surface, rv, coordSys=None, coating=None):
         Reference to transformed input ray vector, which has been modified in
         place.
     """
+    from .global_vars import _batoid_max_threads, _batoid_niter
     if coordSys is None:
         coordSys = rv.coordSys
     ct = CoordTransform(rv.coordSys, coordSys)
@@ -80,6 +82,7 @@ def intersect(surface, rv, coordSys=None, coating=None):
 
 
 def reflect(surface, rv, coordSys=None, coating=None):
+    from .global_vars import _batoid_max_threads, _batoid_niter
     if coordSys is None:
         coordSys = rv.coordSys
     ct = CoordTransform(rv.coordSys, coordSys)
@@ -96,6 +99,7 @@ def reflect(surface, rv, coordSys=None, coating=None):
 
 
 def refract(surface, rv, m1, m2, coordSys=None, coating=None):
+    from .global_vars import _batoid_max_threads, _batoid_niter
     if coordSys is None:
         coordSys = rv.coordSys
     ct = CoordTransform(rv.coordSys, coordSys)
@@ -113,6 +117,7 @@ def refract(surface, rv, m1, m2, coordSys=None, coating=None):
 
 
 def rSplit(surface, rv, inMedium, outMedium, coating, coordSys=None):
+    from .global_vars import _batoid_max_threads, _batoid_niter
     if coordSys is None:
         coordSys = rv.coordSys
     ct = CoordTransform(rv.coordSys, coordSys)
@@ -132,6 +137,7 @@ def rSplit(surface, rv, inMedium, outMedium, coating, coordSys=None):
 
 
 def refractScreen(surface, rv, screen, coordSys=None):
+    from .global_vars import _batoid_max_threads, _batoid_niter
     if coordSys is None:
         coordSys = rv.coordSys
     ct = CoordTransform(rv.coordSys, coordSys)
