@@ -24,7 +24,7 @@ namespace batoid {
         virtual bool timeToIntersect(
             double x, double y, double z,
             double vx, double vy, double vz,
-            double& dt
+            double& dt, int niter
         ) const override;
     };
 

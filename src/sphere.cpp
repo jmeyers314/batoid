@@ -36,7 +36,7 @@ namespace batoid {
     bool Sphere::timeToIntersect(
         double x, double y, double z,
         double vx, double vy, double vz,
-        double& dt
+        double& dt, int niter
     ) const {
         double vr2 = vx*vx + vy*vy;
         double vz2 = vz*vz;

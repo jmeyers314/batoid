@@ -122,10 +122,15 @@ class RayVector:
         ndarray of float, shape (n, 3)
             Positions in meters.
         """
+        from .global_vars import _batoid_max_threads
         x = np.empty(len(self._x))
         y = np.empty(len(self._x))
         z = np.empty(len(self._x))
-        self._rv.positionAtTime(t, x.ctypes.data, y.ctypes.data, z.ctypes.data)
+        self._rv.positionAtTime(
+            t,
+            x.ctypes.data, y.ctypes.data, z.ctypes.data,
+            _batoid_max_threads
+        )
         return np.array([x, y, z]).T
 
     def propagate(self, t):
@@ -141,7 +146,8 @@ class RayVector:
         RayVector
             Reference to self, no copy is made.
         """
-        self._rv.propagateInPlace(t)
+        from .global_vars import _batoid_max_threads
+        self._rv.propagateInPlace(t, _batoid_max_threads)
         return self
 
     def phase(self, r, t):
@@ -158,8 +164,11 @@ class RayVector:
         -------
         ndarray of float, shape(n,)
         """
+        from .global_vars import _batoid_max_threads
         out = np.empty_like(self._t)
-        self._rv.phase(r[0], r[1], r[2], t, out.ctypes.data)
+        self._rv.phase(
+            r[0], r[1], r[2], t, out.ctypes.data, _batoid_max_threads
+        )
         return out
 
     def amplitude(self, r, t):
@@ -177,8 +186,11 @@ class RayVector:
         -------
         ndarray of complex, shape (n,)
         """
+        from .global_vars import _batoid_max_threads
         out = np.empty_like(self._t, dtype=np.complex128)
-        self._rv.amplitude(r[0], r[1], r[2], t, out.ctypes.data)
+        self._rv.amplitude(
+            r[0], r[1], r[2], t, out.ctypes.data, _batoid_max_threads
+        )
         return out
 
     def sumAmplitude(self, r, t, ignoreVignetted=True):
@@ -196,7 +208,10 @@ class RayVector:
         -------
         complex
         """
-        return self._rv.sumAmplitude(r[0], r[1], r[2], t, ignoreVignetted)
+        from .global_vars import _batoid_max_threads
+        return self._rv.sumAmplitude(
+            r[0], r[1], r[2], t, ignoreVignetted, _batoid_max_threads
+        )
 
     @classmethod
     def asGrid(

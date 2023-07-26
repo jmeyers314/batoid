@@ -38,7 +38,7 @@ namespace batoid {
     bool Paraboloid::timeToIntersect(
         double x, double y, double z,
         double vx, double vy, double vz,
-        double& dt
+        double& dt, int niter
     ) const {
         double a = (vx*vx + vy*vy)*_2Rinv;
         double b = (x*vx + y*vy)*_Rinv - vz;

@@ -66,14 +66,16 @@ namespace batoid {
                 size_t x,
                 size_t y,
                 size_t z,
-                size_t n
+                size_t n,
+                int max_threads
             ){
                 applyForwardTransformArrays(
                     dr, drot,
                     reinterpret_cast<double*>(x),
                     reinterpret_cast<double*>(y),
                     reinterpret_cast<double*>(z),
-                    n
+                    n,
+                    max_threads
                 );
             }
         );
@@ -85,14 +87,16 @@ namespace batoid {
                 size_t x,
                 size_t y,
                 size_t z,
-                size_t n
+                size_t n,
+                int max_threads
             ){
                 applyReverseTransformArrays(
                     dr, drot,
                     reinterpret_cast<double*>(x),
                     reinterpret_cast<double*>(y),
                     reinterpret_cast<double*>(z),
-                    n
+                    n,
+                    max_threads
                 );
             }
         );
@@ -115,22 +119,25 @@ namespace batoid {
                     n
                 );
             });
+#if defined(_OPENMP)
         m.def(
             "get_nthreads",
-#if defined(_OPENMP)
             []() { return omp_get_max_threads(); }
-#else
-            []() { return 1; }
-#endif
-        )
-        .def(
-            "set_nthreads",
-#if defined(_OPENMP)
-            [](int nthreads) { omp_set_num_threads(nthreads); }
-#else
-            [](int nthreads) { }
-#endif
         );
+        m.def(
+            "set_nthreads",
+            [](int nthreads) { omp_set_num_threads(nthreads); }
+        );
+#else
+        m.def(
+            "get_nthreads",
+            []() { return 1; }
+        );
+        m.def(
+            "set_nthreads",
+            [](int nthreads) { }
+        );
+#endif
         // #if defined(BATOID_GPU)
         //     m.def(
         //         "get_omp_environment",

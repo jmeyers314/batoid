@@ -51,7 +51,6 @@ namespace batoid {
         // Otherwise, copy to host and do comparison there.
         bool result{true};
         if (syncState == SyncState::host && rhs.syncState == SyncState::host) {
-            #pragma omp parallel for reduction(&:result)
             for(size_t i=0; i<size; i++) result &= data[i] == rhs.data[i];
         } else {
             syncToDevice();
@@ -60,8 +59,6 @@ namespace batoid {
             T* rhsData = rhs.data;
             #if defined(BATOID_GPU)
                 #pragma omp target teams distribute parallel for reduction(&:result)
-            #else
-                #pragma omp parallel for reduction(&:result)
             #endif
             for(size_t i=0; i<size; i++) {
                 result &= myData[i] == rhsData[i];

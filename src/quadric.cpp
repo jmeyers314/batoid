@@ -41,7 +41,7 @@ namespace batoid {
     bool Quadric::timeToIntersect(
         double x, double y, double z,
         double vx, double vy, double vz,
-        double& dt
+        double& dt, int niter
     ) const {
         double z0term = z-_Rcp1;
         double vrr0 = vx*x + vy*y;

@@ -6,8 +6,9 @@ namespace batoid {
     void applyForwardTransformArrays(
         const vec3 dr, const mat3 drot,
         double* x, double* y, double* z,
-        size_t n
+        size_t n, int max_threads
     ) {
+        #pragma omp parallel for num_threads(max_threads)
         for(size_t i=0; i<n; i++) {
             double dx = x[i]-dr[0];
             double dy = y[i]-dr[1];
@@ -21,8 +22,9 @@ namespace batoid {
     void applyReverseTransformArrays(
         const vec3 dr, const mat3 drot,
         double* x, double* y, double* z,
-        size_t n
+        size_t n, int max_threads
     ) {
+        #pragma omp parallel for num_threads(max_threads)
         for(size_t i=0; i<n; i++) {
             double xx = x[i]*drot[0] + y[i]*drot[1] + z[i]*drot[2] + dr[0];
             double yy = x[i]*drot[3] + y[i]*drot[4] + z[i]*drot[5] + dr[1];
@@ -64,7 +66,7 @@ namespace batoid {
         }
     }
 
-    void applyForwardTransform(const vec3 dr, const mat3 drot, RayVector& rv) {
+    void applyForwardTransform(const vec3 dr, const mat3 drot, RayVector& rv, int max_threads) {
         rv.x.syncToDevice();
         rv.y.syncToDevice();
         rv.z.syncToDevice();
@@ -85,7 +87,7 @@ namespace batoid {
             #pragma omp target teams distribute parallel for \
                 map(to:drptr[:3], drotptr[:9])
         #else
-            #pragma omp parallel for
+            #pragma omp parallel for num_threads(max_threads)
         #endif
         for(int i=0; i<size; i++) {
             double dx = xptr[i]-drptr[0];
@@ -104,7 +106,7 @@ namespace batoid {
     }
 
 
-    void applyReverseTransform(const vec3 dr, const mat3 drot, RayVector& rv) {
+    void applyReverseTransform(const vec3 dr, const mat3 drot, RayVector& rv, int max_threads) {
         rv.x.syncToDevice();
         rv.y.syncToDevice();
         rv.z.syncToDevice();
@@ -125,7 +127,7 @@ namespace batoid {
             #pragma omp target teams distribute parallel for \
                 map(to:drptr[:3], drotptr[:9])
         #else
-            #pragma omp parallel for
+            #pragma omp parallel for num_threads(max_threads)
         #endif
         for(int i=0; i<size; i++) {
             double x = xptr[i]*drotptr[0] + yptr[i]*drotptr[1] + zptr[i]*drotptr[2] + drptr[0];
@@ -144,7 +146,7 @@ namespace batoid {
     }
 
 
-    void obscure(const Obscuration& obsc, RayVector& rv) {
+    void obscure(const Obscuration& obsc, RayVector& rv, int max_threads) {
         rv.x.syncToDevice();
         rv.y.syncToDevice();
         rv.z.syncToDevice();
@@ -160,7 +162,7 @@ namespace batoid {
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for is_device_ptr(obscPtr)
         #else
-            #pragma omp parallel for
+            #pragma omp parallel for num_threads(max_threads)
         #endif
         for(int i=0; i<size; i++) {
             vigptr[i] |= obscPtr->contains(xptr[i], yptr[i]);
@@ -172,7 +174,9 @@ namespace batoid {
         const Surface& surface,
         const vec3 dr, const mat3 drot,
         RayVector& rv,
-        const Coating* coating
+        const Coating* coating,
+        int max_threads,
+        int niter
     ) {
         rv.x.syncToDevice();
         rv.y.syncToDevice();
@@ -212,7 +216,7 @@ namespace batoid {
                 is_device_ptr(surfacePtr, coatingPtr) \
                 map(to:drptr[:3], drotptr[:9])
         #else
-            #pragma omp parallel for
+            #pragma omp parallel for num_threads(max_threads)
         #endif
         for(int i=0; i<size; i++) {
             // Coordinate transformation
@@ -229,7 +233,7 @@ namespace batoid {
             // intersection
             if (!failptr[i]) {
                 double dt = 0.0;
-                bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt);
+                bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt, niter);
                 if (success) {
                     x += vx * dt;
                     y += vy * dt;
@@ -268,7 +272,9 @@ namespace batoid {
         const Surface& surface,
         const vec3 dr, const mat3 drot,
         RayVector& rv,
-        const Coating* coating
+        const Coating* coating,
+        int max_threads,
+        int niter
     ) {
         rv.x.syncToDevice();
         rv.y.syncToDevice();
@@ -308,7 +314,7 @@ namespace batoid {
                 is_device_ptr(surfacePtr, coatingPtr) \
                 map(to:drptr[:3], drotptr[:9])
         #else
-            #pragma omp parallel for
+            #pragma omp parallel for num_threads(max_threads)
         #endif
         for(int i=0; i<size; i++) {
             // Coordinate transformation
@@ -325,7 +331,7 @@ namespace batoid {
             if (!failptr[i]) {
                 // intersection
                 double dt = 0.0;
-                bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt);
+                bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt, niter);
                 if (success) {
                     // propagation
                     x += vx * dt;
@@ -375,7 +381,9 @@ namespace batoid {
         const vec3 dr, const mat3 drot,
         const Medium& m1, const Medium& m2,
         RayVector& rv,
-        const Coating* coating
+        const Coating* coating,
+        int max_threads,
+        int niter
     ) {
         rv.x.syncToDevice();
         rv.y.syncToDevice();
@@ -416,7 +424,7 @@ namespace batoid {
                 is_device_ptr(surfacePtr, mPtr, coatingPtr) \
                 map(to:drptr[:3], drotptr[:9])
         #else
-            #pragma omp parallel for
+            #pragma omp parallel for num_threads(max_threads)
         #endif
         for(int i=0; i<size; i++) {
             // Coordinate transformation
@@ -433,7 +441,7 @@ namespace batoid {
             if (!failptr[i]) {
                 // intersection
                 double dt = 0.0;
-                bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt);
+                bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt, niter);
                 if (success) {
                     // propagation
                     x += vx * dt;
@@ -493,7 +501,9 @@ namespace batoid {
         const vec3 dr, const mat3 drot,
         const Medium& m1, const Medium& m2,
         const Coating& coating,
-        RayVector& rv, RayVector& rvSplit
+        RayVector& rv, RayVector& rvSplit,
+        int max_threads,
+        int niter
     ) {
         rv.x.syncToDevice();
         rv.y.syncToDevice();
@@ -556,7 +566,7 @@ namespace batoid {
                 is_device_ptr(surfacePtr, mPtr, cPtr) \
                 map(to:drptr[:3], drotptr[:9])
         #else
-            #pragma omp parallel for
+            #pragma omp parallel for num_threads(max_threads)
         #endif
         for(int i=0; i<size; i++) {
             // Coordinate transformation
@@ -573,7 +583,7 @@ namespace batoid {
             if (!failptr[i]) {
                 // intersection
                 double dt = 0.0;
-                bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt);
+                bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt, niter);
                 if (success) {
                     // propagation
                     x += vx * dt;
@@ -650,7 +660,9 @@ namespace batoid {
         const Surface& surface,
         const vec3 dr, const mat3 drot,
         const Surface& screen,
-        RayVector& rv
+        RayVector& rv,
+        int max_threads,
+        int niter
     ) {
         rv.x.syncToDevice();
         rv.y.syncToDevice();
@@ -685,7 +697,7 @@ namespace batoid {
                 is_device_ptr(surfacePtr, screenPtr) \
                 map(to:drptr[:3], drotptr[:9])
         #else
-            #pragma omp parallel for
+            #pragma omp parallel for num_threads(max_threads)
         #endif
         for(int i=0; i<size; i++) {
             // Coordinate transformation
@@ -702,7 +714,7 @@ namespace batoid {
             if (!failptr[i]) {
                 // intersection
                 double dt = 0.0;
-                bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt);
+                bool success = surfacePtr->timeToIntersect(x, y, z, vx, vy, vz, dt, niter);
                 if (success) {
                     // propagation
                     x += vx * dt;

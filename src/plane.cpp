@@ -21,7 +21,7 @@ namespace batoid {
     }
 
     bool Plane::timeToIntersect(
-        double x, double y, double z, double vx, double vy, double vz, double& dt
+        double x, double y, double z, double vx, double vy, double vz, double& dt, int niter
     ) const {
         if (vz == 0)
             return false;
