@@ -1,6 +1,4 @@
 #include "batoid.h"
-#include <iostream>
-#include <omp.h>
 
 namespace batoid {
 
@@ -85,8 +83,6 @@ namespace batoid {
         const double* drptr = dr.data();
         const double* drotptr = drot.data();
 
-        // std::cout << "batoid::applyForwardTransform   max_threads = " << max_threads << "\n";
-
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for \
                 map(to:drptr[:3], drotptr[:9])
@@ -127,8 +123,6 @@ namespace batoid {
         const double* drptr = dr.data();
         const double* drotptr = drot.data();
 
-        // std::cout << "batoid::applyReverseTransform   max_threads = " << max_threads << "\n";
-
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for \
                 map(to:drptr[:3], drotptr[:9])
@@ -164,8 +158,6 @@ namespace batoid {
         bool* vigptr = rv.vignetted.data;
 
         const Obscuration* obscPtr = obsc.getDevPtr();
-
-        // std::cout << "batoid::obscure   max_threads = " << max_threads << "\n";
 
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for is_device_ptr(obscPtr)
@@ -218,8 +210,6 @@ namespace batoid {
         const Coating* coatingPtr = nullptr;
         if (coating)
             coatingPtr = coating->getDevPtr();
-
-        // std::cout << "batoid::intersect   max_threads = " << max_threads << "\n";
 
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for \
@@ -318,8 +308,6 @@ namespace batoid {
         const Coating* coatingPtr = nullptr;
         if (coating)
             coatingPtr = coating->getDevPtr();
-
-        // std::cout << "batoid::reflect   max_threads = " << max_threads << "\n";
 
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for \
@@ -430,8 +418,6 @@ namespace batoid {
         const Coating* coatingPtr = nullptr;
         if (coating)
             coatingPtr = coating->getDevPtr();
-
-        // std::cout << "batoid::refract   max_threads = " << max_threads << "\n";
 
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for \
@@ -575,8 +561,6 @@ namespace batoid {
         const Medium* mPtr = m2.getDevPtr();
         const Coating* cPtr = coating.getDevPtr();
 
-        // std::cout << "batoid::rSplit   max_threads = " << max_threads << "\n";
-
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for \
                 is_device_ptr(surfacePtr, mPtr, cPtr) \
@@ -707,8 +691,6 @@ namespace batoid {
         const Surface* screenPtr = screen.getDevPtr();
         const double* drptr = dr.data();
         const double* drotptr = drot.data();
-
-        // std::cout << "batoid::refractScreen   max_threads = " << max_threads << "\n";
 
         #if defined(BATOID_GPU)
             #pragma omp target teams distribute parallel for \
