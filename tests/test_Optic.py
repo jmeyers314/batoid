@@ -2,7 +2,6 @@ import batoid
 import numpy as np
 import pytest
 from test_helpers import timer, do_pickle, all_obj_diff, rays_allclose, init_gpu
-import time
 
 
 @timer
@@ -356,6 +355,159 @@ def test_cbp_rotation():
     np.testing.assert_allclose(pdist(cbp_d.reshape(-1, 3)), pdist(rot7_d.reshape(-1, 3)), atol=1e-13)
 
 
+@timer
+def test_insert():
+    # Insert an empty phase screen should do nothing.
+    telescope = batoid.Optic.fromYaml("LSST_r.yaml")
+    inserted = telescope.withInsertedOptic(
+        before="M1",
+        item=batoid.OPDScreen(
+            name='Screen',
+            surface=batoid.Plane(),
+            screen=batoid.Plane(),
+            coordSys=telescope.stopSurface.coordSys,
+        )
+    )
+    rays = batoid.RayVector.asPolar(
+        optic=telescope,
+        theta_x=0.0, theta_y=0.0,
+        wavelength=622e-9,
+        nrandom=1000,
+    )
+    trays = telescope.trace(rays.copy())
+    irays = inserted.trace(rays.copy())
+    rays_allclose(trays, irays, atol=1e-13)
+
+    # If we add a constant phase, then get identical positions but different
+    # phases.  Easiest way to realize is with Z1 term of Zernike.
+    inserted = telescope.withInsertedOptic(
+        before="M1",
+        item=batoid.OPDScreen(
+            name='Screen',
+            surface=batoid.Plane(),
+            screen=batoid.Zernike([0, 0.3]),
+            coordSys=telescope.stopSurface.coordSys,
+        )
+    )
+    irays = inserted.trace(rays.copy())
+    # If we subtract 0.3 from irays.t, then should be identical
+    irays._t -= 0.3
+    rays_allclose(trays, irays, atol=1e-13)
+
+    # But we do get different positions if we add higher order Zernike terms.
+    inserted = telescope.withInsertedOptic(
+        before="M1",
+        item=batoid.OPDScreen(
+            name='Screen',
+            surface=batoid.Plane(),
+            screen=batoid.Zernike([0]*4+[0.1]),
+            coordSys=telescope.stopSurface.coordSys,
+        )
+    )
+    irays = inserted.trace(rays.copy())
+    assert not np.allclose(trays.x, irays.x)
+    assert not np.allclose(trays.y, irays.y)
+
+    # We ought to be able to add a constant phase screen anywhere in the optics
+    # and get a constant phase offset result.
+    inserted = telescope.withInsertedOptic(
+        before="M2",
+        item=batoid.OPDScreen(
+            name='Screen',
+            surface=batoid.Plane(),
+            screen=batoid.Zernike([0, 0.3]),
+            coordSys=telescope.stopSurface.coordSys,
+        )
+    )
+    irays = inserted.trace(rays.copy())
+    # If we subtract 0.3 from irays.t, then should be identical
+    irays._t -= 0.3
+    rays_allclose(trays, irays, atol=1e-13)
+
+    # Above but with non-trivial coordsys.
+    inserted = telescope.withInsertedOptic(
+        before="M2",
+        item=batoid.OPDScreen(
+            name='Screen',
+            surface=batoid.Plane(),
+            screen=batoid.Zernike([0, 0.3]),
+            coordSys=batoid.CoordSys(origin=[0.1, 0.2, 0.3], rot=batoid.RotX(0.001))
+        )
+    )
+    irays = inserted.trace(rays.copy())
+    irays._t -= 0.3
+    rays_allclose(trays, irays, atol=1e-13)
+
+    # Let's remove M3 and add it back in.
+    M3 = telescope['M3']
+    removed = telescope.withRemovedOptic('M3')
+    reinserted = removed.withInsertedOptic(
+        before="LSSTCamera",
+        item=M3
+    )
+    with np.testing.assert_raises(ValueError):
+        removed['M3']
+    assert telescope == reinserted
+    rrays = reinserted.trace(rays.copy())
+    rays_allclose(trays, rrays, atol=1e-13)
+
+
+@timer
+def test_insert_null_phase():
+    telescope = batoid.Optic.fromYaml("LSST_r.yaml")
+    thx = 0.01
+    thy = 0.01
+    wavelength = 622e-9
+    zk0 = batoid.zernike(
+        telescope,
+        theta_x=thx, theta_y=thy,
+        wavelength=wavelength,
+        eps=0.61,
+        jmax=28
+    )*wavelength
+    inserted = telescope.withInsertedOptic(
+        before="M1",
+        item=batoid.OPDScreen(
+            name='Screen',
+            surface=batoid.Plane(),
+            screen=batoid.Zernike(zk0, R_outer=4.18, R_inner=0.61*4.18),
+            coordSys=telescope.stopSurface.coordSys,
+        )
+    )
+    zk1 = batoid.zernike(
+        inserted,
+        theta_x=thx, theta_y=thy,
+        wavelength=wavelength,
+        eps=0.61,
+        jmax=28
+    )*wavelength
+
+    # I get a ton of PTT here, but the most interesting Zernikes do get nulled.
+    np.testing.assert_allclose(zk1[4:]*1e9, 0.0, atol=2e-3)
+
+
+@timer
+def test_insert_middle():
+    telescope = batoid.Optic.fromYaml("LSST_r.yaml")
+    L1S1 = telescope['L1_entrance']
+    removed = telescope.withRemovedOptic('L1_entrance')
+    reinserted = removed.withInsertedOptic(
+        before="L1_exit",
+        item=L1S1
+    )
+    assert telescope == reinserted
+
+    rays = batoid.RayVector.asPolar(
+        optic=telescope,
+        theta_x=0.01, theta_y=0.01,
+        wavelength=622e-9,
+        nrandom=1000,
+    )
+    trays = telescope.trace(rays.copy())
+    rrays = reinserted.trace(rays.copy())
+    rays_allclose(trays, rrays, atol=1e-13)
+
+
 if __name__ == '__main__':
     init_gpu()
     test_optic()
@@ -368,3 +520,6 @@ if __name__ == '__main__':
     test_ne()
     test_name()
     test_cbp_rotation()
+    test_insert()
+    test_insert_null_phase()
+    test_insert_middle()

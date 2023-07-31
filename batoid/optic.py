@@ -945,6 +945,7 @@ class CompoundOptic(Optic):
 
     @lazy_property
     def _names(self):
+        """Dictionary of short names to fully-qualified names."""
         nameDict = {}
         duplicates = set()
         for k in self.itemDict.keys():
@@ -1635,6 +1636,66 @@ class CompoundOptic(Optic):
         return self.withSurface(
             name,
             self.itemDict[name].surface + perturbation
+        )
+
+    def withInsertedOptic(self, before, item):
+        """Return a new `CompoundOptic` with the given item inserted before
+        the given subitem.
+
+        Parameters
+        ----------
+        before : str
+            Subitem before which to insert the new item.
+        item : `batoid.Optic`
+            New item to insert.
+
+        Returns
+        -------
+        `CompoundOptic`
+            Optic with inserted item.
+        """
+        if before in self._names:
+            before = self._names[before]
+        if before not in self.itemDict:
+            raise ValueError("Optic {} not found".format(before))
+        newItems = []
+        newDict = dict(self.__dict__)
+        del newDict['items']
+        for i, it in enumerate(self.items):
+            if self._names[it.name] == self._names[before]:
+                newItems.append(item)
+            newItems.append(it)
+        return self.__class__(
+            newItems,
+            **newDict
+        )
+
+    def withRemovedOptic(self, item):
+        """Return a new `CompoundOptic` with the given subitem removed.
+
+        Parameters
+        ----------
+        item : str
+            Subitem to delete.
+
+        Returns
+        -------
+        `CompoundOptic`
+            Optic without removed item.
+        """
+        if item in self._names:
+            item = self._names[item]
+        if item not in self.itemDict:
+            raise ValueError("Optic {} not found".format(item))
+        newItems = []
+        newDict = dict(self.__dict__)
+        del newDict['items']
+        for it in self.items:
+            if self._names[it.name] != self._names[item]:
+                newItems.append(it)
+        return self.__class__(
+            newItems,
+            **newDict
         )
 
 
