@@ -1,3 +1,4 @@
+from functools import cached_property
 from numbers import Real, Integral
 
 import numpy as np
@@ -6,7 +7,7 @@ from . import _batoid
 from .constants import globalCoordSys, vacuum
 from .coordTransform import CoordTransform
 from .trace import applyForwardTransform, applyForwardTransformArrays
-from .utils import lazy_property, fieldToDirCos
+from .utils import fieldToDirCos
 from .surface import Plane
 
 
@@ -1215,7 +1216,7 @@ class RayVector:
         """
         return 2*np.pi/self.wavelength
 
-    @lazy_property
+    @cached_property
     def _rv(self):
         return _batoid.CPPRayVector(
             self._x.ctypes.data, self._y.ctypes.data, self._z.ctypes.data,
