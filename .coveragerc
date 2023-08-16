@@ -1,0 +1,11 @@
+[run]
+branch = True
+omit = */app.py
+
+[report]
+# Regexes for lines to exclude from consideration
+exclude_lines =
+    # If you put this in a comment, you can manually exclude code from being covered.
+    pragma: no cover
+    # Don't complain if tests don't hit defensive assertion code:
+    raise NotImplementedError
