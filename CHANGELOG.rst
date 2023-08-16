@@ -13,6 +13,7 @@ New Features
 - Add ghosts notebook
 - Add Rubin v3.12 optics description
 - Add Optic.withInsertedOptic and Optic.withRemovedOptic
+- Add Optic.R_outer and R_inner properties
 
 
 Performance Improvements
