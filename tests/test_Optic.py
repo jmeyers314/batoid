@@ -1,6 +1,5 @@
 import batoid
 import numpy as np
-import pytest
 from test_helpers import timer, do_pickle, all_obj_diff, rays_allclose, init_gpu
 
 
@@ -518,6 +517,59 @@ def test_insert_middle():
     rays_allclose(trays, rrays, atol=1e-13)
 
 
+@timer
+def test_optic_radii():
+    import os
+    import yaml
+
+    telescope = batoid.Optic.fromYaml("LSST_r.yaml")
+
+    fn = os.path.join(batoid.datadir, "LSST", "LSST_r.yaml")
+    dct = yaml.safe_load(open(fn, 'r'))
+    M1_outer = dct['opticalSystem']['items'][0]['obscuration']['outer']
+    M1_inner = dct['opticalSystem']['items'][0]['obscuration']['inner']
+    M2_outer = dct['opticalSystem']['items'][1]['obscuration']['outer']
+    M2_inner = dct['opticalSystem']['items'][1]['obscuration']['inner']
+    M3_outer = dct['opticalSystem']['items'][2]['obscuration']['outer']
+    M3_inner = dct['opticalSystem']['items'][2]['obscuration']['inner']
+
+    cam_dct = dct['opticalSystem']['items'][-1]
+    L1S1_outer = cam_dct['items'][0]['items'][0]['obscuration']['radius']
+    L1S1_inner = 0.0
+
+    assert telescope['M1'].R_outer == M1_outer
+    assert telescope['M1'].R_inner == M1_inner
+    assert telescope['M2'].R_outer == M2_outer
+    assert telescope['M2'].R_inner == M2_inner
+    assert telescope['M3'].R_outer == M3_outer
+    assert telescope['M3'].R_inner == M3_inner
+    assert telescope['L1_entrance'].R_outer == L1S1_outer
+    assert telescope['L1_entrance'].R_inner == L1S1_inner
+
+    # Try overriding with an explicit value
+    dct = yaml.safe_load(open(fn, 'r'))
+    dct['opticalSystem']['items'][0]['R_outer'] = 4.2
+    optic = batoid.parse.parse_optic(dct['opticalSystem'])
+    assert optic['M1'].R_outer == 4.2
+    # Still gets R_inner from obscuration
+    assert optic['M1'].R_inner == M1_inner
+    # unless we override that too
+    dct = yaml.safe_load(open(fn, 'r'))
+    dct['opticalSystem']['items'][0]['R_outer'] = 4.2
+    dct['opticalSystem']['items'][0]['R_inner'] = 2.5
+    optic = batoid.parse.parse_optic(dct['opticalSystem'])
+    assert optic['M1'].R_outer == 4.2
+    assert optic['M1'].R_inner == 2.5
+
+    # If no obscuration or override present, then returns None
+    dct = yaml.safe_load(open(fn, 'r'))
+    del dct['opticalSystem']['items'][0]['obscuration']
+    optic = batoid.parse.parse_optic(dct['opticalSystem'])
+    assert optic['M1'].R_outer is None
+    assert optic['M1'].R_inner is None
+
+
+
 if __name__ == '__main__':
     init_gpu()
     test_optic()
@@ -533,3 +585,4 @@ if __name__ == '__main__':
     test_insert()
     test_insert_null_phase()
     test_insert_middle()
+    test_optic_radii()
