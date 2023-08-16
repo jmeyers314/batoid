@@ -721,7 +721,7 @@ class Interface(Optic):
 
     @cached_property
     def R_outer(self):
-        """Radius of outer edge of the surface.
+        """Radius defined for outer edge of interface.
         """
         obsc = self.obscuration
         if obsc is not None:
@@ -735,7 +735,7 @@ class Interface(Optic):
 
     @cached_property
     def R_inner(self):
-        """Radius of inner edge of the surface.
+        """Radius defined for inner edge of interface.
         """
         obsc = self.obscuration
         if obsc is not None:
