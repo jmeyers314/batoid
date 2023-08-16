@@ -719,6 +719,34 @@ class Interface(Optic):
         """
         return self.withSurface(self.surface + perturbation)
 
+    @cached_property
+    def R_outer(self):
+        """Radius of outer edge of the surface.
+        """
+        obsc = self.obscuration
+        if obsc is not None:
+            if isinstance(obsc, ObscNegation):
+                obsc = obsc.original
+            if isinstance(obsc, ObscAnnulus):
+                return obsc.outer
+            if isinstance(obsc, ObscCircle):
+                return obsc.radius
+        return None
+
+    @cached_property
+    def R_inner(self):
+        """Radius of inner edge of the surface.
+        """
+        obsc = self.obscuration
+        if obsc is not None:
+            if isinstance(obsc, ObscNegation):
+                obsc = obsc.original
+            if isinstance(obsc, ObscAnnulus):
+                return obsc.inner
+            if isinstance(obsc, ObscCircle):
+                return 0.0
+        return None
+
 
 class RefractiveInterface(Interface):
     """Specialization for refractive interfaces.
