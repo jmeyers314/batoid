@@ -450,6 +450,17 @@ def test_insert():
     rrays = reinserted.trace(rays.copy())
     rays_allclose(trays, rrays, atol=1e-13)
 
+    with np.testing.assert_raises(ValueError):
+        inserted = telescope.withInsertedOptic(
+            before="junk",
+            item=M3
+        )
+
+    with np.testing.assert_raises(ValueError):
+        removed = telescope.withRemovedOptic(
+            item='junk',
+        )
+
 
 @timer
 def test_insert_null_phase():

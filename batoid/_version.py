@@ -1,6 +1,6 @@
 #https://stackoverflow.com/a/7071358/7530778
 
-__version__ = "0.4.2"
+__version__ = "0.5.0"
 tmp = __version__
 if "rc" in tmp:  # pragma: no cover
     tmp = tmp[:tmp.find("rc")]

@@ -1380,8 +1380,7 @@ class CompoundOptic(Optic):
         # done.  If not, then we need to recurse down to whichever item
         # contains name.  Verify that name is in self.itemDict, but first
         # convert partially qualified name to fully qualified.
-        if name in self._names:
-            name = self._names[name]
+        name = self._names.get(name, name)
         if name not in self.itemDict:
             raise ValueError("Optic {} not found".format(name))
         if name == self.name:
@@ -1536,8 +1535,7 @@ class CompoundOptic(Optic):
         # we're done.  If not, then we need to recurse down to whichever item
         # contains name.  Verify that name is in self.itemDict, but first
         # convert partially qualified name to fully qualified.
-        if name in self._names:
-            name = self._names[name]
+        name = self._names.get(name, name)
         if name not in self.itemDict:
             raise ValueError("Optic {} not found".format(name))
         if rotCenter is None:
@@ -1589,6 +1587,7 @@ class CompoundOptic(Optic):
         `CompoundOptic`
             Optic with new surface.
         """
+        name = self._names.get(name, name)
         if name in self._names:
             name = self._names[name]
         if name not in self.itemDict:
@@ -1631,8 +1630,7 @@ class CompoundOptic(Optic):
         `CompoundOptic`
             Optic with perturbed surface.
         """
-        if name in self._names:
-            name = self._names[name]
+        name = self._names.get(name, name)
         return self.withSurface(
             name,
             self.itemDict[name].surface + perturbation
@@ -1654,8 +1652,7 @@ class CompoundOptic(Optic):
         `CompoundOptic`
             Optic with inserted item.
         """
-        if before in self._names:
-            before = self._names[before]
+        before = self._names.get(before, before)
         if before not in self.itemDict:
             raise ValueError("Optic {} not found".format(before))
         newItems = []
@@ -1683,8 +1680,7 @@ class CompoundOptic(Optic):
         `CompoundOptic`
             Optic without removed item.
         """
-        if item in self._names:
-            item = self._names[item]
+        item = self._names.get(item, item)
         if item not in self.itemDict:
             raise ValueError("Optic {} not found".format(item))
         newItems = []
