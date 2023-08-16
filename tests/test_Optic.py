@@ -95,15 +95,14 @@ def test_traceReverse():
     np.testing.assert_allclose(final_rays.t[w], 0)
 
 
-@pytest.mark.skip_gha
 @timer
 def test_withSurface():
     telescope = batoid.Optic.fromYaml("HSC.yaml")
     rays = batoid.RayVector.asPolar(
         telescope,
         wavelength=620e-9,
-        theta_x=np.deg2rad(0.01), theta_y=0.0,  # TODO: why does this fail for theta_x=np.rad2deg(0.1)?
-        nrad=10, naz=60
+        theta_x=np.deg2rad(0.1), theta_y=0.0,
+        nrandom=300, rng=np.random.default_rng(5)
     )
     trays = telescope.trace(rays.copy())
     for key, item in telescope.itemDict.items():
