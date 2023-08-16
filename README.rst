@@ -17,7 +17,7 @@ https://jmeyers314.github.io/batoid/overview.html
 Requirements
 ============
 
-Batoid is known to work on MacOS and linux, using Python version 3.7+, and
+Batoid is known to work on MacOS and linux, using Python version 3.8+, and
 either the clang or gcc compiler with support for c++14.
 
 Installation
