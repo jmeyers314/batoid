@@ -108,38 +108,63 @@ def parse_optic(config,
     if outMedium is None:
         outMedium = inMedium
 
+    # Look for a few more possible attributes
+    kwargs = {}
+    for k in [
+        'backDist',
+        'sphereRadius',
+        'pupilSize',
+        'pupilObscuration',
+        'R_outer',
+        'R_inner',
+    ]:
+        if k in config:
+            kwargs[k] = config[k]
+    if 'stopSurface' in config:
+        kwargs['stopSurface'] = parse_optic(config['stopSurface'])
+
     typ = config.pop('type')
     if typ == 'Mirror':
         surface = parse_surface(config.pop('surface'))
         return batoid.optic.Mirror(
             surface, name=name,
             coordSys=coordSys, obscuration=obscuration,
-            inMedium=inMedium, outMedium=outMedium)
+            inMedium=inMedium, outMedium=outMedium,
+            **kwargs
+        )
     elif typ == 'RefractiveInterface':
         surface = parse_surface(config.pop('surface'))
         return batoid.optic.RefractiveInterface(
             surface, name=name,
             coordSys=coordSys, obscuration=obscuration,
-            inMedium=inMedium, outMedium=outMedium)
+            inMedium=inMedium, outMedium=outMedium,
+            **kwargs
+        )
     elif typ == 'OPDScreen':
         surface = parse_surface(config.pop('surface'))
         screen = parse_surface(config.pop('screen'))
         return batoid.optic.OPDScreen(
             surface, screen, name=name,
             coordSys=coordSys, obscuration=obscuration,
-            inMedium=inMedium, outMedium=outMedium)
+            inMedium=inMedium, outMedium=outMedium,
+            **kwargs
+        )
     elif typ == 'Baffle':
         surface = parse_surface(config.pop('surface'))
         return batoid.optic.Baffle(
             surface, name=name,
             coordSys=coordSys, obscuration=obscuration,
-            inMedium=inMedium, outMedium=outMedium)
+            inMedium=inMedium, outMedium=outMedium,
+            **kwargs
+        )
     elif typ == 'Detector':
         surface = parse_surface(config.pop('surface'))
         return batoid.optic.Detector(
             surface, name=name,
             coordSys=coordSys, obscuration=obscuration,
-            inMedium=inMedium, outMedium=outMedium)
+            inMedium=inMedium, outMedium=outMedium,
+            **kwargs
+        )
     elif typ == 'Lens':
         medium = parse_medium(config.pop('medium'))
         itemsConfig = config.pop('items')
@@ -160,7 +185,8 @@ def parse_optic(config,
         return batoid.optic.Lens(
             items, name=name, coordSys=coordSys,
             inMedium=inMedium, outMedium=outMedium,
-            medium=medium
+            medium=medium,
+            **kwargs
         )
     elif typ == 'CompoundOptic':
         itemsConfig = config.pop('items')
@@ -173,21 +199,17 @@ def parse_optic(config,
             )
             for iC in itemsConfig
         ]
-        # Look for a few more possible attributes
-        kwargs = {}
-        for k in ['backDist', 'sphereRadius', 'pupilSize', 'pupilObscuration']:
-            if k in config:
-                kwargs[k] = config[k]
-        if 'stopSurface' in config:
-            kwargs['stopSurface'] = parse_optic(config['stopSurface'])
         return batoid.optic.CompoundOptic(
-                items, inMedium=inMedium, outMedium=outMedium,
-                name=name, coordSys=coordSys, **kwargs)
+            items, inMedium=inMedium, outMedium=outMedium,
+            name=name, coordSys=coordSys,
+            **kwargs
+        )
     elif typ == 'Interface':
         surface = parse_surface(config.pop('surface'))
         return batoid.optic.Interface(
             surface, name=name,
-            coordSys=coordSys
+            coordSys=coordSys,
+            **kwargs
         )
     else:
         raise ValueError(f"Unknown optic type: {typ}")
