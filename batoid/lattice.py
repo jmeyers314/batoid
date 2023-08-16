@@ -1,5 +1,6 @@
+from functools import cached_property
+
 import numpy as np
-from .utils import lazy_property
 
 
 def primitiveToLattice(primitiveVectors, Ns):
@@ -57,7 +58,7 @@ class Lattice:
         self.array = array
         self.primitiveVectors = primitiveVectors
 
-    @lazy_property
+    @cached_property
     def coords(self):
         return primitiveToLattice(self.primitiveVectors, self.array.shape)
 

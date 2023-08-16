@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from functools import cached_property
 
 import numpy as np
 
@@ -6,7 +7,6 @@ from .coating import SimpleCoating
 from .obscuration import ObscNegation, ObscCircle, ObscAnnulus
 from .constants import globalCoordSys, vacuum
 from .coordTransform import CoordTransform
-from .utils import lazy_property
 from .rayVector import RayVector
 
 
@@ -899,7 +899,7 @@ class CompoundOptic(Optic):
         self.items = tuple(items)
         self.path = [name for item in self.items for name in item.path]
 
-    @lazy_property
+    @cached_property
     def itemDict(self):
         """Dictionary access of the entire hierarchy of subitems of this
         `CompoundOptic`.
@@ -943,7 +943,7 @@ class CompoundOptic(Optic):
                 raise ValueError("Cannot find item {}".format(key))
         return item
 
-    @lazy_property
+    @cached_property
     def _names(self):
         """Dictionary of short names to fully-qualified names."""
         nameDict = {}
