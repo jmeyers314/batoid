@@ -1,5 +1,6 @@
 import numpy as np
 import batoid
+from galsim.zernike import Zernike, zernikeBasis
 
 from .utils import bilinear_fit, fieldToDirCos
 
@@ -534,8 +535,6 @@ def zernike(
     zernikeGQ function for an alternative algorithm that is independent of
     jmax.
     """
-    import galsim
-
     dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
     rays = batoid.RayVector.asGrid(
         optic=optic, wavelength=wavelength,
@@ -553,7 +552,7 @@ def zernike(
     wfarr = wf.array
     w = ~wfarr.mask
 
-    basis = galsim.zernike.zernikeBasis(
+    basis = zernikeBasis(
         jmax, orig_x[w], orig_y[w],
         R_outer=optic.pupilSize/2, R_inner=optic.pupilSize/2*eps
     )
@@ -633,7 +632,6 @@ def zernikeGQ(
     unaffected by vignetting.  It is required that no rays fail to be traced,
     even in vignetted regions.
     """
-    import galsim
     dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
 
     inner = eps*optic.pupilSize/2
@@ -650,7 +648,7 @@ def zernikeGQ(
     epRays = rays.copy().toCoordSys(optic.stopSurface.coordSys)
     optic.stopSurface.surface.intersect(epRays)
 
-    basis = galsim.zernike.zernikeBasis(
+    basis = zernikeBasis(
         jmax, epRays.x, epRays.y,
         R_outer=optic.pupilSize/2,
         R_inner=inner
@@ -704,14 +702,13 @@ def zernikeGQ(
 
 
 def _dZernikeBasis(jmax, x, y, R_outer=1.0, R_inner=0.0):
-    import galsim
     xout = np.zeros(tuple((jmax+1,)+x.shape), dtype=float)
     yout = np.zeros_like(xout)
     for j in range(2, 1+jmax):
-        xout[j,:] = galsim.zernike.Zernike(
+        xout[j,:] = Zernike(
             [0]*j+[1], R_outer=R_outer, R_inner=R_inner
         ).gradX(x, y)
-        yout[j,:] = galsim.zernike.Zernike(
+        yout[j,:] = Zernike(
             [0]*j+[1], R_outer=R_outer, R_inner=R_inner
         ).gradY(x, y)
     return np.array([xout, yout])
@@ -870,8 +867,7 @@ def doubleZernike(
         ))
     coefs = np.array(coefs)
 
-    import galsim
-    basis = galsim.zernike.zernikeBasis(
+    basis = zernikeBasis(
         kmax, thx, thy, R_outer=field
     )
     dzs = np.dot(basis, coefs*w[:,None])/np.pi
