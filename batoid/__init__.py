@@ -42,7 +42,8 @@ from .constants import globalCoordSys, vacuum
 
 from .analysis import (
     huygensPSF, fftPSF, wavefront, spot,
-    zernike, zernikeGQ, zernikeTA, doubleZernike,
+    zernike, zernikeGQ, zernikeTA, zernikeXYAberrations,
+    doubleZernike,
     drdth, dthdr, exitPupilPos
 )
 from . import plotUtils

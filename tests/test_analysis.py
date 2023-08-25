@@ -357,6 +357,58 @@ def test_huygens_paraboloid(plot=False):
             plt.show()
 
 
+@timer
+def test_transverse_aberrations():
+    telescope = batoid.Optic.fromYaml("LSST_r.yaml")
+    thx = np.deg2rad(1.5)
+    thy = np.deg2rad(0.9)
+    wavelength = 622e-9
+    focal_length = 10.31
+
+    zTA = batoid.zernikeTA(
+        telescope, thx, thy, wavelength,
+        nrad=20, naz=120,
+        jmax=66, eps=0.61,
+        focal_length=focal_length
+    )
+    zTA = galsim.zernike.Zernike(
+        zTA,
+        R_outer=4.18, R_inner=4.18*0.61,
+    )
+    zX, zY = batoid.zernikeXYAberrations(
+        telescope, thx, thy, wavelength,
+        nrad=20, naz=120,
+        jmax=55, eps=0.61,
+    )
+    zX = galsim.zernike.Zernike(
+        zX,
+        R_outer=4.18, R_inner=4.18*0.61,
+    )
+    zY = galsim.zernike.Zernike(
+        zY,
+        R_outer=4.18, R_inner=4.18*0.61,
+    )
+    u = np.linspace(-4.18, 4.18, 50)
+    u, v = np.meshgrid(u, u)
+    r = np.hypot(u, v)
+    w = r < 4.18
+    w &= r > 2.558
+    u = u[w]
+    v = v[w]
+
+    np.testing.assert_allclose(
+        -zTA.gradX(u, v)*wavelength*focal_length,
+        zX(u, v),
+        atol=5e-7, rtol=0  # 0.5 micron = 1/20 pixel
+    )
+
+    np.testing.assert_allclose(
+        -zTA.gradY(u, v)*wavelength*focal_length,
+        zY(u, v),
+        atol=5e-7, rtol=0  # 0.5 micron = 1/20 pixel
+    )
+
+
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
@@ -368,3 +420,4 @@ if __name__ == '__main__':
     test_huygensPSF()
     test_doubleZernike()
     test_huygens_paraboloid(args.plot)
+    test_transverse_aberrations()

@@ -806,6 +806,81 @@ def zernikeTA(
     return -r/focal_length/wavelength
 
 
+def zernikeXYAberrations(
+    optic, theta_x, theta_y, wavelength,
+    projection='postel', nrad=6, naz=36,
+    reference='chief', jmax=22, eps=0.0
+):
+    """Compute Zernike polynomial representations of X- and Y- transverse
+    aberrations.
+
+    Parameters
+    ----------
+    optic : batoid.Optic
+        Optical system
+    theta_x, theta_y : float
+        Field angle in radians
+    wavelength : float
+        Wavelength in meters
+    projection : {'postel', 'zemax', 'gnomonic', 'stereographic', 'lambert', 'orthographic'}
+        Projection used to convert field angle to direction cosines.
+    nrad : int, optional
+        Number of ray radii to use.  (see RayVector.asPolar())
+    naz : int, optional
+        Approximate number of azimuthal angles in outermost ring.  (see
+        RayVector.asPolar())
+    reference : {'chief', 'mean'}
+        If 'chief', then center the output lattice where the chief ray
+        intersects the focal plane.  If 'mean', then center at the mean
+        non-vignetted ray intersection.
+    jmax : int, optional
+        Number of coefficients to compute.  Default: 22.
+    eps : float, optional
+        Use annular Zernike polynomials with this fractional inner radius.
+        Default: 0.0.
+
+    Returns
+    -------
+    xzk, yzk : array
+        Zernike polynomial coefficients in meters.
+    """
+    dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
+    rays = batoid.RayVector.asPolar(
+        optic=optic,
+        wavelength=wavelength,
+        dirCos=dirCos,
+        nrad=nrad, naz=naz
+    )
+    # Propagate to entrance pupil to get positions
+    epRays = rays.copy().toCoordSys(optic.stopSurface.coordSys)
+    optic.stopSurface.surface.intersect(epRays)
+    u = np.array(epRays.x)
+    v = np.array(epRays.y)
+
+    rays = optic.trace(rays)
+    w = ~rays.vignetted
+    if reference == 'mean':
+        point = np.mean(rays.r[w], axis=0)
+    elif reference == 'chief':
+        chief = batoid.RayVector.fromStop(
+            0, 0, optic, wavelength=wavelength,
+            dirCos=dirCos
+        )
+        optic.trace(chief)
+        point = chief.r[0]
+    x = rays.x - point[0]
+    y = rays.y - point[1]
+
+    basis = zernikeBasis(
+        jmax, u, v,
+        R_outer=optic.pupilSize/2, R_inner=optic.pupilSize/2*eps
+    )
+    x_coefs, _, _, _ = np.linalg.lstsq(basis.T, x)
+    y_coefs, _, _, _ = np.linalg.lstsq(basis.T, y)
+
+    return x_coefs, y_coefs
+
+
 def doubleZernike(
     optic, field, wavelength, rings=6, spokes=None, kmax=22,
     **kwargs
