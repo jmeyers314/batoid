@@ -556,7 +556,7 @@ def zernike(
         jmax, orig_x[w], orig_y[w],
         R_outer=optic.pupilSize/2, R_inner=optic.pupilSize/2*eps
     )
-    coefs, _, _, _ = np.linalg.lstsq(basis.T, wfarr[w], rcond=-1)
+    coefs, _, _, _ = np.linalg.lstsq(basis.T, wfarr[w], rcond=None)
     # coefs[0] is meaningless, so always set to 0.0 for comparison consistency
     coefs[0] = 0.0
     return np.array(coefs)
@@ -875,8 +875,8 @@ def zernikeXYAberrations(
         jmax, u, v,
         R_outer=optic.pupilSize/2, R_inner=optic.pupilSize/2*eps
     )
-    x_coefs, _, _, _ = np.linalg.lstsq(basis.T, x)
-    y_coefs, _, _, _ = np.linalg.lstsq(basis.T, y)
+    x_coefs, _, _, _ = np.linalg.lstsq(basis.T, x, rcond=None)
+    y_coefs, _, _, _ = np.linalg.lstsq(basis.T, y, rcond=None)
 
     return x_coefs, y_coefs
 
