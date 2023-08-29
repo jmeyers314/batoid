@@ -809,7 +809,8 @@ def zernikeTA(
 def zernikeXYAberrations(
     optic, theta_x, theta_y, wavelength,
     projection='postel', nrad=6, naz=36,
-    reference='chief', jmax=22, eps=0.0
+    reference='chief', jmax=22, eps=0.0,
+    include_vignetted=False
 ):
     """Compute Zernike polynomial representations of X- and Y- transverse
     aberrations.
@@ -838,6 +839,9 @@ def zernikeXYAberrations(
     eps : float, optional
         Use annular Zernike polynomials with this fractional inner radius.
         Default: 0.0.
+    include_vignetted : bool, optional
+        If True, then include vignetted rays in the fit.  If False, then only
+        use non-vignetted rays.
 
     Returns
     -------
@@ -858,8 +862,8 @@ def zernikeXYAberrations(
     v = np.array(epRays.y)
 
     rays = optic.trace(rays)
-    w = ~rays.vignetted
     if reference == 'mean':
+        w = ~rays.vignetted
         point = np.mean(rays.r[w], axis=0)
     elif reference == 'chief':
         chief = batoid.RayVector.fromStop(
@@ -870,6 +874,13 @@ def zernikeXYAberrations(
         point = chief.r[0]
     x = rays.x - point[0]
     y = rays.y - point[1]
+
+    if not include_vignetted:
+        w = ~rays.vignetted
+        u = u[w]
+        v = v[w]
+        x = x[w]
+        y = y[w]
 
     basis = zernikeBasis(
         jmax, u, v,
