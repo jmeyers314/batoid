@@ -8,6 +8,7 @@ API Changes
 
 New Features
 ------------
+- Added zernikeXYAberration to map pupil coordinates to focal plane coordinates.
 
 
 Performance Improvements
