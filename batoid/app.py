@@ -21,11 +21,11 @@ def get_constellations_xyz():
 
 
 @lru_cache
-def get_stars_xyzs():
+def get_stars_xyzs(maglim=5.5):
     table = fits.getdata(
         os.path.join(batoid.datadir, 'misc', 'BSC5.fits')
     )
-    table = table[table['mag'] < 5.5]
+    table = table[table['mag'] < maglim]
     x = np.cos(table['ra']) * np.cos(table['dec'])
     y = np.sin(table['ra']) * np.cos(table['dec'])
     z = np.sin(table['dec'])
@@ -95,11 +95,13 @@ def az_to_eq(alt_deg, az_deg, jd, lat_deg, lon_deg):
 
 
 class RubinCSApp:
-    def __init__(self, debug=None):
+    def __init__(self, maglim=5.5, debug=None):
+        self.maglim = maglim
         self.sky_dist = 15000
         self.lat = -30.2446
         self.lon = -70.7494
-        self.fiducial_telescope = batoid.Optic.fromYaml("LSST_r.yaml")
+        # self.fiducial_telescope = batoid.Optic.fromYaml("LSST_r.yaml")
+        self.fiducial_telescope = batoid.Optic.fromYaml("LSST_r_align_holes.yaml")
         self.actual_telescope = self.fiducial_telescope
         if debug is None:
             debug = contextlib.redirect_stdout(None)
@@ -260,7 +262,7 @@ class RubinCSApp:
                 batoid.RotZ(np.deg2rad(lst+180)) @ batoid.RotY(-np.deg2rad(90-self.lat))
             )
         )
-        x, y, z, s = get_stars_xyzs()
+        x, y, z, s = get_stars_xyzs(self.maglim)
         x, y, z = ctf.applyForwardArray(x, y, z)
         return x, y, z, s
 
