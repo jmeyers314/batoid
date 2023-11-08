@@ -120,7 +120,7 @@ class Interface(Optic):
 
         # Stealing inRadius and outRadius from self.obscuration.  These are
         # required for the draw methods.
-        self.inRadius = 0.0
+        self.inRadius = self.R_inner
         self.outRadius = None
         if self.obscuration is not None:
             if isinstance(self.obscuration, ObscNegation):
@@ -134,6 +134,10 @@ class Interface(Optic):
             elif isinstance(self.obscuration, ObscAnnulus):
                 self.outRadius = self.obscuration.outer
                 self.inRadius = self.obscuration.inner
+        if self.inRadius is None:
+            self.inRadius = self.R_inner
+        if self.outRadius is None:
+            self.outRadius = self.R_outer
 
     def __hash__(self):
         return hash((self.__class__.__name__, self.surface, self.obscuration,
