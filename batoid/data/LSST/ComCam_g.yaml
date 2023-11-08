@@ -1,6 +1,6 @@
 opticalSystem:
     type: CompoundOptic
-    name: ComCam
+    name: RubinComCam
     inMedium: &air
       type: Air
     medium: *air
