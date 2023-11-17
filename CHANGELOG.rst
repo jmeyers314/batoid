@@ -26,3 +26,4 @@ Bug Fixes
 ---------
 - Allow random seeds in applicable RayVector contructors.
 - Trap divide-by-zero error in field_to_dircos
+- Clean up CompoundOptic cached properties when inserting/removing items
