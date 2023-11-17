@@ -1689,7 +1689,8 @@ class CompoundOptic(Optic):
             raise ValueError("Optic {} not found".format(before))
         newItems = []
         newDict = dict(self.__dict__)
-        del newDict['items']
+        for k in ['items', 'itemDict', '_names', 'R_inner', 'R_outer']:
+            newDict.pop(k, None)
         for i, it in enumerate(self.items):
             if self._names[it.name] == self._names[before]:
                 newItems.append(item)
@@ -1717,7 +1718,8 @@ class CompoundOptic(Optic):
             raise ValueError("Optic {} not found".format(item))
         newItems = []
         newDict = dict(self.__dict__)
-        del newDict['items']
+        for k in ['items', 'itemDict', '_names', 'R_inner', 'R_outer']:
+            newDict.pop(k, None)
         for it in self.items:
             if self._names[it.name] != self._names[item]:
                 newItems.append(it)
