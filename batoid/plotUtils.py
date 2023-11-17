@@ -1,10 +1,25 @@
+import galsim
 from matplotlib.figure import Figure
 from matplotlib.gridspec import GridSpec
 
 
+# From https://joseph-long.com/writing/colorbars/
+def colorbar(mappable):
+    from mpl_toolkits.axes_grid1 import make_axes_locatable
+    import matplotlib.pyplot as plt
+    last_axes = plt.gca()
+    ax = mappable.axes
+    fig = ax.figure
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    cbar = fig.colorbar(mappable, cax=cax)
+    plt.sca(last_axes)
+    return cbar
+
+
 def zernikePyramid(
     xs, ys, zs, figsize=(13, 8), vmin=-1, vmax=1, vdim=True,
-    s=5, title=None, filename=None, fig=None, cmap='Spectral_r',
+    s=5, title=None, filename=None, fig=None, cmap='seismic',
     **kwargs
 ):
     """Make a multi-zernike plot in a pyramid shape.
@@ -21,9 +36,6 @@ def zernikePyramid(
         second index labels spatial coordinate.  First index implicitly starts
         at j=4 defocus.
     """
-
-    import warnings
-    import galsim
     jmax = zs.shape[0]+3
     nmax, _ = galsim.zernike.noll_to_zern(jmax)
 
@@ -71,18 +83,14 @@ def zernikePyramid(
             xs, ys, c=zs[j-4], s=s, linewidths=0.5, cmap=cmap,
             rasterized=True, vmin=_vmin, vmax=_vmax
         )
-        cbar[j] = fig.colorbar(scat, ax=ax)
+        cbar[j] = colorbar(scat)
         ax.set_xticks([])
         ax.set_yticks([])
 
     if title:
         fig.suptitle(title, x=0.1)
 
-    # Mistakenly raises MatplotlibDeprecationWarning.
-    # See https://github.com/matplotlib/matplotlib/issues/19486
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        fig.tight_layout()
+    fig.tight_layout()
     amt = 0.5*(axes[4].get_position().x0 - axes[5].get_position().x0)
     shiftAxes(shiftLeft, -amt)
     shiftAxes(shiftRight, amt)
