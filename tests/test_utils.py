@@ -479,6 +479,34 @@ def test_coord():
         )
 
 
+@timer
+def test_hexapolar():
+    x, y = batoid.utils.hexapolar()
+
+    assert len(x)%6 == 1
+    np.testing.assert_array_less(np.abs(x), 1+1e-10)
+    np.testing.assert_array_less(np.abs(y), 1+1e-10)
+    np.testing.assert_array_less(np.sqrt(x*x+y*y), 1+1e-10)
+
+    x, y = batoid.utils.hexapolar(
+        outer=10.0,
+        inner=1.0,
+    )
+    assert len(x)%6 == 0
+    np.testing.assert_array_less(np.abs(x), 10+1e-10)
+    np.testing.assert_array_less(np.abs(y), 10+1e-10)
+    np.testing.assert_array_less(np.sqrt(x*x+y*y), 10+1e-10)
+    np.testing.assert_array_less(1-1e-10, np.sqrt(x*x+y*y))
+    r, th = batoid.utils.hexapolar(outer=10.0, inner=1.0, rth=True)
+    np.testing.assert_allclose(r*np.cos(th), x, rtol=0, atol=1e-12)
+    np.testing.assert_allclose(r*np.sin(th), y, rtol=0, atol=1e-12)
+
+    x, y = batoid.utils.hexapolar(kfold=5)
+    assert len(x)%5 == 1
+    x, y = batoid.utils.hexapolar(inner=0.1, kfold=5, naz=300, nrad=50)
+    assert len(x)%5 == 0
+
+
 if __name__ == '__main__':
     test_normalized()
     test_gnomonicDirCos()
@@ -488,3 +516,4 @@ if __name__ == '__main__':
     test_orthographicDirCos()
     test_lambertDirCos()
     test_coord()
+    test_hexapolar()

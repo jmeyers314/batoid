@@ -523,8 +523,8 @@ def test_asPolar():
         wavelength = rng.uniform(300e-9, 1100e-9)
         inner = rng.uniform(1.0, 3.0)
         outer = inner + rng.uniform(1.0, 3.0)
-        nrad = rng.integers(1, 11)
-        naz = rng.integers(10, 21)
+        nrad = rng.integers(1, 21)
+        naz = rng.integers(20, 41)
         dirCos = np.array([
             rng.uniform(-0.1, 0.1),
             rng.uniform(-0.1, 0.1),
@@ -566,6 +566,25 @@ def test_asPolar():
         np.testing.assert_allclose(rays.x[-1], 0, atol=1e-14)
         np.testing.assert_allclose(rays.y[-1], 0, atol=1e-14)
         np.testing.assert_allclose(rays.z[-1], 0, atol=1e-14)
+
+        # Check kfold
+        rays = batoid.RayVector.asPolar(
+            backDist=backDist, wavelength=wavelength,
+            outer=outer, inner=0.0,
+            nrad=nrad, naz=naz,
+            kfold=5,
+            dirCos=dirCos
+        )
+        assert len(rays)%5 == 1
+
+        rays = batoid.RayVector.asPolar(
+            backDist=backDist, wavelength=wavelength,
+            outer=outer, inner=0.1,
+            nrad=nrad, naz=naz,
+            kfold=5,
+            dirCos=dirCos
+        )
+        assert len(rays)%5 == 0
 
     # Check nrandom
     rays = batoid.RayVector.asPolar(

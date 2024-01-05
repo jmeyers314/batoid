@@ -7,7 +7,7 @@ from . import _batoid
 from .constants import globalCoordSys, vacuum
 from .coordTransform import CoordTransform
 from .trace import applyForwardTransform, applyForwardTransformArrays
-from .utils import fieldToDirCos
+from .utils import fieldToDirCos, hexapolar
 from .surface import Plane
 
 
@@ -463,11 +463,13 @@ class RayVector:
         outer=None, inner=None,
         source=None, dirCos=None,
         theta_x=None, theta_y=None, projection='postel',
-        nrad=None, naz=None,
+        nrad=None, naz=None, kfold=6,
         flux=1,
         nrandom=None, rng=None
     ):
-        """Create RayVector on an annular region using a hexapolar grid.
+        """Create RayVector on an annular region using a hexapolar grid.  (Note
+        that hexapolar is the default, but other values of kfold besides 6 are
+        allowed.)
 
         This function can be used to regularly sample the entrance pupil of a
         telescope using polar symmetry (really, hexagonal symmetry).  Rings of
@@ -554,12 +556,14 @@ class RayVector:
             Number of radii on which create rays.
         naz : int
             Approximate number of azimuthal angles uniformly spaced along the
-            outermost ring.  Each ring is constrained to have a multiple of 6
-            azimuths, so the realized value may be slightly different than
-            the input value here.  Inner rings will have fewer azimuths in
+            outermost ring.  Each ring is constrained to have a multiple of
+            kfold azimuths, so the realized value may be slightly different
+            than the input value here.  Inner rings will have fewer azimuths in
             proportion to their radius, but will still be constrained to a
-            multiple of 6.  (If the innermost ring has radius 0, then exactly
+            multiple of kfold.  (If the innermost ring has radius 0, then exactly
             1 ray, with azimuth undefined, will be used on that "ring".)
+        kfold : int, optional
+            Each ring will have a multiple of this many azimuths.  Default: 6.
         flux : float, optional
             Flux to assign each ray.  Default is 1.0.
         nrandom : int, optional
@@ -607,25 +611,14 @@ class RayVector:
             raise ValueError("Missing wavelength keyword")
 
         if nrandom is None:
-            nphis = []
-            rhos = np.linspace(outer, inner, nrad)
-            for rho in rhos:
-                nphi = int((naz*rho/outer)//6)*6
-                if nphi == 0:
-                    nphi = 6
-                nphis.append(nphi)
-            if inner == 0.0:
-                nphis[-1] = 1
-            th = np.empty(np.sum(nphis))
-            rr = np.empty(np.sum(nphis))
-            idx = 0
-            for rho, nphi in zip(rhos, nphis):
-                rr[idx:idx+nphi] = rho
-                th[idx:idx+nphi] = np.linspace(0, 2*np.pi, nphi, endpoint=False)
-                idx += nphi
-            if inner == 0.0:
-                rr[-1] = 0.0
-                th[-1] = 0.0
+            rr, th = hexapolar(
+                outer=outer,
+                inner=inner,
+                nrad=nrad,
+                naz=naz,
+                kfold=kfold,
+                rth=True
+            )
         else:
             if rng is None:
                 rng = np.random.default_rng()
