@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from numbers import Integral, Real
 
 import numpy as np
 
@@ -368,32 +369,65 @@ class Asphere(Surface):
         Conic constant :math:`\\kappa`.
     coefs : list of float
         Even polynomial coefficients :math:`\\left\\{\\alpha_i\\right\\}`
+    imin : int, optional
+        Starting index for polynomial coefficients.  The default value of 2
+        means that coefs[0] is the coefficient of :math:`r^4` and coefs[1] is
+        the coefficient of :math:`r^6`.  To enable a coefficient of :math:`r^2`
+        set ``imin=1``.
     """
-    def __init__(self, R, conic, coefs):
+    def __init__(self, R, conic, coefs, imin=2):
         self.R = R
         self.conic = conic
-        self.coefs = np.ascontiguousarray(coefs)
+        self.coefs = coefs
+        self.imin = imin
+
+        if not isinstance(imin, Integral):
+            raise TypeError("imin must be an int")
+        if imin <= 0:
+            raise ValueError("imin must be >= 1")
+        if not all(isinstance(coef, Real) for coef in coefs):
+            raise TypeError("coefs must be a list of floats")
+
+        # padded_coefs starts at i=1, so the 0th term is a_1 r^2.
+        if imin != 1:
+            padded_coefs = np.concatenate([np.zeros(imin-1), coefs])
+        else:
+            padded_coefs = coefs
+        self._padded_coefs = np.ascontiguousarray(padded_coefs)
         self._surface = _batoid.CPPAsphere(
-            R, conic, self.coefs.ctypes.data, len(coefs)
+            R, conic, self._padded_coefs.ctypes.data, len(self._padded_coefs)
         )
 
     def __hash__(self):
-        return hash(("batoid.Asphere", self.R, self.conic, tuple(self.coefs)))
+        return hash((
+            "batoid.Asphere",
+            self.R,
+            self.conic,
+            tuple(self.coefs),
+            self.imin
+        ))
 
     def __setstate__(self, args):
         self.__init__(*args)
 
     def __getstate__(self):
-        return self.R, self.conic, self.coefs
+        return self.R, self.conic, self.coefs, self.imin
 
     def __eq__(self, rhs):
         if not isinstance(rhs, Asphere): return False
         return (self.R == rhs.R and
                 self.conic == rhs.conic and
-                np.array_equal(self.coefs, rhs.coefs))
+                np.array_equal(self.coefs, rhs.coefs) and
+                self.imin == rhs.imin
+               )
 
     def __repr__(self):
-        return f"Asphere({self.R}, {self.conic}, {self.coefs!r})"
+        out = f"Asphere({self.R}, {self.conic}, {self.coefs!r}"
+        if self.imin == 1:
+            out += ")"
+        else:
+            out += f", imin={self.imin})"
+        return out
 
 
 class Zernike(Surface):
