@@ -12,6 +12,7 @@ New Features
 - Added hexapolar util to compute hexapolar grids.
 - Added jmin to zernikePyramid to enable j<4 plots.
 - Added imin argument to Asphere.
+- Add SDSS telescope description.
 
 
 Performance Improvements

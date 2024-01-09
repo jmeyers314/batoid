@@ -1,0 +1,245 @@
+opticalSystem:
+  type: CompoundOptic
+  name: SDSS
+  inMedium: &vacuum 1.0
+  medium: *vacuum
+  backDist: 5.0  # distance from global vertex to use to start tracing rays
+  sphereRadius: 8.0  # reference sphere radius to use for wavefront calculation
+  pupilSize: 2.5  # Pupil fits inside a square with this side length
+  pupilObscuration: 0.48  # Fractional pupil central obscuration
+  stopSurface:
+    type: Interface
+    name: entrancePupil
+    surface:
+      type: Plane
+    coordSys:
+      z: 0.06937187589250429  # Flush with M1 outer edge
+  items:
+    -
+      type: Baffle
+      name: Windscreen
+      surface:
+        type: Plane
+      obscuration:
+        type: ClearAnnulus
+        outer: 1.3925
+        inner: 0.586
+      coordSys:
+        z: 4.8416
+    -
+      type: Baffle
+      name: M2 baffle 1
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscCircle
+        radius: 0.625
+      coordSys:
+        z: 3.7805
+    -
+      type: Baffle
+      name: M2 baffle 2
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscCircle
+        radius: 0.6411
+      coordSys:
+        z: 3.1504
+    -
+      type: Baffle
+      name: Conical baffle
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscCircle
+        radius: 0.6025
+      coordSys:
+        z: 1.8128
+    -
+      type: Baffle
+      name: Windscreen 2
+      surface:
+        type: Plane
+      obscuration:
+        type: ClearAnnulus
+        inner: 0.420
+        outer: 1.27675
+      coordSys:
+        z: 1.0833
+    -
+      type: Mirror
+      name: M1
+      surface:
+        type: Asphere
+        R: 11.25163  # 1/CURV
+        conic: -1.2859
+        coefs: [0.0, -3.8140000000000002e-7, 1.5180000000000001e-8]
+      obscuration:
+        type: ClearAnnulus
+        outer: 1.250
+        inner: 0.600
+      coordSys:
+        z: 0.0  # Reference surface
+    -
+      type: Baffle
+      name: M2 baffle 3
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscCircle
+        radius: 0.5693
+      coordSys:
+        z: 3.52517
+    -
+      type: Mirror
+      name: M2
+      surface:
+        type: Asphere
+        R: 7.19399
+        conic: -11.977
+        coefs: [0.0, -1.785e-4]
+      coordSys:
+        z: 3.64517
+      obscuration:
+        type: ClearAnnulus
+        outer: 0.5693
+        inner: 0.0
+    -
+      type: Baffle
+      name: Conical baffle 2
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscCircle
+        radius: 0.490
+      coordSys:
+        z: 2.54237
+    -
+      type: Baffle
+      name: M1 baffle
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscCircle
+        radius: 0.420
+      coordSys:
+        z: 1.14997
+    -
+      type: CompoundOptic
+      name: Corrector
+      coordSys:
+        z: 0.09997089347400106
+      items:
+        -
+          type: Lens
+          name: L1
+          medium: &silica
+            type: SellmeierMedium
+            B1: 0.6961663
+            B2: 0.4079426
+            B3: 0.8974794
+            C1: 0.00467914825849
+            C2: 0.013512063073959999
+            C3: 97.93400253792099
+          items:
+            -
+              type: RefractiveInterface
+              name: L1S1
+              surface:
+                type: Asphere
+                R: -0.6270209060833548
+                conic: 0.0
+                coefs: [
+                  0.00035905544482819999e+3,
+                  3.7894436573670002e-1,
+                  3.0570076741769999e-1,
+                  5.1457124513370004e-1
+                ]
+                imin: 1
+              obscuration:
+                type: ClearCircle
+                radius: 0.375
+            -
+              type: RefractiveInterface
+              name: L1S2
+              surface:
+                type: Sphere
+                R: -1.3169479177459805
+              coordSys:
+                z: -0.05
+              obscuration:
+                type: ClearCircle
+                radius: 0.360
+        -
+          type: Lens
+          name: L2
+          medium: *silica
+          coordSys:
+            z: -0.5
+          items:
+            -
+              type: RefractiveInterface
+              name: L2S1
+              surface:
+                type: Sphere
+                R: 0.6580063343341003
+              obscuration:
+                type: ClearCircle
+                radius: 0.340
+            -
+              type: RefractiveInterface
+              name: L2S2
+              surface:
+                type: Asphere
+                R: 1.9631287985823387
+                conic: 0.0
+                coefs: [
+                  0.00025093001062379997e+3,
+                  4.0104524984129998e-1,
+                  -5.4679844739520004e-1,
+                  6.2072424640590002e-1
+                ]
+                imin: 1
+              coordSys:
+                z: -0.040000383672800126
+              obscuration:
+                type: ClearCircle
+                radius: 0.355
+        -
+          type: Lens
+          name: L3
+          medium: *silica
+          coordSys:
+            z: -0.7414506822292005
+          items:
+            -
+              type: RefractiveInterface
+              name: L3S1
+              surface:
+                type: Sphere
+                R: -2.4629369191936808
+              obscuration:
+                type: ClearCircle
+                radius: 0.355
+            -
+              type: RefractiveInterface
+              name: L3S2
+              surface:
+                type: Plane
+              coordSys:
+                z: -0.05
+              obscuration:
+                type: ClearCircle
+                radius: 0.355
+        -
+          type: Detector
+          name: Detector
+          surface:
+            type: Sphere
+            R: 9.199322517101522
+          obscuration:
+            type: ClearCircle
+            radius: 0.355
+          coordSys:
+            z: -0.8764500246652506
