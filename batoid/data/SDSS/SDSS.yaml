@@ -87,7 +87,7 @@ opticalSystem:
       surface:
         type: Plane
       obscuration:
-        type: ObscCircle
+        type: ClearCircle
         radius: 0.5693
       coordSys:
         z: 3.52517
@@ -111,7 +111,7 @@ opticalSystem:
       surface:
         type: Plane
       obscuration:
-        type: ObscCircle
+        type: ClearCircle
         radius: 0.490
       coordSys:
         z: 2.54237
@@ -121,7 +121,7 @@ opticalSystem:
       surface:
         type: Plane
       obscuration:
-        type: ObscCircle
+        type: ClearCircle
         radius: 0.420
       coordSys:
         z: 1.14997
