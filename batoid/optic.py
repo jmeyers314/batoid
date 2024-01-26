@@ -1458,7 +1458,11 @@ class CompoundOptic(Optic):
             Optic with shifted subitem.
         """
         # Just apply the rotated global shift.
-        return self.withGloballyShiftedOptic(name, self.coordSys.rot@shift)
+        name = self._names.get(name, name)
+        if name not in self.itemDict:
+            raise ValueError("Optic {} not found".format(name))
+        coordSys = self.itemDict[name].coordSys
+        return self.withGloballyShiftedOptic(name, coordSys.rot@shift)
 
     def withGlobalRotation(self, rot, rotCenter=None, coordSys=None):
         """Return a new `CompoundOptic` with its coordinate system rotated.
