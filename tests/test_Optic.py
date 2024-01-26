@@ -619,6 +619,7 @@ if __name__ == '__main__':
     test_shift()
     test_rotXYZ_parsing()
     test_rotation()
+    test_local_shift_with_rotation()
     test_ne()
     test_name()
     test_cbp_rotation()
