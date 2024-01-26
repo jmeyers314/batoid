@@ -247,6 +247,46 @@ def test_rotation():
 
 
 @timer
+def test_local_shift_with_rotation():
+    # Load HSC for testing
+    telescope = batoid.Optic.fromYaml("HSC.yaml")
+
+    # Rotate the entire telescope
+    rotFull = telescope.withLocalRotation(batoid.RotX(np.pi/2))
+
+    # Make global and local shifts
+    rotFullGlobalShift = rotFull.withGlobalShift([1, 3, 5])
+    rotFullLocalShift = rotFull.withLocalShift([1, 5, -3])
+
+    # Check these coordinate systems are the same
+    assert np.allclose(
+        rotFullGlobalShift.coordSys.origin,
+        rotFullLocalShift.coordSys.origin,
+    )
+    assert np.allclose(
+        rotFullGlobalShift.coordSys.rot,
+        rotFullLocalShift.coordSys.rot,
+    )
+
+    # Now rotate a subitem
+    rotCAM = telescope.withLocallyRotatedOptic("CAM", batoid.RotY(np.pi/2))
+
+    # Make global and local shifts
+    rotCamGlobalShift = rotCAM.withGloballyShiftedOptic("CAM", [3, 5, 1])
+    rotCamLocalShift = rotCAM.withLocallyShiftedOptic("CAM", [-1, 5, 3])
+
+    # Check these coordinate systems are the same
+    assert np.allclose(
+        rotCamGlobalShift["CAM"].coordSys.origin,
+        rotCamLocalShift["CAM"].coordSys.origin,
+    )
+    assert np.allclose(
+        rotCamGlobalShift["CAM"].coordSys.rot,
+        rotCamLocalShift["CAM"].coordSys.rot,
+    )
+
+
+@timer
 def test_ne():
     objs = [
         batoid.Mirror(batoid.Plane()),
