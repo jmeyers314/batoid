@@ -21,3 +21,4 @@ Performance Improvements
 
 Bug Fixes
 ---------
+- Fixed bug where withLocallyShiftedOptic used the top-level rotation instead of the subitem rotation.
