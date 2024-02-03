@@ -1,7 +1,8 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.12)
 project(_batoid CXX)
 # set(CMAKE_VERBOSE_MAKEFILE True)
 cmake_policy(SET CMP0063 NEW)  # Compile the static lib with hidden visibility.
+cmake_policy(SET CMP0148 OLD)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_MACOSX_RPATH 1)
 set(CMAKE_CXX_STANDARD 14)

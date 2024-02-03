@@ -3,9 +3,8 @@ import re
 import sys
 import subprocess
 
-from setuptools import setup, Extension
+from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
-from distutils.version import LooseVersion
 
 VERSIONFILE="batoid/_version.py"
 verstrline = open(VERSIONFILE, "rt").read()
@@ -69,14 +68,12 @@ setup(
     description="Optics raytracer",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    packages=['batoid'],
+    packages=find_packages(exclude=['batoid/data', 'batoid/data/*']),
     package_dir={'batoid': 'batoid'},
     package_data={'batoid' : ['data/**/*']},
     ext_modules=[CMakeExtension('batoid._batoid')],
     install_requires=['pybind11', 'numpy', 'pyyaml', 'scipy', 'galsim', 'matplotlib', 'astropy'],
-    python_requires='>=3.7',
-    setup_requires=['pytest-runner'],
-    tests_require=['pytest'],
+    python_requires='>=3.8',
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
     include_package_data=True,
