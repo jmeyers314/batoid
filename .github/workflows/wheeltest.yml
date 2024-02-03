@@ -8,19 +8,22 @@ jobs:
     name: Build wheels on standard linux
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-          fetch-depth: 2
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v3
+
+      - name: Install cibuildwheel
+        run: python -m pip install cibuildwheel==2.16.5
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.11.3
+        run: python -m cibuildwheel --output-dir wheelhouse
         env:
           CIBW_BUILD: "*manylinux*"
           CIBW_SKIP: cp36* cp37* pp*
           CIBW_BUILD_VERBOSITY: 3
           CIBW_BEFORE_BUILD: pip install -U pybind11-global
-      - uses: actions/upload-artifact@v3
+
+      - uses: actions/upload-artifact@v4
         with:
           path: ./wheelhouse/*.whl
 
@@ -28,19 +31,22 @@ jobs:
     name: Build wheels on musl linux
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-          fetch-depth: 2
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v3
+
+      - name: Install cibuildwheel
+        run: python -m pip install cibuildwheel==2.16.5
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.11.3
+        run: python -m cibuildwheel --output-dir wheelhouse
         env:
           CIBW_BUILD: "*musllinux*"
           CIBW_SKIP: cp36* cp37* pp*
           CIBW_BUILD_VERBOSITY: 3
           CIBW_BEFORE_BUILD: pip install -U pybind11-global
-      - uses: actions/upload-artifact@v3
+
+      - uses: actions/upload-artifact@v4
         with:
           path: ./wheelhouse/*.whl
 
@@ -48,13 +54,15 @@ jobs:
     name: Build wheels on macosx
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-          fetch-depth: 2
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v3
+
+      - name: Install cibuildwheel
+        run: python -m pip install cibuildwheel==2.16.5
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.11.3
+        run: python -m cibuildwheel --output-dir wheelhouse
         env:
           CIBW_BUILD: "*macosx*"
           CIBW_SKIP: cp36* cp37* pp*
@@ -63,7 +71,7 @@ jobs:
           CIBW_BEFORE_TEST: pip install -U -r test_requirements.txt
           CIBW_TEST_COMMAND: pytest --skip_gha {package}/tests
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           path: ./wheelhouse/*.whl
 
