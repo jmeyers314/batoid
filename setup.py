@@ -6,15 +6,6 @@ import subprocess
 from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
 
-VERSIONFILE="batoid/_version.py"
-verstrline = open(VERSIONFILE, "rt").read()
-VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
-mo = re.search(VSRE, verstrline, re.M)
-if mo:
-    version = mo.group(1)
-else:
-    raise RuntimeError("Unable to find version string in %s." % (VERSIONFILE,))
-
 
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=''):
@@ -61,7 +52,6 @@ with open("README.rst", 'r') as fh:
 
 setup(
     name='batoid',
-    version=version,
     author='Josh Meyers',
     author_email='jmeyers314@gmail.com',
     url='https://github.com/jmeyers314/batoid',
