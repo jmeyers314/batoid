@@ -7,10 +7,6 @@ from astropy.table import Table
 
 url = "http://tdc-www.harvard.edu/catalogs/bsc5.dat.gz"
 
-
-from urllib.request import Request, urlopen
-import gzip
-
 response = urlopen(url)
 content = gzip.decompress(response.read())
 decomp_req = content.splitlines()
