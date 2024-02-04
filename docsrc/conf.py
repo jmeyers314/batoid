@@ -22,11 +22,11 @@
 import batoid
 
 project = 'batoid'
-copyright = '2017-2021, Josh Meyers'
+copyright = '2017-2024, Josh Meyers'
 author = 'Josh Meyers'
 
 # The short X.Y version
-version = '.'.join(map(str, batoid.__version_info__[:2]))
+version = '.'.join(map(str, batoid.__version_tuple__[:3]))
 # The full version, including alpha/beta/rc tags
 release = batoid.__version__
 
