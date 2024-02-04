@@ -1,0 +1,258 @@
+opticalSystem:
+  type: CompoundOptic
+  name: LSST
+  inMedium: &vacuum 1.0
+  medium: *vacuum
+  backDist: 15.0  # distance from global vertex to use to start tracing rays
+  sphereRadius: 5.0  # reference sphere radius to use for wavefront calculation
+  pupilSize: 8.36  # Pupil fits inside a square with this side length
+  pupilObscuration: 0.612  # Fractional pupil central obscuration
+  stopSurface:
+    type: Interface
+    name: entrancePupil
+    surface:
+      type: Plane
+    coordSys:
+      z: 0.4393899
+  items:
+    -
+      type: Mirror
+      name: M1
+      surface:
+        type: Asphere
+        R: 19.835
+        conic: -1.215
+        coefs: [0.0, -1.381e-9]
+      obscuration:
+        type: ObscUnion
+        items:
+          -
+            type: ClearAnnulus  # Regular M1 annulus
+            outer: 4.18
+            inner: 2.558
+          -
+            type: ObscUnion  # Make an "+X" in the +x direction
+            items:
+              -
+                type: ObscRectangle  # |
+                width: 0.1
+                height: 0.4
+                x: 3.0
+                y: 0.0
+              -
+                type: ObscRectangle  # -
+                width: 0.4
+                height: 0.1
+                x: 3.0
+                y: 0.0
+              -
+                type: ObscRectangle  # /
+                width: 0.1
+                height: 1.0
+                x: 3.5
+                y: 0.0
+                theta: 0.6
+              -
+                type: ObscRectangle  # \
+                width: 0.1
+                height: 1.0
+                x: 3.5
+                y: 0.0
+                theta: -0.6
+          -
+            type: ObscUnion  # Make a "+Y" in the +y direction
+            items:
+              -
+                type: ObscRectangle
+                width: 0.1
+                height: 0.4
+                x: -0.3
+                y: 3.3
+              -
+                type: ObscRectangle
+                width: 0.4
+                height: 0.1
+                x: -0.3
+                y: 3.3
+              -
+                type: ObscRectangle
+                width: 0.1
+                height: 0.6
+                x: 0.0
+                y: 3.5
+                theta: 0.6
+              -
+                type: ObscRectangle
+                width: 0.1
+                height: 0.6
+                x: 0.4
+                y: 3.5
+                theta: -0.6
+              -
+                type: ObscRectangle
+                width: 0.1
+                height: 0.6
+                x: 0.2
+                y: 3.1
+                theta: 0.0
+      R_outer: 4.18  # Used for sag output
+      R_inner: 2.558
+    -
+      type: Mirror
+      name: M2
+      surface:
+        type: Asphere
+        R: 6.788
+        conic: -0.222
+        coefs: [0.0, 1.274e-5, 9.68e-7]
+      obscuration:
+        type: ClearAnnulus
+        outer: 1.71
+        inner: 0.9
+      coordSys:
+        z: 6.1562006
+    -
+      type: Mirror
+      name: M3
+      surface:
+        type: Asphere
+        R: 8.3445
+        conic: 0.155
+        coefs: [0.0, 4.5e-7, 8.15e-9]
+      obscuration:
+        type: ClearAnnulus
+        outer: 2.508
+        inner: 0.55
+      coordSys:
+        z: -0.2338
+    -
+      type: CompoundOptic
+      name: LSSTCamera
+      coordSys:
+        z: 3.3974725882045593
+      items:
+        -
+          type: Lens
+          name: L1
+          medium: &silica
+            type: SellmeierMedium
+            B1: 0.696183020
+            B2: 0.407925877
+            B3: 0.897464057
+            C1: 0.00467926519
+            C2: 0.0135122244
+            C3: 97.9323636
+          items:
+            -
+              type: RefractiveInterface
+              name: L1_entrance
+              surface:
+                type: Sphere
+                R: 2.824
+              obscuration:
+                type: ClearCircle
+                radius: 0.775
+            -
+              type: RefractiveInterface
+              name: L1_exit
+              surface:
+                type: Sphere
+                R: 5.021
+              obscuration:
+                type: ClearCircle
+                radius: 0.775
+              coordSys:
+                z: 0.08223
+        -
+          type: Lens
+          name: L2
+          medium: *silica
+          coordSys:
+            z: 0.49487202
+          items:
+            -
+              type: RefractiveInterface
+              name: L2_entrance
+              surface:
+                type: Plane
+              obscuration:
+                type: ClearCircle
+                radius: 0.551
+            -
+              type: RefractiveInterface
+              name: L2_exit
+              surface:
+                type: Asphere
+                R: 2.529
+                conic: -1.57
+                coefs: [0.0, -0.001656]
+              obscuration:
+                type: ClearCircle
+                radius: 0.551
+              coordSys:
+                z: 0.03
+        -
+          type: Lens
+          name: Filter
+          medium: *silica
+          coordSys:
+            z: 0.87445202
+          items:
+            -
+              type: RefractiveInterface
+              name: Filter_entrance
+              surface:
+                type: Sphere
+                R: 5.632
+              obscuration:
+                type: ClearCircle
+                radius: 0.375
+            -
+              type: RefractiveInterface
+              name: Filter_exit
+              surface:
+                type: Sphere
+                R: 5.606
+              obscuration:
+                type: ClearCircle
+                radius: 0.375
+              coordSys:
+                z: 0.0179
+        -
+          type: Lens
+          name: L3
+          medium: *silica
+          coordSys:
+            z: 0.94345202
+          items:
+            -
+              type: RefractiveInterface
+              name: L3_entrance
+              surface:
+                type: Quadric
+                R: 3.169
+                conic: -0.962
+              obscuration:
+                type: ClearCircle
+                radius: 0.361
+            -
+              type: RefractiveInterface
+              name: L3_exit
+              surface:
+                type: Sphere
+                R: -13.36
+              obscuration:
+                type: ClearCircle
+                radius: 0.361
+              coordSys:
+                z: 0.06
+        -
+          type: Detector
+          name: Detector
+          surface:
+            type: Plane
+          obscuration:
+            type: ClearCircle
+            radius: 0.4
+          coordSys:
+            z: 1.03195202
