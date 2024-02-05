@@ -51,6 +51,8 @@ with open("README.rst", 'r') as fh:
 
 setup(
     name='batoid',
+    use_scm_version=True,
+    setup_requires=['setuptools_scm'],
     author='Josh Meyers',
     author_email='jmeyers314@gmail.com',
     url='https://github.com/jmeyers314/batoid',
