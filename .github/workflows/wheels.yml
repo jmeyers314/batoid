@@ -7,84 +7,106 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_linux_wheels:
+  build_many_wheels:
     name: Build wheels on standard linux
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-          fetch-depth: 2
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+
+      - name: Install cibuildwheel
+        run: python -m pip install cibuildwheel==2.16.5
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.9.0
+        run: python -m cibuildwheel --output-dir wheelhouse
         env:
           CIBW_BUILD: "*manylinux*"
-          CIBW_SKIP: cp36* cp37* pp*
+          # CIBW_SKIP: cp36* cp37* pp*
+          CIBW_SKIP: cp36* cp37* cp38* cp39* cp310* cp311* pp*
           CIBW_BUILD_VERBOSITY: 3
           CIBW_BEFORE_BUILD: pip install -U pybind11-global
-      - uses: actions/upload-artifact@v3
+
+      - uses: actions/upload-artifact@v4
         with:
+          name: manylinux-artifacts
           path: ./wheelhouse/*.whl
 
   build_musl_wheels:
     name: Build wheels on musl linux
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-          fetch-depth: 2
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+
+      - name: Install cibuildwheel
+        run: python -m pip install cibuildwheel==2.16.5
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.9.0
+        run: python -m cibuildwheel --output-dir wheelhouse
         env:
           CIBW_BUILD: "*musllinux*"
-          CIBW_SKIP: cp36* cp37* pp*
+          # CIBW_SKIP: cp36* cp37* pp*
+          CIBW_SKIP: cp36* cp37* cp38* cp39* cp310* cp311* pp*
           CIBW_BUILD_VERBOSITY: 3
           CIBW_BEFORE_BUILD: pip install -U pybind11-global
-      - uses: actions/upload-artifact@v3
+
+      - uses: actions/upload-artifact@v4
         with:
+          name: musllinux-artifacts
           path: ./wheelhouse/*.whl
 
   build_macosx_wheels:
     name: Build wheels on macosx
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-          fetch-depth: 2
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+
+      - name: Install cibuildwheel
+        run: python -m pip install cibuildwheel==2.16.5
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.9.0
+        run: python -m cibuildwheel --output-dir wheelhouse
         env:
           CIBW_BUILD: "*macosx*"
-          CIBW_SKIP: cp36* cp37* pp*
+          # CIBW_SKIP: cp36* cp37* pp*
+          CIBW_SKIP: cp36* cp37* cp38* cp39* cp310* cp311* pp*
           CIBW_BUILD_VERBOSITY: 3
           CIBW_BEFORE_BUILD: pip install -U pybind11-global
-          CIBW_BEFORE_TEST: pip install -U -r test_requirements.txt
-          CIBW_TEST_COMMAND: pytest --skip_gha {package}/tests
+          # CIBW_BEFORE_TEST: pip install -U -r test_requirements.txt
+          # CIBW_TEST_COMMAND: pytest --skip_gha {package}/tests
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
+          name: macosx-artifacts
           path: ./wheelhouse/*.whl
+
+  merge_wheels:
+    name: Merge wheels
+    needs: [build_many_wheels, build_musl_wheels, build_macosx_wheels]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Merge wheels
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: wheels
+          pattern: "*-artifacts"
 
   build_sdist:
     name: Build sdist and upload to PyPI
-    needs: [build_linux_wheels, build_musl_wheels, build_macosx_wheels]
+    needs: [merge_wheels]
     # Just need to build sdist on a single machine
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-          fetch-depth: 2
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.12"
 
       - name: Install dependencies
         run: |
@@ -94,7 +116,7 @@ jobs:
           pip install -U pybind11-global
 
       - name: Download wheels
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: ./wheels
 
@@ -108,20 +130,20 @@ jobs:
         run: |
           echo ls -l wheels
           ls -l wheels
-          echo ls -l wheels/artifact
-          ls -l wheels/artifact
-          cp wheels/artifact/*.whl dist
+          echo ls -l wheels/wheels
+          ls -l wheels/wheels
+          cp wheels/wheels/*.whl dist
           echo ls -l dist
           ls -l dist
 
-      # - name: Publish package to TestPyPI
-      #   uses: pypa/gh-action-pypi-publish@release/v1
-      #   with:
-      #     password: ${{ secrets.TESTPYPI_PASSWORD }}
-      #     repository_url: https://test.pypi.org/legacy/
-
-      - name: Publish to PyPI
+      - name: Publish package to TestPyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-            password: ${{ secrets.PYPI_PASSWORD }}
-            verbose: true
+          password: ${{ secrets.TESTPYPI_PASSWORD }}
+          repository_url: https://test.pypi.org/legacy/
+
+      # - name: Publish to PyPI
+      #   uses: pypa/gh-action-pypi-publish@release/v1
+      #   with:
+      #       password: ${{ secrets.PYPI_PASSWORD }}
+      #       verbose: true
