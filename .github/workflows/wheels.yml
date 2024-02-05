@@ -24,8 +24,8 @@ jobs:
         run: python -m cibuildwheel --output-dir wheelhouse
         env:
           CIBW_BUILD: "*manylinux*"
-          # CIBW_SKIP: cp36* cp37* pp*
-          CIBW_SKIP: cp36* cp37* cp38* cp39* cp310* cp311* pp*
+          CIBW_SKIP: cp36* cp37* pp*
+          # CIBW_SKIP: cp36* cp37* cp38* cp39* cp310* cp311* pp*
           CIBW_BUILD_VERBOSITY: 3
           CIBW_BEFORE_BUILD: pip install -U pybind11-global
 
@@ -51,8 +51,8 @@ jobs:
         run: python -m cibuildwheel --output-dir wheelhouse
         env:
           CIBW_BUILD: "*musllinux*"
-          # CIBW_SKIP: cp36* cp37* pp*
-          CIBW_SKIP: cp36* cp37* cp38* cp39* cp310* cp311* pp*
+          CIBW_SKIP: cp36* cp37* pp*
+          # CIBW_SKIP: cp36* cp37* cp38* cp39* cp310* cp311* pp*
           CIBW_BUILD_VERBOSITY: 3
           CIBW_BEFORE_BUILD: pip install -U pybind11-global
 
@@ -78,12 +78,12 @@ jobs:
         run: python -m cibuildwheel --output-dir wheelhouse
         env:
           CIBW_BUILD: "*macosx*"
-          # CIBW_SKIP: cp36* cp37* pp*
-          CIBW_SKIP: cp36* cp37* cp38* cp39* cp310* cp311* pp*
+          CIBW_SKIP: cp36* cp37* pp*
+          # CIBW_SKIP: cp36* cp37* cp38* cp39* cp310* cp311* pp*
           CIBW_BUILD_VERBOSITY: 3
           CIBW_BEFORE_BUILD: pip install -U pybind11-global
-          # CIBW_BEFORE_TEST: pip install -U -r test_requirements.txt
-          # CIBW_TEST_COMMAND: pytest --skip_gha {package}/tests
+          CIBW_BEFORE_TEST: pip install -U -r test_requirements.txt
+          CIBW_TEST_COMMAND: pytest --skip_gha {package}/tests
 
       - uses: actions/upload-artifact@v4
         with:
