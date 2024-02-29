@@ -9,10 +9,12 @@ namespace batoid {
 
     PolynomialSurface::PolynomialSurface(
         const double* coefs, const double* coefs_gradx, const double* coefs_grady,
+        const double xorigin, const double yorigin,
         size_t xsize, size_t ysize
     ) :
         Surface(),
         _coefs(coefs), _coefs_gradx(coefs_gradx), _coefs_grady(coefs_grady),
+        _xorigin(xorigin), _yorigin(yorigin),
         _xsize(xsize), _ysize(ysize)
     {}
 
@@ -31,15 +33,15 @@ namespace batoid {
     }
 
     double PolynomialSurface::sag(double x, double y) const {
-        return horner2d(x, y, _coefs, _xsize, _ysize);
+        return horner2d(x-_xorigin, y-_yorigin, _coefs, _xsize, _ysize);
     }
 
     void PolynomialSurface::normal(double x, double y, double& nx, double& ny, double& nz) const {
         // The gradient arrays are always shaped 1 row and column smaller than the coef array.
         // The only exception is when the coef array is 1x1, in which case the gradient array is
         // also 1x1, but filled with a zero (so horner still returns the right result).
-        nx = -horner2d(x, y, _coefs_gradx, _xsize-1, _ysize-1);
-        ny = -horner2d(x, y, _coefs_grady, _xsize-1, _ysize-1);
+        nx = -horner2d(x-_xorigin, y-_yorigin, _coefs_gradx, _xsize-1, _ysize-1);
+        ny = -horner2d(x-_xorigin, y-_yorigin, _coefs_grady, _xsize-1, _ysize-1);
         nz = 1./std::sqrt(nx*nx + ny*ny + 1);
         nx *= nz;
         ny *= nz;
@@ -81,7 +83,9 @@ namespace batoid {
                     map(to:coefs[:size], coefs_gradx[:sizem1], coefs_grady[:sizem1])
                 #pragma omp target map(from:ptr)
                 {
-                    ptr = new PolynomialSurface(coefs, coefs_gradx, coefs_grady, _xsize, _ysize);
+                    ptr = new PolynomialSurface(
+                        coefs, coefs_gradx, coefs_grady, _xorigin, _yorigin, _xsize, _ysize
+                    );
                 }
                 _devPtr = ptr;
             }

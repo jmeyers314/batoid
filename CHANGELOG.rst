@@ -8,7 +8,7 @@ API Changes
 
 New Features
 ------------
-
+- Added x_origin and y_origin arguments to batoid.Zernike.
 
 Performance Improvements
 ------------------------
