@@ -13,6 +13,7 @@ namespace batoid {
     public:
         PolynomialSurface(
             const double* coefs, const double* coefs_gradx, const double* coefs_grady,
+            const double xorigin, const double yorigin,
             size_t xsize, size_t ysize
         );
         ~PolynomialSurface();
@@ -29,6 +30,7 @@ namespace batoid {
         const double* _coefs;
         const double* _coefs_gradx;
         const double* _coefs_grady;
+        const double _xorigin, _yorigin;
         const size_t _xsize, _ysize;
     };
 

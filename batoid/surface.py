@@ -453,17 +453,21 @@ class Zernike(Surface):
     ----------
     coef : list of float
         Annular Zernike polynomial coefficients.
-    R_outer : float
+    R_outer : float, optional
         Outer radius of annulus.
-    R_inner : float
+    R_inner : float, optional
         Inner radius of annulus.
+    x_origin, y_origin : float, optional
+        Origin of the Zernike polynomial.  Default is (0, 0).
     """
-    def __init__(self, coef, R_outer=1.0, R_inner=0.0):
+    def __init__(self, coef, R_outer=1.0, R_inner=0.0, x_origin=0.0, y_origin=0.0):
         import galsim
 
         self.coef = np.array(coef, dtype=float, order="C")
         self.R_outer = float(R_outer)
         self.R_inner = float(R_inner)
+        self.x_origin = float(x_origin)
+        self.y_origin = float(y_origin)
         self.Z = galsim.zernike.Zernike(coef, R_outer, R_inner)
         self._xycoef = self.Z._coef_array_xy
         self._xycoef_gradx = self.Z.gradX._coef_array_xy
@@ -473,6 +477,7 @@ class Zernike(Surface):
             self._xycoef.ctypes.data,
             self._xycoef_gradx.ctypes.data,
             self._xycoef_grady.ctypes.data,
+            self.x_origin, self.y_origin,
             self._xycoef.shape[0],
             self._xycoef.shape[1]
         )
@@ -480,23 +485,37 @@ class Zernike(Surface):
     def __hash__(self):
         return hash((
             "batoid.Zernike",
-            tuple(self.coef), self.R_outer, self.R_inner
+            tuple(self.coef),
+            self.R_outer, self.R_inner,
+            self.x_origin, self.y_origin,
         ))
 
     def __setstate__(self, args):
         self.__init__(*args)
 
     def __getstate__(self):
-        return self.coef, self.R_outer, self.R_inner
+        return self.coef, self.R_outer, self.R_inner, self.x_origin, self.y_origin
 
     def __eq__(self, rhs):
         if not isinstance(rhs, Zernike): return False
         return (np.array_equal(self.coef, rhs.coef) and
                 self.R_outer == rhs.R_outer and
-                self.R_inner == rhs.R_inner)
+                self.R_inner == rhs.R_inner and
+                self.x_origin == rhs.x_origin and
+                self.y_origin == rhs.y_origin)
 
     def __repr__(self):
-        return f"Zernike({self.coef!r}, {self.R_outer}, {self.R_inner})"
+        out = f"Zernike({self.coef!r}"
+        if self.R_outer != 1.0:
+            out += f", R_outer={self.R_outer}"
+        if self.R_inner != 0.0:
+            out += f", R_inner={self.R_inner}"
+        if self.x_origin != 0.0:
+            out += f", x_origin={self.x_origin}"
+        if self.y_origin != 0.0:
+            out += f", y_origin={self.y_origin}"
+        out += ")"
+        return out
 
 
 class Bicubic(Surface):
