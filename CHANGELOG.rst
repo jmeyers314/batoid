@@ -10,6 +10,7 @@ New Features
 ------------
 - Added intersect/reflect/refract methods directly to `Optic.Interface`
   objects.
+- Added x_origin and y_origin arguments to batoid.Zernike.
 
 Performance Improvements
 ------------------------

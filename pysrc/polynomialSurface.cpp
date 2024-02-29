@@ -12,6 +12,8 @@ namespace batoid {
                     size_t coefs,
                     size_t coefs_gradx,
                     size_t coefs_grady,
+                    const double xorigin,
+                    const double yorigin,
                     size_t xsize,
                     size_t ysize
                 ){
@@ -19,6 +21,7 @@ namespace batoid {
                         reinterpret_cast<const double*>(coefs),
                         reinterpret_cast<const double*>(coefs_gradx),
                         reinterpret_cast<const double*>(coefs_grady),
+                        xorigin, yorigin,
                         xsize, ysize
                     );
                 }

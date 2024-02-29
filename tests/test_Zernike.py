@@ -79,6 +79,15 @@ def test_sag():
             rtol=0,
             atol=1e-12
         )
+        # Check origin
+        bz2 = batoid.Zernike(coef, R_outer=R_outer, R_inner=R_inner, x_origin=0.1, y_origin=0.2)
+        do_pickle(bz2)
+        np.testing.assert_allclose(
+            bz2.sag(x, y),
+            bz.sag(x-0.1, y-0.2),
+            rtol=0,
+            atol=1e-12
+        )
 
 
 @timer
