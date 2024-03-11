@@ -542,6 +542,9 @@ class Interface(Optic):
         # intersect independent of `reverse`
         return self.surface.intersect(rv, coordSys=self.coordSys)
 
+    def intersect(self, rv, reverse=False):
+        return self.surface.intersect(rv, coordSys=self.coordSys)
+
     def __eq__(self, other):
         if not self.__class__ == other.__class__:
             return False
@@ -773,6 +776,9 @@ class RefractiveInterface(Interface):
             m1, m2 = self.inMedium, self.outMedium
         return self.surface.refract(rv, m1, m2, coordSys=self.coordSys)
 
+    def refract(self, rv, reverse=False):
+        return self.interact(rv, reverse=reverse)
+
     def rSplit(self, rv, reverse=False):
         # always return in order: refracted, reflected
         if reverse:
@@ -804,6 +810,9 @@ class Mirror(Interface):
     def interact(self, rv, reverse=False):
         # reflect is independent of reverse
         return self.surface.reflect(rv, coordSys=self.coordSys)
+
+    def reflect(self, rv, reverse=False):
+        return self.interact(rv, reverse=reverse)
 
     def rSplit(self, rv, reverse=False):
         # reflect is independent of reverse
@@ -908,6 +917,9 @@ class OPDScreen(Interface):
             self.screen,
             coordSys=self.coordSys
         )
+
+    def refract(self, rv, reverse=False):
+        return self.interact(rv, reverse=reverse)
 
     def rSplit(self, rv, reverse=False):
         # Can only go forward for now.

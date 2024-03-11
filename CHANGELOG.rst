@@ -8,7 +8,8 @@ API Changes
 
 New Features
 ------------
-
+- Added intersect/reflect/refract methods directly to `Optic.Interface`
+  objects.
 
 Performance Improvements
 ------------------------
