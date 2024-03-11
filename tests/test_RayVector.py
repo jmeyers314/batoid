@@ -943,7 +943,7 @@ def test_fromStop():
         nrad=4, naz=10
     )
     rv_traced = telescope.trace(rv.copy())
-    rv_stop = telescope.stopSurface.interact(rv.copy())
+    rv_stop = telescope.stopSurface.intersect(rv.copy())
 
     for rv1, rv_traced1, rv_stop1 in zip(rv, rv_traced, rv_stop):
         rv_test1 = batoid.RayVector.fromStop(
@@ -1021,7 +1021,7 @@ def test_fromFieldAngles():
         optic=telescope, wavelength=625e-9,
     )
     rv_traced = telescope.trace(rv.copy())
-    rv_stop = telescope.stopSurface.interact(rv.copy())
+    rv_stop = telescope.stopSurface.intersect(rv.copy())
 
     for rv1, rv_traced1, rv_stop1 in zip(rv, rv_traced, rv_stop):
         dc = rv_stop1.v[0]/np.sqrt(np.sum(np.square(rv_stop1.v)))
