@@ -17,3 +17,5 @@ Performance Improvements
 
 Bug Fixes
 ---------
+- Fixed error in ComCam definition files where the wrong filter
+  thickness was used for the i, z, and y filters.
