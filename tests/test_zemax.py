@@ -610,6 +610,74 @@ def test_CBP_trace():
             )
 
 
+@timer
+def test_ComCam_trace():
+    surfaces = {
+        5:'M1',
+        6:'M2',
+        8:'M3',
+        10:'L1_entrance',
+        11:'L1_exit',
+        12:'L2_entrance',
+        13:'L2_exit',
+        14:'Filter_entrance',
+        15:'Filter_exit',
+        16:'L3_entrance',
+        17:'L3_exit',
+        18:'Detector',
+    }
+    indices = {v:k for k, v in surfaces.items()}
+
+    for band in 'ugrizy':
+        optic = batoid.Optic.fromYaml(f"ComCam_{band}.yaml")
+
+        for i in range(1, 3):
+            fn = os.path.join(directory, "testdata", f"ComCam_SRT{i}_{band.upper()}.txt")
+            with open(fn, encoding='utf-16-le') as f:
+                wavelength = np.genfromtxt(f, skip_header=8, max_rows=1, usecols=(2,))
+            with open(fn, encoding='utf-16-le') as f:
+                Hx, Hy, Px, Py = np.genfromtxt(f, skip_header=13, max_rows=4, usecols=(6,))
+            with open(fn, encoding='utf-16-le') as f:
+                idxs, x, y, z, xcos, ycos, zcos, nx, ny, nz, cos, path = np.genfromtxt(
+                    f, skip_header=22, max_rows=18, usecols=list(range(0, 12)), unpack=True
+                )
+            # Switch to batoid conventions.  x, y, z -> -x, y, -z
+            Hx *= -1
+            Px *= -1
+            x *= -1
+            z *= -1
+            xcos *= -1
+            zcos *= -1
+            nx *= -1
+            nz *= -1
+            # Wavelength to meters
+            wavelength *= 1e-6
+            # distances to meters
+            x *= 1e-3
+            y *= 1e-3
+            z *= 1e-3
+
+            # Initial ray conditions
+            r = np.r_[x[0], y[0], z[0]]
+            dr = np.r_[x[1]-x[0], y[1]-y[0], z[1]-z[0]]
+            v = dr/np.linalg.norm(dr)
+            ray = batoid.RayVector(*r, *v, t=0, wavelength=wavelength)
+
+            tf = optic.traceFull(ray)
+            for k in tf:
+                idx = indices[k]-1
+                np.testing.assert_allclose(
+                    tf[k]['out'].toCoordSys(batoid.globalCoordSys).r[0],
+                    np.array([x[idx], y[idx], z[idx]]),
+                    rtol=0, atol=1e-9
+                )
+            sx, sy = batoid.spot(
+                optic, np.deg2rad(Hx), np.deg2rad(Hy), wavelength, nx=128
+            )
+            assert np.sqrt(np.nanvar(sx)+np.nanvar(sy)) < 10e-6  # Spot size smaller than 1 pixel
+
+
+
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
@@ -630,3 +698,4 @@ if __name__ == '__main__':
     test_DECam_trace(verbose=False)
     test_DECam_exit_pupil_pos()
     test_CBP_trace()
+    test_ComCam_trace()

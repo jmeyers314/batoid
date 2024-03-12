@@ -1,9 +1,8 @@
 opticalSystem:
   type: CompoundOptic
   name: RubinComCam
-  inMedium: &air
-    type: Air
-  medium: *air
+  inMedium: &vacuum 1.0
+  medium: *vacuum
   backDist: 15.0  # distance from global vertex to use to start tracing rays
   sphereRadius: 5.0  # reference sphere radius to use for wavefront calculation
   pupilSize: 8.36  # Pupil fits inside a square with this side length
@@ -41,7 +40,7 @@ opticalSystem:
         outer: 1.71
         inner: 0.9
       coordSys:
-        z: 6.1559766921647
+        z: 6.155977
     -
       type: Mirror
       name: M3
@@ -60,19 +59,19 @@ opticalSystem:
       type: CompoundOptic
       name: ComCam
       coordSys:
-        z: 4.10903560817
+        z: 4.109030025999346
       items:
         -
           type: Lens
           name: L1
           medium: &silica
             type: SellmeierMedium
-            B1: 0.696183020
-            B2: 0.407925877
-            B3: 0.897464057
-            C1: 0.00467926519
-            C2: 0.0135122244
-            C3: 97.9323636
+            B1: 0.696182877
+            B2: 0.407926020
+            B3: 0.897462254
+            C1: 0.00467926421
+            C2: 0.0135122230
+            C3: 97.9321695
           items:
             -
               type: RefractiveInterface
@@ -82,16 +81,17 @@ opticalSystem:
                 R: 0.744422
               obscuration:
                 type: ClearCircle
-                radius: 0.192
+                # radius: 0.20004
+                radius: 0.189
             -
               type: RefractiveInterface
               name: L1_exit
               surface:
                 type: Sphere
-                R: 4.18068
+                R: 4.180678
               obscuration:
                 type: ClearCircle
-                radius: 0.192
+                radius: 0.20004
               coordSys:
                 z: 0.032
         -
@@ -99,17 +99,18 @@ opticalSystem:
           name: L2
           medium: *silica
           coordSys:
-            z: 0.08896479090387038
+            z: 0.088965
           items:
             -
               type: RefractiveInterface
               name: L2_entrance
               surface:
                 type: Sphere
-                R: -5.99534
+                R: -5.995343
               obscuration:
                 type: ClearCircle
-                radius: 0.166
+                # radius: 0.175
+                radius: 0.161
             -
               type: RefractiveInterface
               name: L2_exit
@@ -118,7 +119,8 @@ opticalSystem:
                 R: 0.639028
               obscuration:
                 type: ClearCircle
-                radius: 0.155
+                # radius: 0.175
+                radius: 0.152
               coordSys:
                 z: 0.009
         -
@@ -126,7 +128,7 @@ opticalSystem:
           name: Filter
           medium: *silica
           coordSys:
-            z: 0.19626409289185995
+            z: 0.196264
           items:
             -
               type: RefractiveInterface
@@ -145,32 +147,32 @@ opticalSystem:
                 type: ClearCircle
                 radius: 0.1325
               coordSys:
-                z: 0.009
+                z: 0.007
         -
           type: Lens
           name: L3
           medium: *silica
           coordSys:
-            z: 0.27026409289185995
+            z: 0.270264
           items:
             -
               type: RefractiveInterface
               name: L3_entrance
               surface:
                 type: Sphere
-                R: 6.10983
+                R: 6.109828
               obscuration:
                 type: ClearCircle
-                radius: 0.108
+                radius: 0.108025
             -
               type: RefractiveInterface
               name: L3_exit
               surface:
                 type: Sphere
-                R: -1.52259
+                R: -1.522589
               obscuration:
                 type: ClearCircle
-                radius: 0.108
+                radius: 0.108025
               coordSys:
                 z: 0.0155
         -
@@ -182,4 +184,4 @@ opticalSystem:
             type: ClearCircle
             radius: 0.11
           coordSys:
-            z: 0.30770909289185965
+            z: 0.307709
