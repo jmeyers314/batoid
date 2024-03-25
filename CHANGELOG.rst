@@ -19,3 +19,5 @@ Bug Fixes
 ---------
 - Fixed error in ComCam definition files where the wrong filter
   thickness was used for the i, z, and y filters.
+- Photons experiencing total internal reflection are now marked
+  as failed.
