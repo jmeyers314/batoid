@@ -1,4 +1,6 @@
 #include "batoid.h"
+#include <limits>
+
 
 namespace batoid {
 
@@ -472,18 +474,26 @@ namespace batoid {
                     double n2 = mPtr->getN(wptr[i]);
                     double eta = n1/n2;
                     double sinsqr = eta*eta*(1-alpha*alpha);
-                    double nfactor = eta*alpha + sqrt(1-sinsqr);
                     // output
-                    vxptr[i] = eta*nvx - nfactor*nx;
-                    vyptr[i] = eta*nvy - nfactor*ny;
-                    vzptr[i] = eta*nvz - nfactor*nz;
-                    vxptr[i] /= n2;
-                    vyptr[i] /= n2;
-                    vzptr[i] /= n2;
                     xptr[i] = x;
                     yptr[i] = y;
                     zptr[i] = z;
                     tptr[i] = t;
+                    if (sinsqr > 1.0) {  // total internal reflection
+                        vxptr[i] = std::numeric_limits<double>::quiet_NaN();
+                        vyptr[i] = std::numeric_limits<double>::quiet_NaN();
+                        vzptr[i] = std::numeric_limits<double>::quiet_NaN();
+                        failptr[i] = true;
+                        vigptr[i] = true;
+                    } else {
+                        double nfactor = eta*alpha + sqrt(1-sinsqr);
+                        vxptr[i] = eta*nvx - nfactor*nx;
+                        vyptr[i] = eta*nvy - nfactor*ny;
+                        vzptr[i] = eta*nvz - nfactor*nz;
+                        vxptr[i] /= n2;
+                        vyptr[i] /= n2;
+                        vzptr[i] /= n2;
+                    }
                     if (coatingPtr) {
                         fluxptr[i] *= coatingPtr->getTransmit(wptr[i], alpha);
                     }
@@ -633,17 +643,25 @@ namespace batoid {
                     double n2 = mPtr->getN(wptr[i]);
                     double eta = n1/n2;
                     double sinsqr = eta*eta*(1-alpha*alpha);
-                    double nfactor = eta*alpha + sqrt(1-sinsqr);
                     xptr[i] = x;
                     yptr[i] = y;
                     zptr[i] = z;
-                    vxptr[i] = eta*nvx - nfactor*nx;
-                    vyptr[i] = eta*nvy - nfactor*ny;
-                    vzptr[i] = eta*nvz - nfactor*nz;
-                    vxptr[i] /= n2;
-                    vyptr[i] /= n2;
-                    vzptr[i] /= n2;
                     tptr[i] = t;
+                    if (sinsqr > 1.0) {  // total internal reflection
+                        vxptr[i] = std::numeric_limits<double>::quiet_NaN();
+                        vyptr[i] = std::numeric_limits<double>::quiet_NaN();
+                        vzptr[i] = std::numeric_limits<double>::quiet_NaN();
+                        failptr[i] = true;
+                        vigptr[i] = true;
+                    } else {
+                        double nfactor = eta*alpha + sqrt(1-sinsqr);
+                        vxptr[i] = eta*nvx - nfactor*nx;
+                        vyptr[i] = eta*nvy - nfactor*ny;
+                        vzptr[i] = eta*nvz - nfactor*nz;
+                        vxptr[i] /= n2;
+                        vyptr[i] /= n2;
+                        vzptr[i] /= n2;
+                    }
                     fluxptr[i] *= transmit;
                 } else {
                     vigptr[i] = true;
