@@ -201,6 +201,58 @@ def test_refract():
 
 
 @timer
+def test_tir():
+    """Test total internal reflection"""
+    # https://github.com/GalSim-developers/GalSim/issues/1280
+
+    x,y,z = 1.4136048029448713, -1.26631532296121, 0.5702413527436976
+    vx,vy,vz = -0.1632631352399052, 0.34430459097839733, 0.5688448339442601
+    t,wave,flux = 17.841282831343328, 5.356478398425508e-07, 0.3783200003476515
+    vig,fail = True, False
+
+    rv0 = batoid.RayVector(x, y, z, vx, vy, vz, t, wave, flux, vig, fail)
+    reflected = rv0.copy()
+    surface = batoid.Sphere(-13.36)
+    ct = batoid.CoordTransform(
+        batoid.CoordSys(
+            np.array([0.        , 0.        , 4.34206865]),
+            np.array([[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]])),
+        batoid.CoordSys(
+            np.array([0.        , 0.        , 4.40206865]),
+            np.array([[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]])
+        )
+    )
+    m1 = batoid.SellmeierMedium(
+        (0.69618302, 0.407925877, 0.897464057, 0.00467926519, 0.0135122244, 97.9323636)
+    )
+    m2 = batoid.ConstMedium(1.0)
+    rv = rv0.copy()
+    batoid._batoid.refract(
+        surface._surface,
+        ct.dr, ct.drot.ravel(),
+        m1._medium, m2._medium,
+        rv._rv, None,
+        1, 5
+    )
+    # TIR should mark the ray as failed
+    assert rv.failed[0]
+
+    # Test rSplit too.
+    # (Recall refracted comes out in the input rv, and reflect as additional output)
+    coating = batoid.SimpleCoating(0.9, 0.1)
+    batoid._batoid.rSplit(
+        surface._surface,
+        ct.dr, ct.drot.ravel(),
+        m1._medium, m2._medium,
+        coating._coating,
+        rv0._rv, reflected._rv,
+        1, 5
+    )
+    assert rv0.vignetted[0]
+    assert rv0.failed[0]
+
+
+@timer
 def test_ne():
     objs = [
         batoid.Sphere(1.0),
@@ -231,3 +283,4 @@ if __name__ == '__main__':
     test_refract()
     test_ne()
     test_fail()
+    test_tir()
