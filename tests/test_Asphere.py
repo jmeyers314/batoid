@@ -15,13 +15,24 @@ def test_properties():
             conic = rng.uniform(-2.0, 1.0)
             ncoef = rng.choice(5)
             coefs = [rng.normal(0, 1e-8) for i in range(ncoef)]
-            asphere = batoid.Asphere(R, conic, coefs)
+            imin = rng.choice([1, 2, 3])
+            asphere = batoid.Asphere(R, conic, coefs, imin=imin)
             lim = min(0.7*abs(R)/np.sqrt(1+conic) if conic > -1 else 5, 5)
             zmax = abs(asphere.sag(lim, lim))
         assert asphere.R == R
         assert asphere.conic == conic
         assert np.array_equal(asphere.coefs, coefs)
+        asphere.imin == imin
         do_pickle(asphere)
+
+    with np.testing.assert_raises(TypeError):
+        batoid.Asphere(1.0, 0.0, [0.0, 0.0], imin=0.5)
+
+    with np.testing.assert_raises(ValueError):
+        batoid.Asphere(1.0, 0.0, [0.0, 0.0], imin=0)
+
+    with np.testing.assert_raises(TypeError):
+        batoid.Asphere(1.0, 0.0, ["a", "b"])
 
 
 def asphere_sag(R, conic, coefs):
@@ -60,6 +71,7 @@ def test_sag():
             ncoef = rng.choice(5)
             coefs = [rng.normal(0, 1e-8) for i in range(ncoef)]
             asphere = batoid.Asphere(R, conic, coefs)
+            asphere2 = batoid.Asphere(R, conic, np.pad(coefs, (1, 0)), imin=1)
             lim = min(0.7*abs(R)/np.sqrt(1+conic) if conic > -1 else 5, 5)
             zmax = abs(asphere.sag(lim, lim))
         for j in range(100):
@@ -70,6 +82,12 @@ def test_sag():
             np.testing.assert_allclose(
                 result,
                 asphere_sag(R, conic, coefs)(x, y)
+            )
+            result2 = asphere2.sag(x, y)
+            np.testing.assert_allclose(
+                result2,
+                result,
+                rtol=0, atol=1e-15
             )
             # Check that it returned a scalar float and not an array
             assert isinstance(result, float)
@@ -302,6 +320,7 @@ def test_ne():
         batoid.Asphere(10.0, 1.0, [0]),
         batoid.Asphere(10.0, 1.0, [0,1]),
         batoid.Asphere(10.0, 1.0, [1,0]),
+        batoid.Asphere(10.0, 1.0, [1,0], imin=1),
         batoid.Asphere(10.0, 1.1, []),
         batoid.Asphere(10.1, 1.0, []),
         batoid.Quadric(10.0, 1.0)
