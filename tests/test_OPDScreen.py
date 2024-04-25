@@ -137,6 +137,16 @@ def test_zeroscreen():
                 atol=1e-13
             )
 
+        through_screen = batoid.trace.refractScreen(
+            screen.surface, rays, screen.screen
+        )
+        np.testing.assert_allclose(
+            tf1['PS']['out'].v,
+            through_screen.v,
+            rtol=0, atol=1e-14
+        )
+
+
 
 @timer
 def test_z4_focus():

@@ -49,6 +49,12 @@ def test_simple_transform():
     np.testing.assert_allclose(rv2.x, x)
     np.testing.assert_allclose(rv2.y, y)
     np.testing.assert_allclose(rv2.z, z)
+    # Round trip through batoid.trace array transforms
+    batoid.trace.applyForwardTransformArrays(transform, x, y, z)
+    batoid.trace.applyReverseTransformArrays(transform, x, y, z)
+    np.testing.assert_allclose(rv2.x, x)
+    np.testing.assert_allclose(rv2.y, y)
+    np.testing.assert_allclose(rv2.z, z)
 
     # Example 2
     # First for a single specific point I worked out
@@ -62,6 +68,12 @@ def test_simple_transform():
     np.testing.assert_allclose(rv2.r, [[-1, 1, 1]])
     # Transform of numpy array
     x, y, z = transform.applyForwardArray(rv.x, rv.y, rv.z)
+    np.testing.assert_allclose(rv2.x, x)
+    np.testing.assert_allclose(rv2.y, y)
+    np.testing.assert_allclose(rv2.z, z)
+    # Round trip through batoid.trace array transforms
+    batoid.trace.applyForwardTransformArrays(transform, x, y, z)
+    batoid.trace.applyReverseTransformArrays(transform, x, y, z)
     np.testing.assert_allclose(rv2.x, x)
     np.testing.assert_allclose(rv2.y, y)
     np.testing.assert_allclose(rv2.z, z)
@@ -79,6 +91,12 @@ def test_simple_transform():
     np.testing.assert_allclose(rv3.z, rv.x-1)
     # Transform of numpy array
     x, y, z = transform.applyForwardArray(rv.x, rv.y, rv.z)
+    np.testing.assert_allclose(rv2.x, x)
+    np.testing.assert_allclose(rv2.y, y)
+    np.testing.assert_allclose(rv2.z, z)
+    # Round trip through batoid.trace array transforms
+    batoid.trace.applyForwardTransformArrays(transform, x, y, z)
+    batoid.trace.applyReverseTransformArrays(transform, x, y, z)
     np.testing.assert_allclose(rv2.x, x)
     np.testing.assert_allclose(rv2.y, y)
     np.testing.assert_allclose(rv2.z, z)
