@@ -1,4 +1,6 @@
 #include "batoid.h"
+#include <limits>
+
 
 namespace batoid {
 
