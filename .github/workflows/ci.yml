@@ -32,7 +32,9 @@ jobs:
             CC: clang
             CXX: clang++
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
       - name: Print github context properties
         run: |
@@ -48,15 +50,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.py }}
-
-      - name: Cache pip
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/pip
-            $HOME/Library/Caches/Homebrew
-            /usr/local/Cellar
-          key: ${{ runner.os }}-${{ matrix.py }}-${{ matrix.CXX}}-pip-${{ hashFiles('requirements.txt') }}
 
       - name: Install libfftw, etc. on linux (needed for GalSim)
         if: matrix.os == 'ubuntu-latest'
@@ -106,20 +99,8 @@ jobs:
       - name: Run unit tests
         run: pytest --cov=batoid --cov-report=xml --cov-config tests/.coveragerc --skip_gha --durations=8 -ra
 
-      - name: Upload coverage to codecov
-        run: |
-          pwd -P
-          ls -la
-          env
-          coverage combine || true  # (Not necessary I think, but just in case.)
-          coverage report
-          ls -la
-          bash <(curl -s https://codecov.io/bash)
-
-      - name: Pre-cache cleanup
-        continue-on-error: true
-        run: |
-          # This was helpful in Travis.  Not sure how important it is in GHA.
-          rm -rfv $HOME/.cache/pip/log
-          rm -rfv $HOME/.cache/pip/http
-          if ${{ runner.os == 'macOS' }}; then brew cleanup || true; fi
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true
