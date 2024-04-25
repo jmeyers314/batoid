@@ -409,6 +409,27 @@ def test_transverse_aberrations():
     )
 
 
+@timer
+def test_rank_deficient():
+    telescope = batoid.Optic.fromYaml("LSST_r.yaml")
+    telescope = telescope.withLocallyShiftedOptic("LSSTCamera", [0, 0, 10.0])  # No rays reach the camera
+    with np.testing.assert_raises(RuntimeError):
+        batoid.zernike(
+            telescope, 0.0, 0.0, 625e-9,
+            jmax=28, reference='chief'
+        )
+    with np.testing.assert_raises(RuntimeError):
+        batoid.zernikeTA(
+            telescope, 0.0, 0.0, 625e-9,
+            jmax=28, reference='chief'
+        )
+    with np.testing.assert_raises(RuntimeError):
+        batoid.zernikeXYAberrations(
+            telescope, 0.0, 0.0, 625e-9,
+            jmax=28, reference='chief'
+        )
+
+
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
