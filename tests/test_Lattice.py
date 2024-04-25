@@ -21,6 +21,11 @@ def test_lattice_coords():
             np.arange(-(N//2), -(-N//2))*primitiveVector
         )
 
+    with np.testing.assert_raises(ValueError):
+        batoid.Lattice(np.ones((2,2)), np.ones(2))
+    with np.testing.assert_raises(ValueError):
+        batoid.Lattice(np.ones((2,2)), np.ones((2, 4)))
+
     # Check 2D
     for _ in np.arange(10):
         N1 = np.random.randint(1, 200)
