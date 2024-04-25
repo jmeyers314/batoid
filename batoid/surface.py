@@ -423,7 +423,7 @@ class Asphere(Surface):
 
     def __repr__(self):
         out = f"Asphere({self.R}, {self.conic}, {self.coefs!r}"
-        if self.imin == 1:
+        if self.imin == 2:
             out += ")"
         else:
             out += f", imin={self.imin})"
