@@ -372,8 +372,17 @@ class ObscUnion(Obscuration):
         if len(items) == 0:
             raise ValueError("Not enough items")
         elif len(items) == 1:
-            if isinstance(items, (list, tuple)):
+            if isinstance(items[0], Obscuration):
+                items = [items[0]]
+            elif isinstance(items[0], (list, tuple)):
                 items = items[0]
+            else:
+                raise TypeError("Single input argument must be an Obscuration or a list of them.")
+        else:
+            pass  # already a list of items
+        if not all(isinstance(item, Obscuration) for item in items):
+            raise TypeError("All items must be Obscurations")
+
         self.items = sorted(items, key=repr)
         self._obsc = _batoid.CPPObscUnion([item._obsc for item in items])
 
@@ -445,8 +454,17 @@ class ObscIntersection(Obscuration):
         if len(items) == 0:
             raise ValueError("Not enough items")
         elif len(items) == 1:
-            if isinstance(items, (list, tuple)):
+            if isinstance(items[0], Obscuration):
+                items = [items[0]]
+            elif isinstance(items[0], (list, tuple)):
                 items = items[0]
+            else:
+                raise TypeError("Single input argument must be an Obscuration or a list of them.")
+        else:
+            pass  # already a list of items
+        if not all(isinstance(item, Obscuration) for item in items):
+            raise TypeError("All items must be Obscurations")
+
         self.items = sorted(items, key=repr)
         self._obsc = _batoid.CPPObscIntersection([item._obsc for item in items])
 

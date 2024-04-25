@@ -163,6 +163,8 @@ def test_ObscRay():
             obsc.contains(x, y),
             rv.vignetted
         )
+    obsc = batoid.ObscRay(1.0, np.pi/2)
+    do_pickle(obsc)
 
 
 @timer
@@ -294,23 +296,41 @@ def test_ObscCompound():
         circ = batoid.ObscCircle(r, cx, cy)
 
         union = batoid.ObscUnion([rect, circ])
-        do_pickle(union)
         union2 = batoid.ObscUnion([circ, rect])
+        union3 = batoid.ObscUnion(rect, circ)
+        union4 = batoid.ObscUnion(circ, rect)
+        union5 = batoid.ObscUnion(union)  # Not equal in value, but in practice
+        do_pickle(union)
+        do_pickle(union5)
         assert union == union2  # commutative!
+        assert union == union3
+        assert union == union4
         assert hash(union) == hash(union2)
+        assert hash(union) == hash(union3)
+        assert hash(union) == hash(union4)
+
         intersection = batoid.ObscIntersection([rect, circ])
-        do_pickle(intersection)
         intersection2 = batoid.ObscIntersection([circ, rect])
+        intersection3 = batoid.ObscIntersection(circ, rect)
+        intersection4 = batoid.ObscIntersection(rect, circ)
+        intersection5 = batoid.ObscIntersection(intersection)
+        do_pickle(intersection)
         assert intersection == intersection2
+        assert intersection == intersection3
+        assert intersection == intersection4
         assert hash(intersection) == hash(intersection2)
+        assert hash(intersection) == hash(intersection3)
+        assert hash(intersection) == hash(intersection4)
 
         for i in range(100):
             x = rng.normal(0.0, 2.0)
             y = rng.normal(0.0, 2.0)
             assert (union.contains(x, y) == union2.contains(x, y)
-                    == (rect.contains(x, y) or circ.contains(x, y)))
+                    == (rect.contains(x, y) or circ.contains(x, y))
+                    == union5.contains(x, y))
             assert (intersection.contains(x, y) == intersection2.contains(x, y)
-                    == (rect.contains(x, y) and circ.contains(x, y)))
+                    == (rect.contains(x, y) and circ.contains(x, y))
+                    == intersection5.contains(x, y))
 
         x = rng.normal(0.0, 2.0, size=size)
         y = rng.normal(0.0, 2.0, size=size)
@@ -349,6 +369,14 @@ def test_ObscCompound():
         batoid.ObscUnion()
     with np.testing.assert_raises(ValueError):
         batoid.ObscIntersection()
+    with np.testing.assert_raises(TypeError):
+        batoid.ObscUnion(batoid.Plane())
+    with np.testing.assert_raises(TypeError):
+        batoid.ObscIntersection(batoid.Plane())
+    with np.testing.assert_raises(TypeError):
+        batoid.ObscUnion([batoid.Plane(), batoid.Plane()])
+    with np.testing.assert_raises(TypeError):
+        batoid.ObscIntersection([batoid.Plane(), batoid.Plane()])
 
 
 @timer
