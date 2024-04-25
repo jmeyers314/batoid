@@ -423,7 +423,8 @@ def test_ne():
         batoid.Bicubic(xs1, ys2, zs1, zs1, zs1, zs2),
         batoid.Bicubic(xs1, ys2, zs1, zs1, zs2, zs2),
         batoid.Bicubic(xs1, ys2, zs1, zs2, zs2, zs2),
-        batoid.Bicubic(xs1, ys2, zs1, zs2, zs2, zs2, nanpolicy='ZERO')
+        batoid.Bicubic(xs1, ys2, zs1, zs2, zs2, zs2, nanpolicy='ZERO'),
+        batoid.Plane(),
     ]
     all_obj_diff(objs)
 
