@@ -1,9 +1,8 @@
 import numpy as np
 
 
-def normalized(*args):
-    if len(args) == 1:
-        args = np.array(*args)
+def normalized(args):
+    args = np.atleast_1d(args)
     return args/np.linalg.norm(args)
 
 
