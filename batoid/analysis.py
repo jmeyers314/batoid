@@ -556,9 +556,12 @@ def zernike(
         jmax, orig_x[w], orig_y[w],
         R_outer=optic.pupilSize/2, R_inner=optic.pupilSize/2*eps
     )
-    coefs, _, _, _ = np.linalg.lstsq(basis.T, wfarr[w], rcond=None)
-    # coefs[0] is meaningless, so always set to 0.0 for comparison consistency
-    coefs[0] = 0.0
+    coefs, _, rank, _ = np.linalg.lstsq(basis.T, wfarr[w], rcond=None)
+    if rank < jmax:
+        raise RuntimeError(
+            f"Rank {rank} matrix found when fitting {jmax} Zernike coefficients.  "
+        )
+    coefs[0] = 0.0    # coefs[0] is meaningless, so always set to 0.0 for comparison consistency
     return np.array(coefs)
 
 
@@ -802,7 +805,12 @@ def zernikeTA(
     )
     a = np.hstack(dzb).T
     b = np.hstack([x[w], y[w]])
-    r, _, _, _ = np.linalg.lstsq(a, b, rcond=None)
+    r, _, rank, _ = np.linalg.lstsq(a, b, rcond=None)
+    if rank < jmax-1:  # zTA is insensitive to piston, so we subtract 1
+        raise RuntimeError(
+            f"Rank {rank} matrix found when fitting {jmax} Zernike coefficients.  "
+        )
+    r[0] = 0.0 # r[0] is meaningless, so always set to 0.0 for comparison consistency
     return -r/focal_length/wavelength
 
 
@@ -886,9 +894,15 @@ def zernikeXYAberrations(
         jmax, u, v,
         R_outer=optic.pupilSize/2, R_inner=optic.pupilSize/2*eps
     )
-    x_coefs, _, _, _ = np.linalg.lstsq(basis.T, x, rcond=None)
-    y_coefs, _, _, _ = np.linalg.lstsq(basis.T, y, rcond=None)
-
+    x_coefs, _, x_rank, _ = np.linalg.lstsq(basis.T, x, rcond=None)
+    y_coefs, _, y_rank, _ = np.linalg.lstsq(basis.T, y, rcond=None)
+    rank = min(x_rank, y_rank)
+    if rank < jmax:
+        raise RuntimeError(
+            f"Rank {rank} matrix found when fitting {jmax} Zernike coefficients.  "
+        )
+    x_coefs[0] = 0.0 # coefs[0] is meaningless, so always set to 0.0 for comparison consistency
+    y_coefs[0] = 0.0
     return x_coefs, y_coefs
 
 
