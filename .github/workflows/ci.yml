@@ -66,7 +66,7 @@ jobs:
           #       already installed, which is goofy.  So || true means these always give
           #       non-error values.  If there really is an error, we should notice later
           #       when trying to use whatever package failed to install.
-          #brew update || true
+          # brew update || true
           brew install fftw wget || true
           brew upgrade wget || true
           brew link --overwrite fftw gcc wget || true
