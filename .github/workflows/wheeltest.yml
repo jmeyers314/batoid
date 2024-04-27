@@ -5,7 +5,7 @@ on:
 
 jobs:
   build_many_wheels:
-    name: Build wheels on standard linux
+    name: Standard linux
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,11 +20,14 @@ jobs:
       - name: Build wheels
         run: python -m cibuildwheel --output-dir wheelhouse
         env:
+          CIBW_ARCHS: "x86_64"
           CIBW_BUILD: "*manylinux*"
           # CIBW_SKIP: cp36* cp37* pp*
           CIBW_SKIP: cp36* cp37* cp38* cp39* cp310* cp311* pp*
           CIBW_BUILD_VERBOSITY: 3
           CIBW_BEFORE_BUILD: pip install -U pybind11-global
+          CIBW_BEFORE_TEST: pip install -U pytest pytest-timeout pytest-cov pytest-xdist
+          CIBW_TEST_COMMAND: pytest --skip_gha {package}/tests
 
       - uses: actions/upload-artifact@v4
         with:
@@ -32,7 +35,7 @@ jobs:
           path: ./wheelhouse/*.whl
 
   build_musl_wheels:
-    name: Build wheels on musl linux
+    name: Musl linux
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -47,19 +50,59 @@ jobs:
       - name: Build wheels
         run: python -m cibuildwheel --output-dir wheelhouse
         env:
+          CIBW_ARCHS: "x86_64"
           CIBW_BUILD: "*musllinux*"
           # CIBW_SKIP: cp36* cp37* pp*
           CIBW_SKIP: cp36* cp37* cp38* cp39* cp310* cp311* pp*
           CIBW_BUILD_VERBOSITY: 3
           CIBW_BEFORE_BUILD: pip install -U pybind11-global
+          CIBW_BEFORE_TEST: pip install -U pytest pytest-timeout pytest-cov pytest-xdist
+          CIBW_TEST_COMMAND: pytest --skip_gha {package}/tests
 
       - uses: actions/upload-artifact@v4
         with:
           name: musllinux-artifacts
           path: ./wheelhouse/*.whl
 
-  build_macosx_wheels:
-    name: Build wheels on macosx
+  # X86 Mac OS
+  build_macosx_x86_wheels:
+    name: MacOS x86
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+
+      - name: Install cibuildwheel
+        run: python -m pip install cibuildwheel==2.16.5
+
+      - name: Build wheels
+        run: python -m cibuildwheel --output-dir wheelhouse
+        env:
+          CIBW_ARCHS: "x86_64"
+          CIBW_BUILD: "*macosx*"
+          CIBW_SKIP: cp36* cp37* cp38* cp39* cp310* cp311* pp*
+          CIBW_BUILD_VERBOSITY: 3
+          CIBW_BEFORE_BUILD: >-
+            pip install -U pybind11-global &&
+            brew install llvm libomp fftw eigen
+          CIBW_ENVIRONMENT: >-
+            CC=/usr/local/opt/llvm/bin/clang
+            CXX=/usr/local/opt/llvm/bin/clang++
+            LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib"
+            CPPFLAGS="-I/usr/local/opt/llvm/include"
+          CIBW_BEFORE_TEST: pip install -U pytest pytest-timeout pytest-cov pytest-xdist
+          CIBW_TEST_COMMAND: pytest --skip_gha {package}/tests
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macosx-x86-artifacts
+          path: ./wheelhouse/*.whl
+
+  build_macosx_arm_wheels:
+    name: MacOS ARM
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -74,22 +117,31 @@ jobs:
       - name: Build wheels
         run: python -m cibuildwheel --output-dir wheelhouse
         env:
+          CIBW_ARCHS: "arm64"
           CIBW_BUILD: "*macosx*"
-          # CIBW_SKIP: cp36* cp37* pp*
           CIBW_SKIP: cp36* cp37* cp38* cp39* cp310* cp311* pp*
           CIBW_BUILD_VERBOSITY: 3
-          CIBW_BEFORE_BUILD: pip install -U pybind11-global && brew install libomp
-          # CIBW_BEFORE_TEST: pip install -U -r test_requirements.txt
-          # CIBW_TEST_COMMAND: pytest --skip_gha {package}/tests
+          CIBW_BEFORE_BUILD: >-
+            pip install -U pybind11-global &&
+            brew install llvm libomp fftw eigen
+          CIBW_ENVIRONMENT: >-
+            CC=/opt/homebrew/opt/llvm/bin/clang
+            CXX=/opt/homebrew/opt/llvm/bin/clang++
+            LDFLAGS="-L/opt/homebrew/opt/llvm/lib -Wl,-rpath,/opt/homebrew/opt/llvm/lib"
+            CPPFLAGS="-I/opt/homebrew/opt/llvm/include"
+            PATH="/opt/homebrew/opt/llvm/bin:$PATH"
+            FFTW_DIR="/opt/homebrew"
+          CIBW_BEFORE_TEST: pip install -U pytest pytest-timeout pytest-cov pytest-xdist
+          CIBW_TEST_COMMAND: pytest --skip_gha {package}/tests
 
       - uses: actions/upload-artifact@v4
         with:
-          name: macosx-artifacts
+          name: macosx-arm-artifacts
           path: ./wheelhouse/*.whl
 
   merge_wheels:
     name: Merge wheels
-    needs: [build_many_wheels, build_musl_wheels, build_macosx_wheels]
+    needs: [build_many_wheels, build_musl_wheels, build_macosx_x86_wheels, build_macosx_arm_wheels]
     runs-on: ubuntu-latest
     steps:
       - name: Merge wheels
