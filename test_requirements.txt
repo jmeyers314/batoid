@@ -3,5 +3,6 @@ pytest-timeout
 pytest-cov
 pytest-xdist
 pytest-astropy
-jupyter
+nbformat
+nbclient
 ipyvolume
