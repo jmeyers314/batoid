@@ -155,7 +155,6 @@ jobs:
   build_sdist:
     name: Build sdist and upload to PyPI
     needs: [merge_wheels]
-    # Just need to build sdist on a single machine
     runs-on: ubuntu-latest
 
     steps:
@@ -170,10 +169,14 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install -U pip
-          pip install build
+          pip install build setuptools_scm
           pip install -U numpy setuptools
           pip install -U -r requirements.txt
           pip install -U pybind11-global
+
+      - name: Extract version
+        run: |
+          echo "PACKAGE_VERSION=$(python -c 'from setuptools_scm import get_version; print(get_version())')" >> $GITHUB_ENV
 
       - name: Download wheels
         uses: actions/download-artifact@v4
@@ -196,15 +199,17 @@ jobs:
           echo ls -l dist
           ls -l dist
 
-      - name: Publish package to TestPyPI
+      - name: Publish to TestPyPI if alpha
+        if: "contains(env.PACKAGE_VERSION, 'a')"
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           verbose: true
           password: ${{ secrets.TESTPYPI_PASSWORD }}
           repository-url: https://test.pypi.org/legacy/
 
-      # - name: Publish to PyPI
-      #   uses: pypa/gh-action-pypi-publish@release/v1
-      #   with:
-      #       password: ${{ secrets.PYPI_PASSWORD }}
-      #       verbose: true
+      - name: Publish to PyPI if stable release
+        if: "!contains(env.PACKAGE_VERSION, 'a') && !contains(env.PACKAGE_VERSION, '.dev')"
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_PASSWORD }}
+          verbose: true
