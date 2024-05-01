@@ -12,6 +12,7 @@ New Features
   objects.
 - Added x_origin and y_origin arguments to batoid.Zernike.
 
+
 Performance Improvements
 ------------------------
 
@@ -22,3 +23,4 @@ Bug Fixes
   thickness was used for the i, z, and y filters.
 - Photons experiencing total internal reflection are now marked
   as failed.
+- Catch rank deficient matrix in batoid.zernike.
