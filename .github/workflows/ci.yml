@@ -89,6 +89,10 @@ jobs:
           # Use pybind11-global to make CMake files visible
           pip install -U pybind11-global
 
+      - name: Try numpy 2 # Delete me after this is default
+        if: matrix.py == 3.12
+        run: pip install numpy==2.0.0rc2
+
       - name: Install remaining dependencies
         run: |
           pip install -U -r test_requirements.txt
