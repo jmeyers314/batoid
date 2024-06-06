@@ -119,7 +119,7 @@ class CoordSys:
         vv : ndarray of float, shape (n, 3)
             Vector in local coordinates.
         """
-        v = np.array(v, dtype=float)
+        v = np.array(v, dtype=float, copy=True)
         v -= self.origin
         return (self.rot.T@v.T).T
 
