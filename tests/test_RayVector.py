@@ -25,6 +25,17 @@ def test_properties():
         )
 
         rv = batoid.RayVector(x, y, z, vx, vy, vz, t, w, fx, vig, fa, cs)
+        assert x is not rv.x
+        assert y is not rv.y
+        assert z is not rv.z
+        assert vx is not rv.vx
+        assert vy is not rv.vy
+        assert vz is not rv.vz
+        assert t is not rv.t
+        assert w is not rv.wavelength
+        assert fx is not rv.flux
+        assert vig is not rv.vignetted
+        assert fa is not rv.failed
 
         np.testing.assert_array_equal(rv.x, x)
         np.testing.assert_array_equal(rv.y, y)
