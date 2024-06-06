@@ -16,7 +16,7 @@ def _reshape_arrays(arrays, shape, dtype=float):
         array = arrays[i]
         if not hasattr(array, 'shape') or array.shape != shape:
             arrays[i] = np.array(np.broadcast_to(array, shape))
-        arrays[i] = np.ascontiguousarray(arrays[i], dtype=dtype)
+        arrays[i] = np.array(arrays[i], dtype=dtype, copy=True, order='C')
     return arrays
 
 
@@ -50,6 +50,8 @@ class RayVector:
         shape = np.broadcast(
             x, y, z, vx, vy, vz, t, wavelength, flux, vignetted, failed
         ).shape
+        if shape == ():
+            shape = (1,)
         x, y, z, vx, vy, vz, t, wavelength, flux = _reshape_arrays(
             [x, y, z, vx, vy, vz, t, wavelength, flux],
             shape
@@ -819,7 +821,7 @@ class RayVector:
         if isinstance(flux, Real):
             flux = np.full(len(x), float(flux))
         if source is None:
-            vv = np.array(dirCos, dtype=float)
+            vv = np.array(dirCos, dtype=float, copy=True)
             vv /= n*np.sqrt(np.dot(vv, vv))
             zhat = -n*vv
             xhat = np.cross(np.array([1.0, 0.0, 0.0]), zhat)
