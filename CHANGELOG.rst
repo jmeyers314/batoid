@@ -24,3 +24,6 @@ Bug Fixes
 - Photons experiencing total internal reflection are now marked
   as failed.
 - Catch rank deficient matrix in batoid.zernike.
+- Force RayVector constructor to copy input arrays.
+- Fixed bug in ComCam yaml files where the wrong filter thickness
+  was used for the i, z, and y filters.

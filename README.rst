@@ -26,10 +26,10 @@ Installation
 PyPI
 ----
 
-Released versions of batoid are available on pypi as source distributions.
-This means you will need at least c++14 compiler available and that setup.py
-can find it.  This should hopefully be the case on most *nix systems, in which
-case, the following ought to work::
+Released versions of batoid are available on pypi as both wheels and source
+distributions.  To compile from source, you will need a c++14 compiler available and
+placed such that that setup.py can find it.  This should hopefully be the case on most
+*nix systems, in which case, the following ought to work::
 
     pip install batoid
 
@@ -47,11 +47,7 @@ or ::
 
 Once the repo has been cloned, then compile and install with ::
 
-    python setup.py install
-
-or optionally ::
-
-    python setup.py install --user
+    pip install .
 
 Tests
 =====
