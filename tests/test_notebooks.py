@@ -2,6 +2,8 @@ import pytest
 import os
 from test_helpers import timer
 from pathlib import Path
+import nbformat
+import nbclient
 
 
 notebook_dir = Path(__file__).resolve().parent.parent / 'notebook'
@@ -12,13 +14,11 @@ def _notebook_run(path):
     """Execute a notebook via nbclient and collect output.
        :returns (parsed nb object, execution errors)
     """
-    import nbformat
-    import nbclient
     # Load the notebook
     nb = nbformat.read(path, as_version=4)
 
     # Setup the client, specifying the timeout and the kernel
-    client =  nbclient.NotebookClient(nb, timeout=300, kernel_name='python3')
+    client =  nbclient.NotebookClient(nb, timeout=30, kernel_name='python3')
 
     # Execute the notebook
     client.execute(cwd=path.parent)
@@ -32,8 +32,8 @@ def _notebook_run(path):
 
 notebooks = [
     "Analytic despace aberration.ipynb",
-    "Apochromat.ipynb",
     "Aspheric Newtonian Telescope.ipynb",
+    "Apochromat.ipynb",
     "AuxTel trace.ipynb",
     "ComCam trace.ipynb",
     "DECam draw2d.ipynb",
@@ -81,7 +81,7 @@ else:
     ]
 
 
-@pytest.mark.timeout(300)
+@pytest.mark.timeout(30)
 @pytest.mark.parametrize("notebook_name", notebooks)
 @timer
 def test_notebook(notebook_name):
