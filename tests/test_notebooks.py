@@ -2,8 +2,6 @@ import pytest
 import os
 from test_helpers import timer
 from pathlib import Path
-import nbformat
-import nbclient
 
 
 notebook_dir = Path(__file__).resolve().parent.parent / 'notebook'
@@ -14,6 +12,8 @@ def _notebook_run(path):
     """Execute a notebook via nbclient and collect output.
        :returns (parsed nb object, execution errors)
     """
+    import nbformat
+    import nbclient
     # Load the notebook
     nb = nbformat.read(path, as_version=4)
 
