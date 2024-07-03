@@ -278,6 +278,102 @@ def test_paraboloid():
             quad.normal(x,y), para.normal(x, y),
             rtol=0, atol=1e-11
         )
+        assert quad.f == para.f
+
+
+@timer
+def test_prolate_ellipsoid_reflect():
+    rng = np.random.default_rng(577215664)
+    size = 1000
+    for i in range(1000):
+        R = rng.uniform(0.1, 10.1)
+        conic = rng.uniform(-0.9, 0.0)
+        quad = batoid.Quadric(R, conic)
+        # Reflect rays from one focus to the other
+        f1 = quad.a - quad.f
+        f2 = quad.a + quad.f
+
+        x = 0
+        y = 0
+        z = f1
+        # Isotropic downward velocities
+        vphi = rng.uniform(0, 2*np.pi, size=size)
+        vz = rng.uniform(-1.0, 0.0, size=size)
+        vr = np.sqrt(1 - vz**2)
+        vx = vr*np.cos(vphi)
+        vy = vr*np.sin(vphi)
+        rays = batoid.RayVector(
+            x, y, z, vx, vy, vz, t=0.0
+        )
+        # Reflect off the ellipsoid
+        quad.reflect(rays)
+        rays.propagate(2*quad.a)
+        np.testing.assert_allclose(rays.z, f2, rtol=0, atol=1e-12)
+        np.testing.assert_allclose(rays.x, 0, rtol=0, atol=1e-12)
+        np.testing.assert_allclose(rays.y, 0, rtol=0, atol=1e-12)
+
+
+@timer
+def test_oblate_ellipsoid_reflect():
+    rng = np.random.default_rng(577215664)
+    size = 1000
+    for i in range(1000):
+        R = rng.uniform(0.1, 10.1)
+        conic = rng.uniform(0.0, 0.9)
+        quad = batoid.Quadric(R, conic)
+        # Launch rays from one side of focal ring to the other
+        frad = quad.f
+
+        phi = rng.uniform(0, 2*np.pi, size=size)
+        x = frad*np.cos(phi)
+        y = frad*np.sin(phi)
+        z = quad.b
+
+        # Have to aim rays within axial plane
+        vz = rng.uniform(-1.0, 0.0, size=size)
+        vr = np.sqrt(1 - vz**2)
+        vx = vr*np.cos(phi)
+        vy = vr*np.sin(phi)
+        rays = batoid.RayVector(
+            x, y, z, vx, vy, vz, t=0.0
+        )
+        # Reflect off the ellipsoid
+        quad.reflect(rays)
+        rays.propagate(2*quad.a)
+        np.testing.assert_allclose(rays.z, quad.b, rtol=0, atol=1e-8)
+        np.testing.assert_allclose(rays.x, -x, rtol=0, atol=1e-12)
+        np.testing.assert_allclose(rays.y, -y, rtol=0, atol=1e-12)
+
+
+@timer
+def test_hyperboloid_reflect():
+    rng = np.random.default_rng(5772156649)
+    size = 1000
+    for i in range(1000):
+        R = -rng.uniform(0.1, 10.1)  # concave down
+        conic = rng.uniform(-30.0, -1.0)
+        quad = batoid.Quadric(R, conic)
+        # Start at one focus, then back up and reflect towards other focus
+        f1 = -quad.f
+
+        x = 0
+        y = 0
+        z = f1
+        # Isotropic downward velocities
+        vphi = rng.uniform(0, 2*np.pi, size=size)
+        vz = rng.uniform(-1.0, 0.0, size=size)
+        vr = np.sqrt(1 - vz**2)
+        vx = vr*np.cos(vphi)
+        vy = vr*np.sin(vphi)
+        rays = batoid.RayVector(
+            x, y, z, vx, vy, vz, t=0.0
+        )
+        # Reflect off the hyperboloid
+        quad.reflect(rays)
+        rays.propagate(2*quad.a)
+        np.testing.assert_allclose(rays.z, 2*quad.a+quad.f, rtol=0, atol=1e-7)
+        np.testing.assert_allclose(rays.x, 0, rtol=0, atol=1e-3)
+        np.testing.assert_allclose(rays.y, 0, rtol=0, atol=1e-3)
 
 
 if __name__ == '__main__':
@@ -292,3 +388,6 @@ if __name__ == '__main__':
     test_fail()
     test_sphere()
     test_paraboloid()
+    test_prolate_ellipsoid_reflect()
+    test_oblate_ellipsoid_reflect()
+    test_hyperboloid_reflect()

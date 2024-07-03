@@ -198,7 +198,7 @@ def test_reflect_to_focus():
         focus = rv.positionAtTime(t)
         np.testing.assert_allclose(focus[:,0], 0, atol=1e-12)
         np.testing.assert_allclose(focus[:,1], 0, atol=1e-12)
-        np.testing.assert_allclose(focus[:,2], R/2, atol=1e-12)
+        np.testing.assert_allclose(focus[:,2], np.sign(R)*para.f, atol=1e-12)
 
 
 @timer

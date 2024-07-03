@@ -254,6 +254,10 @@ class Paraboloid(Surface):
     def __repr__(self):
         return f"Paraboloid({self.R})"
 
+    @property
+    def f(self):
+        return abs(self.R/2)
+
 
 class Sphere(Surface):
     """Spherical surface.  The surface sag follows the equation:
@@ -337,6 +341,46 @@ class Quadric(Surface):
 
     def __repr__(self):
         return f"Quadric({self.R}, {self.conic})"
+
+    @property
+    def a(self):
+        """Semi-major axis of the quadric."""
+        R = abs(self.R)
+        if self.conic > 0: # oblate ellipsoid
+            return R/np.sqrt(1+self.conic)
+        elif self.conic == 0.0:
+            return R
+        elif -1 < self.conic < 0.0: # prolate ellipsoid
+            return R/(1+self.conic)
+        elif self.conic == -1.0: # paraboloid
+            return np.inf
+        elif self.conic < -1: # hyperboloid
+            return -R/(1+self.conic)
+
+    @property
+    def b(self):
+        """Semi-minor axis of the quadric."""
+        R = abs(self.R)
+        if self.conic > 0: # oblate ellipsoid
+            return R/(1+self.conic)
+        elif self.conic == 0.0:
+            return R
+        elif -1 < self.conic < 0.0: # prolate ellipsoid
+            return R/np.sqrt(1+self.conic)
+        elif self.conic == -1.0: # paraboloid
+            return np.inf
+        elif self.conic < -1: # hyperboloid
+            return R/np.sqrt(-(1+self.conic))
+
+    @property
+    def f(self):
+        """Focal length of the quadric."""
+        if self.conic > -1:
+            return np.sqrt(self.a**2 - self.b**2)
+        elif self.conic == -1.0:
+            return abs(self.R/2)
+        elif self.conic < -1:
+            return np.sqrt(self.a**2 + self.b**2) - self.a
 
 
 class Asphere(Surface):
