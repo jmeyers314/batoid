@@ -143,7 +143,7 @@ class Interface(Optic):
         return hash((self.__class__.__name__, self.surface, self.obscuration,
                      self.name, self.inMedium, self.outMedium, self.coordSys))
 
-    def draw3d(self, ax, plotly=False, **kwargs):
+    def draw3d(self, ax, plotly=False, globalSys=globalCoordSys, **kwargs):
         """Draw this interface on a mplot3d axis.
 
         Parameters
@@ -155,7 +155,7 @@ class Interface(Optic):
         """
         if self.outRadius is None:
             return
-        transform = CoordTransform(self.coordSys, globalCoordSys)
+        transform = CoordTransform(self.coordSys, globalSys)
         # Going to draw 4 objects here: inner circle, outer circle, sag along
         # x=0, sag along y=0 inner circle
         if self.inRadius != 0.0:
@@ -1895,7 +1895,9 @@ def drawTrace3d(ax, traceFull, start=None, end=None, plotly=False, **kwargs):
     globalSys : `batoid.CoordSys`
         Global coordinate system to use.
     """
-    xyz, raylen = getGlobalRays(traceFull, start, end)
+    xyz, raylen = getGlobalRays(
+        traceFull, start, end, globalSys=kwargs.get('globalSys', globalCoordSys)
+    )
     for line, nline in zip(xyz, raylen):
         if plotly:
             ax.add_scatter3d(
