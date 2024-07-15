@@ -1434,8 +1434,8 @@ class CompoundOptic(Optic):
         if name == self.name:
             return self.withGlobalShift(shift)
         # Clip off leading token
-        assert name[:len(self.name)+1] == \
-            self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
+        leading = name[:len(self.name)+1]
+        assert leading == self.name+".", f"{leading} != {self.name}."
         name = name[len(self.name)+1:]
         newItems = []
         newDict = dict(self.__dict__)
@@ -1601,8 +1601,8 @@ class CompoundOptic(Optic):
         if name == self.name:
             return self.withLocalRotation(rot, rotCenter, coordSys)
         # Clip off leading token
-        assert name[:len(self.name)+1] == \
-            self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
+        leading = name[:len(self.name)+1]
+        assert leading == self.name+".", f"{leading} != {self.name}."
         name = name[len(self.name)+1:]
         newItems = []
         newDict = dict(self.__dict__)
@@ -1648,9 +1648,9 @@ class CompoundOptic(Optic):
             name = self._names[name]
         if name not in self.itemDict:
             raise ValueError("Optic {} not found".format(name))
-        # name is fully qualified, so clip off leading token
-        assert name[:len(self.name)+1] == \
-            self.name+".", name[:len(self.name)+1]+" != "+self.name+"."
+        # Clip off leading token
+        leading = name[:len(self.name)+1]
+        assert leading == self.name+".", f"{leading} != {self.name}."
         name = name[len(self.name)+1:]
         newItems = []
         newDict = dict(self.__dict__)
