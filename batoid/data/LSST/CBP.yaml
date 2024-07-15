@@ -1,6 +1,6 @@
 opticalSystem:
   type: CompoundOptic
-  name: CPB
+  name: CBP
   inMedium: &vacuum 1.0
   medium: *vacuum
   items:
