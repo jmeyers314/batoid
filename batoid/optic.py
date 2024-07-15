@@ -1627,6 +1627,71 @@ class CompoundOptic(Optic):
             "Error in withLocallyRotatedOptic!, Shouldn't get here!"
         )
 
+    def withGloballyRotatedOptic(self, name, rot, rotCenter=None,
+                                 coordSys=None):
+        """Return a new `CompoundOptic` with the coordinate system of one of
+        its subitems rotated.
+
+        Parameters
+        ----------
+        name : str
+            The subitem to rotate.
+        rot : array (3,3)
+            Rotation matrix wrt to the subitem's local coordinate system to
+            apply.
+        rotCenter : array (3,)
+            Point about which to rotate.  Default: None means use [0,0,0]
+        coordSys : `batoid.CoordSys`
+            Coordinate system of rotCenter above.  Default: None means use the
+            global coordinate system.  The string 'local' can be used to
+            specify that the rotation center should be evaluated in the
+            coordinate system of the subitem being rotated.
+
+        Returns
+        -------
+        `CompoundOptic`
+            Optic with rotated subitem.
+        """
+        # If name is one of items.names, the we use withLocalRotation, and
+        # we're done.  If not, then we need to recurse down to whichever item
+        # contains name.  Verify that name is in self.itemDict, but first
+        # convert partially qualified name to fully qualified.
+        name = self._names.get(name, name)
+        if name not in self.itemDict:
+            raise ValueError("Optic {} not found".format(name))
+        if rotCenter is None:
+            rotCenter = [0,0,0]
+        if coordSys is None:
+            coordSys = globalCoordSys
+        if name == self.name:
+            return self.withGlobalRotation(rot, rotCenter, coordSys)
+        # Clip off leading token
+        leading = name[:len(self.name)+1]
+        assert leading == self.name+".", f"{leading} != {self.name}."
+        name = name[len(self.name)+1:]
+        newItems = []
+        newDict = dict(self.__dict__)
+        del newDict['items']
+        for i, item in enumerate(self.items):
+            if name.startswith(item.name):
+                if name == item.name:
+                    newItems.append(item.withGlobalRotation(
+                        rot, rotCenter, coordSys
+                    ))
+                else:
+                    newItems.append(item.withGloballyRotatedOptic(
+                        name, rot, rotCenter, coordSys
+                    ))
+                newItems.extend(self.items[i+1:])
+                return self.__class__(
+                    newItems,
+                    **newDict
+                )
+            newItems.append(item)
+        raise RuntimeError(
+            "Error in withGloballyRotatedOptic!, Shouldn't get here!"
+        )
+
     def withSurface(self, name, surface):
         """Return a new `CompoundOptic` with one of its subitem's surfaces
         attribute replaced.
