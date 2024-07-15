@@ -624,7 +624,9 @@ class Interface(Optic):
             Point about which to rotate.  Default: None means use [0,0,0]
         coordSys : `batoid.CoordSys`
             Coordinate system of rotCenter above.  Default: None means use
-            the global coordinate system.
+            the global coordinate system.  The string 'local' can be used to
+            specify that the rotation center should be evaluated in the local
+            coordinate system.
 
         Returns
         -------
@@ -635,6 +637,8 @@ class Interface(Optic):
             rotCenter = [0,0,0]
         if coordSys is None:
             coordSys = globalCoordSys
+        elif coordSys == 'local':
+            coordSys = self.coordSys
         ret = self.__class__.__new__(self.__class__)
         newDict = dict(self.__dict__)
         newDict['coordSys'] = self.coordSys.rotateGlobal(
@@ -1487,7 +1491,9 @@ class CompoundOptic(Optic):
             Point about which to rotate.  Default: None means use [0,0,0]
         coordSys : `batoid.CoordSys`
             Coordinate system of rotCenter above.  Default: None means use
-            the global coordinate system.
+            the global coordinate system.  The string 'local' can be used to
+            specify that the rotation center should be evaluated in the local
+            coordinate system.
 
         Returns
         -------
@@ -1498,6 +1504,8 @@ class CompoundOptic(Optic):
             rotCenter = [0,0,0]
         if coordSys is None:
             coordSys = globalCoordSys
+        elif coordSys == 'local':
+            coordSys = self.coordSys
 
         newItems = []
         for item in self.items:
