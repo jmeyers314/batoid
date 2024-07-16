@@ -19,16 +19,16 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest ]
-        py: [3.8, 3.9, '3.10', 3.11, 3.12]
+        py: [3.9, '3.10', 3.11, 3.12]
         CC: [ gcc ]
         CXX: [ g++ ]
         include:
           - os: macos-latest
-            py: 3.8
+            py: 3.9
             CC: cc
             CXX: c++
           - os: ubuntu-latest
-            py: 3.8
+            py: 3.9
             CC: clang
             CXX: clang++
     steps:
