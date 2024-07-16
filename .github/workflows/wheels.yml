@@ -57,8 +57,8 @@ jobs:
           CIBW_SKIP: cp36* cp37* pp*
           CIBW_BUILD_VERBOSITY: 3
           CIBW_BEFORE_BUILD: >-
-            pip install -U pybind11-global &&
-            apk add --no-cache openblas-dev
+            apk add --no-cache jpeg-dev zlib-dev openblas-dev &&
+            pip install -U pybind11-global
           CIBW_BEFORE_TEST: pip install -U pytest pytest-timeout pytest-cov pytest-xdist
           CIBW_TEST_COMMAND: pytest --skip_gha {package}/tests
 
