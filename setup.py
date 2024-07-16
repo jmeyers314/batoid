@@ -64,7 +64,7 @@ setup(
     package_data={'batoid' : ['data/**/*']},
     ext_modules=[CMakeExtension('batoid._batoid')],
     install_requires=['pybind11', 'numpy', 'pyyaml', 'scipy', 'galsim', 'matplotlib', 'astropy'],
-    python_requires='>=3.8',
+    python_requires='>=3.9',
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
     include_package_data=True,
