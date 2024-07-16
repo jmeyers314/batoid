@@ -25,7 +25,7 @@ jobs:
         env:
           CIBW_ARCHS: "x86_64"
           CIBW_BUILD: "*manylinux*"
-          CIBW_SKIP: cp36* cp37* pp*
+          CIBW_SKIP: cp36* cp37* cp38* pp*
           CIBW_BUILD_VERBOSITY: 3
           CIBW_BEFORE_BUILD: pip install -U pybind11-global
           CIBW_BEFORE_TEST: pip install -U pytest pytest-timeout pytest-cov pytest-xdist
@@ -54,7 +54,7 @@ jobs:
         env:
           CIBW_ARCHS: "x86_64"
           CIBW_BUILD: "*musllinux*"
-          CIBW_SKIP: cp36* cp37* pp*
+          CIBW_SKIP: cp36* cp37* cp38* pp*
           CIBW_BUILD_VERBOSITY: 3
           CIBW_BEFORE_BUILD: >-
             apk add --no-cache jpeg-dev zlib-dev openblas-dev &&
@@ -85,7 +85,7 @@ jobs:
         env:
           CIBW_ARCHS: "x86_64"
           CIBW_BUILD: "*macosx*"
-          CIBW_SKIP: cp36* cp37* pp*
+          CIBW_SKIP: cp36* cp37* cp38* pp*
           CIBW_BUILD_VERBOSITY: 3
           CIBW_BEFORE_BUILD: >-
             pip install -U pybind11-global &&
@@ -121,7 +121,7 @@ jobs:
         env:
           CIBW_ARCHS: "arm64"
           CIBW_BUILD: "*macosx*"
-          CIBW_SKIP: cp36* cp37* pp*
+          CIBW_SKIP: cp36* cp37* cp38* pp*
           CIBW_BUILD_VERBOSITY: 3
           CIBW_BEFORE_BUILD: >-
             pip install -U pybind11-global &&
