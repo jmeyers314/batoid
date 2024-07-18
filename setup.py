@@ -24,6 +24,9 @@ class CMakeBuild(build_ext):
             self.build_extension(ext)
 
     def build_extension(self, ext):
+        env = os.environ.copy()
+        env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''),
+                                                              self.distribution.get_version())
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
                       '-DPYTHON_EXECUTABLE=' + sys.executable]
@@ -32,14 +35,12 @@ class CMakeBuild(build_ext):
         build_args = ['--config', cfg]
 
         cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
-        build_args += ['--', '-j8']
+        if "TF_BUILD" not in env:
+            build_args += ['--', '-j8']
 
-        env = os.environ.copy()
-        env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''),
-                                                              self.distribution.get_version())
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
-        if 'CMAKE_VERBOSE_MAKEFILE' in env:
+        if 'CMAKE_VERBOSE_MAKEFILE' in env or 'TF_BUILD' in env:
             cmake_args += ['-DCMAKE_VERBOSE_MAKEFILE=1']
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
         subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
