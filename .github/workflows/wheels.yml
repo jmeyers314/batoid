@@ -200,7 +200,7 @@ jobs:
           ls -l dist
 
       - name: Publish to TestPyPI if alpha
-        if: "contains(env.PACKAGE_VERSION, 'a')"
+        if: "contains(env.PACKAGE_VERSION, 'a') && !contains(env.PACKAGE_VERSION, '.dev')"
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           verbose: true
