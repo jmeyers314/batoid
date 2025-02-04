@@ -89,10 +89,6 @@ jobs:
           # Use pybind11-global to make CMake files visible
           pip install -U pybind11-global
 
-      - name: Verify numpy 1?
-        if: matrix.py == 3.12
-        run: pip install numpy==1.23
-
       - name: Install remaining dependencies
         run: |
           pip install -U -r test_requirements.txt
