@@ -2,7 +2,7 @@ Bug Fix
 - merge bug fix to main
 - checkout release branch
 - cherry-pick bug fix commit(s)
-- alpha tag: 
+- alpha tag:
   git tag -a v0.6.3a0 -m "Version 0.6.3a0"
   git push --tags
 - On GH, run the wheels.yml action manually on the release branch
@@ -16,7 +16,8 @@ Bug Fix
 
 
 New release
-Notes: New release tags (with patch=0) should be tagged on the main branch so setuptools-scm can find it.
+Notes: New release tags (with patch=0) should be tagged on the main branch so
+       setuptools-scm can find it.
 - merge last release feature to main
 - tag alpha
   git tag -a v0.7.0a0 -m "Version 0.7.0a0"
