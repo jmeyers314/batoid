@@ -1,6 +1,8 @@
 import numpy as np
 import batoid
+import galsim
 from galsim.zernike import Zernike, zernikeBasis
+from packaging.version import Version
 
 from .utils import bilinear_fit, fieldToDirCos
 
@@ -711,6 +713,10 @@ def zernikeGQ(
 
 
 def _dZernikeBasis(jmax, x, y, R_outer=1.0, R_inner=0.0):
+    if Version(galsim.__version__) >= Version("2.4.0"):
+        return galsim.zernike.zernikeGradBases(
+            jmax, x, y, R_outer=R_outer, R_inner=R_inner
+        )
     xout = np.zeros(tuple((jmax+1,)+x.shape), dtype=float)
     yout = np.zeros_like(xout)
     for j in range(2, 1+jmax):
