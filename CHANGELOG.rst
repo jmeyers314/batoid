@@ -12,10 +12,14 @@ New Features
   global rotation methods.
 - Added `withGloballyRotatedOptic` method.
 - Added coordSys option for draw3d.
+- Added a UPS table
+- Added ComCam designs with the spider.
+- Added include_vignetted option to various Zernike functions.
 
 
 Performance Improvements
 ------------------------
+- Use galsim.zernike.zernikeGradBases in zernikeTA
 
 
 Bug Fixes
