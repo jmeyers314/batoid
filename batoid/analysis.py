@@ -477,7 +477,8 @@ def fftPSF(
 def zernike(
     optic, theta_x, theta_y, wavelength,
     projection='postel', nx=32,
-    sphereRadius=None, reference='chief', jmax=22, eps=0.0
+    sphereRadius=None, reference='chief', jmax=22, eps=0.0,
+    include_vignetted=False
 ):
     """Compute Zernike polynomial decomposition of the wavefront.
 
@@ -514,6 +515,8 @@ def zernike(
     eps : float, optional
         Use annular Zernike polynomials with this fractional inner radius.
         Default: 0.0.
+    include_vignetted : bool, optional
+        If True, include vignetted rays in the Zernike fit.  Default: False.
 
     Returns
     -------
@@ -550,7 +553,10 @@ def zernike(
                    projection=projection, sphereRadius=sphereRadius,
                    reference=reference)
     wfarr = wf.array
-    w = ~wfarr.mask
+    if include_vignetted:
+        w = np.hypot(wf.coords[...,0], wf.coords[...,1]) <= optic.pupilSize/2
+    else:
+        w = ~wfarr.mask
 
     basis = zernikeBasis(
         jmax, orig_x[w], orig_y[w],
@@ -721,7 +727,8 @@ def zernikeTA(
     optic, theta_x, theta_y, wavelength,
     projection='postel', nrad=6, naz=36,
     reference='chief', jmax=22, eps=0.0,
-    focal_length=None
+    focal_length=None,
+    include_vignetted=False
 ):
     """Compute Zernikes in such a way that transverse ray aberrations are
     proportional to the gradient of the wavefront.
@@ -753,6 +760,8 @@ def zernikeTA(
     focal_length : float, optional
         Value to use for focal length.  If omitted, then compute focal length
         from dr/dth.
+    include_vignetted : bool, optional
+        If True, include vignetted rays in the Zernike fit.  Default: False.
 
     Returns
     -------
@@ -780,7 +789,11 @@ def zernikeTA(
     v = np.array(epRays.y)
 
     rays = optic.trace(rays)
-    w = ~rays.vignetted
+
+    if include_vignetted:
+        w = slice(None)
+    else:
+        w = ~rays.vignetted
     if reference == 'mean':
         point = np.mean(rays.r[w], axis=0)
     elif reference == 'chief':
