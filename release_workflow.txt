@@ -30,5 +30,5 @@ Notes: New release tags (with patch=0) should be tagged on the main branch so
   git push --tags
 - On GH, make a release.  wheels.yml should run automatically.
 - Make a release branch off of that last tagged commit
-  git branch -b releases/0.7
+  git checkout -b releases/0.7
   git push origin releases/0.7
