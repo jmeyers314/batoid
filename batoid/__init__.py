@@ -6,8 +6,8 @@ from .coordSys import CoordSys, RotX, RotY, RotZ
 from .coordTransform import CoordTransform
 
 from .surface import (
-    Surface, Plane, Paraboloid, Sphere, Quadric, Asphere, Bicubic, Sum, Tilted,
-    Zernike
+    Surface, Plane, Paraboloid, Sphere, Quadric, Asphere, Biconic,
+    Bicubic, Sum, Tilted, Zernike
 )
 
 from .trace import (
@@ -20,8 +20,8 @@ from .medium import (
 )
 
 from .obscuration import (
-    Obscuration, ObscCircle, ObscAnnulus, ObscRectangle, ObscRay, ObscPolygon,
-    ObscNegation, ObscUnion, ObscIntersection
+    Obscuration, ObscCircle, ObscEllipse, ObscAnnulus, ObscRectangle,
+    ObscRay, ObscPolygon, ObscNegation, ObscUnion, ObscIntersection
 )
 
 from .coating import Coating, SimpleCoating

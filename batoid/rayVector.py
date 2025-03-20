@@ -7,7 +7,7 @@ from . import _batoid
 from .constants import globalCoordSys, vacuum
 from .coordTransform import CoordTransform
 from .trace import applyForwardTransform, applyForwardTransformArrays
-from .utils import fieldToDirCos, hexapolar
+from .utils import fieldToDirCos, pointSourceToDirCos, hexapolar
 from .surface import Plane
 
 
@@ -435,6 +435,14 @@ class RayVector:
         z = stopSurface.surface.sag(x, y)
         transform = CoordTransform(stopSurface.coordSys, coordSys)
         applyForwardTransformArrays(transform, x, y, z)
+
+        if dirCos is None and source is not None: # Convert source from stopSurface coordinate system to choosen one
+            x_s, y_s, z_s = np.atleast_1d(source[0]).astype(float, copy=False), np.atleast_1d(source[1]).astype(float, copy=False), np.atleast_1d(source[2]).astype(float, copy=False)
+            applyForwardTransformArrays(transform, x_s, y_s, z_s)
+            x_s, y_s, z_s = x_s[0], y_s[0], z_s[0]
+            source = np.array([x_s, y_s, z_s])
+            dirCos = pointSourceToDirCos(source, np.vstack([x, y, z]))
+
         w = np.empty_like(x)
         w.fill(wavelength)
         n = medium.getN(wavelength)
@@ -634,6 +642,14 @@ class RayVector:
         z = stopSurface.surface.sag(x, y)
         transform = CoordTransform(stopSurface.coordSys, coordSys)
         applyForwardTransformArrays(transform, x, y, z)
+
+        if dirCos is None and source is not None: # Convert source from stopSurface coordinate system to choosen one
+            x_s, y_s, z_s = np.atleast_1d(source[0]).astype(float, copy=False), np.atleast_1d(source[1]).astype(float, copy=False), np.atleast_1d(source[2]).astype(float, copy=False)
+            applyForwardTransformArrays(transform, x_s, y_s, z_s)
+            x_s, y_s, z_s = x_s[0], y_s[0], z_s[0]
+            source = np.array([x_s, y_s, z_s])
+            dirCos = pointSourceToDirCos(source, np.vstack([x, y, z]))
+        
         w = np.empty_like(x)
         w.fill(wavelength)
         n = medium.getN(wavelength)
@@ -806,6 +822,14 @@ class RayVector:
         z = stopSurface.surface.sag(x, y)
         transform = CoordTransform(stopSurface.coordSys, coordSys)
         applyForwardTransformArrays(transform, x, y, z)
+
+        if dirCos is None and source is not None: # Convert source from stopSurface coordinate system to choosen one
+            x_s, y_s, z_s = np.atleast_1d(source[0]).astype(float, copy=False), np.atleast_1d(source[1]).astype(float, copy=False), np.atleast_1d(source[2]).astype(float, copy=False)
+            applyForwardTransformArrays(transform, x_s, y_s, z_s)
+            x_s, y_s, z_s = x_s[0], y_s[0], z_s[0]
+            source = np.array([x_s, y_s, z_s])
+            dirCos = pointSourceToDirCos(source, np.vstack([x, y, z]))
+
         w = np.empty_like(x)
         w.fill(wavelength)
         n = medium.getN(wavelength)
@@ -814,48 +838,128 @@ class RayVector:
         )
 
     @classmethod
-    def _finish(
-        cls, backDist, source, dirCos, n, x, y, z, w, flux, coordSys
-    ):
-        """Map rays backwards to their source position."""
+    def _finish(cls, backDist, source, dirCos, n, x, y, z, w, flux, coordSys):
+        """Map rays backwards to their source position.
+        
+        Uses `finishParallel` for a ** single direction cosine ** (dirCos shape (3,)) => beam from infinity
+        Uses `finishParallelMultiple` for ** multiple direction cosines ** (dirCos shape (3, N)) => beam from point source
+        """
+
+        # Ensure `flux` is a NumPy array
         if isinstance(flux, Real):
             flux = np.full(len(x), float(flux))
+
         if source is None:
-            vv = np.array(dirCos, dtype=float, copy=True)
-            vv /= n*np.sqrt(np.dot(vv, vv))
-            zhat = -n*vv
-            xhat = np.cross(np.array([1.0, 0.0, 0.0]), zhat)
-            xhat /= np.sqrt(np.dot(xhat, xhat))
-            yhat = np.cross(xhat, zhat)
-            origin = zhat*backDist
-            rot = np.stack([xhat, yhat, zhat]).T
-            _batoid.finishParallel(
-                origin, rot.ravel(), vv,
-                x.ctypes.data, y.ctypes.data, z.ctypes.data,
-                len(x)
-            )
-            vx = np.full_like(x, vv[0])
-            vy = np.full_like(y, vv[1])
-            vz = np.full_like(z, vv[2])
+            vv = np.asarray(dirCos, dtype=float)  # Ensure `vv` is a NumPy array
+
+            # Check if `dirCos` is a single ray or multiple rays
+            if vv.ndim == 1:  # **Single DirCos case (3,)** => handle beam from infinity
+                # Normalize `vv`
+                norm_vv = np.linalg.norm(vv)
+                if norm_vv > 0:
+                    vv = (vv / norm_vv) * n
+
+                # Compute coordinate system transformation
+                zhat = -n * vv  # Shape (3,)
+
+                # Compute `xhat` and `yhat` using cross products
+                x_ref = np.array([1.0, 0.0, 0.0])
+                xhat = np.cross(x_ref, zhat)  # Shape (3,)
+                xhat /= np.linalg.norm(xhat)  # Normalize `xhat`
+                yhat = np.cross(xhat, zhat)  # Compute `yhat` using cross product
+
+                # Compute origin
+                origin = (zhat * backDist).tolist()  # Convert to (3,)
+
+                # Compute rotation matrix
+                rotation = np.stack([xhat, yhat, zhat]).T.flatten().tolist()  # Convert (3,3) → (9,)
+
+                # Call `finishParallel` for a single direction cosine vector
+                _batoid.finishParallel(
+                    origin, rotation, vv.tolist(),
+                    int(x.ctypes.data), int(y.ctypes.data), int(z.ctypes.data),
+                    int(len(x))
+                )
+
+            else:  # **Multiple DirCos case (3, N)** => handle beam with one DirCos per ray (same as having a source: to avoid errors)
+                num_rays = vv.shape[1]  # Get number of rays (N)
+
+                origins, rotations_list, vv_list = cls._defintions(backDist, vv, n)
+
+                # Call `finishParallelMultiple` for a multiple direction cosine vector
+                _batoid.finishParallelMultiple(
+                    origins, rotations_list, vv_list,
+                    int(x.ctypes.data), int(y.ctypes.data), int(z.ctypes.data),
+                    int(len(x))
+                )
+
+            # Assign velocity components **only once** (avoids redundant writes)
+            vx, vy, vz = vv[:, -1] if vv.ndim > 1 else vv  # Use last ray's velocity (or single ray)
+
+            # Initialize other required variables
             t = np.zeros(len(x), dtype=float)
             vignetted = np.zeros(len(x), dtype=bool)
             failed = np.zeros(len(x), dtype=bool)
+
             return RayVector._directInit(
-                x, y, z, vx, vy, vz, t, w,
-                flux, vignetted, failed, coordSys
+                x, y, z, np.full_like(x, vx), np.full_like(y, vy), np.full_like(z, vz),
+                t, w, flux, vignetted, failed, coordSys
             )
         else:
-            pass
-            # v = np.copy(r)
-            # v -= source
-            # v /= n*np.einsum('ab,ab->b', v, v)
-            # r[:] = source
-            # t = np.zeros(len(r), dtype=float)
-            # vignetted = np.zeros(len(r), dtype=bool)
-            # failed = np.zeros(len(r), dtype=bool)
-            # return RayVector._directInit(
-            #     r, v, t, w, flux, vignetted, failed, coordSys
-            # )
+            vv = np.asarray(dirCos, dtype=float)  # Ensure `vv` is a NumPy array
+
+            origins, rotations_list, vv_list = cls._defintions(backDist, vv, n)
+
+            # Call `finishParallelMultiple` for a multiple direction cosine vector
+            _batoid.finishParallelMultiple(
+                origins, rotations_list, vv_list,
+                int(x.ctypes.data), int(y.ctypes.data), int(z.ctypes.data),
+                int(len(x))
+            )
+
+            # Assign velocity components **only once** (avoids redundant writes)
+            vx, vy, vz = vv[:, -1] if vv.ndim > 1 else vv  # Use last ray's velocity (or single ray)
+
+            # Initialize other required variables
+            t = np.zeros(len(x), dtype=float)
+            vignetted = np.zeros(len(x), dtype=bool)
+            failed = np.zeros(len(x), dtype=bool)
+
+            return RayVector._directInit(
+                x, y, z, np.full_like(x, vx), np.full_like(y, vy), np.full_like(z, vz),
+                t, w, flux, vignetted, failed, coordSys
+            )
+        
+    @classmethod
+    def _defintions(cls,
+                    backDist, vv, n
+                    ):
+        num_rays = vv.shape[1]  # Get number of rays (N)
+
+        # Normalize `vv`
+        norm_vv = np.linalg.norm(vv, axis=0, keepdims=True)  # Shape: (1, N)
+        vv /= np.where(norm_vv > 0, n * norm_vv, 1)  # Avoid division by zero
+
+        # Compute coordinate system transformation
+        zhat = -n * vv  # Shape (3, N)
+
+        # Compute `xhat` and `yhat` using cross products
+        x_ref = np.array([[1.0], [0.0], [0.0]]) if num_rays > 1 else np.array([1.0, 0.0, 0.0])
+        xhat = np.cross(x_ref, zhat, axis=0)  # Shape (3, N)
+        xhat /= np.linalg.norm(xhat, axis=0, keepdims=True)  # Normalize `xhat`
+        yhat = np.cross(xhat, zhat, axis=0)  # Compute `yhat` using cross product
+
+        # Compute origins
+        origins = (zhat * backDist).T.ravel().tolist()  # Flatten to (N * 3)
+
+        # Precompute rotation matrices
+        rotations = np.stack([xhat, yhat, zhat], axis=1)  # Shape (3,3,N)
+        rotations_list = rotations.transpose(2, 0, 1).reshape(num_rays, 9).ravel().tolist()  # Flatten to (N * 9)
+
+        # Convert vv to (N * 3) flattened list
+        vv_list = vv.T.ravel().tolist()  # (3, N) → (N * 3)
+
+        return origins, rotations_list, vv_list
 
     @classmethod
     def fromStop(
@@ -972,6 +1076,13 @@ class RayVector:
         z = stopSurface.surface.sag(x, y)
         transform = CoordTransform(stopSurface.coordSys, coordSys)
         applyForwardTransformArrays(transform, x, y, z)
+
+        if dirCos is None and source is not None: # Convert source from stopSurface coordinate system to choosen one
+            x_s, y_s, z_s = np.atleast_1d(source[0]).astype(float, copy=False), np.atleast_1d(source[1]).astype(float, copy=False), np.atleast_1d(source[2]).astype(float, copy=False)
+            applyForwardTransformArrays(transform, x_s, y_s, z_s)
+            x_s, y_s, z_s = x_s[0], y_s[0], z_s[0]
+            source = np.array([x_s, y_s, z_s])
+            dirCos = pointSourceToDirCos(source, np.vstack([x, y, z]))
 
         w = np.empty_like(x)
         w.fill(wavelength)

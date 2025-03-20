@@ -86,7 +86,52 @@ class ObscCircle(Obscuration):
             out += f", {self.x}, {self.y}"
         out += ")"
         return out
+    
+class ObscEllipse(Obscuration):
+    """An elliptical obscuration.
 
+    Parameters
+    ----------
+    semi_major : float
+        Semi-major axis of the ellipse in meters.
+    semi_minor : float
+        Semi-minor axis of the ellipse in meters.
+    x, y : float, optional
+        Coordinates of ellipse center in meters.  [default: 0.0]
+    """
+    def __init__(self, semi_major, semi_minor, x=0.0, y=0.0):
+        self.semi_major = semi_major
+        self.semi_minor = semi_minor
+        self.x = x
+        self.y = y
+        self._obsc = _batoid.CPPObscEllipse(semi_major, semi_minor, x, y)
+
+    def __eq__(self, rhs):
+        if type(rhs) == type(self):
+            return (
+                self.semi_major == rhs.semi_major
+                and self.semi_minor == rhs.semi_minor
+                and self.x == rhs.x
+                and self.y == rhs.y
+            )
+        return False
+
+    def __getstate__(self):
+        return self.semi_major, self.semi_minor, self.x, self.y
+
+    def __setstate__(self, args):
+        self.semi_major, self.semi_minor, self.x, self.y = args
+        self._obsc = _batoid.CPPObscEllipse(*args)
+
+    def __hash__(self):
+        return hash(("batoid.ObscEllipse", self.semi_major, self.semi_minor, self.x, self.y))
+
+    def __repr__(self):
+        out = f"ObscEllipse({self.semi_major}, {self.semi_minor}"
+        if self.x != 0 or self.y != 0:
+            out += f", {self.x}, {self.y}"
+        out += ")"
+        return out
 
 class ObscAnnulus(Obscuration):
     """An annular obscuration.

@@ -71,6 +71,43 @@ namespace batoid {
         #pragma omp declare target
     #endif
 
+        ObscEllipse::ObscEllipse(double semi_major, double semi_minor, double x0, double y0) :
+            _semi_major(semi_major), _semi_minor(semi_minor), _x0(x0), _y0(y0)
+        {}
+
+        ObscEllipse::~ObscEllipse() {}
+
+        bool ObscEllipse::contains(double x, double y) const {
+            double dx = x - _x0;
+            double dy = y - _y0;
+            return (dx * dx) / (_semi_major * _semi_major) + (dy * dy) / (_semi_minor * _semi_minor) < 1.0;
+        }
+
+    #if defined(BATOID_GPU)
+        #pragma omp end declare target
+    #endif
+
+    const Obscuration* ObscEllipse::getDevPtr() const {
+        #if defined(BATOID_GPU)
+            if (_devPtr)
+                return _devPtr;
+            Obscuration* ptr;
+            #pragma omp target map(from:ptr)
+            {
+                ptr = new ObscEllipse(_semi_major, _semi_minor, _x0, _y0);
+            }
+            _devPtr = ptr;
+            return ptr;
+        #else
+            return this;
+        #endif
+    }
+
+
+    #if defined(BATOID_GPU)
+        #pragma omp declare target
+    #endif
+
         ObscAnnulus::ObscAnnulus(double inner, double outer, double x0, double y0) :
             _inner(inner), _outer(outer), _x0(x0), _y0(y0)
         {}

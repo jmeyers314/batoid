@@ -428,6 +428,63 @@ class Asphere(Surface):
         else:
             out += f", imin={self.imin})"
         return out
+    
+class Biconic(Surface):
+    """Biconic surface where the curvature and conic constant can be different 
+    along the x and y axes. The surface sag follows the equation:
+
+    .. math::
+
+        z(x, y) = \\frac{c_x x^2}{1 + \\sqrt{1 - (1 + k_x) c_x^2 x^2}} + 
+                  \\frac{c_y y^2}{1 + \\sqrt{1 - (1 + k_y) c_y^2 y^2}}
+
+    where:
+
+    - :math:`c_x = \\frac{1}{R_x}` is the curvature along the X-axis.
+    - :math:`c_y = \\frac{1}{R_y}` is the curvature along the Y-axis.
+    - :math:`k_x` and :math:`k_y` are the conic constants in the X and Y directions.
+
+    Different ranges of :math:`k_x` and :math:`k_y` indicate different categories 
+    of surfaces in each axis.
+
+    Parameters
+    ----------
+    Rx : float
+        Radius of curvature in the x-direction.
+    Ry : float
+        Radius of curvature in the y-direction.
+    kx : float
+        Conic constant in the x-direction.
+    ky : float
+        Conic constant in the y-direction.
+    """
+
+    def __init__(self, Rx, Ry, kx, ky):
+        self.Rx = Rx
+        self.Ry = Ry
+        self.kx = kx
+        self.ky = ky
+        self._surface = _batoid.CPPBiconic(Rx, Ry, kx, ky)
+
+    def __hash__(self):
+        return hash(("batoid.Biconic", self.Rx, self.Ry, self.kx, self.ky))
+
+    def __setstate__(self, args):
+        self.__init__(*args)
+
+    def __getstate__(self):
+        return (self.Rx, self.Ry, self.kx, self.ky)
+
+    def __eq__(self, rhs):
+        if not isinstance(rhs, Biconic):
+            return False
+        return (self.Rx == rhs.Rx and
+                self.Ry == rhs.Ry and
+                self.kx == rhs.kx and
+                self.ky == rhs.ky)
+
+    def __repr__(self):
+        return f"Biconic({self.Rx}, {self.Ry}, {self.kx}, {self.ky})"
 
 
 class Zernike(Surface):

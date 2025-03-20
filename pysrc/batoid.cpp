@@ -1,6 +1,8 @@
 #include "batoid.h"
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <vector>
+#include <cstddef>
 
 #if defined(_OPENMP)
 #include "omp.h"
@@ -16,6 +18,7 @@ namespace batoid {
     void pyExportSurface(py::module&);
     void pyExportQuadric(py::module&);
     void pyExportAsphere(py::module&);
+    void pyExportBiconic(py::module&);
     void pyExportTilted(py::module&);
     void pyExportBicubic(py::module&);
     void pyExportSphere(py::module&);
@@ -39,6 +42,7 @@ namespace batoid {
         pyExportTilted(m);
         pyExportBicubic(m);
         pyExportSphere(m);
+        pyExportBiconic(m); // Order Surface, Sphere, Biconic important b/c inheritance
         pyExportSum(m);
         pyExportParaboloid(m);
         pyExportPlane(m);
@@ -113,6 +117,22 @@ namespace batoid {
             ){
                 finishParallel(
                     dr, drot, vv,
+                    reinterpret_cast<double*>(x),
+                    reinterpret_cast<double*>(y),
+                    reinterpret_cast<double*>(z),
+                    n
+                );
+            });
+        m.def(
+            "finishParallelMultiple",
+            [](
+                const std::vector<double>& origins,   // Flattened (N * 3)
+                const std::vector<double>& rotations, // Flattened (N * 9)
+                const std::vector<double>& vv_list,   // Flattened (N * 3)
+                size_t x, size_t y, size_t z, size_t n
+            ){
+                finishParallelMultiple(
+                    origins, rotations, vv_list,
                     reinterpret_cast<double*>(x),
                     reinterpret_cast<double*>(y),
                     reinterpret_cast<double*>(z),

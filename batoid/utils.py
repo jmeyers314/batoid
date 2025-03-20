@@ -441,6 +441,44 @@ def fieldToDirCos(u, v, projection='postel'):
         return orthographicToDirCos(u, v)
     else:
         raise ValueError("Bad projection: {}".format(projection))
+    
+def pointSourceToDirCos(p1, p2_list):
+    """
+    Compute the direction cosines from a single point p1 to multiple points in p2_list.
+
+    Parameters:
+        p1 (array-like): A 3-element array [x, y, z] representing a single point source.
+        p2_list (array-like or np.ndarray): Either:
+            - A (3,) or (3, 1) array representing a single point [x, y, z] or [[x], [y], [z]]
+            - A (3, N) array where each row is [x_list, y_list, z_list]
+
+    Returns:
+        numpy.ndarray: A (3, N) array of unit direction vectors, or (3, 1) if p2_list is a single point.
+    """
+    p1 = np.asarray(p1)  # Convert to NumPy array
+    p2_list = np.asarray(p2_list)  # Convert p2_list to a NumPy array
+
+    # If p2_list is a single point (1D array), reshape to (3,1) for correct broadcasting
+    if p2_list.shape == (3,):
+        p2_list = p2_list[:, np.newaxis]  # Reshape to (3,1) so broadcasting works
+
+    # Ensure p2_list is in (3, N) format
+    if p2_list.shape[0] != 3:
+        raise ValueError("p2_list must have shape (3,) or (3, 1) for a single point or (3, N) for multiple points.")
+
+    # Compute direction vectors (vectorized)
+    dirVecs = p2_list - p1[:, np.newaxis]  # Shape: (3, N)
+
+    # Compute magnitudes along each column
+    mags = np.linalg.norm(dirVecs, axis=0, keepdims=True)  # Shape: (1, N)
+
+    if np.any(mags == 0):
+        raise ValueError("At least one point in p2_list is identical to p1; direction cosines cannot be determined.")
+
+    # Normalize direction vectors correctly
+    result = dirVecs / mags  # Shape remains (3, N)
+
+    return result
 
 
 def dirCosToField(alpha, beta, gamma, projection='postel'):
