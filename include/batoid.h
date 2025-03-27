@@ -1,6 +1,7 @@
 #ifndef batoid_batoid_h
 #define batoid_batoid_h
 
+#include <vector>
 #include <array>
 #include "rayVector.h"
 #include "surface.h"
