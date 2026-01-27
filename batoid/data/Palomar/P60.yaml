@@ -1,0 +1,88 @@
+opticalSystem:
+  type: CompoundOptic
+  name: P60
+  inMedium: &air 1.0
+  medium: *air
+  backDist: 0.
+  sphereRadius: 13.2
+  pupilSize: 1.54
+  pupilObscuration: 0.257
+
+  stopSurface:
+    type: Interface
+    name: entrancePupil
+    surface:
+      type: Plane
+    coordSys:
+      z: 0.0     # stop at z=0
+
+  items:
+    - type: Mirror
+      name: M1
+      surface:
+        type: Asphere
+        R: -7.620
+        conic: -1.00001
+        coefs: [1.835e-5]
+      obscuration:
+        type: ClearAnnulus
+        outer: 0.762
+        inner: 0.1964
+      coordSys:
+        z: 3.82806
+
+    - type: Mirror
+      name: M2
+      surface:
+        type: Asphere
+        R: -2.750
+        conic: -1.00001
+        coefs: [1.743e-2]
+      obscuration:
+        type: ClearCircle
+        radius: 0.1964
+      coordSys:
+        z: 1.0
+    - type: Lens
+      name: Corrector
+      medium:
+        type: SellmeierMedium
+        B1: 0.6961663
+        B2: 0.4079426
+        B3: 0.8974794
+        C1: 0.00467914825849
+        C2: 0.01351206307396
+        C3: 97.93400253792
+      items:
+        -
+          type: RefractiveInterface
+          name: CorrectorFront
+          surface:
+            type: Plane
+          obscuration:
+            type: ClearCircle
+            radius: 0.0363074
+        -
+          type: RefractiveInterface
+          name: CorrectorBack
+          surface:
+            type: Asphere
+            R: -16.36661
+            conic: 0.0
+            coefs: [9.52e-1, 2.45]
+          coordSys:
+            z: 0.010
+          obscuration:
+            type: ClearCircle
+            radius: 0.0363074
+      coordSys:
+        z: 4.12806
+    - type: Detector
+      name: FocalPlane
+      surface:
+        type: Plane
+      obscuration:
+        type: ClearCircle
+        radius: 0.018432
+      coordSys:
+        z: 4.435627062
