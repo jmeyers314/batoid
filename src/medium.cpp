@@ -137,7 +137,8 @@ namespace batoid {
             double B1, double B2, double B3,
             double C1, double C2, double C3
         ) :
-            Medium(), _B1(B1), _B2(B2), _B3(B3), _C1(C1), _C2(C2), _C3(C3)
+            Medium(), _B1(B1), _B2(B2), _B3(B3),
+            _sellC1(C1), _sellC2(C2), _sellC3(C3)
         {}
 
         SellmeierMedium::~SellmeierMedium() {}
@@ -145,7 +146,7 @@ namespace batoid {
         double SellmeierMedium::getN(double wavelength) const {
             // Sellmeier coefficients assume wavelength is in microns, so we have to multiply (1e6)**2
             double x = wavelength*wavelength*1e12;
-            return std::sqrt(1.0 + _B1*x/(x-_C1) + _B2*x/(x-_C2) + _B3*x/(x-_C3));
+            return std::sqrt(1.0 + _B1*x/(x-_sellC1) + _B2*x/(x-_sellC2) + _B3*x/(x-_sellC3));
         }
 
     #if defined(BATOID_GPU)
@@ -160,7 +161,7 @@ namespace batoid {
             Medium* ptr;
             #pragma omp target map(from:ptr)
             {
-                ptr = new SellmeierMedium(_B1, _B2, _B3, _C1, _C2, _C3);
+                ptr = new SellmeierMedium(_B1, _B2, _B3, _sellC1, _sellC2, _sellC3);
             }
             _devPtr = ptr;
             return ptr;

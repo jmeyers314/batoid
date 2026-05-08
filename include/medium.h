@@ -69,7 +69,9 @@ namespace batoid {
         const Medium* getDevPtr() const override;
 
     private:
-        const double _B1, _B2, _B3, _C1, _C2, _C3;
+        // ``_C1`` / ``_C2`` / ``_C3`` collide with macros from the
+        // Windows SDK (ctype.h), so use a Sellmeier-prefixed name.
+        const double _B1, _B2, _B3, _sellC1, _sellC2, _sellC3;
     };
 
 
