@@ -1,4 +1,5 @@
 #include "batoid.h"
+#include <cstddef>  // ptrdiff_t for OpenMP-safe signed loop counters on MSVC.
 #include <limits>
 
 
@@ -10,8 +11,12 @@ namespace batoid {
         double* x, double* y, double* z,
         size_t n, int max_threads
     ) {
+        // MSVC's OpenMP requires a signed integral loop counter; reuse a
+        // ptrdiff_t mirror of ``n`` so the parallel-for index can be signed
+        // without clipping.
+        ptrdiff_t nloop = static_cast<ptrdiff_t>(n);
         #pragma omp parallel for num_threads(max_threads)
-        for(size_t i=0; i<n; i++) {
+        for(ptrdiff_t i=0; i<nloop; i++) {
             double dx = x[i]-dr[0];
             double dy = y[i]-dr[1];
             double dz = z[i]-dr[2];
@@ -26,8 +31,9 @@ namespace batoid {
         double* x, double* y, double* z,
         size_t n, int max_threads
     ) {
+        ptrdiff_t nloop = static_cast<ptrdiff_t>(n);
         #pragma omp parallel for num_threads(max_threads)
-        for(size_t i=0; i<n; i++) {
+        for(ptrdiff_t i=0; i<nloop; i++) {
             double xx = x[i]*drot[0] + y[i]*drot[1] + z[i]*drot[2] + dr[0];
             double yy = x[i]*drot[3] + y[i]*drot[4] + z[i]*drot[5] + dr[1];
             double zz = x[i]*drot[6] + y[i]*drot[7] + z[i]*drot[8] + dr[2];

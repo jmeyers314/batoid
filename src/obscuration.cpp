@@ -212,7 +212,7 @@ namespace batoid {
                             if (y1 != y2) {
                                 xinters = (y-y1)*(x2-x1)/(y2-y1)+x1;
                             }
-                            if (x1 == x2 or x <= xinters) {
+                            if (x1 == x2 || x <= xinters) {
                                 inside = !inside;
                             }
                         }
@@ -251,7 +251,7 @@ namespace batoid {
         xinters.reserve(16);  // 2 is probably most common, but it's cheap to allocate 16
         for (int j=0; j<ny; j++) {
             double y = ygrid[j];
-            if ((y < ymin) or (y > ymax)) {
+            if ((y < ymin) || (y > ymax)) {
                 for (int i=0; i<nx; i++) {
                     out[j*nx+i] = false;
                 }
