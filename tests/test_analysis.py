@@ -78,6 +78,19 @@ def test_zernikeGQ():
         zSquare[4:], zGQ[4:], rtol=0, atol=tol
     )
 
+    # Try reference == ring
+    zSquare = batoid.zernike(
+        telescope, np.deg2rad(0.2), np.deg2rad(0.1), 625e-9,
+        nx=nx, jmax=28, reference='ring', eps=0.61
+    )
+    zGQ = batoid.zernikeGQ(
+        telescope, np.deg2rad(0.2), np.deg2rad(0.1), 625e-9,
+        rings=rings, jmax=28, reference='ring', eps=0.61
+    )
+    # Z1-3 less reliable, but mostly uninteresting anyway...
+    np.testing.assert_allclose(
+        zSquare[4:], zGQ[4:], rtol=0, atol=tol
+    )
 
 @timer
 def test_huygensPSF():
@@ -164,6 +177,21 @@ def test_huygensPSF():
         620e-9,
         nx=63,
     )
+
+    # Cover the ring reference option
+    psf5 = batoid.huygensPSF(
+        telescope,
+        np.deg2rad(0.1), np.deg2rad(0.1),
+        620e-9,
+        nx=64,
+        nxOut=32,
+        dx=[10e-6, 0],
+        dy=[0, 11e-6],
+        reference='ring',
+        # ring_radius=0.5*telescope.pupilSize,
+        # nring=10
+    )
+    assert np.array_equal(psf1.primitiveVectors, psf5.primitiveVectors)
 
 
 @timer
@@ -365,48 +393,52 @@ def test_transverse_aberrations():
     wavelength = 622e-9
     focal_length = 10.31
 
-    zTA = batoid.zernikeTA(
-        telescope, thx, thy, wavelength,
-        nrad=20, naz=120,
-        jmax=66, eps=0.61,
-        focal_length=focal_length
-    )
-    zTA = galsim.zernike.Zernike(
-        zTA,
-        R_outer=4.18, R_inner=4.18*0.61,
-    )
-    zX, zY = batoid.zernikeXYAberrations(
-        telescope, thx, thy, wavelength,
-        nrad=20, naz=120,
-        jmax=55, eps=0.61,
-    )
-    zX = galsim.zernike.Zernike(
-        zX,
-        R_outer=4.18, R_inner=4.18*0.61,
-    )
-    zY = galsim.zernike.Zernike(
-        zY,
-        R_outer=4.18, R_inner=4.18*0.61,
-    )
-    u = np.linspace(-4.18, 4.18, 50)
-    u, v = np.meshgrid(u, u)
-    r = np.hypot(u, v)
-    w = r < 4.18
-    w &= r > 2.558
-    u = u[w]
-    v = v[w]
+    for reference in ['chief', 'mean', 'ring']:
 
-    np.testing.assert_allclose(
-        -zTA.gradX(u, v)*wavelength*focal_length,
-        zX(u, v),
-        atol=5e-7, rtol=0  # 0.5 micron = 1/20 pixel
-    )
+        zTA = batoid.zernikeTA(
+            telescope, thx, thy, wavelength,
+            nrad=20, naz=120,
+            jmax=66, eps=0.61,
+            focal_length=focal_length,
+            reference=reference
+        )
+        zTA = galsim.zernike.Zernike(
+            zTA,
+            R_outer=4.18, R_inner=4.18*0.61,
+        )
+        zX, zY = batoid.zernikeXYAberrations(
+            telescope, thx, thy, wavelength,
+            nrad=20, naz=120,
+            jmax=55, eps=0.61,
+            reference=reference
+        )
+        zX = galsim.zernike.Zernike(
+            zX,
+            R_outer=4.18, R_inner=4.18*0.61,
+        )
+        zY = galsim.zernike.Zernike(
+            zY,
+            R_outer=4.18, R_inner=4.18*0.61,
+        )
+        u = np.linspace(-4.18, 4.18, 50)
+        u, v = np.meshgrid(u, u)
+        r = np.hypot(u, v)
+        w = r < 4.18
+        w &= r > 2.558
+        u = u[w]
+        v = v[w]
 
-    np.testing.assert_allclose(
-        -zTA.gradY(u, v)*wavelength*focal_length,
-        zY(u, v),
-        atol=5e-7, rtol=0  # 0.5 micron = 1/20 pixel
-    )
+        np.testing.assert_allclose(
+            -zTA.gradX(u, v)*wavelength*focal_length,
+            zX(u, v),
+            atol=5e-7, rtol=0  # 0.5 micron = 1/20 pixel
+        )
+
+        np.testing.assert_allclose(
+            -zTA.gradY(u, v)*wavelength*focal_length,
+            zY(u, v),
+            atol=5e-7, rtol=0  # 0.5 micron = 1/20 pixel
+        )
 
 
 @timer
@@ -430,6 +462,25 @@ def test_rank_deficient():
         )
 
 
+@timer
+def test_ring_reference_consistency():
+    # chief and ring references should agree on Z4+ (piston/tip/tilt can differ)
+    telescope = batoid.Optic.fromYaml("LSST_r.yaml")
+    thx = np.deg2rad(0.2)
+    thy = np.deg2rad(0.1)
+    wavelength = 625e-9
+
+    z_chief = batoid.zernike(
+        telescope, thx, thy, wavelength, jmax=37, nx=128, eps=0.61,
+        reference='chief'
+    )
+    z_ring = batoid.zernike(
+        telescope, thx, thy, wavelength, jmax=37, nx=128, eps=0.61,
+        reference='ring'
+    )
+    np.testing.assert_allclose(z_chief[4:], z_ring[4:], rtol=0, atol=1e-3)
+
+
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
@@ -442,3 +493,4 @@ if __name__ == '__main__':
     test_doubleZernike()
     test_huygens_paraboloid(args.plot)
     test_transverse_aberrations()
+    test_ring_reference_consistency()
