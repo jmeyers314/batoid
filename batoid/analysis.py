@@ -14,6 +14,23 @@ def _reciprocalLatticeVectors(a1, a2, N):
     return b1, b2
 
 
+def _ringReferencePoint(optic, wavelength, dirCos, ring_radius, nring):
+    if ring_radius is None:
+        r_outer = optic.pupilSize/2
+        r_inner = optic.pupilSize/2*optic.pupilObscuration
+        ring_radius = 0.5 * (r_outer + r_inner)
+    azring = np.linspace(0, 2*np.pi, nring, endpoint=False)
+    xring = ring_radius*np.cos(azring)
+    yring = ring_radius*np.sin(azring)
+    ringRays = batoid.RayVector.fromStop(
+        xring, yring,
+        optic=optic, wavelength=wavelength,
+        dirCos=dirCos,
+    )
+    optic.trace(ringRays)
+    return np.mean(ringRays.r, axis=0), ringRays
+
+
 def dkdu(
     optic, theta_x, theta_y, wavelength, nrad=6, naz=36, projection='postel'
 ):
@@ -181,7 +198,8 @@ def dthdr(
 def huygensPSF(
     optic, theta_x, theta_y, wavelength,
     projection='postel', nx=None, dx=None, dy=None,
-    nxOut=None, reference='chief'
+    nxOut=None, reference='chief',
+    ring_radius=None, nring=100
 ):
     r"""Compute a PSF via the Huygens construction.
 
@@ -202,10 +220,18 @@ def huygensPSF(
         fftPSF lattice.
     nxOut : int, optional
         Size of the output lattice.  Default is to use nx.
-    reference : {'chief', 'mean'}
+    reference : {'chief', 'mean', 'ring'}
         If 'chief', then center the output lattice where the chief ray
         intersects the focal plane.  If 'mean', then center at the mean
-        non-vignetted ray intersections.
+        non-vignetted ray intersections.  If 'ring', then center at the mean of the
+        (possibly vignetted) ring of rays described by `ring_radius` and `nring`.
+    ring_radius : float, optional
+        If `reference` is 'ring', then this is the radius of the ring of rays to
+        use for centering the output lattice.  If None, then use the average of
+        optic.pupilSize/2 and optic.pupilSize/2*optic.pupilObscuration.  Default: None.
+    nring : int, optional
+        If `reference` is 'ring', then this is the number of rays to use in the
+        ring of rays to use for centering the output lattice.  Default: 100.
 
     Returns
     -------
@@ -292,6 +318,9 @@ def huygensPSF(
     elif reference == 'chief':
         cridx = (nx//2)*nx+nx//2 if (nx%2)==0 else (nx*nx-1)//2
         point = rays.r[cridx]
+    elif reference == 'ring':
+        point, _ = _ringReferencePoint(optic, wavelength, dirCos, ring_radius, nring)
+
     # Need transpose to conform to numpy [y,x] ordering convention
     xs = out.coords[..., 0].T + point[0]
     ys = out.coords[..., 1].T + point[1]
@@ -308,7 +337,8 @@ def huygensPSF(
 def wavefront(
     optic, theta_x, theta_y, wavelength,
     projection='postel', nx=32,
-    sphereRadius=None, reference='chief'
+    sphereRadius=None, reference='chief',
+    ring_radius=None, nring=100
 ):
     """Compute wavefront.
 
@@ -330,10 +360,18 @@ def wavefront(
         very sensitive to this.  Many of the telescopes that come with batoid
         have values for this set in their yaml files, which will be used if
         this is None.
-    reference : {'chief', 'mean'}
+    reference : {'chief', 'mean', 'ring'}
         If 'chief', then center the output lattice where the chief ray
         intersects the focal plane.  If 'mean', then center at the mean
-        non-vignetted ray intersections.
+        non-vignetted ray intersections.  If 'ring', then center at the mean of the
+        (possibly vignetted) ring of rays described by `ring_radius` and `nring`.
+    ring_radius : float, optional
+        If `reference` is 'ring', then this is the radius of the ring of rays to
+        use for centering the output lattice.  If None, then use the average of
+        optic.pupilSize/2 and optic.pupilSize/2*optic.pupilObscuration.  Default: None.
+    nring : int, optional
+        If `reference` is 'ring', then this is the number of rays to use in the
+        ring of rays to use for centering the output lattice.  Default: 100.
 
     Returns
     -------
@@ -356,6 +394,9 @@ def wavefront(
     elif reference == 'chief':
         cridx = (nx//2)*nx+nx//2 if (nx%2)==0 else (nx*nx-1)//2
         point = rays.r[cridx]
+    elif reference == 'ring':
+        point, ringRays = _ringReferencePoint(optic, wavelength, dirCos, ring_radius, nring)
+
     # Place vertex of reference sphere one radius length away from the
     # intersection point.  So transform our rays into that coordinate system.
     targetCoordSys = rays.coordSys.shiftLocal(
@@ -371,6 +412,8 @@ def wavefront(
         t0 = np.mean(rays.t[w])
     elif reference == 'chief':
         t0 = rays.t[cridx]
+    elif reference == 'ring':
+        t0 = np.mean(ringRays.t)
     arr = np.ma.masked_array(
         (t0-rays.t)/wavelength,
         mask=rays.vignetted
@@ -390,7 +433,8 @@ def wavefront(
 
 def spot(
     optic, theta_x, theta_y, wavelength,
-    projection='postel', nx=32, reference='chief'
+    projection='postel', nx=32, reference='chief',
+    ring_radius=None, nring=100
 ):
     dirCos = fieldToDirCos(theta_x, theta_y, projection=projection)
     rays = batoid.RayVector.asGrid(
@@ -404,6 +448,8 @@ def spot(
     elif reference == 'chief':
         cridx = (nx//2)*nx+nx//2 if (nx%2)==0 else (nx*nx-1)//2
         point = rays[cridx].r[0]
+    elif reference == 'ring':
+        point, _ = _ringReferencePoint(optic, wavelength, dirCos, ring_radius, nring)
     else:
         point = [0,0,0]
     targetCoordSys = rays.coordSys.shiftLocal(point)
@@ -416,7 +462,8 @@ def spot(
 def fftPSF(
     optic, theta_x, theta_y, wavelength,
     projection='postel', nx=32, pad_factor=2,
-    sphereRadius=None, reference='chief'
+    sphereRadius=None, reference='chief',
+    ring_radius=None, nring=100
 ):
     """Compute PSF using FFT.
 
@@ -440,10 +487,18 @@ def fftPSF(
         very sensitive to this.  Many of the telescopes that come with batoid
         have values for this set in their yaml files, which will be used if
         this is None.
-    reference : {'chief', 'mean'}
+    reference : {'chief', 'mean', 'ring'}
         If 'chief', then center the output lattice where the chief ray
         intersects the focal plane.  If 'mean', then center at the mean
-        non-vignetted ray intersection.
+        non-vignetted ray intersection.  If 'ring', then center at the mean of the
+        (possibly vignetted) ring of rays described by `ring_radius` and `nring`.
+    ring_radius : float, optional
+        If `reference` is 'ring', then this is the radius of the ring of rays to
+        use for centering the output lattice.  If None, then use the average of
+        optic.pupilSize/2 and optic.pupilSize/2*optic.pupilObscuration.  Default: None.
+    nring : int, optional
+        If `reference` is 'ring', then this is the number of rays to use in the
+        ring of rays to use for centering the output lattice.  Default: 100.
 
     Returns
     -------
@@ -454,7 +509,8 @@ def fftPSF(
     wf = wavefront(
         optic, theta_x, theta_y, wavelength,
         nx=nx, projection=projection,
-        sphereRadius=sphereRadius, reference=reference
+        sphereRadius=sphereRadius, reference=reference,
+        ring_radius=ring_radius, nring=nring
     )
     wfarr = wf.array
     pad_size = nx*pad_factor
@@ -479,7 +535,9 @@ def fftPSF(
 def zernike(
     optic, theta_x, theta_y, wavelength,
     projection='postel', nx=32,
-    sphereRadius=None, reference='chief', jmax=22, eps=0.0,
+    sphereRadius=None, reference='chief',
+    ring_radius=None, nring=100,
+    jmax=22, eps=0.0,
     include_vignetted=False
 ):
     """Compute Zernike polynomial decomposition of the wavefront.
@@ -508,10 +566,18 @@ def zernike(
         very sensitive to this.  Many of the telescopes that come with batoid
         have values for this set in their yaml files, which will be used if
         this is None.
-    reference : {'chief', 'mean'}
+    reference : {'chief', 'mean', 'ring'}
         If 'chief', then center the output lattice where the chief ray
         intersects the focal plane.  If 'mean', then center at the mean
-        non-vignetted ray intersection.
+        non-vignetted ray intersections.  If 'ring', then center at the mean of the
+        (possibly vignetted) ring of rays described by `ring_radius` and `nring`.
+    ring_radius : float, optional
+        If `reference` is 'ring', then this is the radius of the ring of rays to
+        use for centering the output lattice.  If None, then use the average of
+        optic.pupilSize/2 and optic.pupilSize/2*optic.pupilObscuration.  Default: None.
+    nring : int, optional
+        If `reference` is 'ring', then this is the number of rays to use in the
+        ring of rays to use for centering the output lattice.  Default: 100.
     jmax : int, optional
         Number of coefficients to compute.  Default: 12.
     eps : float, optional
@@ -553,7 +619,7 @@ def zernike(
 
     wf = wavefront(optic, theta_x, theta_y, wavelength, nx=nx,
                    projection=projection, sphereRadius=sphereRadius,
-                   reference=reference)
+                   reference=reference, ring_radius=ring_radius, nring=nring)
     wfarr = wf.array
     if include_vignetted:
         w = np.hypot(wf.coords[...,0], wf.coords[...,1]) <= optic.pupilSize/2
@@ -577,6 +643,7 @@ def zernikeGQ(
     optic, theta_x, theta_y, wavelength,
     projection='postel', rings=6, spokes=None,
     sphereRadius=None, reference='chief',
+    ring_radius=None, nring=100,
     jmax=22, eps=0.0
 ):
     r"""Compute Zernike polynomial decomposition of the wavefront.
@@ -607,10 +674,18 @@ def zernikeGQ(
         very sensitive to this.  Many of the telescopes that come with batoid
         have values for this set in their yaml files, which will be used if
         this is None.
-    reference : {'chief', 'mean'}
+    reference : {'chief', 'mean', 'ring'}
         If 'chief', then center the output lattice where the chief ray
         intersects the focal plane.  If 'mean', then center at the mean
-        non-vignetted ray intersection.
+        non-vignetted ray intersections.  If 'ring', then center at the mean of the
+        (possibly vignetted) ring of rays described by `ring_radius` and `nring`.
+    ring_radius : float, optional
+        If `reference` is 'ring', then this is the radius of the ring of rays to
+        use for centering the output lattice.  If None, then use the average of
+        optic.pupilSize/2 and optic.pupilSize/2*optic.pupilObscuration.  Default: None.
+    nring : int, optional
+        If `reference` is 'ring', then this is the number of rays to use in the
+        ring of rays to use for centering the output lattice.  Default: 100.
     jmax : int, optional
         Number of coefficients to compute.  Default: 22.
     eps : float, optional
@@ -687,6 +762,8 @@ def zernikeGQ(
         )
         optic.trace(chiefRay)
         point = chiefRay.r[0]
+    elif reference == 'ring':
+        point, ringRays = _ringReferencePoint(optic, wavelength, dirCos, ring_radius, nring)
 
     # Place vertex of reference sphere one radius length away from the
     # intersection point.  So transform our rays into that coordinate system.
@@ -705,7 +782,10 @@ def zernikeGQ(
         chiefRay.toCoordSys(targetCoordSys)
         sphere.intersect(chiefRay)
         t0 = chiefRay.t
-
+    elif reference == 'ring':
+        ringRays.toCoordSys(targetCoordSys)
+        sphere.intersect(ringRays)
+        t0 = np.mean(ringRays.t)
     # Zernike coefficients are flux-weighted dot products of relative phases
     # with basis.
     area = np.pi*(1.-eps**2)
@@ -732,7 +812,8 @@ def _dZernikeBasis(jmax, x, y, R_outer=1.0, R_inner=0.0):
 def zernikeTA(
     optic, theta_x, theta_y, wavelength,
     projection='postel', nrad=6, naz=36,
-    reference='chief', jmax=22, eps=0.0,
+    reference='chief', ring_radius=None, nring=100,
+    jmax=22, eps=0.0,
     focal_length=None,
     include_vignetted=False
 ):
@@ -754,10 +835,18 @@ def zernikeTA(
     naz : int, optional
         Approximate number of azimuthal angles in outermost ring.  (see
         RayVector.asPolar())
-    reference : {'chief', 'mean'}
+    reference : {'chief', 'mean', 'ring'}
         If 'chief', then center the output lattice where the chief ray
         intersects the focal plane.  If 'mean', then center at the mean
-        non-vignetted ray intersection.
+        non-vignetted ray intersections.  If 'ring', then center at the mean of the
+        (possibly vignetted) ring of rays described by `ring_radius` and `nring`.
+    ring_radius : float, optional
+        If `reference` is 'ring', then this is the radius of the ring of rays to
+        use for centering the output lattice.  If None, then use the average of
+        optic.pupilSize/2 and optic.pupilSize/2*optic.pupilObscuration.  Default: None.
+    nring : int, optional
+        If `reference` is 'ring', then this is the number of rays to use in the
+        ring of rays to use for centering the output lattice.  Default: 100.
     jmax : int, optional
         Number of coefficients to compute.  Default: 22.
     eps : float, optional
@@ -809,6 +898,8 @@ def zernikeTA(
         )
         optic.trace(chief)
         point = chief.r[0]
+    elif reference == 'ring':
+        point, _ = _ringReferencePoint(optic, wavelength, dirCos, ring_radius, nring)
     x = rays.x - point[0]
     y = rays.y - point[1]
 
@@ -836,7 +927,8 @@ def zernikeTA(
 def zernikeXYAberrations(
     optic, theta_x, theta_y, wavelength,
     projection='postel', nrad=6, naz=36,
-    reference='chief', jmax=22, eps=0.0,
+    reference='chief', ring_radius=None, nring=100,
+    jmax=22, eps=0.0,
     include_vignetted=False
 ):
     """Compute Zernike polynomial representations of X- and Y- transverse
@@ -857,10 +949,18 @@ def zernikeXYAberrations(
     naz : int, optional
         Approximate number of azimuthal angles in outermost ring.  (see
         RayVector.asPolar())
-    reference : {'chief', 'mean'}
+    reference : {'chief', 'mean', 'ring'}
         If 'chief', then center the output lattice where the chief ray
         intersects the focal plane.  If 'mean', then center at the mean
-        non-vignetted ray intersection.
+        non-vignetted ray intersections.  If 'ring', then center at the mean of the
+        (possibly vignetted) ring of rays described by `ring_radius` and `nring`.
+    ring_radius : float, optional
+        If `reference` is 'ring', then this is the radius of the ring of rays to
+        use for centering the output lattice.  If None, then use the average of
+        optic.pupilSize/2 and optic.pupilSize/2*optic.pupilObscuration.  Default: None.
+    nring : int, optional
+        If `reference` is 'ring', then this is the number of rays to use in the
+        ring of rays to use for centering the output lattice.  Default: 100.
     jmax : int, optional
         Number of coefficients to compute.  Default: 22.
     eps : float, optional
@@ -899,6 +999,8 @@ def zernikeXYAberrations(
         )
         optic.trace(chief)
         point = chief.r[0]
+    elif reference == 'ring':
+        point, _ = _ringReferencePoint(optic, wavelength, dirCos, ring_radius, nring)
     x = rays.x - point[0]
     y = rays.y - point[1]
 
