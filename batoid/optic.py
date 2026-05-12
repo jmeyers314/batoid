@@ -1802,16 +1802,27 @@ class CompoundOptic(Optic):
         `CompoundOptic`
             Optic without removed item.
         """
+        if item == "":
+            return self
         item = self._names.get(item, item)
         if item not in self.itemDict:
+            # return self
             raise ValueError("Optic {} not found".format(item))
         newItems = []
         newDict = dict(self.__dict__)
         for k in ['items', 'itemDict', '_names', 'R_inner', 'R_outer']:
             newDict.pop(k, None)
+        targetNames = self._names[item].split(".")
+        targetName = ".".join(targetNames[1:])
         for it in self.items:
-            if self._names[it.name] != self._names[item]:
-                newItems.append(it)
+            itName = self._names[it.name]
+            itName = ".".join(itName.split(".")[1:])
+            if itName != targetName:
+                if isinstance(it, CompoundOptic):
+                    newTargetName = ".".join(targetNames[2:])
+                    newItems.append(it.withRemovedOptic(newTargetName))
+                else:
+                    newItems.append(it)
         return self.__class__(
             newItems,
             **newDict
