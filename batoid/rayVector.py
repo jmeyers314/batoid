@@ -860,10 +860,15 @@ class RayVector:
             vx = dx / (n * dist)
             vy = dy / (n * dist)
             vz = dz / (n * dist)
-            x = np.full_like(vx, source[0])
-            y = np.full_like(vy, source[1])
-            z = np.full_like(vz, source[2])
-            t = np.zeros(len(x), dtype=float)
+            # Advance rays from source to backDist ahead of the stop,
+            # mirroring the source is None case.  This avoids catastrophic
+            # cancellation in Surface::timeToIntersect when the source is
+            # far from the telescope.
+            t_advance = n * np.maximum(0.0, dist - backDist)
+            x = source[0] + vx * t_advance
+            y = source[1] + vy * t_advance
+            z = source[2] + vz * t_advance
+            t = t_advance
             vignetted = np.zeros(len(x), dtype=bool)
             failed = np.zeros(len(x), dtype=bool)
             return RayVector._directInit(
