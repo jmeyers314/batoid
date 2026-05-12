@@ -604,6 +604,28 @@ def test_insert_middle():
 
 
 @timer
+def test_remove_nested():
+    telescope = batoid.Optic.fromYaml("LSST_r.yaml")
+    # L1 is nested two levels deep: LSST > LSSTCamera > L1.
+    # The old withRemovedOptic only iterated direct children, so nested compound
+    # optics were never actually removed.
+    removed = telescope.withRemovedOptic('L1')
+    with np.testing.assert_raises(ValueError):
+        removed['L1']
+    # L1_entrance/L1_exit were inside L1, so they're gone too.
+    with np.testing.assert_raises(ValueError):
+        removed['L1_entrance']
+    with np.testing.assert_raises(ValueError):
+        removed['L1.L1_entrance']
+    with np.testing.assert_raises(ValueError):
+        removed['LSSTCamera.L1']
+    # The rest of the camera hierarchy should still be intact.
+    assert removed['L2'] is not None
+    assert removed['LSSTCamera'] is not None
+    assert removed['LSSTCamera.L2'] is not None
+
+
+@timer
 def test_optic_radii():
     import os
     import yaml
@@ -673,4 +695,5 @@ if __name__ == '__main__':
     test_insert()
     test_insert_null_phase()
     test_insert_middle()
+    test_remove_nested()
     test_optic_radii()
