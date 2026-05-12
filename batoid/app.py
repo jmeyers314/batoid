@@ -196,7 +196,7 @@ class RubinCSApp:
             self.constellations,
             self.stars,
             self.telescope,
-            self.fp,
+            *self.fp,
             self.azimuth_ring,
             self.elevation_bearings,
             self.rays,
@@ -353,6 +353,8 @@ class RubinCSApp:
         )
 
     def _elevation_bearings_xyz(self, az):
+        c = np.cos(np.deg2rad(90-az))
+        s = np.sin(np.deg2rad(90-az))
         th = np.linspace(0, 2*np.pi, 100)
         x_, y_ = np.cos(th), np.sin(th)
         xs = []
@@ -364,8 +366,6 @@ class RubinCSApp:
                 y = x_*r
                 z = y_*r
                 z += 5.425  # height of elevation axis above azimuth ring
-                c = np.cos(np.deg2rad(90-az))
-                s = np.sin(np.deg2rad(90-az))
                 x, y = c*x - s*y, s*x + c*y
                 xs.append(x)
                 ys.append(y)
@@ -457,50 +457,65 @@ class RubinCSApp:
             batoid.globalCoordSys
         )
 
-        # Build in xy-plane in units of rafts to start
-        xs = []
-        ys = []
+        # Separate e2v and ITL rafts.  And ignore corner rafts.
+        e2v_idx = [
+            3,
+            6, 7, 8,
+            11, 12, 13,
+            16, 17, 18,
+            21, 22, 23,
+        ]
+        itl_idx = [
+            1, 2,
+            5, 9,
+            10, 14,
+            15, 19,
+        ]
 
-        # top hline
-        xs.extend([-1.5, 1.5, np.nan])
-        ys.extend([2.5, 2.5, np.nan])
-        # Middle hlines
-        for y in [1.5, 0.5, -0.5, -1.5]:
-            xs.extend([-2.5, 2.5, np.nan])
-            ys.extend([y, y, np.nan])
-        # bottom hline
-        xs.extend([-1.5, 1.5, np.nan])
-        ys.extend([-2.5, -2.5, np.nan])
-        # left vline
-        xs.extend([-2.5, -2.5, np.nan])
-        ys.extend([-1.5, 1.5, np.nan])
-        # middle vlines
-        for x in [1.5, 0.5, -0.5, -1.5]:
-            xs.extend([x, x, np.nan])
-            ys.extend([-2.5, 2.5, np.nan])
-        # right vline
-        xs.extend([2.5, 2.5, np.nan])
-        ys.extend([-1.5, 1.5, np.nan])
-        xs = np.array(xs)
-        ys = np.array(ys)
-        zs = np.zeros_like(xs)
+        e2v_xs = []
+        e2v_ys = []
+        itl_xs = []
+        itl_ys = []
 
-        # Now do the projection on the sky.  It's technically a 180-degree rotation,
-        # but we'll ignore that for now since the pattern is rotationally symmetric.
-        xfp, yfp, zfp = detector_ctf.applyForwardArray(xs*raft_det, ys*raft_det, zs)
-        xsky, ysky, zsky = sky_ctf.applyForwardArray(xs*raft_sky, ys*raft_sky, zs)
+        w = 0.49
+        for idx in e2v_idx:
+            cx = idx % 5 - 2
+            cy = idx // 5 - 2
+            e2v_xs.extend([cx-w, cx+w, cx+w, cx-w, cx-w, np.nan])
+            e2v_ys.extend([cy-w, cy-w, cy+w, cy+w, cy-w, np.nan])
+        e2v_xs = np.array(e2v_xs)
+        e2v_ys = np.array(e2v_ys)
+
+        for idx in itl_idx:
+            cx = idx % 5 - 2
+            cy = idx // 5 - 2
+            itl_xs.extend([cx-w, cx+w, cx+w, cx-w, cx-w, np.nan])
+            itl_ys.extend([cy-w, cy-w, cy+w, cy+w, cy-w, np.nan])
+        itl_xs = np.array(itl_xs)
+        itl_ys = np.array(itl_ys)
+
+        e2v_zs = np.zeros_like(e2v_xs)
+        e2v_xfp, e2v_yfp, e2v_zfp = detector_ctf.applyForwardArray(e2v_xs*raft_det, e2v_ys*raft_det, e2v_zs)
+        e2v_xsky, e2v_ysky, e2v_zsky = sky_ctf.applyForwardArray(e2v_xs*raft_sky, e2v_ys*raft_sky, e2v_zs)
+
+        itl_zs = np.zeros_like(itl_xs)
+        itl_xfp, itl_yfp, itl_zfp = detector_ctf.applyForwardArray(itl_xs*raft_det, itl_ys*raft_det, itl_zs)
+        itl_xsky, itl_ysky, itl_zsky = sky_ctf.applyForwardArray(itl_xs*raft_sky, itl_ys*raft_sky, itl_zs)
 
         return (
-            np.hstack([xfp, [np.nan], xsky]),
-            np.hstack([yfp, [np.nan], ysky]),
-            np.hstack([zfp, [np.nan], zsky])
+            np.hstack([e2v_xfp, [np.nan], e2v_xsky]),
+            np.hstack([e2v_yfp, [np.nan], e2v_ysky]),
+            np.hstack([e2v_zfp, [np.nan], e2v_zsky]),
+            np.hstack([itl_xfp, [np.nan], itl_xsky]),
+            np.hstack([itl_yfp, [np.nan], itl_ysky]),
+            np.hstack([itl_zfp, [np.nan], itl_zsky]),
         )
 
     def _fp_view(self):
-        x, y, z = self._fp_xyz()
-        return ipv.Scatter(
-            x=x, y=y, z=z,
-            color="red",
+        e2v_x, e2v_y, e2v_z, itl_x, itl_y, itl_z = self._fp_xyz()
+        e2v_scatter = ipv.Scatter(
+            x=e2v_x, y=e2v_y, z=e2v_z,
+            color="blue",
             visible_lines=True,
             color_selected=None,
             size_selected=0,
@@ -510,6 +525,19 @@ class RubinCSApp:
             cast_shadow=True,
             receive_shadow=True
         )
+        itl_scatter = ipv.Scatter(
+            x=itl_x, y=itl_y, z=itl_z,
+            color="cyan",
+            visible_lines=True,
+            color_selected=None,
+            size_selected=0,
+            size=0,
+            connected=True,
+            visible_markers=False,
+            cast_shadow=True,
+            receive_shadow=True
+        )
+        return e2v_scatter, itl_scatter
 
     def _cs_xyz(self, coordSys, length=2):
         p0 = coordSys.origin
@@ -527,7 +555,7 @@ class RubinCSApp:
 
         xscat = ipv.Scatter(
             x=x_xyz[0], y=x_xyz[1], z=x_xyz[2],
-            color="cyan",
+            color="green",
             visible_lines=True,
             color_selected=None,
             size_selected=1,
@@ -622,17 +650,17 @@ class RubinCSApp:
         self.spot_ax.set_ylim(-1, 1)
 
         # Add EDCS rose to spot diagram
-        edcs_x = self.spot_ax.arrow(-0.9, -0.9, 1.0, 0.0, width=0.02, color='cyan')
+        edcs_x = self.spot_ax.arrow(-0.9, -0.9, 1.0, 0.0, width=0.02, color='green')
         edcs_y = self.spot_ax.arrow(-0.9, -0.9, 0.0, 1.0, width=0.02, color='magenta')
-        edcs_x_text = self.spot_ax.text(1.0, -0.9, "EDCS +x", color='cyan', fontsize=8)
+        edcs_x_text = self.spot_ax.text(1.0, -0.9, "EDCS +x", color='green', fontsize=8)
         edcs_y_text = self.spot_ax.text(-0.9, 0.3, "EDCS +y", color='magenta', fontsize=8, rotation='vertical')
         self.EDCS_mpl = (edcs_x, edcs_y, edcs_x_text, edcs_y_text)
 
         # Add DVCS rose to spot diagram.  This is just x/y transpose of EDCS
         dvcs_y = self.spot_ax.arrow(-0.9, -0.9, 1.0, 0.0, width=0.02, color='magenta')
-        dvcs_x = self.spot_ax.arrow(-0.9, -0.9, 0.0, 1.0, width=0.02, color='cyan')
+        dvcs_x = self.spot_ax.arrow(-0.9, -0.9, 0.0, 1.0, width=0.02, color='green')
         dvcs_y_text = self.spot_ax.text(1.0, -0.9, "DVCS +y", color='magenta', fontsize=8)
-        dvcs_x_text = self.spot_ax.text(-0.9, 0.3, "DVCS +x", color='cyan', fontsize=8, rotation='vertical')
+        dvcs_x_text = self.spot_ax.text(-0.9, 0.3, "DVCS +x", color='green', fontsize=8, rotation='vertical')
         self.DVCS_mpl = (dvcs_x, dvcs_y, dvcs_x_text, dvcs_y_text)
 
         # Wavefront
@@ -644,16 +672,16 @@ class RubinCSApp:
             extent=[4.18, -4.18, -4.18, 4.18]  # +x goes to the left in OCS
         )
         # Add OCS rose.
-        ocs_x = self.wf_ax.arrow(-4.0, -4.0, 1.0, 0.0, width=0.02, color='cyan')
+        ocs_x = self.wf_ax.arrow(-4.0, -4.0, 1.0, 0.0, width=0.02, color='green')
         ocs_y = self.wf_ax.arrow(-4.0, -4.0, 0.0, 1.0, width=0.02, color='magenta')
-        ocs_x_text = self.wf_ax.text(0.0, -4.0, "OCS +x", color='cyan', fontsize=8)
+        ocs_x_text = self.wf_ax.text(0.0, -4.0, "OCS +x", color='green', fontsize=8)
         ocs_y_text = self.wf_ax.text(-4.0, -2.5, "OCS +y", color='magenta', fontsize=8, rotation='vertical')
         self.OCS_mpl = (ocs_x, ocs_y, ocs_x_text, ocs_y_text)
 
         # Add ZCS rose.
-        zcs_x = self.wf_ax.arrow(4.0, -4.0, -1.0, 0.0, width=0.02, color='cyan')
+        zcs_x = self.wf_ax.arrow(4.0, -4.0, -1.0, 0.0, width=0.02, color='green')
         zcs_y = self.wf_ax.arrow(4.0, -4.0, 0.0, 1.0, width=0.02, color='magenta')
-        zcs_x_text = self.wf_ax.text(2.5, -4.0, "ZCS +x", color='cyan', fontsize=8)
+        zcs_x_text = self.wf_ax.text(2.5, -4.0, "ZCS +x", color='green', fontsize=8)
         zcs_y_text = self.wf_ax.text(4.0, -2.5, "ZCS +y", color='magenta', fontsize=8, rotation='vertical')
         self.ZCS_mpl = (zcs_x, zcs_y, zcs_x_text, zcs_y_text)
 
@@ -932,10 +960,13 @@ class RubinCSApp:
         self.rays.visible = self.show_rays
 
     def update_fp(self):
-        x, y, z = self._fp_xyz()
-        self.fp.x = x
-        self.fp.y = y
-        self.fp.z = z
+        e2v_x, e2v_y, e2v_z, itl_x, itl_y, itl_z = self._fp_xyz()
+        self.fp[0].x = e2v_x
+        self.fp[0].y = e2v_y
+        self.fp[0].z = e2v_z
+        self.fp[1].x = itl_x
+        self.fp[1].y = itl_y
+        self.fp[1].z = itl_z
 
     def update_spot(self):
         # Spot respects z_offset, wf does not.
