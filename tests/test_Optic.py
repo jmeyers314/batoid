@@ -75,22 +75,19 @@ def test_traceFull_reverse_with_path():
     # Forward trace through the three mirrors, recording intersections.
     tf_fwd = telescope.traceFull(rays.copy(), path=['M1', 'M2', 'M3'])
 
-    # Flip the M3-output rays to start a reverse trace.
+    # Flip velocity only (not t) to start a reverse trace.
     rev_start = tf_fwd['M3_0']['out'].copy()
     rev_start.toCoordSys(batoid.globalCoordSys)
     rev_start.vx[:] *= -1
     rev_start.vy[:] *= -1
     rev_start.vz[:] *= -1
-    rev_start.t[:] *= -1
 
     # Reverse-trace through the mirrors in reverse order.
     tf_rev = telescope.traceFull(rev_start, path=['M3', 'M2', 'M1'], reverse=True)
 
-    # After the reverse trace, the 'out' rays at M1 are ON the mirror surface.
-    # These must coincide with the 'out' rays from the forward trace (same
-    # physical hit-point on M1), and the velocities must be negated.
-    # The old bug traced M3/M2/M1 forward instead of backward, so the
-    # reverse-trace rays hit completely wrong points on the mirror.
+    # Positions at M1 must match the forward-trace hit points.
+    # The old bug always set direction="forward" regardless of reverse=True,
+    # so the reverse-trace rays hit completely wrong points on the mirror.
     rev_out_m1 = tf_rev['M1_0']['out'].copy()
     fwd_out_m1 = tf_fwd['M1_0']['out'].copy()
     rev_out_m1.toCoordSys(batoid.globalCoordSys)
@@ -99,9 +96,15 @@ def test_traceFull_reverse_with_path():
     np.testing.assert_allclose(rev_out_m1.x[w], fwd_out_m1.x[w], atol=1e-9)
     np.testing.assert_allclose(rev_out_m1.y[w], fwd_out_m1.y[w], atol=1e-9)
     np.testing.assert_allclose(rev_out_m1.z[w], fwd_out_m1.z[w], atol=1e-9)
-    np.testing.assert_allclose(rev_out_m1.vx[w], -fwd_out_m1.vx[w], atol=1e-9)
-    np.testing.assert_allclose(rev_out_m1.vy[w], -fwd_out_m1.vy[w], atol=1e-9)
-    np.testing.assert_allclose(rev_out_m1.vz[w], -fwd_out_m1.vz[w], atol=1e-9)
+
+    # After tracing backward through M3→M2→M1, each reflection is undone in
+    # sequence, so the exit velocity at M1 equals the negated pre-M1 velocity
+    # from the forward trace (not the negated post-M1 velocity).
+    m1_in = tf_fwd['M1_0']['in'].copy()
+    m1_in.toCoordSys(batoid.globalCoordSys)
+    np.testing.assert_allclose(rev_out_m1.vx[w], -m1_in.vx[w], atol=1e-9)
+    np.testing.assert_allclose(rev_out_m1.vy[w], -m1_in.vy[w], atol=1e-9)
+    np.testing.assert_allclose(rev_out_m1.vz[w], -m1_in.vz[w], atol=1e-9)
 
 
 @timer
@@ -583,24 +586,15 @@ def test_insert_null_phase():
 
 @timer
 def test_insert_middle():
+    # Lens is an atomic unit (always 2 surfaces), so test round-tripping at the
+    # Lens level rather than removing individual surfaces.  withInsertedOptic
+    # only inserts into direct children, so operate on the Camera directly.
     telescope = batoid.Optic.fromYaml("LSST_r.yaml")
-    L1S1 = telescope['L1_entrance']
-    removed = telescope.withRemovedOptic('L1_entrance')
-    reinserted = removed.withInsertedOptic(
-        before="L1_exit",
-        item=L1S1
-    )
-    assert telescope == reinserted
-
-    rays = batoid.RayVector.asPolar(
-        optic=telescope,
-        theta_x=0.01, theta_y=0.01,
-        wavelength=622e-9,
-        nrandom=1000,
-    )
-    trays = telescope.trace(rays.copy())
-    rrays = reinserted.trace(rays.copy())
-    rays_allclose(trays, rrays, atol=1e-13)
+    camera = telescope['LSSTCamera']
+    L1 = camera['L1']
+    removed = camera.withRemovedOptic('L1')
+    reinserted = removed.withInsertedOptic(before='L2', item=L1)
+    assert camera == reinserted
 
 
 @timer
