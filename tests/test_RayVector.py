@@ -1121,6 +1121,33 @@ def test_source():
     np.testing.assert_allclose(rays.vy[0], dy/dist, rtol=1e-14)
     np.testing.assert_allclose(rays.vz[0], dz/dist, rtol=1e-14)
 
+    # Far-source test: when dist > backDist, rays should start backDist ahead
+    # of the stop (not at the source), but still have the same velocity direction.
+    backDist = 5.0
+    source_far = (0.0, 0.0, -1000.0)
+    rays_far = batoid.RayVector.fromStop(
+        stop_x, stop_y,
+        backDist=backDist,
+        medium=batoid.vacuum,
+        stopSurface=batoid.Interface(batoid.Plane()),
+        wavelength=500e-9,
+        source=source_far,
+        coordSys=batoid.globalCoordSys
+    )
+    dx = stop_x - source_far[0]
+    dy = stop_y - source_far[1]
+    dz = 0.0 - source_far[2]
+    dist_far = np.sqrt(dx**2 + dy**2 + dz**2)
+    # velocity direction unchanged
+    np.testing.assert_allclose(rays_far.vx[0], dx/dist_far, rtol=1e-14)
+    np.testing.assert_allclose(rays_far.vy[0], dy/dist_far, rtol=1e-14)
+    np.testing.assert_allclose(rays_far.vz[0], dz/dist_far, rtol=1e-14)
+    # rays should have advanced backDist behind the stop (not at source)
+    t_advance = dist_far - backDist
+    np.testing.assert_allclose(rays_far.x[0], source_far[0] + rays_far.vx[0]*t_advance, rtol=1e-14)
+    np.testing.assert_allclose(rays_far.y[0], source_far[1] + rays_far.vy[0]*t_advance, rtol=1e-14)
+    np.testing.assert_allclose(rays_far.z[0], source_far[2] + rays_far.vz[0]*t_advance, rtol=1e-14)
+
 
 def test_fromFieldAngles():
     telescope = batoid.Optic.fromYaml("LSST_r.yaml")
