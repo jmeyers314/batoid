@@ -28,6 +28,7 @@ Notes: New release tags (with patch=0) should be tagged on the main branch so
 - tag for realz:
   git tag -a v0.7.0 -m "Version 0.7.0"
   git push --tags
+  git pushf
 - On GH, make a release.  wheels.yml should run automatically.
 - Make a release branch off of that last tagged commit
   git checkout -b releases/0.7
