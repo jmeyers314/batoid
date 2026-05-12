@@ -1135,13 +1135,13 @@ class CompoundOptic(Optic):
                 if name not in nominalOrder.keys():
                     nominalOrder[name] = i
                     i += 1
-            direction = "forward"
+            direction = "reverse" if reverse else "forward"
             rv_in = rv
             # Do the actual tracing here.
             for i in range(len(path)):
                 currentName = path[i]
                 item = self[currentName]
-                # logic to decide when to reverse direction
+                # logic to decide when to switch direction
                 if i == len(path)-1:
                     if nominalOrder[path[i]] == 0:
                         nextDirection = "reverse"
@@ -1150,9 +1150,9 @@ class CompoundOptic(Optic):
                 else:
                     nextName = path[i+1]
                     if nominalOrder[nextName] < nominalOrder[currentName]:
-                        nextDirection = "reverse"
+                        nextDirection = "forward" if reverse else "reverse"
                     else:
-                        nextDirection = "forward"
+                        nextDirection = "reverse" if reverse else "forward"
                 # trace
                 if direction == nextDirection:
                     rv_out = item.trace(
