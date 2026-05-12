@@ -1050,6 +1050,78 @@ def test_fromStop():
     assert rv == rv2
 
 
+@timer
+def test_source():
+    # Test the source is not None branch of RayVector._finish.
+    # Rays should all originate at source, have |v|=1/n, and point toward stop.
+    rng = np.random.default_rng(12345)
+
+    for _ in range(5):
+        wavelength = rng.uniform(300e-9, 1100e-9)
+        n = rng.uniform(1.0, 1.5)
+        medium = batoid.ConstMedium(n)
+        outer = rng.uniform(1.0, 4.0)
+        inner = rng.uniform(0.0, outer * 0.5)
+        src = rng.uniform(-5.0, -1.0)
+        source = (0.0, 0.0, src)
+
+        for factory in [
+            lambda: batoid.RayVector.asPolar(
+                backDist=None,
+                medium=medium,
+                stopSurface=batoid.Interface(batoid.Plane()),
+                nrad=8, naz=48,
+                wavelength=wavelength,
+                source=source,
+                inner=inner, outer=outer,
+                coordSys=batoid.globalCoordSys
+            ),
+            lambda: batoid.RayVector.asGrid(
+                backDist=None,
+                medium=medium,
+                stopSurface=batoid.Interface(batoid.Plane()),
+                nx=10,
+                wavelength=wavelength,
+                source=source,
+                lx=outer*2,
+                coordSys=batoid.globalCoordSys
+            ),
+        ]:
+            rays = factory()
+
+            # All rays must start at the source point
+            np.testing.assert_allclose(rays.x, source[0], atol=1e-15)
+            np.testing.assert_allclose(rays.y, source[1], atol=1e-15)
+            np.testing.assert_allclose(rays.z, source[2], atol=1e-15)
+
+            # Speed must be 1/n
+            vmag = np.sqrt(rays.vx**2 + rays.vy**2 + rays.vz**2)
+            np.testing.assert_allclose(vmag, 1.0/n, rtol=1e-14)
+
+            # vz must be positive (stop surface is at z=0, source is at z<0)
+            assert np.all(rays.vz > 0)
+
+    # Direction test: for a single known stop position verify direction
+    source = (1.0, 2.0, -5.0)
+    stop_x, stop_y = 3.0, 4.0
+    rays = batoid.RayVector.fromStop(
+        stop_x, stop_y,
+        backDist=None,
+        medium=batoid.vacuum,
+        stopSurface=batoid.Interface(batoid.Plane()),
+        wavelength=500e-9,
+        source=source,
+        coordSys=batoid.globalCoordSys
+    )
+    dx = stop_x - source[0]
+    dy = stop_y - source[1]
+    dz = 0.0  - source[2]
+    dist = np.sqrt(dx**2 + dy**2 + dz**2)
+    np.testing.assert_allclose(rays.vx[0], dx/dist, rtol=1e-14)
+    np.testing.assert_allclose(rays.vy[0], dy/dist, rtol=1e-14)
+    np.testing.assert_allclose(rays.vz[0], dz/dist, rtol=1e-14)
+
+
 def test_fromFieldAngles():
     telescope = batoid.Optic.fromYaml("LSST_r.yaml")
     thx = np.linspace(-0.5, 0.5, 10)

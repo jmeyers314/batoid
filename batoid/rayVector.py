@@ -845,17 +845,31 @@ class RayVector:
                 flux, vignetted, failed, coordSys
             )
         else:
-            pass
-            # v = np.copy(r)
-            # v -= source
-            # v /= n*np.einsum('ab,ab->b', v, v)
-            # r[:] = source
-            # t = np.zeros(len(r), dtype=float)
-            # vignetted = np.zeros(len(r), dtype=bool)
-            # failed = np.zeros(len(r), dtype=bool)
-            # return RayVector._directInit(
-            #     r, v, t, w, flux, vignetted, failed, coordSys
-            # )
+            source = np.array(source, dtype=float)
+            if coordSys is not globalCoordSys:
+                transform = CoordTransform(globalCoordSys, coordSys)
+                sx = np.array([source[0]])
+                sy = np.array([source[1]])
+                sz = np.array([source[2]])
+                applyForwardTransformArrays(transform, sx, sy, sz)
+                source = np.array([sx[0], sy[0], sz[0]])
+            dx = x - source[0]
+            dy = y - source[1]
+            dz = z - source[2]
+            dist = np.sqrt(dx*dx + dy*dy + dz*dz)
+            vx = dx / (n * dist)
+            vy = dy / (n * dist)
+            vz = dz / (n * dist)
+            x = np.full_like(vx, source[0])
+            y = np.full_like(vy, source[1])
+            z = np.full_like(vz, source[2])
+            t = np.zeros(len(x), dtype=float)
+            vignetted = np.zeros(len(x), dtype=bool)
+            failed = np.zeros(len(x), dtype=bool)
+            return RayVector._directInit(
+                x, y, z, vx, vy, vz, t, w,
+                flux, vignetted, failed, coordSys
+            )
 
     @classmethod
     def fromStop(
