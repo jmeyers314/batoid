@@ -481,6 +481,64 @@ def test_ring_reference_consistency():
     np.testing.assert_allclose(z_chief[4:], z_ring[4:], rtol=0, atol=1e-3)
 
 
+@timer
+def test_conjugate_point():
+    # A conic (Quadric) mirror has two exact geometric foci: a source at one
+    # focus maps perfectly to the other, for any aperture (not just paraxial).
+    # With conic constant k < 0 (prolate ellipse), the two foci are at
+    #   f1 = R / (1 + sqrt(-k))   (near focus)
+    #   f2 = R / (1 - sqrt(-k))   (far focus)
+    # We place the mirror at z=0 (vertex), opening downward (reflective),
+    # source at (0, 0, f1), and expect conjugatePoint to return ~(0, 0, f2).
+    rng = np.random.default_rng(57721)
+
+    R = 4.0
+    k = -0.5
+    e = np.sqrt(-k)
+    f1 = R / (1 + e)
+    f2 = R / (1 - e)
+    diam = 1.0
+
+    mirror = batoid.Mirror(
+        batoid.Quadric(R, k),
+        name="Mirror",
+        obscuration=batoid.ObscNegation(
+            batoid.ObscAnnulus(0.0, 0.5 * diam)
+        ),
+    )
+    telescope = batoid.CompoundOptic(
+        items=[
+            mirror,
+            batoid.Detector(
+                batoid.Plane(),
+                name="detector",
+                coordSys=batoid.CoordSys(origin=[0, 0, f2]),
+            ),
+        ],
+        pupilSize=diam,
+        backDist=10.0,
+        stopSurface=mirror,
+        inMedium=batoid.ConstMedium(1.0),
+    )
+
+    # On-axis point source at f1
+    result = batoid.conjugatePoint(
+        telescope, source=[0, 0, f1], wavelength=500e-9, nrad=10, naz=36
+    )
+    np.testing.assert_allclose(result, [0, 0, f2], atol=1e-9)
+
+    # Off-axis: small transverse offset at f1 — conjugate z should be near f2
+    # (field curvature shifts it slightly) and x/y should be magnified by
+    # approximately -f2/f1 (mirror inverts; exact only in paraxial limit).
+    dx = 0.001  # small enough for paraxial approximation to hold well
+    result_off = batoid.conjugatePoint(
+        telescope, source=[dx, 0, f1], wavelength=500e-9, nrad=10, naz=36
+    )
+    np.testing.assert_allclose(result_off[2], f2, atol=1e-3)
+    np.testing.assert_allclose(result_off[0], -dx * f2 / f1, rtol=1e-2)
+    np.testing.assert_allclose(result_off[1], 0.0, atol=1e-9)
+
+
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
@@ -494,3 +552,4 @@ if __name__ == '__main__':
     test_huygens_paraboloid(args.plot)
     test_transverse_aberrations()
     test_ring_reference_consistency()
+    test_conjugate_point()
