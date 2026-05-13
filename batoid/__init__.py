@@ -44,7 +44,7 @@ from .analysis import (
     huygensPSF, fftPSF, wavefront, spot,
     zernike, zernikeGQ, zernikeTA, zernikeXYAberrations,
     doubleZernike,
-    drdth, dthdr, exitPupilPos
+    drdth, dthdr, exitPupilPos, conjugatePoint
 )
 from . import plotUtils
 from . import global_vars

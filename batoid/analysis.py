@@ -1124,6 +1124,86 @@ def _closestApproach(P, u, Q, v):
     return P + sc*u
 
 
+def conjugatePoint(
+    optic, source, wavelength, nrad=6, naz=36, coordSys=None,
+    include_vignetted=False
+):
+    """Find the image-space conjugate of an object-space point source.
+
+    Traces a bundle of rays from ``source`` through the optic and finds the
+    plane (perpendicular to the z-axis of the working coordinate system) at
+    which the transverse RMS spread of the ray bundle is minimized.  This is
+    the geometric best-focus conjugate of the source point.
+
+    Parameters
+    ----------
+    optic : batoid.Optic
+        Optical system.
+    source : array_like, shape (3,)
+        Point source position in global coordinates (meters).
+    wavelength : float
+        Wavelength in meters.
+    nrad : int, optional
+        Number of entrance-pupil radial samples.  Default: 6.
+    naz : int, optional
+        Approximate number of azimuthal samples in the outermost ring.
+        Default: 36.
+    coordSys : batoid.CoordSys, optional
+        Coordinate system whose z-axis defines the focus-scan direction.
+        Defaults to the coordSys of the last optic surface (i.e.
+        ``rays.coordSys`` after tracing).
+    include_vignetted : bool, optional
+        If True, include vignetted rays in the conjugate point calculation.
+        Default: False.
+
+    Returns
+    -------
+    point : ndarray, shape (3,)
+        Best-focus conjugate position in global coordinates (meters).
+    """
+    rays = batoid.RayVector.asPolar(
+        optic=optic, wavelength=wavelength,
+        source=source,
+        nrad=nrad, naz=naz,
+    )
+    optic.trace(rays)
+
+    if coordSys is not None:
+        rays.toCoordSys(coordSys)
+    working_cs = rays.coordSys
+
+    if include_vignetted:
+        w = ~rays.failed
+    else:
+        w = ~rays.vignetted & ~rays.failed
+    if not np.any(w):
+        raise ValueError("No valid rays after tracing — all rays vignetted or failed")
+    x = rays.x[w]
+    y = rays.y[w]
+    z = rays.z[w]
+    vx = rays.v[w, 0]
+    vy = rays.v[w, 1]
+    vz = rays.v[w, 2]
+
+    # Slopes and intercepts for ray-plane intersections
+    ax = vx / vz   # dx/dz
+    ay = vy / vz   # dy/dz
+    bx = x - ax * z
+    by = y - ay * z
+
+    denom = np.var(ax) + np.var(ay)
+    if denom == 0:
+        raise ValueError("Rays are parallel — no finite conjugate exists")
+    z_star = -(np.cov(bx, ax)[0, 1] + np.cov(by, ay)[0, 1]) / denom
+
+    local_point = np.array([
+        np.mean(bx + ax * z_star),
+        np.mean(by + ay * z_star),
+        z_star,
+    ])
+    return working_cs.toGlobal(local_point)
+
+
 def exitPupilPos(optic, wavelength, smallAngle=np.deg2rad(1./3600), **kwargs):
     """Compute position of the exit pupil.
 
