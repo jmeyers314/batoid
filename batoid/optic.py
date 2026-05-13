@@ -1951,7 +1951,11 @@ def getGlobalRays(traceFull, start=None, end=None, globalSys=globalCoordSys):
     return xyz, raylen
 
 
-def drawTrace3d(ax, traceFull, start=None, end=None, plotly=False, **kwargs):
+def drawTrace3d(
+    ax, traceFull, start=None, end=None, plotly=False,
+    extend=0.0, vignette_kw=None,
+    **kwargs
+):
     """Draw 3D rays in global coordinates on the specified axis.
 
     Parameters
@@ -1968,12 +1972,39 @@ def drawTrace3d(ax, traceFull, start=None, end=None, plotly=False, **kwargs):
         surface in the model when None.
     plotly : bool
         Set True to use plotly API instead of ipyvolume/matplotlib API
+    extend : float, optional
+        If > 0, extend each non-vignetted ray this many meters past the last
+        surface in a straight line.  Default: 0.
+    vignette_kw : dict or None, optional
+        If provided, draw the vignetted portion of each ray using these kwargs
+        instead of ``**kwargs``.  If None, vignetted segments are not drawn.
+        Default: None.
     globalSys : `batoid.CoordSys`
         Global coordinate system to use.
     """
+    names = list(traceFull.keys())
+    if end is None:
+        end = names[-1]
+
     xyz, raylen = getGlobalRays(
         traceFull, start, end, globalSys=kwargs.get('globalSys', globalCoordSys)
     )
+
+    if extend > 0.0:
+        out_rays = traceFull[end]['out']
+        transform = CoordTransform(out_rays.coordSys, globalCoordSys)
+        v = out_rays.v
+        r = out_rays.r
+        v_mag = np.linalg.norm(v, axis=1, keepdims=True)
+        r_ext = r + v / v_mag * extend
+        xyz_ext = np.stack(
+            transform.applyForwardArray(*r_ext.T), axis=1
+        )[:, :, np.newaxis]
+        xyz = np.concatenate([xyz, xyz_ext], axis=2)
+        not_done = ~out_rays.vignetted & ~out_rays.failed
+        raylen[not_done] += 1
+
+    total_nvert = xyz.shape[2]
     for line, nline in zip(xyz, raylen):
         if plotly:
             ax.add_scatter3d(
@@ -1982,11 +2013,27 @@ def drawTrace3d(ax, traceFull, start=None, end=None, plotly=False, **kwargs):
                 z=line[2, :nline],
                 **kwargs
             )
+            if vignette_kw is not None and nline < total_nvert:
+                ax.add_scatter3d(
+                    x=line[0, nline-1:],
+                    y=line[1, nline-1:],
+                    z=line[2, nline-1:],
+                    **vignette_kw
+                )
         else:
             ax.plot(line[0, :nline], line[1, :nline], line[2, :nline], **kwargs)
+            if vignette_kw is not None and nline < total_nvert:
+                ax.plot(
+                    line[0, nline-1:], line[1, nline-1:], line[2, nline-1:],
+                    **vignette_kw
+                )
 
 
-def drawTrace2d(ax, traceFull, start=None, end=None, **kwargs):
+def drawTrace2d(
+    ax, traceFull, start=None, end=None,
+    extend=0.0, vignette_kw=None,
+    **kwargs
+):
     """Draw 2D rays in global coordinates on the specified axis.
 
     Parameters
@@ -2001,11 +2048,53 @@ def drawTrace2d(ax, traceFull, start=None, end=None, **kwargs):
     end : str or None
         Name of the last surface to include in the output, or use the last
         surface in the model when None.
+    extend : float, optional
+        If > 0, extend each non-vignetted ray this many meters past the last
+        surface in a straight line.  Default: 0.
+    vignette_kw : dict or None, optional
+        If provided, draw the vignetted portion of each ray (from where it
+        first becomes vignetted onward) using these matplotlib kwargs instead
+        of ``**kwargs``.  If None, vignetted segments are not drawn.
+        Default: None.
     globalSys : `batoid.CoordSys`
         Global coordinate system to use.
     """
+    names = list(traceFull.keys())
+    if end is None:
+        end = names[-1]
+
     xyz, raylen = getGlobalRays(traceFull, start, end)
-    lines = []
-    for line, nline in zip(xyz, raylen):
-        lines.extend([line[0, :nline], line[2, :nline]])
-    ax.plot(*lines, **kwargs)
+    nvert = xyz.shape[2]  # nsurf + 1
+
+    if extend > 0.0:
+        out_rays = traceFull[end]['out']
+        transform = CoordTransform(out_rays.coordSys, globalCoordSys)
+        v = out_rays.v          # (nray, 3) in surface coordSys
+        r = out_rays.r          # (nray, 3) in surface coordSys
+        v_mag = np.linalg.norm(v, axis=1, keepdims=True)
+        r_ext = r + v / v_mag * extend
+        xyz_ext = np.stack(
+            transform.applyForwardArray(*r_ext.T), axis=1
+        )[:, :, np.newaxis]    # (nray, 3, 1)
+        xyz = np.concatenate([xyz, xyz_ext], axis=2)
+        not_done = ~out_rays.vignetted & ~out_rays.failed
+        raylen[not_done] += 1
+
+    if vignette_kw is None:
+        lines = []
+        for line, nline in zip(xyz, raylen):
+            lines.extend([line[0, :nline], line[2, :nline]])
+        ax.plot(*lines, **kwargs)
+    else:
+        total_nvert = xyz.shape[2]
+        lines_main = []
+        lines_vig = []
+        for line, nline in zip(xyz, raylen):
+            lines_main.extend([line[0, :nline], line[2, :nline]])
+            if nline < total_nvert:
+                # Connect smoothly: start vignetted segment at last good point
+                lines_vig.extend([line[0, nline-1:], line[2, nline-1:]])
+        if lines_main:
+            ax.plot(*lines_main, **kwargs)
+        if lines_vig:
+            ax.plot(*lines_vig, **vignette_kw)
