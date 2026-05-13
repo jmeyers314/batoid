@@ -90,6 +90,7 @@ ENV/
 
 .clang_complete
 .pytest_cache
+.DS_Store
 
 # Temporary outputs
 *.png
