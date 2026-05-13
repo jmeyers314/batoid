@@ -798,7 +798,7 @@ class RayVector:
         flux = np.broadcast_to(flux, rings.shape)
         rings = rings.ravel()
         spokes = spokes.ravel()
-        flux = flux.ravel()
+        flux = flux.ravel().copy()
 
         x = rings*np.cos(spokes)
         y = rings*np.sin(spokes)
@@ -967,8 +967,8 @@ class RayVector:
         if wavelength is None:
             raise ValueError("Missing wavelength keyword")
 
-        x = np.atleast_1d(x).astype(float, copy=False)
-        y = np.atleast_1d(y).astype(float, copy=False)
+        x = np.atleast_1d(x).astype(float, copy=True)
+        y = np.atleast_1d(y).astype(float, copy=True)
         z = stopSurface.surface.sag(x, y)
         transform = CoordTransform(stopSurface.coordSys, coordSys)
         applyForwardTransformArrays(transform, x, y, z)
