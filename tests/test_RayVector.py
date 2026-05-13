@@ -773,6 +773,20 @@ def test_asSpokes():
                 w_
             )
 
+    # Regression: flux from broadcast_to must be writable in the output RayVector.
+    # The bug only manifests when flux is already C-contiguous with the post-meshgrid
+    # shape (n_spokes, n_rings), because then broadcast_to is a no-op that just marks
+    # the array read-only, and ravel() returns a read-only view.
+    n_rings, n_spokes = 3, 7
+    flux_2d = np.ones((n_spokes, n_rings))  # exact post-meshgrid shape
+    rays = batoid.RayVector.asSpokes(
+        backDist=10.0, wavelength=500e-9,
+        outer=1.0, inner=0.1, rings=n_rings, spokes=n_spokes,
+        dirCos=[0, 0, -1],
+        flux=flux_2d,
+    )
+    rays.flux[0] = 99.0  # must not raise ValueError (read-only array)
+
 
 @timer
 def test_factory_optic():
@@ -1005,6 +1019,19 @@ def test_fromStop():
             np.testing.assert_allclose(
                 rv_test.vz, rv_traced1.vz, rtol=0, atol=1e-14
             )
+
+    # Regression: fromStop must not alias the caller's x/y arrays
+    x_arr = np.array([0.1, 0.2])
+    y_arr = np.array([0.05, 0.15])
+    x_orig = x_arr.copy()
+    y_orig = y_arr.copy()
+    batoid.RayVector.fromStop(
+        x_arr, y_arr,
+        optic=telescope, wavelength=625e-9,
+        theta_x=np.deg2rad(1.0), theta_y=np.deg2rad(0.2)
+    )
+    np.testing.assert_array_equal(x_arr, x_orig)
+    np.testing.assert_array_equal(y_arr, y_orig)
 
     # A few more coverage checks
     with np.testing.assert_raises(ValueError):
