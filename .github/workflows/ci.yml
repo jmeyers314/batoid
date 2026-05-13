@@ -15,24 +15,35 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.experimental == true }}
 
     strategy:
       matrix:
         os: [ ubuntu-latest ]
-        py: [3.9, '3.10', 3.11, 3.12, 3.13]
+        py: ['3.10', 3.11, 3.12, 3.13, 3.14]
         CC: [ gcc ]
         CXX: [ g++ ]
         include:
           - os: macos-latest
-            py: 3.9
+            py: '3.10'
             CC: cc
             CXX: c++
           - os: ubuntu-latest
-            py: 3.9
+            py: '3.10'
             CC: clang
             CXX: clang++
+          - os: ubuntu-latest
+            py: '3.14t'
+            CC: gcc
+            CXX: g++
+            experimental: true
+          - os: ubuntu-latest
+            py: '3.15'
+            CC: gcc
+            CXX: g++
+            experimental: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 2
 
@@ -47,9 +58,11 @@ jobs:
           echo 'event.after: ${{ github.event.after }}'
 
       - name: Set up Python ${{ matrix.py }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.py }}
+          cache: 'pip'
+          allow-prereleases: ${{ matrix.experimental == true }}
 
       - name: Install libfftw, etc. on linux (needed for GalSim)
         if: matrix.os == 'ubuntu-latest'
@@ -58,20 +71,23 @@ jobs:
           sudo -H apt-get -qq update
           sudo -H apt-get install -y libfftw3-dev libeigen3-dev
 
-      - name: Install libfftw, etc. on MacOS
+      - name: Cache Homebrew packages
+        id: cache-brew
         if: matrix.os == 'macos-latest'
-        run: |
-          # brew update takes forever to run.  Hopefully won't need to enable this too often.
-          # Note: The || true bit here is because brew returns an error code if everything is
-          #       already installed, which is goofy.  So || true means these always give
-          #       non-error values.  If there really is an error, we should notice later
-          #       when trying to use whatever package failed to install.
-          # brew update || true
-          brew install fftw wget || true
-          brew upgrade wget || true
-          brew link --overwrite fftw gcc wget || true
-          brew install eigen || true
-          brew link --overwrite eigen || true
+        uses: actions/cache@v4
+        with:
+          path: |
+            /opt/homebrew/Cellar/fftw
+            /opt/homebrew/Cellar/eigen
+            /opt/homebrew/Cellar/wget
+            /opt/homebrew/opt/fftw
+            /opt/homebrew/opt/eigen
+            /opt/homebrew/opt/wget
+          key: macos-brew-fftw-eigen-wget-v1
+
+      - name: Install libfftw, etc. on MacOS
+        if: matrix.os == 'macos-latest' && steps.cache-brew.outputs.cache-hit != 'true'
+        run: brew install fftw eigen wget
 
       - name: Install dependencies
         env:
@@ -103,7 +119,7 @@ jobs:
         run: pytest --cov=batoid --cov-report=xml --cov-config tests/.coveragerc --skip_gha --durations=8 -ra
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
