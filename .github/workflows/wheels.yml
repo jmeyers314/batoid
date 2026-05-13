@@ -66,6 +66,25 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Cache Homebrew packages
+        id: cache-brew
+        uses: actions/cache@v4
+        with:
+          path: |
+            /usr/local/Cellar/llvm
+            /usr/local/Cellar/libomp
+            /usr/local/Cellar/fftw
+            /usr/local/Cellar/eigen
+            /usr/local/opt/llvm
+            /usr/local/opt/libomp
+            /usr/local/opt/fftw
+            /usr/local/opt/eigen
+          key: macos-x86-brew-llvm-libomp-fftw-eigen-v1
+
+      - name: Install Homebrew packages
+        if: steps.cache-brew.outputs.cache-hit != 'true'
+        run: brew install llvm libomp fftw eigen
+
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.3.1
         env:
@@ -73,9 +92,7 @@ jobs:
           CIBW_BUILD: "*macosx*"
           CIBW_SKIP: cp38* cp39*
           CIBW_BUILD_VERBOSITY: 3
-          CIBW_BEFORE_BUILD: >-
-            pip install -U pybind11-global &&
-            brew install llvm libomp fftw eigen
+          CIBW_BEFORE_BUILD: pip install -U pybind11-global
           CIBW_ENVIRONMENT: >-
             CC=/usr/local/opt/llvm/bin/clang
             CXX=/usr/local/opt/llvm/bin/clang++
@@ -98,6 +115,25 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Cache Homebrew packages
+        id: cache-brew
+        uses: actions/cache@v4
+        with:
+          path: |
+            /opt/homebrew/Cellar/llvm
+            /opt/homebrew/Cellar/libomp
+            /opt/homebrew/Cellar/fftw
+            /opt/homebrew/Cellar/eigen
+            /opt/homebrew/opt/llvm
+            /opt/homebrew/opt/libomp
+            /opt/homebrew/opt/fftw
+            /opt/homebrew/opt/eigen
+          key: macos-arm-brew-llvm-libomp-fftw-eigen-v1
+
+      - name: Install Homebrew packages
+        if: steps.cache-brew.outputs.cache-hit != 'true'
+        run: brew install llvm libomp fftw eigen
+
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.3.1
         env:
@@ -105,9 +141,7 @@ jobs:
           CIBW_BUILD: "*macosx*"
           CIBW_SKIP: cp38* cp39*
           CIBW_BUILD_VERBOSITY: 3
-          CIBW_BEFORE_BUILD: >-
-            pip install -U pybind11-global &&
-            brew install llvm libomp fftw eigen
+          CIBW_BEFORE_BUILD: pip install -U pybind11-global
           CIBW_ENVIRONMENT: >-
             CC=/opt/homebrew/opt/llvm/bin/clang
             CXX=/opt/homebrew/opt/llvm/bin/clang++
