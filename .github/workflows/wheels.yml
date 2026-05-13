@@ -66,23 +66,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Cache Homebrew packages
-        id: cache-brew
+      - name: Cache Homebrew downloads
         uses: actions/cache@v4
         with:
-          path: |
-            /usr/local/Cellar/llvm
-            /usr/local/Cellar/libomp
-            /usr/local/Cellar/fftw
-            /usr/local/Cellar/eigen
-            /usr/local/opt/llvm
-            /usr/local/opt/libomp
-            /usr/local/opt/fftw
-            /usr/local/opt/eigen
-          key: macos-x86-brew-llvm-libomp-fftw-eigen-v1
+          path: ~/Library/Caches/Homebrew
+          key: macos-x86-brew-downloads-llvm-libomp-fftw-eigen-v1
 
       - name: Install Homebrew packages
-        if: steps.cache-brew.outputs.cache-hit != 'true'
         run: brew install llvm libomp fftw eigen
 
       - name: Build wheels
@@ -115,23 +105,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Cache Homebrew packages
-        id: cache-brew
+      - name: Cache Homebrew downloads
         uses: actions/cache@v4
         with:
-          path: |
-            /opt/homebrew/Cellar/llvm
-            /opt/homebrew/Cellar/libomp
-            /opt/homebrew/Cellar/fftw
-            /opt/homebrew/Cellar/eigen
-            /opt/homebrew/opt/llvm
-            /opt/homebrew/opt/libomp
-            /opt/homebrew/opt/fftw
-            /opt/homebrew/opt/eigen
-          key: macos-arm-brew-llvm-libomp-fftw-eigen-v1
+          path: ~/Library/Caches/Homebrew
+          key: macos-arm-brew-downloads-llvm-libomp-fftw-eigen-v1
 
       - name: Install Homebrew packages
-        if: steps.cache-brew.outputs.cache-hit != 'true'
         run: brew install llvm libomp fftw eigen
 
       - name: Build wheels
