@@ -1447,10 +1447,12 @@ class CompoundOptic(Optic):
                 else:
                     newItems.append(item.withGloballyShiftedOptic(name, shift))
                 newItems.extend(self.items[i+1:])
-                return self.__class__(
-                    newItems,
-                    **newDict
-                )
+                result = self.__class__(newItems, **newDict)
+                # Propagate to siblings declared as dependents of this item.
+                for dep in self.items:
+                    if getattr(dep, 'parent', None) == name:
+                        result = result.withGloballyShiftedOptic(dep.name, shift)
+                return result
             newItems.append(item)
         raise RuntimeError(
             "Error in withGloballyShiftedOptic!, Shouldn't get here!"
@@ -1618,10 +1620,14 @@ class CompoundOptic(Optic):
                         name, rot, rotCenter, coordSys
                     ))
                 newItems.extend(self.items[i+1:])
-                return self.__class__(
-                    newItems,
-                    **newDict
-                )
+                result = self.__class__(newItems, **newDict)
+                # Propagate to siblings declared as dependents of this item.
+                for dep in self.items:
+                    if getattr(dep, 'parent', None) == name:
+                        result = result.withLocallyRotatedOptic(
+                            dep.name, rot, rotCenter, coordSys
+                        )
+                return result
             newItems.append(item)
         raise RuntimeError(
             "Error in withLocallyRotatedOptic!, Shouldn't get here!"
@@ -1683,10 +1689,14 @@ class CompoundOptic(Optic):
                         name, rot, rotCenter, coordSys
                     ))
                 newItems.extend(self.items[i+1:])
-                return self.__class__(
-                    newItems,
-                    **newDict
-                )
+                result = self.__class__(newItems, **newDict)
+                # Propagate to siblings declared as dependents of this item.
+                for dep in self.items:
+                    if getattr(dep, 'parent', None) == name:
+                        result = result.withGloballyRotatedOptic(
+                            dep.name, rot, rotCenter, coordSys
+                        )
+                return result
             newItems.append(item)
         raise RuntimeError(
             "Error in withGloballyRotatedOptic!, Shouldn't get here!"
@@ -1812,8 +1822,10 @@ class CompoundOptic(Optic):
         newDict = dict(self.__dict__)
         for k in ['items', 'itemDict', '_names', 'R_inner', 'R_outer']:
             newDict.pop(k, None)
+        import warnings
         targetNames = self._names[item].split(".")
         targetName = ".".join(targetNames[1:])
+        removedShortName = targetNames[-1]
         for it in self.items:
             itName = self._names[it.name]
             itName = ".".join(itName.split(".")[1:])
@@ -1823,6 +1835,16 @@ class CompoundOptic(Optic):
                     newItems.append(it.withRemovedOptic(newTargetName))
                 else:
                     newItems.append(it)
+        # Warn about any remaining items whose parent was just removed.
+        for it in newItems:
+            if getattr(it, 'parent', None) == removedShortName:
+                warnings.warn(
+                    f"Optic '{it.name}' has parent='{removedShortName}' which "
+                    f"was just removed; '{it.name}' is now an orphan and will "
+                    f"no longer co-move with its former parent.",
+                    UserWarning,
+                    stacklevel=2,
+                )
         return self.__class__(
             newItems,
             **newDict
