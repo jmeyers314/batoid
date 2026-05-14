@@ -117,6 +117,7 @@ def parse_optic(config,
         'pupilObscuration',
         'R_outer',
         'R_inner',
+        'parent',
     ]:
         if k in config:
             kwargs[k] = config[k]
