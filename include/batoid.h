@@ -1,6 +1,7 @@
 #ifndef batoid_batoid_h
 #define batoid_batoid_h
 
+#include <vector>
 #include <array>
 #include "rayVector.h"
 #include "surface.h"
@@ -53,6 +54,14 @@ namespace batoid {
     );
 
     void finishParallel(const vec3 dr, const mat3 drot, const vec3 vv, double* x, double* y, double* z, size_t n);
+    
+    void finishParallelMultiple(
+        const std::vector<double>& origins,   // (N * 3) Flattened array
+        const std::vector<double>& rotations, // (N * 9) Flattened array
+        const std::vector<double>& vv_list,   // (N * 3) Flattened array
+        double* x, double* y, double* z,
+        size_t n
+    );
 }
 
 #endif

@@ -1,6 +1,8 @@
 #include "batoid.h"
 #include <limits>
 
+#include <vector>
+#include <cstddef>
 
 namespace batoid {
 
@@ -65,6 +67,54 @@ namespace batoid {
             x[i] = xx;
             y[i] = yy;
             z[i] = zz;
+        }
+    }
+
+    void finishParallelMultiple(
+        const std::vector<double>& origins,  
+        const std::vector<double>& rotations,
+        const std::vector<double>& vv_list,  
+        double* x, double* y, double* z, size_t n
+    ){
+        for (size_t i = 0; i < n; i++) {
+            // Extract direction cosines (each `(x, y, z)` has its own `vv`)
+            double vv0 = vv_list[i * 3], vv1 = vv_list[i * 3 + 1], vv2 = vv_list[i * 3 + 2];
+
+            // Extract corresponding origin
+            double dr0 = origins[i * 3], dr1 = origins[i * 3 + 1], dr2 = origins[i * 3 + 2];
+
+            // Extract corresponding rotation matrix (9 elements)
+            double drot[9] = {
+                rotations[i * 9], rotations[i * 9 + 1], rotations[i * 9 + 2], 
+                rotations[i * 9 + 3], rotations[i * 9 + 4], rotations[i * 9 + 5], 
+                rotations[i * 9 + 6], rotations[i * 9 + 7], rotations[i * 9 + 8]
+            };
+
+            // Compute local velocity components (precomputed to avoid extra calls)
+            double vxlocal = -vv0 * drot[0] - vv1 * drot[3] - vv2 * drot[6];
+            double vylocal = -vv0 * drot[1] - vv1 * drot[4] - vv2 * drot[7];
+            double vzlocal = -vv0 * drot[2] - vv1 * drot[5] - vv2 * drot[8];
+
+            // Process this point (x, y, z)
+            double dx = x[i] - dr0;
+            double dy = y[i] - dr1;
+            double dz = z[i] - dr2;
+
+            // Rotate forward
+            double x_new = dx * drot[0] + dy * drot[3] + dz * drot[6];
+            double y_new = dx * drot[1] + dy * drot[4] + dz * drot[7];
+            double z_new = dx * drot[2] + dy * drot[5] + dz * drot[8];
+
+            // Intersect
+            double dt = -z_new / vzlocal;
+            x_new += dt * vxlocal;
+            y_new += dt * vylocal;
+            z_new += dt * vzlocal;
+
+            // Rotate reverse
+            x[i] = x_new * drot[0] + y_new * drot[1] + z_new * drot[2] + dr0;
+            y[i] = x_new * drot[3] + y_new * drot[4] + z_new * drot[5] + dr1;
+            z[i] = x_new * drot[6] + y_new * drot[7] + z_new * drot[8] + dr2;
         }
     }
 

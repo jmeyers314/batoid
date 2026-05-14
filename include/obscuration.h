@@ -41,6 +41,19 @@ namespace batoid {
         const double _radius, _x0, _y0;
     };
 
+    class ObscEllipse : public Obscuration {
+    public:
+        ObscEllipse(double semi_major, double semi_minor, double x0=0.0, double y0=0.0);
+        ~ObscEllipse();
+
+        bool contains(double x, double y) const override;
+
+        const Obscuration* getDevPtr() const override;
+
+    private:
+        const double _semi_major, _semi_minor, _x0, _y0;
+    };
+
 
     class ObscAnnulus : public Obscuration {
     public:

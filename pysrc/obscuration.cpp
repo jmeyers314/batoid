@@ -18,6 +18,10 @@ namespace batoid {
             .def(py::init<double,double,double>());
 
 
+        py::class_<ObscEllipse, std::shared_ptr<ObscEllipse>, Obscuration>(m, "CPPObscEllipse")
+            .def(py::init<double, double, double, double>());
+
+
         py::class_<ObscAnnulus, std::shared_ptr<ObscAnnulus>, Obscuration>(m, "CPPObscAnnulus")
             .def(py::init<double,double,double,double>());
 
