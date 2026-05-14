@@ -1,0 +1,604 @@
+opticalSystem:
+  type: CompoundOptic
+  name: LSST
+  inMedium: &vacuum 1.0
+  medium: *vacuum
+  backDist: 15.0  # distance from global vertex to use to start tracing rays
+  sphereRadius: 5.0  # reference sphere radius to use for wavefront calculation
+  pupilSize: 8.36  # Pupil fits inside a square with this side length
+  pupilObscuration: 0.612  # Fractional pupil central obscuration
+  stopSurface:
+    type: Interface
+    name: entrancePupil
+    surface:
+      type: Plane
+    coordSys:
+      z: 0.4393899
+  items:
+    -
+      type: Interface
+      name: Sky
+      surface:
+        type: Plane
+      coordSys:
+        z: 10.0
+    -
+      type: Baffle
+      name: CenterCap
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscCircle
+        radius: 1.1
+      coordSys:
+        z: 9.818006 # meters above M1 Vertex
+    -
+      type: Baffle
+      name: CenterPlateAndSpiderTop
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscUnion
+        items:
+          - # CenterPlate1
+            type: ObscRectangle
+            width: 2.8454
+            height: 1.6764
+          - # CenterPlate2
+            type: ObscRectangle
+            width: 1.6764
+            height: 2.8454
+          - # CenterPlate3
+            type: ObscRectangle
+            width: 0.8
+            height: 3.2
+            theta: 0.7853981634
+          - # CenterPlate4
+            type: ObscRectangle
+            width: 0.8
+            height: 3.2
+            theta: -0.7853981634
+          - # Spider1
+            type: ObscRectangle
+            width: 0.05
+            height: 9.6
+            x: 0.
+            y: 0.5656854249
+            theta: 0.7853981634
+          - # Spider1
+            type: ObscRectangle
+            width: 0.05
+            height: 9.6
+            x: 0.
+            y: 0.5656854249
+            theta: 2.3561944902
+          - # Spider2
+            type: ObscRectangle
+            width: 0.05
+            height: 9.6
+            x: 0.
+            y: -0.5656854249
+            theta: 0.7853981634
+          - # Spider2
+            type: ObscRectangle
+            width: 0.05
+            height: 9.6
+            x: 0.
+            y: -0.5656854249
+            theta: 2.3561944902
+      coordSys:
+        z: 8.6180006 # meters above M1 Vertex    -
+    -
+      type: Baffle
+      name: UpperTopEnd
+      surface:
+        type: Plane
+
+      # LTS-213
+      obscuration:
+        type: ObscAnnulus
+        inner: 4.448
+        outer: 4.9
+      coordSys:
+        z: 8.063
+
+      # # AF-173402-13
+      # obscuration:
+      #   type: ObscAnnulus
+      #   inner: 4.43939
+      #   outer: 4.89139
+      # coordSys:
+      #   z: 8.0557
+    -
+      type: Baffle
+      name: LowerTopEnd
+      surface:
+        type: Plane
+
+      # LTS-213
+      obscuration:
+        type: ObscAnnulus
+        inner: 4.423
+        outer: 5.025
+      coordSys:
+        z: 7.263
+
+      # AF-173402-13
+      # obscuration:
+      #   type: ObscAnnulus
+      #   inner: 4.41631
+      #   outer: 5.01831
+      # coordSys:
+      #   z: 7.2441
+    -
+      type: Baffle
+      name: MidLevel
+      surface:
+        type: Plane
+
+      # LTS-213
+      obscuration:
+        type: ObscAnnulus
+        inner: 4.357
+        outer: 5.125
+      coordSys:
+        z: 5.377
+
+      # AF-173402-13
+      # obscuration:
+      #   type: ObscAnnulus
+      #   # inner: 4.350515
+      #   inner: 4.345398  # pessimistic value
+      #   # outer: 5.118515
+      #   outer: 5.113398  # pessimistic value
+      # coordSys:
+      #   # z: 5.3751
+      #   z: 5.3811  # pessimistic value
+    -
+      type: Baffle
+      name: M2Baffle0
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscAnnulus
+        inner: 1.7
+        outer: 1.71
+      coordSys:
+        z: 6.3747
+    -
+      type: Baffle
+      name: M2Baffle1
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscAnnulus
+        inner: 1.734425
+        outer: 1.744425
+      coordSys:
+        z: 6.323565
+    -
+      type: Baffle
+      name: M2Baffle2
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscAnnulus
+        inner: 1.76885
+        outer: 1.77885
+      coordSys:
+        z: 6.27243
+    -
+      type: Baffle
+      name: M2Baffle3
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscAnnulus
+        inner: 1.803275
+        outer: 1.813275
+      coordSys:
+        z: 6.221295
+    -
+      type: Baffle
+      name: M2Baffle4
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscAnnulus
+        inner: 1.8377
+        outer: 1.8477
+      coordSys:
+        z: 6.17016
+    -
+      type: Baffle
+      name: M2Baffle5
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscAnnulus
+        inner: 1.872125
+        outer: 1.882125
+      coordSys:
+        z: 6.119025
+    -
+      type: Baffle
+      name: M2Baffle6
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscAnnulus
+        inner: 1.90655
+        outer: 1.91655
+      coordSys:
+        z: 6.06789
+    -
+      type: Baffle
+      name: M2Baffle7
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscAnnulus
+        inner: 1.940975
+        outer: 1.950975
+      coordSys:
+        z: 6.016755
+    -
+      type: Baffle
+      name: M2Baffle8
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscAnnulus
+        inner: 1.9754
+        outer: 1.9854
+      coordSys:
+        z: 5.96562
+    -
+      type: Baffle
+      name: M2Baffle9
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscAnnulus
+        inner: 2.009825
+        outer: 2.019825
+      coordSys:
+        z: 5.914485
+    -
+      type: Baffle
+      name: M2Baffle10
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscAnnulus
+        inner: 2.04425
+        outer: 2.05425
+      coordSys:
+        z: 5.86335
+    -
+      type: Baffle
+      name: M2Baffle11
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscAnnulus
+        inner: 2.078675
+        outer: 2.088675
+      coordSys:
+        z: 5.812215
+    -
+      type: Baffle
+      name: M2Baffle12
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscAnnulus
+        inner: 2.1131
+        outer: 2.1231
+      coordSys:
+        z: 5.76108
+    -
+      type: Baffle
+      name: M2Baffle13
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscAnnulus
+        inner: 2.147525
+        outer: 2.157525
+      coordSys:
+        z: 5.709945
+    -
+      type: Baffle
+      name: M2Baffle14
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscAnnulus
+        inner: 2.18195
+        outer: 2.19195
+      coordSys:
+        z: 5.65881
+    -
+      type: Baffle
+      name: M2Baffle15
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscAnnulus
+        inner: 2.216375
+        outer: 2.226375
+      coordSys:
+        z: 5.607675
+    -
+      type: Baffle
+      name: M2Baffle16
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscAnnulus
+        inner: 2.2508
+        outer: 2.2608
+      coordSys:
+        z: 5.55654
+    -
+      type: Baffle
+      name: M2Baffle17
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscAnnulus
+        inner: 2.285225
+        outer: 2.295225
+      coordSys:
+        z: 5.505405
+    -
+      type: Baffle
+      name: M2Baffle18
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscAnnulus
+        inner: 2.31965
+        outer: 2.32965
+      coordSys:
+        z: 5.45427
+    -
+      type: Baffle
+      name: M2Baffle19
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscAnnulus
+        inner: 2.354075
+        outer: 2.364075
+      coordSys:
+        z: 5.403135
+    -
+      type: Baffle
+      name: M2Baffle20
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscAnnulus
+        inner: 2.3885
+        outer: 2.3985
+      coordSys:
+        z: 5.352
+    -
+      type: Baffle
+      name: CameraBody
+      parent: LSSTCamera  # physically attached to camera; moves with it under rigid-body ops
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscCircle
+        radius: 0.80469  # = 1.60938/2 m; camera body outer diameter
+      coordSys:
+        z: 3.5019725882045593  # L1_entrance (3.3974725882045593) + 0.1045 m
+    -
+      type: Baffle
+      name: Center
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscAnnulus
+        # inner: 4.286
+        inner: 4.301  # pessimistic value
+        outer: 10.0 # effectively infinite
+      coordSys:
+        # z: 2.893
+        z: 2.878  # pessimistic value
+    -
+      type: Baffle
+      name: M1CaBaffle
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscAnnulus
+        outer: 4.675
+        inner: 4.18
+      coordSys:
+        z: 0.4394
+    -
+      type: Mirror
+      name: M1
+      surface:
+        type: Asphere
+        R: 19.835
+        conic: -1.215
+        coefs: [0.0, -1.381e-9]
+      obscuration:
+        type: ClearAnnulus
+        outer: 4.18
+        inner: 2.558
+    -
+      type: Baffle
+      name: M1CaBaffle2
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscAnnulus
+        inner: 4.185
+        outer: 4.675
+      coordSys:
+        z: 0.4394
+    -
+      type: Mirror
+      name: M2
+      surface:
+        type: Asphere
+        R: 6.788
+        conic: -0.222
+        coefs: [0.0, 1.274e-5, 9.68e-7]
+      obscuration:
+        type: ClearAnnulus
+        outer: 1.71
+        inner: 0.9
+      coordSys:
+        z: 6.1562006
+    -
+      type: Mirror
+      name: M3
+      surface:
+        type: Asphere
+        R: 8.3445
+        conic: 0.155
+        coefs: [0.0, 4.5e-7, 8.15e-9]
+      obscuration:
+        type: ClearAnnulus
+        outer: 2.508
+        inner: 0.55
+      coordSys:
+        z: -0.2338
+    -
+      type: CompoundOptic
+      name: LSSTCamera
+      coordSys:
+        z: 3.3974725882045593
+      items:
+        -
+          type: Lens
+          name: L1
+          medium: &silica
+            type: SellmeierMedium
+            B1: 0.696183020
+            B2: 0.407925877
+            B3: 0.897464057
+            C1: 0.00467926519
+            C2: 0.0135122244
+            C3: 97.9323636
+          items:
+            -
+              type: RefractiveInterface
+              name: L1_entrance
+              surface:
+                type: Sphere
+                R: 2.824
+              obscuration:
+                type: ClearCircle
+                radius: 0.775
+            -
+              type: RefractiveInterface
+              name: L1_exit
+              surface:
+                type: Sphere
+                R: 5.021
+              obscuration:
+                type: ClearCircle
+                radius: 0.775
+              coordSys:
+                z: 0.08223
+        -
+          type: Lens
+          name: L2
+          medium: *silica
+          coordSys:
+            z: 0.49487202
+          items:
+            -
+              type: RefractiveInterface
+              name: L2_entrance
+              surface:
+                type: Plane
+              obscuration:
+                type: ClearCircle
+                radius: 0.551
+            -
+              type: RefractiveInterface
+              name: L2_exit
+              surface:
+                type: Asphere
+                R: 2.529
+                conic: -1.57
+                coefs: [0.0, -0.001656]
+              obscuration:
+                type: ClearCircle
+                radius: 0.551
+              coordSys:
+                z: 0.03
+        -
+          type: Lens
+          name: Filter
+          medium: *silica
+          coordSys:
+            z: 0.87445202
+          items:
+            -
+              type: RefractiveInterface
+              name: Filter_entrance
+              surface:
+                type: Sphere
+                R: 5.632
+              obscuration:
+                type: ClearCircle
+                radius: 0.375
+            -
+              type: RefractiveInterface
+              name: Filter_exit
+              surface:
+                type: Sphere
+                R: 5.606
+              obscuration:
+                type: ClearCircle
+                radius: 0.375
+              coordSys:
+                z: 0.0179
+        -
+          type: Lens
+          name: L3
+          medium: *silica
+          coordSys:
+            z: 0.94345202
+          items:
+            -
+              type: RefractiveInterface
+              name: L3_entrance
+              surface:
+                type: Quadric
+                R: 3.169
+                conic: -0.962
+              obscuration:
+                type: ClearCircle
+                radius: 0.361
+            -
+              type: RefractiveInterface
+              name: L3_exit
+              surface:
+                type: Sphere
+                R: -13.36
+              obscuration:
+                type: ClearCircle
+                radius: 0.361
+              coordSys:
+                z: 0.06
+        -
+          type: Detector
+          name: Detector
+          surface:
+            type: Plane
+          obscuration:
+            type: ClearCircle
+            radius: 0.4
+          coordSys:
+            z: 1.03195202
