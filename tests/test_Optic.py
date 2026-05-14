@@ -672,6 +672,257 @@ def test_optic_radii():
 
 
 
+@timer
+def test_parent_propagation():
+    # Build a minimal telescope with two top-level items where one declares
+    # parent=other, using a hand-constructed CompoundOptic (no YAML needed).
+    mirror = batoid.Mirror(
+        batoid.Paraboloid(R=10.0),
+        name="Mirror",
+        obscuration=batoid.ObscNegation(batoid.ObscAnnulus(0.5, 2.0)),
+    )
+    # A baffle physically attached to the mirror — it should co-move.
+    baffle = batoid.Baffle(
+        batoid.Plane(),
+        name="Rider",
+        obscuration=batoid.ObscCircle(1.0),
+        coordSys=batoid.CoordSys(origin=[0, 0, 1.0]),
+    )
+    baffle.parent = "Mirror"  # declare attachment
+
+    # An independent baffle — must NOT move.
+    bystander = batoid.Baffle(
+        batoid.Plane(),
+        name="Bystander",
+        obscuration=batoid.ObscCircle(0.5),
+        coordSys=batoid.CoordSys(origin=[0, 0, 5.0]),
+    )
+
+    tel = batoid.CompoundOptic(
+        items=[mirror, baffle, bystander],
+        name="Tel",
+        pupilSize=4.0,
+        backDist=10.0,
+        inMedium=batoid.ConstMedium(1.0),
+        stopSurface=mirror,
+    )
+
+    shift = np.array([0.01, -0.02, 0.03])
+
+    # --- global shift ---
+    t2 = tel.withGloballyShiftedOptic("Mirror", shift)
+    np.testing.assert_allclose(
+        t2["Mirror"].coordSys.origin,
+        tel["Mirror"].coordSys.origin + shift,
+    )
+    # Rider follows Mirror
+    np.testing.assert_allclose(
+        t2["Rider"].coordSys.origin,
+        tel["Rider"].coordSys.origin + shift,
+    )
+    # Bystander stays put
+    np.testing.assert_allclose(
+        t2["Bystander"].coordSys.origin,
+        tel["Bystander"].coordSys.origin,
+    )
+
+    # --- local shift (same direction since coordSys is unrotated) ---
+    t3 = tel.withLocallyShiftedOptic("Mirror", shift)
+    np.testing.assert_allclose(
+        t3["Mirror"].coordSys.origin,
+        tel["Mirror"].coordSys.origin + shift,
+    )
+    np.testing.assert_allclose(
+        t3["Rider"].coordSys.origin,
+        tel["Rider"].coordSys.origin + shift,
+    )
+    np.testing.assert_allclose(
+        t3["Bystander"].coordSys.origin,
+        tel["Bystander"].coordSys.origin,
+    )
+
+    # --- shifting the dependent directly does NOT drag the parent ---
+    t4 = tel.withGloballyShiftedOptic("Rider", shift)
+    np.testing.assert_allclose(
+        t4["Rider"].coordSys.origin,
+        tel["Rider"].coordSys.origin + shift,
+    )
+    np.testing.assert_allclose(
+        t4["Mirror"].coordSys.origin,
+        tel["Mirror"].coordSys.origin,  # unchanged
+    )
+
+    # --- global rotation propagates to dependent ---
+    rot = batoid.RotZ(0.1)
+    rot_center = [0, 0, 0]
+    t5 = tel.withGloballyRotatedOptic("Mirror", rot, rot_center)
+    mirror_origin_rot = rot @ tel["Mirror"].coordSys.origin
+    rider_origin_rot = rot @ tel["Rider"].coordSys.origin
+    np.testing.assert_allclose(t5["Mirror"].coordSys.origin, mirror_origin_rot, atol=1e-15)
+    np.testing.assert_allclose(t5["Rider"].coordSys.origin, rider_origin_rot, atol=1e-15)
+    np.testing.assert_allclose(
+        t5["Bystander"].coordSys.origin,
+        tel["Bystander"].coordSys.origin,
+    )
+
+    # --- local rotation propagates to dependent ---
+    t6 = tel.withLocallyRotatedOptic("Mirror", rot, rot_center)
+    np.testing.assert_allclose(t6["Mirror"].coordSys.origin, mirror_origin_rot, atol=1e-15)
+    np.testing.assert_allclose(t6["Rider"].coordSys.origin, rider_origin_rot, atol=1e-15)
+    np.testing.assert_allclose(
+        t6["Bystander"].coordSys.origin,
+        tel["Bystander"].coordSys.origin,
+    )
+
+    # --- cumulative: shift Rider independently, then shift Mirror; both apply ---
+    shift2 = np.array([0.1, 0.0, 0.0])
+    t_cum = tel.withGloballyShiftedOptic("Rider", shift2)
+    t_cum = t_cum.withGloballyShiftedOptic("Mirror", shift)
+    np.testing.assert_allclose(
+        t_cum["Rider"].coordSys.origin,
+        tel["Rider"].coordSys.origin + shift2 + shift,
+    )
+    np.testing.assert_allclose(
+        t_cum["Mirror"].coordSys.origin,
+        tel["Mirror"].coordSys.origin + shift,
+    )
+
+    # --- chained / transitive: C.parent=B, B.parent=A => shifting A moves all ---
+    c = batoid.Baffle(
+        batoid.Plane(), name="C",
+        coordSys=batoid.CoordSys(origin=[0, 0, 2.0]),
+    )
+    c.parent = "Rider"
+    tel2 = batoid.CompoundOptic(
+        items=[mirror, baffle, c, bystander],
+        name="Tel2",
+        pupilSize=4.0,
+        backDist=10.0,
+        inMedium=batoid.ConstMedium(1.0),
+        stopSurface=mirror,
+    )
+    t7 = tel2.withGloballyShiftedOptic("Mirror", shift)
+    np.testing.assert_allclose(
+        t7["Mirror"].coordSys.origin, tel2["Mirror"].coordSys.origin + shift
+    )
+    np.testing.assert_allclose(
+        t7["Rider"].coordSys.origin, tel2["Rider"].coordSys.origin + shift
+    )
+    np.testing.assert_allclose(
+        t7["C"].coordSys.origin, tel2["C"].coordSys.origin + shift
+    )
+    np.testing.assert_allclose(
+        t7["Bystander"].coordSys.origin, tel2["Bystander"].coordSys.origin
+    )
+
+    # --- YAML round-trip: parent attribute survives parse_optic ---
+    import yaml, io
+    yaml_str = """
+opticalSystem:
+  type: CompoundOptic
+  name: Tel
+  pupilSize: 4.0
+  backDist: 10.0
+  items:
+    - type: Mirror
+      name: Mirror
+      surface:
+        type: Paraboloid
+        R: 10.0
+      obscuration:
+        type: ClearAnnulus
+        inner: 0.5
+        outer: 2.0
+    - type: Baffle
+      name: Rider
+      parent: Mirror
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscCircle
+        radius: 1.0
+      coordSys:
+        z: 1.0
+    - type: Detector
+      name: Detector
+      surface:
+        type: Plane
+      coordSys:
+        z: 5.0
+"""
+    config = yaml.safe_load(io.StringIO(yaml_str))
+    parsed = batoid.parse.parse_optic(config['opticalSystem'])
+    assert getattr(parsed['Rider'], 'parent', None) == 'Mirror', \
+        "parent attribute not preserved through YAML round-trip"
+    # And propagation still works on the parsed optic
+    s = np.array([0.0, 0.0, 0.05])
+    tp = parsed.withGloballyShiftedOptic('Mirror', s)
+    np.testing.assert_allclose(
+        tp['Rider'].coordSys.origin,
+        parsed['Rider'].coordSys.origin + s,
+    )
+
+    # --- partially-qualified vs fully-qualified name both trigger propagation ---
+    # "Tel.Mirror" and "Mirror" should both shift Rider
+    t_fq = tel.withGloballyShiftedOptic("Tel.Mirror", shift)
+    t_pq = tel.withGloballyShiftedOptic("Mirror", shift)
+    np.testing.assert_allclose(
+        t_fq["Rider"].coordSys.origin,
+        t_pq["Rider"].coordSys.origin,
+    )
+    np.testing.assert_allclose(
+        t_fq["Rider"].coordSys.origin,
+        tel["Rider"].coordSys.origin + shift,
+    )
+
+    # --- withGlobalShift / withLocalShift (shift whole optic) --- no regression
+    t_gs = tel.withGlobalShift(shift)
+    np.testing.assert_allclose(
+        t_gs["Mirror"].coordSys.origin,
+        tel["Mirror"].coordSys.origin + shift,
+    )
+    np.testing.assert_allclose(
+        t_gs["Rider"].coordSys.origin,
+        tel["Rider"].coordSys.origin + shift,
+    )
+    t_ls = tel.withLocalShift(shift)
+    np.testing.assert_allclose(
+        t_ls["Mirror"].coordSys.origin,
+        tel["Mirror"].coordSys.origin + shift,
+    )
+
+    # --- orphan warning when parent is removed ---
+    import warnings
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        orphaned = tel.withRemovedOptic("Mirror")
+    assert len(w) == 1
+    assert issubclass(w[0].category, UserWarning)
+    assert "orphan" in str(w[0].message).lower()
+    assert "Rider" in str(w[0].message)
+    # Orphaned item still exists but no longer co-moves (parent attribute intact
+    # but no match found — silent, no error)
+    orphaned.withGloballyShiftedOptic("Bystander", shift)  # should not raise
+
+    # --- LSST smoke test: CameraBody loaded from YAML co-moves with LSSTCamera ---
+    lsst = batoid.Optic.fromYaml("LSST_r_baffles_LTS-213.yaml")
+    assert getattr(lsst['CameraBody'], 'parent', None) == 'LSSTCamera'
+    dz = 0.001
+    lsst2 = lsst.withLocallyShiftedOptic('LSSTCamera', [0, 0, dz])
+    np.testing.assert_allclose(
+        lsst2['CameraBody'].coordSys.origin[2],
+        lsst['CameraBody'].coordSys.origin[2] + dz,
+    )
+    np.testing.assert_allclose(
+        lsst2['LSSTCamera'].coordSys.origin[2],
+        lsst['LSSTCamera'].coordSys.origin[2] + dz,
+    )
+    np.testing.assert_allclose(
+        lsst2['M2'].coordSys.origin[2],
+        lsst['M2'].coordSys.origin[2],  # unaffected
+    )
+
+
 if __name__ == '__main__':
     init_gpu()
     test_optic()
@@ -688,6 +939,7 @@ if __name__ == '__main__':
     test_cbp_rotation()
     test_insert()
     test_insert_null_phase()
+    test_parent_propagation()
     test_insert_middle()
     test_remove_nested()
     test_optic_radii()
