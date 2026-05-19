@@ -36,12 +36,32 @@ class CMakeBuild(build_ext):
             "-DPYTHON_EXECUTABLE=" + sys.executable,
         ]
 
+        # Make pybind11 discoverable in PEP 517 isolated builds, where
+        # CMake's normal find_package would not see the temporary site
+        # packages.  ``python -m pybind11 --cmakedir`` returns the
+        # directory shipped with the pybind11 wheel.
+        try:
+            import pybind11
+            cmake_args.append("-Dpybind11_DIR=" + pybind11.get_cmake_dir())
+        except (ImportError, AttributeError):
+            pass
+
         cfg = "Debug" if self.debug else "RelWithDebInfo"
         build_args = ["--config", cfg]
 
         cmake_args += ["-DCMAKE_BUILD_TYPE=" + cfg]
+        # Hand parallelism to ``cmake --build --parallel`` instead of
+        # forwarding ``-j8`` to the underlying tool: MSBuild rejects
+        # ``-j8`` outright (it expects ``/m`` or ``-maxCpuCount``), while
+        # Make/Ninja are happy with the CMake-level flag.  ``--parallel``
+        # picks up CMAKE_BUILD_PARALLEL_LEVEL when set, or defaults to a
+        # generator-appropriate count.
         if "TF_BUILD" not in env:
-            build_args += ["--", "-j8"]
+            jobs = os.environ.get("CMAKE_BUILD_PARALLEL_LEVEL")
+            if jobs:
+                build_args += ["--parallel", str(jobs)]
+            else:
+                build_args += ["--parallel"]
 
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
