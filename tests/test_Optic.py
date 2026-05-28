@@ -875,6 +875,29 @@ opticalSystem:
         tel["Rider"].coordSys.origin + shift,
     )
 
+    # --- fully-qualified parent name (e.g. "Tel.Mirror") should also work ---
+    # Regression: parent stored as "Tel.Mirror" must co-move just like "Mirror".
+    baffle_fq = batoid.Baffle(
+        batoid.Plane(),
+        name="RiderFQ",
+        obscuration=batoid.ObscCircle(1.0),
+        coordSys=batoid.CoordSys(origin=[0, 0, 1.0]),
+    )
+    baffle_fq.parent = "Tel.Mirror"  # fully-qualified name
+    tel_fq = batoid.CompoundOptic(
+        items=[mirror, baffle_fq, bystander],
+        name="Tel",
+        pupilSize=4.0,
+        backDist=10.0,
+        inMedium=batoid.ConstMedium(1.0),
+        stopSurface=mirror,
+    )
+    t_fq2 = tel_fq.withGloballyShiftedOptic("Mirror", shift)
+    np.testing.assert_allclose(
+        t_fq2["RiderFQ"].coordSys.origin,
+        tel_fq["RiderFQ"].coordSys.origin + shift,
+    )
+
     # --- withGlobalShift / withLocalShift (shift whole optic) --- no regression
     t_gs = tel.withGlobalShift(shift)
     np.testing.assert_allclose(
@@ -903,6 +926,30 @@ opticalSystem:
     # Orphaned item still exists but no longer co-moves (parent attribute intact
     # but no match found — silent, no error)
     orphaned.withGloballyShiftedOptic("Bystander", shift)  # should not raise
+
+    # --- orphan warning also fires when parent attribute is fully-qualified ---
+    baffle_fq_orphan = batoid.Baffle(
+        batoid.Plane(),
+        name="RiderFQOrphan",
+        obscuration=batoid.ObscCircle(1.0),
+        coordSys=batoid.CoordSys(origin=[0, 0, 1.0]),
+    )
+    baffle_fq_orphan.parent = "Tel.Mirror"  # fully-qualified name
+    tel_fq_orphan = batoid.CompoundOptic(
+        items=[mirror, baffle_fq_orphan, bystander],
+        name="Tel",
+        pupilSize=4.0,
+        backDist=10.0,
+        inMedium=batoid.ConstMedium(1.0),
+        stopSurface=mirror,
+    )
+    with warnings.catch_warnings(record=True) as w2:
+        warnings.simplefilter("always")
+        tel_fq_orphan.withRemovedOptic("Mirror")
+    assert len(w2) == 1
+    assert issubclass(w2[0].category, UserWarning)
+    assert "orphan" in str(w2[0].message).lower()
+    assert "RiderFQOrphan" in str(w2[0].message)
 
     # --- LSST smoke test: CameraBody loaded from YAML co-moves with LSSTCamera ---
     lsst = batoid.Optic.fromYaml("LSST_r_baffles_LTS-213.yaml")

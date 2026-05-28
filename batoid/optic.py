@@ -1449,8 +1449,12 @@ class CompoundOptic(Optic):
                 newItems.extend(self.items[i+1:])
                 result = self.__class__(newItems, **newDict)
                 # Propagate to siblings declared as dependents of this item.
+                # Normalize dep.parent through _names so both short names
+                # ("Mirror") and fully-qualified names ("Tel.Mirror") match.
+                fq_name = self.name + "." + name
                 for dep in self.items:
-                    if getattr(dep, 'parent', None) == name:
+                    dep_parent = getattr(dep, 'parent', None)
+                    if dep_parent is not None and self._names.get(dep_parent, dep_parent) == fq_name:
                         result = result.withGloballyShiftedOptic(dep.name, shift)
                 return result
             newItems.append(item)
@@ -1622,8 +1626,10 @@ class CompoundOptic(Optic):
                 newItems.extend(self.items[i+1:])
                 result = self.__class__(newItems, **newDict)
                 # Propagate to siblings declared as dependents of this item.
+                fq_name = self.name + "." + name
                 for dep in self.items:
-                    if getattr(dep, 'parent', None) == name:
+                    dep_parent = getattr(dep, 'parent', None)
+                    if dep_parent is not None and self._names.get(dep_parent, dep_parent) == fq_name:
                         result = result.withLocallyRotatedOptic(
                             dep.name, rot, rotCenter, coordSys
                         )
@@ -1691,8 +1697,10 @@ class CompoundOptic(Optic):
                 newItems.extend(self.items[i+1:])
                 result = self.__class__(newItems, **newDict)
                 # Propagate to siblings declared as dependents of this item.
+                fq_name = self.name + "." + name
                 for dep in self.items:
-                    if getattr(dep, 'parent', None) == name:
+                    dep_parent = getattr(dep, 'parent', None)
+                    if dep_parent is not None and self._names.get(dep_parent, dep_parent) == fq_name:
                         result = result.withGloballyRotatedOptic(
                             dep.name, rot, rotCenter, coordSys
                         )
@@ -1836,8 +1844,10 @@ class CompoundOptic(Optic):
                 else:
                     newItems.append(it)
         # Warn about any remaining items whose parent was just removed.
+        # Normalize dep.parent so both short and fully-qualified names match.
         for it in newItems:
-            if getattr(it, 'parent', None) == removedShortName:
+            dep_parent = getattr(it, 'parent', None)
+            if dep_parent is not None and self._names.get(dep_parent, dep_parent) == item:
                 warnings.warn(
                     f"Optic '{it.name}' has parent='{removedShortName}' which "
                     f"was just removed; '{it.name}' is now an orphan and will "
