@@ -97,3 +97,5 @@ ENV/
 *.pdf
 .vscode
 pytest_session.txt
+
+CLAUDE.md
