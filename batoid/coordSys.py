@@ -61,6 +61,23 @@ class CoordSys:
         """
         return self.rot[:, 2]
 
+    def euler(self):
+        """Return (rotX, rotY, rotZ) Euler angles in radians.
+
+        Angles follow the intrinsic XYZ Tait-Bryan convention used by
+        parse_coordSys: R = RotX(rx) @ RotY(ry) @ RotZ(rz).
+
+        Returns
+        -------
+        rx, ry, rz : float
+            Rotation angles in radians about the local X, Y, Z axes.
+        """
+        R = self.rot
+        ry = np.arcsin(R[0, 2])
+        rx = np.arctan2(-R[1, 2], R[2, 2])
+        rz = np.arctan2(-R[0, 1], R[0, 0])
+        return rx, ry, rz
+
     def shiftGlobal(self, dr):
         """Return new CoordSys with origin shifted along global axes.
 

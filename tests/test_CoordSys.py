@@ -377,6 +377,51 @@ def test_ne():
     all_obj_diff(objs)
 
 
+@timer
+def test_euler():
+    # Identity CoordSys should give zero angles
+    rx, ry, rz = batoid.CoordSys().euler()
+    np.testing.assert_allclose([rx, ry, rz], [0, 0, 0], atol=1e-15)
+
+    # Single-axis rotations: the other two angles should be zero
+    for angle in [0.1, -0.3, 1.2]:
+        rx, ry, rz = batoid.CoordSys(rot=batoid.RotX(angle)).euler()
+        np.testing.assert_allclose(rx, angle, atol=1e-15)
+        np.testing.assert_allclose([ry, rz], [0, 0], atol=1e-15)
+
+        rx, ry, rz = batoid.CoordSys(rot=batoid.RotY(angle)).euler()
+        np.testing.assert_allclose(ry, angle, atol=1e-15)
+        np.testing.assert_allclose([rx, rz], [0, 0], atol=1e-15)
+
+        rx, ry, rz = batoid.CoordSys(rot=batoid.RotZ(angle)).euler()
+        np.testing.assert_allclose(rz, angle, atol=1e-15)
+        np.testing.assert_allclose([rx, ry], [0, 0], atol=1e-15)
+
+    # Round-trip: random angles, avoid gimbal lock (|ry| < pi/2)
+    rng = np.random.default_rng(42)
+    for _ in range(50):
+        origin = rng.uniform(-1, 1, size=3)
+        # Keep ry well away from ±pi/2
+        rx0 = rng.uniform(-1.5, 1.5)
+        ry0 = rng.uniform(-1.4, 1.4)
+        rz0 = rng.uniform(-1.5, 1.5)
+        rot = batoid.RotX(rx0) @ batoid.RotY(ry0) @ batoid.RotZ(rz0)
+        cs = batoid.CoordSys(origin, rot)
+        rx1, ry1, rz1 = cs.euler()
+        np.testing.assert_allclose([rx1, ry1, rz1], [rx0, ry0, rz0], atol=1e-13)
+
+    # Round-trip consistency with parse_coordSys
+    from batoid.parse import parse_coordSys
+    for _ in range(20):
+        rx0 = rng.uniform(-0.01, 0.01)  # small angles as in real LSST YAMLs
+        ry0 = rng.uniform(-0.01, 0.01)
+        rz0 = rng.uniform(-0.01, 0.01)
+        cs1 = parse_coordSys({'rotX': rx0, 'rotY': ry0, 'rotZ': rz0})
+        rx1, ry1, rz1 = cs1.euler()
+        cs2 = parse_coordSys({'rotX': rx1, 'rotY': ry1, 'rotZ': rz1})
+        np.testing.assert_allclose(cs1.rot, cs2.rot, atol=1e-15)
+
+
 if __name__ == '__main__':
     test_rot_matrix()
     test_params()
@@ -385,3 +430,4 @@ if __name__ == '__main__':
     test_rotate()
     test_combinations()
     test_ne()
+    test_euler()
