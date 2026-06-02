@@ -387,17 +387,6 @@ opticalSystem:
         z: 5.352
     -
       type: Baffle
-      name: CameraBody
-      parent: LSSTCamera  # physically attached to camera; moves with it under rigid-body ops
-      surface:
-        type: Plane
-      obscuration:
-        type: ObscCircle
-        radius: 0.80469  # = 1.60938/2 m; camera body outer diameter
-      coordSys:
-        z: 3.5019725882045593  # L1_entrance (3.3974725882045593) + 0.1045 m
-    -
-      type: Baffle
       name: Center
       surface:
         type: Plane
@@ -457,6 +446,17 @@ opticalSystem:
         inner: 0.9
       coordSys:
         z: 6.1562006
+    -
+      type: Baffle
+      name: CameraBody
+      parent: LSSTCamera  # physically attached to camera; moves with it under rigid-body ops
+      surface:
+        type: Plane
+      obscuration:
+        type: ObscCircle
+        radius: 0.80469  # = 1.60938/2 m; camera body outer diameter
+      coordSys:
+        z: 3.5019725882045593  # L1_entrance (3.3974725882045593) + 0.1045 m
     -
       type: Mirror
       name: M3
