@@ -1,0 +1,18 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      # Kept separate: a cibuildwheel major bump changes wheel build behavior
+      # and needs a manual workflow_dispatch run to validate, so it shouldn't
+      # ride along with routine action bumps.
+      cibuildwheel:
+        patterns:
+          - "pypa/cibuildwheel"
+      actions:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "pypa/cibuildwheel"
