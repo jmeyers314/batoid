@@ -112,7 +112,10 @@ jobs:
 
   build_macosx_arm_wheels:
     name: MacOS ARM
-    runs-on: macos-latest
+    # Pinned rather than macos-latest: on macos-26 runners the Homebrew llvm
+    # bottle ships a libomp.dylib with a minimum target of 26.0, which delocate
+    # refuses to vendor into a macosx_15_0 wheel.
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v7
         with:
