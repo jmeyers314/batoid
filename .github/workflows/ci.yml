@@ -12,6 +12,13 @@ on:
       - releases/*
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -43,7 +50,7 @@ jobs:
             CXX: g++
             experimental: true
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 2
 
@@ -58,7 +65,7 @@ jobs:
           echo 'event.after: ${{ github.event.after }}'
 
       - name: Set up Python ${{ matrix.py }}
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.py }}
           cache: 'pip'
@@ -74,7 +81,7 @@ jobs:
       - name: Cache Homebrew packages
         id: cache-brew
         if: matrix.os == 'macos-latest'
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             /opt/homebrew/Cellar/fftw
@@ -119,7 +126,7 @@ jobs:
         run: pytest --cov=batoid --cov-report=xml --cov-config tests/.coveragerc --skip_gha --durations=8 -ra
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true

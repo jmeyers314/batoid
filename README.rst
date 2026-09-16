@@ -1,6 +1,6 @@
-.. image:: https://github.com/jmeyers314/batoid/workflows/batoid%20CI/badge.svg
-        :target: https://github.com/jmeyers314/batoid/workflows/batoid%20CI/badge.svg
-.. image:: https://codecov.io/gh/jmeyers314/batoid/branch/master/graph/badge.svg
+.. image:: https://github.com/jmeyers314/batoid/actions/workflows/ci.yml/badge.svg?branch=main
+        :target: https://github.com/jmeyers314/batoid/actions/workflows/ci.yml
+.. image:: https://codecov.io/gh/jmeyers314/batoid/branch/main/graph/badge.svg
         :target: https://codecov.io/gh/jmeyers314/batoid
 
 
@@ -17,7 +17,7 @@ https://jmeyers314.github.io/batoid/overview.html
 Requirements
 ============
 
-Batoid is known to work on MacOS and linux, using Python version 3.9+, and
+Batoid is known to work on MacOS and linux, using Python version 3.10+, and
 either the clang or gcc compiler with support for c++14.
 
 Installation
@@ -29,7 +29,7 @@ PyPI
 Released versions of batoid are available on pypi as both wheels and source
 distributions.  To compile from source, you will need a c++14 compiler available and
 placed such that that setup.py can find it.  This should hopefully be the case on most
-*nix systems, in which case, the following ought to work::
+\*nix systems, in which case, the following ought to work::
 
     pip install batoid
 
