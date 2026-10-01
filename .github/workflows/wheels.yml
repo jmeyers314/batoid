@@ -19,7 +19,7 @@ jobs:
           fetch-depth: 0
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v3.3.1
+        uses: pypa/cibuildwheel@v4.2.1
         env:
           CIBW_ARCHS: "x86_64"
           CIBW_BUILD: "*manylinux*"
@@ -43,7 +43,7 @@ jobs:
           fetch-depth: 0
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v3.3.1
+        uses: pypa/cibuildwheel@v4.2.1
         env:
           CIBW_ARCHS: "x86_64"
           CIBW_BUILD: "*musllinux*"
@@ -75,7 +75,7 @@ jobs:
         run: brew install llvm libomp fftw eigen
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v3.3.1
+        uses: pypa/cibuildwheel@v4.2.1
         env:
           CIBW_ARCHS: "x86_64"
           CIBW_BUILD: "*macosx*"
@@ -113,7 +113,7 @@ jobs:
         run: brew install llvm libomp fftw eigen
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v3.3.1
+        uses: pypa/cibuildwheel@v4.2.1
         env:
           CIBW_ARCHS: "arm64"
           CIBW_BUILD: "*macosx*"
