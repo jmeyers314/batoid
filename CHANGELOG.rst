@@ -1,3 +1,21 @@
+Changes from v0.9 to v0.10
+==========================
+
+
+New Features
+------------
+- Added ``method``, ``weights``, ``irradiance``, and ``eps`` arguments to
+  `huygensPSF`.  ``method='nufft'`` evaluates the Huygens sum at all output
+  points at once with a type-1 non-uniform FFT (requires the optional
+  ``finufft`` package) and works for any output lattice.  For the default
+  lattice this is 1.5e3 (``nx=256``) to 1.7e4 (``nx=1024``) times faster than
+  the per-point sum, with the gain growing with ``nx``.
+  ``weights='debye'`` applies the energy-conserving Debye-Wolf ray weight
+  sqrt(dOmega/d^2u), and ``irradiance='flux'`` returns the energy flux through
+  the detector plane; together these are accurate for optics that violate
+  the sine condition.  Defaults reproduce the previous behavior.
+
+
 Changes from v0.8 to v0.9
 =========================
 

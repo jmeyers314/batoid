@@ -6,3 +6,4 @@ pytest-astropy
 nbformat
 nbclient
 ipyvolume
+finufft
