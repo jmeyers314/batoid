@@ -1,5 +1,6 @@
 import numpy as np
 import galsim
+import pytest
 import batoid
 from test_helpers import timer, init_gpu
 
@@ -192,6 +193,123 @@ def test_huygensPSF():
         # nring=10
     )
     assert np.array_equal(psf1.primitiveVectors, psf5.primitiveVectors)
+
+
+@timer
+def test_huygensPSF_nufft():
+    pytest.importorskip("finufft")
+    telescope = batoid.Optic.fromYaml("LSST_r.yaml")
+    theta = np.deg2rad(0.1)
+
+    # Default (fftPSF) lattice, coarse square lattice with |k.dx| >> pi, and a
+    # non-orthogonal lattice.
+    lattices = [
+        dict(),
+        dict(dx=10e-6, nxOut=32),
+        dict(dx=[3e-6, 1e-6], dy=[-1e-6, 4e-6], nxOut=24),
+    ]
+    options = [
+        dict(),
+        dict(weights='debye'),
+        dict(irradiance='flux'),
+        dict(weights='debye', irradiance='flux'),
+    ]
+    for lattice in lattices:
+        for option in options:
+            psf1 = batoid.huygensPSF(
+                telescope, theta, theta, 620e-9,
+                nx=32, reference='mean', **lattice, **option
+            )
+            psf2 = batoid.huygensPSF(
+                telescope, theta, theta, 620e-9,
+                nx=32, reference='mean', method='nufft', **lattice, **option
+            )
+            assert np.array_equal(psf1.primitiveVectors, psf2.primitiveVectors)
+            np.testing.assert_allclose(
+                psf1.array, psf2.array,
+                rtol=0, atol=1e-9*np.max(psf1.array)
+            )
+
+    with np.testing.assert_raises(ValueError):
+        batoid.huygensPSF(telescope, 0.0, 0.0, 620e-9, nx=32, method='fft')
+    with np.testing.assert_raises(ValueError):
+        batoid.huygensPSF(telescope, 0.0, 0.0, 620e-9, nx=32, weights='x')
+    with np.testing.assert_raises(ValueError):
+        batoid.huygensPSF(telescope, 0.0, 0.0, 620e-9, nx=32, irradiance='x')
+
+
+def _paraboloidDebyeIrradiance(r, wavelength, focalLength, diam, obscuration,
+                               defocus):
+    """Scalar Debye energy flux through the detector plane for a defocused
+    annular paraboloid on axis, from the 1D Bessel integral over pupil radius.
+    """
+    from scipy.special import j0
+    xg, wg = np.polynomial.legendre.leggauss(32)
+    edges = np.linspace(0.5*obscuration*diam, 0.5*diam, 401)
+    half = 0.5*np.diff(edges)
+    mid = 0.5*(edges[1:] + edges[:-1])
+    h = (mid[:, None] + half[:, None]*xg).ravel()
+    gw = (half[:, None]*wg).ravel()
+    theta = 2*np.arctan(h/(2*focalLength))
+    k = 2*np.pi/wavelength
+    # Debye weight sqrt(dOmega/d^2u) = cos^2(theta/2)/f for a paraboloid
+    base = np.cos(theta/2)**2*np.exp(1j*k*defocus*np.cos(theta))*h*gw
+    J = j0(k*np.outer(r, np.sin(theta)))
+    U = J @ base
+    V = J @ (base*np.cos(theta))
+    return np.real(np.conj(U)*V)
+
+
+@timer
+def test_huygens_debye_paraboloid():
+    pytest.importorskip("finufft")
+    # A fast paraboloid violates the sine condition, so the Debye weights
+    # matter.  Compare a defocused image to the semi-analytic Debye integral.
+    wavelength = 500e-9
+    focalLength = 0.12
+    diam = 0.1
+    obscuration = 0.5
+    defocus = 50e-6
+    telescope = batoid.CompoundOptic(
+        items = [
+            batoid.Mirror(
+                batoid.Paraboloid(2*focalLength),
+                name="Mirror",
+                obscuration=batoid.ObscNegation(
+                    batoid.ObscAnnulus(0.5*obscuration*diam, 0.5*diam)
+                )
+            ),
+            batoid.Detector(
+                batoid.Plane(),
+                name="detector",
+                coordSys=batoid.CoordSys(origin=[0, 0, focalLength+defocus])
+            )
+        ],
+        pupilSize=diam,
+        backDist=1.0,
+        inMedium=batoid.ConstMedium(1.0)
+    )
+
+    rms = {}
+    for weights, irradiance in [('debye', 'flux'), ('unit', 'intensity')]:
+        psf = batoid.huygensPSF(
+            telescope, 0.0, 0.0, wavelength,
+            nx=512, nxOut=128, dx=0.5e-6,
+            method='nufft', weights=weights, irradiance=irradiance
+        )
+        r = np.hypot(psf.coords[..., 0], psf.coords[..., 1]).T
+        ref = _paraboloidDebyeIrradiance(
+            r.ravel(), wavelength, focalLength, diam, obscuration, defocus
+        ).reshape(r.shape)
+        ref /= np.sum(ref)
+        arr = psf.array/np.sum(psf.array)
+        rms[weights] = np.sqrt(np.mean((arr - ref)**2))/np.max(ref)
+        print(f"{weights} weights: rms residual / peak = {rms[weights]:.2e}")
+
+    # Debye-weighted residual is pupil-sampling limited (1.8e-3 at nx=512,
+    # 4.9e-3 at nx=256); unit weights leave a systematic ~9e-3.
+    assert rms['debye'] < 3e-3
+    assert rms['unit'] > 2*rms['debye']
 
 
 @timer
@@ -548,6 +666,8 @@ if __name__ == '__main__':
     init_gpu()
     test_zernikeGQ()
     test_huygensPSF()
+    test_huygensPSF_nufft()
+    test_huygens_debye_paraboloid()
     test_doubleZernike()
     test_huygens_paraboloid(args.plot)
     test_transverse_aberrations()

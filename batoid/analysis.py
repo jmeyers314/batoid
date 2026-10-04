@@ -199,7 +199,8 @@ def huygensPSF(
     optic, theta_x, theta_y, wavelength,
     projection='postel', nx=None, dx=None, dy=None,
     nxOut=None, reference='chief',
-    ring_radius=None, nring=100
+    ring_radius=None, nring=100,
+    method='direct', weights='unit', irradiance='intensity', eps=1e-10
 ):
     r"""Compute a PSF via the Huygens construction.
 
@@ -232,6 +233,25 @@ def huygensPSF(
     nring : int, optional
         If `reference` is 'ring', then this is the number of rays to use in the
         ring of rays to use for centering the output lattice.  Default: 100.
+    method : {'direct', 'nufft'}
+        If 'direct', then sum the ray amplitudes separately at each output
+        point with `RayVector.sumAmplitude`.  If 'nufft', then evaluate the
+        same sum at all output points at once with a type-1 non-uniform FFT
+        (requires the ``finufft`` package).  The two agree to roughly `eps`.
+        Default: 'direct'.
+    weights : {'unit', 'debye'}
+        If 'unit', then each ray contributes with amplitude equal to its flux.
+        If 'debye', then each ray's amplitude is additionally weighted by
+        sqrt(dOmega/d^2u), the energy-conserving Debye-Wolf weight for rays
+        that uniformly sample the entrance pupil.  See Notes.  Default: 'unit'.
+    irradiance : {'intensity', 'flux'}
+        If 'intensity', then return :math:`|U|^2`.  If 'flux', then return the
+        energy flux through the detector plane, :math:`\mathrm{Re}(U^* V)`,
+        where :math:`V` is the same sum with each ray additionally weighted by
+        its direction cosine along the detector normal.  Default: 'intensity'.
+    eps : float, optional
+        Relative tolerance of the non-uniform FFT.  Only used if `method` is
+        'nufft'.  Default: 1e-10.
 
     Returns
     -------
@@ -259,8 +279,45 @@ def huygensPSF(
     lattice with primitive vectors ``[dx, 0]`` and ``[0, dy]`` will be used.
     If ``dx`` and ``dy`` are 2-vectors, then those will be the primitive
     vectors of the output lattice.
+
+    Each term of the sum is a plane wave, with the phase of the ray at its
+    intersection with the focal plane.  This phase is constant along the ray,
+    so the sum is a discretization of the Debye integral
+
+    .. math::
+
+        U(x) = \int a(\hat{k}) \exp(i \Phi(\hat{k})) \exp(i k \cdot x)
+               d\Omega
+
+    It includes the full traced aberrations and defocus, without a paraxial
+    approximation.  ``fftPSF`` evaluates the same sum with two approximations:
+    a linear map from pupil position to ray direction (`dkdu`), and phases
+    measured on a reference sphere of finite radius.
+
+    On an output lattice :math:`x = x_0 + m a_1 + n a_2`, the sum is
+    :math:`\sum_u c_u \exp(i [m (k_u \cdot a_1) + n (k_u \cdot a_2)])`, a
+    type-1 non-uniform FFT in the frequencies :math:`k_u \cdot a_1` and
+    :math:`k_u \cdot a_2`.  Since :math:`m` and :math:`n` are integers, these
+    frequencies can be wrapped into :math:`[-\pi, \pi)` without changing the
+    result, so ``method='nufft'`` works for any output lattice.
+
+    Energy conservation in the Debye integral requires :math:`|a|^2 d\Omega
+    \propto d^2u`, so a ray sampling pupil area :math:`d^2u` carries weight
+    :math:`\sqrt{d\Omega/d^2u}`, computed here by finite differences of the
+    ray direction cosines over the pupil grid.  For an optic obeying the Abbe
+    sine condition this weight cancels against the direction cosine of the
+    flux projection, and the default unit weights are correct.  For optics
+    that violate it (e.g., a fast paraboloid), use ``weights='debye'`` and
+    ``irradiance='flux'``.
     """
     from numbers import Real
+
+    if method not in ('direct', 'nufft'):
+        raise ValueError(f"Unknown method {method!r}")
+    if weights not in ('unit', 'debye'):
+        raise ValueError(f"Unknown weights {weights!r}")
+    if irradiance not in ('intensity', 'flux'):
+        raise ValueError(f"Unknown irradiance {irradiance!r}")
 
     if dx is None:
         if (nx%2) == 0:
@@ -328,10 +385,84 @@ def huygensPSF(
 
     points = np.concatenate([aux[..., None] for aux in (xs, ys, zs)], axis=-1)
     time = rays.t[0]
-    for idx in np.ndindex(amplitudes.shape):
-        amplitudes[idx] = rays.sumAmplitude(points[idx], time)
-    out.array = np.abs(amplitudes)**2
+
+    flux = rays.flux
+    if weights == 'debye':
+        flux = flux*_debyeWeights(rays, nx)
+    fluxes = [flux]
+    if irradiance == 'flux':
+        gamma = np.abs(rays.vz)/np.sqrt(rays.vx**2 + rays.vy**2 + rays.vz**2)
+        fluxes.append(flux*gamma)
+
+    sums = []
+    for i, f in enumerate(fluxes):
+        if method == 'direct':
+            rv = rays
+            if i > 0 or weights == 'debye':
+                rv = batoid.RayVector(
+                    rays.x, rays.y, rays.z, rays.vx, rays.vy, rays.vz,
+                    rays.t, rays.wavelength, f, rays.vignetted, rays.failed,
+                    rays.coordSys
+                )
+            amplitudes = np.zeros(amplitudes.shape, dtype=np.complex128)
+            for idx in np.ndindex(amplitudes.shape):
+                amplitudes[idx] = rv.sumAmplitude(points[idx], time)
+        else:
+            origin = np.array([point[0], point[1], 0.0])
+            amplitudes = _huygensNUFFT(
+                rays, f, origin, primitiveX, amplitudes.shape, time, eps
+            )
+        sums.append(amplitudes)
+
+    if irradiance == 'flux':
+        out.array = np.real(np.conj(sums[0])*sums[1])
+    else:
+        out.array = np.abs(sums[0])**2
     return out
+
+
+def _debyeWeights(rays, nx):
+    """Debye-Wolf amplitude weight sqrt(dOmega/d^2u) for each ray of an
+    nx x nx entrance pupil grid, normalized to unit mean over unvignetted rays.
+    """
+    vnorm = np.sqrt(rays.vx**2 + rays.vy**2 + rays.vz**2)
+    alpha = (rays.vx/vnorm).reshape(nx, nx)
+    beta = (rays.vy/vnorm).reshape(nx, nx)
+    gamma = np.abs(rays.vz/vnorm)
+    da0, da1 = np.gradient(alpha)
+    db0, db1 = np.gradient(beta)
+    # dOmega = dalpha dbeta / gamma
+    weight = np.sqrt(np.abs(da0*db1 - da1*db0).ravel()/gamma)
+    w = ~rays.vignetted & ~rays.failed & np.isfinite(weight)
+    weight = np.where(np.isfinite(weight), weight, 0.0)
+    return weight/np.mean(weight[w])
+
+
+def _huygensNUFFT(rays, flux, origin, primitiveX, shape, time, eps):
+    """Sum ray amplitudes on the lattice origin + i*primitiveX[0] +
+    j*primitiveX[1] with a type-1 non-uniform FFT.  Same phase convention as
+    RayVector.sumAmplitude.  Returns amplitudes in [j, i] order, as
+    huygensPSF.
+    """
+    try:
+        import finufft
+    except ImportError:
+        raise ImportError(
+            "huygensPSF with method='nufft' requires the finufft package"
+        )
+    w = ~rays.vignetted & ~rays.failed
+    v = np.stack([rays.vx[w], rays.vy[w], rays.vz[w]], axis=-1)
+    r = np.stack([rays.x[w], rays.y[w], rays.z[w]], axis=-1)
+    wavelength = rays.wavelength[w]
+    k = 2*np.pi*v/(wavelength*np.sum(v*v, axis=-1))[:, None]
+    phase = np.sum(k*(origin - r), axis=-1)
+    phase -= 2*np.pi*(time - rays.t[w])/wavelength
+    c = flux[w]*np.exp(1j*phase)
+    # Lattice indices are integers, so the frequencies can be wrapped.
+    f1 = np.mod(k[:, :2] @ primitiveX[0] + np.pi, 2*np.pi) - np.pi
+    f2 = np.mod(k[:, :2] @ primitiveX[1] + np.pi, 2*np.pi) - np.pi
+    amplitudes = finufft.nufft2d1(f1, f2, c, shape, eps=eps, isign=1)
+    return amplitudes.T
 
 
 def wavefront(
